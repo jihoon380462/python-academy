@@ -256,3 +256,4 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 img.aimg{display:inline-block;vertical-align:middle;object-fit:contain}img.aimg.hc-icon{width:48px;height:48px;margin:-4px 0}img.aimg.boss-img{width:56px;height:56px;margin:0}.bosshp.dead img.aimg{filter:grayscale(1) opacity(.5)}
 img.aimg.node-img{width:40px;height:40px}.node.done img.aimg.node-img{filter:grayscale(1) opacity(.6)}
 .hub-hero{margin:4px 0 12px;text-align:center}.hub-hero img.hero-img{width:100%;max-width:960px;height:auto;display:block;margin:0 auto}img.aimg.badge-img{width:56px;height:56px}.badge.no img.aimg.badge-img{filter:grayscale(1) opacity(.45)}img.aimg.empty-img{width:140px;height:140px;display:block;margin:0 auto 8px}
+img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none}
