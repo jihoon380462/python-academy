@@ -11,7 +11,23 @@ concurrency:
   group: pages
   cancel-in-progress: false
 jobs:
+  verify:
+    # 배포 전 게이트: 콘텐츠 스키마 검사 + 모든 정답 코드 CPython 실행. 하나라도 실패하면 배포하지 않는다.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: validate_content
+        run: node tools/validate_content.mjs
+      - name: run_solutions
+        run: node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
   deploy:
+    needs: verify
     runs-on: ubuntu-latest
     environment:
       name: github-pages

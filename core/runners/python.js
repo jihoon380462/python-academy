@@ -1,0 +1,288 @@
+// core/runners/python.js — Pyodide 워커(Py)·파이썬 프렐류드·거북이 캔버스(TurtleView)
+// ---------- Pyodide 워커 ----------
+const PY_PRELUDE = String.raw`
+import sys, json, math, types, traceback
+class _PAStop(Exception): pass
+class _PATurtle:
+    def __init__(s): s.reset()
+    def reset(s):
+        s.x=0.0; s.y=0.0; s.h=0.0; s.pen=True; s.col='#2bb673'; s.w=2; s.spd=6
+        s.cmds=[]; s.segs=[]; s.filling=False; s.fillpts=[]; s.used=False
+_pt=_PATurtle()
+def _pa_turtle_module():
+    m=types.ModuleType('turtle')
+    def _mv(nx,ny):
+        if _pt.pen: _pt.segs.append([round(_pt.x,2),round(_pt.y,2),round(nx,2),round(ny,2)])
+        if len(_pt.cmds)<20000: _pt.cmds.append(['move',round(nx,2),round(ny,2),_pt.pen,_pt.col,_pt.w])
+        if _pt.filling: _pt.fillpts.append([round(nx,2),round(ny,2)])
+        _pt.x=nx; _pt.y=ny
+    def forward(d):
+        _pt.used=True; d=float(d); r=math.radians(_pt.h)
+        _mv(_pt.x+math.cos(r)*d, _pt.y+math.sin(r)*d)
+    def backward(d): forward(-float(d))
+    def left(a):
+        _pt.used=True; _pt.h=(_pt.h+float(a))%360
+        if len(_pt.cmds)<20000: _pt.cmds.append(['turn',round(_pt.h,2)])
+    def right(a): left(-float(a))
+    def penup(): _pt.pen=False
+    def pendown(): _pt.pen=True
+    def color(c,*r): _pt.col=str(c); _pt.cmds.append(['color',_pt.col])
+    def width(w): _pt.w=float(w); _pt.cmds.append(['width',_pt.w])
+    def speed(s=6): _pt.spd=s; _pt.cmds.append(['speed',s])
+    def goto(x,y=None):
+        _pt.used=True
+        if y is None: x,y=x
+        _mv(float(x),float(y))
+    def setheading(a): _pt.h=float(a)%360; _pt.cmds.append(['turn',round(_pt.h,2)])
+    def circle(r,extent=360):
+        r=float(r); extent=float(extent); steps=max(12,int(abs(extent)/10))
+        seg=2*math.pi*abs(r)*abs(extent)/360/steps; ang=extent/steps
+        if r<0: ang=-ang
+        for _ in range(steps):
+            left(ang/2); forward(seg); left(ang/2)
+    def begin_fill(): _pt.filling=True; _pt.fillpts=[[round(_pt.x,2),round(_pt.y,2)]]
+    def end_fill(): _pt.cmds.append(['fill',list(_pt.fillpts),_pt.col]); _pt.filling=False
+    def clear(): _pt.segs=[]; _pt.cmds.append(['clear'])
+    def home(): goto(0,0); setheading(0)
+    def done(*a,**k): pass
+    def position(): return (_pt.x,_pt.y)
+    def heading(): return _pt.h
+    def hideturtle(): _pt.cmds.append(['hide'])
+    def showturtle(): _pt.cmds.append(['show'])
+    def bgcolor(c,*r): _pt.cmds.append(['bg',str(c)])
+    fns=dict(forward=forward,fd=forward,backward=backward,bk=backward,back=backward,left=left,lt=left,right=right,rt=right,
+        penup=penup,pu=penup,up=penup,pendown=pendown,pd=pendown,down=pendown,color=color,pencolor=color,fillcolor=color,
+        width=width,pensize=width,speed=speed,goto=goto,setpos=goto,setposition=goto,setheading=setheading,seth=setheading,
+        circle=circle,begin_fill=begin_fill,end_fill=end_fill,clear=clear,reset=clear,home=home,done=done,mainloop=done,
+        exitonclick=done,position=position,pos=position,heading=heading,hideturtle=hideturtle,ht=hideturtle,showturtle=showturtle,
+        st=showturtle,bgcolor=bgcolor,shape=done,title=done,tracer=done,update=done,delay=done,setup=done,xcor=lambda: _pt.x,ycor=lambda: _pt.y)
+    for k,v in fns.items(): setattr(m,k,v)
+    class Turtle:
+        def __init__(self,*a,**k): pass
+        def __getattr__(self,name):
+            if name in fns: return fns[name]
+            raise AttributeError("turtle."+name+"은(는) 아직 지원하지 않아요")
+    class Screen:
+        def __init__(self,*a,**k): pass
+        def __getattr__(self,name): return done
+    m.Turtle=Turtle; m.Pen=Turtle; m.Screen=Screen; m.RawTurtle=Turtle
+    def _ga(name): raise AttributeError("turtle."+name+"은(는) 아직 지원하지 않아요")
+    m.__getattr__=_ga
+    return m
+sys.modules['turtle']=_pa_turtle_module()
+
+def _pa_safe(v):
+    try: r=repr(v)
+    except Exception: r='?'
+    return r if len(r)<=80 else r[:77]+'...'
+
+def __pa_run(code, call=None, trace=False, maxsteps=500):
+    _pt.reset()
+    ns={'__name__':'__main__'}
+    res={'ok':True}
+    steps=[]; buf=[]; stack=[]
+    class _Cap:
+        def write(self,t): buf.append(t); return len(t)
+        def flush(self): pass
+    def tr(frame,event,arg):
+        if frame.f_code.co_filename!='<user>': return None
+        if event=='call': stack.append(frame.f_code.co_name)
+        if event in ('line','return'):
+            if len(steps)>=maxsteps: raise _PAStop()
+            loc={}
+            for k,v in frame.f_locals.items():
+                if k.startswith('__') or callable(v) or isinstance(v,types.ModuleType): continue
+                loc[k]=_pa_safe(v)
+            steps.append({'line':frame.f_lineno,'vars':loc,'stack':list(stack),'out':''.join(buf)[-3000:],'event':event})
+        if event=='return' and stack: stack.pop()
+        return tr
+    old=sys.stdout
+    try:
+        if trace:
+            sys.stdout=_Cap(); sys.settrace(tr)
+        exec(compile(code,'<user>','exec'),ns)
+        if call: res['ret']=repr(eval(call,ns))
+    except _PAStop:
+        res['truncated']=True
+    except SystemExit:
+        pass
+    except BaseException as e:
+        res['ok']=False; res['ename']=type(e).__name__; res['emsg']=str(e)
+        line=None
+        if isinstance(e,SyntaxError): line=e.lineno
+        else:
+            try:
+                for fr in traceback.extract_tb(e.__traceback__):
+                    if fr.filename=='<user>': line=fr.lineno
+            except Exception: pass
+        res['line']=line
+        try: res['tb']=''.join(traceback.format_exception_only(type(e),e)).strip()
+        except Exception: res['tb']=res['ename']+': '+res['emsg']
+    finally:
+        if trace:
+            sys.settrace(None); sys.stdout=old
+            res['trace']=steps; res['out']=''.join(buf)
+    res['segs']=_pt.segs[:5000]; res['cmds']=_pt.cmds; res['turtleUsed']=_pt.used; res['nsegs']=len(_pt.segs)
+    return json.dumps(res)
+
+def __pa_compile(code):
+    try:
+        compile(code,'<user>','exec'); return json.dumps({'ok':True})
+    except SyntaxError as e:
+        return json.dumps({'ok':False,'line':e.lineno,'msg':e.msg,'ename':type(e).__name__})
+`;
+
+const WORKER_SRC = `
+const PYODIDE_URL=${JSON.stringify(CONFIG.PYODIDE_URL)}, INDEX=${JSON.stringify(CONFIG.PYODIDE_INDEX)};
+const PRELUDE=${JSON.stringify(PY_PRELUDE)};
+let pyodide=null, inputLines=[], inputIdx=0, curId=null;
+const dec=new TextDecoder();
+async function prefetch(files){
+  let total=0, got=0; const sizes={};
+  // 예상 크기(MB): 응답에 content-length가 없을 때 대비
+  const est={'pyodide.asm.wasm':9.8e6,'pyodide.asm.js':1.4e6,'python_stdlib.zip':3.2e6,'pyodide-lock.json':3e5};
+  for(const f of files){ sizes[f]=est[f]||1e6; total+=sizes[f]; }
+  for(const f of files){
+    try{
+      const r=await fetch(INDEX+f);
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const cl=Number(r.headers.get('content-length')); if(cl>0){ total+= cl - sizes[f]; sizes[f]=cl; }
+      const reader=r.body.getReader(); let read=0;
+      while(true){ const {done,value}=await reader.read(); if(done) break; read+=value.length; const frac=Math.min(1, read/sizes[f]); const pct=Math.min(94, Math.round(100*(got+frac*sizes[f])/total)); postMessage({type:'progress',pct,phase:'download'}); }
+      got+=sizes[f];
+    }catch(e){ throw new Error('다운로드 실패: '+f+' ('+e.message+')'); }
+  }
+}
+async function init(){
+  try{
+    postMessage({type:'progress',pct:1,phase:'download'});
+    importScripts(PYODIDE_URL);
+    await prefetch(['pyodide.asm.js','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json']);
+    postMessage({type:'progress',pct:95,phase:'init'});
+    pyodide=await loadPyodide({indexURL:INDEX});
+    pyodide.setStdout({write:(b)=>{ postMessage({type:'out',id:curId,text:dec.decode(b,{stream:true})}); return b.length; }});
+    pyodide.setStderr({write:(b)=>{ postMessage({type:'err',id:curId,text:dec.decode(b,{stream:true})}); return b.length; }});
+    pyodide.setStdin({stdin:()=>{ if(inputIdx<inputLines.length) return inputLines[inputIdx++]+'\\n'; return null; }, autoEOF:false, isatty:false});
+    pyodide.runPython(PRELUDE);
+    postMessage({type:'progress',pct:100,phase:'ready'});
+    postMessage({type:'ready'});
+  }catch(e){ postMessage({type:'initError',msg:String(e&&e.message||e)}); }
+}
+self.onmessage=(ev)=>{
+  const m=ev.data;
+  if(m.type==='init') return init();
+  if(!pyodide) return postMessage({type:'done',id:m.id,result:{ok:false,ename:'NotReady',emsg:'파이썬 엔진이 아직 준비되지 않았어요'}});
+  if(m.type==='compile'){
+    try{ const r=JSON.parse(pyodide.runPython('__pa_compile(' + JSON.stringify(m.code) + ')')); postMessage({type:'compiled',id:m.id,result:r}); }
+    catch(e){ postMessage({type:'compiled',id:m.id,result:{ok:true}}); }
+    return;
+  }
+  if(m.type==='run'){
+    curId=m.id; inputLines=(m.input||'').replace(/\\r/g,'').split('\\n'); if(inputLines.length && inputLines[inputLines.length-1]==='' ) inputLines.pop(); inputIdx=0;
+    let result;
+    try{
+      const fn=pyodide.globals.get('__pa_run');
+      const r=fn(m.code, m.call||null, !!m.trace, m.maxsteps||500);
+      result=JSON.parse(r); fn.destroy && fn.destroy();
+    }catch(e){ result={ok:false,ename:'InternalError',emsg:String(e&&e.message||e)}; }
+    result.inputUsed=inputIdx;
+    try{ pyodide.runPython('import sys; sys.stdout.flush(); sys.stderr.flush()'); }catch(e){}
+    postMessage({type:'done',id:m.id,result});
+    curId=null;
+  }
+};
+`;
+
+const Py = {
+  worker: null, ready: false, failed: false, progress: 0, phase: 'idle', seq: 0, pending: {}, queue: [], busy: false, listeners: [], main: false, py: null, cur: null, inputLines: [], inputIdx: 0,
+  onState(fn) { this.listeners.push(fn); },
+  _emit() { this.listeners.forEach(f => { try { f(this); } catch (e) {} }); },
+  start() {
+    if (this.worker || this.main) return;
+    this.failed = false; this.ready = false; this.progress = 0; this.phase = 'download'; this._emit();
+    let w;
+    try { const blob = new Blob([WORKER_SRC], { type: 'text/javascript' }); w = new Worker(URL.createObjectURL(blob)); }
+    catch (e) { console.info('워커를 만들 수 없는 환경 → 메인 스레드 실행기로 전환'); return this.startMain(); }
+    this.worker = w;
+    w.onmessage = (ev) => {
+      const m = ev.data;
+      if (m.type === 'progress') { this.progress = m.pct; this.phase = m.phase; this._emit(); }
+      else if (m.type === 'ready') { this.ready = true; this.phase = 'ready'; this._emit(); this._next(); }
+      else if (m.type === 'initError') { this.failed = true; this.phase = 'error'; this.error = m.msg; this._emit(); this.worker = null; w.terminate(); }
+      else if (m.type === 'out' || m.type === 'err') { const p = this.pending[m.id]; if (p && p.onOut) p.onOut(m.text, m.type === 'err'); }
+      else if (m.type === 'done') { const p = this.pending[m.id]; if (p) { clearTimeout(p.timer); delete this.pending[m.id]; p.resolve(m.result); } this.busy = false; this._next(); }
+      else if (m.type === 'compiled') { const p = this.pending[m.id]; if (p) { delete this.pending[m.id]; p.resolve(m.result); } this.busy = false; this._next(); }
+    };
+    w.onerror = (e) => { if (!this.ready && !this.failed) { try { w.terminate(); } catch (err) {} this.worker = null; this.startMain(); } };
+    w.postMessage({ type: 'init' });
+  },
+  // 워커를 못 만드는 환경(일부 앱 내 미리보기·샌드박스)용 메인 스레드 실행기. 무한루프 5초 중단은 불가.
+  async startMain() {
+    this.main = true; this.phase = 'download'; this.progress = 3; this._emit();
+    // 먼저 작은 파일 하나를 받아 본다. 안 되면(앱 미리보기 같은 샌드박스) 엔진 로드를 시도하지 않는다 → 불필요한 경고 없음
+    try { const r = await fetch(CONFIG.PYODIDE_INDEX + 'pyodide-lock.json', { cache: 'force-cache' }); if (!r.ok) throw new Error('HTTP ' + r.status); }
+    catch (e) { this.failed = true; this.sandboxed = true; this.error = ''; this.phase = 'error'; this.main = false; this._emit(); return; }
+    const quiet = { warn: console.warn, error: console.error }; console.warn = () => {}; console.error = () => {}; // Pyodide 내부 경고가 화면에 뜨지 않게
+    try {
+      await loadScript(CONFIG.PYODIDE_URL); this.progress = 20; this._emit();
+      const py = await loadPyodide({ indexURL: CONFIG.PYODIDE_INDEX }); this.progress = 95; this.phase = 'init'; this._emit();
+      const dec = new TextDecoder();
+      py.setStdout({ write: (b) => { if (this.cur && this.cur.onOut) this.cur.onOut(dec.decode(b, { stream: true }), false); return b.length; } });
+      py.setStderr({ write: (b) => { if (this.cur && this.cur.onOut) this.cur.onOut(dec.decode(b, { stream: true }), true); return b.length; } });
+      py.setStdin({ stdin: () => this.inputIdx < this.inputLines.length ? this.inputLines[this.inputIdx++] + '\n' : null, autoEOF: false, isatty: false });
+      py.runPython(PY_PRELUDE); this.py = py; this.ready = true; this.phase = 'ready'; this.progress = 100; this._emit(); this._next();
+    } catch (e) { this.failed = true; this.error = String(e && e.message || e); this.phase = 'error'; this._emit(); this.main = false; }
+    finally { console.warn = quiet.warn; console.error = quiet.error; }
+  },
+  _runMain(id, job) {
+    setTimeout(() => {
+      let result;
+      if (job.kind === 'compile') { try { result = JSON.parse(this.py.runPython('__pa_compile(' + JSON.stringify(job.code) + ')')); } catch (e) { result = { ok: true }; } }
+      else {
+        this.cur = job; this.inputLines = (job.input || '').replace(/\r/g, '').split('\n'); if (this.inputLines.length && this.inputLines[this.inputLines.length - 1] === '') this.inputLines.pop(); this.inputIdx = 0;
+        try { const fn = this.py.globals.get('__pa_run'); const r = fn(job.code, job.call || null, !!job.trace, CONFIG.TRACE_MAX_STEPS); result = JSON.parse(r); fn.destroy && fn.destroy(); } catch (e) { result = { ok: false, ename: 'InternalError', emsg: String(e && e.message || e) }; }
+        result.inputUsed = this.inputIdx; this.cur = null;
+      }
+      delete this.pending[id]; this.busy = false; job.resolve(result); this._next();
+    }, 0);
+  },
+  restart() { if (this.worker) { try { this.worker.terminate(); } catch (e) {} } this.worker = null; this.ready = false; this.busy = false; Object.values(this.pending).forEach(p => { clearTimeout(p.timer); p.resolve({ ok: false, ename: 'Timeout', emsg: T.timeout, timeout: true }); }); this.pending = {}; this.start(); },
+  _next() {
+    if (!this.ready || this.busy || !this.queue.length) return;
+    const job = this.queue.shift(); this.busy = true;
+    const id = ++this.seq; this.pending[id] = job;
+    if (this.main) return this._runMain(id, job);
+    if (job.kind === 'run') {
+      job.timer = setTimeout(() => { if (this.pending[id]) { delete this.pending[id]; job.resolve({ ok: false, ename: 'Timeout', emsg: T.timeout, timeout: true }); this.restart(); } }, CONFIG.RUN_TIMEOUT_MS);
+      this.worker.postMessage({ type: 'run', id, code: job.code, input: job.input, call: job.call, trace: job.trace, maxsteps: CONFIG.TRACE_MAX_STEPS });
+    } else { this.worker.postMessage({ type: 'compile', id, code: job.code }); }
+  },
+  run({ code, input = '', call = null, trace = false, onOut = null }) {
+    return new Promise(resolve => { this.queue.push({ kind: 'run', code, input, call, trace, onOut, resolve }); if (!this.worker && !this.main) this.start(); this._next(); });
+  },
+  compile(code) { return new Promise(resolve => { this.queue.push({ kind: 'compile', code, resolve }); if (!this.worker && !this.main) this.start(); this._next(); }); },
+  explain(result) { // 에러 → 한국어 한 줄
+    if (!result || result.ok) return '';
+    if (result.timeout) return T.timeout;
+    if (result.ename === 'EOFError') return T.needInput((result.inputUsed || 0) + 1);
+    if (result.ename === 'IndentationError' || result.ename === 'TabError') { const m = result.emsg || ''; const ln = result.line ? `${result.line}번 줄` : '이 줄'; if (/expected an indented block/.test(m)) return `${ln}은 위 줄(콜론 :으로 끝난 줄)보다 안쪽에 있어야 해요. 앞에 공백 4칸을 넣으세요.`; if (/unexpected indent/.test(m)) return `${ln}은 위 줄과 같은 칸에서 시작해야 해요. 앞의 공백을 지우세요.`; if (/unindent does not match/.test(m)) return `${ln}의 들여쓰기 칸수가 위 묶음과 맞지 않아요. 같은 묶음은 같은 칸수여야 해요.`; }
+    return ERROR_HINTS[result.ename] || '에러가 났어요. 메시지를 읽어 보세요.';
+  },
+};
+
+
+// ---------- 거북이 캔버스 ----------
+const TurtleView = {
+  draw(canvas, cmds, { animate = true, speed = 6, onDone = null } = {}) {
+    const ctx = canvas.getContext('2d'); const W = canvas.width, H = canvas.height; const ox = W / 2, oy = H / 2;
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--surface2') || '#fff'; ctx.fillRect(0, 0, W, H);
+    let x = 0, y = 0, h = 0, col = '#2bb673', w = 2, pen = true, hidden = false; const segs = []; const fills = [];
+    const tx = (v) => ox + v, ty = (v) => oy - v;
+    const render = () => { ctx.clearRect(0, 0, W, H); ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--surface2') || '#fff'; ctx.fillRect(0, 0, W, H); for (const f of fills) { ctx.beginPath(); f.pts.forEach((p, i) => i ? ctx.lineTo(tx(p[0]), ty(p[1])) : ctx.moveTo(tx(p[0]), ty(p[1]))); ctx.closePath(); ctx.fillStyle = f.c; ctx.globalAlpha = 0.5; ctx.fill(); ctx.globalAlpha = 1; } for (const s of segs) { ctx.beginPath(); ctx.moveTo(tx(s[0]), ty(s[1])); ctx.lineTo(tx(s[2]), ty(s[3])); ctx.strokeStyle = s[4]; ctx.lineWidth = s[5]; ctx.lineCap = 'round'; ctx.stroke(); } if (!hidden) { ctx.save(); ctx.translate(tx(x), ty(y)); ctx.rotate(-h * Math.PI / 180); ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-7, 6); ctx.lineTo(-4, 0); ctx.lineTo(-7, -6); ctx.closePath(); ctx.fillStyle = '#2bb673'; ctx.fill(); ctx.strokeStyle = '#1a7a4c'; ctx.stroke(); ctx.restore(); } };
+    let i = 0; const perFrame = speed >= 10 ? 1e9 : Math.max(1, Math.round(speed * speed / 4));
+    const apply = (c) => { if (c[0] === 'move') { if (c[3]) segs.push([x, y, c[1], c[2], col, w]); x = c[1]; y = c[2]; } else if (c[0] === 'turn') h = c[1]; else if (c[0] === 'color') col = c[1]; else if (c[0] === 'width') w = c[1]; else if (c[0] === 'clear') { segs.length = 0; fills.length = 0; } else if (c[0] === 'fill') fills.push({ pts: c[1], c: c[2] }); else if (c[0] === 'hide') hidden = true; else if (c[0] === 'show') hidden = false; };
+    if (!animate || !cmds.length) { cmds.forEach(apply); render(); if (onDone) onDone(); return () => {}; }
+    let stopped = false; const step = () => { if (stopped) return; let n = 0; while (i < cmds.length && n < perFrame) { apply(cmds[i++]); n++; } render(); if (i < cmds.length) requestAnimationFrame(step); else if (onDone) onDone(); }; requestAnimationFrame(step);
+    return () => { stopped = true; cmds.slice(i).forEach(apply); i = cmds.length; render(); };
+  },
+};

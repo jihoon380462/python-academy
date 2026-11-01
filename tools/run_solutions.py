@@ -1,5 +1,11 @@
+#!/usr/bin/env python3
+# tools/run_solutions.py — 배포 전 게이트 2. 모든 코스의 정답 코드를 CPython으로 돌려 테스트 케이스를 전부 통과하는지 확인한다.
+#   사용: node tools/extract.mjs && python3 tools/run_solutions.py   (Actions와 로컬 동일)
+#   runner별: python → CPython -I (거북이는 심), sql → sqlite3 (Phase 3), shell → Node 시뮬레이터 (Phase 2), web → Playwright (Phase 4)
 import json, subprocess, sys, tempfile, os, re
-P=json.load(open('/home/claude/verify/problems.json'))
+HERE=os.path.dirname(os.path.abspath(__file__)); OUT=os.path.join(HERE,'.out')
+if not os.path.exists(os.path.join(OUT,'problems.json')): subprocess.run(['node',os.path.join(HERE,'extract.mjs'),OUT],check=True)
+P=json.load(open(os.path.join(OUT,'problems.json'),encoding='utf-8'))
 TURTLE_SHIM = '''
 import sys, types, math
 _m=types.ModuleType('turtle'); _s={'x':0.0,'y':0.0,'h':0.0,'pen':True,'segs':[]}
@@ -38,12 +44,15 @@ def run(code, stdin='', call=None, turtle=False):
         return out, r.stderr if r.returncode else '', ret if not turtle else segs
 fails=[]; computed={}; table=[]
 for p in P:
+    if p.get('runner') not in (None,'python'):
+        fails.append((p['id'],f"runner {p['runner']} 검증기는 아직 없음 (해당 Phase에서 추가)")); continue
     tests=p['tests'] or []
     if p['type'] in ('quiz','fill'): table.append((p,len(tests))); continue
     if not p['solution']: fails.append((p['id'],'no solution')); continue
     if not tests: fails.append((p['id'],'no tests')); continue
     for i,t in enumerate(tests):
         out,err,extra=run(p['solution'], t.get('input','') , t.get('call'), p['turtle'])
+        if err=='TIMEOUT': fails.append((p['id'],f'test{i+1} 시간 초과(5초)')); continue
         if err: fails.append((p['id'],f'test{i+1} error: {err.strip()[-300:]}')); continue
         if p['turtle']:
             if not extra: fails.append((p['id'],f'test{i+1} no segments')); continue
@@ -59,5 +68,9 @@ for p in P:
 for p in P:
     if p['parsons'] and p['solution'] and p['parsons']['solution']!=p['solution'] and p['type']=='parsons': fails.append((p['id'],'parsons/solution mismatch'))
 print('FAILS',len(fails)); [print(' ',f) for f in fails]
-json.dump(computed,open('/home/claude/verify/computed.json','w'),ensure_ascii=False,indent=1)
-print('COMPUTED',json.dumps(computed,ensure_ascii=False)[:2000])
+json.dump(computed,open(os.path.join(OUT,'computed.json'),'w'),ensure_ascii=False,indent=1)
+by={}
+for p,n in table: by[p['course']]=by.get(p['course'],0)+1
+print('검증한 문제:',by)
+if fails: print('✗ run_solutions 실패'); sys.exit(1)
+print('✓ run_solutions OK')

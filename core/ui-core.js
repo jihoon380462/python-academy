@@ -1,40 +1,4 @@
-// =====================================================================
-// === UI ===  (화면·스타일·연출)
-// =====================================================================
-
-// ---------- 마스코트 SVG ----------
-const MASCOT_COLORS = ['#3cb371', '#ff8c42', '#5b8def'];
-function mascotSVG({ stage = 0, mood = 'normal', color = 0, accessory = 'none', size = 64 } = {}) {
-  const c = MASCOT_COLORS[color % MASCOT_COLORS.length]; const dark = '#1f4d33';
-  const eyes = mood === 'happy' ? `<path d="M22 30 q4 -5 8 0" stroke="${dark}" stroke-width="2.5" fill="none"/><path d="M38 30 q4 -5 8 0" stroke="${dark}" stroke-width="2.5" fill="none"/>`
-    : mood === 'confused' ? `<circle cx="26" cy="30" r="3" fill="${dark}"/><circle cx="42" cy="30" r="2" fill="${dark}"/><path d="M36 20 q6 -4 8 2" stroke="${dark}" stroke-width="2" fill="none"/>`
-    : `<circle cx="26" cy="30" r="3" fill="${dark}"/><circle cx="42" cy="30" r="3" fill="${dark}"/><circle cx="27" cy="29" r="1" fill="#fff"/><circle cx="43" cy="29" r="1" fill="#fff"/>`;
-  const mouth = mood === 'happy' ? `<path d="M28 40 q6 6 12 0" stroke="${dark}" stroke-width="2" fill="none"/>` : mood === 'confused' ? `<path d="M30 42 q4 -3 8 0" stroke="${dark}" stroke-width="2" fill="none"/>` : `<path d="M30 40 q4 3 8 0" stroke="${dark}" stroke-width="2" fill="none"/>`;
-  const tongue = `<path d="M34 46 l0 6 l-3 3 M34 52 l3 3" stroke="#e05" stroke-width="2" fill="none"/>`;
-  let body;
-  if (stage === 0) body = `<ellipse cx="34" cy="38" rx="18" ry="22" fill="#f4f1de" stroke="#cbbf9a" stroke-width="2"/><path d="M22 36 l6 6 l5 -8 l6 7 l5 -6" stroke="#cbbf9a" stroke-width="2" fill="none"/><circle cx="28" cy="30" r="2" fill="${dark}"/><circle cx="40" cy="30" r="2" fill="${dark}"/>`;
-  else body = `<path d="M12 58 q-8 -14 8 -18 q12 -3 10 -14" stroke="${c}" stroke-width="9" fill="none" stroke-linecap="round"/><ellipse cx="34" cy="34" rx="18" ry="16" fill="${c}"/><ellipse cx="34" cy="36" rx="12" ry="8" fill="rgba(255,255,255,.25)"/>${eyes}${mouth}${stage >= 1 ? tongue : ''}`;
-  let hat = '';
-  if (stage >= 2 && stage < 3) hat = `<circle cx="26" cy="30" r="6" stroke="#333" stroke-width="2" fill="none"/><circle cx="42" cy="30" r="6" stroke="#333" stroke-width="2" fill="none"/><path d="M32 30 h4" stroke="#333" stroke-width="2"/>`;
-  if (stage >= 3) hat += `<path d="M18 40 q-10 18 2 28 l10 -10 l-4 -16 z" fill="#c0392b" opacity=".9"/>`;
-  if (stage >= 4) hat += `<path d="M22 20 l4 -10 l8 8 l8 -8 l4 10 z" fill="#f1c40f" stroke="#b8860b" stroke-width="1.5"/>`;
-  if (stage >= 5) body = body.replace(new RegExp(c, 'g'), '#e6b800');
-  const acc = {
-    glasses: `<circle cx="26" cy="30" r="6" stroke="#2c3e50" stroke-width="2" fill="rgba(135,206,250,.3)"/><circle cx="42" cy="30" r="6" stroke="#2c3e50" stroke-width="2" fill="rgba(135,206,250,.3)"/><path d="M32 30 h4" stroke="#2c3e50" stroke-width="2"/>`,
-    cap: `<path d="M16 22 q18 -14 36 0 l0 4 l-36 0 z" fill="#e74c3c"/><path d="M48 26 l10 0 l-2 4 l-8 0 z" fill="#c0392b"/>`,
-    bow: `<path d="M44 16 l8 -5 l0 10 z M44 16 l-8 -5 l0 10 z" fill="#ff69b4"/><circle cx="44" cy="16" r="2" fill="#c2185b"/>`,
-    scarf: `<path d="M18 46 q16 8 32 0 l0 6 q-16 8 -32 0 z" fill="#e67e22"/><path d="M40 50 l6 12" stroke="#e67e22" stroke-width="6" stroke-linecap="round"/>`,
-    tophat: `<rect x="22" y="4" width="24" height="16" fill="#222"/><rect x="16" y="18" width="36" height="4" fill="#222"/><rect x="22" y="14" width="24" height="3" fill="#c0392b"/>`,
-    wizard: `<path d="M34 -2 l16 24 l-32 0 z" fill="#5b3ea8"/><circle cx="36" cy="10" r="2" fill="#ffd700"/><circle cx="30" cy="16" r="1.5" fill="#ffd700"/>`,
-    headphone: `<path d="M16 32 q0 -22 18 -22 q18 0 18 22" stroke="#333" stroke-width="3" fill="none"/><rect x="12" y="28" width="8" height="12" rx="3" fill="#333"/><rect x="48" y="28" width="8" height="12" rx="3" fill="#333"/>`,
-    flower: `<circle cx="48" cy="18" r="3" fill="#ff6b6b"/><circle cx="52" cy="14" r="3" fill="#ff6b6b"/><circle cx="44" cy="14" r="3" fill="#ff6b6b"/><circle cx="48" cy="10" r="3" fill="#ff6b6b"/><circle cx="48" cy="14" r="2.5" fill="#ffd93d"/>`,
-    halo: `<ellipse cx="34" cy="8" rx="14" ry="4" stroke="#ffd700" stroke-width="3" fill="none"/>`,
-    crown2: `<path d="M20 20 l5 -12 l9 8 l9 -8 l5 12 z" fill="#ffd700" stroke="#b8860b"/><circle cx="25" cy="10" r="2" fill="#e74c3c"/><circle cx="34" cy="14" r="2" fill="#3498db"/><circle cx="43" cy="10" r="2" fill="#2ecc71"/>`,
-  }[accessory] || '';
-  return `<svg class="mascot" viewBox="0 0 68 68" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${body}${hat}${acc}</svg>`;
-}
-function myMascot(opts = {}) { const d = Store.data; return mascotSVG({ stage: Game.mascotStage(Game.level().level), color: d.mascotColor, accessory: d.settings.accessory, ...opts }); }
-
+// core/ui-core.js — UI 공통(모달·토스트·상단바·용어 칩), 로딩 오버레이, 모바일 퀵 키
 // ---------- 공통 UI 헬퍼 ----------
 const UI = {
   view: null, params: null, history: [],
@@ -53,13 +17,13 @@ const UI = {
   prompt(title, placeholder = '', value = '', opt = {}) { return new Promise(resolve => { const ov = document.createElement('div'); ov.className = 'modal-ov'; ov.innerHTML = `<div class="modal"><div class="modal-title">${title}</div><div class="modal-body">${opt.hint ? `<p class="muted" style="margin:0 0 8px;font-size:.92em;line-height:1.5">${opt.hint}</p>` : ''}<input class="input" placeholder="${esc(placeholder)}" value="${esc(value)}" maxlength="40" autocomplete="off" spellcheck="false">${opt.chips ? `<div class="chips"><span class="muted small">추천:</span>${opt.chips.map(c => `<button class="chip" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : ''}</div><div class="modal-btns"><button class="btn" data-a="c">${opt.cancel || T.close}</button><button class="btn primary" data-a="ok">${opt.ok || T.save}</button></div></div>`; document.body.appendChild(ov); const inp = $('input', ov); setTimeout(() => inp.focus(), 50); $$('.chip', ov).forEach(c => c.onclick = () => { inp.value = c.dataset.c; inp.focus(); $$('.chip', ov).forEach(x => x.classList.toggle('on', x === c)); }); const done = (v) => { ov.remove(); resolve(v); }; $('[data-a=c]', ov).onclick = () => done(null); $('[data-a=ok]', ov).onclick = () => done(inp.value.trim() || null); inp.onkeydown = (e) => { if (e.key === 'Enter') done(inp.value.trim() || null); }; }); },
   isMobile() { return innerWidth < 768; },
   applyTheme() { const s = Store.data.settings; document.documentElement.dataset.theme = s.theme; document.documentElement.dataset.font = s.font; document.documentElement.dataset.anim = s.anim; const et = INVENTORY.editorTheme.find(x => x.id === s.editorTheme) || INVENTORY.editorTheme[0]; for (const k in et.css) document.documentElement.style.setProperty('--ed-' + k, et.css[k]); },
-  go(view, params = {}, push = true) { if (push && this.view) this.history.push([this.view, this.params]); this.view = view; this.params = params; if (this.current && this.current.destroy) try { this.current.destroy(); } catch (e) {} this.current = null; Tutor.ui && Tutor.ui.close(); const root = $('#view'); root.className = 'view-' + view; root.scrollTop = 0; window.scrollTo(0, 0); const V = Views[view]; const seq = ++this._seq; const res = V(root, params); if (seq !== this._seq) return; /* 뷰 안에서 다른 화면으로 넘어간 경우 */ this.current = res || null; this.renderTopbar(); },
+  go(view, params = {}, push = true) { if (push && this.view) this.history.push([this.view, this.params]); this.view = view; this.params = params; if (this.current && this.current.destroy) try { this.current.destroy(); } catch (e) {} this.current = null; Tutor.ui && Tutor.ui.close(); const root = $('#view'); root.className = 'view-' + view; root.scrollTop = 0; window.scrollTo(0, 0); if (['problem', 'lesson'].includes(view)) { Store.data.last = { course: Store.course, view, params: { pid: params.pid, lessonId: params.lessonId, page: params.page }, at: Date.now() }; } const V = Views[view]; const seq = ++this._seq; const res = V(root, params); if (seq !== this._seq) return; /* 뷰 안에서 다른 화면으로 넘어간 경우 */ this.current = res || null; this.renderTopbar(); },
   _seq: 0,
   back() { const h = this.history.pop(); if (h) this.go(h[0], h[1], false); else this.go('home', {}, false); },
   renderTopbar() {
     const d = Store.data; const lv = Game.level(); const streak = Game.currentStreak();
     const title = this.view === 'lesson' || this.view === 'problem' ? (this.params.lessonTitle || '') : ({ home: T.home, playground: T.playground, badges: T.badges, profile: T.profile, settings: T.settings, inventory: T.inventory, glossary: T.glossary, errors: T.errorDict, weakness: T.weakness, review: T.review, challenge: T.dailyChallenge, timeattack: T.timeAttack, checkup: T.checkup }[this.view] || '');
-    $('#topbar').innerHTML = `<button class="tb-btn" id="tbHome" title="${T.home}">${this.view === 'home' ? myMascot({ size: 30 }) : '🏠'}</button><div class="tb-title">${esc(title)}</div>
+    $('#topbar').innerHTML = `<a class="tb-btn tb-hub" href="${CONFIG.HUB_PATH}" title="아카데미 허브로">⌂</a><button class="tb-btn" id="tbHome" title="${T.home}">${this.view === 'home' ? myMascot({ size: 30 }) : '🏠'}</button><div class="tb-title">${esc(title)}</div>
       <div class="tb-xp" title="레벨 ${lv.level} · ${Game.title(lv.level)}"><span class="tb-lv">Lv.${lv.level}</span><div class="xpbar"><div class="xpfill" style="width:${lv.need ? Math.round(100 * lv.into / lv.need) : 100}%"></div></div><span class="tb-xpn">${lv.into}/${lv.need || '최대'}</span></div>
       ${Game.combo >= 2 ? `<div class="tb-combo t${Game.combo >= 10 ? 3 : Game.combo >= 5 ? 2 : Game.combo >= 3 ? 1 : 0}" title="${T.combo}">⚡×${Game.combo}</div>` : ''}<div class="tb-streak ${streak ? 'on' : ''}" title="${T.streak}">🔥${streak}</div>
       ${typeof Sync !== 'undefined' && Sync.on ? `<button class="tb-btn tb-sync ${Sync.state}" id="tbSync" title="기기 연동: ${Sync.state === 'err' ? Sync.msg : '마지막 동기화 ' + Sync.ago() + ' (누르면 지금 동기화)'}">${Sync.icon()}</button>` : ''}<button class="tb-btn" id="tbSettings" title="${T.settings}">⚙</button>`;

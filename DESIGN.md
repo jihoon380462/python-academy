@@ -248,3 +248,30 @@ v1.0.1에서 **메인 스레드 보조 실행기**를 추가했습니다. 워커
 5. 블록↔줄 대응을 `STATEMENT_PREFIX` 기반 정확 매핑으로 교체
 6. 프로필 PNG에 뱃지 아이콘 넣기, 마스코트 진화 애니메이션
 7. 진행 저장이 5MB에 가까워지면 오래된 선생님 대화부터 자동 정리
+
+
+## 11. v2.0.0 Phase 0 — 멀티 코스 구조 전환 (설계 결정 요약)
+
+**임의로 정한 수치**
+- 허브 "남은 시간" = 남은 문제 수 × 4분(`CONFIG.HUB.minutesPerProblem`). 저장 용량 경고 4MB(`CONFIG.STORAGE_WARN_BYTES`).
+- 코스 카드 순서·전제(`CONFIG.COURSES`): 알고리즘은 B3, 웹은 B2 보스 클리어. 설정 `settings.unlockAll`이 true면 전제 무시(스위치 UI는 Phase 5에서 노출).
+
+**지시서(EXPANSION.md)와 다르게 한 것과 이유**
+- `core/util.js`를 추가(지시서 구조에는 없음): `$`, `esc`, `todayKey` 같은 유틸은 모든 파일이 쓰므로 config 바로 다음에 따로 둠.
+- `shared/badges.js`로 BADGES·INVENTORY를 묶음(지시서는 errors·glossary만 shared). 뱃지·보관함 아이템은 코스 공통이고 허브가 마스코트를 그릴 때 INVENTORY가 필요.
+- `core/tutor.js`에 API 호출(Tutor)과 패널(Tutor.ui)을 함께 둠. 선생님 UI는 코스 페이지 전용이지만 파일을 둘로 나누면 `Tutor.ui = {...}` 확장 순서 문제만 생기고 이득이 없음.
+- `Store.data`는 v1과 똑같은 한 객체를 유지하고 저장 시점에만 `academy.*` 조각으로 나눔. 이유: 400곳 넘는 `Store.data.x` 접근을 바꾸지 않아 회귀 위험 0, 기기 연동(Sync) payload·내보내기 JSON도 v1과 호환.
+- 허브가 `courses/python/content.js`(데이터 100KB)를 읽음. 지시서는 "러너를 받지 않는다"이고 데이터는 러너가 아님. 복습 큐 수·이어서 하기·진행률 계산에 문제 목록이 필요. 코스가 늘면 `course.json`에 문제 수를 캐시해 다른 코스 콘텐츠는 안 읽는다.
+- 캐시 깨기 `?v=`는 `tools/stamp.mjs`로 일괄 갱신(빌드 도구가 아니라 치환 스크립트). validate_content가 불일치를 에러로 잡아 잊어버리면 배포가 막힘.
+- 회귀 체크리스트 중 "허브 1초/코스 2초"는 헤드리스에서 측정하지 않음(파일 크기 기준: 허브 ≈ 160KB, 코스 페이지 ≈ 380KB, CDN 제외).
+
+**알려진 제약과 다음 Phase에 넘긴 것**
+- 러너 인터페이스(load/run/grade/reset/snapshot/view)는 아직 `Py`·`Grader` 그대로. Phase 1에서 시각화와 함께 `Runner` 래퍼로 감싼다(동작 변경 없음).
+- `tools/schema.json`(JSON Schema)은 미작성. validate_content.mjs가 같은 규칙을 코드로 검사 중이며 Phase 1에서 선생님 문제 생성과 함께 JSON Schema로 옮긴다.
+- 허브 4·5번(추천 로드맵·캘린더·뱃지·작품)은 Phase 5. 설정 화면은 아직 코스 페이지 안에만 있음(허브 ⚙는 그리로 이동).
+- 다른 코스의 진행 조각(`academy.course.<id>`)은 읽기만 하고, 코스 간 복습 큐 통합은 Phase 1에서.
+
+**파일별 줄 수 / 로딩 용량** (CDN 제외)
+- core: config 118 · util 13 · storage 68 · sync 130 · engine 180 · runners/python 288 · game 75 · tutor 74 · fx 63 · ui-core 80 · ui-editors 207 · ui-views-main 279 · ui-views-more 166 · hub 42 · ui.css 212
+- courses/python: content.js 798 (≈100KB) · shared: errors 41 · glossary 43 · badges 84
+- 허브 전송량 ≈ 160KB, 파이썬 코스 페이지 ≈ 380KB (gzip 전).

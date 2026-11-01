@@ -1,3 +1,4 @@
+// core/ui-editors.js — 텍스트/블록/Parsons 에디터
 // ---------- 텍스트 에디터 (CodeMirror 6, 실패 시 textarea 대체) ----------
 const CM = {
   modsPromise: null, mods: null, failed: false,

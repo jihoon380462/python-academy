@@ -1,3 +1,4 @@
+// core/ui-views-more.js — 놀이터·뱃지·프로필·보관함·설정·용어집·약점·세션·점검·온보딩·코스 페이지 초기화
 // ---------- 놀이터 ----------
 Views.playground = (root, params = {}) => {
   const d = Store.data; let mode = params.mode || 'text'; let editor = null, blockEd = null, stopTurtle = null; let currentWork = null;
@@ -70,7 +71,7 @@ Views.settings = (root) => {
     <div class="card"><div class="card-h">학습</div><div class="srow"><span>${T.dailyGoal}</span><div class="seg">${CONFIG.DAILY_GOAL_OPTIONS.map(n => `<button data-goal="${n}" class="${d.dailyGoal === n ? 'on' : ''}">${n}문제</button>`).join('')}</div></div><div class="srow"><span>온보딩 다시 보기</span><button class="btn sm" id="sOnb">보기</button></div><div class="srow"><span>${T.glossary} / ${T.errorDict}</span><div class="row"><button class="btn sm" id="sGl">용어집</button><button class="btn sm" id="sEr">에러 사전</button></div></div></div>
     <div class="card"><div class="card-h">클로드 선생님 (Claude API)</div><div class="muted small">키는 내 브라우저(localStorage)에만 저장돼요. 이 파일에는 절대 쓰이지 않아요. 키 발급: <a href="${CONFIG.TUTOR.consoleUrl}" target="_blank" rel="noopener">${CONFIG.TUTOR.consoleUrl}</a></div><div class="srow"><span>API 키</span><input class="input" type="password" id="sKey" value="${esc(s.apiKey)}" placeholder="sk-ant-..."></div><div class="srow"><span>모델</span><div class="row"><select id="sModelSel"><option value="${CONFIG.TUTOR.defaultModel}">${CONFIG.TUTOR.defaultModel} (빠르고 저렴)</option><option value="${CONFIG.TUTOR.altModel}">${CONFIG.TUTOR.altModel} (더 똑똑)</option><option value="__custom">직접 입력</option></select><input class="input" id="sModel" value="${esc(s.model)}" placeholder="모델 문자열"></div></div><div class="row"><button class="btn primary" id="sKeySave">저장</button><button class="btn" id="sKeyTest">연결 테스트</button><span id="sKeyMsg" class="muted small"></span></div></div>
     ${Sync.card()}
-    <div class="card"><div class="card-h">진행 데이터</div><div class="row"><button class="btn" id="sExport">📤 내보내기 (JSON)</button><button class="btn" id="sImport">📥 가져오기</button><input type="file" id="sImportFile" accept=".json" style="display:none"></div><div class="row" style="margin-top:8px"><button class="btn danger" id="sReset">전체 초기화</button></div></div>
+    <div class="card"><div class="card-h">진행 데이터 <small>${(Store.usage() / 1024).toFixed(0)}KB 사용</small></div><div class="row"><button class="btn" id="sExport">📤 내보내기 (JSON)</button><button class="btn" id="sImport">📥 가져오기</button><input type="file" id="sImportFile" accept=".json" style="display:none"></div>${Store.usage() > CONFIG.STORAGE_WARN_BYTES ? `<div class="warn small" style="margin-top:8px">저장 공간이 커졌어요. 클리어한 문제의 중간 저장 코드만 정리할 수 있어요.</div><div class="row" style="margin-top:4px"><button class="btn" id="sCleanup">🧹 오래된 코드 정리</button></div>` : ''}<div class="row" style="margin-top:8px">${Store.hasV1Backup() ? `<button class="btn" id="sRestoreV1" title="v1(이전 버전) 저장 데이터 백업을 통째로 되돌려요">↩ v1 데이터 다시 가져오기</button>` : ''}<button class="btn danger" id="sReset">전체 초기화</button></div></div>
     <div class="muted small center">${T.appName} v${CONFIG.APP_VERSION} · Pyodide ${CONFIG.PYODIDE_VERSION}</div></div>`;
   const re = () => { Store.save(); UI.applyTheme(); UI.renderTopbar(); Views.settings(root); };
   $$('[data-theme]', root).forEach(b => b.onclick = () => { s.theme = b.dataset.theme; Game.stat('themeChanged'); Game.checkBadges().forEach(x => UI.badgeFly(x)); re(); });
@@ -83,6 +84,8 @@ Views.settings = (root) => {
   Sync.bind(root, () => Views.settings(root));
   $('#sExport').onclick = () => { const a = document.createElement('a'); a.download = `python_academy_${todayKey()}.json`; a.href = URL.createObjectURL(new Blob([Store.exportJSON()], { type: 'application/json' })); a.click(); UI.toast(T.exported); };
   $('#sImport').onclick = () => $('#sImportFile').click(); $('#sImportFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; if (!await UI.confirm(T.importConfirm)) return; try { Store.importJSON(await f.text()); UI.applyTheme(); UI.toast('불러왔어요'); UI.go('home'); } catch (err) { UI.toast('불러오기 실패: ' + err.message); } };
+  const cl = $('#sCleanup'); if (cl) cl.onclick = async () => { if (!await UI.confirm('클리어한 문제에 남아 있는 중간 저장 코드를 지울까요? (별점·XP는 그대로예요)', '정리')) return; const n = Store.cleanupCodes(); UI.toast(`${n}개 문제의 코드를 정리했어요`); Views.settings(root); };
+  const rv = $('#sRestoreV1'); if (rv) rv.onclick = async () => { if (!await UI.confirm('지금 데이터를 버리고 v1 백업(이전 버전 저장 데이터)으로 되돌릴까요? 되돌린 뒤에는 되돌리기 전 상태로 돌아올 수 없어요.', '되돌리기')) return; try { Store.restoreV1Backup(); UI.applyTheme(); location.reload(); } catch (e) { UI.toast('되돌리기 실패: ' + e.message); } };
   $('#sReset').onclick = async () => { if (!await UI.confirm(T.confirmReset, '초기화')) return; if (!await UI.confirm(T.confirmReset2, '정말 초기화')) return; Store.reset(); UI.applyTheme(); if (Sync.on) { UI.toast('초기화를 다른 기기에도 알리는 중…'); await Sync.syncNow(true); } location.reload(); };
 };
 
@@ -131,48 +134,6 @@ Views.checkup = (root, { n }) => {
   render();
 };
 
-// ---------- 선생님 패널 ----------
-Tutor.ui = {
-  ctx: null, el: null, busy: false,
-  init() { this.el = $('#tutorPanel'); },
-  open(ctx) {
-    this.ctx = ctx; const el = this.el; el.classList.add('open'); const key = ctx.key || 'global'; const chats = Store.data.tutorChats; chats[key] = chats[key] || [];
-    const extra = ctx.free && !ctx.preset ? '' : ctx.review ? `<button class="chip-btn" data-x="review">📝 내 코드 리뷰</button>` : ctx.problem ? `<button class="chip-btn" data-x="similar">🎲 비슷한 문제 하나 더</button>${ctx.cleared ? `<button class="chip-btn" data-x="review">📝 내 코드 리뷰</button>` : ''}` : ctx.lesson ? `<button class="chip-btn" data-x="analogy">🔁 이 개념 다른 비유로</button>` : '';
-    el.innerHTML = `<div class="tp-head"><span>💬 클로드 선생님</span><div><button class="btn xs" id="tpClear">대화 지우기</button><button class="btn xs" id="tpClose">✕</button></div></div><div class="tp-chips">${(ctx.free ? [] : T.chips).map(c => `<button class="chip-btn" data-q="${esc(c)}">${esc(c)}</button>`).join('')}${extra}</div><div class="tp-log" id="tpLog"></div><div class="tp-in"><textarea id="tpText" rows="2" placeholder="${Store.data.settings.apiKey ? '질문을 적어 보세요' : T.noKey}"></textarea><button class="btn primary" id="tpSend">보내기</button></div><div class="tp-foot muted small">이번 세션 질문 <span id="tpCount">${this.count || 0}</span>회 · 모델 ${esc(Store.data.settings.model)}${Store.data.settings.apiKey ? '' : ` · <a id="tpSettings">설정에서 키 넣기</a>`}</div>`;
-    $('#tpClose').onclick = () => this.close(); $('#tpClear').onclick = () => { chats[key] = []; Store.save(); this.renderLog(); }; $('#tpSend').onclick = () => this.send($('#tpText').value); $('#tpText').onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send($('#tpText').value); } }; const ts = $('#tpSettings'); if (ts) ts.onclick = () => { this.close(); UI.go('settings'); };
-    $$('[data-q]', el).forEach(b => b.onclick = () => this.send(b.dataset.q)); $$('[data-x]', el).forEach(b => b.onclick = () => this.special(b.dataset.x));
-    this.renderLog(); if (ctx.preset) this.send(ctx.preset);
-  },
-  close() { if (this.el) this.el.classList.remove('open'); },
-  log() { const key = this.ctx ? (this.ctx.key || 'global') : 'global'; return Store.data.tutorChats[key] = Store.data.tutorChats[key] || []; },
-  renderLog() { const log = $('#tpLog'); if (!log) return; log.innerHTML = this.log().map(m => `<div class="msg ${m.role}">${m.role === 'assistant' ? this.md(m.content) : esc(m.content)}</div>`).join('') || `<div class="muted small">무엇이든 물어보세요. 정답을 바로 주진 않지만 길을 알려 줘요. 질문은 별점·XP에 영향이 없어요.</div>`; log.scrollTop = log.scrollHeight; },
-  md(s) { return esc(s).replace(/```(?:python)?\n?([\s\S]*?)```/g, (m, c) => `<pre class="code">${c}</pre>`).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>'); },
-  systemPrompt() { const c = this.ctx; const sys = c.free ? T.tutorSystemFree : T.tutorSystem; const ctxText = Tutor.context({ lesson: c.lesson, problem: c.problem, code: c.getCode ? c.getCode() : null, lastRun: c.getLastRun ? c.getLastRun() : null, hints: c.hints, answerSeen: c.answerSeen, trace: TracePanel.cur ? `${TracePanel.cur.line}번 줄, 변수: ${JSON.stringify(TracePanel.cur.vars)}` : null, pageHtml: c.pageHtml }); return sys + '\n\n[맥락]\n' + ctxText; },
-  async send(text, { hidden = false, system = null, onDone = null } = {}) {
-    text = (text || '').trim(); if (!text || this.busy) return; if (!Store.data.settings.apiKey) { UI.toast(T.noKey); return; }
-    const log = this.log(); if (!hidden) log.push({ role: 'user', content: text }); const ta = $('#tpText'); if (ta) ta.value = ''; this.busy = true; this.count = (this.count || 0) + 1; const cnt = $('#tpCount'); if (cnt) cnt.textContent = this.count; Game.stat('tutorAsks');
-    const msgs = (hidden ? log.concat([{ role: 'user', content: text }]) : log).slice(-12).map(m => ({ role: m.role, content: m.content })); const entry = { role: 'assistant', content: '' }; log.push(entry); this.renderLog(); const logEl = $('#tpLog');
-    try { const full = await Tutor.call({ system: system || this.systemPrompt(), messages: msgs, onText: (t, f) => { entry.content = f; const last = logEl && logEl.lastElementChild; if (last) { last.innerHTML = this.md(f); logEl.scrollTop = logEl.scrollHeight; } } }); entry.content = full; if (onDone) onDone(full); }
-    catch (e) { entry.content = '⚠ ' + Tutor.errMsg(e); }
-    this.busy = false; Store.save(); this.renderLog();
-  },
-  async special(kind) {
-    const c = this.ctx;
-    if (kind === 'analogy') return this.send('지금 설명하는 개념을 방금과는 다른 비유로 다시 설명해 주세요.');
-    if (kind === 'review') { return this.send('방금 통과한 제 코드를 리뷰해 주세요. 더 파이썬다운 쓰기, 변수 이름, 불필요한 줄을 3가지 이내로만 짚어 주세요.', { onDone: () => { if (c.onPolished) { UI.toast('리뷰를 받았어요. 코드를 고쳐 다시 통과시키면 다듬기 XP!'); Store.prob(c.problem.id).reviewed = true; Store.save(); } } }); }
-    if (kind === 'similar') {
-      const p = c.problem; const schema = `{"title":"...","prompt":"...(HTML 없이)","starter":"...","solution":"...","tests":[{"input":"...","output":"..."},{"input":"...","output":"..."},{"input":"...","output":"..."}],"hints":["방향","구체","거의 정답"]}`;
-      const ask = async () => { let json = ''; await this.send(`현재 문제와 같은 개념(${p.tags.join(', ')})을 연습하는 새 문제를 하나 만들어 주세요. 반드시 아래 JSON 형식만 출력하고 다른 말은 쓰지 마세요. tests는 3개, 각 output은 solution을 그 input으로 실행했을 때의 정확한 표준 출력이어야 해요. 코드는 지금 레슨 범위 안의 문법만 쓰세요.\n${schema}`, { hidden: true, onDone: (f) => { json = f; } }); const m = json.match(/\{[\s\S]*\}/); if (!m) throw new Error('형식 오류'); return JSON.parse(m[0]); };
-      const verify = async (q) => { for (const t of q.tests) { let out = ''; const r = await Py.run({ code: q.solution, input: t.input || '', onOut: (x, e) => { if (!e) out += x; } }); if (!r.ok || Grader.norm(out) !== Grader.norm(t.output)) return false; } return true; };
-      try { let q = await ask(); let ok = await verify(q); if (!ok) { q = await ask(); ok = await verify(q); } if (!ok) { this.log().push({ role: 'assistant', content: '지금은 만들 수 없어요. 잠시 후 다시 시도해 주세요.' }); this.renderLog(); return; }
-        const np = { id: 'MY_' + uid(), lesson: p.lesson, type: 'code', title: '🎲 ' + q.title, prompt: esc(q.prompt).replace(/\n/g, '<br>'), tags: p.tags, hints: q.hints && q.hints.length >= 3 ? q.hints : ['문제를 다시 읽어 보세요', '원래 문제의 풀이를 떠올리세요', q.solution.split('\n')[0]], starter: q.starter || '', solution: q.solution, tests: q.tests, myProblem: true };
-        Store.data.myProblems.push(np); Content.problemMap[np.id] = np; Content.byLesson[np.lesson] = Content.byLesson[np.lesson] || []; Content.byLesson[np.lesson].push(np); PROBLEMS.push(np); Store.save();
-        this.log().push({ role: 'assistant', content: `새 문제 "${q.title}"를 만들었어요! 내 문제집에 저장했고, 복습 큐에도 들어가요.` }); this.renderLog(); UI.toast('🎲 새 문제가 준비됐어요'); setTimeout(() => { this.close(); if (c.onNewProblem) c.onNewProblem(np); }, 800);
-      } catch (e) { this.log().push({ role: 'assistant', content: '지금은 만들 수 없어요. (' + (e.message || '') + ')' }); this.renderLog(); }
-    }
-  },
-};
-
 // ---------- 온보딩 ----------
 const Onboarding = {
   async start(replay = false) {
@@ -192,12 +153,15 @@ const Onboarding = {
 
 // ---------- 초기화 ----------
 window.addEventListener('DOMContentLoaded', () => {
-  Store.load(); Content.init(); (Store.data.myProblems || []).forEach(np => { if (!Content.problemMap[np.id]) { Content.problemMap[np.id] = np; (Content.byLesson[np.lesson] = Content.byLesson[np.lesson] || []).push(np); PROBLEMS.push(np); } });
+  Store.load(document.body.dataset.course || 'python'); Content.init(); (Store.data.myProblems || []).forEach(np => { if (!Content.problemMap[np.id]) { Content.problemMap[np.id] = np; (Content.byLesson[np.lesson] = Content.byLesson[np.lesson] || []).push(np); PROBLEMS.push(np); } });
   UI.applyTheme(); Confetti.init(); Loader.init(); QuickKeys.init(); Tutor.ui.init();
   Sync.load();
   Py.start(); // 홈 진입과 동시에 백그라운드 로딩
   Game.touchStreak(); Store.save();
   document.addEventListener('click', () => { Audio._ctx(); }, { once: true });
   if (!Store.data.onboarded) { UI.go('home', {}, false); Onboarding.start(); } else UI.go('home', {}, false);
+  // 허브에서 온 딥링크: #problem/L3P2 · #lesson/L1 · #settings · #review 등
+  const goHash = () => { const h = location.hash.slice(1); if (!h) return; const [v, id] = h.split('/'); try { if (v === 'problem' && Content.problemMap[id]) UI.go('problem', { pid: id, lessonId: Content.problemMap[id].lesson }); else if (v === 'lesson' && Content.lessonMap[id]) UI.go('lesson', { lessonId: id, page: 0 }); else if (Views[v] && !id) UI.go(v); } catch (e) { console.warn('deep link', e); } history.replaceState(null, '', location.pathname + location.search); };
+  if (Store.data.onboarded) goHash();
   Sync.init(); // 연동돼 있으면 다른 기기 진행 상황을 내려받아 합친다
 });

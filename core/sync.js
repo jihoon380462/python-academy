@@ -4,7 +4,7 @@
 //   - 저장할 때마다(디바운스 3초) 올리고, 앱 시작·화면 복귀 때 내려받아 합친다. 클로드 API 키는 동기화하지 않는다.
 // =====================================================================
 const Sync = {
-  KEY: 'python_academy_sync', FILE: 'python_academy_save.json', DESC: '파이썬 아카데미 진행 데이터 (자동 동기화 · 지우지 마세요)',
+  KEY: 'academy.sync', FILE: 'python_academy_save.json', DESC: '파이썬 아카데미 진행 데이터 (자동 동기화 · 지우지 마세요)',
   API: 'https://api.github.com', TOKEN_URL: 'https://github.com/settings/tokens/new?scopes=gist&description=python-academy-sync',
   DEBOUNCE_MS: 3000, CODE_PREFIX: 'PA-SYNC:',
   cfg: null, timer: null, state: 'off', msg: '', busy: false, pending: false, hook: null,
