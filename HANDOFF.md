@@ -7,8 +7,8 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| **현재 버전** | v2.1.0 (2026-11-01 배포, Phase 1) |
-| **마지막 작업** | **Phase 1 완료(v2.1.0)**: 코스 2 알고리즘·자료구조 `courses/algo/`(레슨 16+보스 4, 문제 101, 모의고사 15문제 풀) + `core/visualize.js` 시각화 8종(레슨 예제 `example.visualize`·문제 `visualize`·추적 퀴즈 `quiz.code`) + 시간 제한 채점(`limits.time`, `inputGen`, `Py.bench`) + 모의고사 모드(`Views.mock`, `Sessions.mock`) + 새 유형 kind(trace/bigo/choose/ct) + 허브 알고리즘 카드(전제 B3, 설정 '전제 무시') + 알고리즘 뱃지 4개. 상세: DESIGN.md 12절, CHANGELOG. |
+| **현재 버전** | v2.1.1 (2026-11-01 배포) |
+| **마지막 작업** | v2.1.1: 기기 연동 토스트 억제 — 병합 비교에서 updatedAt·syncDevice·last 메타 제외(다른 기기가 저장만 해도 '가져왔어요'가 뜨던 문제), 화면 복귀·온라인 복구 pull은 `quietSync`(토스트 없음, 앱 시작 때만 알림). 그 전 **Phase 1 완료(v2.1.0)**: 코스 2 알고리즘·자료구조 `courses/algo/`(레슨 16+보스 4, 문제 101, 모의고사 15문제 풀) + `core/visualize.js` 시각화 8종(레슨 예제 `example.visualize`·문제 `visualize`·추적 퀴즈 `quiz.code`) + 시간 제한 채점(`limits.time`, `inputGen`, `Py.bench`) + 모의고사 모드(`Views.mock`, `Sessions.mock`) + 새 유형 kind(trace/bigo/choose/ct) + 허브 알고리즘 카드(전제 B3, 설정 '전제 무시') + 알고리즘 뱃지 4개. 상세: DESIGN.md 12절, CHANGELOG. |
 | **다음 후보** | ① v2.1.0 실사용 확인(알고리즘 코스 시각화·시간 제한·모의고사, 실제 Pyodide) 후 패치 ② **Phase 2**: 코스 3 터미널·Git + 셸·Git 시뮬레이터(EXPANSION.md 6절 → v2.2.0) ③ 레슨 A0·A1 n 슬라이더 UI 노출, 허브 복습 큐 코스 통합 |
 
 ## 1. 이게 뭔가

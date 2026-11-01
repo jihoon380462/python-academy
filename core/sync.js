@@ -54,7 +54,10 @@ const Sync = {
   },
   apply(remote) { // 내려받은 데이터를 로컬에 반영 (API 키는 로컬 것 유지)
     const apiKey = Store.data.settings.apiKey; const local = Store.data; const fresh = !this.cfg.lastSyncAt && !local.xp && !Object.keys(local.problems || {}).length && !(local.works || []).length; // 이 기기는 처음 연동 + 아직 아무것도 안 함 → 다른 기기 것을 통째로
-    const merged = fresh ? JSON.parse(JSON.stringify(remote)) : this.merge(local, remote); const changed = JSON.stringify(merged) !== JSON.stringify(Store.data);
+    const merged = fresh ? JSON.parse(JSON.stringify(remote)) : this.merge(local, remote);
+    // "바뀌었다"는 시각(updatedAt)·기기 이름 같은 메타는 빼고, 진행·설정이 실제로 달라졌을 때만 (안 그러면 다른 기기가 저장할 때마다 토스트가 떠서 시선을 뺏음)
+    const strip = (d) => { const o = Object.assign({}, d); delete o.updatedAt; delete o.syncDevice; delete o.last; return JSON.stringify(o); };
+    const changed = strip(merged) !== strip(Store.data);
     Store.data = Object.assign(Store.blank(), merged); Store.data.settings = Object.assign(Store.blank().settings, merged.settings || {}); Store.data.settings.apiKey = apiKey; Store.migrate(); Store.save({ silent: true });
     return changed;
   },
@@ -88,11 +91,12 @@ const Sync = {
       this.set('syncing'); const changed = await this.pull();
       if (force || (Store.data.updatedAt || 0) > this.cfg.lastLocalUpdated || changed) await this.push();
       this.cfg.lastSyncAt = Date.now(); this.saveCfg(); this.set('ok');
-      if (changed) { UI.toast('☁ 다른 기기의 진행 상황을 가져왔어요'); if (UI.view && !['problem', 'lesson', 'playground'].includes(UI.view)) UI.go(UI.view, UI.params, false); else UI.renderTopbar(); }
+      if (changed) { if (!this._quiet) UI.toast('☁ 다른 기기의 진행 상황을 가져왔어요', 1500); if (UI.view && !['problem', 'lesson', 'playground'].includes(UI.view)) UI.go(UI.view, UI.params, false); else UI.renderTopbar(); }
       return changed;
     } catch (e) { this.set('err', this.errMsg(e)); console.warn('sync', e); return false; }
     finally { this.busy = false; if (this.pending) { this.pending = false; this.schedulePush(); } }
   },
+  async quietSync() { this._quiet = true; try { return await this.syncNow(); } finally { this._quiet = false; } }, // 복귀·온라인 복구 때는 토스트 없이
   schedulePush() { if (!this.on) return; clearTimeout(this.timer); this.state = 'dirty'; this.timer = setTimeout(() => this.syncNow(), this.DEBOUNCE_MS); },
   flush() { if (!this.on || this.state !== 'dirty') return; clearTimeout(this.timer); this.syncNow(); },
   ago() { const t = this.cfg && this.cfg.lastSyncAt; if (!t) return '아직 안 함'; const s = Math.round((Date.now() - t) / 1000); return s < 60 ? '방금' : s < 3600 ? Math.round(s / 60) + '분 전' : s < 86400 ? Math.round(s / 3600) + '시간 전' : Math.round(s / 86400) + '일 전'; },
@@ -100,8 +104,8 @@ const Sync = {
   init() {
     this.load(); if (!this.on) return;
     this.syncNow();
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') this.syncNow(); else this.flush(); });
-    window.addEventListener('pagehide', () => this.flush()); window.addEventListener('online', () => this.syncNow());
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') this.quietSync(); else this.flush(); });
+    window.addEventListener('pagehide', () => this.flush()); window.addEventListener('online', () => this.quietSync());
   },
   // 설정 화면 카드
   card() {
