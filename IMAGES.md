@@ -17,7 +17,7 @@
 
 프롬프트는 영어로 적어 두었다(생성기가 영어를 더 잘 알아듣는다). 한국어 설명은 의도 확인용.
 
-## 2. 완료된 그림 (검수 통과 ✅ — 18장, 2026-11-02 v2.2.18 기준. **스타일 기준**: 새 그림은 이 세트와 나란히 놓았을 때 한 작가가 그린 것처럼 보여야 한다)
+## 2. 완료된 그림 (검수 통과 ✅ — 31장, v2.2.21 기준. **스타일 기준**: 새 그림은 이 세트와 나란히 놓았을 때 한 작가가 그린 것처럼 보여야 한다)
 
 | 파일 | 내용 | 쓰이는 곳 |
 | --- | --- | --- |
@@ -26,30 +26,27 @@
 | `badge-master_python.png` `badge-master_algo.png` | 왕관 쓴 뱀·부엉이 금메달 | 뱃지 화면, 공유 카드 |
 | `hero-hub.png` (1200×274로 잘라 둠) | 마스코트 5마리 + 코드 블록 | 허브 맨 위 배너 |
 | `empty-works.png` | 이젤 위 새싹 + 붓 든 뱀 | 내 작품 빈 화면 |
+| `chapter-python-0.png` | ✅ 완료 — 출발 깃발(초록) | 홈 지도 파이썬 0 시작 제목 옆 32px |
+| `chapter-python-1.png` | ✅ 완료 — 새싹 화분 | 홈 지도 1 첫걸음 제목 옆 32px |
+| `chapter-python-2.png` | ✅ 완료 — 파란 회오리 화살표(반복) | 홈 지도 2 반복과 묶음 제목 옆 32px |
+| `chapter-python-3.png` | ✅ 완료 — 주황 상자 3개 쌓임 | 홈 지도 3 데이터 다루기 제목 옆 32px |
+| `chapter-python-4.png` | ✅ 완료 — 보라 톱니바퀴 2개 | 홈 지도 4 더 큰 프로그램 제목 옆 32px |
+| `chapter-python-5.png` | ✅ 완료 — 분홍 리본 메달 | 홈 지도 5 마무리 제목 옆 32px |
+| `chapter-python-6.png` | ✅ 완료 — 금 트로피 | 홈 지도 6 실전 제목 옆 32px |
+| `chapter-python-7.png` | ✅ 완료 — 청록 망원경 | 홈 지도 7 한 걸음 더 제목 옆 32px |
+| `chapter-algo-1.png` | ✅ 완료 — 초록 나침반 | 홈 지도 알고 1 들어가기 제목 옆 32px |
+| `chapter-algo-2.png` | ✅ 완료 — 파란 돋보기 + 막대 3개 | 홈 지도 2 찾고 정렬하기 제목 옆 32px |
+| `chapter-algo-3.png` | ✅ 완료 — 주황 사슬 고리 3개 | 홈 지도 3 연결된 구조 제목 옆 32px |
+| `chapter-algo-4.png` | ✅ 완료 — 보라 퍼즐 조각 | 홈 지도 4 패턴 제목 옆 32px |
+| `chapter-algo-5.png` | ✅ 완료 — 금 트로피(파이썬 6과 같은 것 재사용 가능 — 같은 파일 복사) | 홈 지도 5 실전 제목 옆 32px |
+
+**검수 메모(3차 A)**: 챕터 장식 13장(파이썬 0~7·알고 1~5) ✅ 완료. 512×512 RGBA, 사방 8% 이상 여백, `img_clean.py --check` 통과. 다크/라이트 배경에서 32px 축소본 확인. A12 트로피는 A7과 같은 파일 복사. 생성 프롬프트는 `assets/img/README.md`.
 
 **검수 메모(2차)**: 2차 16장 중 6장(알고·SQL·웹 아이콘, 빈 작품, 알고 마스터 뱃지, 배너)에 **흰 스티커 테두리**가 있어 다크 테마에서 흰 띠로 보였음 → `tools/img_clean.py`로 투명 배경에 닿은 흰~회색 테두리를 지워 해결(내부 흰색은 윤곽선에 막혀 유지). 앞으로는 납품 전에 `python3 tools/img_clean.py --check`로 확인하고, 테두리가 있으면 `python3 tools/img_clean.py`(인자 없음)로 정리한 뒤 커밋. 배너는 아래 빈 공간을 잘라 1200×274가 됨 — 가로 배너는 **내용이 캔버스를 꽉 채우게** 그리는 편이 좋다.
 
-## 3. 요청 목록 — 3차 (다음에 만들 것, 총 17장)
+## 3. 요청 목록 — 3차 잔여 (B: 수학 공간 8장)
 
 규칙은 1절 + 2절 검수 메모(흰 테두리 금지 — 바깥 윤곽선은 어두운 남색 `#1d2230`으로 끝나야 함).
-
-### A. 챕터 장식 (512×512, 홈 지도 챕터 제목 옆 32px — 작게 보이므로 **소품 하나, 단순하게**)
-
-| # | 파일 | 챕터 | 소품 | Prompt (EN) |
-| --- | --- | --- | --- | --- |
-| A1 | `chapter-python-0.png` | 파이썬 0 시작 | 출발 깃발(초록) | `flat vector sticker of a small green start flag on a short pole, bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin, simple icon` |
-| A2 | `chapter-python-1.png` | 1 첫걸음 | 새싹 화분 | `flat vector sticker of a tiny sprout in a small pot, bold dark navy outline (#1d2230), green (#4caf50), no text, transparent background, centered, 8% margin` |
-| A3 | `chapter-python-2.png` | 2 반복과 묶음 | 파란 회오리 화살표(반복) | `flat vector sticker of a blue circular loop arrow (#2196f3), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A4 | `chapter-python-3.png` | 3 데이터 다루기 | 주황 상자 3개 쌓임 | `flat vector sticker of three stacked orange boxes (#ff9800) with a small label tag, bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A5 | `chapter-python-4.png` | 4 더 큰 프로그램 | 보라 톱니바퀴 2개 | `flat vector sticker of two interlocking purple gears (#9c27b0), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A6 | `chapter-python-5.png` | 5 마무리 | 분홍 리본 메달 | `flat vector sticker of a pink ribbon rosette medal (#e91e63), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A7 | `chapter-python-6.png` | 6 실전 | 금 트로피 | `flat vector sticker of a small golden trophy (#ffd166), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A7b | `chapter-python-7.png` | 7 한 걸음 더 | 청록 망원경 | `flat vector sticker of a small teal telescope on a tripod (#00acc1), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A8 | `chapter-algo-1.png` | 알고 1 들어가기 | 초록 나침반 | `flat vector sticker of a small green compass (#4caf50), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A9 | `chapter-algo-2.png` | 2 찾고 정렬하기 | 파란 돋보기 + 막대 3개 | `flat vector sticker of a blue magnifying glass over three bars of increasing height (#2196f3), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A10 | `chapter-algo-3.png` | 3 연결된 구조 | 주황 사슬 고리 3개 | `flat vector sticker of three orange chain links (#ff9800) connected in a row, bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A11 | `chapter-algo-4.png` | 4 패턴 | 보라 퍼즐 조각 | `flat vector sticker of a purple jigsaw puzzle piece (#9c27b0), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
-| A12 | `chapter-algo-5.png` | 5 실전 | 금 트로피(파이썬 6과 같은 것 재사용 가능 — 같은 파일 복사) | (A7 복사) |
 
 ### B. 수학 공간 (EXPANSION.md 14절 준비 — 자리는 M1에서 생김, **M1 착수 전엔 만들지 말 것**)
 

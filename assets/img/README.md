@@ -130,3 +130,80 @@ Create ONE isolated finished PNG asset for the same beginner coding academy stic
 SUBJECT: An empty EASEL with a blank canvas; a small green SPROUT actually grows from the bottom of the canvas. The same friendly green snake as reference sits beside the easel holding a PAINTBRUSH. One snake, one easel, one sprout. Warm soft yellow and green palette; inviting create-your-first-project illustration. No question mark, no artwork painted on the otherwise blank canvas, no laptop or text.
 This is a small icon, no large empty frame around it.
 ```
+
+
+## 3차 A — 챕터 장식 13장
+
+내장 `image_gen` 사용. `course-python.png`는 스타일 참조로만 사용. 최종 납품은 512×512 RGBA·8% 이상 여백이며 `tools/img_clean.py --check`와 다크/라이트 32px 축소본 검수를 통과했다. `chapter-algo-5.png`는 `chapter-python-6.png`의 동일 복사본이다.
+
+### `chapter-python-0.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: A small green start flag on a short dark navy pole. Plain solid green flag, no symbol or writing. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-python-1.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: A tiny green #4caf50 sprout with two broad leaves in a small simple terracotta pot. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-python-2.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: One thick blue #2196f3 circular loop arrow. A clear almost-complete circular ring ending in one large arrowhead, empty center. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-python-3.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: Three stacked orange #ff9800 boxes with one small blank label tag. Very simple broad box shapes. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-python-4.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: Two interlocking purple #9c27b0 gears. Clearly separated teeth and small open centers. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-python-5.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: A pink #e91e63 ribbon rosette medal, round pleated seal and two short ribbon tails, plain blank center. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-python-6.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: A small gold #ffd166 trophy cup with two handles, short stem and solid base. Plain cup, no emblem. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-algo-1.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: A small green #4caf50 compass with a bold directional needle in a round green casing. No letters, no numbers. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-algo-2.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: A blue #2196f3 magnifying glass over three simple bars of increasing height. Keep all three bars distinguishable and the lens clear. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-algo-3.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: Exactly three orange #ff9800 chain links connected in a row. Three simple interlocking oval loops, clear open centers. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-algo-4.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: One purple #9c27b0 jigsaw puzzle piece with broad rounded tabs and sockets. Simple single piece. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
+
+### `chapter-python-7.png`
+
+```text
+Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: A small teal #00acc1 telescope on a short tripod. A simple diagonal telescope tube with one large lens, exactly three sturdy tripod legs. No extra sky objects. Reference image is STYLE ONLY: do not include the snake or laptop.
+```
