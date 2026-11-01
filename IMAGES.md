@@ -24,14 +24,14 @@
 - **한국어 설명**: 친근한 초록 뱀(파이썬 마스코트 느낌이지만 공식 로고를 베끼지 말 것)이 작은 노트북 또는 코드 블록 `{ }` 위에 똬리를 틀고 윙크하는 스티커. 초록 `#2bb673` 주색, 노랑 포인트.
 - **Prompt (EN)**: `flat vector sticker of a cute friendly green snake coiled around a small laptop, winking, bold dark navy outline (#1d2230), bright green (#2bb673) body with yellow (#ffd166) accents, no text, no gradients, transparent background, centered, 8% margin, simple shapes, kid-friendly educational app icon style`
 - **Negative**: `realistic, 3D render, photo, text, letters, logo, white background, gradient, shadow`
-- **상태**: ⬜ 요청
+- **상태**: ✅ 완료 — 2026-11-02, 윙크하는 초록 뱀과 노트북. 512×512 투명 PNG, 여백·축소 표시 검수.
 
 ### 테스트 2 — 챕터 1 보스 캐릭터: 숫자 맞히기 괴물
 - **파일**: `assets/img/boss-python-1.png` · **크기**: 512×512 · **쓰이는 곳**: 파이썬 코스 챕터 1 보스 문제(「보스: 숫자 맞히기」) 상단의 보스 HP 바 옆(화면 64px) — 지금은 👾 이모지. 보스를 깨면 같은 그림이 회색으로 바뀐다(코드가 처리, 별도 그림 불필요)
 - **한국어 설명**: 숫자 카드(1~100)가 흩날리는 가운데, 물음표 모양 뿔이 달린 동그란 보라색 꼬마 괴물이 "맞혀 봐!" 하는 듯 장난스럽게 웃는 모습. 무섭지 않게, 10세도 좋아할 귀여운 악당. 보라 `#9c27b0` 주색, 노랑 `#ffd166` 포인트.
 - **Prompt (EN)**: `flat vector sticker of a cute round purple monster (#9c27b0) with a question-mark shaped horn, playful mischievous grin, holding a card with a big number, a few floating number cards around it, bold dark navy outline (#1d2230), yellow (#ffd166) accents, no text other than digits on the cards, transparent background, centered, 8% margin, simple kid-friendly game boss icon`
 - **Negative**: `scary, realistic, 3D, photo, letters, words, white background, gradient`
-- **상태**: ⬜ 요청
+- **상태**: ✅ 완료 — 2026-11-02, 사용자 피드백으로 큰 물음표 뿔·굵은 눈썹·망토·넓은 자세를 더해 보스 인상 강화. 512×512 투명 PNG.
 
 ## 3. 다음에 요청할 것들 (테스트가 잘 되면 — 아직 만들지 말 것)
 
