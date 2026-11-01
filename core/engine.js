@@ -214,7 +214,7 @@ const Grader = {
       }
       if (tooSlow) { ok = false; note = `⏱ 시간 초과 (제한 ${limitSec}초, 내 코드 ${(r.ms / 1000 / CONFIG.ALGO.slowdown / (Py.speedFactor || 1)).toFixed(1)}초 상당) — 더 빠른 자료구조나 방법이 필요해요`; actual = '(시간 초과)'; }
       if (r.timeout && limitMs) { note = `⏱ 시간 초과 (제한 ${limitSec}초) — 더 빠른 자료구조나 방법이 필요해요`; }
-      const res = { idx: i, ok, input: t.inputGen ? (input.length <= 300 ? input : `(큰 입력 · ${input.length}자)`) : (t.input || ''), expected, actual, error: r.ok ? '' : (Py.explain(r) + (r.tb ? '\n' + r.tb : '')), hidden: i === tests.length - 1, note, raw: r, ms: r.ms };
+      const res = { idx: i, ok, input: t.inputGen ? (input.length <= 300 ? input : `(큰 입력 · ${input.length}자)`) : (t.input || ''), expected, actual, error: r.ok ? '' : (Py.explain(r) + (r.ename === 'SyntaxError' && Py.syntaxTips ? ' ' + Py.syntaxTips(code, r.line) : '') + (r.tb ? '\n' + r.tb : '')), hidden: i === tests.length - 1, note, raw: r, ms: r.ms };
       results.push(res); if (ok) passed++;
       if (onEach) onEach(res, i, tests.length);
       if (r.timeout) break;

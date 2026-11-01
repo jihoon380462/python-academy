@@ -299,8 +299,26 @@ const Py = {
       this.worker.postMessage({ type: 'run', id, code: job.code, input: job.input, call: job.call, trace: job.trace, maxsteps: job.maxsteps || CONFIG.TRACE_MAX_STEPS, vis: job.vis ? JSON.stringify(job.vis) : null, files: job.files || null, outFiles: job.outFiles || null });
     } else { this.worker.postMessage({ type: 'compile', id, code: job.code }); }
   },
+  // 보이지 않는 문자 정리 (v2.2.16): 모바일 키보드가 넣는 NBSP·전각 기호(：（）“”)·제로폭 문자·탭 때문에 생기는 SyntaxError 를 막는다.
+  //   문자열 안의 글자는 건드리지 않는다(따옴표 추적). 바뀐 게 있으면 result.normalized 에 목록을 담아 화면이 알려 준다.
+  normalize(code) {
+    const changes = new Set(); let out = ''; let q = null; const FW = { '：': ':', '（': '(', '）': ')', '［': '[', '］': ']', '｛': '{', '｝': '}', '，': ',', '．': '.', '＝': '=', '＜': '<', '＞': '>', '＋': '+', '－': '-', '＊': '*', '／': '/', '％': '%', '！': '!', '＃': '#', '“': '"', '”': '"', '‘': "'", '’': "'", '〃': '"', '＂': '"', '＇': "'" };
+    const src = String(code || '').replace(/\r\n?/g, '\n');
+    for (let i = 0; i < src.length; i++) { const ch = src[i];
+      if (ch === '\u200b' || ch === '\u200c' || ch === '\u200d' || ch === '\ufeff') { changes.add('제로폭 문자'); continue; }
+      if (q) { const curly = (q === '"' && (ch === '“' || ch === '”' || ch === '＂')) || (q === "'" && (ch === '‘' || ch === '’' || ch === '＇')); if (curly) { changes.add('둥근 따옴표 ' + ch + ' → ' + q); out += q; q = null; continue; } if (ch === q && src[i - 1] !== '\\') q = null; out += ch; continue; }
+      if (ch === '"' || ch === "'") { q = ch; out += ch; continue; }
+      if (ch === '#') { const j = src.indexOf('\n', i); out += src.slice(i, j < 0 ? src.length : j); i = (j < 0 ? src.length : j) - 1; continue; }
+      if (ch === '\u00a0' || ch === '\u3000' || ch === '\u2003' || ch === '\u2002') { changes.add(ch === '\u3000' ? '전각 공백' : '특수 공백'); out += ch === '\u3000' ? '    ' : ' '; continue; }
+      if (ch === '\t') { changes.add('탭 → 공백 4칸'); out += '    '; continue; }
+      if (FW[ch] && (ch === '“' || ch === '”' || ch === '‘' || ch === '’' || ch === '〃' || ch === '＂' || ch === '＇')) { changes.add('둥근 따옴표 ' + ch + ' → ' + FW[ch]); q = FW[ch]; out += FW[ch]; continue; }
+      if (FW[ch]) { changes.add('전각 기호 ' + ch + ' → ' + FW[ch]); out += FW[ch]; continue; }
+      out += ch; }
+    return { code: out, changes: [...changes] };
+  },
   run({ code, input = '', call = null, trace = false, onOut = null, vis = null, maxsteps = null, timeoutMs = null, files = null, outFiles = null }) {
-    return new Promise(resolve => { this.queue.push({ kind: 'run', code, input, call, trace, onOut, vis, maxsteps, timeoutMs, files, outFiles, resolve }); if (!this.worker && !this.main) this.start(); this._next(); });
+    const nz = this.normalize(code); code = nz.code;
+    return new Promise(resolve => { this.queue.push({ kind: 'run', code, input, call, trace, onOut, vis, maxsteps, timeoutMs, files, outFiles, resolve: (r) => { if (r && nz.changes.length) r.normalized = nz.changes; resolve(r); } }); if (!this.worker && !this.main) this.start(); this._next(); });
   },
   // 기기 속도 보정: 같은 작업을 한 번 돌려 기준 시간과 비교 (알고리즘 코스 시간 제한 채점에 곱함). 1회만.
   speedFactor: 1, benched: false,
@@ -310,6 +328,20 @@ const Py = {
     return this.speedFactor;
   },
   compile(code) { return new Promise(resolve => { this.queue.push({ kind: 'compile', code, resolve }); if (!this.worker && !this.main) this.start(); this._next(); }); },
+  // SyntaxError 원인 추정 (v2.2.16): 에러 줄과 그 앞 줄을 보고 흔한 실수를 짚는다 (선생님 없이도)
+  syntaxTips(code, line) {
+    if (!line) return ''; const lines = String(code || '').split('\n'); const cur = lines[line - 1] || ''; let pi = line - 2; while (pi >= 0 && !lines[pi].trim()) pi--; const prev = pi >= 0 ? lines[pi] : ''; const tips = [];
+    const ind = (l) => (l.match(/^ */) || [''])[0].length; const strip = (l) => l.replace(/(["']).*?\1/g, '""').replace(/#.*$/, '');
+    const opens = (l) => { const t = strip(l); return (t.match(/[([{]/g) || []).length - (t.match(/[)\]}]/g) || []).length; };
+    if (/^\s*(elif|else)\b/.test(cur)) { let j = line - 2, found = false; while (j >= 0) { const l = lines[j]; if (l.trim() && ind(l) === ind(cur) && /^\s*(if|elif|for|while|try|except)\b/.test(l)) { found = /^\s*(if|elif|try|except)\b/.test(l); break; } if (l.trim() && ind(l) < ind(cur)) break; j--; } if (!found) tips.push(`${cur.trim().split(/[\s:]/)[0]} 는 짝이 되는 if 와 들여쓰기(칸 수)가 정확히 같아야 해요. 위의 if 가 몇 칸 들여쓰여 있는지 세어 보세요.`); if (!/:\s*(#.*)?$/.test(cur) && /^\s*else\b/.test(cur)) tips.push('else 뒤에는 콜론(:)이 필요해요.'); }
+    if (prev && opens(prev) > 0) tips.push(`${pi + 1}번 줄의 괄호가 닫히지 않았어요 — ( 와 ) 개수를 맞추세요.`);
+    if (prev && ((strip(prev).match(/"/g) || []).length % 2 === 1 || (prev.replace(/"[^"]*"/g, '').match(/'/g) || []).length % 2 === 1)) tips.push(`${pi + 1}번 줄의 따옴표 짝이 맞지 않아요.`);
+    if (/^\s*(if|elif|else|for|while|def|class|try|except|finally|with)\b/.test(cur) && !/:\s*(#.*)?$/.test(cur) && opens(cur) === 0) tips.push('이 줄 끝에 콜론(:)이 빠졌어요.');
+    if (/^\s*(if|elif|while)\s.*[^=!<>]=[^=]/.test(strip(cur)) && !/==/.test(cur)) tips.push('비교는 = 가 아니라 == 예요.');
+    if (/[\u00a0\u3000\uff01-\uff5e\u201c\u201d\u2018\u2019]/.test(cur + prev)) tips.push('전각 기호(：（）“”)나 특수 공백이 섞여 있어요. 한/영을 영문으로 두고 다시 치거나 아래 칩으로 넣으세요.');
+    if (!tips.length && prev && ind(cur) > ind(prev) && !/:\s*(#.*)?$/.test(prev)) tips.push(`${pi + 1}번 줄이 콜론(:)으로 끝나지 않는데 이 줄이 들여쓰여 있어요.`);
+    return tips.slice(0, 2).join(' ');
+  },
   explain(result) { // 에러 → 한국어 한 줄
     if (!result || result.ok) return '';
     if (result.timeout) return T.timeout;
