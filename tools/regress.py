@@ -54,6 +54,9 @@ with sync_playwright() as p:
     check(x1==x0 and d1==d0 and any(e.get('rerun') for e in ev if e['type']=='xp'), '이미 클리어한 문제 재제출 → XP·일일 횟수 없음 (%d→%d)'%(x0,x1))
     d=pg.evaluate("Grader.explainDiff({expected:'1\\n2\\n3', actual:'1\\n2'})"); check(len(d['tips'])>=1 and '적어요' in d['tips'][0] and len(d['rows'])==3, '출력 차이 설명(explainDiff): '+d['tips'][0][:30])
     pg.evaluate("UI.go('lesson',{lessonId:'L2',page:0})"); pg.wait_for_timeout(300); pg.click('#lpLost'); pg.wait_for_timeout(200); check(pg.locator('.lp-helpbox').count()==1 and pg.evaluate("Store.data.stats.confused||0")>=1, '레슨 「모르겠어요」 도움 상자')
+    pg.evaluate("UI.go('stats')"); pg.wait_for_timeout(300); check(pg.locator('.st-day').count()==14 and '클리어' in pg.locator('#view').inner_text() and '모르겠어요가 많았던' in pg.locator('#view').inner_text(), '학습 통계 화면(F3) + 모르겠어요 레슨')
+    pg.evaluate("UI.go('weakness')"); pg.wait_for_timeout(300); check(pg.locator('[data-cl-lesson]').count()>=1, '약점 화면: 모르겠어요 레슨 연결')
+    pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('#homeConf').count()==1, '홈: 모르겠어요 레슨 다시 보기 추천')
     pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300); check(pg.locator('#sOffline').count()==1 and '완전 무료' in pg.locator('#view').inner_text(), '설정: 오프라인 캐시 줄 + 무료 안내')
     # 빈칸
     pg.evaluate("UI.go('problem',{pid:'L1P4',lessonId:'L1'})"); pg.wait_for_timeout(300)

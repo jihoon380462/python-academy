@@ -44,7 +44,7 @@
 | --- | --- | --- | --- |
 | F1 | 복습 큐를 허브에서 코스 공통으로(지금은 파이썬만 `Review.due`) | `core/game.js` Review, `core/hub.js` | 알고리즘 틀린 문제도 복습 |
 | F2 | 알고리즘 `example.slider:{var,min,max,step}` — n을 끌면 예제가 다시 실행되고 시간이 그래프로 | `core/ui-views-main.js` 레슨 예제, `core/visualize.js` | 지시서 5절 미구현 |
-| F3 | 학습 통계 화면(요일별 푼 문제·정답률·약점 태그 추이) | 새 `Views.stats`(`core/ui-views-more.js`), `Store.data.days`·`stats` | 그래프는 visualize bars 재사용 |
+| F3 | ~~학습 통계 화면~~ **완료(v2.2.8)** `Views.stats` | | |
 | F4 | 문제 검색·필터(제목/태그/상태) 홈 지도 위 | `core/ui-views-main.js` home | 모바일에선 칩으로 |
 | F5 | 선생님(튜터) 개선: 현재 문제의 테스트 실패 내용을 자동으로 같이 보내기, 답변에 코드 블록 복사 버튼 | `core/tutor.js` | 키 없는 사용자 영향 없음 |
 | F6 | 키보드 단축키 안내 모달(?) + Ctrl+Enter 실행/Ctrl+Shift+Enter 제출/Esc 닫기 | `core/ui-core.js` | PC만 |

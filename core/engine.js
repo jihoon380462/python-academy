@@ -268,5 +268,7 @@ Grader.explainDiff = function (r) {
     }
   }
   if (/input\(["'][^"']+["']\)/.test(r.code || '') && al.length > el.length) tips.push('input("…") 안의 안내문은 출력으로 나가요. 채점에서는 input() 을 비워 두세요.');
+  if (r.ptype === 'parsons') tips.push('순서 맞추기: 타일의 순서뿐 아니라 들여쓰기 칸(▸)도 채점돼요. 반복·조건 안에 들어갈 줄은 한 칸 안으로.');
+  else if (r.mode === 'block') tips.push('블록: 반복 안에 들어가야 할 블록이 밖에 있거나, 변수 이름이 다르거나, 출력 블록이 빠지지 않았는지 보세요.');
   return { rows, tips: [...new Set(tips)].slice(0, 3), firstBad };
 };
