@@ -103,9 +103,17 @@ dfn.term{font-style:normal;font-weight:800;font-size:1.12em;text-decoration:unde
 .turtle-c{max-width:100%;border-radius:8px;border:1px solid var(--border);background:var(--surface2);margin-top:8px}
 #quickkeys{position:fixed;left:0;right:0;bottom:0;z-index:200;display:none;gap:4px;padding:6px;background:var(--surface);border-top:1px solid var(--border);overflow-x:auto;white-space:nowrap}#quickkeys.show{display:flex}#quickkeys button{min-width:44px;min-height:44px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--mono);flex-shrink:0}
 /* 블록 */
-.block-wrap{display:grid;grid-template-columns:1fr 280px;gap:10px}.bed{height:460px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface2)}.bed-ws{width:100%;height:100%}.bed-loading{padding:20px;color:var(--muted)}
+.block-wrap{display:grid;grid-template-columns:1fr 280px;gap:10px}.bed{position:relative;height:460px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface2)}.bed-ws{width:100%;height:100%}.bed-loading{padding:20px;color:var(--muted)}
+.bed-guide{position:absolute;left:46%;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;text-align:center;color:#334;background:rgba(255,255,255,.92);border:2px dashed var(--primary);border-radius:14px;padding:14px 12px;font-size:1.02em;line-height:1.5;box-shadow:0 6px 20px rgba(0,0,0,.12);transition:opacity .25s}.bed-guide.hide{opacity:0}
+.bed-guide .bg-arrow{font-size:2em;line-height:1;color:var(--primary);animation:bgnudge 1.1s ease-in-out infinite}.bed-guide .bg-t b{color:var(--primary)}.bed-guide .bg-s{margin-top:6px;font-size:.86em;color:#667}
+.bed.single .bed-guide{left:50%}.bed.horiz .bed-guide{left:14px;right:14px;top:34%;transform:none}.bed.horiz .bg-arrow{animation-name:bgnudgev}
+@keyframes bgnudge{0%,100%{transform:translateX(0)}50%{transform:translateX(-10px)}}@keyframes bgnudgev{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
 .codeview{min-width:0}.codeview .code{height:400px;overflow:auto;padding:8px}.cvl{padding:0 6px;border-radius:4px;cursor:pointer;white-space:pre}.cvl.hl{background:rgba(80,160,255,.3)}
-.blocklyToolboxDiv{background:var(--surface)!important;color:var(--text)}.blocklyTreeLabel{color:var(--text)!important}.blocklyFlyoutBackground{fill:var(--surface2)!important}
+.blocklyToolboxDiv{background:var(--surface)!important;color:var(--text);padding:6px 4px!important}.blocklyTreeLabel{color:var(--text)!important;font-weight:800;font-size:1.05em}.blocklyFlyoutBackground{fill:var(--surface2)!important}
+.bed:not(.horiz) .blocklyToolboxContents::before{content:'블록 메뉴\A눌러서 열기 ▾';white-space:pre;display:block;text-align:center;font-size:.72em;color:var(--muted);padding:4px 0 8px;line-height:1.35}
+.bed:not(.horiz) .blocklyToolboxCategory{margin:3px 0}.bed:not(.horiz) .blocklyTreeRow{display:flex;align-items:center;justify-content:center;gap:4px;height:auto!important;padding:10px 8px!important;margin:0!important;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;transition:transform .12s}.bed:not(.horiz) .blocklyTreeRow:hover{transform:translateX(2px)}
+.bed:not(.horiz) .blocklyTreeRow::after{content:'▸';font-weight:900;color:var(--muted)}.bed:not(.horiz) .blocklyTreeSelected::after{content:'◂';color:#fff}.bed:not(.horiz) .blocklyTreeSelected .blocklyTreeLabel{color:#fff!important}
+.blocklyFlyoutLabelText{fill:var(--text)!important;font-weight:800;font-size:.95em}
 /* Parsons */
 .parsons{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pz-col{min-width:0}.pz-head{font-weight:700;font-size:.9em;margin-bottom:6px}.pz-head small{color:var(--muted);font-weight:normal}
 .pz-list{min-height:120px;border:1px dashed var(--border);border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:5px;background:var(--surface2)}.pz-empty{color:var(--muted);font-size:.85em;padding:8px}
@@ -195,7 +203,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '1.0.4',
+  APP_VERSION: '1.0.5',
   SAVE_KEY: 'python_academy_save',
   SCHEMA_VERSION: 1,
 
@@ -1975,7 +1983,10 @@ const Blocks = {
   toolbox(allowed) {
     const shadow = { text_print: { TEXT: { shadow: { type: 'text', fields: { TEXT: '안녕' } } } }, math_arithmetic: { A: { shadow: { type: 'math_number', fields: { NUM: 1 } } }, B: { shadow: { type: 'math_number', fields: { NUM: 1 } } } }, math_modulo: { DIVIDEND: { shadow: { type: 'math_number', fields: { NUM: 7 } } }, DIVISOR: { shadow: { type: 'math_number', fields: { NUM: 2 } } } }, py_floordiv: { A: { shadow: { type: 'math_number', fields: { NUM: 7 } } }, B: { shadow: { type: 'math_number', fields: { NUM: 2 } } } }, logic_compare: { A: { shadow: { type: 'math_number', fields: { NUM: 1 } } }, B: { shadow: { type: 'math_number', fields: { NUM: 1 } } } }, controls_repeat_ext: { TIMES: { shadow: { type: 'math_number', fields: { NUM: 3 } } } }, py_for_range: { FROM: { shadow: { type: 'math_number', fields: { NUM: 1 } } }, TO: { shadow: { type: 'math_number', fields: { NUM: 5 } } } }, py_change: { N: { shadow: { type: 'math_number', fields: { NUM: 1 } } } }, py_index: { I: { shadow: { type: 'math_number', fields: { NUM: 0 } } } }, py_int: { X: { shadow: { type: 'py_input' } } }, variables_set: { VALUE: { shadow: { type: 'math_number', fields: { NUM: 0 } } } } };
     const contents = [];
-    for (const [name, colour, types] of this.CATS) { const use = types.filter(t => allowed.includes(t)); if (!use.length) continue; const cat = { kind: 'category', name, colour: String(colour) }; if (name === '변수') { cat.custom = 'VARIABLE'; } else if (name === '함수') { cat.custom = 'PROCEDURE'; } else cat.contents = use.map(t => ({ kind: 'block', type: t, inputs: shadow[t] })); contents.push(cat); }
+    const guide = { kind: 'label', text: '👉 블록을 끌어서 흰 바탕에 놓으세요' };
+    for (const [name, colour, types] of this.CATS) { const use = types.filter(t => allowed.includes(t)); if (!use.length) continue; const cat = { kind: 'category', name, colour: String(colour) }; if (name === '변수') { cat.custom = 'VARIABLE'; } else if (name === '함수') { cat.custom = 'PROCEDURE'; } else cat.contents = [guide].concat(use.map(t => ({ kind: 'block', type: t, inputs: shadow[t] }))); contents.push(cat); }
+    // 카테고리가 하나뿐이면(초반 레슨) 메뉴를 누를 필요 없이 블록이 바로 보이는 플라이아웃 도구상자 사용
+    if (contents.length === 1 && contents[0].contents) return { kind: 'flyoutToolbox', contents: contents[0].contents, _single: true };
     return { kind: 'categoryToolbox', contents };
   },
 };
@@ -1987,10 +1998,22 @@ class BlockEditor {
   }
   build(allowed, state) {
     this.parent.innerHTML = ''; const div = document.createElement('div'); div.className = 'bed-ws'; this.parent.appendChild(div);
-    const mobile = UI.isMobile();
-    this.ws = Blockly.inject(div, { toolbox: Blocks.toolbox(allowed), horizontalLayout: mobile, toolboxPosition: mobile ? 'end' : 'start', scrollbars: true, trashcan: true, zoom: { controls: true, wheel: true, startScale: mobile ? 0.8 : 0.95, maxScale: 2, minScale: 0.4, pinch: true }, move: { scrollbars: true, drag: true, wheel: false }, renderer: 'zelos', grid: { spacing: 20, length: 2, colour: 'rgba(128,128,128,.15)', snap: true } });
+    const mobile = UI.isMobile(); const tb = Blocks.toolbox(allowed); const single = !!tb._single; delete tb._single;
+    this.parent.classList.toggle('horiz', mobile); this.parent.classList.toggle('single', single);
+    this.ws = Blockly.inject(div, { toolbox: tb, horizontalLayout: mobile, toolboxPosition: mobile ? 'end' : 'start', scrollbars: true, trashcan: true, zoom: { controls: true, wheel: true, startScale: mobile ? 0.8 : 0.95, maxScale: 2, minScale: 0.4, pinch: true }, move: { scrollbars: true, drag: true, wheel: false }, renderer: 'zelos', grid: { spacing: 20, length: 2, colour: 'rgba(128,128,128,.15)', snap: true } });
     if (state) { try { Blockly.serialization.workspaces.load(state, this.ws); } catch (e) { console.warn('블록 상태 복원 실패', e); } }
-    this.ws.addChangeListener((ev) => { if (ev.isUiEvent) { if (ev.type === Blockly.Events.SELECTED && this.onSelect) this.onSelect(ev.newElementId); return; } this.onChange && this.onChange(this.getCode()); });
+    // 빈 작업판 안내: 블록이 하나도 없을 때만 보임
+    const guide = document.createElement('div'); guide.className = 'bed-guide';
+    const from = mobile ? '아래' : '왼쪽', arrow = mobile ? '⬇' : '⬅';
+    guide.innerHTML = single
+      ? `<div class="bg-arrow">${arrow}</div><div class="bg-t">${from}에 있는 <b>블록을 손가락(마우스)으로 끌어서</b><br>이 흰 바탕에 놓으세요</div><div class="bg-s">놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`
+      : `<div class="bg-arrow">${arrow}</div><div class="bg-t"><b>①</b> ${from} 메뉴(출력·변수…)를 눌러 블록을 꺼내고<br><b>②</b> 블록을 끌어서 이 흰 바탕에 놓으세요</div><div class="bg-s">놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`;
+    this.parent.appendChild(guide); this.guide = guide;
+    const updGuide = () => { if (!this.ws) return; guide.classList.toggle('hide', this.ws.getAllBlocks(false).length > 0); };
+    updGuide();
+    // 여러 카테고리일 때 작업판이 비어 있으면 첫 메뉴를 자동으로 열어 블록을 바로 보여줌
+    if (!single && !this.ws.getAllBlocks(false).length) { setTimeout(() => { try { const t = this.ws && this.ws.getToolbox(); if (t && t.selectItemByPosition) t.selectItemByPosition(0); } catch (e) {} }, 120); }
+    this.ws.addChangeListener((ev) => { if (ev.isUiEvent) { if (ev.type === Blockly.Events.SELECTED && this.onSelect) this.onSelect(ev.newElementId); return; } updGuide(); this.onChange && this.onChange(this.getCode()); });
     setTimeout(() => this.resize(), 50); this._rs = () => this.resize(); addEventListener('resize', this._rs);
     this.onChange && this.onChange(this.getCode());
   }
@@ -2208,7 +2231,7 @@ Views.problem = (root, params) => {
       else { host.innerHTML = `<div class="muted">② 코드를 고쳐서 채점하세요 (틀린 줄: ${p.bug.bugLine}번)</div><div class="ed-wrap"><div id="pvEd"></div></div>`; st.editor = new TextEditor($('#pvEd'), { value: st.bugFixed || (rec.mode === 'bugfix' && rec.code) || p.bug.code, onChange: () => { st.editor.setErrorLine(null); } }); st.editor.setLines([{ line: p.bug.bugLine, cls: 'hl-line' }]); io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun(); }
     }
     else if (st.mode === 'parsons') { host.innerHTML = `<div id="pvPz"></div><div class="row"><button class="btn accent" id="btnGrade">✔ 확인</button><button class="btn" id="btnRun">▶ 실행해 보기</button></div><div class="out-wrap"><pre class="out" id="pvOut"></pre></div>`; let state = null; try { if (rec.mode === 'parsons' && rec.code) state = JSON.parse(rec.code); } catch (e) {} st.parsons = new ParsonsEditor($('#pvPz'), { problem: p, state }); $('#btnGrade').onclick = gradeParsons; $('#btnRun').onclick = () => runCode(false); }
-    else if (st.mode === 'block') { host.innerHTML = `<div class="block-wrap"><div class="block-ed" id="pvBlock"></div><div class="codeview"><div class="lbl">생성된 파이썬 코드 <span class="muted">(블록을 누르면 줄이 반짝여요)</span></div><pre class="code" id="pvCodeView"></pre></div></div>`; let state = null; try { if (rec.mode === 'block' && rec.code) state = JSON.parse(rec.code); } catch (e) {} const cv = $('#pvCodeView'); const showCode = (code, hl = []) => { cv.innerHTML = (code || '# 블록을 끌어다 놓으세요').split('\n').map((ln, i) => `<div class="cvl ${hl.includes(i + 1) ? 'hl' : ''}" data-ln="${i + 1}">${esc(ln) || '&nbsp;'}</div>`).join(''); $$('.cvl', cv).forEach(el => el.onclick = () => { const id = st.blockEd.blockForLine(+el.dataset.ln); st.blockEd.highlight(id); $$('.cvl', cv).forEach(x => x.classList.remove('hl')); el.classList.add('hl'); }); }; st.blockEd = new BlockEditor($('#pvBlock'), { allowed: Content.blocksUpTo(base.lesson), state, onChange: (code) => { showCode(code); } }); st.blockEd.onSelect = (id) => { showCode(st.blockEd.getCode(), id ? st.blockEd.blockLines(id) : []); }; io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun(); }
+    else if (st.mode === 'block') { host.innerHTML = `<div class="block-wrap"><div class="block-ed" id="pvBlock"></div><div class="codeview"><div class="lbl">생성된 파이썬 코드 <span class="muted">(블록을 누르면 줄이 반짝여요)</span></div><pre class="code" id="pvCodeView"></pre></div></div>`; let state = null; try { if (rec.mode === 'block' && rec.code) state = JSON.parse(rec.code); } catch (e) {} const cv = $('#pvCodeView'); const showCode = (code, hl = []) => { cv.innerHTML = (code || '# 아직 블록이 없어요\n# 왼쪽 블록을 흰 바탕으로 끌어오면\n# 여기에 파이썬 코드가 나타나요').split('\n').map((ln, i) => `<div class="cvl ${hl.includes(i + 1) ? 'hl' : ''}" data-ln="${i + 1}">${esc(ln) || '&nbsp;'}</div>`).join(''); $$('.cvl', cv).forEach(el => el.onclick = () => { const id = st.blockEd.blockForLine(+el.dataset.ln); st.blockEd.highlight(id); $$('.cvl', cv).forEach(x => x.classList.remove('hl')); el.classList.add('hl'); }); }; st.blockEd = new BlockEditor($('#pvBlock'), { allowed: Content.blocksUpTo(base.lesson), state, onChange: (code) => { showCode(code); } }); st.blockEd.onSelect = (id) => { showCode(st.blockEd.getCode(), id ? st.blockEd.blockLines(id) : []); }; io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun(); }
     else { // text
       host.innerHTML = `<div class="ed-wrap"><div id="pvEd"></div></div>`; const init = (rec.mode === 'text' && rec.code != null) ? rec.code : (p.starter || ''); st.editor = new TextEditor($('#pvEd'), { value: init, onChange: () => { st.editor.setErrorLine(null); clearTimeout(st.synTimer); st.synTimer = setTimeout(syntaxCheck, 700); } }); io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun();
     }
@@ -2281,7 +2304,7 @@ Views.playground = (root, params = {}) => {
     $$('.seg button', root).forEach(b => b.onclick = () => { mode = b.dataset.m; rebuild(); });
     const initCode = params.code || '# 아무 코드나 써 보세요!\nprint("안녕, 놀이터!")\n';
     if (mode === 'text') { editor = new TextEditor($('#pgEd'), { value: initCode }); blockEd = null; }
-    else { let state = null; try { state = params.blockState ? JSON.parse(params.blockState) : null; } catch (e) {} blockEd = new BlockEditor($('#pgEd'), { allowed: Content.blocksUpTo('L8'), state, onChange: (c) => { $('#pgCodeView').textContent = c || '# 블록을 끌어다 놓으세요'; } }); editor = null; }
+    else { let state = null; try { state = params.blockState ? JSON.parse(params.blockState) : null; } catch (e) {} blockEd = new BlockEditor($('#pgEd'), { allowed: Content.blocksUpTo('L8'), state, onChange: (c) => { $('#pgCodeView').textContent = c || '# 아직 블록이 없어요\n# 왼쪽 블록을 흰 바탕으로 끌어오면\n# 여기에 파이썬 코드가 나타나요'; } }); editor = null; }
     const getCode = () => editor ? editor.getValue() : (blockEd ? blockEd.getCode() : '');
     const run = async (trace) => {
       const code = getCode(); const out = $('#pgOut'); out.textContent = ''; out.className = 'out'; $('#pgTurtle').innerHTML = ''; editor && editor.setErrorLine(null); if (stopTurtle) { stopTurtle(); stopTurtle = null; }
