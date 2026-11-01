@@ -51,7 +51,9 @@ select{padding:8px 10px;border-radius:8px;border:1px solid var(--border);backgro
 /* 홈 */
 .home{display:grid;grid-template-columns:1fr 320px;gap:16px}
 .map{min-width:0}.side{min-width:0}
-.ch-sec{border-left:4px solid var(--chc);padding:4px 0 10px 14px;margin-bottom:14px;position:relative}.ch-sec.locked{opacity:.55}
+.ch-sec{border-left:4px solid var(--chc);padding:4px 0 10px 14px;margin-bottom:14px;position:relative}.ch-sec.locked{opacity:.55}.ch-sec.collapsed .nodes{display:none}.ch-sec.collapsed{padding-bottom:4px;margin-bottom:8px}.ch-toggle{margin-left:auto;font-size:.85em}
+.hcont{grid-column:1/-1;display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 16px;margin-bottom:12px;border-radius:12px;border:2px solid var(--primary);background:linear-gradient(135deg,rgba(108,140,255,.18),rgba(43,182,115,.1));color:var(--text)}.hcont-ic{font-size:1.4em;color:var(--primary)}.hcont-t{display:flex;flex-direction:column;min-width:0}.hcont-t b{font-size:1.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hcont-t small{color:var(--muted)}
+.pv-brief{display:none}
 .ch-title{font-weight:800;color:var(--chc);display:flex;gap:10px;align-items:center;margin-bottom:8px}.ch-title .lock{font-size:.8em;color:var(--muted);font-weight:normal}.ch-decor{font-size:1.4em;animation:pop .6s}
 .nodes{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;position:relative}
 .nodes::before{content:"";position:absolute;left:30px;right:30px;top:40px;border-top:3px dashed var(--border);z-index:0}
@@ -84,6 +86,7 @@ dfn.term{font-style:normal;font-weight:800;font-size:1.12em;text-decoration:unde
 .pnum{width:26px;height:26px;border-radius:50%;background:var(--surface);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.85em;flex-shrink:0}.ptype{font-size:.75em;color:var(--muted);flex-shrink:0}.ptitle{flex:1}.pxp{color:var(--gold);font-size:.85em}
 /* 에디터 */
 .ted{min-height:200px;height:280px;resize:vertical;overflow:hidden;border:1px solid var(--border);border-radius:10px;background:var(--ed-bg)}
+.ted.ex-ed{height:calc(var(--ex-lines,6) * var(--code-size) * 1.5 + 22px);min-height:70px;max-height:420px} /* 예제는 줄 수에 맞춰 (모바일에서 실행 버튼이 화면 밖으로 밀리지 않게) */
 .ted-cm,.ted-fb{height:100%}.ted-fb{display:flex}.ted-gutter{width:40px;padding:8px 6px;text-align:right;color:var(--ed-com);background:var(--ed-bg);border-right:1px solid rgba(128,128,128,.2);overflow:hidden;font-size:var(--code-size);line-height:1.5;user-select:none}
 .ted-ta{flex:1;padding:8px;border:0;outline:0;resize:none;background:var(--ed-bg);color:var(--ed-fg);font-family:var(--mono);font-size:var(--code-size);line-height:1.5;tab-size:4}
 .cm-editor{height:100%}.cm-scroller{overflow:auto!important}
@@ -195,6 +198,10 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
  .node{width:calc(50% - 6px)}.node.boss{width:100%}
  .pv,.pv.mode-block{grid-template-columns:1fr}.pv-tabs{display:flex;margin-bottom:10px;background:var(--surface2);border-radius:10px;overflow:hidden}.pv-tabs button{flex:1;min-height:44px;border:0;background:transparent;color:var(--muted);font-weight:700}.pv-tabs button.on{background:var(--primary);color:#fff}
  .pv:not([data-tab]) .pv-work,.pv[data-tab=desc] .pv-work{display:none}.pv[data-tab=work] .pv-desc{display:none}.pv-focusbar{display:none}.pv.focus .pv-desc{display:block}.pv.focus[data-tab=work] .pv-desc{display:none}
+ .pv.instant .pv-tabs{display:none}.pv.instant .pv-work,.pv.instant .pv-desc{display:block!important}.pv.instant .pv-nav{order:9}
+ .pv-brief{display:block;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:8px}.pv-brief-t{font-weight:800;margin-bottom:2px}.pv-brief-p{font-size:.92em;line-height:1.45;max-height:4.4em;overflow:hidden;position:relative}.pv-brief .lnk{font-size:.85em;margin-top:4px}
+ .pv-run kbd{display:none}
+ .home .hcont{order:-2}
  .block-wrap{grid-template-columns:1fr}.bed{height:380px}.codeview .code{height:160px}.parsons{grid-template-columns:1fr}.tc-body{grid-template-columns:1fr}.tr-body{grid-template-columns:1fr}
  .pg{grid-template-columns:1fr}#tutorPanel{width:100%;top:auto;height:78vh;border-left:0;border-top:1px solid var(--border);border-radius:16px 16px 0 0;transform:translateY(105%)}
  .tb-xpn{display:none}.xpbar{width:60px}.out{max-height:200px}.pc-grid{grid-template-columns:repeat(2,1fr)}

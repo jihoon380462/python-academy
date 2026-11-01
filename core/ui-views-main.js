@@ -12,12 +12,16 @@ Views.home = (root) => {
       nodes.push(`<button class="node ${l.boss ? 'boss' : ''} ${done ? 'done' : ''} ${isCur ? 'cur' : ''} ${lo ? '' : 'locked'}" data-l="${l.id}" ${lo ? '' : 'disabled'}><div class="node-ic">${l.boss ? '👾' : done ? '✓' : lo ? (l.n ?? '') : '🔒'}</div><div class="node-t">${esc(l.title)}</div>${done ? `<div class="node-stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>` : ''}${isCur ? `<div class="node-mascot">${myMascot({ size: 36 })}</div>` : ''}</button>`);
       if (checkAfter[l.id]) { const n = checkAfter[l.id]; const okq = Game.lessonDone(l); const sc = d.checkups[n]; nodes.push(`<button class="node check ${sc != null ? 'done' : ''} ${okq ? '' : 'locked'}" data-check="${n}" ${okq ? '' : 'disabled'}><div class="node-ic">📝</div><div class="node-t">종합 점검 ${n}</div>${sc != null ? `<div class="node-stars">${sc}점</div>` : ''}</button>`); }
     });
-    sections.push(`<div class="ch-sec ${open ? '' : 'locked'}" style="--chc:${c.color}"><div class="ch-title"><span>${c.ch ? `챕터 ${c.ch}` : ''} ${c.name}</span>${(() => { const bl = LESSONS.find(l => l.boss && l.ch === c.ch); return bl && d.stats['boss_' + bl.id]; })() ? `<span class="ch-decor">${MAP_DECOR[c.ch] || ''}</span>` : ''}${open ? '' : '<span class="lock">🔒 이전 보스를 깨면 열려요</span>'}</div><div class="nodes">${nodes.join('')}</div></div>`);
+    const allDone = ls.every(l => Game.lessonDone(l)); const hasCur = ls.some(l => cur && cur.id === l.id); const collapsed = (allDone && !hasCur) || !open; // 완료·잠긴 챕터는 접어서 지도를 짧게
+    sections.push(`<div class="ch-sec ${open ? '' : 'locked'} ${collapsed ? 'collapsed' : ''}" style="--chc:${c.color}" data-ch="${c.ch}"><div class="ch-title"><span>${c.ch ? `챕터 ${c.ch}` : ''} ${c.name}</span>${allDone && open ? '<span class="chip">완료 ✓</span>' : ''}${collapsed ? `<button class="lnk ch-toggle" data-toggle="${c.ch}">펼치기 ▾</button>` : ''}${(() => { const bl = LESSONS.find(l => l.boss && l.ch === c.ch); return bl && d.stats['boss_' + bl.id]; })() ? `<span class="ch-decor">${MAP_DECOR[c.ch] || ''}</span>` : ''}${open ? '' : '<span class="lock">🔒 이전 보스를 깨면 열려요</span>'}</div><div class="nodes">${nodes.join('')}</div></div>`);
   });
   const nodes = sections;
   const dc = d.dailyChallenge && d.dailyChallenge.date === today ? d.dailyChallenge : null; const msLeft = new Date(today + 'T23:59:59') - new Date(); const hLeft = Math.max(0, Math.floor(msLeft / 3600000)), mLeft = Math.max(0, Math.floor((msLeft % 3600000) / 60000));
   const cal = []; for (let i = 13; i >= 0; i--) { const k = addDays(today, -i); const n = d.days[k] || 0; cal.push(`<div class="cal-cell l${Math.min(4, n)}" title="${k}: ${n}문제"></div>`); }
+  const last = d.last && d.last.course === Store.course && d.last.params ? d.last : null; const lastP = last && last.params.pid && Content.problemMap[last.params.pid]; const lastL = last && last.params.lessonId && Content.lessonMap[last.params.lessonId];
+  const contTarget = lastP && Store.prob(lastP.id).status !== 'clear' ? { go: 'problem', params: { pid: lastP.id, lessonId: lastP.lesson }, label: `${esc(lastP.title)} 이어서 풀기`, sub: esc((lastL || Content.lesson(lastP.lesson)).title) } : cur ? { go: 'lesson', params: { lessonId: cur.id, page: (d.lessons[cur.id] || {}).page || 0 }, label: `${esc(cur.title)}`, sub: Game.lessonDone(cur) ? '복습하기' : (d.lessons[cur.id] && d.lessons[cur.id].page ? '이어서 보기' : '시작하기') } : null;
   root.innerHTML = `<div class="home">
+    ${contTarget ? `<button class="hcont" id="homeCont"><span class="hcont-ic">▶</span><span class="hcont-t"><b>${contTarget.label}</b><small>${contTarget.sub}</small></span></button>` : ''}
     <div class="map">${nodes.join('')}
       <div class="ch-sec" style="--chc:#607d8b"><div class="ch-title"><span>자유 공간</span></div><div class="nodes"><button class="node play" data-go="playground"><div class="node-ic">🛝</div><div class="node-t">놀이터</div></button><button class="node play" data-go="timeattack"><div class="node-ic">⏱</div><div class="node-t">타임 어택</div></button></div></div>
     </div>
@@ -31,6 +35,8 @@ Views.home = (root) => {
       <div class="card"><div class="card-h">⚡ ${T.dailyChallenge} <small>${hLeft}시간 ${mLeft}분 남음</small></div>${dc && dc.done ? '<div class="ok">오늘 도전 완료! 내일 또 만나요</div>' : (d.stats.clears || 0) >= 3 ? `<div class="muted">클리어한 범위의 변형 문제 1개. XP 2배!</div><button class="btn primary sm" data-go="challenge">도전하기</button>` : '<div class="muted">문제를 3개 이상 풀면 열려요</div>'}</div>
       <div class="card"><div class="card-h">📅 최근 14일</div><div class="cal">${cal.join('')}</div></div>
     </aside></div>`;
+  const hc = $('#homeCont', root); if (hc) hc.onclick = () => UI.go(contTarget.go, contTarget.params);
+  $$('[data-toggle]', root).forEach(b => b.onclick = (e) => { e.stopPropagation(); const sec = b.closest('.ch-sec'); sec.classList.toggle('collapsed'); b.textContent = sec.classList.contains('collapsed') ? '펼치기 ▾' : '접기 ▴'; });
   $$('[data-l]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.l }));
   $$('[data-go]', root).forEach(b => b.onclick = () => UI.go(b.dataset.go));
   $$('[data-check]', root).forEach(b => b.onclick = () => UI.go('checkup', { n: +b.dataset.check }));
@@ -53,7 +59,7 @@ Views.lesson = (root, { lessonId, page = 0 }) => {
         <div class="lp-card"><h3>연습문제 <small>${probs.filter(p => Store.prob(p.id).status === 'clear').length}/${probs.length}</small></h3><div class="plist">${probs.map((p, i) => { const r = Store.prob(p.id); return `<button class="pitem ${r.status}" data-p="${p.id}"><span class="pnum">${i + 1}</span><span class="ptype">${typeName(p.type, p)}</span><span class="ptitle">${esc(p.title)}</span><span class="pxp">${p.xp || CONFIG.XP[p.type]} XP</span>${r.status === 'clear' ? UI.stars(r.stars) : ''}</button>`; }).join('')}</div>
         <div class="row"><button class="btn primary big" id="startProbs">${probs.every(p => Store.prob(p.id).status === 'clear') ? '다시 풀기' : '문제 풀기 시작'}</button></div></div>`;
     } else {
-      body = `<div class="lp-card"><h2>${esc(pg.title)}</h2><div class="lp-html">${UI.terms(pg.html)}</div>${pg.example ? `<div class="ex"><div class="ex-h">${T.example} <span class="muted">코드를 고쳐서 실행해도 돼요</span></div><div class="ex-ed" id="exEd"></div>${pg.example.stdin != null ? `<label class="lbl">${T.stdin}</label><textarea class="stdin" id="exIn" rows="2">${esc(pg.example.stdin)}</textarea>` : ''}<div class="row"><button class="btn primary" id="exRun">▶ ${T.tryIt}</button>${pg.example.trace ? `<button class="btn" id="exTrace">👣 ${T.stepRun}</button>` : ''}${pg.example.visualize && typeof Viz !== 'undefined' ? `<button class="btn accent" id="exViz">👀 시각화 재생</button>` : ''}<button class="btn" id="exPlay">${T.toPlayground}</button><button class="btn" id="exReset">↺ 원래대로</button></div><pre class="out" id="exOut"></pre><div id="exTurtle"></div><div id="exTracePanel"></div></div>` : ''}</div>`;
+      body = `<div class="lp-card"><h2>${esc(pg.title)}</h2><div class="lp-html">${UI.terms(pg.html)}</div>${pg.example ? `<div class="ex"><div class="ex-h">${T.example} <span class="muted">코드를 고쳐서 실행해도 돼요</span></div><div class="ex-ed" id="exEd" style="--ex-lines:${Math.max(2, Math.min(18, pg.example.code.split('\n').length))}"></div>${pg.example.stdin != null ? `<label class="lbl">${T.stdin}</label><textarea class="stdin" id="exIn" rows="2">${esc(pg.example.stdin)}</textarea>` : ''}<div class="row"><button class="btn primary" id="exRun">▶ ${T.tryIt}</button>${pg.example.trace ? `<button class="btn" id="exTrace">👣 ${T.stepRun}</button>` : ''}${pg.example.visualize && typeof Viz !== 'undefined' ? `<button class="btn accent" id="exViz">👀 시각화 재생</button>` : ''}<button class="btn" id="exPlay">${T.toPlayground}</button><button class="btn" id="exReset">↺ 원래대로</button></div><pre class="out" id="exOut"></pre><div id="exTurtle"></div><div id="exTracePanel"></div></div>` : ''}</div>`;
     }
     root.innerHTML = `<div class="lesson"><div class="lp-top"><span class="muted">${T.minutes(l.minutes)} · ${cur + 1}/${total}</span><div class="dots">${Array.from({ length: total }, (_, i) => `<span class="${i === cur ? 'on' : ''} ${i < cur ? 'past' : ''}"></span>`).join('')}</div><button class="btn sm" id="lpAsk">💬 선생님</button></div>${body}<div class="lp-nav"><button class="btn" id="lpPrev" ${cur === 0 ? 'disabled' : ''}>← ${T.prev}</button>${cur < total - 1 ? `<button class="btn primary" id="lpNext">${T.next} →</button>` : `<button class="btn" id="lpHome">지도로</button>`}</div></div>`;
     UI.bindTerms(root);
@@ -74,6 +80,7 @@ Views.lesson = (root, { lessonId, page = 0 }) => {
         if (!r.ok) { out.innerHTML += `<div class="errbox"><b>${esc(r.ename)}</b>: ${esc(r.emsg || '')}<br><span class="errko">💡 ${esc(Py.explain(r))}</span> <button class="btn xs" id="exErrMore">자세히</button></div>`; if (r.line) exampleEditor.setErrorLine(r.line); Game.recordError(null); const b = $('#exErrMore'); if (b) b.onclick = () => UI.go('errors', { name: r.ename }); Game.checkBadges().forEach(bd => UI.badgeFly(bd)); }
         else if (!out.textContent.trim() && !r.turtleUsed) out.textContent = '(출력이 없어요)';
         if (r.turtleUsed) { tdiv.innerHTML = `<canvas class="turtle-c" width="400" height="300"></canvas>`; stopTurtle = TurtleView.draw($('canvas', tdiv), r.cmds, { speed: Store.data.settings.turtleSpeed }); }
+        if (UI.isMobile() && !trace) setTimeout(() => out.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 50);
         Game.checkBadges().forEach(bd => UI.badgeFly(bd)); Store.save(); UI.renderTopbar();
       };
       $('#exRun').onclick = () => run(false); const tb = $('#exTrace'); if (tb) tb.onclick = () => run(true);
@@ -173,8 +180,8 @@ Views.problem = (root, params) => {
     st.mode = await decideMode();
     const typeLabel = typeName(p.type, p) + (st.mode === 'text' && p.type !== 'code' ? ' → 텍스트' : '');
     const xpBase = isBoss ? Game.bossXp(p) : (p.xp || CONFIG.XP[p.type]);
-    const focus = !!Store.data.settings.focus;
-    root.innerHTML = `<div class="pv ${isBoss ? 'boss' : ''} ${focus ? 'focus' : ''}">
+    const focus = !!Store.data.settings.focus; const instant = ['quiz', 'fill'].includes(st.mode); // 즉시 채점형은 모바일에서도 한 화면
+    root.innerHTML = `<div class="pv ${isBoss ? 'boss' : ''} ${focus ? 'focus' : ''} ${instant ? 'instant' : ''}">
       <div class="pv-tabs"><button data-t="desc" class="on">설명</button><button data-t="work">작업</button></div>
       <div class="pv-desc">
         <div class="pv-head"><span class="chip type-${p.type}">${typeLabel}</span>${isBoss ? '<span class="chip boss">BOSS</span>' : ''}${inReview ? '<span class="chip">복습</span>' : ''}${inChallenge ? '<span class="chip hot">도전 XP 2배</span>' : ''}<span class="chip xp">${xpBase} XP</span>${rec.status === 'clear' ? UI.stars(rec.stars) : ''}<span class="muted small">${idx + 1}/${probs.length}</span></div>
@@ -189,6 +196,7 @@ Views.problem = (root, params) => {
         <div class="pv-nav"><button class="btn sm" id="btnLesson">📖 레슨 설명 보기</button>${idx > 0 ? `<button class="btn sm" id="btnPrevP">◀ 이전 문제</button>` : ''}${idx < probs.length - 1 ? `<button class="btn sm" id="btnNextP">다음 문제 ▶</button>` : ''}<button class="btn sm" id="btnResetP" title="이 문제의 진행·코드만 지워요">↺ 이 문제 초기화</button></div>
       </div>
       <div class="pv-work">
+        ${instant ? '' : `<div class="pv-brief"><div class="pv-brief-t">${esc(p.title)}</div><div class="pv-brief-p">${UI.terms(p.prompt)}</div><button class="lnk" id="briefDesc">설명 전체 보기 ▸</button></div>`}
         <div class="pv-focusbar"><button class="btn sm" id="btnFocus" title="문제 설명을 접고 작업판을 넓게 써요">${focus ? '⛶ 집중 모드 끄기' : '⛶ 집중 모드'}</button>${focus ? `<span class="pv-focus-title" title="${esc(p.title)}">${esc(p.title)}</span><button class="btn sm" id="fbDesc">📄 설명</button><button class="btn sm" id="fbHint">💡 힌트</button><button class="btn sm tutor" id="fbTutor">💬 선생님</button>` : ''}</div>
         ${isBoss ? `<div class="bosshp"><div class="bosshp-h">👾 보스 HP</div><div class="hpbar"><div class="hpfill" style="width:100%"></div></div><div class="bosshp-n">${tests.length}/${tests.length}</div></div>` : ''}
         <div class="pv-mode" id="pvMode"></div>
@@ -199,6 +207,8 @@ Views.problem = (root, params) => {
       </div></div>`;
     UI.bindTerms(root);
     $$('.pv-tabs button', root).forEach(b => b.onclick = () => { $$('.pv-tabs button', root).forEach(x => x.classList.remove('on')); b.classList.add('on'); root.querySelector('.pv').dataset.tab = b.dataset.t; });
+    if (instant && UI.isMobile()) { const w = $('.pv-work', root), pr = $('.pv-prompt', root); if (w && pr) pr.insertAdjacentElement('afterend', w); } // 즉시 채점형: 보기를 지문 바로 아래에
+    const bd = $('#briefDesc', root); if (bd) bd.onclick = () => { const tb = $('.pv-tabs button[data-t=desc]', root); if (tb) tb.click(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
     $('#btnLesson').onclick = () => UI.go('lesson', { lessonId: base.lesson, page: 0 }); const pp = $('#btnPrevP'); if (pp) pp.onclick = () => UI.go('problem', { pid: probs[idx - 1].id, lessonId: base.lesson }); const np = $('#btnNextP'); if (np) np.onclick = () => UI.go('problem', { pid: probs[idx + 1].id, lessonId: base.lesson });
     $('#btnResetP').onclick = async () => { if (!await UI.confirm('이 문제의 별점·힌트·저장된 코드를 지우고 처음부터 풀까요? (XP는 그대로예요)', '초기화')) return; Store.resetProblem(pid); UI.go('problem', { pid, lessonId: base.lesson }, false); };
     $$('[data-mock]', root).forEach(b => b.onclick = () => { saveCode(); session.goto(+b.dataset.mock); }); const me = $('#mockEnd'); if (me) me.onclick = async () => { if (!await UI.confirm('지금 끝낼까요? 남은 문제는 틀린 것으로 처리돼요.', '끝내기')) return; saveCode(); Sessions.finish(session); };
@@ -244,6 +254,7 @@ Views.problem = (root, params) => {
     if (!r.ok) { out.innerHTML += `<div class="errbox"><b>${esc(r.ename)}</b>: ${esc(r.emsg || '')}<br><span class="errko">💡 ${esc(Py.explain(r))}</span> <button class="btn xs" id="pvErrMore">자세히</button></div>`; st.lastRun += `\n[에러] ${r.ename}: ${r.emsg}`; if (r.line && st.editor) st.editor.setErrorLine(r.line); if (r.line && st.blockEd) st.blockEd.highlight(st.blockEd.blockForLine(r.line)); Audio.wrong(); Game.recordError(p); $('#pvErrMore').onclick = () => UI.go('errors', { name: r.ename }); if (st.sameErr.name === r.ename) st.sameErr.n++; else st.sameErr = { name: r.ename, n: 1 }; if (st.sameErr.n === 3 && rec.hints === 0) { if (await UI.confirm(`같은 에러가 3번 났어요. 힌트 1단계를 무료로 볼까요? (별점에 영향 없음)`, '힌트 보기')) { $('#pvHints').innerHTML = `<div class="hint h1"><b>무료 힌트</b> ${esc(p.hints[0])}</div>`; } } }
     else if (!out.textContent.trim() && !r.turtleUsed) out.textContent = '(출력이 없어요)';
     if (r.turtleUsed && tdiv) { tdiv.innerHTML = `<canvas class="turtle-c" width="400" height="300"></canvas>`; st.stopTurtle = TurtleView.draw($('canvas', tdiv), r.cmds, { speed: Store.data.settings.turtleSpeed }); if (r.nsegs >= 100) Game.stat('turtleLines100'); }
+    if (UI.isMobile() && !trace) { const ow = out.closest('.out-wrap') || out; setTimeout(() => ow.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 50); }
     saveCode(); Game.checkBadges().forEach(b => UI.badgeFly(b)); Store.save(); UI.renderTopbar();
   };
   const beforeGrade = () => { if (!st.firstGradeDone) { st.firstGradeDone = true; st.firstTryCandidate = rec.attempts === 0 && rec.status !== 'clear'; } st.attemptsNow++; };

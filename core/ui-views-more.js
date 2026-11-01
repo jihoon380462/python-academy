@@ -167,7 +167,7 @@ const Onboarding = {
     for (const [sel, text] of steps) { const el = $(sel); if (!el) continue; const skip = await this.point(el, text); if (skip) break; }
     UI.go('lesson', { lessonId: LESSONS[0].id, page: 0, autoRun: true });
   },
-  point(el, text) { return new Promise(res => { const r = el.getBoundingClientRect(); const ov = document.createElement('div'); ov.className = 'ob-ov'; ov.innerHTML = `<div class="ob-ring" style="left:${r.left - 6}px;top:${r.top - 6 + scrollY}px;width:${r.width + 12}px;height:${r.height + 12}px"></div><div class="ob-tip" style="left:${Math.max(10, Math.min(innerWidth - 300, r.left))}px;top:${r.bottom + 12 + scrollY}px"><div>${text}</div><div class="row"><button class="btn primary sm" data-a="n">다음</button><button class="btn sm" data-a="s">건너뛰기</button></div></div>`; document.body.appendChild(ov); $$('button', ov).forEach(b => b.onclick = () => { ov.remove(); res(b.dataset.a === 's'); }); }); },
+  point(el, text) { return new Promise(res => { try { el.scrollIntoView({ block: 'center' }); } catch (e) {} const r = el.getBoundingClientRect(); const ov = document.createElement('div'); ov.className = 'ob-ov'; ov.innerHTML = `<div class="ob-ring" style="left:${r.left - 6}px;top:${r.top - 6 + scrollY}px;width:${r.width + 12}px;height:${r.height + 12}px"></div><div class="ob-tip" style="left:${Math.max(10, Math.min(innerWidth - 300, r.left))}px;top:${r.bottom + 12 + scrollY}px"><div>${text}</div><div class="row"><button class="btn primary sm" data-a="n">다음</button><button class="btn sm" data-a="s">건너뛰기</button></div></div>`; document.body.appendChild(ov); $$('button', ov).forEach(b => b.onclick = () => { ov.remove(); res(b.dataset.a === 's'); }); }); },
 };
 
 // ---------- 초기화 ----------

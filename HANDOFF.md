@@ -7,9 +7,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| **현재 버전** | v2.1.1 (2026-11-01 배포) |
-| **마지막 작업** | v2.1.1: 기기 연동 토스트 억제 — 병합 비교에서 updatedAt·syncDevice·last 메타 제외(다른 기기가 저장만 해도 '가져왔어요'가 뜨던 문제), 화면 복귀·온라인 복구 pull은 `quietSync`(토스트 없음, 앱 시작 때만 알림). 그 전 **Phase 1 완료(v2.1.0)**: 코스 2 알고리즘·자료구조 `courses/algo/`(레슨 16+보스 4, 문제 101, 모의고사 15문제 풀) + `core/visualize.js` 시각화 8종(레슨 예제 `example.visualize`·문제 `visualize`·추적 퀴즈 `quiz.code`) + 시간 제한 채점(`limits.time`, `inputGen`, `Py.bench`) + 모의고사 모드(`Views.mock`, `Sessions.mock`) + 새 유형 kind(trace/bigo/choose/ct) + 허브 알고리즘 카드(전제 B3, 설정 '전제 무시') + 알고리즘 뱃지 4개. 상세: DESIGN.md 12절, CHANGELOG. |
-| **다음 후보** | ① v2.1.0 실사용 확인(알고리즘 코스 시각화·시간 제한·모의고사, 실제 Pyodide) 후 패치 ② **Phase 2**: 코스 3 터미널·Git + 셸·Git 시뮬레이터(EXPANSION.md 6절 → v2.2.0) ③ 레슨 A0·A1 n 슬라이더 UI 노출, 허브 복습 큐 코스 통합 |
+| **현재 버전** | v2.1.2 (2026-11-02 배포) |
+| **마지막 작업** | v2.1.2: 파이썬 코스 모바일 UX 보강(직접 플레이 점검 B항목 9~15): 퀴즈·빈칸은 탭 없이 한 화면(`.pv.instant`, 보기를 지문 아래로 이동), 작업 탭 맨 위에 문제 요약(`.pv-brief`), 레슨 예제 에디터 높이를 줄 수에 맞춤(`--ex-lines`), 실행 후 출력으로 스크롤, 홈 맨 위 「▶ 이어서 하기」 바(`.hcont`, `data.last`/현재 레슨) + 완료·잠긴 챕터 접기, 모바일에서 Ctrl+Enter 숨김, 온보딩 투어 scrollIntoView. 남은 점검 항목(A·C·D)은 CHANGELOG 아래 「개선 후보 목록」 참고. 그 전 v2.1.1: 기기 연동 토스트 억제 — 병합 비교에서 updatedAt·syncDevice·last 메타 제외(다른 기기가 저장만 해도 '가져왔어요'가 뜨던 문제), 화면 복귀·온라인 복구 pull은 `quietSync`(토스트 없음, 앱 시작 때만 알림). 그 전 **Phase 1 완료(v2.1.0)**: 코스 2 알고리즘·자료구조 `courses/algo/`(레슨 16+보스 4, 문제 101, 모의고사 15문제 풀) + `core/visualize.js` 시각화 8종(레슨 예제 `example.visualize`·문제 `visualize`·추적 퀴즈 `quiz.code`) + 시간 제한 채점(`limits.time`, `inputGen`, `Py.bench`) + 모의고사 모드(`Views.mock`, `Sessions.mock`) + 새 유형 kind(trace/bigo/choose/ct) + 허브 알고리즘 카드(전제 B3, 설정 '전제 무시') + 알고리즘 뱃지 4개. 상세: DESIGN.md 12절, CHANGELOG. |
+| **다음 후보** | ① 파이썬 코스 점검 목록 나머지: A(힌트 한 단어 15개·starter 없는 코드 문제 17개·L5P5 빈칸 보기·초반 블록 손글 코치 L3P6/L4P2/L4P5·한 줄 지문 12개·코치 문구 PC 기준·보스 1문제·레슨0 실행 문제) / C(선생님 키 바로가기·마지막 문제 뒤 다음 레슨·trace 전부 켜기·용어 칩 힌트) / D(상단바 제목·설정 PC/모바일 구분) ② v2.1.x 실사용 피드백 ③ **Phase 2** 터미널·Git(EXPANSION.md 6절 → v2.2.0) ④ 알고리즘 n 슬라이더 UI, 허브 복습 큐 통합 |
 
 ## 1. 이게 뭔가
 - **파이썬 아카데미**: 완전 초보자용 학습 사이트. v2.0.0(Phase 0)부터 **허브 + 코스 페이지** 구조 (확장 계획은 `EXPANSION.md`; "Phase N을 진행해"가 의뢰 단위).
