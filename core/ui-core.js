@@ -76,8 +76,8 @@ const Loader = {
 // ---------- 모바일 퀵 키 ----------
 const QuickKeys = {
   el: null, target: null,
-  init() { this.el = $('#quickkeys'); const keys = ['Tab', ':', '(', ')', '[', ']', '{', '}', '"', '=', ',', 'print', '←', '→']; this.el.innerHTML = keys.map(k => `<button data-k="${esc(k)}">${esc(k)}</button>`).join(''); $$('button', this.el).forEach(b => { b.addEventListener('pointerdown', (e) => { e.preventDefault(); this.press(b.dataset.k); }); }); },
+  init() { this.el = $('#quickkeys'); const keys = ['Tab', '⇤', ':', '(', ')', '[', ']', '{', '}', '"', "'", '=', ',', '.', '<', '>', '-', '*', '/', '#', 'print', 'input', '←', '→']; /* v2.2.4 F12: ⇤ 내어쓰기, 기호·input 추가 */ this.el.innerHTML = keys.map(k => `<button data-k="${esc(k)}">${esc(k)}</button>`).join(''); $$('button', this.el).forEach(b => { b.addEventListener('pointerdown', (e) => { e.preventDefault(); this.press(b.dataset.k); }); }); },
   show(ed) { this.target = ed; if (UI.isMobile()) this.el.classList.add('show'); },
   hide() { this.el.classList.remove('show'); this.target = null; },
-  press(k) { const ed = this.target; if (!ed) return; const pairs = { '(': '()', '[': '[]', '{': '{}', '"': '""' }; if (k === 'Tab') ed.insert('    ', 4); else if (k === '←') ed.moveCursor(-1); else if (k === '→') ed.moveCursor(1); else if (pairs[k]) ed.insert(pairs[k], 1); else ed.insert(k, k.length); ed.focus(); },
+  press(k) { const ed = this.target; if (!ed) return; const pairs = { '(': '()', '[': '[]', '{': '{}', '"': '""' }; if (k === 'Tab') ed.insert('    ', 4); else if (k === '⇤') ed.dedentLine(); else if (k === 'input') ed.insert('input()', 7); else if (k === '←') ed.moveCursor(-1); else if (k === '→') ed.moveCursor(1); else if (pairs[k]) ed.insert(pairs[k], 1); else ed.insert(k, k.length); ed.focus(); },
 };

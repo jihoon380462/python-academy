@@ -8,10 +8,12 @@ const Hub = {
     if (c.id === Store.course) { const total = PROBLEMS.length; const cleared = PROBLEMS.filter(p => (probs[p.id] || {}).status === 'clear').length; const stars = PROBLEMS.reduce((s, p) => s + ((probs[p.id] || {}).stars || 0), 0); return { total, cleared, stars, maxStars: total * 3, pct: total ? Math.round(100 * cleared / total) : 0, mins: Math.round((total - cleared) * CONFIG.HUB.minutesPerProblem) }; }
     const ids = Object.keys(probs); const cleared = ids.filter(id => probs[id].status === 'clear').length; const stars = ids.reduce((s, id) => s + (probs[id].stars || 0), 0); const total = c.total || 0; return { total, cleared, stars, maxStars: total * 3, pct: total ? Math.round(100 * cleared / total) : 0, mins: Math.round(Math.max(0, total - cleared) * CONFIG.HUB.minutesPerProblem) };
   },
+  // 복습 큐를 코스 공통으로(v2.2.4, NEXT.md F1): 각 코스 저장 조각의 problems[].review.due 만 보면 되므로 콘텐츠가 없어도 셀 수 있다
+  reviewDue() { const today = todayKey(); return CONFIG.COURSES.filter(c => c.ready).map(c => { const probs = Store.courseData(c.id).problems || {}; const n = Object.values(probs).filter(r => r && r.status === 'clear' && r.review && r.review.due <= today).length; return { c, n }; }).filter(x => x.n); },
   locked(c) { if (!c.requires) return false; if (Store.data.settings.unlockAll) return false; return !Store.data.stats['boss_' + c.requires.boss]; }, // 보스 클리어 통계는 프로필(공통)에 있음
   ring(pct, color) { const r = 26, C = 2 * Math.PI * r; return `<svg class="ring" viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="7"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct / 100)}" transform="rotate(-90 32 32)"/><text x="32" y="36" text-anchor="middle" font-size="14" font-weight="800" fill="var(--text)">${pct}%</text></svg>`; },
   render() {
-    const d = Store.data; const lv = Game.level(); const streak = Game.currentStreak(); const today = todayKey(); const todayCount = d.days[today] || 0; const due = Review.due(); const py = CONFIG.COURSES.find(c => c.id === 'python');
+    const d = Store.data; const lv = Game.level(); const streak = Game.currentStreak(); const today = todayKey(); const todayCount = d.days[today] || 0; const rd = this.reviewDue(); const py = CONFIG.COURSES.find(c => c.id === 'python');
     const last = d.last && d.last.view ? d.last : null; const lastP = last && last.params.pid && Content.problemMap[last.params.pid]; const lastL = last && last.params.lessonId && Content.lessonMap[last.params.lessonId];
     const cur = Game.currentLesson();
     const lastCourse = last && last.course && last.course !== 'python' ? CONFIG.COURSES.find(c => c.id === last.course) : null;
@@ -26,7 +28,7 @@ const Hub = {
     $('#view').innerHTML = `<div class="page hub">
       <div class="card hub-today"><div class="card-h">📌 오늘의 할 일</div>
         <a class="btn primary big hub-cont" href="${this.courseUrl(contCourse, contHash)}">▶ ${contLabel}</a>
-        <div class="hub-stats"><span>🎯 일일 목표 <b>${Math.min(todayCount, d.dailyGoal)}/${d.dailyGoal}</b></span><span>🧠 복습 큐 <b>${due.length}</b>개${due.length ? ` <a href="${this.courseUrl(py, 'review')}">복습하기</a>` : ''}</span><span>🔥 ${chal}</span></div>
+        <div class="hub-stats"><span>🎯 일일 목표 <b>${Math.min(todayCount, d.dailyGoal)}/${d.dailyGoal}</b></span><span>🧠 복습 큐 <b>${rd.reduce((a, x) => a + x.n, 0)}</b>개${rd.length ? ' · ' + rd.map(x => `<a href="${this.courseUrl(x.c, 'review')}">${esc(x.c.name)} ${x.n}</a>`).join(' · ') : ''}</span><span>🔥 ${chal}</span></div>
       </div>
       <h2 class="hub-h">코스</h2>
       <div class="hub-courses">${CONFIG.COURSES.map(c => this.courseCard(c)).join('')}</div>

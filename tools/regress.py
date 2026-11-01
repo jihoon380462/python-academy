@@ -40,6 +40,8 @@ with sync_playwright() as p:
     check(pg.evaluate("Store.data.xp")==385 and pg.evaluate("localStorage.getItem('python_academy_save')") is None, '코스 페이지도 같은 v2 데이터')
     check(pg.locator('#pvCoach .coach').count()==1, '텍스트 코치 표시'); check(pg.locator('.pv.focus').count()==1, '집중 모드 유지')
     check(pg.locator('.tb-hub').count()==1, '상단바 허브 버튼')
+    bundle=pg.evaluate("Store.exportBundle()"); check('academy-bundle' in bundle and 'academy.course.python' in bundle and 'apiKey' not in bundle, '백업 묶음 내보내기(F8, API 키 제외)')
+    check(pg.evaluate("(()=>{const q=document.querySelector('#quickkeys'); return q && q.textContent.includes('⇤') && q.textContent.includes('input');})()"), '모바일 입력 칩 ⇤·input (F12)')
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('.node').count()>20, '지도 노드')
     # 퀴즈 채점
     pg.evaluate("UI.go('problem',{pid:'L0P2',lessonId:'L0'})"); pg.wait_for_timeout(300); ans=pg.evaluate("Content.problem('L0P2').quiz.ans"); pg.click(f'.qopt[data-i="{ans}"]'); pg.wait_for_timeout(1500)
@@ -87,6 +89,7 @@ with sync_playwright() as p:
     for _ in range(3):
         if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
     check(pg.locator('.result.ok').count()==1, '2단계 정답 → 클리어')
+    pg.evaluate("UI.go('lesson',{lessonId:'A0',page:0})"); pg.wait_for_timeout(500); check(pg.locator('#exSl').count()==1 and pg.evaluate("$('#exSl').value")=='1000000', '레슨 예제 n 슬라이더(F2, 코드 값으로 초기화)')
     pg.evaluate("UI.go('problem',{pid:'A5P2',lessonId:'A5'})"); pg.wait_for_timeout(500); check(pg.locator('#btnViz').count()==1, '코드 문제: 👀 시각화 버튼')
     pg.evaluate("Store.data.settings.unlockAll=true; UI.go('problem',{pid:'E1P1',lessonId:'E1'})"); pg.wait_for_timeout(600); check(pg.locator('#btnViz').count()==1 and pg.evaluate("CHAPTERS.some(c=>c.ch===5&&c.name==='실전')"), '알고 실전 E1P1: 격자 시각화 버튼 + 챕터 E'); pg.evaluate("Store.data.settings.unlockAll=false")
     pg.evaluate("UI.go('lesson',{lessonId:'AB4'})"); pg.wait_for_timeout(300); check(pg.evaluate("UI.view")=='mock' and pg.locator('#mockStart').count()==1, '보스 AB4 → 모의고사 화면')
@@ -97,6 +100,8 @@ with sync_playwright() as p:
     check(vz['ok1'] and vz['frames']==3 and vz['errs']==0, "시각화 플레이어·8종 그리기 (frames=%s, errs=%s)" % (vz['frames'], vz['errs']))
     pg.goto(HUB); pg.wait_for_timeout(600); hc = pg.evaluate("()=>[...document.querySelectorAll('.hc')].map(e=>e.className+'|'+e.innerText.replace(/\\n/g,' ').slice(0,60))")
     check(any('알고리즘' in x and ('ready' in x or 'locked' in x) for x in hc), '허브에 알고리즘 코스 카드: '+([x for x in hc if '알고리즘' in x]+['?'])[0][:70])
+    pg.evaluate("(()=>{const k='academy.course.algo'; const c=JSON.parse(localStorage.getItem(k)||'{}'); c.problems=c.problems||{}; c.problems['A0P3']={status:'clear',stars:3,hints:0,attempts:1,review:{stage:0,due:'2000-01-01'}}; localStorage.setItem(k,JSON.stringify(c)); Hub.render();})()"); pg.wait_for_timeout(200)
+    check('알고리즘·자료구조 1' in pg.locator('.hub-stats').inner_text(), '허브 복습 큐 코스 공통(F1): '+pg.locator('.hub-stats').inner_text().replace('\n',' ')[:80])
     # ---- 3. 모바일
     print('[모바일 390px]'); pg.set_viewport_size({'width':390,'height':800})
     pg.goto(HUB); pg.wait_for_timeout(500); check(pg.evaluate('document.documentElement.scrollWidth')<=390, '허브 가로 스크롤 없음'); pg.screenshot(path=SHOT+'/hub_m.png', full_page=True)
