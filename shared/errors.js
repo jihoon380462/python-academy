@@ -39,3 +39,32 @@ const ERROR_HINTS = {
 };
 
 // 용어집 (레슨의 [[용어]] 와 연결)
+
+// ---------- 셸·Git 에러 사전 (터미널·Git 코스, v2.2.15) — re 는 bash/git 원문에 맞춘다. Shell.explain(err) 가 첫 매치를 돌려준다 ----------
+const ERRORS_SHELL = [
+  { re: /command not found/, title: '없는 명령', why: '그런 이름의 명령이 없어요. 오타이거나(예: `sl` ↔ `ls`), 명령과 인자 사이 띄어쓰기를 빠뜨렸을 수 있어요.', fix: '명령 이름을 다시 확인하세요. 지원 명령: pwd ls cd mkdir touch cat echo rm cp mv head tail wc grep find tree history clear edit git' },
+  { re: /cd: .*: No such file or directory/, title: '없는 폴더로 cd', why: '그 이름의 폴더가 지금 위치에서 보이지 않아요. 경로는 "지금 폴더 기준"이라는 걸 기억하세요.', fix: '`ls`로 지금 폴더에 뭐가 있는지 보고, `cd ..`로 위로 가거나 `cd /home/me/...`처럼 절대 경로를 쓰세요.' },
+  { re: /No such file or directory/, title: '없는 파일·폴더', why: '적은 경로에 파일이나 폴더가 없어요. 대소문자·확장자·경로의 중간 폴더까지 확인하세요.', fix: '`ls` 또는 `find . -name "이름*"`로 실제 이름을 확인하세요. 중간 폴더가 없으면 `mkdir -p`로 먼저 만드세요.' },
+  { re: /Is a directory/, title: '폴더에 파일 명령', why: '파일에만 쓰는 명령(cat·rm 등)을 폴더에 썼어요.', fix: '폴더 안을 보려면 `ls 폴더`, 폴더를 지우려면 `rm -r 폴더`.' },
+  { re: /Not a directory/, title: '파일에 폴더 명령', why: '폴더가 아닌 것(파일)에 `cd`를 하려 했어요.', fix: '`cd`는 폴더에만. 파일은 `cat 파일`로 보세요.' },
+  { re: /File exists/, title: '이미 있음', why: '같은 이름의 폴더가 이미 있어요.', fix: '다른 이름을 쓰거나, 있어도 괜찮게 `mkdir -p`를 쓰세요.' },
+  { re: /missing (file )?operand/, title: '인자 빠짐', why: '명령 뒤에 무엇을 할지(파일·폴더 이름)를 안 적었어요.', fix: '예: `mkdir 새폴더`, `touch 파일.txt`, `cp 원본 사본`, `mv 원본 새이름`.' },
+  { re: /dangerous to operate recursively/, title: '위험한 rm', why: '`rm -rf /`나 홈 폴더 전체 삭제는 막아 두었어요. 진짜 컴퓨터에서는 모든 것이 사라질 수 있는 명령이에요.', fix: '지울 폴더 이름을 정확히 적으세요: `rm -r 폴더이름`.' },
+  { re: /-r not specified; omitting directory/, title: '폴더 복사는 -r', why: '폴더는 안에 든 것까지 함께 복사해야 해서 `-r`(recursive)이 필요해요.', fix: '`cp -r 폴더 새폴더`' },
+  { re: /not a git repository/, title: 'Git 저장소 아님', why: '지금 폴더(와 그 위 폴더들)에 `.git`이 없어요. `git init`을 한 폴더 안에서만 git 명령이 돼요.', fix: '`cd 프로젝트폴더` 후 다시 하거나, 새로 시작하면 `git init`.' },
+  { re: /nothing to commit, working tree clean|Aborting commit due to empty commit message/, title: '커밋할 게 없음·메시지 없음', why: '바뀐 파일이 없거나(스테이징이 비어 있음), `-m "메시지"`를 안 적었어요.', fix: '`git status`로 확인 → 바꾼 파일을 `git add 파일` → `git commit -m "무엇을 왜 바꿨는지"`.' },
+  { re: /nothing added to commit|Changes not staged for commit/, title: 'add를 안 했어요', why: '파일을 고쳤지만 스테이징(장바구니)에 담지 않아서 커밋에 들어가지 않아요.', fix: '`git add 파일` 또는 `git add .` 다음에 커밋하세요.' },
+  { re: /pathspec '.*' did not match any file/, title: '그런 파일 없음(git)', why: 'git이 모르는 이름이에요. 오타이거나, 저장소 밖의 파일이거나, .gitignore에 걸렸을 수 있어요.', fix: '`git status`에 보이는 이름 그대로 적으세요.' },
+  { re: /ignored by one of your \.gitignore/, title: '.gitignore에 걸림', why: '그 파일은 .gitignore 규칙에 맞아서 git이 일부러 무시해요(로그·비밀키·빌드 결과처럼 올리면 안 되는 것).', fix: '정말 올려야 하면 .gitignore에서 그 규칙을 지우세요. 보통은 무시하는 게 맞아요.' },
+  { re: /has no upstream branch/, title: '원격 브랜치 연결 안 됨', why: '이 브랜치를 원격의 어느 브랜치에 올릴지 아직 정하지 않았어요. 처음 한 번만 알려 주면 돼요.', fix: '`git push -u origin 브랜치이름` (그 뒤로는 `git push`만).' },
+  { re: /does not appear to be a git repository|Could not read from remote repository/, title: '원격 저장소 없음', why: '`origin`이라는 원격이 등록되지 않았거나 주소가 틀렸어요.', fix: '`git remote add origin 주소` 후 `git remote -v`로 확인.' },
+  { re: /\[rejected\].*fetch first|Updates were rejected/, title: 'push 거부: 원격이 앞섬', why: '다른 사람(또는 다른 기기)이 먼저 올린 커밋이 원격에 있어요. 그걸 먼저 받아 합쳐야 올릴 수 있어요.', fix: '`git pull` → (충돌 있으면 해결) → `git push`.' },
+  { re: /CONFLICT \(content\)/, title: '충돌', why: '같은 파일의 같은 부분을 양쪽에서 다르게 고쳤어요. git은 어느 쪽이 맞는지 모르니 파일에 `<<<<<<<` `=======` `>>>>>>>` 표시를 넣고 멈춰요.', fix: '`edit 파일`로 열어 마커를 지우고 원하는 내용만 남기기 → `git add 파일` → `git commit -m "충돌 해결"`. 포기하려면 `git merge --abort`.' },
+  { re: /Your local changes to the following files would be overwritten/, title: '저장 안 한 변경이 있음', why: '브랜치를 바꾸면 지금 고치던 내용이 사라질 수 있어 git이 막았어요.', fix: '먼저 `git commit -am "작업 중"`으로 저장하거나, `git stash`로 잠시 치워 두세요.' },
+  { re: /is not fully merged/, title: '아직 합치지 않은 브랜치', why: '이 브랜치의 커밋이 다른 곳에 합쳐지지 않아서 지우면 작업이 사라져요.', fix: '먼저 `git merge 브랜치`로 합치거나, 정말 버릴 거면 `git branch -D 브랜치`.' },
+  { re: /a branch named '.*' already exists/, title: '같은 이름의 브랜치', why: '그 이름은 이미 있어요.', fix: '`git branch`로 목록을 보고 다른 이름을 쓰거나, 있는 브랜치로 가려면 `git switch 이름`.' },
+  { re: /Cannot delete branch '.*' checked out/, title: '서 있는 브랜치는 못 지움', why: '지금 그 브랜치 위에 있어요. 자기가 서 있는 가지는 자를 수 없어요.', fix: '`git switch main`으로 옮긴 뒤 `git branch -d 이름`.' },
+  { re: /unmerged files|Exiting because of an unresolved conflict/, title: '충돌을 아직 안 풀었어요', why: '충돌 마커가 남은 파일이 있어서 커밋할 수 없어요.', fix: '파일에서 `<<<<<<<` `=======` `>>>>>>>` 줄을 지우고 `git add 파일` 뒤 커밋.' },
+  { re: /not something we can merge|invalid reference|invalid upstream/, title: '없는 브랜치', why: '그 이름의 브랜치가 없어요.', fix: '`git branch`로 정확한 이름을 확인하세요.' },
+  { re: /does not have any commits yet|You do not have the initial commit yet/, title: '커밋이 아직 없음', why: '저장소를 만들었지만 첫 커밋 전이에요.', fix: '`git add .` → `git commit -m "첫 커밋"`.' },
+];

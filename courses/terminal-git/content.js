@@ -2,7 +2,7 @@
 // 채우는 순서·규칙은 NEXT.md WP-B, 설계는 EXPANSION.md 6절. 파이썬/알고리즘 content.js 와 같은 전역 const 구조(엔진이 그대로 읽는다).
 //
 // 이 코스의 문제 필드(엔진 확장이 필요한 것은 ★):
-//   type:'mission' ★   미션형. setup:{cwd, tree}(초기 VFS) · goals:[{text, expect:{...}}] (실시간 체크리스트, 명령마다 Shell.state()와 대조) · grader:'state' · expect:{cwd?, files?:{path:content|null(없어야 함)}, dirs?:[path], commits?:n, branches?:[], head?:'main', staged?:[], remoteBranches?:[], noConflictMarkers?:true}
+//   type:'mission' ★   미션형. setup:{cwd, tree, git?, remote?}(core/runners/shell.js 머리말) · goals:[{text, expect:{...}}] (실시간 체크리스트, 명령마다 Shell.state()와 대조) · grader:'state' · expect: Grader.matchState 의 키(core/engine.js 맨 아래: cwd cwdStartsWith files dirs noFiles commits branchCommits branches noBranches head staged stagedEmpty clean noConflictMarkers tags messages lastMessage remoteBranches pushed stash forbid historyIncludes) — 셸·Git 엔진과 채점기는 v2.2.15에 구현·테스트됨(tools/test_shell.mjs 111건)
 //                       — expect 에 적힌 항목만 비교(EXPANSION 6절 "채점"). 함수는 쓰지 않는다(extract.mjs 가 JSON으로 내보내 run_solutions 가 Node 셸로 검증하므로 전부 선언형). 명령 히스토리 규칙은 `forbid:['rm -rf /']` ★
 //   type:'quiz'        그대로(명령 맞히기 = quiz 에 kind:'cmd' ★: "이 상태에서 ○○ 하려면?" 보기 4개가 명령어)
 //   type:'parsons'     명령 순서 맞히기(parsons.solution 은 줄마다 명령 한 개, 채점은 셸로 실행해 expect 비교 ★)

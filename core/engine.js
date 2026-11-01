@@ -272,3 +272,38 @@ Grader.explainDiff = function (r) {
   else if (r.mode === 'block') tips.push('블록: 반복 안에 들어가야 할 블록이 밖에 있거나, 변수 이름이 다르거나, 출력 블록이 빠지지 않았는지 보세요.');
   return { rows, tips: [...new Set(tips)].slice(0, 3), firstBad };
 };
+
+// ---------- 미션 채점 (터미널·Git 코스, WP-B 4단계 준비, v2.2.15) ----------
+// Grader.matchState(state, expect) — Shell.state() 결과를 expect 에 적힌 항목만 비교. 반환 { ok, fails:[한국어 이유] }
+//   expect: { cwd, cwdStartsWith, files:{path: content|null(없어야 함)|{includes}|{excludes}|{lines:n}}, dirs:[path], noFiles:[path],
+//             commits:n|{min:n}, branchCommits:n|{min}, branches:[...], noBranches:[...], head:'main', staged:[], stagedEmpty:true, clean:true,
+//             noConflictMarkers:true, tags:[...], messages:[...](순서대로 포함), lastMessage:'...', remoteBranches:{origin:[...]}, pushed:true(현재 브랜치가 origin에 그대로),
+//             stash:n, forbid:['rm -rf /', /정규식/], historyIncludes:['git log'] }
+Grader.matchState = function (st, ex) {
+  const fails = []; const git = st.git || {}; const tree = st.tree || {}; const at = (p) => { let n = tree; for (const seg of String(p).split('/').filter(Boolean)) { if (!n || typeof n !== 'object' || !(seg in n)) return undefined; n = n[seg]; } return n; };
+  const abs = (p) => p.startsWith('/') ? p : (git.root ? git.root + '/' + p : '/home/me/' + p);
+  if (ex.cwd != null && st.cwd !== ex.cwd) fails.push(`지금 위치가 ${ex.cwd} 이어야 해요 (지금 ${st.cwd})`);
+  if (ex.cwdStartsWith && !(st.cwd === ex.cwdStartsWith || st.cwd.startsWith(ex.cwdStartsWith + '/'))) fails.push(`${ex.cwdStartsWith} 안에 있어야 해요`);
+  for (const [p, want] of Object.entries(ex.files || {})) { const v = at(abs(p)); if (want === null) { if (v !== undefined) fails.push(`${p} 가 없어야 해요`); continue; } if (typeof v !== 'string') { fails.push(`파일 ${p} 가 없어요`); continue; } if (typeof want === 'string') { if (v.replace(/\s+$/, '') !== want.replace(/\s+$/, '')) fails.push(`${p} 내용이 달라요`); } else { if (want.includes != null && !v.includes(want.includes)) fails.push(`${p} 에 "${want.includes}" 가 있어야 해요`); if (want.excludes != null && v.includes(want.excludes)) fails.push(`${p} 에 "${want.excludes}" 가 없어야 해요`); if (want.lines != null && v.replace(/\n$/, '').split('\n').length !== want.lines) fails.push(`${p} 는 ${want.lines}줄이어야 해요`); } }
+  for (const p of ex.dirs || []) { const v = at(abs(p)); if (!v || typeof v !== 'object') fails.push(`폴더 ${p} 가 없어요`); }
+  for (const p of ex.noFiles || []) if (at(abs(p)) !== undefined) fails.push(`${p} 는 없어야 해요`);
+  const num = (key, val, label) => { if (val == null) return; const got = git[key] || 0; if (typeof val === 'number' ? got !== val : (val.min != null && got < val.min) || (val.max != null && got > val.max)) fails.push(`${label} ${typeof val === 'number' ? val + '개' : (val.min != null ? val.min + '개 이상' : val.max + '개 이하')}여야 해요 (지금 ${got}개)`); };
+  if (ex.git !== undefined && ex.git === true && !st.git) fails.push('git 저장소가 아니에요 (git init)');
+  if ((ex.commits != null || ex.branchCommits != null || ex.branches || ex.head || ex.staged || ex.clean != null || ex.messages || ex.lastMessage || ex.remoteBranches || ex.pushed || ex.tags || ex.stash != null || ex.stagedEmpty || ex.noConflictMarkers) && !st.git) { fails.push('git 저장소가 아니에요 (git init 부터)'); return { ok: false, fails }; }
+  num('commits', ex.commits, '커밋이'); num('branchCommits', ex.branchCommits, '이 브랜치의 커밋이'); num('stash', ex.stash, 'stash 가');
+  for (const b of ex.branches || []) if (!(git.branches || []).includes(b)) fails.push(`브랜치 ${b} 가 있어야 해요`);
+  for (const b of ex.noBranches || []) if ((git.branches || []).includes(b)) fails.push(`브랜치 ${b} 는 없어야 해요`);
+  if (ex.head && git.head !== ex.head) fails.push(`${ex.head} 브랜치에 있어야 해요 (지금 ${git.head || '분리된 HEAD'})`);
+  if (ex.staged) for (const p of ex.staged) if (!(git.staged || []).includes(p)) fails.push(`${p} 가 스테이징되어야 해요 (git add)`);
+  if (ex.stagedEmpty && (git.staged || []).length) fails.push('스테이징이 비어 있어야 해요');
+  if (ex.clean != null && !!git.clean !== ex.clean) fails.push(ex.clean ? '커밋되지 않은 변경이 남아 있어요 (git status)' : '변경이 있어야 해요');
+  if (ex.noConflictMarkers && (git.conflicts || []).length) fails.push(`충돌 마커가 남아 있어요: ${git.conflicts.join(', ')}`);
+  for (const t of ex.tags || []) if (!(git.tags || []).includes(t)) fails.push(`태그 ${t} 가 있어야 해요`);
+  if (ex.messages) { const msgs = (git.log || []).map(c => c.message); let i = 0; for (const m of ex.messages) { const j = msgs.findIndex((x, k) => k >= i && (m instanceof RegExp ? m.test(x) : x.includes(m))); if (j < 0) { fails.push(`"${m}" 커밋이 (순서대로) 있어야 해요`); break; } i = j + 1; } }
+  if (ex.lastMessage) { const last = (git.log || []).slice(-1)[0]; if (!last || !(ex.lastMessage instanceof RegExp ? ex.lastMessage.test(last.message) : last.message.includes(ex.lastMessage))) fails.push(`마지막 커밋 메시지에 "${ex.lastMessage}" 가 들어가야 해요`); }
+  for (const [r, bs] of Object.entries(ex.remoteBranches || {})) for (const b of bs) if (!((git.remoteBranches || {})[r] || []).includes(b)) fails.push(`원격 ${r} 에 브랜치 ${b} 가 있어야 해요 (git push)`);
+  if (ex.pushed && !git.pushed) fails.push(((git.remoteHead || {}).origin || {})[git.head] ? '마지막 커밋이 아직 push 되지 않았어요' : `${git.head} 브랜치를 origin 에 push 해야 해요`);
+  for (const f of ex.forbid || []) { const re = f instanceof RegExp ? f : new RegExp(f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); if ((st.history || []).some(h => re.test(h))) fails.push(`쓰면 안 되는 명령을 썼어요: ${f}`); }
+  for (const f of ex.historyIncludes || []) { const re = f instanceof RegExp ? f : new RegExp('(^|&&|;|\\|)\\s*' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); if (!(st.history || []).some(h => re.test(h))) fails.push(`${f} 명령을 써 보세요`); }
+  return { ok: !fails.length, fails };
+};
