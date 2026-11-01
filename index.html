@@ -214,7 +214,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '1.1.1',
+  APP_VERSION: '1.1.2',
   SAVE_KEY: 'python_academy_save',
   SCHEMA_VERSION: 1,
 
@@ -399,7 +399,7 @@ const LESSONS = [
   tutorSummary:'사칙연산 + - * /, 나머지 %, 몫 //, 거듭제곱 **. input()은 사용자가 입력한 글자(문자열)를 돌려준다. 숫자로 계산하려면 int()로 바꿔야 한다.',
   terms:{ '형 변환':'값의 종류를 바꾸는 것. int("3")은 글자 "3"을 숫자 3으로 바꾼다' },
   pages:[
-    { title:'계산기처럼', html:`<p>파이썬은 계산기예요. <code>+ - *</code>는 더하기·빼기·곱하기, <code>/</code>는 나누기예요. 곱하기는 x가 아니라 <b>별표 *</b>를 써요.</p><p><code>**</code>는 거듭제곱이에요. <code>2 ** 3</code>은 2를 세 번 곱한 8이에요.</p>`,
+    { title:'계산기처럼', html:`<p>파이썬은 계산기예요. <code>+</code>는 더하기, <code>-</code>는 빼기, <code>*</code>는 곱하기, <code>/</code>는 나누기예요. 곱하기는 x가 아니라 <b>별표 <code>*</code></b>를 써요.</p><p><code>**</code>는 거듭제곱이에요. <code>2 ** 3</code>은 2를 세 번 곱한 8이에요.</p>`,
       example:{ code:`print(3 + 4)\nprint(10 - 7)\nprint(6 * 7)\nprint(2 ** 10)` } },
     { title:'나머지와 몫', html:`<p>나누기 <code>/</code>는 결과가 항상 소수예요. <code>7 / 2</code>는 3.5이고, <code>8 / 2</code>도 4가 아니라 <b>4.0</b>이 나와요.</p><p>정수로 된 <b>몫</b>만 원하면 <code>//</code>, <b>나머지</b>만 원하면 <code>%</code>를 써요. 나머지는 짝수·홀수를 구분할 때 아주 자주 써요. <code>n % 2</code>가 0이면 짝수예요.</p>`,
       example:{ code:`print(7 / 2)\nprint(7 // 2)\nprint(7 % 2)\nprint(8 / 2)` } },
