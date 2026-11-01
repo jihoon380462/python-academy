@@ -1,0 +1,199 @@
+// ---------- 놀이터 ----------
+Views.playground = (root, params = {}) => {
+  const d = Store.data; let mode = params.mode || 'text'; let editor = null, blockEd = null, stopTurtle = null; let currentWork = null;
+  const render = () => {
+    root.innerHTML = `<div class="pg"><div class="pg-main">
+      <div class="pg-top"><div class="seg"><button class="${mode === 'text' ? 'on' : ''}" data-m="text">⌨ 텍스트</button><button class="${mode === 'block' ? 'on' : ''}" data-m="block">🧱 블록</button></div><div class="row"><button class="btn sm" id="pgSave">💾 ${T.save}</button><button class="btn sm" id="pgNew">✚ 새 코드</button><button class="btn sm tutor" id="pgAsk">💬 질문</button></div></div>
+      <div class="pg-ed" id="pgEd"></div>
+      ${mode === 'block' ? `<pre class="code" id="pgCodeView"></pre>` : ''}
+      <div class="pv-run"><button class="btn primary" id="pgRun">▶ ${T.run} <kbd>Ctrl+Enter</kbd></button><button class="btn" id="pgTrace">👣 ${T.stepRun}</button><label class="lbl inline">🐢 속도 <input type="range" id="pgSpeed" min="1" max="10" value="${d.settings.turtleSpeed}"></label></div>
+      <label class="lbl">${T.stdin}</label><textarea class="stdin" id="pgIn" rows="2"></textarea>
+      <div class="lbl">${T.output}</div><pre class="out" id="pgOut"></pre><div id="pgTurtle"></div><div id="pgTrace"></div>
+    </div><aside class="pg-side"><div class="card"><div class="card-h">🎨 ${T.works} <small>${d.works.length}개</small></div><div class="works" id="pgWorks">${d.works.length ? d.works.slice().reverse().map(w => `<div class="work ${currentWork === w.id ? 'cur' : ''}" data-w="${w.id}">${w.png ? `<img src="${w.png}">` : '<div class="work-ic">📄</div>'}<div class="work-n">${esc(w.name)}</div><div class="work-d">${new Date(w.date).toLocaleDateString()}</div><button class="btn xs del" data-del="${w.id}">✕</button></div>`).join('') : '<div class="muted">아직 작품이 없어요. 코드를 쓰고 저장해 보세요.</div>'}</div><div class="muted small">10줄 이상 실행하면 +${CONFIG.PLAYGROUND_XP} XP (하루 최대 ${CONFIG.PLAYGROUND_XP_DAILY_MAX})</div></div></aside></div>`;
+    $$('.seg button', root).forEach(b => b.onclick = () => { mode = b.dataset.m; rebuild(); });
+    const initCode = params.code || '# 아무 코드나 써 보세요!\nprint("안녕, 놀이터!")\n';
+    if (mode === 'text') { editor = new TextEditor($('#pgEd'), { value: initCode }); blockEd = null; }
+    else { let state = null; try { state = params.blockState ? JSON.parse(params.blockState) : null; } catch (e) {} blockEd = new BlockEditor($('#pgEd'), { allowed: Content.blocksUpTo('L8'), state, onChange: (c) => { $('#pgCodeView').textContent = c || '# 아직 블록이 없어요\n# 왼쪽 블록을 흰 바탕으로 끌어오면\n# 여기에 파이썬 코드가 나타나요'; } }); editor = null; }
+    const getCode = () => editor ? editor.getValue() : (blockEd ? blockEd.getCode() : '');
+    const run = async (trace) => {
+      const code = getCode(); const out = $('#pgOut'); out.textContent = ''; out.className = 'out'; $('#pgTurtle').innerHTML = ''; editor && editor.setErrorLine(null); if (stopTurtle) { stopTurtle(); stopTurtle = null; }
+      if (!Py.ready) { out.textContent = T.loadingPy + '…'; Py.start(); } Audio.click(); Game.stat('runs'); if (/print\(\s*["']안녕["']\s*\)/.test(code)) Game.stat('printHello');
+      let lines = 0; const r = await Py.run({ code, input: $('#pgIn').value, trace, onOut: (t, e) => { out.textContent += t; lines += (t.match(/\n/g) || []).length; if (lines > CONFIG.MAX_OUTPUT_LINES) out.textContent = out.textContent.split('\n').slice(0, CONFIG.MAX_OUTPUT_LINES).join('\n') + '\n' + T.tooLong; if (e) out.classList.add('haserr'); } });
+      if (trace && r.trace) { if (r.out != null) out.textContent = r.out; TracePanel.show($('#pgTrace'), r, editor, blockEd); }
+      if (!r.ok) { out.innerHTML += `<div class="errbox"><b>${esc(r.ename)}</b>: ${esc(r.emsg || '')}<br><span class="errko">💡 ${esc(Py.explain(r))}</span> <button class="btn xs" id="pgErrMore">자세히</button></div>`; if (r.line && editor) editor.setErrorLine(r.line); Audio.wrong(); Game.recordError(null); $('#pgErrMore').onclick = () => UI.go('errors', { name: r.ename }); }
+      else if (!out.textContent.trim() && !r.turtleUsed) out.textContent = '(출력이 없어요)';
+      if (r.turtleUsed) { $('#pgTurtle').innerHTML = `<canvas class="turtle-c" width="480" height="360"></canvas><div class="row"><button class="btn sm" id="pgPng">🖼 PNG로 저장</button><button class="btn sm" id="pgSaveT">🐢 그림 작품으로 저장</button></div>`; stopTurtle = TurtleView.draw($('canvas', $('#pgTurtle')), r.cmds, { speed: d.settings.turtleSpeed }); if (r.nsegs >= 100) Game.stat('turtleLines100'); $('#pgPng').onclick = () => { stopTurtle && stopTurtle(); const a = document.createElement('a'); a.download = 'turtle.png'; a.href = $('canvas', $('#pgTurtle')).toDataURL(); a.click(); }; $('#pgSaveT').onclick = async () => { stopTurtle && stopTurtle(); const name = await UI.prompt(T.nameWork, '예: 별 그림'); if (!name) return; const c = $('canvas', $('#pgTurtle')); const small = document.createElement('canvas'); small.width = 160; small.height = 120; small.getContext('2d').drawImage(c, 0, 0, 160, 120); d.works.push({ id: uid(), name, code, date: Date.now(), mode: 'text', png: small.toDataURL('image/jpeg', 0.7) }); Game.stat('worksSaved'); Game.stat('turtleSaved'); Store.save(); UI.toast('🐢 ' + T.savedWork); Game.checkBadges().forEach(b => UI.badgeFly(b)); render(); }; }
+      if (r.ok && code.split('\n').filter(x => x.trim()).length >= 10) { const px = d.playgroundXp; if (px.date !== todayKey()) { px.date = todayKey(); px.amount = 0; } if (px.amount < CONFIG.PLAYGROUND_XP_DAILY_MAX) { px.amount += CONFIG.PLAYGROUND_XP; Game.addXp(CONFIG.PLAYGROUND_XP); Game.stat('playgroundRuns'); UI.toast(`🛝 +${CONFIG.PLAYGROUND_XP} XP`); } }
+      Game.checkBadges().forEach(b => UI.badgeFly(b)); Store.save(); UI.renderTopbar();
+    };
+    $('#pgRun').onclick = () => run(false); $('#pgTrace').onclick = () => run(true); $('#pgSpeed').oninput = (e) => { d.settings.turtleSpeed = +e.target.value; Store.save(); };
+    $('#pgSave').onclick = async () => { const code = getCode(); if (!code.trim()) return UI.toast('저장할 코드가 없어요'); const cur = currentWork && d.works.find(w => w.id === currentWork); const name = await UI.prompt(T.nameWork, '예: 구구단', cur ? cur.name : ''); if (!name) return; if (cur) { cur.name = name; cur.code = code; cur.mode = mode; cur.blockState = blockEd ? JSON.stringify(blockEd.getState()) : null; cur.date = Date.now(); } else { const w = { id: uid(), name, code, mode, blockState: blockEd ? JSON.stringify(blockEd.getState()) : null, date: Date.now() }; d.works.push(w); currentWork = w.id; Game.stat('worksSaved'); } Store.save(); UI.toast('💾 ' + T.savedWork); Game.checkBadges().forEach(b => UI.badgeFly(b)); render(); };
+    $('#pgNew').onclick = () => { currentWork = null; params = { mode }; rebuild(); };
+    $('#pgAsk').onclick = () => Tutor.ui.open({ free: true, getCode, getLastRun: () => $('#pgOut').textContent.slice(-1000), key: 'playground' });
+    $$('[data-w]', root).forEach(el => el.onclick = (e) => { if (e.target.dataset.del) return; const w = d.works.find(x => x.id === el.dataset.w); if (!w) return; currentWork = w.id; params = { code: w.code, mode: w.mode || 'text', blockState: w.blockState }; mode = params.mode; rebuild(); });
+    $$('[data-del]', root).forEach(b => b.onclick = async (e) => { e.stopPropagation(); if (!await UI.confirm('이 작품을 지울까요?')) return; d.works = d.works.filter(w => w.id !== b.dataset.del); Store.save(); render(); });
+  };
+  const rebuild = () => { editor && editor.destroy(); blockEd && blockEd.destroy(); render(); };
+  const keyHandler = (e) => { if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); $('#pgRun') && $('#pgRun').click(); } }; document.addEventListener('keydown', keyHandler);
+  render();
+  return { destroy() { document.removeEventListener('keydown', keyHandler); editor && editor.destroy(); blockEd && blockEd.destroy(); } };
+};
+
+// ---------- 뱃지 ----------
+Views.badges = (root) => { const d = Store.data; root.innerHTML = `<div class="page"><h2>🏅 ${T.badges} <small>${d.badges.length}/${BADGES.length}</small></h2><div class="badges">${BADGES.map(b => { const got = d.badges.includes(b.id); return `<div class="badge ${got ? 'got' : 'no'}"><div class="b-ic">${got ? b.icon : (b.secret ? '❔' : b.icon)}</div><div class="b-n">${got ? esc(b.name) : (b.secret ? '???' : esc(b.name))}</div><div class="b-d">${got ? esc(b.desc) : (b.secret ? '비밀 뱃지' : esc(b.desc))}</div>${got ? `<div class="b-date">${new Date(d.badgeDates[b.id] || 0).toLocaleDateString()}</div>` : ''}</div>`; }).join('')}</div></div>`; };
+
+// ---------- 프로필 ----------
+Views.profile = (root) => {
+  const d = Store.data; const lv = Game.level(); const clears = PROBLEMS.filter(p => Store.prob(p.id).status === 'clear').length; const stars = PROBLEMS.reduce((a, p) => a + Store.prob(p.id).stars, 0);
+  root.innerHTML = `<div class="page"><div class="card pcard" id="pcard"><div class="pc-top">${myMascot({ size: 96, mood: 'happy' })}<div><div class="pc-name">${esc(d.nick || '학습자')}</div><div class="pc-title">${Game.title(lv.level)}</div><div class="pc-lv">Lv.${lv.level}</div></div></div>
+    <div class="pc-grid"><div><b>${d.xp}</b><span>총 XP</span></div><div><b>${clears}/${PROBLEMS.length}</b><span>클리어</span></div><div><b>${stars}</b><span>별 합계</span></div><div><b>${d.badges.length}</b><span>뱃지</span></div><div><b>${Game.currentStreak()}</b><span>연속 학습</span></div><div><b>${d.streak.best}</b><span>최고 스트릭</span></div></div></div>
+    <div class="row"><button class="btn primary" id="pcPng">🖼 PNG로 저장</button><button class="btn" id="pcInv">보관함</button></div>
+    <h3>타임 어택 최고 기록</h3><div class="card">${Object.keys(d.bestTimes).length ? Object.entries(d.bestTimes).map(([k, v]) => `<div>${esc(Content.lesson(k)?.title || k)}: <b>${v}초</b></div>`).join('') : '<div class="muted">아직 기록이 없어요</div>'}</div></div>`;
+  $('#pcInv').onclick = () => UI.go('inventory');
+  $('#pcPng').onclick = () => { const c = document.createElement('canvas'); c.width = 600; c.height = 340; const x = c.getContext('2d'); x.fillStyle = '#1e1e2e'; x.fillRect(0, 0, 600, 340); x.fillStyle = '#89b4fa'; x.font = 'bold 30px sans-serif'; x.fillText(d.nick || '학습자', 170, 70); x.fillStyle = '#cdd6f4'; x.font = '20px sans-serif'; x.fillText(`${Game.title(lv.level)} · Lv.${lv.level}`, 170, 105); const rows = [['총 XP', d.xp], ['클리어', `${clears}/${PROBLEMS.length}`], ['별', stars], ['뱃지', d.badges.length], ['연속 학습', Game.currentStreak() + '일'], ['최고 스트릭', d.streak.best + '일']]; rows.forEach(([k, v], i) => { const cx = 40 + (i % 3) * 185, cy = 180 + Math.floor(i / 3) * 70; x.fillStyle = '#313244'; x.fillRect(cx, cy, 170, 55); x.fillStyle = '#a6adc8'; x.font = '14px sans-serif'; x.fillText(k, cx + 12, cy + 20); x.fillStyle = '#f9e2af'; x.font = 'bold 22px sans-serif'; x.fillText(String(v), cx + 12, cy + 46); }); x.fillStyle = '#6c7086'; x.font = '13px sans-serif'; x.fillText('파이썬 아카데미', 40, 325); const img = new Image(); const svg = new Blob([myMascot({ size: 120, mood: 'happy' })], { type: 'image/svg+xml' }); img.onload = () => { x.drawImage(img, 30, 30, 120, 120); const a = document.createElement('a'); a.download = 'profile.png'; a.href = c.toDataURL(); a.click(); }; img.src = URL.createObjectURL(svg); };
+};
+
+// ---------- 보관함 ----------
+Views.inventory = (root) => {
+  const d = Store.data; const cats = [['editorTheme', '에디터 테마'], ['confetti', '색종이 팔레트'], ['sound', '효과음 세트'], ['accessory', '마스코트 액세서리']]; let tab = 'editorTheme';
+  const render = () => { const items = INVENTORY[tab]; const curId = { editorTheme: d.settings.editorTheme, confetti: d.settings.confetti, sound: d.settings.soundSet, accessory: d.settings.accessory }[tab]; root.innerHTML = `<div class="page"><h2>🎒 ${T.inventory}</h2><div class="seg">${cats.map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" data-t="${k}">${n}</button>`).join('')}</div><div class="inv-grid">${items.map(it => { const un = Game.isUnlocked(it); const prev = tab === 'editorTheme' ? `<div class="inv-prev" style="background:${it.css.bg};color:${it.css.fg}"><span style="color:${it.css.kw}">def</span> f(): <span style="color:${it.css.str}">"hi"</span> <span style="color:${it.css.num}">42</span></div>` : tab === 'confetti' ? `<div class="inv-prev dots">${it.colors.map(c => `<i style="background:${c}"></i>`).join('')}</div>` : tab === 'accessory' ? `<div class="inv-prev">${mascotSVG({ stage: Game.mascotStage(Game.level().level), color: d.mascotColor, accessory: it.id, size: 56 })}</div>` : `<div class="inv-prev">🔔</div>`; return `<div class="inv ${un ? '' : 'locked'} ${curId === it.id ? 'cur' : ''}" data-id="${it.id}">${prev}<div class="inv-n">${esc(it.name)}</div>${un ? (curId === it.id ? '<div class="ok">장착 중</div>' : '<button class="btn xs">장착</button>') : `<div class="muted small">🔒 ${Game.unlockText(it)}</div>`}</div>`; }).join('')}</div></div>`;
+    $$('.seg button', root).forEach(b => b.onclick = () => { tab = b.dataset.t; render(); });
+    $$('.inv:not(.locked)', root).forEach(el => el.onclick = () => { const id = el.dataset.id; if (tab === 'editorTheme') d.settings.editorTheme = id; if (tab === 'confetti') d.settings.confetti = id; if (tab === 'sound') { d.settings.soundSet = id; Audio.pass(); } if (tab === 'accessory') d.settings.accessory = id; Store.save(); UI.applyTheme(); if (tab === 'confetti') Confetti.burst(60); render(); UI.renderTopbar(); }); };
+  render();
+};
+
+// ---------- 설정 ----------
+Views.settings = (root) => {
+  const s = Store.data.settings; const d = Store.data;
+  root.innerHTML = `<div class="page settings"><h2>⚙ ${T.settings}</h2>
+    <div class="card"><div class="card-h">화면</div><div class="srow"><span>테마</span><div class="seg"><button data-theme="dark" class="${s.theme === 'dark' ? 'on' : ''}">다크</button><button data-theme="light" class="${s.theme === 'light' ? 'on' : ''}">라이트</button></div></div><div class="srow"><span>글자 크기</span><div class="seg">${[0, 1, 2].map(i => `<button data-font="${i}" class="${s.font === i ? 'on' : ''}">${['작게', '보통', '크게'][i]}</button>`).join('')}</div></div><div class="srow"><span>애니메이션</span><div class="seg">${[0, 1, 2].map(i => `<button data-anim="${i}" class="${s.anim === i ? 'on' : ''}">${['끔', '약하게', '보통'][i]}</button>`).join('')}</div></div><div class="srow"><span>효과음</span><input type="checkbox" id="sSound" ${s.sound ? 'checked' : ''}></div><div class="srow"><span>진동 (모바일)</span><input type="checkbox" id="sVib" ${s.vibrate ? 'checked' : ''}></div></div>
+    <div class="card"><div class="card-h">학습</div><div class="srow"><span>${T.dailyGoal}</span><div class="seg">${CONFIG.DAILY_GOAL_OPTIONS.map(n => `<button data-goal="${n}" class="${d.dailyGoal === n ? 'on' : ''}">${n}문제</button>`).join('')}</div></div><div class="srow"><span>온보딩 다시 보기</span><button class="btn sm" id="sOnb">보기</button></div><div class="srow"><span>${T.glossary} / ${T.errorDict}</span><div class="row"><button class="btn sm" id="sGl">용어집</button><button class="btn sm" id="sEr">에러 사전</button></div></div></div>
+    <div class="card"><div class="card-h">클로드 선생님 (Claude API)</div><div class="muted small">키는 내 브라우저(localStorage)에만 저장돼요. 이 파일에는 절대 쓰이지 않아요. 키 발급: <a href="${CONFIG.TUTOR.consoleUrl}" target="_blank" rel="noopener">${CONFIG.TUTOR.consoleUrl}</a></div><div class="srow"><span>API 키</span><input class="input" type="password" id="sKey" value="${esc(s.apiKey)}" placeholder="sk-ant-..."></div><div class="srow"><span>모델</span><div class="row"><select id="sModelSel"><option value="${CONFIG.TUTOR.defaultModel}">${CONFIG.TUTOR.defaultModel} (빠르고 저렴)</option><option value="${CONFIG.TUTOR.altModel}">${CONFIG.TUTOR.altModel} (더 똑똑)</option><option value="__custom">직접 입력</option></select><input class="input" id="sModel" value="${esc(s.model)}" placeholder="모델 문자열"></div></div><div class="row"><button class="btn primary" id="sKeySave">저장</button><button class="btn" id="sKeyTest">연결 테스트</button><span id="sKeyMsg" class="muted small"></span></div></div>
+    <div class="card"><div class="card-h">진행 데이터</div><div class="row"><button class="btn" id="sExport">📤 내보내기 (JSON)</button><button class="btn" id="sImport">📥 가져오기</button><input type="file" id="sImportFile" accept=".json" style="display:none"></div><div class="row" style="margin-top:8px"><button class="btn danger" id="sReset">전체 초기화</button></div></div>
+    <div class="muted small center">${T.appName} v${CONFIG.APP_VERSION} · Pyodide ${CONFIG.PYODIDE_VERSION}</div></div>`;
+  const re = () => { Store.save(); UI.applyTheme(); UI.renderTopbar(); Views.settings(root); };
+  $$('[data-theme]', root).forEach(b => b.onclick = () => { s.theme = b.dataset.theme; Game.stat('themeChanged'); Game.checkBadges().forEach(x => UI.badgeFly(x)); re(); });
+  $$('[data-font]', root).forEach(b => b.onclick = () => { s.font = +b.dataset.font; re(); }); $$('[data-anim]', root).forEach(b => b.onclick = () => { s.anim = +b.dataset.anim; re(); }); $$('[data-goal]', root).forEach(b => b.onclick = () => { d.dailyGoal = +b.dataset.goal; re(); });
+  $('#sSound').onchange = (e) => { s.sound = e.target.checked; Store.save(); if (s.sound) Audio.pass(); }; $('#sVib').onchange = (e) => { s.vibrate = e.target.checked; Store.save(); Haptic.tap(30); };
+  $('#sOnb').onclick = () => Onboarding.start(true); $('#sGl').onclick = () => UI.go('glossary'); $('#sEr').onclick = () => UI.go('errors');
+  const sel = $('#sModelSel'); sel.value = [CONFIG.TUTOR.defaultModel, CONFIG.TUTOR.altModel].includes(s.model) ? s.model : '__custom'; sel.onchange = () => { if (sel.value !== '__custom') $('#sModel').value = sel.value; };
+  $('#sKeySave').onclick = () => { s.apiKey = $('#sKey').value.trim(); s.model = $('#sModel').value.trim() || CONFIG.TUTOR.defaultModel; Store.save(); $('#sKeyMsg').textContent = '저장했어요'; };
+  $('#sKeyTest').onclick = async () => { s.apiKey = $('#sKey').value.trim(); s.model = $('#sModel').value.trim() || CONFIG.TUTOR.defaultModel; Store.save(); const m = $('#sKeyMsg'); m.textContent = '확인 중…'; try { await Tutor.test(); m.textContent = '✅ ' + T.keyOk; } catch (e) { m.textContent = '❌ ' + Tutor.errMsg(e); } };
+  $('#sExport').onclick = () => { const a = document.createElement('a'); a.download = `python_academy_${todayKey()}.json`; a.href = URL.createObjectURL(new Blob([Store.exportJSON()], { type: 'application/json' })); a.click(); UI.toast(T.exported); };
+  $('#sImport').onclick = () => $('#sImportFile').click(); $('#sImportFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; if (!await UI.confirm(T.importConfirm)) return; try { Store.importJSON(await f.text()); UI.applyTheme(); UI.toast('불러왔어요'); UI.go('home'); } catch (err) { UI.toast('불러오기 실패: ' + err.message); } };
+  $('#sReset').onclick = async () => { if (!await UI.confirm(T.confirmReset, '초기화')) return; if (!await UI.confirm(T.confirmReset2, '정말 초기화')) return; Store.reset(); UI.applyTheme(); location.reload(); };
+};
+
+// ---------- 용어집 / 에러 사전 ----------
+Views.glossary = (root) => { const learned = Store.data.lessons.terms || {}; const where = {}; LESSONS.forEach(l => (l.pages || []).forEach(pg => (pg.html.match(/\[\[([^\]]+)\]\]/g) || []).forEach(m => { const t = m.slice(2, -2); (where[t] = where[t] || []).push(l); }))); const entries = Object.entries(GLOSSARY).sort((a, b) => (learned[b[0]] ? 1 : 0) - (learned[a[0]] ? 1 : 0)); root.innerHTML = `<div class="page"><h2>📚 ${T.glossary}</h2><div class="muted">레슨에서 밑줄 친 용어를 누르면 여기에 모여요. 배운 용어가 위에 와요.</div><div class="gl">${entries.map(([t, def]) => `<div class="gl-item ${learned[t] ? 'learned' : ''}"><b>${esc(t)}</b><span>${esc(def)}</span>${where[t] ? `<div class="gl-where">${where[t].map(l => `<a data-l="${l.id}">레슨 ${l.n}</a>`).join(' ')}</div>` : ''}</div>`).join('')}</div></div>`; $$('[data-l]', root).forEach(a => a.onclick = () => UI.go('lesson', { lessonId: a.dataset.l })); };
+Views.errors = (root, { name } = {}) => { root.innerHTML = `<div class="page"><h2>🩺 ${T.errorDict}</h2><div class="muted">에러는 컴퓨터가 보내는 힌트예요. 이름을 눌러 펼쳐 보세요.</div><div class="errs">${ERRORS.map(e => `<details class="err" ${e.name === name ? 'open' : ''}><summary><code>${esc(e.name)}</code> ${esc(e.title)}</summary><div class="err-b"><p><b>왜 나나요?</b> ${esc(e.why)}</p><p><b>자주 하는 실수</b></p><pre class="code bad">${esc(e.bad)}</pre><p><b>고치는 법</b></p><pre class="code good">${esc(e.fix)}</pre></div></details>`).join('')}</div></div>`; const o = $('details[open]', root); if (o) setTimeout(() => o.scrollIntoView({ block: 'start' }), 50); };
+
+// ---------- 약점 분석 ----------
+Views.weakness = (root) => {
+  const ts = Review.tagStats(); const tags = ['변수', '계산', '조건', '반복', '리스트', '함수', '문자열', '딕셔너리', '클래스', '예외', '파일', '모듈', '출력', '입력', '오개념'].filter(t => ts[t]);
+  root.innerHTML = `<div class="page"><h2>📊 ${T.weakness}</h2><div class="muted">개념별 정답률과 평균 시도 횟수예요.</div><div class="wk">${tags.map(t => { const s = ts[t]; const tried = s.clear + s.fails; const rate = tried ? Math.round(100 * s.clear / Math.max(1, s.clear + s.fails)) : null; const avg = s.clear ? (s.attempts / Math.max(1, s.clear)).toFixed(1) : '-'; return `<div class="wk-row"><span class="wk-t">#${esc(t)}</span><div class="wk-bar"><div style="width:${rate ?? 0}%" class="${rate != null && rate < 60 ? 'low' : ''}"></div></div><span class="wk-n">${rate == null ? '미도전' : rate + '%'} · 평균 ${avg}회 · ${s.clear}/${s.total}</span></div>`; }).join('')}</div>
+    <div class="row"><button class="btn primary" id="wkStart">가장 약한 개념 복습 시작</button><button class="btn tutor" id="wkAsk">💬 선생님에게 약점 요약 받기</button></div><div id="wkTutor"></div></div>`;
+  $('#wkStart').onclick = () => { const w = Review.weakest(); const pool = PROBLEMS.filter(p => Store.prob(p.id).status === 'clear' && (!w || p.tags.includes(w))); if (!pool.length) return UI.toast('아직 복습할 문제가 없어요'); const pick = pool.sort(() => Math.random() - 0.5).slice(0, 3); Sessions.start(pick.map(p => p.id), { inReview: true, title: `#${w} 복습` }); };
+  $('#wkAsk').onclick = () => { const summary = tags.map(t => { const s = ts[t]; return `${t}: 정답률 ${s.clear + s.fails ? Math.round(100 * s.clear / Math.max(1, s.clear + s.fails)) : '미도전'}%, 클리어 ${s.clear}/${s.total}, 실패 ${s.fails}`; }).join('\n'); Tutor.ui.open({ free: true, key: 'weakness', preset: `아래는 제 개념별 정답률이에요. 무엇을 어떤 순서로 복습하면 좋을지 한 문단으로 알려 주세요.\n\n${summary}` }); };
+};
+
+// ---------- 세션(복습·도전·타임어택·약점) ----------
+const Sessions = {
+  start(pids, { inReview = false, inChallenge = false, timeAttack = false, title = '', lessonId = null } = {}) {
+    let i = 0; const startAt = Date.now(); const self = this;
+    const sess = { timeAttack, autoNext: false, next() { i++; if (i >= pids.length) return self.finish(sess); UI.go('problem', { pid: pids[i], lessonId: Content.problem(pids[i]).lesson, inReview, inChallenge, session: sess, params: inReview || inChallenge ? Content.randomParams(Content.problem(pids[i])) : null }, false); }, onFail() { if (timeAttack) sess.fails = (sess.fails || 0) + 1; }, pids, i: () => i, startAt, title, lessonId, inReview, inChallenge };
+    UI.toast(`${title || '세션 시작'} · ${pids.length}문제`);
+    UI.go('problem', { pid: pids[0], lessonId: Content.problem(pids[0]).lesson, inReview, inChallenge, session: sess, params: inReview || inChallenge ? Content.randomParams(Content.problem(pids[0])) : null });
+  },
+  async finish(sess) {
+    if (sess.timeAttack) { const sec = Math.round((Date.now() - sess.startAt) / 1000); const bt = Store.data.bestTimes; const prev = bt[sess.lessonId]; const best = prev == null || sec < prev; if (best) { bt[sess.lessonId] = sec; Store.save(); Confetti.rain(260); Audio.levelUp(); } if (sec <= 60) { Game.stat('timeAttackFast'); Game.checkBadges().forEach(b => UI.badgeFly(b)); } await UI.modal({ title: '⏱ 타임 어택 완료', body: `<div class="center"><div class="big">${sec}초</div>${best ? `<div class="ok">🏆 개인 최고 기록 경신!</div>` : `<div class="muted">최고 기록: ${prev}초</div>`}</div>` }); UI.go('home'); return; }
+    if (sess.inReview) { const rt = Store.data.reviewToday; if (rt.date === todayKey() && rt.count >= 3 && !rt.bonus) { rt.bonus = true; Game.addXp(CONFIG.REVIEW_BONUS); Store.save(); await UI.modal({ title: '🧠 ' + T.reviewDone, body: `<div class="center">${myMascot({ size: 100, mood: 'happy' })}<div class="big">+${CONFIG.REVIEW_BONUS} XP</div><div class="muted">마스코트가 끄덕끄덕!</div></div>` }); } else UI.toast('복습 세션 완료!'); Game.checkBadges().forEach(b => UI.badgeFly(b)); UI.go('home'); return; }
+    UI.go('home');
+  },
+};
+Views.review = (root) => { const due = Review.due(); if (!due.length) { UI.toast('복습할 문제가 없어요'); UI.go('home', {}, false); return; } Sessions.start(due.slice(0, 5).map(p => p.id), { inReview: true, title: '오늘의 복습' }); };
+Views.challenge = (root) => { const d = Store.data; const today = todayKey(); if (!d.dailyChallenge || d.dailyChallenge.date !== today) { const pool = PROBLEMS.filter(p => Store.prob(p.id).status === 'clear' && ['code', 'block', 'parsons', 'fill'].includes(p.type)); if (!pool.length) { UI.toast('클리어한 문제가 아직 없어요'); UI.go('home', {}, false); return; } const seed = today.split('-').reduce((a, b) => a + +b, 0); const pick = pool[seed % pool.length]; d.dailyChallenge = { date: today, pid: pick.id, done: false, params: Content.randomParams(pick) }; Store.save(); } if (d.dailyChallenge.done) { UI.toast('오늘 도전은 끝났어요'); UI.go('home', {}, false); return; } const p = Content.problem(d.dailyChallenge.pid); UI.go('problem', { pid: p.id, lessonId: p.lesson, inChallenge: true, params: d.dailyChallenge.params }, false); };
+Views.timeattack = (root) => { const done = LESSONS.filter(l => !l.boss && l.id !== 'L0' && Game.lessonDone(l)); root.innerHTML = `<div class="page"><h2>⏱ ${T.timeAttack}</h2><div class="muted">완료한 레슨의 문제 5개를 연속으로 풀어요. 별점에는 영향이 없고, 기록만 남아요.</div>${done.length ? `<div class="plist">${done.map(l => `<button class="pitem" data-l="${l.id}"><span class="ptitle">${esc(l.title)}</span><span class="pxp">${Store.data.bestTimes[l.id] ? '최고 ' + Store.data.bestTimes[l.id] + '초' : '기록 없음'}</span></button>`).join('')}</div>` : '<div class="card muted">완료한 레슨이 아직 없어요.</div>'}</div>`; $$('[data-l]', root).forEach(b => b.onclick = () => { const ps = Content.problemsOf(b.dataset.l).slice().sort(() => Math.random() - 0.5).slice(0, 5); Sessions.start(ps.map(p => p.id), { timeAttack: true, title: '타임 어택', lessonId: b.dataset.l }); }); };
+
+// ---------- 종합 점검 ----------
+Views.checkup = (root, { n }) => {
+  const upto = { 1: 'L5', 2: 'L10', 3: 'L15' }[n]; const pool = Review.quizPool(upto).sort(() => Math.random() - 0.5).slice(0, CONFIG.CHECKUP_SIZE); let i = 0, score = 0;
+  const render = () => {
+    if (i >= pool.length) { const pct = Math.round(100 * score / pool.length); Store.data.checkups[n] = pct; const pass = pct >= CONFIG.CHECKUP_PASS * 100; if (pass) { Game.stat('checkupsPassed'); Game.addXp(CONFIG.CHECKUP_BONUS); Confetti.rain(200); Audio.clear(); } Store.save(); Game.checkBadges().forEach(b => UI.badgeFly(b)); root.innerHTML = `<div class="page center"><h2>📝 ${T.checkup} ${n} 결과</h2><div class="big">${pct}점</div>${pass ? `<div class="ok">통과! +${CONFIG.CHECKUP_BONUS} XP</div>` : '<div class="muted">80점 이상이면 보너스가 있어요. 다시 도전해 보세요!</div>'}<div class="row center"><button class="btn primary" id="ckHome">지도로</button><button class="btn" id="ckAgain">다시 풀기</button></div></div>`; $('#ckHome').onclick = () => UI.go('home'); $('#ckAgain').onclick = () => Views.checkup(root, { n }); UI.renderTopbar(); return; }
+    const p = pool[i];
+    root.innerHTML = `<div class="page"><div class="muted">${T.checkup} ${n} · ${i + 1}/${pool.length} · 맞힌 수 ${score}</div><h3>${esc(p.title)}</h3><div class="pv-prompt">${UI.terms(p.prompt)}</div><div id="ckBody"></div><div id="ckRes"></div></div>`;
+    const body = $('#ckBody');
+    if (p.type === 'quiz') { body.innerHTML = `<div class="quiz">${p.quiz.opts.map((o, k) => `<button class="qopt" data-i="${k}">${String.fromCharCode(65 + k)}. ${o}</button>`).join('')}</div>`; $$('.qopt', body).forEach(b => b.onclick = () => { $$('.qopt', body).forEach(x => x.disabled = true); const ok = +b.dataset.i === p.quiz.ans; b.classList.add(ok ? 'right' : 'wrong'); if (ok) { score++; Audio.pass(); } else Audio.wrong(); $('#ckRes').innerHTML = `<div class="result ${ok ? 'ok' : 'bad'}">${ok ? '정답!' : '아쉬워요.'} ${esc(p.quiz.why)}</div><button class="btn primary" id="ckNext">${T.next}</button>`; $('#ckNext').onclick = () => { i++; render(); }; }); }
+    else { const code = esc(p.fill.code).replace(/___(\d)___/g, (m, k) => { const b = p.fill.blanks[+k - 1]; return b.opt ? `<select class="blank" data-b="${+k - 1}"><option value="">?</option>${b.opt.map(o => `<option>${esc(o)}</option>`).join('')}</select>` : `<input class="blank" data-b="${+k - 1}" size="8">`; }); body.innerHTML = `<pre class="code fill">${code}</pre><button class="btn accent" id="ckCheck">확인</button>`; $('#ckCheck').onclick = () => { const ans = []; $$('.blank', body).forEach(el => ans[+el.dataset.b] = el.value); const r = Grader.checkFill(p, ans); $$('.blank', body).forEach(el => el.disabled = true); if (r.ok) { score++; Audio.pass(); } else Audio.wrong(); $('#ckRes').innerHTML = `<div class="result ${r.ok ? 'ok' : 'bad'}">${r.ok ? '정답!' : '아쉬워요. 정답: ' + esc(p.fill.blanks.map(b => b.a[0]).join(', '))} ${esc(p.fill.why)}</div><button class="btn primary" id="ckNext">${T.next}</button>`; $('#ckNext').onclick = () => { i++; render(); }; }; }
+  };
+  render();
+};
+
+// ---------- 선생님 패널 ----------
+Tutor.ui = {
+  ctx: null, el: null, busy: false,
+  init() { this.el = $('#tutorPanel'); },
+  open(ctx) {
+    this.ctx = ctx; const el = this.el; el.classList.add('open'); const key = ctx.key || 'global'; const chats = Store.data.tutorChats; chats[key] = chats[key] || [];
+    const extra = ctx.free && !ctx.preset ? '' : ctx.review ? `<button class="chip-btn" data-x="review">📝 내 코드 리뷰</button>` : ctx.problem ? `<button class="chip-btn" data-x="similar">🎲 비슷한 문제 하나 더</button>${ctx.cleared ? `<button class="chip-btn" data-x="review">📝 내 코드 리뷰</button>` : ''}` : ctx.lesson ? `<button class="chip-btn" data-x="analogy">🔁 이 개념 다른 비유로</button>` : '';
+    el.innerHTML = `<div class="tp-head"><span>💬 클로드 선생님</span><div><button class="btn xs" id="tpClear">대화 지우기</button><button class="btn xs" id="tpClose">✕</button></div></div><div class="tp-chips">${(ctx.free ? [] : T.chips).map(c => `<button class="chip-btn" data-q="${esc(c)}">${esc(c)}</button>`).join('')}${extra}</div><div class="tp-log" id="tpLog"></div><div class="tp-in"><textarea id="tpText" rows="2" placeholder="${Store.data.settings.apiKey ? '질문을 적어 보세요' : T.noKey}"></textarea><button class="btn primary" id="tpSend">보내기</button></div><div class="tp-foot muted small">이번 세션 질문 <span id="tpCount">${this.count || 0}</span>회 · 모델 ${esc(Store.data.settings.model)}${Store.data.settings.apiKey ? '' : ` · <a id="tpSettings">설정에서 키 넣기</a>`}</div>`;
+    $('#tpClose').onclick = () => this.close(); $('#tpClear').onclick = () => { chats[key] = []; Store.save(); this.renderLog(); }; $('#tpSend').onclick = () => this.send($('#tpText').value); $('#tpText').onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send($('#tpText').value); } }; const ts = $('#tpSettings'); if (ts) ts.onclick = () => { this.close(); UI.go('settings'); };
+    $$('[data-q]', el).forEach(b => b.onclick = () => this.send(b.dataset.q)); $$('[data-x]', el).forEach(b => b.onclick = () => this.special(b.dataset.x));
+    this.renderLog(); if (ctx.preset) this.send(ctx.preset);
+  },
+  close() { if (this.el) this.el.classList.remove('open'); },
+  log() { const key = this.ctx ? (this.ctx.key || 'global') : 'global'; return Store.data.tutorChats[key] = Store.data.tutorChats[key] || []; },
+  renderLog() { const log = $('#tpLog'); if (!log) return; log.innerHTML = this.log().map(m => `<div class="msg ${m.role}">${m.role === 'assistant' ? this.md(m.content) : esc(m.content)}</div>`).join('') || `<div class="muted small">무엇이든 물어보세요. 정답을 바로 주진 않지만 길을 알려 줘요. 질문은 별점·XP에 영향이 없어요.</div>`; log.scrollTop = log.scrollHeight; },
+  md(s) { return esc(s).replace(/```(?:python)?\n?([\s\S]*?)```/g, (m, c) => `<pre class="code">${c}</pre>`).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>'); },
+  systemPrompt() { const c = this.ctx; const sys = c.free ? T.tutorSystemFree : T.tutorSystem; const ctxText = Tutor.context({ lesson: c.lesson, problem: c.problem, code: c.getCode ? c.getCode() : null, lastRun: c.getLastRun ? c.getLastRun() : null, hints: c.hints, answerSeen: c.answerSeen, trace: TracePanel.cur ? `${TracePanel.cur.line}번 줄, 변수: ${JSON.stringify(TracePanel.cur.vars)}` : null, pageHtml: c.pageHtml }); return sys + '\n\n[맥락]\n' + ctxText; },
+  async send(text, { hidden = false, system = null, onDone = null } = {}) {
+    text = (text || '').trim(); if (!text || this.busy) return; if (!Store.data.settings.apiKey) { UI.toast(T.noKey); return; }
+    const log = this.log(); if (!hidden) log.push({ role: 'user', content: text }); const ta = $('#tpText'); if (ta) ta.value = ''; this.busy = true; this.count = (this.count || 0) + 1; const cnt = $('#tpCount'); if (cnt) cnt.textContent = this.count; Game.stat('tutorAsks');
+    const msgs = (hidden ? log.concat([{ role: 'user', content: text }]) : log).slice(-12).map(m => ({ role: m.role, content: m.content })); const entry = { role: 'assistant', content: '' }; log.push(entry); this.renderLog(); const logEl = $('#tpLog');
+    try { const full = await Tutor.call({ system: system || this.systemPrompt(), messages: msgs, onText: (t, f) => { entry.content = f; const last = logEl && logEl.lastElementChild; if (last) { last.innerHTML = this.md(f); logEl.scrollTop = logEl.scrollHeight; } } }); entry.content = full; if (onDone) onDone(full); }
+    catch (e) { entry.content = '⚠ ' + Tutor.errMsg(e); }
+    this.busy = false; Store.save(); this.renderLog();
+  },
+  async special(kind) {
+    const c = this.ctx;
+    if (kind === 'analogy') return this.send('지금 설명하는 개념을 방금과는 다른 비유로 다시 설명해 주세요.');
+    if (kind === 'review') { return this.send('방금 통과한 제 코드를 리뷰해 주세요. 더 파이썬다운 쓰기, 변수 이름, 불필요한 줄을 3가지 이내로만 짚어 주세요.', { onDone: () => { if (c.onPolished) { UI.toast('리뷰를 받았어요. 코드를 고쳐 다시 통과시키면 다듬기 XP!'); Store.prob(c.problem.id).reviewed = true; Store.save(); } } }); }
+    if (kind === 'similar') {
+      const p = c.problem; const schema = `{"title":"...","prompt":"...(HTML 없이)","starter":"...","solution":"...","tests":[{"input":"...","output":"..."},{"input":"...","output":"..."},{"input":"...","output":"..."}],"hints":["방향","구체","거의 정답"]}`;
+      const ask = async () => { let json = ''; await this.send(`현재 문제와 같은 개념(${p.tags.join(', ')})을 연습하는 새 문제를 하나 만들어 주세요. 반드시 아래 JSON 형식만 출력하고 다른 말은 쓰지 마세요. tests는 3개, 각 output은 solution을 그 input으로 실행했을 때의 정확한 표준 출력이어야 해요. 코드는 지금 레슨 범위 안의 문법만 쓰세요.\n${schema}`, { hidden: true, onDone: (f) => { json = f; } }); const m = json.match(/\{[\s\S]*\}/); if (!m) throw new Error('형식 오류'); return JSON.parse(m[0]); };
+      const verify = async (q) => { for (const t of q.tests) { let out = ''; const r = await Py.run({ code: q.solution, input: t.input || '', onOut: (x, e) => { if (!e) out += x; } }); if (!r.ok || Grader.norm(out) !== Grader.norm(t.output)) return false; } return true; };
+      try { let q = await ask(); let ok = await verify(q); if (!ok) { q = await ask(); ok = await verify(q); } if (!ok) { this.log().push({ role: 'assistant', content: '지금은 만들 수 없어요. 잠시 후 다시 시도해 주세요.' }); this.renderLog(); return; }
+        const np = { id: 'MY_' + uid(), lesson: p.lesson, type: 'code', title: '🎲 ' + q.title, prompt: esc(q.prompt).replace(/\n/g, '<br>'), tags: p.tags, hints: q.hints && q.hints.length >= 3 ? q.hints : ['문제를 다시 읽어 보세요', '원래 문제의 풀이를 떠올리세요', q.solution.split('\n')[0]], starter: q.starter || '', solution: q.solution, tests: q.tests, myProblem: true };
+        Store.data.myProblems.push(np); Content.problemMap[np.id] = np; Content.byLesson[np.lesson] = Content.byLesson[np.lesson] || []; Content.byLesson[np.lesson].push(np); PROBLEMS.push(np); Store.save();
+        this.log().push({ role: 'assistant', content: `새 문제 "${q.title}"를 만들었어요! 내 문제집에 저장했고, 복습 큐에도 들어가요.` }); this.renderLog(); UI.toast('🎲 새 문제가 준비됐어요'); setTimeout(() => { this.close(); if (c.onNewProblem) c.onNewProblem(np); }, 800);
+      } catch (e) { this.log().push({ role: 'assistant', content: '지금은 만들 수 없어요. (' + (e.message || '') + ')' }); this.renderLog(); }
+    }
+  },
+};
+
+// ---------- 온보딩 ----------
+const Onboarding = {
+  async start(replay = false) {
+    const d = Store.data; let color = d.mascotColor; let nick = d.nick;
+    await UI.modal({ title: `👋 ${T.appName}에 온 걸 환영해요!`, wide: true, body: `<p>닉네임을 정하고(선택) 마스코트 색을 골라 주세요.</p><input class="input" id="obNick" placeholder="닉네임 (선택)" value="${esc(nick)}" maxlength="12"><div class="ob-colors">${MASCOT_COLORS.map((c, i) => `<button class="ob-c ${i === color ? 'on' : ''}" data-c="${i}">${mascotSVG({ stage: 1, color: i, size: 64, mood: 'happy' })}</button>`).join('')}</div>`, buttons: [{ label: '다음', cls: 'primary', block: true, onClick: (ov) => { nick = $('#obNick', ov).value.trim(); } }], onOpen: (ov) => { $$('.ob-c', ov).forEach(b => b.onclick = () => { $$('.ob-c', ov).forEach(x => x.classList.remove('on')); b.classList.add('on'); color = +b.dataset.c; }); } });
+    d.nick = nick; d.mascotColor = color;
+    let goal = d.dailyGoal;
+    await UI.modal({ title: '🎯 하루에 몇 문제?', body: `<p>작게 시작해도 괜찮아요. 매일 하는 게 중요해요.</p><div class="seg big" id="obGoal">${CONFIG.DAILY_GOAL_OPTIONS.map(n => `<button class="${n === goal ? 'on' : ''}" data-g="${n}">${n}문제</button>`).join('')}</div>`, buttons: [{ label: '다음', cls: 'primary', block: true }], onOpen: (ov) => { $$('#obGoal button', ov).forEach(b => b.onclick = () => { $$('#obGoal button', ov).forEach(x => x.classList.remove('on')); b.classList.add('on'); goal = +b.dataset.g; }); } });
+    d.dailyGoal = goal; d.onboarded = true; Store.save(); UI.renderTopbar();
+    UI.go('home', {}, false); await sleep(300);
+    const steps = [['.node.cur', '지도에서 레슨을 골라요. 반짝이는 곳이 지금 할 레슨이에요.'], ['.tb-xp', '문제를 풀면 XP가 쌓이고 레벨이 올라요.'], ['.card.prof', '프로필·뱃지·보관함은 여기서 봐요.'], ['#tbSettings', '설정에서 테마와 선생님(API 키)을 설정해요.']];
+    for (const [sel, text] of steps) { const el = $(sel); if (!el) continue; const skip = await this.point(el, text); if (skip) break; }
+    UI.go('lesson', { lessonId: 'L0', page: 0, autoRun: true });
+  },
+  point(el, text) { return new Promise(res => { const r = el.getBoundingClientRect(); const ov = document.createElement('div'); ov.className = 'ob-ov'; ov.innerHTML = `<div class="ob-ring" style="left:${r.left - 6}px;top:${r.top - 6 + scrollY}px;width:${r.width + 12}px;height:${r.height + 12}px"></div><div class="ob-tip" style="left:${Math.max(10, Math.min(innerWidth - 300, r.left))}px;top:${r.bottom + 12 + scrollY}px"><div>${text}</div><div class="row"><button class="btn primary sm" data-a="n">다음</button><button class="btn sm" data-a="s">건너뛰기</button></div></div>`; document.body.appendChild(ov); $$('button', ov).forEach(b => b.onclick = () => { ov.remove(); res(b.dataset.a === 's'); }); }); },
+};
+
+// ---------- 초기화 ----------
+window.addEventListener('DOMContentLoaded', () => {
+  Store.load(); Content.init(); (Store.data.myProblems || []).forEach(np => { if (!Content.problemMap[np.id]) { Content.problemMap[np.id] = np; (Content.byLesson[np.lesson] = Content.byLesson[np.lesson] || []).push(np); PROBLEMS.push(np); } });
+  UI.applyTheme(); Confetti.init(); Loader.init(); QuickKeys.init(); Tutor.ui.init();
+  Py.start(); // 홈 진입과 동시에 백그라운드 로딩
+  Game.touchStreak(); Store.save();
+  document.addEventListener('click', () => { Audio._ctx(); }, { once: true });
+  if (!Store.data.onboarded) { UI.go('home', {}, false); Onboarding.start(); } else UI.go('home', {}, false);
+});

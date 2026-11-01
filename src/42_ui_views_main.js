@@ -1,0 +1,270 @@
+const Views = {};
+
+// ---------- 홈: 스테이지 맵 ----------
+Views.home = (root) => {
+  const d = Store.data; const lv = Game.level(); const cur = Game.currentLesson(); const today = todayKey(); const todayCount = d.days[today] || 0; const due = Review.due(); const streak = Game.currentStreak();
+  const checkAfter = { L5: 1, L10: 2, L15: 3 }; const sections = [];
+  CHAPTERS.forEach(c => {
+    const ls = LESSONS.filter(l => l.ch === c.ch); if (!ls.length) return; const open = Game.chapterOpen(c.ch); const nodes = [];
+    ls.forEach(l => {
+      const lo = Game.lessonOpen(l), done = Game.lessonDone(l), stars = done ? Game.lessonStars(l) : 0, isCur = cur && cur.id === l.id;
+      nodes.push(`<button class="node ${l.boss ? 'boss' : ''} ${done ? 'done' : ''} ${isCur ? 'cur' : ''} ${lo ? '' : 'locked'}" data-l="${l.id}" ${lo ? '' : 'disabled'}><div class="node-ic">${l.boss ? '👾' : done ? '✓' : lo ? (l.n ?? '') : '🔒'}</div><div class="node-t">${esc(l.title)}</div>${done ? `<div class="node-stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>` : ''}${isCur ? `<div class="node-mascot">${myMascot({ size: 36 })}</div>` : ''}</button>`);
+      if (checkAfter[l.id]) { const n = checkAfter[l.id]; const okq = Game.lessonDone(l); const sc = d.checkups[n]; nodes.push(`<button class="node check ${sc != null ? 'done' : ''} ${okq ? '' : 'locked'}" data-check="${n}" ${okq ? '' : 'disabled'}><div class="node-ic">📝</div><div class="node-t">종합 점검 ${n}</div>${sc != null ? `<div class="node-stars">${sc}점</div>` : ''}</button>`); }
+    });
+    sections.push(`<div class="ch-sec ${open ? '' : 'locked'}" style="--chc:${c.color}"><div class="ch-title"><span>${c.ch ? `챕터 ${c.ch}` : ''} ${c.name}</span>${d.stats['boss_B' + c.ch] ? `<span class="ch-decor">${MAP_DECOR[c.ch] || ''}</span>` : ''}${open ? '' : '<span class="lock">🔒 이전 보스를 깨면 열려요</span>'}</div><div class="nodes">${nodes.join('')}</div></div>`);
+  });
+  const nodes = sections;
+  const dc = d.dailyChallenge && d.dailyChallenge.date === today ? d.dailyChallenge : null; const msLeft = new Date(today + 'T23:59:59') - new Date(); const hLeft = Math.max(0, Math.floor(msLeft / 3600000)), mLeft = Math.max(0, Math.floor((msLeft % 3600000) / 60000));
+  const cal = []; for (let i = 13; i >= 0; i--) { const k = addDays(today, -i); const n = d.days[k] || 0; cal.push(`<div class="cal-cell l${Math.min(4, n)}" title="${k}: ${n}문제"></div>`); }
+  root.innerHTML = `<div class="home">
+    <div class="map">${nodes.join('')}
+      <div class="ch-sec" style="--chc:#607d8b"><div class="ch-title"><span>자유 공간</span></div><div class="nodes"><button class="node play" data-go="playground"><div class="node-ic">🛝</div><div class="node-t">놀이터</div></button><button class="node play" data-go="timeattack"><div class="node-ic">⏱</div><div class="node-t">타임 어택</div></button></div></div>
+    </div>
+    <aside class="side">
+      <div class="card prof"><div class="prof-top">${myMascot({ size: 64, mood: 'happy' })}<div><div class="prof-name">${esc(d.nick || '학습자')}</div><div class="prof-title">${Game.title(lv.level)}</div><div class="prof-lv">Lv.${lv.level} · ${d.xp} XP</div></div></div>
+        <div class="xpbar big"><div class="xpfill" style="width:${lv.need ? Math.round(100 * lv.into / lv.need) : 100}%"></div></div>
+        <div class="prof-row"><span>🔥 ${streak}일 연속</span><span>🏅 ${d.badges.length}/${BADGES.length}</span><span>⭐ ${PROBLEMS.reduce((a, p) => a + Store.prob(p.id).stars, 0)}</span></div>
+        <div class="prof-btns"><button class="btn sm" data-go="profile">프로필</button><button class="btn sm" data-go="badges">뱃지</button><button class="btn sm" data-go="inventory">보관함</button><button class="btn sm" data-go="weakness">약점 분석</button></div></div>
+      <div class="card"><div class="card-h">🎯 ${T.dailyGoal} <small>${todayCount}/${d.dailyGoal}</small></div><div class="goalbar"><div style="width:${Math.min(100, 100 * todayCount / d.dailyGoal)}%"></div></div>${todayCount >= d.dailyGoal ? `<div class="ok">${T.goalDone}</div>` : `<div class="muted">오늘 ${d.dailyGoal - todayCount}문제 더 풀면 +${CONFIG.DAILY_GOAL_BONUS} XP</div>`}</div>
+      <div class="card ${due.length ? 'hot' : ''}"><div class="card-h">🧠 오늘의 복습 <small>${due.length}개</small></div>${due.length ? `<div class="muted">잊기 전에 다시 풀어요. 3개를 마치면 +${CONFIG.REVIEW_BONUS} XP</div><button class="btn primary sm" data-go="review">복습 시작</button>` : '<div class="muted">복습할 문제가 없어요. 잘하고 있어요!</div>'}</div>
+      <div class="card"><div class="card-h">⚡ ${T.dailyChallenge} <small>${hLeft}시간 ${mLeft}분 남음</small></div>${dc && dc.done ? '<div class="ok">오늘 도전 완료! 내일 또 만나요</div>' : (d.stats.clears || 0) >= 3 ? `<div class="muted">클리어한 범위의 변형 문제 1개. XP 2배!</div><button class="btn primary sm" data-go="challenge">도전하기</button>` : '<div class="muted">문제를 3개 이상 풀면 열려요</div>'}</div>
+      <div class="card"><div class="card-h">📅 최근 14일</div><div class="cal">${cal.join('')}</div></div>
+    </aside></div>`;
+  $$('[data-l]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.l }));
+  $$('[data-go]', root).forEach(b => b.onclick = () => UI.go(b.dataset.go));
+  $$('[data-check]', root).forEach(b => b.onclick = () => UI.go('checkup', { n: +b.dataset.check }));
+  const curNode = $('.node.cur', root); if (curNode && !UI._homeScrolled) { setTimeout(() => curNode.scrollIntoView({ block: 'center', behavior: 'smooth' }), 100); UI._homeScrolled = true; }
+};
+
+// ---------- 레슨 ----------
+Views.lesson = (root, { lessonId, page = 0 }) => {
+  const l = Content.lesson(lessonId); const probs = Content.problemsOf(lessonId); UI.params.lessonTitle = l.title;
+  if (l.boss) { UI.go('problem', { pid: probs[0].id, lessonId }, false); return; }
+  const pages = l.pages || []; const total = pages.length + 1; let cur = clamp(page, 0, total - 1); let exampleEditor = null, stopTurtle = null;
+  Store.data.lessons[lessonId] = Store.data.lessons[lessonId] || {}; 
+  const render = () => {
+    if (exampleEditor) { exampleEditor.destroy(); exampleEditor = null; }
+    const isSummary = cur === pages.length; const pg = pages[cur];
+    let body;
+    if (isSummary) {
+      body = `<div class="lp-card"><h2>📘 ${T.learned}</h2><ul class="summary">${(l.summary || []).map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>
+        <div class="lp-card"><h3>연습문제 <small>${probs.filter(p => Store.prob(p.id).status === 'clear').length}/${probs.length}</small></h3><div class="plist">${probs.map((p, i) => { const r = Store.prob(p.id); return `<button class="pitem ${r.status}" data-p="${p.id}"><span class="pnum">${i + 1}</span><span class="ptype">${typeName(p.type)}</span><span class="ptitle">${esc(p.title)}</span><span class="pxp">${p.xp || CONFIG.XP[p.type]} XP</span>${r.status === 'clear' ? UI.stars(r.stars) : ''}</button>`; }).join('')}</div>
+        <div class="row"><button class="btn primary big" id="startProbs">${probs.every(p => Store.prob(p.id).status === 'clear') ? '다시 풀기' : '문제 풀기 시작'}</button></div></div>`;
+    } else {
+      body = `<div class="lp-card"><h2>${esc(pg.title)}</h2><div class="lp-html">${UI.terms(pg.html)}</div>${pg.example ? `<div class="ex"><div class="ex-h">${T.example} <span class="muted">코드를 고쳐서 실행해도 돼요</span></div><div class="ex-ed" id="exEd"></div>${pg.example.stdin != null ? `<label class="lbl">${T.stdin}</label><textarea class="stdin" id="exIn" rows="2">${esc(pg.example.stdin)}</textarea>` : ''}<div class="row"><button class="btn primary" id="exRun">▶ ${T.tryIt}</button>${pg.example.trace ? `<button class="btn" id="exTrace">👣 ${T.stepRun}</button>` : ''}<button class="btn" id="exPlay">${T.toPlayground}</button><button class="btn" id="exReset">↺ 원래대로</button></div><pre class="out" id="exOut"></pre><div id="exTurtle"></div><div id="exTracePanel"></div></div>` : ''}</div>`;
+    }
+    root.innerHTML = `<div class="lesson"><div class="lp-top"><span class="muted">${T.minutes(l.minutes)} · ${cur + 1}/${total}</span><div class="dots">${Array.from({ length: total }, (_, i) => `<span class="${i === cur ? 'on' : ''} ${i < cur ? 'past' : ''}"></span>`).join('')}</div><button class="btn sm" id="lpAsk">💬 선생님</button></div>${body}<div class="lp-nav"><button class="btn" id="lpPrev" ${cur === 0 ? 'disabled' : ''}>← ${T.prev}</button>${cur < total - 1 ? `<button class="btn primary" id="lpNext">${T.next} →</button>` : `<button class="btn" id="lpHome">지도로</button>`}</div></div>`;
+    UI.bindTerms(root);
+    $('#lpPrev').onclick = () => { cur--; render(); }; const nx = $('#lpNext'); if (nx) nx.onclick = () => { cur++; render(); }; const hm = $('#lpHome'); if (hm) hm.onclick = () => UI.go('home');
+    $('#lpAsk').onclick = () => Tutor.ui.open({ lesson: l, pageHtml: pg ? pg.html : (l.summary || []).join(' '), key: 'lesson_' + l.id });
+    Store.data.lessons[lessonId].page = cur; Store.save();
+    if (isSummary) { $$('[data-p]', root).forEach(b => b.onclick = () => UI.go('problem', { pid: b.dataset.p, lessonId })); $('#startProbs').onclick = () => { const first = probs.find(p => Store.prob(p.id).status !== 'clear') || probs[0]; UI.go('problem', { pid: first.id, lessonId }); }; return; }
+    if (pg.example) {
+      const orig = pg.example.code; exampleEditor = new TextEditor($('#exEd'), { value: orig });
+      const out = $('#exOut'); const tdiv = $('#exTurtle');
+      const run = async (trace) => {
+        const code = exampleEditor.getValue(); out.textContent = ''; out.className = 'out'; tdiv.innerHTML = ''; exampleEditor.setErrorLine(null); if (stopTurtle) { stopTurtle(); stopTurtle = null; }
+        if (!Py.ready) { out.textContent = T.loadingPy + '…'; Py.start(); } Audio.click(); Game.stat('runs');
+        if (code.trim() !== orig.trim()) { const ee = Store.data.examplesEdited; const k = l.id + ':' + cur; if (!ee[k]) { ee[k] = 1; Game.stat('examplesEdited'); } }
+        if (/print\(\s*["']안녕["']\s*\)/.test(code)) Game.stat('printHello');
+        const r = await Py.run({ code, input: $('#exIn') ? $('#exIn').value : '', trace, onOut: (t, e) => { out.textContent += t; if (e) out.classList.add('haserr'); } });
+        if (trace && r.trace) { TracePanel.show($('#exTracePanel'), r, exampleEditor); if (r.out != null) out.textContent = r.out; }
+        if (!r.ok) { out.innerHTML += `<div class="errbox"><b>${esc(r.ename)}</b>: ${esc(r.emsg || '')}<br><span class="errko">💡 ${esc(Py.explain(r))}</span> <button class="btn xs" id="exErrMore">자세히</button></div>`; if (r.line) exampleEditor.setErrorLine(r.line); Game.recordError(null); const b = $('#exErrMore'); if (b) b.onclick = () => UI.go('errors', { name: r.ename }); Game.checkBadges().forEach(bd => UI.badgeFly(bd)); }
+        else if (!out.textContent.trim() && !r.turtleUsed) out.textContent = '(출력이 없어요)';
+        if (r.turtleUsed) { tdiv.innerHTML = `<canvas class="turtle-c" width="400" height="300"></canvas>`; stopTurtle = TurtleView.draw($('canvas', tdiv), r.cmds, { speed: Store.data.settings.turtleSpeed }); }
+        Game.checkBadges().forEach(bd => UI.badgeFly(bd)); Store.save(); UI.renderTopbar();
+      };
+      $('#exRun').onclick = () => run(false); const tb = $('#exTrace'); if (tb) tb.onclick = () => run(true);
+      $('#exReset').onclick = () => exampleEditor.setValue(orig);
+      $('#exPlay').onclick = () => UI.go('playground', { code: exampleEditor.getValue() });
+      if (l.id === 'L0' && cur === 0 && UI.params.autoRun) { UI.params.autoRun = false; const tryRun = () => { if (Py.ready) run(false); else setTimeout(tryRun, 500); }; tryRun(); }
+    }
+  };
+  render();
+  return { destroy() { if (exampleEditor) exampleEditor.destroy(); } };
+};
+const typeName = (t) => ({ quiz: '퀴즈', fill: '빈칸', bug: '버그 찾기', parsons: 'Parsons', block: '블록 조립', code: '코드 작성' }[t] || t);
+
+// ---------- 한 줄씩 보기 패널 ----------
+const TracePanel = {
+  show(host, r, editor, blockEd) {
+    const steps = r.trace || []; if (!steps.length) { host.innerHTML = '<div class="muted">기록할 단계가 없어요.</div>'; return; }
+    let i = 0;
+    host.innerHTML = `<div class="trace"><div class="tr-head"><b>👣 ${T.stepRun}</b> <span class="muted" id="trPos"></span> ${r.truncated ? `<span class="warn">너무 길어서 ${CONFIG.TRACE_MAX_STEPS}단계까지만 보여줘요</span>` : ''}<button class="btn xs" id="trClose">${T.close}</button></div><div class="tr-ctrl"><button class="btn sm" id="trPrev">◀</button><input type="range" id="trSlider" min="0" max="${steps.length - 1}" value="0"><button class="btn sm" id="trNext">▶</button></div><div class="tr-body"><div class="tr-vars"><div class="tr-stack" id="trStack"></div><table id="trTable"></table></div><div class="tr-out"><div class="lbl">여기까지의 출력</div><pre id="trOut"></pre></div></div></div>`;
+    let prev = {};
+    const render = () => { const s = steps[i]; $('#trPos').textContent = `${i + 1}/${steps.length} · ${s.line}번 줄`; $('#trSlider').value = i; editor && editor.setTraceLine(s.line); if (blockEd) blockEd.highlight(blockEd.blockForLine(s.line)); $('#trStack').innerHTML = (s.stack || []).filter(x => x !== '<module>').map(n => `<span class="chip">${esc(n)}()</span>`).join(' → ') || '<span class="muted">메인</span>'; const rows = Object.entries(s.vars || {}); $('#trTable').innerHTML = rows.length ? `<tr><th>변수</th><th>값</th></tr>` + rows.map(([k, v]) => `<tr class="${prev[k] !== v ? 'changed' : ''}"><td>${esc(k)}</td><td><code>${esc(v)}</code></td></tr>`).join('') : '<tr><td class="muted">아직 변수가 없어요</td></tr>'; $('#trOut').textContent = s.out || ''; prev = { ...s.vars }; this.cur = s; };
+    $('#trPrev').onclick = () => { if (i > 0) { i--; render(); } }; $('#trNext').onclick = () => { if (i < steps.length - 1) { i++; render(); } }; $('#trSlider').oninput = (e) => { i = +e.target.value; render(); }; $('#trClose').onclick = () => { host.innerHTML = ''; editor && editor.setTraceLine(null); this.cur = null; };
+    render();
+  },
+  cur: null,
+};
+
+// ---------- 문제 풀이 ----------
+// ---------- 블록 문제 따라하기 코치 ----------
+// 정답 코드가 만들어지는 과정을 단계별로 안내하고, 생성된 코드를 보고 자동으로 다음 단계로 넘어간다.
+const Coach = {
+  norm(code) { return String(code || '').replace(/\s+/g, '').replace(/'/g, '"'); },
+  mount(el, p, rec, getEd) {
+    const steps = Content.guideFor(p); if (!steps || !steps.length || !el) return null;
+    const key = 'coach_' + p.id; const st = { i: 0, open: !(rec.status === 'clear'), all: false, done: new Set() };
+    const self = {
+      check(step, code) {
+        if (!step.c) return false; const cs = Array.isArray(step.c) ? step.c : [step.c]; const n = Coach.norm(code); const ed = getEd();
+        return cs.every(c => { if (typeof c !== 'string') return false; if (c.startsWith('@var:')) { const name = c.slice(5); try { return !!(ed && ed.ws && ed.ws.getVariable(name)); } catch (e) { return false; } } if (c.startsWith('~')) { try { return new RegExp(c.slice(1)).test(n); } catch (e) { return false; } } return n.includes(Coach.norm(c)); });
+      },
+      update(code) {
+        if (st.i >= steps.length - 1) { self.render(); return; }
+        // 현재 단계부터 연속으로 만족하는 만큼 전진 (이미 만들어 둔 상태 복원 포함)
+        let moved = false; while (st.i < steps.length - 1 && self.check(steps[st.i], code)) { st.done.add(st.i); st.i++; moved = true; }
+        if (moved && code != null && self._init) { Audio.pass(); self.flash = true; }
+        self._init = true; self.render();
+      },
+      ran() { /* 실행 버튼을 눌렀을 때: 마지막 단계면 그대로 둠 */ },
+      skip() { if (st.i < steps.length - 1) { st.i++; self.render(); } },
+      back() { if (st.i > 0) { st.i--; self.render(); } },
+      highlightCat(name) {
+        $$('.blocklyTreeRow.coach-hl').forEach(r => r.classList.remove('coach-hl')); if (!name) return;
+        $$('.blocklyTreeRow').forEach(r => { const lbl = $('.blocklyTreeLabel', r); if (lbl && lbl.textContent.trim() === name) r.classList.add('coach-hl'); });
+      },
+      render() {
+        const last = st.i >= steps.length - 1; const cur = steps[st.i];
+        if (!st.open) { el.innerHTML = `<div class="coach mini"><button class="btn sm" id="coachOpen">🧭 따라하기 안내 펼치기 (${Math.min(st.i + 1, steps.length)}/${steps.length})</button></div>`; $('#coachOpen', el).onclick = () => { st.open = true; self.render(); }; self.highlightCat(null); return; }
+        const dots = steps.map((s, k) => `<span class="cd ${k < st.i ? 'done' : k === st.i ? 'cur' : ''}"></span>`).join('');
+        const list = st.all ? `<ol class="coach-all">${steps.map((s, k) => `<li class="${k < st.i ? 'done' : k === st.i ? 'cur' : ''}">${s.t}</li>`).join('')}</ol>` : '';
+        el.innerHTML = `<div class="coach ${last ? 'last' : ''} ${self.flash ? 'flash' : ''}">
+          <div class="coach-head"><span class="coach-title">🧭 따라하기 <b>${st.i + 1}</b>/${steps.length}</span><span class="coach-dots">${dots}</span><span class="grow"></span><button class="lnk" id="coachAll">${st.all ? '현재 단계만' : '전체 단계 보기'}</button><button class="lnk" id="coachClose">접기</button></div>
+          <div class="coach-body"><span class="coach-num">${last ? '🎉' : st.i + 1}</span><div class="coach-text">${cur.t}</div></div>
+          ${list}
+          <div class="coach-foot">${st.i > 0 ? '<button class="btn sm" id="coachBack">◀ 이전 단계</button>' : ''}${!last ? '<button class="btn sm" id="coachSkip">이 단계는 했어요 ▶</button>' : ''}<span class="muted sm">${last ? '' : '블록을 맞게 놓으면 자동으로 다음 단계로 넘어가요'}</span></div>
+        </div>`;
+        self.flash = false;
+        const b = (id, fn) => { const x = $(id, el); if (x) x.onclick = fn; };
+        b('#coachAll', () => { st.all = !st.all; self.render(); }); b('#coachClose', () => { st.open = false; self.render(); }); b('#coachBack', self.back); b('#coachSkip', () => { Audio.click(); self.skip(); });
+        setTimeout(() => self.highlightCat(last ? null : cur.cat), 200);
+      },
+    };
+    self.render(); return self;
+  },
+};
+
+Views.problem = (root, params) => {
+  const { pid, lessonId, inReview, inChallenge, session } = params; const base = Content.problem(pid); const l = Content.lesson(base.lesson); UI.params.lessonTitle = l.title;
+  const p = Content.instantiate(base, params.params); const rec = Store.prob(pid); const probs = Content.problemsOf(base.lesson); const idx = probs.findIndex(x => x.id === pid);
+  const st = { mode: null, editor: null, blockEd: null, parsons: null, bugStep: 1, bugFixed: null, grading: false, hintsShown: rec.hints, lastRun: '', sameErr: { name: '', n: 0 }, cleared: rec.status === 'clear', attemptsNow: 0, usedTutorBefore: !!rec.tutorAsked, stopTurtle: null, firstGradeDone: false };
+  const wasClearBefore = rec.status === 'clear'; const isBoss = !!p.boss; const tests = Grader.normTests(p);
+  // 모드 결정
+  const decideMode = async () => {
+    if (['quiz', 'fill', 'bug'].includes(p.type)) return p.type;
+    if (p.type === 'block') return rec.mode === 'text' ? 'text' : 'block';
+    if (p.type === 'code') { if (p.dual && !rec.mode) { const r = await UI.modal({ title: T.parsonsOrText, body: `<p>Parsons는 줄을 끌어다 맞추고, 텍스트는 직접 타자로 써요.</p>`, buttons: [{ label: T.byParsons, value: 'parsons', block: true }, { label: T.byText, cls: 'primary', value: 'text', block: true }] }); rec.mode = r || 'parsons'; Store.save(); } return p.dual ? (rec.mode === 'text' ? 'text' : 'parsons') : 'text'; }
+    if (p.type === 'parsons') { if (p.dual && !rec.mode) { const r = await UI.modal({ title: T.parsonsOrText, body: `<p>Parsons는 줄을 끌어다 맞추고, 텍스트는 직접 타자로 써요.</p>`, buttons: [{ label: T.byParsons, value: 'parsons', block: true }, { label: T.byText, cls: 'primary', value: 'text', block: true }] }); rec.mode = r || 'parsons'; Store.save(); } return p.dual && rec.mode === 'text' ? 'text' : 'parsons'; }
+    return 'text';
+  };
+  const needsRun = () => ['block', 'text'].includes(st.mode) || (st.mode === 'bug' && st.bugStep === 2);
+  const getCode = () => { if (st.mode === 'block') return st.blockEd ? st.blockEd.getCode() : ''; if (st.mode === 'text' || (st.mode === 'bug' && st.bugStep === 2)) return st.editor ? st.editor.getValue() : ''; if (st.mode === 'parsons') return st.parsons ? st.parsons.getCode() : ''; return ''; };
+  const saveCode = () => { if (st.mode === 'block' && st.blockEd) { const s = st.blockEd.getState(); if (s) Store.setCode(pid, JSON.stringify(s), 'block'); } else if (st.mode === 'text' || (st.mode === 'bug' && st.bugStep === 2)) { Store.setCode(pid, getCode(), st.mode === 'bug' ? 'bugfix' : 'text'); } else if (st.mode === 'parsons' && st.parsons) Store.setCode(pid, JSON.stringify(st.parsons.getState()), 'parsons'); };
+
+  const render = async () => {
+    st.mode = await decideMode();
+    const typeLabel = typeName(p.type) + (st.mode === 'text' && p.type !== 'code' ? ' → 텍스트' : '');
+    const xpBase = isBoss ? Game.bossXp(p) : (p.xp || CONFIG.XP[p.type]);
+    root.innerHTML = `<div class="pv ${isBoss ? 'boss' : ''}">
+      <div class="pv-tabs"><button data-t="desc" class="on">설명</button><button data-t="work">작업</button></div>
+      <div class="pv-desc">
+        <div class="pv-head"><span class="chip type-${p.type}">${typeLabel}</span>${isBoss ? '<span class="chip boss">BOSS</span>' : ''}${inReview ? '<span class="chip">복습</span>' : ''}${inChallenge ? '<span class="chip hot">도전 XP 2배</span>' : ''}<span class="chip xp">${xpBase} XP</span>${rec.status === 'clear' ? UI.stars(rec.stars) : ''}<span class="muted small">${idx + 1}/${probs.length}</span></div>
+        <h2 class="pv-title">${esc(p.title)}</h2>
+        <div class="pv-prompt">${UI.terms(p.prompt)}</div>
+        ${p.inputExample ? `<div class="pv-inex"><b>입력 예시</b><pre>${esc(p.inputExample)}</pre></div>` : ''}
+        ${p.project ? `<div class="pv-proj"><b>📋 단계별 체크리스트</b><ol>${p.project.steps.map((s, i) => `<li><label><input type="checkbox" data-step="${i}"> ${esc(s)}</label></li>`).join('')}</ol></div>` : ''}
+        ${p.tags ? `<div class="pv-tags">${p.tags.map(t => `<span class="tag">#${esc(t)}</span>`).join(' ')}</div>` : ''}
+        <div class="pv-hints" id="pvHints"></div>
+        <div class="pv-actions"><button class="btn" id="btnHint">💡 ${T.hint} <small id="hintCnt"></small></button><button class="btn" id="btnAnswer">🔓 ${T.answer}</button><button class="btn tutor" id="btnTutor">💬 ${T.askTutor}</button></div>
+        <div class="pv-nav"><button class="btn sm" id="btnLesson">📖 레슨 설명 보기</button>${idx > 0 ? `<button class="btn sm" id="btnPrevP">◀ 이전 문제</button>` : ''}${idx < probs.length - 1 ? `<button class="btn sm" id="btnNextP">다음 문제 ▶</button>` : ''}<button class="btn sm" id="btnResetP" title="이 문제의 진행·코드만 지워요">↺ 이 문제 초기화</button></div>
+      </div>
+      <div class="pv-work">
+        ${isBoss ? `<div class="bosshp"><div class="bosshp-h">👾 보스 HP</div><div class="hpbar"><div class="hpfill" style="width:100%"></div></div><div class="bosshp-n">${tests.length}/${tests.length}</div></div>` : ''}
+        <div class="pv-mode" id="pvMode"></div>
+        <div class="pv-io" id="pvIo"></div>
+        <div class="pv-tests" id="pvTests"></div>
+        <div class="pv-trace" id="pvTrace"></div>
+        <div class="pv-result" id="pvResult"></div>
+      </div></div>`;
+    UI.bindTerms(root);
+    $$('.pv-tabs button', root).forEach(b => b.onclick = () => { $$('.pv-tabs button', root).forEach(x => x.classList.remove('on')); b.classList.add('on'); root.querySelector('.pv').dataset.tab = b.dataset.t; });
+    $('#btnLesson').onclick = () => UI.go('lesson', { lessonId: base.lesson, page: 0 }); const pp = $('#btnPrevP'); if (pp) pp.onclick = () => UI.go('problem', { pid: probs[idx - 1].id, lessonId: base.lesson }); const np = $('#btnNextP'); if (np) np.onclick = () => UI.go('problem', { pid: probs[idx + 1].id, lessonId: base.lesson });
+    $('#btnResetP').onclick = async () => { if (!await UI.confirm('이 문제의 별점·힌트·저장된 코드를 지우고 처음부터 풀까요? (XP는 그대로예요)', '초기화')) return; Store.resetProblem(pid); UI.go('problem', { pid, lessonId: base.lesson }, false); };
+    $('#btnHint').onclick = useHint; $('#btnAnswer').onclick = seeAnswer; $('#btnTutor').onclick = () => { rec.tutorAsked = true; Store.save(); Tutor.ui.open({ lesson: l, problem: p, getCode, getLastRun: () => st.lastRun, hints: rec.hints, answerSeen: rec.answerSeen, key: pid, cleared: rec.status === 'clear', onNewProblem: (q) => UI.go('problem', { pid: q.id, lessonId: q.lesson }) }); };
+    if (p.project) { const done = (Store.data.lessons['proj_' + pid] || []); $$('[data-step]', root).forEach(cb => { cb.checked = !!done[+cb.dataset.step]; cb.onchange = () => { done[+cb.dataset.step] = cb.checked; Store.data.lessons['proj_' + pid] = done; Store.save(); Audio.click(); }; }); }
+    renderHints(); renderMode();
+  };
+  const renderHints = () => { const h = $('#pvHints'); h.innerHTML = p.hints.slice(0, rec.hints).map((t, i) => `<div class="hint h${i + 1}"><b>힌트 ${i + 1} (${T.hintLabel[i]})</b> ${esc(t)}</div>`).join('') + (rec.answerSeen ? `<div class="hint ans"><b>정답</b><pre class="code">${esc(UI.annotate(p.type === 'bug' ? p.bug.solution : (p.solution || (p.parsons && p.parsons.solution) || '')))}</pre></div>` : ''); $('#hintCnt').textContent = `${rec.hints}/3`; const ab = $('#btnAnswer'); ab.disabled = rec.hints < 3 || rec.answerSeen; };
+  const useHint = () => { if (rec.hints >= 3) { UI.toast('힌트를 모두 봤어요'); return; } rec.hints++; Game.combo = 0; Store.save(); Audio.click(); renderHints(); const h = $('#pvHints'); if (h) { h.lastElementChild && h.lastElementChild.scrollIntoView({ block: 'nearest' }); } if (UI.isMobile()) $('.pv-tabs button[data-t=desc]').click(); };
+  const seeAnswer = async () => { if (rec.hints < 3) { UI.toast(T.needAllHints); return; } if (!await UI.confirm(T.seeAnswerConfirm, '정답 보기')) return; rec.answerSeen = true; Store.save(); renderHints(); };
+  const ioHtml = (showStdin) => `<div class="pv-run"><button class="btn primary" id="btnRun">▶ ${T.run} <kbd>Ctrl+Enter</kbd></button><button class="btn accent" id="btnGrade">✔ ${T.runAll}</button>${['text', 'block'].includes(st.mode) ? `<button class="btn" id="btnTrace">👣 ${T.stepRun}</button>` : ''}${st.mode === 'block' ? `<button class="btn" id="btnToText">⌨ ${T.toText}</button>` : ''}</div>${showStdin ? `<div class="stdin-wrap"><label class="lbl">${T.stdin} <span class="muted">(한 줄에 하나, input()이 차례로 읽어요)</span></label><textarea class="stdin" id="pvIn" rows="2" placeholder="입력값이 필요 없으면 비워 두세요">${esc(p.inputExample || '')}</textarea></div>` : ''}<div class="out-wrap"><div class="lbl">${T.output}</div><pre class="out" id="pvOut"></pre><div id="pvTurtle"></div></div>`;
+  const renderMode = () => {
+    const host = $('#pvMode'); const io = $('#pvIo'); host.innerHTML = ''; io.innerHTML = ''; $('#pvTests').innerHTML = ''; $('#pvResult').innerHTML = '';
+    if (st.mode === 'quiz') { host.innerHTML = `<div class="quiz">${p.quiz.opts.map((o, i) => `<button class="qopt" data-i="${i}">${String.fromCharCode(65 + i)}. ${o}</button>`).join('')}</div>`; $$('.qopt', host).forEach(b => b.onclick = () => gradeQuiz(+b.dataset.i, b)); }
+    else if (st.mode === 'fill') { let k = 0; const code = esc(p.fill.code).replace(/___(\d)___/g, (m, n) => { const b = p.fill.blanks[+n - 1]; k++; return b.opt ? `<select class="blank" data-b="${+n - 1}"><option value="">?</option>${b.opt.map(o => `<option>${esc(o)}</option>`).join('')}</select>` : `<input class="blank" data-b="${+n - 1}" placeholder="?" size="8">`; }); host.innerHTML = `<pre class="code fill">${code}</pre><div class="row"><button class="btn accent" id="btnGrade">✔ 제출하기</button></div>`; $('#btnGrade').onclick = gradeFill; }
+    else if (st.mode === 'bug') {
+      if (st.bugStep === 1) { host.innerHTML = `<div class="muted">① 틀린 줄을 눌러 고르세요</div><div class="buglines">${p.bug.code.split('\n').map((ln, i) => `<div class="bugline" data-i="${i + 1}"><span class="ln">${i + 1}</span><code>${esc(ln) || '&nbsp;'}</code></div>`).join('')}</div>`; $$('.bugline', host).forEach(el => el.onclick = () => gradeBugLine(+el.dataset.i, el)); }
+      else { host.innerHTML = `<div class="muted">② 코드를 고쳐서 제출하세요 (틀린 줄: ${p.bug.bugLine}번)</div><div class="ed-wrap"><div id="pvEd"></div></div>`; st.editor = new TextEditor($('#pvEd'), { value: st.bugFixed || (rec.mode === 'bugfix' && rec.code) || p.bug.code, onChange: () => { st.editor.setErrorLine(null); } }); st.editor.setLines([{ line: p.bug.bugLine, cls: 'hl-line' }]); io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun(); }
+    }
+    else if (st.mode === 'parsons') { host.innerHTML = `<div id="pvPz"></div><div class="row"><button class="btn accent" id="btnGrade">✔ 제출하기</button><button class="btn" id="btnRun">▶ 실행해 보기</button></div><div class="out-wrap"><pre class="out" id="pvOut"></pre></div>`; let state = null; try { if (rec.mode === 'parsons' && rec.code) state = JSON.parse(rec.code); } catch (e) {} st.parsons = new ParsonsEditor($('#pvPz'), { problem: p, state }); $('#btnGrade').onclick = gradeParsons; $('#btnRun').onclick = () => runCode(false); }
+    else if (st.mode === 'block') { const pvEl = host.closest('.pv'); if (pvEl) pvEl.classList.add('mode-block'); host.innerHTML = `<div id="pvCoach"></div><div class="block-wrap"><div class="block-ed" id="pvBlock"></div><div class="codeview"><div class="lbl">생성된 파이썬 코드 <span class="muted">(블록을 누르면 줄이 반짝여요)</span></div><pre class="code" id="pvCodeView"></pre></div></div>`; let state = null; try { if (rec.mode === 'block' && rec.code) state = JSON.parse(rec.code); } catch (e) {} const cv = $('#pvCodeView'); const showCode = (code, hl = []) => { cv.innerHTML = (code || '# 아직 블록이 없어요\n# 왼쪽 블록을 흰 바탕으로 끌어오면\n# 여기에 파이썬 코드가 나타나요').split('\n').map((ln, i) => `<div class="cvl ${hl.includes(i + 1) ? 'hl' : ''}" data-ln="${i + 1}">${esc(ln) || '&nbsp;'}</div>`).join(''); $$('.cvl', cv).forEach(el => el.onclick = () => { const id = st.blockEd.blockForLine(+el.dataset.ln); st.blockEd.highlight(id); $$('.cvl', cv).forEach(x => x.classList.remove('hl')); el.classList.add('hl'); }); }; st.coach = Coach.mount($('#pvCoach'), p, rec, () => st.blockEd); st.blockEd = new BlockEditor($('#pvBlock'), { allowed: Content.blocksUpTo(base.lesson), state, onChange: (code) => { showCode(code); st.coach && st.coach.update(code); } }); st.blockEd.onSelect = (id) => { showCode(st.blockEd.getCode(), id ? st.blockEd.blockLines(id) : []); }; io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun(); }
+    else { // text
+      host.innerHTML = `<div class="ed-wrap"><div id="pvEd"></div></div>`; const init = (rec.mode === 'text' && rec.code != null) ? rec.code : (p.starter || ''); st.editor = new TextEditor($('#pvEd'), { value: init, onChange: () => { st.editor.setErrorLine(null); clearTimeout(st.synTimer); st.synTimer = setTimeout(syntaxCheck, 700); } }); io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun();
+    }
+    renderTests();
+  };
+  const syntaxCheck = async () => { if (!st.editor || !Py.ready) return; const code = st.editor.getValue(); if (!code.trim()) return; const r = await Py.compile(code); if (r && !r.ok && r.line) st.editor.setLines([{ line: r.line, cls: 'err-line' }]); };
+  const bindRun = () => { const run = $('#btnRun'); if (run) run.onclick = () => runCode(false); const gr = $('#btnGrade'); if (gr) gr.onclick = () => grade(); const tr = $('#btnTrace'); if (tr) tr.onclick = () => runCode(true); const tt = $('#btnToText'); if (tt) tt.onclick = async () => { if (!await UI.confirm(T.toTextConfirm, '텍스트로 바꾸기')) return; const code = getCode(); rec.mode = 'text'; rec.code = code; Store.save(); if (st.blockEd) { st.blockEd.destroy(); st.blockEd = null; } render(); }; };
+  const renderTests = (results) => { const el = $('#pvTests'); if (!el || !needsRun()) return; el.innerHTML = `<div class="lbl">${T.tests} <span class="muted">(마지막 1개는 숨김)</span></div>` + tests.map((t, i) => { const r = results && results[i]; const hidden = i === tests.length - 1; return `<div class="tcase ${r ? (r.ok ? 'ok' : 'bad') : ''}" data-i="${i}"><div class="tc-h"><span class="tc-ic">${r ? (r.ok ? '✓' : '✗') : '○'}</span> 테스트 ${i + 1}${hidden ? ' (숨김)' : ''}${r && !r.ok && r.note ? ` <span class="muted">${esc(r.note)}</span>` : ''}</div>${r && !r.ok && !hidden ? `<div class="tc-body"><div><b>입력</b><pre>${esc(r.input || '(없음)')}</pre></div><div><b>기대한 출력</b><pre>${esc(r.expected)}</pre></div><div><b>내 출력</b><pre>${esc(r.actual)}${r.error ? '\n' + esc(r.error) : ''}</pre></div></div>` : ''}</div>`; }).join(''); };
+  const outEl = () => $('#pvOut');
+  const runCode = async (trace) => { if (st.coach) st.coach.ran();
+    const code = getCode(); const out = outEl(); if (!out) return; out.textContent = ''; out.className = 'out'; const tdiv = $('#pvTurtle'); if (tdiv) tdiv.innerHTML = ''; st.editor && st.editor.setErrorLine(null); if (st.stopTurtle) { st.stopTurtle(); st.stopTurtle = null; }
+    if (!Py.ready) { out.textContent = T.loadingPy + '…'; Py.start(); } Audio.click(); Haptic.tap(10); Game.stat('runs'); if (/print\(\s*["']안녕["']\s*\)/.test(code)) Game.stat('printHello');
+    const inp = $('#pvIn') ? $('#pvIn').value : (tests[0].input || ''); let lines = 0;
+    const r = await Py.run({ code, input: inp, trace, onOut: (t, e) => { out.textContent += t; lines += (t.match(/\n/g) || []).length; if (lines > CONFIG.MAX_OUTPUT_LINES) { out.textContent = out.textContent.split('\n').slice(0, CONFIG.MAX_OUTPUT_LINES).join('\n') + '\n' + T.tooLong; } if (e) out.classList.add('haserr'); } });
+    if (trace && r.trace) { if (r.out != null) out.textContent = r.out; TracePanel.show($('#pvTrace'), r, st.editor, st.blockEd); }
+    st.lastRun = (out.textContent || '').slice(-1500);
+    if (!r.ok) { out.innerHTML += `<div class="errbox"><b>${esc(r.ename)}</b>: ${esc(r.emsg || '')}<br><span class="errko">💡 ${esc(Py.explain(r))}</span> <button class="btn xs" id="pvErrMore">자세히</button></div>`; st.lastRun += `\n[에러] ${r.ename}: ${r.emsg}`; if (r.line && st.editor) st.editor.setErrorLine(r.line); if (r.line && st.blockEd) st.blockEd.highlight(st.blockEd.blockForLine(r.line)); Audio.wrong(); Game.recordError(p); $('#pvErrMore').onclick = () => UI.go('errors', { name: r.ename }); if (st.sameErr.name === r.ename) st.sameErr.n++; else st.sameErr = { name: r.ename, n: 1 }; if (st.sameErr.n === 3 && rec.hints === 0) { if (await UI.confirm(`같은 에러가 3번 났어요. 힌트 1단계를 무료로 볼까요? (별점에 영향 없음)`, '힌트 보기')) { $('#pvHints').innerHTML = `<div class="hint h1"><b>무료 힌트</b> ${esc(p.hints[0])}</div>`; } } }
+    else if (!out.textContent.trim() && !r.turtleUsed) out.textContent = '(출력이 없어요)';
+    if (r.turtleUsed && tdiv) { tdiv.innerHTML = `<canvas class="turtle-c" width="400" height="300"></canvas>`; st.stopTurtle = TurtleView.draw($('canvas', tdiv), r.cmds, { speed: Store.data.settings.turtleSpeed }); if (r.nsegs >= 100) Game.stat('turtleLines100'); }
+    saveCode(); Game.checkBadges().forEach(b => UI.badgeFly(b)); Store.save(); UI.renderTopbar();
+  };
+  const beforeGrade = () => { if (!st.firstGradeDone) { st.firstGradeDone = true; st.firstTryCandidate = rec.attempts === 0 && rec.status !== 'clear'; } st.attemptsNow++; };
+  const onFail = (msg) => { const hadCombo = Game.combo >= 2; Game.failProblem(p); Audio.wrong(); Haptic.tap(60); UI.shake($('.pv-work', root)); $('#pvResult').innerHTML = `<div class="result bad">${msg}${hadCombo ? ' <span class="muted">(콤보가 끊겼어요)</span>' : ''}</div>`; UI.renderTopbar(); if (session && session.onFail) session.onFail(); };
+  const onClear = async (anchor) => {
+    const firstTry = st.firstTryCandidate && st.attemptsNow === 1 && rec.fails === 0;
+    const events = Game.clearProblem(p, { mode: st.mode, hints: rec.hints, firstTry, usedTutor: rec.tutorAsked && !st.usedTutorBefore, inReview, inChallenge, inTimeAttack: !!(session && session.timeAttack) });
+    if (inReview) Review.afterReview(base, true, rec.hints);
+    if (inChallenge) { Store.data.dailyChallenge.done = true; Store.save(); }
+    if (p.project) { const code = getCode(); if (code && !Store.data.works.some(w => w.src === pid)) { Store.data.works.push({ id: uid(), name: p.title, code, src: pid, date: Date.now(), mode: 'text' }); Game.stat('worksSaved'); Store.save(); UI.toast('🎨 ' + T.savedWork); } }
+    saveCode(); renderHints();
+    const xpEv = events.find(e => e.type === 'xp'); const next = session ? null : (idx < probs.length - 1 ? probs[idx + 1] : null);
+    $('#pvResult').innerHTML = `<div class="result ok"><div class="res-big">${isBoss ? '👾 ' + T.bossDefeated : '🎉 ' + T.clear}</div>${firstTry && !wasClearBefore ? `<div class="res-ft">${T.firstTry} +${Math.round(CONFIG.FIRST_TRY_BONUS * 100)}%</div>` : ''}<div class="res-xp">+${xpEv ? xpEv.amount : 0} XP ${xpEv && xpEv.mult > 1 ? `<span class="chip hot">콤보 ×${xpEv.mult}</span>` : ''} ${UI.stars(xpEv ? xpEv.stars : rec.stars)}</div>${isBoss ? `<div class="muted">${T.chapterOpen}</div>` : ''}<div class="row">${session ? `<button class="btn primary big" id="btnSessNext">다음 ▶</button>` : next ? `<button class="btn primary big" id="btnNext">다음 문제 ▶</button>` : `<button class="btn primary big" id="btnBackLesson">${isBoss ? '지도로' : '레슨 완료! 지도로'}</button>`}<button class="btn" id="btnReview">📝 내 코드 리뷰 받기</button><button class="btn" id="btnRetry">다시 풀기</button></div></div>`;
+    const bn = $('#btnNext'); if (bn) bn.onclick = () => UI.go('problem', { pid: next.id, lessonId: base.lesson }); const bl = $('#btnBackLesson'); if (bl) bl.onclick = () => UI.go('home'); const bs = $('#btnSessNext'); if (bs) bs.onclick = () => session.next(); $('#btnRetry').onclick = () => { $('#pvResult').innerHTML = ''; }; $('#btnReview').onclick = () => Tutor.ui.open({ lesson: l, problem: p, getCode, getLastRun: () => st.lastRun, hints: rec.hints, answerSeen: rec.answerSeen, key: pid, cleared: true, review: true, onPolished: () => { if (!Store.data.polished[pid]) { Store.data.polished[pid] = true; Game.addXp(CONFIG.POLISH_XP); UI.toast(`✨ 다듬기 +${CONFIG.POLISH_XP} XP`); UI.renderTopbar(); } } });
+    if (isBoss) { Audio.boss(); Confetti.rain(300); const node = $('.bosshp'); if (node) node.classList.add('dead'); }
+    await UI.celebrate(events, anchor); $('#pvResult').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    if (session && session.autoNext) setTimeout(() => session.next(), 600);
+  };
+  const grade = async () => {
+    if (st.grading) return; st.grading = true; beforeGrade(); const code = getCode(); const gradeBtn = $('#btnGrade'); if (gradeBtn) gradeBtn.disabled = true; $('#pvResult').innerHTML = `<div class="muted">확인 중… 0/${tests.length}</div>`; renderTests();
+    if (!Py.ready) Py.start(); Audio.click();
+    const results = []; let hp = tests.length;
+    const res = await Grader.runTests(p, code, (r, i, n) => { results[i] = r; renderTests(results); $('#pvResult').innerHTML = `<div class="muted">확인 중… ${i + 1}/${n}</div>`; if (r.ok) { Audio.pass(); if (isBoss) { hp--; const f = $('.hpfill'); if (f) { f.style.width = (100 * hp / n) + '%'; } $('.bosshp-n').textContent = `${hp}/${n}`; const bh = $('.bosshp'); if (bh) { bh.classList.remove('hit'); void bh.offsetWidth; bh.classList.add('hit'); } Audio.hit(); } } });
+    st.grading = false; if (gradeBtn) gradeBtn.disabled = false; renderTests(res.results); st.lastRun = `테스트 ${res.passed}/${res.total} 통과` + (res.results.filter(r => !r.ok && !r.hidden).map(r => `\n[실패] 입력: ${r.input || '(없음)'} / 기대: ${r.expected} / 내 출력: ${r.actual}${r.error ? ' / ' + r.error.split('\n')[0] : ''}`).join(''));
+    const err = res.results.find(r => r.error); if (err && err.raw) { if (err.raw.line && st.editor) st.editor.setErrorLine(err.raw.line); Game.recordError(p); }
+    if (res.allPass) { if (st.mode === 'block' && p.type === 'block') rec.mode = rec.mode || 'block'; await onClear(gradeBtn); }
+    else onFail(`${res.passed}/${res.total} 통과. ${res.results.find(r => !r.ok && r.error) ? Py.explain(res.results.find(r => !r.ok && r.error).raw) : '기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.'}`);
+    saveCode(); UI.renderTopbar();
+  };
+  const gradeQuiz = async (i, btn) => { beforeGrade(); $$('.qopt', root).forEach(b => b.classList.remove('sel')); btn.classList.add('sel'); if (i === p.quiz.ans) { btn.classList.add('right'); $$('.qopt', root).forEach(b => b.disabled = true); $('#pvResult').innerHTML = `<div class="result ok"><div class="muted">${esc(p.quiz.why)}</div></div>`; await onClear(btn); } else { btn.classList.add('wrong'); onFail('아쉬워요. 다시 생각해 보세요.'); } };
+  const gradeFill = async () => { beforeGrade(); const answers = []; $$('.blank', root).forEach(el => answers[+el.dataset.b] = el.value); const r = Grader.checkFill(p, answers); $$('.blank', root).forEach(el => el.classList.toggle('wrong', r.wrong.includes(+el.dataset.b))); if (r.ok) { $$('.blank', root).forEach(el => el.disabled = true); $('#pvResult').innerHTML = `<div class="muted">${esc(p.fill.why)}</div>`; await onClear($('#btnGrade')); } else onFail('빨간 칸을 다시 확인하세요.'); };
+  const gradeBugLine = async (line, el) => { beforeGrade(); if (line === p.bug.bugLine) { el.classList.add('right'); Audio.pass(); UI.toast('맞아요! 이제 그 줄을 고쳐 보세요'); st.bugStep = 2; renderMode(); } else { el.classList.add('wrong'); onFail('그 줄은 괜찮아요. 다른 줄을 보세요.'); setTimeout(() => el.classList.remove('wrong'), 800); } };
+  const gradeParsons = async () => { beforeGrade(); const r = Grader.checkParsons(p, st.parsons.getArranged()); if (r.ok) { await onClear($('#btnGrade')); } else { st.parsons.markWrong(r.wrong); onFail(r.lengthMismatch ? '줄 개수가 달라요. 함정 줄이 섞이지 않았는지, 빠진 줄은 없는지 보세요.' : '빨간 줄의 순서나 들여쓰기를 다시 보세요.'); } saveCode(); };
+  const keyHandler = (e) => { if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); if ($('#btnRun')) runCode(false); } if (e.ctrlKey && e.key === '/') { e.preventDefault(); useHint(); } };
+  document.addEventListener('keydown', keyHandler);
+  render();
+  return { destroy() { document.removeEventListener('keydown', keyHandler); saveCode(); st.editor && st.editor.destroy(); st.blockEd && st.blockEd.destroy(); if (st.stopTurtle) st.stopTurtle(); } };
+};
