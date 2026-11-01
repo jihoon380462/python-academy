@@ -33,7 +33,7 @@
 - **Negative**: `scary, realistic, 3D, photo, letters, words, white background, gradient`
 - **상태**: ✅ 완료 — 2026-11-02, 사용자 피드백으로 큰 물음표 뿔·굵은 눈썹·망토·넓은 자세를 더해 보스 인상 강화. 512×512 투명 PNG.
 
-## 3. 다음에 요청할 것들 (테스트가 잘 되면 — 아직 만들지 말 것)
+## 3. 다음에 요청할 것들 (테스트 2건 검수 통과 ✅ 2026-11-02 — 같은 스타일로 진행)
 
 | 파일 | 크기 | 쓰이는 곳 |
 | --- | --- | --- |
@@ -47,5 +47,5 @@
 ## 4. 사이트 쪽 연결 (개발 메모)
 
 - `assetUrl(name)`(core/util.js)이 허브/코스 페이지 어디서든 `assets/img/<name>`의 올바른 상대 경로를 돌려준다. `UI.img(name, fallbackEmoji, cls)`는 `<img>`를 만들고, 파일이 없으면 `onerror`로 이모지 `<span>`으로 바뀐다 → 그림이 없어도 화면 그대로.
-- 지금 그림을 쓰는 자리: 허브 코스 카드 아이콘(`course-<courseId>.png`), 보스 문제 HP 패널(`boss-<courseId>-<챕터번호>.png`).
+- 지금 그림을 쓰는 자리: 허브 코스 카드 아이콘(`course-<courseId>.png`, 48px), 보스 문제 HP 패널(56px)과 지도의 보스 노드(40px, 깬 뒤엔 회색) — 둘 다 `boss-<courseId>-<챕터번호>.png`.
 - 새 그림을 쓰는 자리를 추가할 때는 이 파일 2절에 요청을 적고, 코드에서 `UI.img(...)`로 바꾼다. `tools/stamp.mjs`가 `assets/img/*.png`를 오프라인 캐시 목록에 넣는다.

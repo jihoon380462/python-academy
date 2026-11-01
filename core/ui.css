@@ -156,7 +156,7 @@ dfn.term{font-style:normal;font-weight:800;font-size:1.12em;text-decoration:unde
 @keyframes flip{0%{transform:rotateX(90deg)}100%{transform:none}}
 .result{margin-top:12px;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);animation:pop .3s}.result.ok{border-color:var(--accent)}.result.bad{border-color:var(--danger);color:var(--danger)}
 .res-big{font-size:1.5em;font-weight:900}.res-ft{color:var(--gold);font-weight:700}.res-xp{font-size:1.2em;font-weight:700;margin:4px 0}
-.bosshp{background:linear-gradient(90deg,#3a1430,var(--surface));border:1px solid #a33;border-radius:10px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px}.bosshp-h{font-weight:800}.hpbar{flex:1;height:16px;background:#222;border-radius:999px;overflow:hidden;border:1px solid #a33}.hpfill{height:100%;background:linear-gradient(90deg,#ff3b5c,#ff8c42);transition:width .4s}.bosshp.hit{animation:shake .4s}.bosshp.dead{opacity:.5;filter:grayscale(1)}
+.bosshp{background:linear-gradient(90deg,#3a1430,var(--surface));border:1px solid #a33;border-radius:10px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px}.bosshp-h{font-weight:800;display:flex;align-items:center;gap:8px;white-space:nowrap}.hpbar{flex:1;height:16px;background:#222;border-radius:999px;overflow:hidden;border:1px solid #a33}.hpfill{height:100%;background:linear-gradient(90deg,#ff3b5c,#ff8c42);transition:width .4s}.bosshp.hit{animation:shake .4s}.bosshp.dead{opacity:.5;filter:grayscale(1)}
 @keyframes shake{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}.shake{animation:shake .45s}
 /* 추적 */
 .trace{border:1px solid var(--gold);border-radius:10px;padding:10px;margin-top:10px;background:var(--surface)}.tr-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.tr-head .btn{margin-left:auto}.tr-ctrl{display:flex;gap:8px;align-items:center;margin:8px 0}.tr-ctrl input{flex:1}
@@ -253,4 +253,5 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 .chip-btn.on{background:var(--primary);color:#fff;border-color:transparent}
 .pitem.locked{opacity:.6}
 /* ===== 아트 리소스 (IMAGES.md) ===== */
-img.aimg{display:inline-block;vertical-align:middle;object-fit:contain}img.aimg.hc-icon{width:44px;height:44px}img.aimg.boss-img{width:64px;height:64px;margin-right:6px}.bosshp.dead img.aimg{filter:grayscale(1) opacity(.5)}
+img.aimg{display:inline-block;vertical-align:middle;object-fit:contain}img.aimg.hc-icon{width:48px;height:48px;margin:-4px 0}img.aimg.boss-img{width:56px;height:56px;margin:0}.bosshp.dead img.aimg{filter:grayscale(1) opacity(.5)}
+img.aimg.node-img{width:40px;height:40px}.node.done img.aimg.node-img{filter:grayscale(1) opacity(.6)}
