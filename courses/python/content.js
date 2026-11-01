@@ -715,6 +715,10 @@ PROBLEMS.push(
 );
 
 
+// 코스별 설정: 종합 점검 위치(after: 레슨 id → 점검 번호, upto: 점검 번호 → 출제 범위 마지막 레슨), 약점 분석 태그 순서, 놀이터 블록 범위
+const CHECKUPS = { after: { L5: 1, L10: 2, L15: 3 }, upto: { 1: 'L5', 2: 'L10', 3: 'L15' } };
+const WEAKNESS_TAGS = ['변수', '계산', '조건', '반복', '리스트', '함수', '문자열', '딕셔너리', '클래스', '예외', '파일', '모듈', '출력', '입력', '오개념'];
+const PLAYGROUND_BLOCKS_UPTO = 'L8';
 const CHAPTERS = [
   { ch:0, name:'시작', color:'#8b8fa8' },
   { ch:1, name:'첫걸음', color:'#4caf50' },

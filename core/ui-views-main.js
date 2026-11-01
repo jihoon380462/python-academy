@@ -4,7 +4,7 @@ const Views = {};
 // ---------- 홈: 스테이지 맵 ----------
 Views.home = (root) => {
   const d = Store.data; const lv = Game.level(); const cur = Game.currentLesson(); const today = todayKey(); const todayCount = d.days[today] || 0; const due = Review.due(); const streak = Game.currentStreak();
-  const checkAfter = { L5: 1, L10: 2, L15: 3 }; const sections = [];
+  const checkAfter = typeof CHECKUPS !== 'undefined' ? CHECKUPS.after : {}; const sections = [];
   CHAPTERS.forEach(c => {
     const ls = LESSONS.filter(l => l.ch === c.ch); if (!ls.length) return; const open = Game.chapterOpen(c.ch); const nodes = [];
     ls.forEach(l => {
@@ -12,7 +12,7 @@ Views.home = (root) => {
       nodes.push(`<button class="node ${l.boss ? 'boss' : ''} ${done ? 'done' : ''} ${isCur ? 'cur' : ''} ${lo ? '' : 'locked'}" data-l="${l.id}" ${lo ? '' : 'disabled'}><div class="node-ic">${l.boss ? '👾' : done ? '✓' : lo ? (l.n ?? '') : '🔒'}</div><div class="node-t">${esc(l.title)}</div>${done ? `<div class="node-stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>` : ''}${isCur ? `<div class="node-mascot">${myMascot({ size: 36 })}</div>` : ''}</button>`);
       if (checkAfter[l.id]) { const n = checkAfter[l.id]; const okq = Game.lessonDone(l); const sc = d.checkups[n]; nodes.push(`<button class="node check ${sc != null ? 'done' : ''} ${okq ? '' : 'locked'}" data-check="${n}" ${okq ? '' : 'disabled'}><div class="node-ic">📝</div><div class="node-t">종합 점검 ${n}</div>${sc != null ? `<div class="node-stars">${sc}점</div>` : ''}</button>`); }
     });
-    sections.push(`<div class="ch-sec ${open ? '' : 'locked'}" style="--chc:${c.color}"><div class="ch-title"><span>${c.ch ? `챕터 ${c.ch}` : ''} ${c.name}</span>${d.stats['boss_B' + c.ch] ? `<span class="ch-decor">${MAP_DECOR[c.ch] || ''}</span>` : ''}${open ? '' : '<span class="lock">🔒 이전 보스를 깨면 열려요</span>'}</div><div class="nodes">${nodes.join('')}</div></div>`);
+    sections.push(`<div class="ch-sec ${open ? '' : 'locked'}" style="--chc:${c.color}"><div class="ch-title"><span>${c.ch ? `챕터 ${c.ch}` : ''} ${c.name}</span>${(() => { const bl = LESSONS.find(l => l.boss && l.ch === c.ch); return bl && d.stats['boss_' + bl.id]; })() ? `<span class="ch-decor">${MAP_DECOR[c.ch] || ''}</span>` : ''}${open ? '' : '<span class="lock">🔒 이전 보스를 깨면 열려요</span>'}</div><div class="nodes">${nodes.join('')}</div></div>`);
   });
   const nodes = sections;
   const dc = d.dailyChallenge && d.dailyChallenge.date === today ? d.dailyChallenge : null; const msLeft = new Date(today + 'T23:59:59') - new Date(); const hLeft = Math.max(0, Math.floor(msLeft / 3600000)), mLeft = Math.max(0, Math.floor((msLeft % 3600000) / 60000));
@@ -78,7 +78,7 @@ Views.lesson = (root, { lessonId, page = 0 }) => {
       $('#exRun').onclick = () => run(false); const tb = $('#exTrace'); if (tb) tb.onclick = () => run(true);
       $('#exReset').onclick = () => exampleEditor.setValue(orig);
       $('#exPlay').onclick = () => UI.go('playground', { code: exampleEditor.getValue() });
-      if (l.id === 'L0' && cur === 0 && UI.params.autoRun) { UI.params.autoRun = false; const tryRun = () => { if (Py.ready) run(false); else setTimeout(tryRun, 500); }; tryRun(); }
+      if (l.id === LESSONS[0].id && cur === 0 && UI.params.autoRun) { UI.params.autoRun = false; const tryRun = () => { if (Py.ready) run(false); else setTimeout(tryRun, 500); }; tryRun(); }
     }
   };
   render();
@@ -114,11 +114,11 @@ const Coach = {
         return cs.every(c => { if (typeof c !== 'string') return false; if (c.startsWith('@var:')) { const name = c.slice(5); try { return !!(ed && ed.ws && ed.ws.getVariable(name)); } catch (e) { return false; } } if (c.startsWith('~')) { try { return new RegExp(c.slice(1)).test(n); } catch (e) { return false; } } return n.includes(Coach.norm(c)); });
       },
       update(code) {
-        if (st.i >= steps.length - 1) { self.render(); return; }
+        if (st.i >= steps.length - 1) { if (!el.firstChild) self.render(); return; }
         // 현재 단계부터 연속으로 만족하는 만큼 전진 (이미 만들어 둔 상태 복원 포함)
         let moved = false; while (st.i < steps.length - 1 && self.check(steps[st.i], code)) { st.done.add(st.i); st.i++; moved = true; }
         if (moved && code != null && self._init) { Audio.pass(); self.flash = true; }
-        self._init = true; self.render();
+        const first = !self._init; self._init = true; if (moved || first || !el.firstChild) self.render(); // 단계가 바뀔 때만 다시 그림 (타이핑마다 깜빡이지 않게)
       },
       ran() { /* 실행 버튼을 눌렀을 때: 마지막 단계면 그대로 둠 */ },
       skip() { if (st.i < steps.length - 1) { st.i++; self.render(); } },

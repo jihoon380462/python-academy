@@ -17,6 +17,13 @@ const CM = {
   },
 };
 
+// else:/elif/except/finally 를 치면 짝이 되는 if/try 와 같은 들여쓰기로 자동으로 맞춘다 (초보자가 백스페이스로 지우지 않게)
+function dedentTarget(lines, idx) {
+  const cur = lines[idx]; const m = cur.match(/^( +)(else|elif\b.*|except\b.*|finally):\s*$/); if (!m) return null;
+  const ind = m[1].length;
+  for (let k = idx - 1; k >= 0; k--) { const l = lines[k]; if (!l.trim()) continue; const li = l.match(/^ */)[0].length; if (li < ind) { if (/^\s*(if|elif|else|try|except|for|while|with)\b/.test(l)) return li; return li; } }
+  return 0;
+}
 class TextEditor {
   constructor(parent, { value = '', onChange = null, readOnly = false } = {}) {
     this.parent = parent; this.onChange = onChange; this.readOnly = readOnly; this.cm = null; this.ta = null; this.value = value; this.lines = []; this.destroyed = false;
@@ -27,7 +34,7 @@ class TextEditor {
   buildFallback(value) {
     const wrap = document.createElement('div'); wrap.className = 'ted-fb'; wrap.innerHTML = `<pre class="ted-gutter"></pre><textarea class="ted-ta" spellcheck="false" autocapitalize="off" autocorrect="off" ${this.readOnly ? 'readonly' : ''}></textarea>`;
     this.parent.appendChild(wrap); this.fb = wrap; this.ta = $('textarea', wrap); this.gut = $('.ted-gutter', wrap); this.ta.value = value; this.updateGutter();
-    this.ta.addEventListener('input', () => { this.updateGutter(); this.onChange && this.onChange(this.getValue()); });
+    this.ta.addEventListener('input', (e) => { if (e.data === ':') this.autoDedentTA(); this.updateGutter(); this.onChange && this.onChange(this.getValue()); });
     this.ta.addEventListener('scroll', () => { this.gut.scrollTop = this.ta.scrollTop; });
     this.ta.addEventListener('focus', () => QuickKeys.show(this)); this.ta.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== this.ta) QuickKeys.hide(); }, 150));
     this.ta.addEventListener('keydown', (e) => {
@@ -35,13 +42,15 @@ class TextEditor {
       else if (e.key === 'Enter') { e.preventDefault(); const pos = ta.selectionStart; const before = ta.value.slice(0, pos); const line = before.slice(before.lastIndexOf('\n') + 1); let ind = line.match(/^ */)[0]; if (/:\s*$/.test(line)) ind += '    '; this.insert('\n' + ind, 1 + ind.length); }
     });
   }
+  autoDedentTA() { const ta = this.ta; const pos = ta.selectionStart; const lines = ta.value.split('\n'); let acc = 0, idx = 0; for (let k = 0; k < lines.length; k++) { if (pos <= acc + lines[k].length) { idx = k; break; } acc += lines[k].length + 1; idx = k; } const t = dedentTarget(lines, idx); if (t == null) return; const cur = lines[idx]; const ind = cur.match(/^ */)[0].length; if (t === ind) return; lines[idx] = ' '.repeat(t) + cur.trimStart(); ta.value = lines.join('\n'); const np = pos - (ind - t); ta.selectionStart = ta.selectionEnd = Math.max(0, np); }
   updateGutter() { if (!this.gut) return; const n = this.ta.value.split('\n').length; this.gut.textContent = Array.from({ length: n }, (_, i) => i + 1).join('\n'); }
   buildCM(m, value) {
     const { core, python, view, state, commands, language } = m; this.m = m;
     this.lineEffect = m.setLines; const host = document.createElement('div'); host.className = 'ted-cm';
-    this.cm = new view.EditorView({ doc: value, parent: host, extensions: [core.basicSetup, python.python(), view.keymap.of([commands.indentWithTab]), language.indentUnit.of('    '), language.syntaxHighlighting(m.hs), m.theme, m.lineField, m.guides, view.EditorView.editable.of(!this.readOnly), view.EditorView.updateListener.of(u => { if (u.docChanged && this.onChange) this.onChange(this.getValue()); }), view.EditorView.domEventHandlers({ focus: () => QuickKeys.show(this), blur: () => setTimeout(() => { if (!this.cm || !this.cm.hasFocus) QuickKeys.hide(); }, 150) })] });
+    this.cm = new view.EditorView({ doc: value, parent: host, extensions: [core.basicSetup, python.python(), view.keymap.of([commands.indentWithTab]), language.indentUnit.of('    '), language.syntaxHighlighting(m.hs), m.theme, m.lineField, m.guides, view.EditorView.editable.of(!this.readOnly), view.EditorView.updateListener.of(u => { if (u.docChanged) { this.autoDedentCM(u); if (this.onChange) this.onChange(this.getValue()); } }), view.EditorView.domEventHandlers({ focus: () => QuickKeys.show(this), blur: () => setTimeout(() => { if (!this.cm || !this.cm.hasFocus) QuickKeys.hide(); }, 150) })] });
     if (this.fb) this.fb.remove(); this.fb = null; this.ta = null; this.parent.appendChild(host); if (this.lines.length) this.setLines(this.lines);
   }
+  autoDedentCM(u) { try { let typedColon = false; u.changes.iterChanges((fa, ta, fb, tb, ins) => { if (ins.toString() === ':') typedColon = true; }); if (!typedColon || this._dedenting) return; const doc = this.cm.state.doc; const head = this.cm.state.selection.main.head; const ln = doc.lineAt(head); const lines = []; for (let k = 1; k <= ln.number; k++) lines.push(doc.line(k).text); const t = dedentTarget(lines, ln.number - 1); if (t == null) return; const ind = ln.text.match(/^ */)[0].length; if (t === ind) return; this._dedenting = true; this.cm.dispatch({ changes: { from: ln.from, to: ln.from + ind, insert: ' '.repeat(t) } }); this._dedenting = false; } catch (e) { this._dedenting = false; } }
   getValue() { return this.cm ? this.cm.state.doc.toString() : this.ta.value; }
   setValue(v) { if (this.cm) this.cm.dispatch({ changes: { from: 0, to: this.cm.state.doc.length, insert: v } }); else { this.ta.value = v; this.updateGutter(); } }
   focus() { this.cm ? this.cm.focus() : this.ta.focus(); }

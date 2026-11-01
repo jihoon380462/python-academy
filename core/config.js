@@ -2,7 +2,7 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.0.1',
+  APP_VERSION: '2.0.2',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
@@ -36,6 +36,7 @@ const CONFIG = {
   RUN_TIMEOUT_MS: 5000,
   MAX_OUTPUT_LINES: 2000,
   TRACE_MAX_STEPS: 500,
+  ALGO: { traceMaxSteps: 5000, slowdown: 3, benchBaselineMs: 350, mockMinutes: 60, mockCount: 3 }, // 알고리즘 코스: 시각화 추적 단계, Pyodide/CPython 배율, 기기 벤치 기준(ms), 모의고사
   MAX_CODE_SAVE_BYTES: 10240,
   STORAGE_WARN_BYTES: 4 * 1024 * 1024,     // 저장 용량 경고 (설정에 정리 버튼)
   HUB: { minutesPerProblem: 4 },           // 허브 '남은 시간' 추정치 (문제당 분)

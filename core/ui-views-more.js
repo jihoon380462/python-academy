@@ -14,7 +14,7 @@ Views.playground = (root, params = {}) => {
     $$('.seg button', root).forEach(b => b.onclick = () => { mode = b.dataset.m; rebuild(); });
     const initCode = params.code || '# 아무 코드나 써 보세요!\nprint("안녕, 놀이터!")\n';
     if (mode === 'text') { editor = new TextEditor($('#pgEd'), { value: initCode }); blockEd = null; }
-    else { let state = null; try { state = params.blockState ? JSON.parse(params.blockState) : null; } catch (e) {} blockEd = new BlockEditor($('#pgEd'), { allowed: Content.blocksUpTo('L8'), state, onChange: (c) => { $('#pgCodeView').textContent = c || '# 아직 블록이 없어요\n# 왼쪽 블록을 흰 바탕으로 끌어오면\n# 여기에 파이썬 코드가 나타나요'; } }); editor = null; }
+    else { let state = null; try { state = params.blockState ? JSON.parse(params.blockState) : null; } catch (e) {} blockEd = new BlockEditor($('#pgEd'), { allowed: Content.blocksUpTo(typeof PLAYGROUND_BLOCKS_UPTO !== 'undefined' ? PLAYGROUND_BLOCKS_UPTO : LESSONS[LESSONS.length - 1].id), state, onChange: (c) => { $('#pgCodeView').textContent = c || '# 아직 블록이 없어요\n# 왼쪽 블록을 흰 바탕으로 끌어오면\n# 여기에 파이썬 코드가 나타나요'; } }); editor = null; }
     const getCode = () => editor ? editor.getValue() : (blockEd ? blockEd.getCode() : '');
     const run = async (trace) => {
       const code = getCode(); const out = $('#pgOut'); out.textContent = ''; out.className = 'out'; $('#pgTurtle').innerHTML = ''; editor && editor.setErrorLine(null); if (stopTurtle) { stopTurtle(); stopTurtle = null; }
@@ -95,7 +95,7 @@ Views.errors = (root, { name } = {}) => { root.innerHTML = `<div class="page"><h
 
 // ---------- 약점 분석 ----------
 Views.weakness = (root) => {
-  const ts = Review.tagStats(); const tags = ['변수', '계산', '조건', '반복', '리스트', '함수', '문자열', '딕셔너리', '클래스', '예외', '파일', '모듈', '출력', '입력', '오개념'].filter(t => ts[t]);
+  const ts = Review.tagStats(); const tags = (typeof WEAKNESS_TAGS !== 'undefined' ? WEAKNESS_TAGS : [...new Set(PROBLEMS.flatMap(p => p.tags || []))]).filter(t => ts[t]);
   root.innerHTML = `<div class="page"><h2>📊 ${T.weakness}</h2><div class="muted">개념별 정답률과 평균 시도 횟수예요.</div><div class="wk">${tags.map(t => { const s = ts[t]; const tried = s.clear + s.fails; const rate = tried ? Math.round(100 * s.clear / Math.max(1, s.clear + s.fails)) : null; const avg = s.clear ? (s.attempts / Math.max(1, s.clear)).toFixed(1) : '-'; return `<div class="wk-row"><span class="wk-t">#${esc(t)}</span><div class="wk-bar"><div style="width:${rate ?? 0}%" class="${rate != null && rate < 60 ? 'low' : ''}"></div></div><span class="wk-n">${rate == null ? '미도전' : rate + '%'} · 평균 ${avg}회 · ${s.clear}/${s.total}</span></div>`; }).join('')}</div>
     <div class="row"><button class="btn primary" id="wkStart">가장 약한 개념 복습 시작</button><button class="btn tutor" id="wkAsk">💬 선생님에게 약점 요약 받기</button></div><div id="wkTutor"></div></div>`;
   $('#wkStart').onclick = () => { const w = Review.weakest(); const pool = PROBLEMS.filter(p => Store.prob(p.id).status === 'clear' && (!w || p.tags.includes(w))); if (!pool.length) return UI.toast('아직 복습할 문제가 없어요'); const pick = pool.sort(() => Math.random() - 0.5).slice(0, 3); Sessions.start(pick.map(p => p.id), { inReview: true, title: `#${w} 복습` }); };
@@ -122,7 +122,7 @@ Views.timeattack = (root) => { const done = LESSONS.filter(l => !l.boss && l.id 
 
 // ---------- 종합 점검 ----------
 Views.checkup = (root, { n }) => {
-  const upto = { 1: 'L5', 2: 'L10', 3: 'L15' }[n]; const pool = Review.quizPool(upto).sort(() => Math.random() - 0.5).slice(0, CONFIG.CHECKUP_SIZE); let i = 0, score = 0;
+  const upto = (typeof CHECKUPS !== 'undefined' ? CHECKUPS.upto : {})[n]; const pool = Review.quizPool(upto).sort(() => Math.random() - 0.5).slice(0, CONFIG.CHECKUP_SIZE); let i = 0, score = 0;
   const render = () => {
     if (i >= pool.length) { const pct = Math.round(100 * score / pool.length); Store.data.checkups[n] = pct; const pass = pct >= CONFIG.CHECKUP_PASS * 100; if (pass) { Game.stat('checkupsPassed'); Game.addXp(CONFIG.CHECKUP_BONUS); Confetti.rain(200); Audio.clear(); } Store.save(); Game.checkBadges().forEach(b => UI.badgeFly(b)); root.innerHTML = `<div class="page center"><h2>📝 ${T.checkup} ${n} 결과</h2><div class="big">${pct}점</div>${pass ? `<div class="ok">통과! +${CONFIG.CHECKUP_BONUS} XP</div>` : '<div class="muted">80점 이상이면 보너스가 있어요. 다시 도전해 보세요!</div>'}<div class="row center"><button class="btn primary" id="ckHome">지도로</button><button class="btn" id="ckAgain">다시 풀기</button></div></div>`; $('#ckHome').onclick = () => UI.go('home'); $('#ckAgain').onclick = () => Views.checkup(root, { n }); UI.renderTopbar(); return; }
     const p = pool[i];
@@ -146,7 +146,7 @@ const Onboarding = {
     UI.go('home', {}, false); await sleep(300);
     const steps = [['.node.cur', '지도에서 레슨을 골라요. 반짝이는 곳이 지금 할 레슨이에요.'], ['.tb-xp', '문제를 풀면 XP가 쌓이고 레벨이 올라요.'], ['.card.prof', '프로필·뱃지·보관함은 여기서 봐요.'], ['#tbSettings', '설정에서 테마와 선생님(API 키)을 설정해요.']];
     for (const [sel, text] of steps) { const el = $(sel); if (!el) continue; const skip = await this.point(el, text); if (skip) break; }
-    UI.go('lesson', { lessonId: 'L0', page: 0, autoRun: true });
+    UI.go('lesson', { lessonId: LESSONS[0].id, page: 0, autoRun: true });
   },
   point(el, text) { return new Promise(res => { const r = el.getBoundingClientRect(); const ov = document.createElement('div'); ov.className = 'ob-ov'; ov.innerHTML = `<div class="ob-ring" style="left:${r.left - 6}px;top:${r.top - 6 + scrollY}px;width:${r.width + 12}px;height:${r.height + 12}px"></div><div class="ob-tip" style="left:${Math.max(10, Math.min(innerWidth - 300, r.left))}px;top:${r.bottom + 12 + scrollY}px"><div>${text}</div><div class="row"><button class="btn primary sm" data-a="n">다음</button><button class="btn sm" data-a="s">건너뛰기</button></div></div>`; document.body.appendChild(ov); $$('button', ov).forEach(b => b.onclick = () => { ov.remove(); res(b.dataset.a === 's'); }); }); },
 };

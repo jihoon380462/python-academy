@@ -58,7 +58,7 @@ const Game = {
   isUnlocked(item) { if (!item.unlock) return true; if (item.unlock.level) return this.level().level >= item.unlock.level; if (item.unlock.badge) return Store.data.badges.includes(item.unlock.badge); return false; },
   unlockText(item) { if (!item.unlock) return ''; if (item.unlock.level) return `레벨 ${item.unlock.level}`; const b = BADGES.find(x => x.id === item.unlock.badge); return b ? `뱃지 "${b.secret ? '???' : b.name}"` : ''; },
   // 잠금: 보스를 깨야 다음 챕터
-  chapterOpen(ch) { if (ch <= 1) return true; return !!Store.data.stats['boss_B' + (ch - 1)]; },
+  chapterOpen(ch) { if (ch <= 1) return true; const prevBoss = LESSONS.find(l => l.boss && l.ch === ch - 1); return !prevBoss || !!Store.data.stats['boss_' + prevBoss.id]; },
   lessonOpen(l) { if (!this.chapterOpen(l.ch)) return false; const idx = LESSONS.findIndex(x => x.id === l.id); if (idx === 0) return true; const prev = LESSONS[idx - 1]; if (prev.ch !== l.ch) return true; return this.lessonDone(prev); },
   lessonDone(l) { const ps = Content.problemsOf(l.id); return ps.length > 0 && ps.every(p => Store.prob(p.id).status === 'clear'); },
   lessonStars(l) { const ps = Content.problemsOf(l.id); if (!ps.length) return 0; return Math.min(...ps.map(p => Store.prob(p.id).stars)); },

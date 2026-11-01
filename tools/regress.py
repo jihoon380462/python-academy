@@ -58,7 +58,7 @@ with sync_playwright() as p:
     for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','playground']:
         pg.evaluate(f"UI.go('{v}')"); pg.wait_for_timeout(300); check(len(pg.locator('#view').inner_text())>10, f'화면 {v}')
     pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300)
-    check(pg.locator('.card.sync').count()==1 and pg.locator('#syncOff').count()==1, '설정: 기기 연동 카드(연동 상태)'); check(pg.locator('#sRestoreV1').count()==1, '설정: v1 데이터 다시 가져오기 버튼'); check('v2.0.0' in pg.locator('#view').inner_text(), '설정 하단 버전 표시')
+    check(pg.locator('.card.sync').count()==1 and pg.locator('#syncOff').count()==1, '설정: 기기 연동 카드(연동 상태)'); check(pg.locator('#sRestoreV1').count()==1, '설정: v1 데이터 다시 가져오기 버튼'); check(('v'+pg.evaluate('CONFIG.APP_VERSION')) in pg.locator('#view').inner_text(), '설정 하단 버전 표시')
     ex=pg.evaluate("JSON.parse(Store.exportJSON())"); check(ex['xp']>=385 and 'problems' in ex and 'works' in ex and 'tutorChats' in ex, '내보내기 JSON은 v1과 같은 모양')
     pg.evaluate("UI.go('checkup',{n:1})"); pg.wait_for_timeout(300); check(pg.locator('.qopt,.blank').count()>0, '종합 점검')
     # ---- 3. 모바일

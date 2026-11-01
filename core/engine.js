@@ -16,7 +16,7 @@ const Content = {
       if (!(p.tags && p.tags.length)) warn(`개념 태그 없음: ${p.id}`);
       if (p.boss && this.tests(p).length < 5) warn(`보스 테스트 5개 미만: ${p.id}`);
     });
-    LESSONS.forEach(l => { if (!l.boss && l.id !== 'L0' && this.byLesson[l.id].length < 4) warn(`문제 4개 미만 레슨: ${l.id}`); });
+    LESSONS.forEach(l => { if (!l.boss && l.id !== LESSONS[0].id && this.byLesson[l.id].length < 4) warn(`문제 4개 미만 레슨: ${l.id}`); });
   },
   lesson(id) { return this.lessonMap[id]; },
   problem(id) { return this.problemMap[id]; },
