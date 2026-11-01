@@ -26,6 +26,7 @@ const Hub = {
       <div class="tb-streak ${streak ? 'on' : ''}" title="${T.streak}">🔥${streak}</div>
       ${Sync.on ? `<a class="tb-btn tb-sync ${Sync.state}" href="${this.courseUrl(py, 'settings')}" title="기기 연동: 마지막 동기화 ${Sync.ago()}">${Sync.icon()}</a>` : ''}<a class="tb-btn" href="${this.courseUrl(py, 'settings')}" title="${T.settings}">⚙</a>`;
     $('#view').innerHTML = `<div class="page hub">
+      <div class="hub-hero"><img class="aimg hero-img" src="${assetUrl('hero-hub.png')}" alt="" onerror="this.parentNode.remove()"></div>
       <div class="card hub-today"><div class="card-h">📌 오늘의 할 일</div>
         <a class="btn primary big hub-cont" href="${this.courseUrl(contCourse, contHash)}">▶ ${contLabel}</a>
         <div class="hub-stats"><span>🎯 일일 목표 <b>${Math.min(todayCount, d.dailyGoal)}/${d.dailyGoal}</b></span><span>🧠 복습 큐 <b>${rd.reduce((a, x) => a + x.n, 0)}</b>개${rd.length ? ' · ' + rd.map(x => `<a href="${this.courseUrl(x.c, 'review')}">${esc(x.c.name)} ${x.n}</a>`).join(' · ') : ''}</span><span>🔥 ${chal}</span></div>

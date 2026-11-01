@@ -1,8 +1,8 @@
 // shared/badges.js — 공통 뱃지(BADGES)·보관함 아이템(INVENTORY)
 const BADGES = [
   // --- 코스 마스터 (실전 챕터 전부 클리어) ---
-  { id: 'master_python', name: '파이썬 마스터', desc: '파이썬 실전 프로젝트 2개 완성', icon: '👑', cond: ['master_python', 1], course: 'python' },
-  { id: 'master_algo', name: '알고리즘 마스터', desc: '알고리즘 실전 프로젝트 2개 완성', icon: '👑', cond: ['master_algo', 1], course: 'algo' },
+  { id: 'master_python', name: '파이썬 마스터', desc: '파이썬 실전 프로젝트 전부 완성', icon: '👑', cond: ['master_python', 1], course: 'python' },
+  { id: 'master_algo', name: '알고리즘 마스터', desc: '알고리즘 실전 프로젝트 전부 완성', icon: '👑', cond: ['master_algo', 1], course: 'algo' },
   // --- 알고리즘 코스 (course:'algo') ---
   { id: 'algo_viz10', name: '눈으로 보는 사람', desc: '시각화 10번 재생', icon: '👀', cond: ['vizRuns', 10], course: 'algo' },
   { id: 'algo_tle', name: 'O(n²)에서 O(n log n)으로', desc: '시간 초과 뒤 같은 문제 통과', icon: '⏱', cond: ['tleRecovered', 1], course: 'algo' },

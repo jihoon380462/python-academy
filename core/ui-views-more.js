@@ -41,7 +41,7 @@ Views.playground = (root, params = {}) => {
 };
 
 // ---------- 뱃지 ----------
-Views.badges = (root) => { const d = Store.data; root.innerHTML = `<div class="page"><h2>🏅 ${T.badges} <small>${d.badges.length}/${BADGES.length}</small></h2><div class="badges">${BADGES.map(b => { const got = d.badges.includes(b.id); return `<div class="badge ${got ? 'got' : 'no'}"><div class="b-ic">${got ? b.icon : (b.secret ? '❔' : b.icon)}</div><div class="b-n">${got ? esc(b.name) : (b.secret ? '???' : esc(b.name))}</div><div class="b-d">${got ? esc(b.desc) : (b.secret ? '비밀 뱃지' : esc(b.desc))}</div>${got ? `<div class="b-date">${new Date(d.badgeDates[b.id] || 0).toLocaleDateString()}</div>` : ''}</div>`; }).join('')}</div></div>`; };
+Views.badges = (root) => { const d = Store.data; root.innerHTML = `<div class="page"><h2>🏅 ${T.badges} <small>${d.badges.length}/${BADGES.length}</small></h2><div class="badges">${BADGES.map(b => { const got = d.badges.includes(b.id); return `<div class="badge ${got ? 'got' : 'no'}"><div class="b-ic">${got ? UI.img('badge-' + b.id + '.png', b.icon, 'badge-img') : (b.secret ? '❔' : UI.img('badge-' + b.id + '.png', b.icon, 'badge-img'))}</div><div class="b-n">${got ? esc(b.name) : (b.secret ? '???' : esc(b.name))}</div><div class="b-d">${got ? esc(b.desc) : (b.secret ? '비밀 뱃지' : esc(b.desc))}</div>${got ? `<div class="b-date">${new Date(d.badgeDates[b.id] || 0).toLocaleDateString()}</div>` : ''}</div>`; }).join('')}</div></div>`; };
 
 // ---------- 프로필 ----------
 Views.profile = (root) => {
@@ -201,7 +201,7 @@ Views.works = (root) => {
       <pre class="code small wc-code">${esc((w.code || '').split('\n').slice(0, 6).join('\n'))}${lines > 6 ? '\n…' : ''}</pre>
       <div class="row wrap"><button class="btn sm" data-open="${w.id}">🛝 놀이터에서 열기</button><button class="btn sm" data-copy="${w.id}">📋 복사</button><button class="btn sm" data-py="${w.id}">📥 .py</button>${p ? `<button class="btn sm" data-prob="${w.src}">📘 문제로</button>` : ''}${p && !w.review && CONFIG.TUTOR.enabled ? `<button class="btn sm" data-review="${w.id}">🎓 선생님 리뷰</button>` : ''}<button class="btn sm danger" data-del="${w.id}">🗑</button></div></div>`; };
   root.innerHTML = `<div class="page"><h2>🎨 ${T.works} <small>${works.length}개</small></h2>
-    <h3>🏆 실전 프로젝트 <small class="muted">${projects.length}개</small></h3>${projects.length ? projects.map(card).join('') : '<div class="card muted">실전 챕터의 프로젝트를 클리어하면 여기에 자동으로 저장돼요.</div>'}
+    <h3>🏆 실전 프로젝트 <small class="muted">${projects.length}개</small></h3>${projects.length ? projects.map(card).join('') : `<div class="card muted center">${UI.img('empty-works.png', '', 'empty-img')}<div>실전 챕터의 프로젝트를 클리어하면 여기에 자동으로 저장돼요.</div></div>`}
     <h3>🛝 놀이터 작품 <small class="muted">${free.length}개</small></h3>${free.length ? free.map(card).join('') : '<div class="card muted">놀이터에서 「저장」한 코드가 여기 모여요.</div>'}</div>`;
   const find = (id) => d.works.find(w => w.id === id);
   $$('[data-open]', root).forEach(b => b.onclick = () => { const w = find(b.dataset.open); UI.go('playground', { code: w.code, mode: w.mode || 'text', blockState: w.blockState }); });
