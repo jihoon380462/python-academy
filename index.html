@@ -214,7 +214,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '1.1.0',
+  APP_VERSION: '1.1.1',
   SAVE_KEY: 'python_academy_save',
   SCHEMA_VERSION: 1,
 
@@ -661,13 +661,13 @@ const PROBLEMS = [
   bug:{ code:'name = "민수"\nprint(nmae)', bugLine:2, solution:'name = "민수"\nprint(name)', tests:[{output:'민수'}] },
   hints:['변수 이름은 글자 하나만 달라도 다른 이름이에요','첫 줄에서 만든 이름과 둘째 줄에서 부르는 이름을 비교해 보세요','print(name)'] },
 { id:'L2P5', lesson:'L2', type:'block', title:'곱하고 더하기', prompt:'변수 <code>a</code>에 <code>{{a}}</code>, <code>b</code>에 <code>{{b}}</code>를 넣고, 첫 줄에 a × b, 둘째 줄에 a + b를 출력하세요.', tags:['변수','계산'],
-  vary:{ a:[2, 9], b:[2, 9] },
+  vary:{ a:[3, 9], b:[4, 9] },
   solution:'a = {{a}}\nb = {{b}}\nprint(a * b)\nprint(a + b)', tests:[{output:'{{a*b}}\n{{a+b}}'}],
   hints:['변수 설정 블록 두 개, 출력 블록 두 개','계산 블록의 연산자를 ×와 +로 각각 고르세요','print(a * b) 다음 print(a + b)'] },
 
 // ---------------- L3 ----------------
 { id:'L3P1', lesson:'L3', type:'block', title:'곱셈 계산', prompt:'<code>{{a}} × {{b}}</code>의 결과를 출력하세요. (숫자를 직접 계산해서 적지 말고 계산 블록을 쓰세요)', tags:['계산'],
-  vary:{ a:[3, 12], b:[3, 12] },
+  vary:{ a:[3, 12], b:[4, 12] },
   solution:'print({{a}} * {{b}})', tests:[{output:'{{a*b}}'}],
   hints:['곱하기는 * 예요','출력 블록 안에 계산 블록을 넣고 연산자를 ×로','print({{a}} * {{b}})'] },
 { id:'L3P2', lesson:'L3', type:'block', title:'두 배로', prompt:'숫자 하나를 입력받아 2배한 값을 출력하세요.', tags:['계산','입력'], inputExample:'7',
