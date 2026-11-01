@@ -209,3 +209,12 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 .hc-head{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.08em}.hc-icon{font-size:1.4em}.hc-name{flex:1}.hc-desc{margin:4px 0 10px;min-height:2.6em}
 .hc-body{display:flex;align-items:center;gap:12px}.hc-sub{font-size:.92em}.hc-soon{font-weight:700;color:var(--muted)}.hc-soon small{font-weight:normal}.ring{flex:none}
 .hub-foot{margin:24px 0 12px}
+
+/* ---------- 시각화 (알고리즘 코스) ---------- */
+.viz{border:1px solid var(--primary);border-radius:12px;padding:10px;margin-top:10px;background:var(--surface)}.viz-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.viz-canvases{display:grid;gap:8px;grid-template-columns:1fr}.viz-c{width:100%;height:260px;border-radius:8px;background:var(--surface);border:1px solid var(--border);display:block}
+.viz-ctrl{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}.viz-ctrl input[type=range]{flex:1;min-width:120px}.viz-out{margin-top:6px;white-space:pre-wrap;font-family:var(--mono);min-height:1.2em}
+.quiz-code{margin:0 0 10px;white-space:pre}.quiz-q{margin:0 0 10px;line-height:1.5}
+.mock-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;padding:8px;border:1px dashed var(--warn);border-radius:10px}.mock-bar .chip.warn{background:var(--danger);color:#fff}
+.mock-rev{margin-top:12px;display:flex;flex-direction:column;gap:6px}.mock-row{padding:8px 10px;border-radius:8px;border:1px solid var(--border)}.mock-row.ok{border-color:var(--accent)}.mock-row.bad{border-color:var(--danger)}
+@media (max-width:767px){.viz-c{height:220px}}

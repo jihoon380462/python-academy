@@ -179,8 +179,8 @@ class BlockEditor {
 
 // ---------- Parsons 에디터 ----------
 class ParsonsEditor {
-  constructor(parent, { problem, state }) {
-    this.parent = parent; this.p = problem; parent.classList.add('parsons'); const lines = Grader.parsonsLines(problem.parsons.solution).map(l => l.text); const extra = (problem.parsons.distractors || []).map(s => s.trim());
+  constructor(parent, { problem, state, onChange = null }) {
+    this.parent = parent; this.p = problem; this.onChange = onChange; parent.classList.add('parsons'); const lines = Grader.parsonsLines(problem.parsons.solution).map(l => l.text); const extra = (problem.parsons.distractors || []).map(s => s.trim());
     const all = lines.concat(extra); const seedSort = all.map((t, i) => ({ t, k: Math.sin(i * 9301 + t.length * 49297) })).sort((a, b) => a.k - b.k).map(x => x.t);
     this.bank = seedSort.map(t => ({ id: uid(), text: t })); this.answer = [];
     if (state && state.answer) { this.answer = state.answer.map(a => ({ id: uid(), text: a.text, indent: a.indent })); const used = {}; this.answer.forEach(a => used[a.text] = (used[a.text] || 0) + 1); this.bank = this.bank.filter(b => { if (used[b.text]) { used[b.text]--; return false; } return true; }); }
@@ -200,6 +200,7 @@ class ParsonsEditor {
       this.drag(t, i); ans.appendChild(t);
     });
     if (this.wrong) this.wrong.forEach(i => { const t = $(`.pz-ans[data-i="${i}"]`, el); if (t) t.classList.add('wrong'); });
+    if (this.onChange && this._rendered) this.onChange(); this._rendered = true;
   }
   drag(tile, idx) {
     const grip = $('.pz-grip', tile); let ghost = null, startX = 0, startInd = 0;

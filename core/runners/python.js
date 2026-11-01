@@ -76,8 +76,38 @@ def _pa_safe(v):
     except Exception: r='?'
     return r if len(r)<=80 else r[:77]+'...'
 
-def __pa_run(code, call=None, trace=False, maxsteps=500):
+def _pa_vis(v, depth=0, seen=None):
+    # 시각화용 구조 스냅샷: 리스트/딕셔너리/집합/객체를 JSON 가능한 형태로 (깊이·개수 제한, 순환 방지)
+    if seen is None: seen=set()
+    if v is None or isinstance(v,(bool,int,float)): return v if not isinstance(v,float) or math.isfinite(v) else str(v)
+    if isinstance(v,str): return v if len(v)<=60 else v[:57]+'...'
+    if depth>8: return '...'
+    if isinstance(v,(list,tuple)):
+        return [_pa_vis(x,depth+1,seen) for x in v[:300]]+(['...'] if len(v)>300 else [])
+    if isinstance(v,(set,frozenset)):
+        try: items=sorted(v)
+        except Exception: items=list(v)
+        return {'__set':[_pa_vis(x,depth+1,seen) for x in items[:300]]}
+    if isinstance(v,dict):
+        out={}
+        for i,(k,x) in enumerate(v.items()):
+            if i>=200: out['...']='...'; break
+            out[str(k)]=_pa_vis(x,depth+1,seen)
+        return out
+    if hasattr(v,'__dict__') and not callable(v) and not isinstance(v,types.ModuleType):
+        oid=id(v)
+        if oid in seen: return {'__ref':oid}
+        seen.add(oid)
+        out={'__cls':type(v).__name__,'__id':oid}
+        for k,x in list(vars(v).items())[:20]:
+            if k.startswith('_'): continue
+            out[k]=_pa_vis(x,depth+1,seen)
+        return out
+    return _pa_safe(v)
+
+def __pa_run(code, call=None, trace=False, maxsteps=500, vis=None):
     _pt.reset()
+    visnames=json.loads(vis) if vis else None
     ns={'__name__':'__main__'}
     res={'ok':True}
     steps=[]; buf=[]; stack=[]
@@ -90,10 +120,18 @@ def __pa_run(code, call=None, trace=False, maxsteps=500):
         if event in ('line','return'):
             if len(steps)>=maxsteps: raise _PAStop()
             loc={}
-            for k,v in frame.f_locals.items():
-                if k.startswith('__') or callable(v) or isinstance(v,types.ModuleType): continue
-                loc[k]=_pa_safe(v)
-            steps.append({'line':frame.f_lineno,'vars':loc,'stack':list(stack),'out':''.join(buf)[-3000:],'event':event})
+            if len(steps)<500 or not visnames:
+                for k,v in frame.f_locals.items():
+                    if k.startswith('__') or callable(v) or isinstance(v,types.ModuleType): continue
+                    loc[k]=_pa_safe(v)
+            st={'line':frame.f_lineno,'vars':loc,'stack':list(stack),'out':''.join(buf)[-3000:],'event':event}
+            if visnames:
+                snap={}
+                for name in visnames:
+                    if name in frame.f_locals: snap[name]=_pa_vis(frame.f_locals[name])
+                    elif name in ns: snap[name]=_pa_vis(ns[name])
+                st['vis']=snap; st['depth']=len(stack); st['fn']=frame.f_code.co_name
+            steps.append(st)
         if event=='return' and stack: stack.pop()
         return tr
     old=sys.stdout
@@ -182,8 +220,8 @@ self.onmessage=(ev)=>{
     let result;
     try{
       const fn=pyodide.globals.get('__pa_run');
-      const r=fn(m.code, m.call||null, !!m.trace, m.maxsteps||500);
-      result=JSON.parse(r); fn.destroy && fn.destroy();
+      const t0=Date.now(); const r=fn(m.code, m.call||null, !!m.trace, m.maxsteps||500, m.vis||null);
+      result=JSON.parse(r); result.ms=Date.now()-t0; fn.destroy && fn.destroy();
     }catch(e){ result={ok:false,ename:'InternalError',emsg:String(e&&e.message||e)}; }
     result.inputUsed=inputIdx;
     try{ pyodide.runPython('import sys; sys.stdout.flush(); sys.stderr.flush()'); }catch(e){}
@@ -207,7 +245,7 @@ const Py = {
     w.onmessage = (ev) => {
       const m = ev.data;
       if (m.type === 'progress') { this.progress = m.pct; this.phase = m.phase; this._emit(); }
-      else if (m.type === 'ready') { this.ready = true; this.phase = 'ready'; this._emit(); this._next(); }
+      else if (m.type === 'ready') { this.ready = true; this.phase = 'ready'; this._emit(); this._next(); if (typeof COURSE !== 'undefined' && COURSE.bench) this.bench(); }
       else if (m.type === 'initError') { this.failed = true; this.phase = 'error'; this.error = m.msg; this._emit(); this.worker = null; w.terminate(); }
       else if (m.type === 'out' || m.type === 'err') { const p = this.pending[m.id]; if (p && p.onOut) p.onOut(m.text, m.type === 'err'); }
       else if (m.type === 'done') { const p = this.pending[m.id]; if (p) { clearTimeout(p.timer); delete this.pending[m.id]; p.resolve(m.result); } this.busy = false; this._next(); }
@@ -240,7 +278,7 @@ const Py = {
       if (job.kind === 'compile') { try { result = JSON.parse(this.py.runPython('__pa_compile(' + JSON.stringify(job.code) + ')')); } catch (e) { result = { ok: true }; } }
       else {
         this.cur = job; this.inputLines = (job.input || '').replace(/\r/g, '').split('\n'); if (this.inputLines.length && this.inputLines[this.inputLines.length - 1] === '') this.inputLines.pop(); this.inputIdx = 0;
-        try { const fn = this.py.globals.get('__pa_run'); const r = fn(job.code, job.call || null, !!job.trace, CONFIG.TRACE_MAX_STEPS); result = JSON.parse(r); fn.destroy && fn.destroy(); } catch (e) { result = { ok: false, ename: 'InternalError', emsg: String(e && e.message || e) }; }
+        try { const t0 = Date.now(); const fn = this.py.globals.get('__pa_run'); const r = fn(job.code, job.call || null, !!job.trace, job.maxsteps || CONFIG.TRACE_MAX_STEPS, job.vis ? JSON.stringify(job.vis) : null); result = JSON.parse(r); result.ms = Date.now() - t0; fn.destroy && fn.destroy(); } catch (e) { result = { ok: false, ename: 'InternalError', emsg: String(e && e.message || e) }; }
         result.inputUsed = this.inputIdx; this.cur = null;
       }
       delete this.pending[id]; this.busy = false; job.resolve(result); this._next();
@@ -253,12 +291,19 @@ const Py = {
     const id = ++this.seq; this.pending[id] = job;
     if (this.main) return this._runMain(id, job);
     if (job.kind === 'run') {
-      job.timer = setTimeout(() => { if (this.pending[id]) { delete this.pending[id]; job.resolve({ ok: false, ename: 'Timeout', emsg: T.timeout, timeout: true }); this.restart(); } }, CONFIG.RUN_TIMEOUT_MS);
-      this.worker.postMessage({ type: 'run', id, code: job.code, input: job.input, call: job.call, trace: job.trace, maxsteps: CONFIG.TRACE_MAX_STEPS });
+      job.timer = setTimeout(() => { if (this.pending[id]) { delete this.pending[id]; job.resolve({ ok: false, ename: 'Timeout', emsg: T.timeout, timeout: true, ms: job.timeoutMs || CONFIG.RUN_TIMEOUT_MS }); this.restart(); } }, job.timeoutMs || CONFIG.RUN_TIMEOUT_MS);
+      this.worker.postMessage({ type: 'run', id, code: job.code, input: job.input, call: job.call, trace: job.trace, maxsteps: job.maxsteps || CONFIG.TRACE_MAX_STEPS, vis: job.vis ? JSON.stringify(job.vis) : null });
     } else { this.worker.postMessage({ type: 'compile', id, code: job.code }); }
   },
-  run({ code, input = '', call = null, trace = false, onOut = null }) {
-    return new Promise(resolve => { this.queue.push({ kind: 'run', code, input, call, trace, onOut, resolve }); if (!this.worker && !this.main) this.start(); this._next(); });
+  run({ code, input = '', call = null, trace = false, onOut = null, vis = null, maxsteps = null, timeoutMs = null }) {
+    return new Promise(resolve => { this.queue.push({ kind: 'run', code, input, call, trace, onOut, vis, maxsteps, timeoutMs, resolve }); if (!this.worker && !this.main) this.start(); this._next(); });
+  },
+  // 기기 속도 보정: 같은 작업을 한 번 돌려 기준 시간과 비교 (알고리즘 코스 시간 제한 채점에 곱함). 1회만.
+  speedFactor: 1, benched: false,
+  async bench() {
+    if (this.benched) return this.speedFactor; this.benched = true;
+    try { const r = await this.run({ code: 's = 0\nfor i in range(1000000):\n    s += i\n' }); if (r.ok && r.ms) this.speedFactor = Math.min(4, Math.max(0.5, r.ms / CONFIG.ALGO.benchBaselineMs)); } catch (e) {}
+    return this.speedFactor;
   },
   compile(code) { return new Promise(resolve => { this.queue.push({ kind: 'compile', code, resolve }); if (!this.worker && !this.main) this.start(); this._next(); }); },
   explain(result) { // 에러 → 한국어 한 줄

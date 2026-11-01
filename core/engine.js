@@ -44,6 +44,7 @@ const Content = {
   // 블록 문제 따라하기 가이드. 손으로 쓴 guide가 있으면 그것, 없으면 정답 코드 줄에서 자동 생성
   guideFor(p, mode = 'block') {
     if (mode === 'text') return this.textGuideFor(p);
+    if (mode === 'parsons') return this.parsonsGuideFor(p);
     const hand = p.guide || (typeof GUIDES !== 'undefined' && GUIDES[p.id]);
     if (hand) { const params = p.params || {}; const sub = (x) => typeof x !== 'string' ? x : x.replace(/\{\{([^}]+)\}\}/g, (m, e) => { try { return String(this.evalExpr(e, params)); } catch (err) { return m; } }); return hand.map(g => ({ ...g, t: sub(g.t), c: Array.isArray(g.c) ? g.c.map(sub) : sub(g.c) })); }
     if (p.type !== 'block' || !p.solution) return null;
@@ -138,6 +139,17 @@ const Content = {
     steps.push({ t: '다 쳤으면 <b>▶ 실행</b>으로 결과를 확인하고, <b>✔ 제출하기</b>를 누르세요!' });
     return steps;
   },
+  // Parsons(줄 맞추기) 푸는 방법 가이드: 사용법 한 단계 + 줄마다 "어떤 줄을 어디에, 들여쓰기 몇 칸" + 함정 줄 주의
+  parsonsGuideFor(p) {
+    const sol = p.parsons && p.parsons.solution; if (!sol) return null;
+    const lines = Grader.parsonsLines(sol); const steps = [];
+    steps.push({ t: `<b>사용법</b>: 왼쪽 <b>사용 가능한 줄</b>에서 줄을 <b>누르면</b> 오른쪽 <b>내 코드</b>에 추가돼요. 순서는 <b>▲▼</b>(또는 ⠿ 끌기), 들여쓰기는 <b>◀▶</b>로 바꿔요. ✕는 다시 빼기. 정답은 <b>${lines.length}줄</b>이에요${(p.parsons.distractors || []).length ? ` — 쓰면 안 되는 <b>함정 줄 ${p.parsons.distractors.length}개</b>가 섞여 있어요` : ''}.`, c: '@pz:any' });
+    lines.forEach((l, k) => { const prev = lines[k - 1]; let indTxt = ''; if (l.indent > 0 && (!prev || prev.indent < l.indent)) indTxt = ` 그리고 <b>▶를 ${l.indent}번</b> 눌러 안쪽으로 들여쓰세요 (위 줄의 "안쪽"이라는 뜻).`; else if (l.indent > 0) indTxt = ` 들여쓰기는 위 줄과 같게(▶ ${l.indent}번).`; if (prev && prev.indent > 0 && l.indent === 0) indTxt = ' 들여쓰기 <b>없이</b> 맨 왼쪽(반복/조건에서 나왔다는 뜻).';
+      const why = l.text.endsWith(':') ? ' 끝에 콜론(:)이 있는 줄은 아래 줄들을 "안쪽"에 거느려요.' : '';
+      steps.push({ t: `<b>${k + 1}번째 줄</b>: <code>${esc(l.text)}</code> 를 눌러 추가하세요.${indTxt}${why}`, c: '@pz:' + k }); });
+    steps.push({ t: `${lines.length}줄이 순서·들여쓰기까지 맞으면 <b>✔ 제출하기</b>! 애매하면 <b>▶ 실행해 보기</b>로 결과를 먼저 확인하세요.` });
+    return steps;
+  },
   instantiate(p, params) {
     if (!p.vary) return p;
     if (!params || !Object.keys(params).length) params = this.defaultParams(p);
@@ -164,15 +176,22 @@ const Grader = {
   async expected(p, test, idx) { // 정답 코드 실행으로 기대값 계산
     const key = p.id + '|' + JSON.stringify(p.params || {}) + '|' + idx; if (this.solutionCache[key]) return this.solutionCache[key];
     const sol = p.type === 'bug' ? p.bug.solution : p.solution;
-    let out = ''; const r = await Py.run({ code: sol, input: test.input || '', call: test.call || null, onOut: (t, e) => { if (!e) out += t; } });
+    let out = ''; const r = await Py.run({ code: sol, input: test._input != null ? test._input : await this.testInput(test), call: test.call || null, onOut: (t, e) => { if (!e) out += t; }, timeoutMs: CONFIG.RUN_TIMEOUT_MS * 3 });
     const v = { out, ret: r.ret, segs: r.segs, ok: r.ok }; this.solutionCache[key] = v; return v;
   },
+  inputCache: {},
+  // 큰 입력은 문자열 대신 파이썬 식(inputGen)으로 적어 두고 실행해서 만든다 (n=10^5 같은 코딩테스트 입력)
+  async testInput(t) { if (!t.inputGen) return t.input || ''; if (this.inputCache[t.inputGen]) return this.inputCache[t.inputGen]; let out = ''; const r = await Py.run({ code: 'import sys\nsys.stdout.write(str(' + t.inputGen + '))', onOut: (x, e) => { if (!e) out += x; } }); if (!r.ok) throw new Error('inputGen 실패: ' + (r.emsg || '')); this.inputCache[t.inputGen] = out; return out; },
   async runTests(p, code, onEach) {
     const tests = this.normTests(p); const results = []; let passed = 0;
+    const limitSec = p.limits && p.limits.time ? p.limits.time : null; const limitMs = limitSec ? limitSec * 1000 * CONFIG.ALGO.slowdown * (Py.speedFactor || 1) : null;
     for (let i = 0; i < tests.length; i++) {
-      const t = tests[i]; let out = '', err = '';
-      const r = await Py.run({ code, input: t.input || '', call: t.call || null, onOut: (txt, e) => { if (e) err += txt; else out += txt; } });
+      const t = tests[i]; let out = '', err = ''; let input = '';
+      try { input = await this.testInput(t); } catch (e) { results.push({ idx: i, ok: false, input: '', expected: '', actual: '', error: e.message, hidden: false, note: '', raw: {} }); continue; }
+      t._input = input;
+      const r = await Py.run({ code, input, call: t.call || null, onOut: (txt, e) => { if (e) err += txt; else out += txt; }, timeoutMs: limitMs ? Math.max(CONFIG.RUN_TIMEOUT_MS, limitMs * 1.5) : null });
       let ok = false, expected = t.output, actual = out, note = '';
+      const tooSlow = limitMs && r.ok && r.ms != null && r.ms > limitMs;
       if (p.turtle) {
         const ex = await this.expected(p, t, i); const a = r.segs || [], b = ex.segs || [];
         ok = r.ok && a.length === b.length && a.every((s, k) => s.every((v, j) => Math.abs(v - b[k][j]) <= 1.5));
@@ -186,7 +205,9 @@ const Grader = {
         let exp = t.output; if (exp === '__COMPUTED__' || p.varied) { const ex = await this.expected(p, t, i); exp = ex.out; }
         ok = r.ok && this.norm(out, p.ignoreCase) === this.norm(exp, p.ignoreCase); expected = exp;
       }
-      const res = { idx: i, ok, input: t.input || '', expected, actual, error: r.ok ? '' : (Py.explain(r) + (r.tb ? '\n' + r.tb : '')), hidden: i === tests.length - 1, note, raw: r };
+      if (tooSlow) { ok = false; note = `⏱ 시간 초과 (제한 ${limitSec}초, 내 코드 ${(r.ms / 1000 / CONFIG.ALGO.slowdown / (Py.speedFactor || 1)).toFixed(1)}초 상당) — 더 빠른 자료구조나 방법이 필요해요`; actual = '(시간 초과)'; }
+      if (r.timeout && limitMs) { note = `⏱ 시간 초과 (제한 ${limitSec}초) — 더 빠른 자료구조나 방법이 필요해요`; }
+      const res = { idx: i, ok, input: t.inputGen ? `(큰 입력 · ${input.length}자)` : (t.input || ''), expected, actual, error: r.ok ? '' : (Py.explain(r) + (r.tb ? '\n' + r.tb : '')), hidden: i === tests.length - 1, note, raw: r, ms: r.ms };
       results.push(res); if (ok) passed++;
       if (onEach) onEach(res, i, tests.length);
       if (r.timeout) break;
