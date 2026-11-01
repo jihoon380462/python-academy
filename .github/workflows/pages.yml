@@ -21,6 +21,16 @@ jobs:
       - uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Cancel any stuck in-progress Pages deployment from recent commits
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --deepen=15 origin main >/dev/null 2>&1 || true
+          for sha in $(git log --format=%H -n 15); do
+            if [ "$sha" != "${{ github.sha }}" ]; then
+              gh api -X POST "repos/${{ github.repository }}/pages/deployments/$sha/cancel" >/dev/null 2>&1 && echo "cancelled stuck deployment $sha" || true
+            fi
+          done
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
