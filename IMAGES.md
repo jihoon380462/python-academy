@@ -17,51 +17,53 @@
 
 프롬프트는 영어로 적어 두었다(생성기가 영어를 더 잘 알아듣는다). 한국어 설명은 의도 확인용.
 
-## 2. 완료된 그림 (총 18장 · ✅ 2026-11-02)
+## 2. 완료된 그림 (검수 통과 ✅ — 18장, 2026-11-02 v2.2.18 기준. **스타일 기준**: 새 그림은 이 세트와 나란히 놓았을 때 한 작가가 그린 것처럼 보여야 한다)
 
-스타일 기준은 최초 승인된 `course-python.png`와 `boss-python-1.png`다. 2차 A~D 16장도 같은 세트로 제작했으며, 지정 크기·투명 배경·8% 이상 여백과 다크/라이트 배경의 축소 표시를 검수했다.
-
-| 파일 | 내용 | 비고 |
+| 파일 | 내용 | 쓰이는 곳 |
 | --- | --- | --- |
-| `course-python.png` | 윙크하는 초록 뱀 + 노트북 | 허브 코스 카드 48px |
-| `boss-python-1.png` | 보라색 숫자 괴물(물음표 뿔·숫자 카드·망토) | 보스 HP 패널 56px · 지도 보스 노드 40px |
-| `course-algo.png` | 파란 부엉이·나침반·그래프 | ✅ 완료 · 512×512 · 투명 PNG |
-| `course-terminal-git.png` | 회색 고양이·터미널·분기/병합 꼬리 | ✅ 완료 · 512×512 · 투명 PNG |
-| `course-sql.png` | 노란 코끼리·서랍 3칸·커피 | ✅ 완료 · 512×512 · 투명 PNG |
-| `course-web.png` | 주황 여우·지구본·종이비행기 | ✅ 완료 · 512×512 · 투명 PNG |
-| `boss-python-2.png` | 파란 숫자 보스·느낌표 뿔·주사위 2개 | ✅ 완료 · 512×512 · 투명 PNG |
-| `boss-python-3.png` | 주황 가계부 보스·동전·영수증·지갑 | ✅ 완료 · 512×512 · 투명 PNG |
-| `boss-python-4.png` | 보라 가위바위보 보스·팔 3개·톱니 뿔 | ✅ 완료 · 512×512 · 투명 PNG |
-| `boss-python-5.png` | 진홍 RPG 최종 보스·왕관·나무 검·방패·하트 3개 | ✅ 완료 · 512×512 · 투명 PNG |
-| `boss-algo-1.png` | 초록 괄호 보스·종이 뭉치·프린터 | ✅ 완료 · 512×512 · 투명 PNG |
-| `boss-algo-2.png` | 파란 정렬 보스·돋보기·정렬 막대·화살표 뿔 | ✅ 완료 · 512×512 · 투명 PNG |
-| `boss-algo-3.png` | 주황 미로 보스·미로 판·그래프 노드 3개 | ✅ 완료 · 512×512 · 투명 PNG |
-| `boss-algo-4.png` | 보라 시험 보스·안경·초시계·시험지·연필 뿔 | ✅ 완료 · 512×512 · 투명 PNG |
-| `badge-master_python.png` | 파이썬 마스터·왕관 쓴 초록 뱀 금색 메달 | ✅ 완료 · 256×256 · 투명 PNG |
-| `badge-master_algo.png` | 알고리즘 마스터·왕관 쓴 파란 부엉이 금색 메달 | ✅ 완료 · 256×256 · 투명 PNG |
-| `hero-hub.png` | 다섯 마스코트와 코드 블록 가로 배너 | ✅ 완료 · 1200×400 · 투명 PNG · 하단 1/3 투명 |
-| `empty-works.png` | 붓을 든 초록 뱀·새싹 이젤 | ✅ 완료 · 512×512 · 투명 PNG |
+| `course-python.png` `course-algo.png` `course-terminal-git.png` `course-sql.png` `course-web.png` | 뱀+노트북 · 부엉이+나침반 · 고양이+터미널 · 코끼리+캐비닛 · 여우+지구본 | 허브 코스 카드 48px, 공유 카드 |
+| `boss-python-1~5.png` `boss-algo-1~4.png` | 꼬마 괴물 종족(보라 물음표·파랑 주사위·주황 가계부·보라 세 팔·빨강 왕관 / 초록 괄호·파랑 돋보기·주황 미로·보라 감독관) | 보스 HP 패널 56px, 지도 보스 노드 40px |
+| `badge-master_python.png` `badge-master_algo.png` | 왕관 쓴 뱀·부엉이 금메달 | 뱃지 화면, 공유 카드 |
+| `hero-hub.png` (1200×274로 잘라 둠) | 마스코트 5마리 + 코드 블록 | 허브 맨 위 배너 |
+| `empty-works.png` | 이젤 위 새싹 + 붓 든 뱀 | 내 작품 빈 화면 |
 
-## 3. 요청 목록 — 2차 납품 완료
+**검수 메모(2차)**: 2차 16장 중 6장(알고·SQL·웹 아이콘, 빈 작품, 알고 마스터 뱃지, 배너)에 **흰 스티커 테두리**가 있어 다크 테마에서 흰 띠로 보였음 → `tools/img_clean.py`로 투명 배경에 닿은 흰~회색 테두리를 지워 해결(내부 흰색은 윤곽선에 막혀 유지). 앞으로는 납품 전에 `python3 tools/img_clean.py --check`로 확인하고, 테두리가 있으면 `python3 tools/img_clean.py`(인자 없음)로 정리한 뒤 커밋. 배너는 아래 빈 공간을 잘라 1200×274가 됨 — 가로 배너는 **내용이 캔버스를 꽉 채우게** 그리는 편이 좋다.
 
-✅ **A~D 총 16장 완료** — 항목을 2절 완료 표로 이동했다. 현재 남은 2차 요청은 없다.
+## 3. 요청 목록 — 3차 (다음에 만들 것, 총 16장)
 
-**납품 체크리스트 (2차)**
+규칙은 1절 + 2절 검수 메모(흰 테두리 금지 — 바깥 윤곽선은 어두운 남색 `#1d2230`으로 끝나야 함).
 
-- [x] 16장 모두 `assets/img/`에 정확한 이름으로 저장
-- [x] 완료 항목을 2절 표로 이동하고 3절 요청 표에서 제거
-- [x] `APP_VERSION` 2.2.16 → 2.2.17 (패치 +1)
-- [x] `node tools/stamp.mjs`로 HTML 버전·오프라인 캐시 목록 갱신
-- [x] `CHANGELOG.md`·`HANDOFF.md` 상태판 갱신
-- [x] 이미지·문서·버전·캐시를 한 납품 커밋에 포함
+### A. 챕터 장식 (512×512, 홈 지도 챕터 제목 옆 32px — 작게 보이므로 **소품 하나, 단순하게**)
 
-생성 방식·최종 프롬프트는 [`assets/img/README.md`](assets/img/README.md)에 기록했다.
+| # | 파일 | 챕터 | 소품 | Prompt (EN) |
+| --- | --- | --- | --- | --- |
+| A1 | `chapter-python-0.png` | 파이썬 0 시작 | 출발 깃발(초록) | `flat vector sticker of a small green start flag on a short pole, bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin, simple icon` |
+| A2 | `chapter-python-1.png` | 1 첫걸음 | 새싹 화분 | `flat vector sticker of a tiny sprout in a small pot, bold dark navy outline (#1d2230), green (#4caf50), no text, transparent background, centered, 8% margin` |
+| A3 | `chapter-python-2.png` | 2 반복과 묶음 | 파란 회오리 화살표(반복) | `flat vector sticker of a blue circular loop arrow (#2196f3), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A4 | `chapter-python-3.png` | 3 데이터 다루기 | 주황 상자 3개 쌓임 | `flat vector sticker of three stacked orange boxes (#ff9800) with a small label tag, bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A5 | `chapter-python-4.png` | 4 더 큰 프로그램 | 보라 톱니바퀴 2개 | `flat vector sticker of two interlocking purple gears (#9c27b0), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A6 | `chapter-python-5.png` | 5 마무리 | 분홍 리본 메달 | `flat vector sticker of a pink ribbon rosette medal (#e91e63), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A7 | `chapter-python-6.png` | 6 실전 | 금 트로피 | `flat vector sticker of a small golden trophy (#ffd166), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A8 | `chapter-algo-1.png` | 알고 1 들어가기 | 초록 나침반 | `flat vector sticker of a small green compass (#4caf50), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A9 | `chapter-algo-2.png` | 2 찾고 정렬하기 | 파란 돋보기 + 막대 3개 | `flat vector sticker of a blue magnifying glass over three bars of increasing height (#2196f3), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A10 | `chapter-algo-3.png` | 3 연결된 구조 | 주황 사슬 고리 3개 | `flat vector sticker of three orange chain links (#ff9800) connected in a row, bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A11 | `chapter-algo-4.png` | 4 패턴 | 보라 퍼즐 조각 | `flat vector sticker of a purple jigsaw puzzle piece (#9c27b0), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A12 | `chapter-algo-5.png` | 5 실전 | 금 트로피(파이썬 6과 같은 것 재사용 가능 — 같은 파일 복사) | (A7 복사) |
 
-## 4. 3차 이후 (2차가 끝난 뒤 — 챕터 장식은 자리 있음, 나머지는 자리 없음)
+### B. 수학 공간 (EXPANSION.md 14절 준비 — 자리는 M1에서 생김, **M1 착수 전엔 만들지 말 것**)
+
+| # | 파일 | 쓰이는 곳 | 설명 |
+| --- | --- | --- | --- |
+| B1 | `course-math.png` | 허브 수학 공간 카드 | 박사모 쓴 거북이(느리지만 확실히)가 자와 컴퍼스를 듦 |
+| B2 | `gear-cap.png` | 마스코트 장비 「박사모」 | 검은 사각모 + 금술, 마스코트 머리 위에 얹히는 투명 PNG(256) |
+| B3 | `area-math-1~6.png` | 지식 지도 영역 아이콘 6 | 수·논리·확률·함수·벡터·그래프 소품 |
+
+**납품 체크리스트 (3차)**: 파일을 `assets/img/`에 → `python3 tools/img_clean.py --check`(문제 있으면 인자 없이 실행해 정리) → 이 파일 2절 표로 옮기고 3절에서 지운다 → `core/config.js` `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → `CHANGELOG.md`·`HANDOFF.md` 상태판 한 줄 → 커밋.
+
+## 4. 그 뒤 (자리 없음 — 만들지 말 것)
 
 | 파일 | 크기 | 쓰이는 곳 | 메모 |
 | --- | --- | --- | --- |
-| `chapter-<course>-<n>.png` (파이썬 0~6, 알고리즘 1~5) | 512 | 홈 지도 챕터 제목 옆 장식(32px) — **자리 있음(v2.2.14)** | 챕터 주제 소품 하나씩(시작=깃발, 첫걸음=새싹, 반복=회오리, 데이터=상자, 더 큰 프로그램=톱니, 마무리=리본, 실전=트로피 / 알고: 나침반, 돋보기, 사슬, 퍼즐, 트로피) |
 | `mascot-<stage>-<color>.png` | 512 | 상단바·프로필 마스코트(지금은 코드로 그린 SVG, 색·장비를 사용자가 고름) | 색·장비 조합이 많아 SVG가 유리 — 그림으로 바꿀지 미정 |
 | `badge-<id>.png` 나머지 뱃지 ~40개 | 256 | 뱃지 화면 | 자리는 이미 있음(`badge-<id>.png`가 있으면 이모지 대신 표시) |
 | `lesson-<course>-<id>.png` | 640×360 | 레슨 첫 페이지 머리 그림 | 레슨 수가 많아(52) 후순위 |
