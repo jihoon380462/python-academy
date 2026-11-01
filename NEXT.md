@@ -45,12 +45,12 @@
 | F1 | 복습 큐를 허브에서 코스 공통으로(지금은 파이썬만 `Review.due`) | `core/game.js` Review, `core/hub.js` | 알고리즘 틀린 문제도 복습 |
 | F2 | 알고리즘 `example.slider:{var,min,max,step}` — n을 끌면 예제가 다시 실행되고 시간이 그래프로 | `core/ui-views-main.js` 레슨 예제, `core/visualize.js` | 지시서 5절 미구현 |
 | F3 | ~~학습 통계 화면~~ **완료(v2.2.8)** `Views.stats` | | |
-| F4 | 문제 검색·필터(제목/태그/상태) 홈 지도 위 | `core/ui-views-main.js` home | 모바일에선 칩으로 |
+| F4 | ~~문제 검색·필터~~ **완료(v2.2.9)** | | |
 | F5 | 선생님(튜터) 개선: 현재 문제의 테스트 실패 내용을 자동으로 같이 보내기, 답변에 코드 블록 복사 버튼 | `core/tutor.js` | 키 없는 사용자 영향 없음 |
-| F6 | 키보드 단축키 안내 모달(?) + Ctrl+Enter 실행/Ctrl+Shift+Enter 제출/Esc 닫기 | `core/ui-core.js` | PC만 |
+| F6 | ~~키보드 단축키~~ **완료(v2.2.9)** | | |
 | F7 | ~~오프라인 캐시~~ **완료(v2.2.6)** `sw.js` | | |
 | F8 | 진행 데이터 내보내기/가져오기(JSON 파일) 설정 카드 | `core/ui-views-more.js` settings | gist 연동 없는 사용자용 백업 |
-| F9 | 접근성: 포커스 링·aria-label·명도 대비, 글자 크기 단계 추가 | `core/ui.css`, `data-font` | |
+| F9 | ~~접근성~~ **완료(v2.2.9)** (고대비·아주 크게·포커스 링) | | |
 | F10 | ~~"이해했어요/모르겠어요"~~ **완료(v2.2.6)** — 다음: `lessons.confused` 를 약점 복습에 연결 | | |
 | F11 | 뱃지 알림 모아 보기·프로필 공유 카드(PNG 저장) | `Views.profile`, canvas | |
 | F12 | 모바일 코드 입력 보조: 들여쓰기 ±, 자주 쓰는 기호 칩(`: ( ) [ ] " =`) 키보드 위 고정 | `core/ui-editors.js` TextEditor | 알고리즘 코스에서 특히 필요 |

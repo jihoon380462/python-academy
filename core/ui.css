@@ -5,7 +5,9 @@
  --ed-bg:#1e1e2e;--ed-fg:#cdd6f4;--ed-kw:#cba6f7;--ed-str:#a6e3a1;--ed-num:#fab387;--ed-com:#6c7086}
 [data-theme=dark]{--bg:#0f1117;--surface:#181b26;--surface2:#222636;--border:#2d3247;--text:#e6e8f0;--muted:#8b90a8;--primary:#6c8cff;--primary2:#4f6fe6;--accent:#2bb673;--accent2:#1f9a5f;--danger:#ff5d6c;--warn:#ffb347;--gold:#ffd166;--shadow:0 6px 24px rgba(0,0,0,.35)}
 [data-theme=light]{--bg:#f4f6fb;--surface:#ffffff;--surface2:#eef1f8;--border:#d9deea;--text:#1d2230;--muted:#6b7187;--primary:#3f63e8;--primary2:#2f4fc4;--accent:#1f9a5f;--accent2:#177a4a;--danger:#e0405a;--warn:#e69500;--gold:#d9a400;--shadow:0 6px 20px rgba(30,40,80,.12)}
-[data-font="0"]{--fs:13.5px;--code-size:13px}[data-font="1"]{--fs:15px;--code-size:14px}[data-font="2"]{--fs:17.5px;--code-size:16px}
+[data-font="0"]{--fs:13.5px;--code-size:13px}[data-font="1"]{--fs:15px;--code-size:14px}[data-font="2"]{--fs:17.5px;--code-size:16px}[data-font="3"]{--fs:20px;--code-size:18px}
+[data-contrast="1"][data-theme=dark]{--bg:#000;--surface:#0d0d12;--surface2:#1a1a24;--border:#5a607a;--text:#ffffff;--muted:#c3c7d6;--primary:#8fa8ff;--accent:#3ddb8c;--danger:#ff7a86;--gold:#ffe08a}[data-contrast="1"][data-theme=light]{--bg:#fff;--surface:#fff;--surface2:#f0f2f8;--border:#6b7187;--text:#000;--muted:#3a3f52;--primary:#1f3fc8;--accent:#0f7a44;--danger:#c3203a}
+[data-contrast="1"] .btn{border-width:2px}[data-contrast="1"] .muted{color:var(--muted)}
 [data-anim="0"] *{animation:none!important;transition:none!important}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%;text-size-adjust:100%}html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:var(--fs);line-height:1.55}
 button{font:inherit;cursor:pointer}textarea,input,select{font:inherit}a{color:var(--primary);cursor:pointer}
@@ -242,3 +244,11 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 /* ===== 학습 통계 (v2.2.8) ===== */
 .st-grid{grid-template-columns:repeat(3,1fr)}.st-days{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;align-items:end;height:120px}.st-day{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}.st-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end}.st-bar{width:100%;background:var(--primary);border-radius:4px 4px 0 0;min-height:2px}.st-bar.zero{background:var(--border)}.st-n{font-size:.7em;color:var(--muted);height:14px}.st-dow{font-size:.7em;color:var(--muted)}.st-dow.sun{color:var(--danger)}.st-stars{display:flex;flex-direction:column;gap:6px}.st-srow{display:grid;grid-template-columns:110px 1fr auto;gap:10px;align-items:center;font-size:.9em}.st-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.wk-cl{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border)}.wk-cl:first-of-type{border-top:0}.hcont-conf{border-color:var(--gold)}
 @media (max-width:767px){.st-two{grid-template-columns:1fr}.st-srow{grid-template-columns:80px 1fr auto}.st-days{height:90px}}
+/* ===== 접근성·단축키 (v2.2.9) ===== */
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:6px}.btn:focus-visible,.node:focus-visible,.qopt:focus-visible,.pitem:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.kb{border-collapse:collapse;width:100%}.kb td{padding:6px 8px;border-top:1px solid var(--border)}.kb tr:first-child td{border-top:0}.kb kbd{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-family:var(--mono);white-space:nowrap}
+.hsearch{margin:8px 0 12px}.hsearch .input{width:100%;font-size:1em;padding:10px 12px}.hs-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}#homeResults{margin-top:8px}.pst{min-width:44px;text-align:center;color:var(--muted)}#homeMap.hide,#homeResults.hide{display:none}
+@media (max-width:767px){.only-pc{display:none}}
+.chip-btn.on{background:var(--primary);color:#fff;border-color:transparent}
+.pitem.locked{opacity:.6}
