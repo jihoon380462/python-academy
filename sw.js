@@ -1,0 +1,20 @@
+// sw.js — 오프라인 캐시 (v2.2.6, 무료 교육 원칙: 한 번 열면 인터넷 없이도 공부). tools/stamp.mjs 가 VERSION·ASSETS 를 갱신한다.
+//   같은 출처(core/shared/courses): 설치 때 미리 캐시 + 캐시 우선(?v= 로 버전이 갈리므로 안전). HTML은 네트워크 우선(새 버전 반영) → 실패하면 캐시.
+//   CDN(Pyodide·Blockly·CodeMirror): 처음 쓸 때 캐시(runtime), 그 뒤 캐시 우선. Pyodide 한 벌 ≈ 12MB.
+//   버전이 바뀌면 activate 에서 옛 캐시를 지운다. 설정 화면의 "오프라인 캐시" 줄이 상태를 보여 준다.
+const VERSION = '2.2.6';
+const SHELL = 'academy-shell-' + VERSION;
+const CDN = 'academy-cdn-1'; // CDN 캐시는 버전과 무관(러너 버전은 config 에서 바뀔 때만)
+const ASSETS = ["index.html","core/config.js?v=2.2.6","core/engine.js?v=2.2.6","core/fx.js?v=2.2.6","core/game.js?v=2.2.6","core/hub.js?v=2.2.6","core/storage.js?v=2.2.6","core/sync.js?v=2.2.6","core/tutor.js?v=2.2.6","core/ui-core.js?v=2.2.6","core/ui-editors.js?v=2.2.6","core/ui-views-main.js?v=2.2.6","core/ui-views-more.js?v=2.2.6","core/ui.css?v=2.2.6","core/util.js?v=2.2.6","core/visualize.js?v=2.2.6","core/runners/python.js?v=2.2.6","core/runners/shell.js?v=2.2.6","shared/badges.js?v=2.2.6","shared/errors.js?v=2.2.6","shared/glossary.js?v=2.2.6","courses/algo/index.html","courses/algo/content.js?v=2.2.6","courses/algo/course.json","courses/python/index.html","courses/python/content.js?v=2.2.6","courses/python/course.json","courses/terminal-git/index.html","courses/terminal-git/content.js?v=2.2.6","courses/terminal-git/course.json"];
+const CDN_HOSTS = ['cdn.jsdelivr.net', 'unpkg.com', 'cdnjs.cloudflare.com'];
+self.addEventListener('install', (e) => { e.waitUntil((async () => { const c = await caches.open(SHELL); await Promise.allSettled(ASSETS.map(u => c.add(new Request(u, { cache: 'reload' })))); self.skipWaiting(); })()); });
+self.addEventListener('activate', (e) => { e.waitUntil((async () => { for (const k of await caches.keys()) if (k.startsWith('academy-shell-') && k !== SHELL) await caches.delete(k); await self.clients.claim(); })()); });
+self.addEventListener('message', (e) => { if (e.data === 'status') { (async () => { const shell = await caches.open(SHELL); const cdn = await caches.open(CDN); const a = (await shell.keys()).length, b = (await cdn.keys()).length; e.source && e.source.postMessage({ type: 'status', version: VERSION, shell: a, cdn: b, total: ASSETS.length }); })(); } if (e.data === 'clear') { (async () => { for (const k of await caches.keys()) await caches.delete(k); e.source && e.source.postMessage({ type: 'cleared' }); })(); } });
+self.addEventListener('fetch', (e) => {
+  const req = e.request; if (req.method !== 'GET') return; const url = new URL(req.url);
+  if (url.origin === self.location.origin) {
+    if (req.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) { e.respondWith((async () => { try { const r = await fetch(req); const c = await caches.open(SHELL); c.put(req, r.clone()); return r; } catch (_) { const alt = url.pathname.endsWith('/') ? url.pathname + 'index.html' : null; return (await caches.match(req, { ignoreSearch: true })) || (alt && await caches.match(new URL(alt, self.location.origin).href)) || (await caches.match(new URL('index.html', self.registration.scope).href)) || Response.error(); } })()); return; }
+    e.respondWith((async () => { const hit = await caches.match(req); if (hit) return hit; try { const r = await fetch(req); if (r.ok) { const c = await caches.open(SHELL); c.put(req, r.clone()); } return r; } catch (_) { return (await caches.match(req, { ignoreSearch: true })) || Response.error(); } })()); return;
+  }
+  if (CDN_HOSTS.includes(url.hostname)) { e.respondWith((async () => { const hit = await caches.match(req); if (hit) return hit; try { const r = await fetch(req); if (r.ok || r.type === 'opaque') { const c = await caches.open(CDN); c.put(req, r.clone()); } return r; } catch (_) { return Response.error(); } })()); }
+});

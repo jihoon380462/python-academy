@@ -49,6 +49,10 @@ with sync_playwright() as p:
     for _ in range(3):
         if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
     check(pg.locator('.result.ok').count()==1, '퀴즈 채점 클리어')
+    pg.evaluate("UI.go('problem',{pid:'L6P3',lessonId:'L6'})"); pg.wait_for_timeout(300); check(pg.locator('.qopt pre.qcode').count()==4, '퀴즈 여러 줄 코드 보기 → 블록(네모칸 수정)')
+    d=pg.evaluate("Grader.explainDiff({expected:'1\\n2\\n3', actual:'1\\n2'})"); check(len(d['tips'])>=1 and '적어요' in d['tips'][0] and len(d['rows'])==3, '출력 차이 설명(explainDiff): '+d['tips'][0][:30])
+    pg.evaluate("UI.go('lesson',{lessonId:'L2',page:0})"); pg.wait_for_timeout(300); pg.click('#lpLost'); pg.wait_for_timeout(200); check(pg.locator('.lp-helpbox').count()==1 and pg.evaluate("Store.data.stats.confused||0")>=1, '레슨 「모르겠어요」 도움 상자')
+    pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300); check(pg.locator('#sOffline').count()==1 and '완전 무료' in pg.locator('#view').inner_text(), '설정: 오프라인 캐시 줄 + 무료 안내')
     # 빈칸
     pg.evaluate("UI.go('problem',{pid:'L1P4',lessonId:'L1'})"); pg.wait_for_timeout(300)
     blanks=pg.evaluate("Content.problem('L1P4').fill.blanks.map(b=>b.ans||b.answer||b.a)")
@@ -100,6 +104,7 @@ with sync_playwright() as p:
     vz = pg.evaluate(VIZ_JS)
     check(vz['ok1'] and vz['frames']==3 and vz['errs']==0, "시각화 플레이어·8종 그리기 (frames=%s, errs=%s)" % (vz['frames'], vz['errs']))
     pg.goto(HUB); pg.wait_for_timeout(600); hc = pg.evaluate("()=>[...document.querySelectorAll('.hc')].map(e=>e.className+'|'+e.innerText.replace(/\\n/g,' ').slice(0,60))")
+    check('완전 무료' in pg.locator('.hub-foot').inner_text(), '허브 푸터: 완전 무료·계정 없음·오프라인')
     check(any('알고리즘' in x and ('ready' in x or 'locked' in x) for x in hc), '허브에 알고리즘 코스 카드: '+([x for x in hc if '알고리즘' in x]+['?'])[0][:70])
     pg.evaluate("(()=>{const k='academy.course.algo'; const c=JSON.parse(localStorage.getItem(k)||'{}'); c.problems=c.problems||{}; c.problems['A0P3']={status:'clear',stars:3,hints:0,attempts:1,review:{stage:0,due:'2000-01-01'}}; localStorage.setItem(k,JSON.stringify(c)); Hub.render();})()"); pg.wait_for_timeout(200)
     check('알고리즘·자료구조 1' in pg.locator('.hub-stats').inner_text(), '허브 복습 큐 코스 공통(F1): '+pg.locator('.hub-stats').inner_text().replace('\n',' ')[:80])

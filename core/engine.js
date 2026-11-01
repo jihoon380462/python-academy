@@ -230,3 +230,43 @@ const Grader = {
   },
   checkFill(p, answers) { const wrong = []; p.fill.blanks.forEach((b, i) => { const a = (answers[i] || '').trim(); if (!b.a.some(x => x.trim() === a)) wrong.push(i); }); return { ok: wrong.length === 0, wrong }; },
 };
+
+// ---------- 무료 도움 (v2.2.6): 기대 출력 vs 내 출력 줄 단위 비교 + 규칙 기반 설명 ----------
+// 선생님(API) 없이도 "왜 틀렸는지"를 브라우저 안에서 설명한다. 반환 { rows:[{exp, act, same, pos}], tips:[...] }
+Grader.explainDiff = function (r) {
+  const exp = this.norm(r.expected || ''), act = this.norm(r.actual || '');
+  const el = exp === '' ? [] : exp.split('\n'), al = act === '' ? [] : act.split('\n');
+  const n = Math.max(el.length, al.length); const rows = []; let firstBad = -1;
+  for (let i = 0; i < n; i++) { const e = el[i], a = al[i]; const same = e === a; let pos = -1; if (!same && e != null && a != null) { pos = 0; while (pos < e.length && pos < a.length && e[pos] === a[pos]) pos++; } if (!same && firstBad < 0) firstBad = i; rows.push({ exp: e, act: a, same, pos }); }
+  const tips = []; if (exp === act && !r.error) return { rows: [], tips: r.note ? [r.note] : [], firstBad: -1 };
+  if (r.error) tips.push('먼저 에러부터 고치세요 — 에러가 나면 그 뒤 출력은 나오지 않아요.');
+  else if (act === '' && exp !== '') tips.push('출력이 하나도 없어요. print()를 했나요? 함수 안에서 return만 하고 밖에서 print를 안 했을 수도 있어요.');
+  else {
+    const sq = (s) => s.replace(/\s+/g, '');
+    if (exp.toLowerCase() === act.toLowerCase()) tips.push('글자는 같은데 대소문자가 달라요 (예: True/true, OK/ok).');
+    else if (sq(exp) === sq(act)) tips.push('글자는 같은데 띄어쓰기·줄바꿈이 달라요. print(a, b)는 사이에 공백 하나, print(a + b)는 공백 없음. 문장 끝에 공백이 더 붙지 않았는지도 보세요.');
+    else if (sq(exp).replace(/[.,:!?]/g, '') === sq(act).replace(/[.,:!?]/g, '')) tips.push('내용은 맞는데 쉼표·마침표·콜론 같은 기호가 달라요. 기대한 출력을 글자 그대로 따라 쓰세요.');
+    else {
+      if (al.length > el.length) tips.push(`출력이 ${al.length - el.length}줄 많아요. 반복문 안에서 print 하고 있거나, 확인용 print가 남아 있지 않나요? input() 안에 안내 문구를 넣으면 그것도 출력에 섞여요.`);
+      else if (al.length < el.length) tips.push(`출력이 ${el.length - al.length}줄 적어요. 반복 횟수(range 끝 번호)나 조건 분기 하나를 빠뜨렸는지 보세요.${al.length && el.slice(0, al.length).join('\n') === al.join('\n') ? ' 앞부분은 맞아요 — 뒷부분만 보면 돼요.' : ''}`);
+      if (el.length === al.length && el.length > 1 && [...el].sort().join('\n') === [...al].sort().join('\n')) tips.push('줄 내용은 전부 맞는데 순서가 달라요. 정렬 방향(오름/내림차순)이나 반복 순서를 확인하세요.');
+      const fe = firstBad >= 0 ? el[firstBad] : null, fa = firstBad >= 0 ? al[firstBad] : null;
+      if (fe != null && fa != null && !tips.some(t => t.startsWith('줄 내용은'))) {
+        const ne = fe.match(/-?\d+(\.\d+)?/g), na = fa.match(/-?\d+(\.\d+)?/g);
+        if (ne && na && ne.length === na.length && fe.replace(/-?\d+(\.\d+)?/g, '#') === fa.replace(/-?\d+(\.\d+)?/g, '#')) {
+          const diffs = ne.map((x, i) => [x, na[i]]).filter(([x, y]) => x !== y);
+          if (diffs.length && diffs.every(([x, y]) => Math.abs(+x - +y) === 1)) tips.push('숫자가 딱 1 차이예요. range(1, n)은 n을 포함하지 않아요 → range(1, n + 1). < 와 <= 도 확인하세요.');
+          else if (diffs.length && diffs.every(([x, y]) => +x === +y)) tips.push('값은 같은데 표기가 달라요 (예: 3 과 3.0). / 는 항상 실수, // 는 정수예요. round()나 int()를 쓰거나 f"{x:.1f}" 처럼 자릿수를 맞추세요.');
+          else if (diffs.length && diffs.every(([x, y]) => Math.abs(+y) === Math.abs(+x) * 2 || Math.abs(+x) === Math.abs(+y) * 2)) tips.push('숫자가 2배(또는 절반)예요. 같은 값을 두 번 더하거나, 양쪽에서 한 번씩 세고 있지 않나요?');
+          else if (diffs.length) tips.push(`숫자만 달라요 (기대 ${diffs[0][0]}, 내 출력 ${diffs[0][1]}). 계산식이나 초기값(0에서 시작했는지), 누적하는 변수(+=)를 확인하세요.`);
+        } else if (fa.startsWith(fe) && fa.length > fe.length) tips.push('기대한 줄 뒤에 글자가 더 붙었어요. print 안에 넣은 안내문이나 end=" " 같은 옵션을 확인하세요.');
+        else if (fe.startsWith(fa) && fa.length) tips.push('기대한 줄의 앞부분까지만 나왔어요. 뒤에 이어 붙일 값을 빠뜨렸나요?');
+        else if (/[가-힣]/.test(fe) && !/[가-힣]/.test(fa)) tips.push('기대한 출력은 한글 문구인데 내 출력엔 없어요. 문제에서 요구한 문장을 글자 그대로 출력하세요.');
+        else if (firstBad === 0) tips.push('첫 줄부터 달라요. 입력을 int()로 바꿨는지, 출력 형식(문구·순서)을 지문과 맞췄는지부터 보세요.');
+        else tips.push(`${firstBad + 1}번째 줄부터 달라요. 그 줄을 만드는 코드만 집중해서 보세요.`);
+      }
+    }
+  }
+  if (/input\(["'][^"']+["']\)/.test(r.code || '') && al.length > el.length) tips.push('input("…") 안의 안내문은 출력으로 나가요. 채점에서는 input() 을 비워 두세요.');
+  return { rows, tips: [...new Set(tips)].slice(0, 3), firstBad };
+};

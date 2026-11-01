@@ -32,7 +32,7 @@ const Hub = {
       </div>
       <h2 class="hub-h">코스</h2>
       <div class="hub-courses">${CONFIG.COURSES.map(c => this.courseCard(c)).join('')}</div>
-      <div class="muted small center hub-foot">${T.appName} v${CONFIG.APP_VERSION}</div>
+      <div class="muted small center hub-foot">${T.appName} v${CONFIG.APP_VERSION} · <b>완전 무료</b> · 계정 없음 · 진행은 내 기기에만 저장(설정에서 백업·기기 연동) · 한 번 연 뒤엔 오프라인도 OK</div>
     </div>`;
   },
   courseCard(c) {
@@ -47,7 +47,7 @@ const Hub = {
 };
 window.addEventListener('DOMContentLoaded', () => {
   Store.load('python'); Content.init(); (Store.data.myProblems || []).forEach(np => { if (!Content.problemMap[np.id]) { Content.problemMap[np.id] = np; PROBLEMS.push(np); } });
-  UI.applyTheme(); Sync.load();
+  UI.applyTheme(); Sync.load(); Offline.register('sw.js');
   Hub.render();
   if (Sync.on) { Sync.hook = () => Hub.render(); Sync.syncNow().then(ch => { if (ch) Hub.render(); }); }
 });
