@@ -60,9 +60,13 @@ with sync_playwright() as p:
     pg.evaluate("Store.data.settings.unlockAll=true; UI.go('problem',{pid:'X1P1',lessonId:'X1'})"); pg.wait_for_timeout(600)
     check(pg.locator('#btnUpload').count()==1 and pg.locator('#pvFile').count()==1, '실전: 📎 CSV 업로드 버튼')
     check(pg.locator('.pv-tests .chip').count()>=4 or '단계' in pg.locator('#view').inner_text(), '실전: 테스트에 단계 칩')
-    check(pg.evaluate("CHAPTERS.some(c=>c.ch===6&&c.name==='실전') && LESSONS.filter(l=>l.practical).length===2"), '실전 챕터 6 · practical 레슨 2개')
+    check(pg.evaluate("CHAPTERS.some(c=>c.ch===6&&c.name==='실전') && LESSONS.filter(l=>l.practical).length===4"), '실전 챕터 6 · practical 레슨 4개')
+    pg.evaluate("Store.data.settings.unlockAll=true; UI.go('problem',{pid:'X3P1',lessonId:'X3'})"); pg.wait_for_timeout(500)
+    check(pg.locator('#pvExtra').count()==1 and pg.locator('#pvExtra.hide').count()==1, '실전: 더 만들어 보기 카드(클리어 전 숨김)')
+    pg.evaluate("Store.data.works.push({id:'w_t', name:'테스트 작품', code:'print(1)\\nprint(2)', src:'X1P1', course:'python', date:Date.now(), mode:'text', steps:4, total:4}); Store.save(); UI.go('works')"); pg.wait_for_timeout(300)
+    check(pg.locator('.work-card').count()>=1 and pg.locator('[data-review]').count()>=1 and '단계 4/4' in pg.locator('#view').inner_text(), '내 작품 갤러리: 프로젝트 카드 + 리뷰 버튼')
     pg.evaluate("Store.data.settings.unlockAll=false")
-    for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','playground']:
+    for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','playground','works']:
         pg.evaluate(f"UI.go('{v}')"); pg.wait_for_timeout(300); check(len(pg.locator('#view').inner_text())>10, f'화면 {v}')
     pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300)
     check(pg.locator('.card.sync').count()==1 and pg.locator('#syncOff').count()==1, '설정: 기기 연동 카드(연동 상태)'); check(pg.locator('#sRestoreV1').count()==1, '설정: v1 데이터 다시 가져오기 버튼'); check(('v'+pg.evaluate('CONFIG.APP_VERSION')) in pg.locator('#view').inner_text(), '설정 하단 버전 표시')

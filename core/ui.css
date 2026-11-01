@@ -228,3 +228,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 .mock-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;padding:8px;border:1px dashed var(--warn);border-radius:10px}.mock-bar .chip.warn{background:var(--danger);color:#fff}
 .mock-rev{margin-top:12px;display:flex;flex-direction:column;gap:6px}.mock-row{padding:8px 10px;border-radius:8px;border:1px solid var(--border)}.mock-row.ok{border-color:var(--accent)}.mock-row.bad{border-color:var(--danger)}
 @media (max-width:767px){.viz-c{height:220px}}
+
+/* ===== 내 작품 갤러리 · 더 만들어 보기 (v2.2.3) ===== */
+.work-card{margin-bottom:10px}.wc-head{display:flex;gap:10px;align-items:center}.wc-ic{font-size:1.6em;width:40px;text-align:center}.wc-ic img{width:40px;height:40px;object-fit:cover;border-radius:6px}.wc-n{font-weight:700}.wc-code{max-height:120px;overflow:auto;margin:8px 0}.wc-review{margin:8px 0;padding:8px 10px;border-left:3px solid var(--gold);background:var(--surface2);border-radius:6px}.row.wrap{flex-wrap:wrap}.btn.danger{color:var(--danger)}
+.pv-extra{margin-top:10px;padding:8px 10px;border:1px dashed var(--gold);border-radius:8px}.pv-extra ul{margin:6px 0 0;padding-left:18px}.pv-extra.hide{display:none}

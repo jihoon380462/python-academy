@@ -72,3 +72,10 @@ Tutor.ui = {
     }
   },
 };
+// 실전 프로젝트 전체 코드 리뷰 (v2.2.3): 짧은 칭찬 1 + 고칠 점 2 + 다음 도전 1. 정답 코드는 주지 않는다.
+Tutor.reviewProject = async function (p, code) {
+  const persona = (typeof COURSE !== 'undefined' && COURSE.tutorPersona) ? COURSE.tutorPersona : T.tutorSystem;
+  const system = `${persona}\n\n지금은 학생이 완성한 실전 프로젝트의 코드 리뷰를 한다. 한국어, 존댓말, 300자 안팎. 형식: "👍 잘한 점" 1개, "🔧 고치면 좋은 점" 2개(이유와 함께, 코드 한두 줄 예시 허용), "🚀 다음 도전" 1개. 전체 정답 코드는 쓰지 않는다.`;
+  const ctx = `[프로젝트] ${p.title}\n${(p.prompt || '').replace(/<[^>]+>/g, '').slice(0, 1200)}\n\n[단계]\n${(p.project && p.project.steps || []).map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\n[학생 코드]\n${code}`;
+  return this.call({ system, messages: [{ role: 'user', content: ctx }], maxTokens: 700 });
+};

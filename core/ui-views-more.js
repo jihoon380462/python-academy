@@ -47,10 +47,10 @@ Views.badges = (root) => { const d = Store.data; root.innerHTML = `<div class="p
 Views.profile = (root) => {
   const d = Store.data; const lv = Game.level(); const clears = PROBLEMS.filter(p => Store.prob(p.id).status === 'clear').length; const stars = PROBLEMS.reduce((a, p) => a + Store.prob(p.id).stars, 0);
   root.innerHTML = `<div class="page"><div class="card pcard" id="pcard"><div class="pc-top">${myMascot({ size: 96, mood: 'happy' })}<div><div class="pc-name">${esc(d.nick || '학습자')}</div><div class="pc-title">${Game.title(lv.level)}</div><div class="pc-lv">Lv.${lv.level}</div></div></div>
-    <div class="pc-grid"><div><b>${d.xp}</b><span>총 XP</span></div><div><b>${clears}/${PROBLEMS.length}</b><span>클리어</span></div><div><b>${stars}</b><span>별 합계</span></div><div><b>${d.badges.length}</b><span>뱃지</span></div><div><b>${Game.currentStreak()}</b><span>연속 학습</span></div><div><b>${d.streak.best}</b><span>최고 스트릭</span></div></div></div>
-    <div class="row"><button class="btn primary" id="pcPng">🖼 PNG로 저장</button><button class="btn" id="pcInv">보관함</button></div>
+    <div class="pc-grid"><div><b>${d.xp}</b><span>총 XP</span></div><div><b>${clears}/${PROBLEMS.length}</b><span>클리어</span></div><div><b>${stars}</b><span>별 합계</span></div><div><b>${d.badges.length}</b><span>뱃지</span></div><div><b>${Game.currentStreak()}</b><span>연속 학습</span></div><div><b>${d.streak.best}</b><span>최고 스트릭</span></div><div><b>${d.works.filter(w => w.src).length}</b><span>완성한 프로젝트</span></div></div></div>
+    <div class="row"><button class="btn primary" id="pcPng">🖼 PNG로 저장</button><button class="btn" id="pcInv">보관함</button><button class="btn" id="pcWorks">🎨 내 작품</button></div>
     <h3>타임 어택 최고 기록</h3><div class="card">${Object.keys(d.bestTimes).length ? Object.entries(d.bestTimes).map(([k, v]) => `<div>${esc(Content.lesson(k)?.title || k)}: <b>${v}초</b></div>`).join('') : '<div class="muted">아직 기록이 없어요</div>'}</div></div>`;
-  $('#pcInv').onclick = () => UI.go('inventory');
+  $('#pcInv').onclick = () => UI.go('inventory'); $('#pcWorks').onclick = () => UI.go('works');
   $('#pcPng').onclick = () => { const c = document.createElement('canvas'); c.width = 600; c.height = 340; const x = c.getContext('2d'); x.fillStyle = '#1e1e2e'; x.fillRect(0, 0, 600, 340); x.fillStyle = '#89b4fa'; x.font = 'bold 30px sans-serif'; x.fillText(d.nick || '학습자', 170, 70); x.fillStyle = '#cdd6f4'; x.font = '20px sans-serif'; x.fillText(`${Game.title(lv.level)} · Lv.${lv.level}`, 170, 105); const rows = [['총 XP', d.xp], ['클리어', `${clears}/${PROBLEMS.length}`], ['별', stars], ['뱃지', d.badges.length], ['연속 학습', Game.currentStreak() + '일'], ['최고 스트릭', d.streak.best + '일']]; rows.forEach(([k, v], i) => { const cx = 40 + (i % 3) * 185, cy = 180 + Math.floor(i / 3) * 70; x.fillStyle = '#313244'; x.fillRect(cx, cy, 170, 55); x.fillStyle = '#a6adc8'; x.font = '14px sans-serif'; x.fillText(k, cx + 12, cy + 20); x.fillStyle = '#f9e2af'; x.font = 'bold 22px sans-serif'; x.fillText(String(v), cx + 12, cy + 46); }); x.fillStyle = '#6c7086'; x.font = '13px sans-serif'; x.fillText('파이썬 아카데미', 40, 325); const img = new Image(); const svg = new Blob([myMascot({ size: 120, mood: 'happy' })], { type: 'image/svg+xml' }); img.onload = () => { x.drawImage(img, 30, 30, 120, 120); const a = document.createElement('a'); a.download = 'profile.png'; a.href = c.toDataURL(); a.click(); }; img.src = URL.createObjectURL(svg); };
 };
 
@@ -185,3 +185,25 @@ window.addEventListener('DOMContentLoaded', () => {
   if (Store.data.onboarded) goHash();
   Sync.init(); // 연동돼 있으면 다른 기기 진행 상황을 내려받아 합친다
 });
+
+// ---------- 내 작품 갤러리 (v2.2.3, NEXT.md WP-G G3·G4) ----------
+// 실전 프로젝트 클리어 시 자동 저장된 작품(src=문제 id)과 놀이터에서 저장한 작품을 한 화면에. 코드 복사·.py 내려받기·놀이터에서 열기·문제로·선생님 리뷰(키 있을 때).
+Views.works = (root) => {
+  const d = Store.data; const works = d.works.slice().sort((a, b) => b.date - a.date); const projects = works.filter(w => w.src), free = works.filter(w => !w.src);
+  const courseName = (id) => { const c = CONFIG.COURSES.find(x => x.id === id); return c ? c.icon + ' ' + c.name : ''; };
+  const card = (w) => { const p = w.src ? Content.problemMap[w.src] : null; const lines = (w.code || '').split('\n').length; return `<div class="card work-card" data-wc="${w.id}">
+      <div class="wc-head"><span class="wc-ic">${w.png ? `<img src="${w.png}">` : (w.src ? '🏆' : '📄')}</span><div class="wc-t"><div class="wc-n">${esc(w.name)}</div><div class="muted small">${new Date(w.date).toLocaleDateString()} · ${lines}줄${w.src ? ` · ${courseName(w.course || Store.course)}${w.total ? ` · 단계 ${w.steps || 0}/${w.total}` : ''}` : ''}</div></div></div>
+      ${w.review ? `<div class="wc-review"><b>🎓 선생님 리뷰</b><div class="small">${Tutor.ui.md(w.review)}</div></div>` : ''}
+      <pre class="code small wc-code">${esc((w.code || '').split('\n').slice(0, 6).join('\n'))}${lines > 6 ? '\n…' : ''}</pre>
+      <div class="row wrap"><button class="btn sm" data-open="${w.id}">🛝 놀이터에서 열기</button><button class="btn sm" data-copy="${w.id}">📋 복사</button><button class="btn sm" data-py="${w.id}">📥 .py</button>${p ? `<button class="btn sm" data-prob="${w.src}">📘 문제로</button>` : ''}${p && !w.review ? `<button class="btn sm" data-review="${w.id}">🎓 선생님 리뷰</button>` : ''}<button class="btn sm danger" data-del="${w.id}">🗑</button></div></div>`; };
+  root.innerHTML = `<div class="page"><h2>🎨 ${T.works} <small>${works.length}개</small></h2>
+    <h3>🏆 실전 프로젝트 <small class="muted">${projects.length}개</small></h3>${projects.length ? projects.map(card).join('') : '<div class="card muted">실전 챕터의 프로젝트를 클리어하면 여기에 자동으로 저장돼요.</div>'}
+    <h3>🛝 놀이터 작품 <small class="muted">${free.length}개</small></h3>${free.length ? free.map(card).join('') : '<div class="card muted">놀이터에서 「저장」한 코드가 여기 모여요.</div>'}</div>`;
+  const find = (id) => d.works.find(w => w.id === id);
+  $$('[data-open]', root).forEach(b => b.onclick = () => { const w = find(b.dataset.open); UI.go('playground', { code: w.code, mode: w.mode || 'text', blockState: w.blockState }); });
+  $$('[data-copy]', root).forEach(b => b.onclick = async () => { const w = find(b.dataset.copy); try { await navigator.clipboard.writeText(w.code); UI.toast('📋 코드를 복사했어요'); } catch (e) { UI.modal({ title: '코드', body: `<pre class="code">${esc(w.code)}</pre>` }); } });
+  $$('[data-py]', root).forEach(b => b.onclick = () => { const w = find(b.dataset.py); const a = document.createElement('a'); a.download = (w.name || 'work').replace(/[\\/:*?"<>|\s]+/g, '_') + '.py'; a.href = URL.createObjectURL(new Blob(['# ' + w.name + ' — ' + T.appName + '\n' + w.code], { type: 'text/x-python;charset=utf-8' })); a.click(); Game.stat('fileDownloads'); });
+  $$('[data-prob]', root).forEach(b => b.onclick = () => { const p = Content.problemMap[b.dataset.prob]; if (p) UI.go('problem', { pid: p.id, lessonId: p.lesson }); });
+  $$('[data-del]', root).forEach(b => b.onclick = async () => { if (!await UI.confirm('이 작품을 지울까요?')) return; d.works = d.works.filter(w => w.id !== b.dataset.del); Store.save(); Views.works(root); });
+  $$('[data-review]', root).forEach(b => b.onclick = async () => { const w = find(b.dataset.review); const p = Content.problemMap[w.src]; if (!Store.data.settings.apiKey) { UI.toast(T.noKey); UI.go('settings'); setTimeout(() => { const k = $('#sKey'); if (k) { k.scrollIntoView({ block: 'center' }); k.focus(); } }, 150); return; } b.disabled = true; b.textContent = '🎓 리뷰 중…'; try { const text = await Tutor.reviewProject(p, w.code); w.review = text; Store.save(); Game.stat('reviews'); Views.works(root); } catch (e) { UI.toast(Tutor.errMsg(e)); b.disabled = false; b.textContent = '🎓 선생님 리뷰'; } });
+};
