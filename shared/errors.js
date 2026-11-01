@@ -6,7 +6,7 @@ const ERRORS = [
   { name:'TypeError', title:'종류 오류', why:'서로 다른 종류의 값을 섞어 썼어요. 가장 흔한 건 글자와 숫자를 더하는 것이에요.', bad:'age = input()\nprint(age + 1)', fix:'int()로 숫자로 바꾼 뒤 계산하거나, str()로 글자로 바꿔 이어 붙이세요.\nprint(int(age) + 1)' },
   { name:'ValueError', title:'값 오류', why:'종류는 맞는데 값이 이상해요. int("abc")처럼 숫자로 바꿀 수 없는 글자를 바꾸려 할 때 나요.', bad:'n = int("abc")', fix:'숫자 모양의 글자만 int()로 바꿀 수 있어요. try/except ValueError로 받아 주면 안전해요.' },
   { name:'IndexError', title:'번호 오류', why:'리스트에 없는 번호를 꺼냈어요. 인덱스는 0부터 시작하므로 3개짜리 리스트의 마지막은 2예요.', bad:'a = [1, 2, 3]\nprint(a[3])', fix:'마지막은 a[2] 또는 a[-1]이에요. len(a)보다 작은 번호만 쓰세요.' },
-  { name:'KeyError', title:'키 오류', why:'딕셔너리에 없는 키를 대괄호로 꺼냈어요.', bad:'d = {"a": 1}\nprint(d["b"])', fix:'d.get("b", 0)처럼 get을 쓰거나, if "b" in d: 로 먼저 확인하세요.' },
+  { name:'KeyError', title:'키 오류', why:'딕셔너리에 없는 키를 대괄호로 꺼냈어요. CSV를 읽을 때 나면 파일의 열 이름(첫 줄)이 코드의 이름과 다른 거예요.', bad:'d = {"a": 1}\nprint(d["b"])', fix:'d.get("b", 0)처럼 get을 쓰거나, if "b" in d: 로 먼저 확인하세요.' },
   { name:'ZeroDivisionError', title:'0으로 나눔', why:'0으로 나눌 수는 없어요. 나누는 수가 변수라면 0이 들어온 거예요.', bad:'print(10 / 0)', fix:'나누기 전에 if b != 0: 으로 확인하거나 except ZeroDivisionError로 받으세요.' },
   { name:'AttributeError', title:'속성 오류', why:'그 값에 없는 메서드나 속성을 불렀어요. 리스트에 upper()를 쓰거나 메서드 이름에 오타가 있을 때 나요.', bad:'nums = [1, 2]\nnums.add(3)', fix:'리스트에 추가는 append예요. 값의 종류에 맞는 메서드인지 확인하세요.\nnums.append(3)' },
   { name:'ModuleNotFoundError', title:'모듈 없음', why:'import한 이름의 모듈이 없어요. 오타이거나 설치되지 않은 모듈이에요.', bad:'import ramdom', fix:'이름을 확인하세요: import random' },

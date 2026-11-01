@@ -98,6 +98,9 @@ with sync_playwright() as p:
     pg.goto(HUB); pg.wait_for_timeout(500); check(pg.evaluate('document.documentElement.scrollWidth')<=390, '허브 가로 스크롤 없음'); pg.screenshot(path=SHOT+'/hub_m.png', full_page=True)
     pg.goto(COURSE+'#problem/L13P1'); pg.wait_for_timeout(1200); pg.evaluate("Loader.minimized=true;Loader.render()"); pg.click('.pv-tabs button[data-t="work"]'); pg.wait_for_timeout(300)
     check(pg.evaluate('document.documentElement.scrollWidth')<=390, '코스 페이지 가로 스크롤 없음'); pg.screenshot(path=SHOT+'/course_m.png')
+    pg.goto(ALGO+'#problem/A5P2'); pg.wait_for_timeout(1200); pg.evaluate("Loader.minimized=true;Loader.render()"); pg.click('.pv-tabs button[data-t="work"]'); pg.wait_for_timeout(300)
+    check(pg.evaluate('document.documentElement.scrollWidth')<=390, '알고리즘 문제 화면 가로 스크롤 없음(390px)')
+    pg.goto(ALGO+'#lesson/AB4'); pg.wait_for_timeout(800); pg.evaluate("Store.data.settings.unlockAll=true;UI.go('lesson',{lessonId:'AB4'})"); pg.wait_for_timeout(400); check(pg.locator('#mockStart').count()==1 and pg.evaluate('document.documentElement.scrollWidth')<=390, '모의고사 안내 화면 모바일')
     # ---- 4. 예전 주소
     pg.goto('file://'+os.path.join(ROOT,'python_academy.html')); pg.wait_for_timeout(800); check(pg.url.endswith('courses/python/index.html') or '/courses/python/' in pg.url, '예전 주소 → 코스 페이지 리다이렉트 ('+pg.url[-40:]+')')
     b.close()
