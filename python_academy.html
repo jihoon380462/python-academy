@@ -203,7 +203,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '1.0.8',
+  APP_VERSION: '1.0.9',
   SAVE_KEY: 'python_academy_save',
   SCHEMA_VERSION: 1,
 
@@ -1807,7 +1807,7 @@ const UI = {
     });
   },
   async confirm(msg, ok = '확인', cancel = '취소') { const r = await this.modal({ title: '확인', body: `<p>${msg}</p>`, buttons: [{ label: cancel, value: false }, { label: ok, cls: 'primary', value: true }] }); return r === true; },
-  prompt(title, placeholder = '', value = '') { return new Promise(resolve => { const ov = document.createElement('div'); ov.className = 'modal-ov'; ov.innerHTML = `<div class="modal"><div class="modal-title">${title}</div><div class="modal-body"><input class="input" placeholder="${esc(placeholder)}" value="${esc(value)}" maxlength="40"></div><div class="modal-btns"><button class="btn" data-a="c">${T.close}</button><button class="btn primary" data-a="ok">${T.save}</button></div></div>`; document.body.appendChild(ov); const inp = $('input', ov); setTimeout(() => inp.focus(), 50); const done = (v) => { ov.remove(); resolve(v); }; $('[data-a=c]', ov).onclick = () => done(null); $('[data-a=ok]', ov).onclick = () => done(inp.value.trim() || null); inp.onkeydown = (e) => { if (e.key === 'Enter') done(inp.value.trim() || null); }; }); },
+  prompt(title, placeholder = '', value = '', opt = {}) { return new Promise(resolve => { const ov = document.createElement('div'); ov.className = 'modal-ov'; ov.innerHTML = `<div class="modal"><div class="modal-title">${title}</div><div class="modal-body">${opt.hint ? `<p class="muted" style="margin:0 0 8px;font-size:.92em;line-height:1.5">${opt.hint}</p>` : ''}<input class="input" placeholder="${esc(placeholder)}" value="${esc(value)}" maxlength="40" autocomplete="off" spellcheck="false"></div><div class="modal-btns"><button class="btn" data-a="c">${opt.cancel || T.close}</button><button class="btn primary" data-a="ok">${opt.ok || T.save}</button></div></div>`; document.body.appendChild(ov); const inp = $('input', ov); setTimeout(() => inp.focus(), 50); const done = (v) => { ov.remove(); resolve(v); }; $('[data-a=c]', ov).onclick = () => done(null); $('[data-a=ok]', ov).onclick = () => done(inp.value.trim() || null); inp.onkeydown = (e) => { if (e.key === 'Enter') done(inp.value.trim() || null); }; }); },
   isMobile() { return innerWidth < 768; },
   applyTheme() { const s = Store.data.settings; document.documentElement.dataset.theme = s.theme; document.documentElement.dataset.font = s.font; document.documentElement.dataset.anim = s.anim; const et = INVENTORY.editorTheme.find(x => x.id === s.editorTheme) || INVENTORY.editorTheme[0]; for (const k in et.css) document.documentElement.style.setProperty('--ed-' + k, et.css[k]); },
   go(view, params = {}, push = true) { if (push && this.view) this.history.push([this.view, this.params]); this.view = view; this.params = params; if (this.current && this.current.destroy) try { this.current.destroy(); } catch (e) {} this.current = null; Tutor.ui && Tutor.ui.close(); const root = $('#view'); root.className = 'view-' + view; root.scrollTop = 0; window.scrollTo(0, 0); const V = Views[view]; const seq = ++this._seq; const res = V(root, params); if (seq !== this._seq) return; /* 뷰 안에서 다른 화면으로 넘어간 경우 */ this.current = res || null; this.renderTopbar(); },
@@ -1936,6 +1936,12 @@ const Blocks = {
   },
   gen() { return (window.python && python.pythonGenerator) || Blockly.Python; },
   setup() {
+    // Blockly 기본 창(window.prompt/confirm/alert) 대신 앱 안의 모달 사용 — 변수 만들기/이름 바꾸기/지우기
+    try {
+      Blockly.dialog.setPrompt((msg, def, cb) => { const isNew = !def; UI.prompt(isNew ? '🧰 새 변수 만들기' : '✏️ 변수 이름 바꾸기', '예: age, name, score', def || '', { ok: isNew ? '만들기' : '바꾸기', cancel: '취소', hint: '변수는 값을 담아 두는 <b>이름표 붙은 상자</b>예요.<br>영어 소문자로 짓고 띄어쓰기 대신 _ 를 쓰세요. (예: <code>my_age</code>)' }).then(v => cb(v === null ? null : v.replace(/\s+/g, '_'))); });
+      Blockly.dialog.setConfirm((msg, cb) => { UI.confirm(msg, '확인', '취소').then(cb); });
+      Blockly.dialog.setAlert((msg, cb) => { UI.modal({ title: '알림', body: `<p>${esc(msg)}</p>` }).then(() => cb && cb()); });
+    } catch (e) { console.info('Blockly dialog override skipped', e); }
     const gen = this.gen(); const Order = (window.python && python.Order) || { ATOMIC: 0, FUNCTION_CALL: 2.2, MEMBER: 2.1, MULTIPLICATIVE: 5, NONE: 99 };
     gen.INDENT = '    ';
     const origInit = gen.init.bind(gen); gen.init = (ws) => { origInit(ws); gen.definitions_['variables'] = ''; };
