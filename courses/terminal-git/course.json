@@ -1,0 +1,1 @@
+{ "id": "terminal-git", "name": "터미널·Git", "icon": "🎧", "desc": "검은 창이 무섭지 않게. 가상 터미널과 Git 시뮬레이터", "runner": "shell", "mapColor": "#607d8b", "mascotGear": "headset", "requires": { "course": "python", "boss": "B2" } }
