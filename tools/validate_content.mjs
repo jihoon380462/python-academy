@@ -23,11 +23,14 @@ for (const id of courses()) {
     if (p.vary) for (const [k, v] of Object.entries(p.vary)) if (!Array.isArray(v) || v.length !== 2) err(`${where}: vary.${k}는 [lo, hi]`);
     if (p.runner && !['python', 'sql', 'shell', 'web', 'none'].includes(p.runner)) err(`${where}: runner 값 오류 ${p.runner}`);
     if (p.grader && !['stdout', 'return', 'state', 'custom'].includes(p.grader)) err(`${where}: grader 값 오류 ${p.grader}`);
+    if (p.project) { if (!Array.isArray(p.project.steps) || !p.project.steps.length) err(`${where}: project.steps 배열 필요`); else { const stages = new Set((p.tests || []).map(t => t.stage).filter(s => s != null)); for (const s of stages) if (!(Number.isInteger(s) && s >= 0 && s < p.project.steps.length)) err(`${where}: tests[].stage ${s} 가 steps 범위 밖`); const practical = (c.LESSONS.find(l => l.id === p.lesson) || {}).practical; if (practical) { for (let i = 0; i < p.project.steps.length; i++) if (!stages.has(i)) err(`${where}: 단계 ${i}를 검사하는 테스트가 없음`); if ((p.xp || 0) < p.project.steps.length * 25) err(`${where}: 실전 프로젝트 xp는 단계수×25 이상`); } } }
+    if (p.files) { if (p.files.upload && !(p.files.upload.name && typeof p.files.upload.sample === 'string')) err(`${where}: files.upload 에 name·sample 필요`); if (p.files.outputs && !Array.isArray(p.files.outputs)) err(`${where}: files.outputs 는 배열`); for (const t of (p.tests || [])) if (t.outFile && !(p.files.outputs || []).includes(t.outFile)) err(`${where}: test.outFile ${t.outFile} 가 files.outputs 에 없음`); }
   }
   for (const gid of Object.keys(c.GUIDES)) if (!pids.has(gid)) err(`${id}: GUIDES에 없는 문제 ${gid}`);
   const termSet = Object.assign({}, c.GLOSSARY); c.LESSONS.forEach(l => Object.assign(termSet, l.terms || {}));
   for (const l of c.LESSONS) (l.pages || []).forEach((pg, i) => { for (const m of (pg.html || '').matchAll(/\[\[([^\]]+)\]\]/g)) if (!(m[1] in termSet)) err(`${id}: 레슨 ${l.id} p${i} 용어 [[${m[1]}]] 가 용어집에 없음`); });
   const cfgCourse = (c.CONFIG.COURSES || []).find(x => x.id === id); if (cfgCourse && cfgCourse.ready) { if (cfgCourse.total !== c.PROBLEMS.length) err(`${id}: CONFIG.COURSES total ${cfgCourse.total} ≠ 실제 문제 수 ${c.PROBLEMS.length} (core/config.js 갱신)`); if (cfgCourse.lessons !== c.LESSONS.length) err(`${id}: CONFIG.COURSES lessons ${cfgCourse.lessons} ≠ 실제 레슨 수 ${c.LESSONS.length}`); }
+  for (const l of c.LESSONS) if (l.practical && !c.PROBLEMS.some(p => p.lesson === l.id && p.project)) err(`${id}: 실전 레슨 ${l.id} 에 project 문제가 없음`);
   for (const p of c.PROBLEMS) if (p.boss) { const tests = p.type === 'bug' ? p.bug.tests : p.tests; if (tests && tests.length < 5) err(`${id}/${p.id}: 보스 테스트 5개 미만`); }
   totals.lessons += c.LESSONS.length; totals.problems += c.PROBLEMS.length;
   console.log(`✓ ${id}: 레슨 ${c.LESSONS.length} · 문제 ${c.PROBLEMS.length} · 가이드 ${Object.keys(c.GUIDES).length}`);

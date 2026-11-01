@@ -56,6 +56,12 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('problem',{pid:'L5P2',lessonId:'L5'})"); pg.wait_for_timeout(300); check(pg.locator('.pz-tile.pz-ans').count()==1 and pg.locator('.pz-bank .pz-tile').count()>0, 'Parsons 렌더 + 저장된 배치 복원')
     pg.evaluate("UI.go('problem',{pid:'L13P1',lessonId:'L13'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('#pvIn').count()==1, '텍스트 문제 에디터(폴백)+입력칸')
     pg.evaluate("UI.go('problem',{pid:'L1P1',lessonId:'L1'})"); pg.wait_for_timeout(1200); check('블록' in pg.locator('.bed').inner_text(), '블록 문제 (CDN 없음 → 안내 문구)')
+    # 실전 챕터 6 (v2.2.0): 프로젝트 체크리스트·단계 칩·파일 업로드 UI·마스터 뱃지
+    pg.evaluate("Store.data.settings.unlockAll=true; UI.go('problem',{pid:'X1P1',lessonId:'X1'})"); pg.wait_for_timeout(600)
+    check(pg.locator('#btnUpload').count()==1 and pg.locator('#pvFile').count()==1, '실전: 📎 CSV 업로드 버튼')
+    check(pg.locator('.pv-tests .chip').count()>=4 or '단계' in pg.locator('#view').inner_text(), '실전: 테스트에 단계 칩')
+    check(pg.evaluate("CHAPTERS.some(c=>c.ch===6&&c.name==='실전') && LESSONS.filter(l=>l.practical).length===2"), '실전 챕터 6 · practical 레슨 2개')
+    pg.evaluate("Store.data.settings.unlockAll=false")
     for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','playground']:
         pg.evaluate(f"UI.go('{v}')"); pg.wait_for_timeout(300); check(len(pg.locator('#view').inner_text())>10, f'화면 {v}')
     pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300)
@@ -78,6 +84,7 @@ with sync_playwright() as p:
         if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
     check(pg.locator('.result.ok').count()==1, '2단계 정답 → 클리어')
     pg.evaluate("UI.go('problem',{pid:'A5P2',lessonId:'A5'})"); pg.wait_for_timeout(500); check(pg.locator('#btnViz').count()==1, '코드 문제: 👀 시각화 버튼')
+    pg.evaluate("Store.data.settings.unlockAll=true; UI.go('problem',{pid:'E1P1',lessonId:'E1'})"); pg.wait_for_timeout(600); check(pg.locator('#btnViz').count()==1 and pg.evaluate("CHAPTERS.some(c=>c.ch===5&&c.name==='실전')"), '알고 실전 E1P1: 격자 시각화 버튼 + 챕터 E'); pg.evaluate("Store.data.settings.unlockAll=false")
     pg.evaluate("UI.go('lesson',{lessonId:'AB4'})"); pg.wait_for_timeout(300); check(pg.evaluate("UI.view")=='mock' and pg.locator('#mockStart').count()==1, '보스 AB4 → 모의고사 화면')
     pg.evaluate("UI.go('problem',{pid:'AB4P1',lessonId:'AB4'})"); pg.wait_for_timeout(400); check('입력 형식' in pg.locator('.pv-prompt').inner_text() and '코딩테스트' in pg.locator('.pv-head').inner_text(), '코딩테스트 형식 문제')
     pg.evaluate("UI.go('playground')"); pg.wait_for_timeout(300); check(pg.locator('[data-m="block"]').count()==0, '놀이터에 블록 탭 없음')

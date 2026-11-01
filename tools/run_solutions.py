@@ -25,14 +25,19 @@ import atexit
 atexit.register(lambda: sys.stderr.write('__SEGS__'+str(len(_s['segs']))+'\\n'))
 '''
 def norm(s): return '\n'.join(l.rstrip() for l in s.replace('\r','').split('\n')).strip('\n')
-def run(code, stdin='', call=None, turtle=False):
+def run(code, stdin='', call=None, turtle=False, files=None, out_files=None):
     src = (TURTLE_SHIM if turtle else '') + code
     if call: src += '\nprint("__RET__", repr(' + call + '))'
     with tempfile.TemporaryDirectory() as d:
         f=os.path.join(d,'s.py'); open(f,'w',encoding='utf-8').write(src)
+        for fl in (files or []): open(os.path.join(d,fl['name']),'w',encoding='utf-8').write(fl['text'])
         try:
             r=subprocess.run([sys.executable,'-I',f],input=stdin,capture_output=True,text=True,timeout=10,cwd=d)
-        except subprocess.TimeoutExpired: return None,'TIMEOUT',None
+        except subprocess.TimeoutExpired: return None,'TIMEOUT',None,None
+        outf={}
+        for name in (out_files or []):
+            fp=os.path.join(d,name)
+            if os.path.exists(fp): outf[name]=open(fp,encoding='utf-8').read()
         out=r.stdout; ret=None
         if call:
             m=re.search(r'__RET__ (.*)$', out.strip().split('\n')[-1]) if out.strip() else None
@@ -41,7 +46,7 @@ def run(code, stdin='', call=None, turtle=False):
         segs=None
         if turtle:
             m=re.search(r'__SEGS__(\d+)', r.stderr); segs=int(m.group(1)) if m else None
-        return out, r.stderr if r.returncode else '', ret if not turtle else segs
+        return out, r.stderr if r.returncode else '', ret if not turtle else segs, outf
 fails=[]; computed={}; table=[]
 for p in P:
     if p.get('runner') not in (None,'python'):
@@ -57,11 +62,14 @@ for p in P:
             if g.returncode: fails.append((p['id'],f'test{i+1} inputGen error: {g.stderr.strip()[-200:]}')); continue
             stdin=g.stdout
         t0=time.perf_counter()
-        out,err,extra=run(p['solution'], stdin , t.get('call'), p['turtle'])
+        files=t.get('files') or ([{'name':(p['files'].get('upload') or {}).get('name','data.csv'),'text':(p['files'].get('upload') or {}).get('sample','')}] if p.get('files') and p['files'].get('upload') else None)
+        out,err,extra,outf=run(p['solution'], stdin , t.get('call'), p['turtle'], files, (p.get('files') or {}).get('outputs'))
         el=time.perf_counter()-t0
         if p.get('limits') and p['limits'].get('time') and el>p['limits']['time']*0.5: fails.append((p['id'],f'test{i+1} 정답이 제한의 50%를 넘음 ({el:.2f}s > {p["limits"]["time"]*0.5:.2f}s)'))
         if err=='TIMEOUT': fails.append((p['id'],f'test{i+1} 시간 초과(5초)')); continue
         if err: fails.append((p['id'],f'test{i+1} error: {err.strip()[-300:]}')); continue
+        if t.get('outFile') and t['outFile'] not in outf: fails.append((p['id'],f'test{i+1} 정답이 {t["outFile"]} 파일을 만들지 않음'))
+        if t.get('stage') is not None and (not p.get('project') or t['stage']>=len(p['project']['steps'])): fails.append((p['id'],f'test{i+1} stage {t["stage"]} 가 project.steps 범위 밖'))
         if p['turtle']:
             if not extra: fails.append((p['id'],f'test{i+1} no segments')); continue
             continue

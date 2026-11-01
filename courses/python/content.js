@@ -872,3 +872,67 @@ const GUIDES = {
     { t: '<b>▶ 실행</b> → 1~5가 한 줄씩 나오면 <b>✔ 제출하기</b>.' },
   ],
 };
+
+// =====================================================================
+// === 챕터 6 실전 (v2.2.0, EXPANSION.md 9절 ② 층) — B5 클리어 시 해금. 레슨 1개 = 프로젝트 1개, 단계별 체크리스트 채점(tests[].stage)
+// =====================================================================
+CHAPTERS.push({ ch: 6, name: '실전', color: '#ffd166' });
+MAP_DECOR[6] = '🏆';
+LESSONS.push(
+{ id: 'X1', ch: 6, n: 19, practical: true, title: '실전 1: 내 CSV 분석기', minutes: 40, mode: 'text',
+  tutorSummary: '실전 프로젝트 1. csv 모듈로 파일을 읽어 딕셔너리 리스트로 만들고, 명령(요약/평균/반별/저장)에 따라 집계해 출력한다. 저장은 result.csv로 쓰고 앱에서 내려받는다. 사용자가 자기 CSV를 올릴 수 있다.',
+  terms: { 'CSV': '쉼표로 값을 나눈 표 파일. 엑셀에서 저장할 수 있다', '헤더': 'CSV의 첫 줄. 열 이름들' },
+  pages: [
+    { title: '뭘 만드나', html: '<p>엑셀 대신 <b>파이썬으로 표를 읽고 집계하는 도구</b>를 만들어요. 반 학생 점수표([[CSV]]) 파일을 읽어서 명령에 따라 ① 요약(몇 명, 어떤 열) ② 점수 합계·평균 ③ 반별 평균 ④ 결과를 <code>result.csv</code>로 저장까지.</p><p>완성하면 문제 화면의 <b>📎 내 CSV 파일 올리기</b>로 <b>진짜 내 파일</b>을 넣어 돌려 보고, <b>📥 내려받기</b>로 결과 파일을 받을 수 있어요. 엑셀에서 "다른 이름으로 저장 → CSV UTF-8"로 만든 파일이면 돼요.</p>',
+      example: { code: 'import csv\nwith open("data.csv", "w", encoding="utf-8") as f:\n    f.write("이름,반,점수\\n민수,1,85\\n지우,1,92\\n하늘,2,78\\n")\n\nwith open("data.csv", encoding="utf-8") as f:\n    rows = list(csv.DictReader(f))\nprint(len(rows), "명")\nprint(rows[0])\nprint(rows[0]["이름"], rows[0]["점수"])', trace: true } },
+    { title: '설계: csv.DictReader', html: '<p><code>csv.DictReader</code>는 첫 줄([[헤더]])을 열 이름으로 써서 <b>각 줄을 딕셔너리</b>로 읽어 줘요. <code>{"이름": "민수", "반": "1", "점수": "85"}</code> 처럼요. 값은 전부 <b>글자</b>라서 점수는 <code>int()</code>로 바꿔야 더할 수 있어요.</p><p>반별 집계는 레슨 10의 "없으면 0에서 시작" 패턴이에요: <code>sums[반] = sums.get(반, 0) + 점수</code>, 인원도 같이 세요.</p><p>저장은 <code>csv.writer</code>로: <code>w.writerow(["반", "인원", "평균"])</code> 다음 반마다 한 줄.</p>',
+      example: { code: 'import csv\nrows = [{"이름": "민수", "반": "1", "점수": "85"}, {"이름": "하늘", "반": "2", "점수": "78"}, {"이름": "유나", "반": "1", "점수": "95"}]\nsums = {}\ncounts = {}\nfor r in rows:\n    c = r["반"]\n    sums[c] = sums.get(c, 0) + int(r["점수"])\n    counts[c] = counts.get(c, 0) + 1\nfor c in sorted(sums):\n    print(f"{c}반 평균: {sums[c] / counts[c]:.1f}")', trace: true } },
+    { title: '명령으로 나누기', html: '<p>프로그램은 첫 줄에 <b>명령</b>을 입력받아 그에 맞는 분석만 출력해요. 그래야 단계별로 채점할 수 있어요.</p><ul><li><code>요약</code> → <code>5명</code>, <code>열: 이름, 반, 점수</code></li><li><code>평균</code> → <code>합계: 438</code>, <code>평균: 87.6</code></li><li><code>반별</code> → <code>1반 평균: 90.7</code> …(반 번호 오름차순)</li><li><code>저장</code> → <code>result.csv</code>에 <code>반,인원,평균</code> 표를 쓰고 <code>저장 완료</code> 출력</li></ul><p>단계가 통과될 때마다 체크리스트가 자동으로 체크돼요. 네 단계 다 되면 완성!</p>',
+      example: { code: 'cmd = input()\nif cmd == "요약":\n    print("요약을 출력할 자리")\nelif cmd == "평균":\n    print("평균을 출력할 자리")\nelse:\n    print("모르는 명령:", cmd)', stdin: '요약', trace: true } },
+  ],
+  summary: ['csv.DictReader로 줄마다 딕셔너리, 값은 글자라 int()로', '그룹 집계 = sums.get(k, 0) + v, counts.get(k, 0) + 1', 'csv.writer로 결과 파일 저장 → 📥 내려받기'] },
+{ id: 'X2', ch: 6, n: 20, practical: true, title: '실전 2: 단어 암기 퀴즈', minutes: 40, mode: 'text',
+  tutorSummary: '실전 프로젝트 2. 단어 파일(words.csv)을 Card 객체 리스트로 읽고, 명령 루프(목록/퀴즈 seed/복습/끝)로 동작. 퀴즈는 random.seed 후 shuffle, 답을 input으로 받아 채점, 틀린 단어를 wrong.csv에 저장해 복습에 재출제.',
+  terms: { '단어장': '영어 단어와 뜻을 모아 둔 파일' },
+  pages: [
+    { title: '뭘 만드나', html: '<p>단어 파일을 읽어 <b>랜덤 순서로 퀴즈</b>를 내고, 틀린 단어만 모아 <b>다시 출제</b>하는 암기 도구예요. 레슨 14~17에서 배운 클래스·random·파일을 한 번에 써요.</p><p>명령을 한 줄씩 입력받아요: <code>목록</code> · <code>퀴즈 7</code>(7은 random.seed 값) · <code>복습</code> · <code>끝</code>. 퀴즈 중에는 질문이 나올 때마다 답을 한 줄 입력해요.</p>',
+      example: { code: 'import csv\nwith open("words.csv", "w", encoding="utf-8") as f:\n    f.write("apple,사과\\nbook,책\\ncat,고양이\\n")\n\nclass Card:\n    def __init__(self, eng, kor):\n        self.eng = eng\n        self.kor = kor\n\ncards = []\nwith open("words.csv", encoding="utf-8") as f:\n    for eng, kor in csv.reader(f):\n        cards.append(Card(eng, kor))\nprint(len(cards), "장")\nprint(cards[1].eng, cards[1].kor)', trace: true } },
+    { title: '설계: 카드와 덱', html: '<p><code>Card</code>는 영어·뜻 두 속성. <code>Deck</code>은 카드 리스트를 들고 <code>shuffle(seed)</code>(<code>random.seed(seed)</code> 뒤 <code>random.shuffle</code>)과 <code>quiz()</code>를 가져요. 퀴즈는 <b>뜻을 보여 주고 영어를 입력</b>받아요.</p><ul><li>맞으면 <code>정답</code>, 틀리면 <code>오답 (정답: apple)</code></li><li>끝나면 <code>점수: 2/3</code></li><li>틀린 카드는 <code>wrong.csv</code>에 <code>eng,kor</code>로 저장(없으면 빈 파일)</li></ul><p><code>복습</code>은 <code>wrong.csv</code>를 읽어 <b>파일 순서 그대로</b>(섞지 않고) 다시 퀴즈를 내고, 여전히 틀린 것만 다시 저장해요. 틀린 게 없으면 <code>틀린 단어가 없어요</code>.</p>',
+      example: { code: 'import random\nwords = ["apple", "book", "cat", "dog"]\nrandom.seed(7)\nrandom.shuffle(words)\nprint(words)\nrandom.seed(7)\nwords2 = ["apple", "book", "cat", "dog"]\nrandom.shuffle(words2)\nprint(words2 == words, "- 같은 씨앗이면 같은 순서")', trace: true } },
+  ],
+  summary: ['Card(eng, kor) 객체 리스트 = 단어장', 'random.seed(n) 뒤 shuffle → 재현 가능한 섞기', '틀린 것만 wrong.csv에 저장했다가 복습에 재출제'] },
+);
+PROBLEMS.push(
+{ id: 'X1P1', lesson: 'X1', type: 'code', title: '프로젝트: 내 CSV 분석기', xp: 120, tags: ['파일', '딕셔너리', '모듈'],
+  prompt: '<p><code>data.csv</code>(열: <code>이름,반,점수</code>)를 읽고, 첫 줄에 입력된 <b>명령</b>에 따라 출력하세요.</p><ul><li><code>요약</code> → 첫 줄 <code>N명</code>, 둘째 줄 <code>열: 이름, 반, 점수</code></li><li><code>평균</code> → <code>합계: S</code>, <code>평균: A</code> (소수 첫째 자리까지, <code>round(…, 1)</code>)</li><li><code>반별</code> → 반 번호 오름차순으로 <code>1반 평균: 90.7</code> (소수 첫째 자리)</li><li><code>저장</code> → <code>result.csv</code>에 헤더 <code>반,인원,평균</code>과 반별 한 줄(평균은 소수 첫째 자리)을 쓰고 <code>저장 완료</code> 출력</li></ul><p>📎 로 내 CSV를 올리면 그 파일로 실행돼요(열 이름은 같아야 해요).</p>',
+  project: { steps: ['요약: 몇 명, 어떤 열인지 출력 (csv.DictReader)', '평균: 점수 합계와 평균', '반별: 반마다 평균 (딕셔너리 집계)', '저장: result.csv로 쓰고 내려받기'] },
+  files: { upload: { name: 'data.csv', accept: '.csv,text/csv', label: '내 CSV 파일 올리기', sample: '이름,반,점수\n민수,1,85\n지우,1,92\n하늘,2,78\n서준,2,88\n유나,1,95\n' }, outputs: ['result.csv'] },
+  inputExample: '요약',
+  starter: 'import csv\n\ncmd = input()\nwith open("data.csv", encoding="utf-8") as f:\n    reader = csv.DictReader(f)\n    header = reader.fieldnames\n    rows = list(reader)\n\nif cmd == "요약":\n    # N명 / 열: 이름, 반, 점수\n    pass\nelif cmd == "평균":\n    # 합계: S / 평균: A\n    pass\nelif cmd == "반별":\n    # 1반 평균: 90.7 ...\n    pass\nelif cmd == "저장":\n    # result.csv 쓰고 "저장 완료"\n    pass\n',
+  solution: 'import csv\n\ncmd = input()\nwith open("data.csv", encoding="utf-8") as f:\n    reader = csv.DictReader(f)\n    header = reader.fieldnames\n    rows = list(reader)\n\ndef by_class():\n    sums = {}\n    counts = {}\n    for r in rows:\n        c = r["반"]\n        sums[c] = sums.get(c, 0) + int(r["점수"])\n        counts[c] = counts.get(c, 0) + 1\n    return sums, counts\n\nif cmd == "요약":\n    print(f"{len(rows)}명")\n    print("열: " + ", ".join(header))\nelif cmd == "평균":\n    total = sum(int(r["점수"]) for r in rows)\n    print("합계:", total)\n    print("평균:", round(total / len(rows), 1))\nelif cmd == "반별":\n    sums, counts = by_class()\n    for c in sorted(sums, key=int):\n        print(f"{c}반 평균: {sums[c] / counts[c]:.1f}")\nelif cmd == "저장":\n    sums, counts = by_class()\n    with open("result.csv", "w", encoding="utf-8", newline="") as f:\n        w = csv.writer(f)\n        w.writerow(["반", "인원", "평균"])\n        for c in sorted(sums, key=int):\n            w.writerow([c, counts[c], f"{sums[c] / counts[c]:.1f}"])\n    print("저장 완료")',
+  tests: [
+    { stage: 0, input: '요약', output: '5명\n열: 이름, 반, 점수' },
+    { stage: 1, input: '평균', output: '합계: 438\n평균: 87.6' },
+    { stage: 2, input: '반별', output: '1반 평균: 90.7\n2반 평균: 83.0' },
+    { stage: 3, input: '저장', output: '저장 완료', outFile: 'result.csv' },
+    { stage: 2, input: '반별', files: [{ name: 'data.csv', text: '이름,반,점수\n가,3,100\n나,1,50\n다,3,80\n라,10,70\n' }], output: '1반 평균: 50.0\n3반 평균: 90.0\n10반 평균: 70.0' },
+    { stage: 3, input: '저장', files: [{ name: 'data.csv', text: '이름,반,점수\n가,3,100\n나,1,50\n다,3,80\n' }], output: '저장 완료', outFile: 'result.csv' },
+  ],
+  hints: ['요약: len(rows)와 reader.fieldnames 를 ", ".join 으로', '반별: sums[c] = sums.get(c, 0) + int(점수), counts도 같이. 반 번호는 글자라 sorted(sums, key=int)', '저장: with open("result.csv","w",encoding="utf-8",newline="") as f: w = csv.writer(f); w.writerow([...]) → 끝에 print("저장 완료")'] },
+{ id: 'X2P1', lesson: 'X2', type: 'code', title: '프로젝트: 단어 암기 퀴즈', xp: 120, tags: ['클래스', '파일', '모듈'],
+  prompt: '<p><code>words.csv</code>(줄마다 <code>english,뜻</code>)를 <code>Card</code> 객체 리스트로 읽고, 명령을 한 줄씩 처리하세요(<code>끝</code>이면 종료).</p><ul><li><code>목록</code> → <code>단어 N개</code> 다음 파일 순서대로 <code>apple - 사과</code></li><li><code>퀴즈 S</code> → <code>random.seed(S)</code> 후 카드 복사본을 <code>random.shuffle</code>. 카드마다 <code>Q: 뜻</code> 출력 → 답 한 줄 입력 → <code>정답</code> 또는 <code>오답 (정답: apple)</code>. 끝에 <code>점수: 맞힌수/전체</code>. 틀린 카드를 <code>wrong.csv</code>에 <code>english,뜻</code>으로 저장(틀린 게 없으면 빈 파일)</li><li><code>복습</code> → <code>wrong.csv</code>가 없거나 비었으면 <code>틀린 단어가 없어요</code>. 아니면 그 카드들을 <b>파일 순서대로</b> 같은 형식으로 퀴즈, 끝에 점수 출력, 여전히 틀린 것만 다시 <code>wrong.csv</code>에 저장</li></ul>',
+  project: { steps: ['목록: 파일 → Card 객체 리스트 (csv.reader)', '퀴즈: seed로 섞고 뜻 보여 주며 답 받기', '채점과 wrong.csv 저장', '복습: 틀린 단어만 다시 출제'] },
+  files: { upload: { name: 'words.csv', accept: '.csv,.txt,text/csv', label: '내 단어장 올리기', sample: 'apple,사과\nbook,책\ncat,고양이\ndog,개\n' }, outputs: ['wrong.csv'] },
+  inputExample: '목록\n끝',
+  starter: 'import csv\nimport random\n\nclass Card:\n    def __init__(self, eng, kor):\n        self.eng = eng\n        self.kor = kor\n\ndef load(path):\n    cards = []\n    # path 파일을 읽어 Card 리스트로\n    return cards\n\ndef quiz(cards):\n    # 카드마다 "Q: 뜻" 출력 → input() → 정답/오답, 끝에 점수. 틀린 카드 리스트를 돌려주기\n    wrong = []\n    return wrong\n\ndef save_wrong(cards):\n    # wrong.csv에 eng,kor 저장 (없으면 빈 파일)\n    pass\n\ndeck = load("words.csv")\nwhile True:\n    cmd = input().split()\n    if cmd[0] == "끝":\n        break\n    # 목록 / 퀴즈 S / 복습\n',
+  solution: 'import csv\nimport random\n\nclass Card:\n    def __init__(self, eng, kor):\n        self.eng = eng\n        self.kor = kor\n\ndef load(path):\n    cards = []\n    try:\n        with open(path, encoding="utf-8") as f:\n            for row in csv.reader(f):\n                if len(row) >= 2 and row[0].strip():\n                    cards.append(Card(row[0].strip(), row[1].strip()))\n    except FileNotFoundError:\n        pass\n    return cards\n\ndef quiz(cards):\n    wrong = []\n    correct = 0\n    for c in cards:\n        print("Q:", c.kor)\n        ans = input().strip()\n        if ans == c.eng:\n            print("정답")\n            correct += 1\n        else:\n            print(f"오답 (정답: {c.eng})")\n            wrong.append(c)\n    print(f"점수: {correct}/{len(cards)}")\n    return wrong\n\ndef save_wrong(cards):\n    with open("wrong.csv", "w", encoding="utf-8", newline="") as f:\n        w = csv.writer(f)\n        for c in cards:\n            w.writerow([c.eng, c.kor])\n\ndeck = load("words.csv")\nwhile True:\n    cmd = input().split()\n    if cmd[0] == "끝":\n        break\n    if cmd[0] == "목록":\n        print(f"단어 {len(deck)}개")\n        for c in deck:\n            print(f"{c.eng} - {c.kor}")\n    elif cmd[0] == "퀴즈":\n        random.seed(int(cmd[1]))\n        cards = list(deck)\n        random.shuffle(cards)\n        save_wrong(quiz(cards))\n    elif cmd[0] == "복습":\n        wrongs = load("wrong.csv")\n        if not wrongs:\n            print("틀린 단어가 없어요")\n        else:\n            save_wrong(quiz(wrongs))',
+  tests: [
+    { stage: 0, input: '목록\n끝', output: '단어 4개\napple - 사과\nbook - 책\ncat - 고양이\ndog - 개' },
+    { stage: 1, inputGen: "'퀴즈 7\\n' + '\\n'.join(__import__('random').seed(7) or (lambda ws: (__import__('random').shuffle(ws), ws)[1])(['apple','book','cat','dog'])) + '\\n끝'", output: '__COMPUTED__' },
+    { stage: 2, input: '퀴즈 3\nx\nx\nx\nx\n끝', output: '__COMPUTED__', outFile: 'wrong.csv' },
+    { stage: 3, input: '복습\n끝', output: '틀린 단어가 없어요' },
+    { stage: 3, inputGen: "'퀴즈 1\\nx\\nx\\nx\\nx\\n복습\\n' + '\\n'.join(__import__('random').seed(1) or (lambda ws: (__import__('random').shuffle(ws), ws)[1])(['apple','book','cat','dog'])) + '\\n복습\\n끝'", output: '__COMPUTED__', outFile: 'wrong.csv' },
+    { stage: 0, input: '목록\n끝', files: [{ name: 'words.csv', text: 'sun,해\nmoon,달\n' }], output: '단어 2개\nsun - 해\nmoon - 달' },
+  ],
+  hints: ['load: csv.reader(f)로 줄마다 [eng, kor] → Card(eng, kor)', '퀴즈: random.seed(int(cmd[1])); cards = list(deck); random.shuffle(cards) → 섞은 복사본으로 quiz()', '복습: load("wrong.csv")가 비면 "틀린 단어가 없어요", 아니면 quiz() 후 save_wrong(틀린 것)'] },
+);

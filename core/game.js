@@ -32,6 +32,7 @@ const Game = {
     if (!wasClear) { rec.firstTry = !!firstTry; this.stat('clears'); if (firstTry) this.stat('firstTryClears'); if (rec.fails >= 5) this.stat('fail5Clear'); if (rec.hadError) this.stat('errorsOvercome'); }
     if (hints === 0 && !rec.answerSeen) { this.noHintStreak++; this.statMax('noHintStreak', this.noHintStreak); } else this.noHintStreak = 0;
     if (mode === 'text' && p.type === 'code') this.stat('textClears'); if (p.type === 'parsons') this.stat('parsonsClears');
+    { const ll = Content.lesson(p.lesson); if (ll && ll.practical) { const allPr = PROBLEMS.filter(q => (Content.lesson(q.lesson) || {}).practical); if (allPr.every(q => q.id === p.id || Store.prob(q.id).status === 'clear')) this.stat('master_' + Store.course); } } // 실전 챕터 전부 클리어 → 코스 마스터
     if (p.boss && !p.mock && Content.problemsOf(p.lesson).every(q => q.id === p.id || Store.prob(q.id).status === 'clear')) { d.stats['boss_' + p.lesson] = 1; this.stat('bossClears'); if (Store.course === 'algo' && !d.lessons['bossMarked_' + p.lesson]) { d.lessons['bossMarked_' + p.lesson] = 1; this.stat('algoBosses'); } }
     if (usedTutor) this.stat('tutorBreakthrough');
     const h = new Date().getHours(); if (h >= 0 && h < 4) this.stat('nightClear');

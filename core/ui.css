@@ -33,6 +33,7 @@ select{padding:8px 10px;border-radius:8px;border:1px solid var(--border);backgro
 .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}.chip{padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--mono);font-size:.9em;min-height:32px}.chip:hover,.chip.on{border-color:var(--primary);background:var(--primary);color:#fff}
 .only-mobile{display:none}@media (max-width:767px){.only-mobile{display:flex}.only-pc{display:none}}
 .tp-nokey{margin:8px 0;padding:10px 12px;border:1px dashed var(--primary);border-radius:10px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.pv-files{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0}
 .tb-sync{font-size:1.05em;color:var(--muted)}.tb-sync.ok{color:var(--accent)}.tb-sync.err{color:var(--warn)}.tb-sync.syncing{animation:spin 1s linear infinite}.tb-sync.dirty{color:var(--primary)}@keyframes spin{to{transform:rotate(360deg)}}
 .tb-title{flex:1;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tb-xp{display:flex;align-items:center;gap:6px;font-size:.85em}.tb-lv{font-weight:800;color:var(--gold)}.tb-xpn{color:var(--muted);font-size:.85em}

@@ -219,9 +219,13 @@ self.onmessage=(ev)=>{
     curId=m.id; inputLines=(m.input||'').replace(/\\r/g,'').split('\\n'); if(inputLines.length && inputLines[inputLines.length-1]==='' ) inputLines.pop(); inputIdx=0;
     let result;
     try{
+      // 파일 입출력: 실행 전에 업로드/고정 파일을 쓰고, 결과 파일은 지웠다가 실행 뒤 읽어 돌려준다
+      for(const f of (m.files||[])){ try{ pyodide.FS.writeFile(f.name, f.text||'', {encoding:'utf8'}); }catch(e){} }
+      for(const n of (m.outFiles||[])){ try{ pyodide.FS.unlink(n); }catch(e){} }
       const fn=pyodide.globals.get('__pa_run');
       const t0=Date.now(); const r=fn(m.code, m.call||null, !!m.trace, m.maxsteps||500, m.vis||null);
       result=JSON.parse(r); result.ms=Date.now()-t0; fn.destroy && fn.destroy();
+      if(m.outFiles&&m.outFiles.length){ result.outFiles={}; for(const n of m.outFiles){ try{ result.outFiles[n]=pyodide.FS.readFile(n,{encoding:'utf8'}); }catch(e){} } }
     }catch(e){ result={ok:false,ename:'InternalError',emsg:String(e&&e.message||e)}; }
     result.inputUsed=inputIdx;
     try{ pyodide.runPython('import sys; sys.stdout.flush(); sys.stderr.flush()'); }catch(e){}
@@ -278,7 +282,7 @@ const Py = {
       if (job.kind === 'compile') { try { result = JSON.parse(this.py.runPython('__pa_compile(' + JSON.stringify(job.code) + ')')); } catch (e) { result = { ok: true }; } }
       else {
         this.cur = job; this.inputLines = (job.input || '').replace(/\r/g, '').split('\n'); if (this.inputLines.length && this.inputLines[this.inputLines.length - 1] === '') this.inputLines.pop(); this.inputIdx = 0;
-        try { const t0 = Date.now(); const fn = this.py.globals.get('__pa_run'); const r = fn(job.code, job.call || null, !!job.trace, job.maxsteps || CONFIG.TRACE_MAX_STEPS, job.vis ? JSON.stringify(job.vis) : null); result = JSON.parse(r); result.ms = Date.now() - t0; fn.destroy && fn.destroy(); } catch (e) { result = { ok: false, ename: 'InternalError', emsg: String(e && e.message || e) }; }
+        try { for (const f of (job.files || [])) { try { this.py.FS.writeFile(f.name, f.text || '', { encoding: 'utf8' }); } catch (e) {} } for (const n of (job.outFiles || [])) { try { this.py.FS.unlink(n); } catch (e) {} } const t0 = Date.now(); const fn = this.py.globals.get('__pa_run'); const r = fn(job.code, job.call || null, !!job.trace, job.maxsteps || CONFIG.TRACE_MAX_STEPS, job.vis ? JSON.stringify(job.vis) : null); result = JSON.parse(r); result.ms = Date.now() - t0; fn.destroy && fn.destroy(); if (job.outFiles && job.outFiles.length) { result.outFiles = {}; for (const n of job.outFiles) { try { result.outFiles[n] = this.py.FS.readFile(n, { encoding: 'utf8' }); } catch (e) {} } } } catch (e) { result = { ok: false, ename: 'InternalError', emsg: String(e && e.message || e) }; }
         result.inputUsed = this.inputIdx; this.cur = null;
       }
       delete this.pending[id]; this.busy = false; job.resolve(result); this._next();
@@ -292,11 +296,11 @@ const Py = {
     if (this.main) return this._runMain(id, job);
     if (job.kind === 'run') {
       job.timer = setTimeout(() => { if (this.pending[id]) { delete this.pending[id]; job.resolve({ ok: false, ename: 'Timeout', emsg: T.timeout, timeout: true, ms: job.timeoutMs || CONFIG.RUN_TIMEOUT_MS }); this.restart(); } }, job.timeoutMs || CONFIG.RUN_TIMEOUT_MS);
-      this.worker.postMessage({ type: 'run', id, code: job.code, input: job.input, call: job.call, trace: job.trace, maxsteps: job.maxsteps || CONFIG.TRACE_MAX_STEPS, vis: job.vis ? JSON.stringify(job.vis) : null });
+      this.worker.postMessage({ type: 'run', id, code: job.code, input: job.input, call: job.call, trace: job.trace, maxsteps: job.maxsteps || CONFIG.TRACE_MAX_STEPS, vis: job.vis ? JSON.stringify(job.vis) : null, files: job.files || null, outFiles: job.outFiles || null });
     } else { this.worker.postMessage({ type: 'compile', id, code: job.code }); }
   },
-  run({ code, input = '', call = null, trace = false, onOut = null, vis = null, maxsteps = null, timeoutMs = null }) {
-    return new Promise(resolve => { this.queue.push({ kind: 'run', code, input, call, trace, onOut, vis, maxsteps, timeoutMs, resolve }); if (!this.worker && !this.main) this.start(); this._next(); });
+  run({ code, input = '', call = null, trace = false, onOut = null, vis = null, maxsteps = null, timeoutMs = null, files = null, outFiles = null }) {
+    return new Promise(resolve => { this.queue.push({ kind: 'run', code, input, call, trace, onOut, vis, maxsteps, timeoutMs, files, outFiles, resolve }); if (!this.worker && !this.main) this.start(); this._next(); });
   },
   // 기기 속도 보정: 같은 작업을 한 번 돌려 기준 시간과 비교 (알고리즘 코스 시간 제한 채점에 곱함). 1회만.
   speedFactor: 1, benched: false,
