@@ -2,11 +2,11 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.2.18',
+  APP_VERSION: '2.2.19',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
-    { id: 'python', name: '파이썬', icon: '🐍', desc: '블록에서 텍스트까지, 브라우저에서 진짜 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 114, lessons: 28 },
+    { id: 'python', name: '파이썬', icon: '🐍', desc: '블록에서 텍스트까지, 브라우저에서 진짜 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 141, lessons: 34 },
     { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '코드가 돌아가는 모습을 눈으로 보며, 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 105, lessons: 24, requires: { course: 'python', boss: 'B3', label: '파이썬 챕터 3까지 끝내면 열려요' } },
     { id: 'terminal-git', name: '터미널·Git', icon: '🎧', desc: '검은 창이 무섭지 않게. 가상 터미널과 Git 시뮬레이터', phase: 2 },
     { id: 'sql', name: '데이터베이스(SQL)', icon: '🗄️', desc: '동네 카페 데이터로 배우는 진짜 SQLite', phase: 3 },

@@ -29,7 +29,7 @@
 
 **검수 메모(2차)**: 2차 16장 중 6장(알고·SQL·웹 아이콘, 빈 작품, 알고 마스터 뱃지, 배너)에 **흰 스티커 테두리**가 있어 다크 테마에서 흰 띠로 보였음 → `tools/img_clean.py`로 투명 배경에 닿은 흰~회색 테두리를 지워 해결(내부 흰색은 윤곽선에 막혀 유지). 앞으로는 납품 전에 `python3 tools/img_clean.py --check`로 확인하고, 테두리가 있으면 `python3 tools/img_clean.py`(인자 없음)로 정리한 뒤 커밋. 배너는 아래 빈 공간을 잘라 1200×274가 됨 — 가로 배너는 **내용이 캔버스를 꽉 채우게** 그리는 편이 좋다.
 
-## 3. 요청 목록 — 3차 (다음에 만들 것, 총 16장)
+## 3. 요청 목록 — 3차 (다음에 만들 것, 총 17장)
 
 규칙은 1절 + 2절 검수 메모(흰 테두리 금지 — 바깥 윤곽선은 어두운 남색 `#1d2230`으로 끝나야 함).
 
@@ -44,6 +44,7 @@
 | A5 | `chapter-python-4.png` | 4 더 큰 프로그램 | 보라 톱니바퀴 2개 | `flat vector sticker of two interlocking purple gears (#9c27b0), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
 | A6 | `chapter-python-5.png` | 5 마무리 | 분홍 리본 메달 | `flat vector sticker of a pink ribbon rosette medal (#e91e63), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
 | A7 | `chapter-python-6.png` | 6 실전 | 금 트로피 | `flat vector sticker of a small golden trophy (#ffd166), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
+| A7b | `chapter-python-7.png` | 7 한 걸음 더 | 청록 망원경 | `flat vector sticker of a small teal telescope on a tripod (#00acc1), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
 | A8 | `chapter-algo-1.png` | 알고 1 들어가기 | 초록 나침반 | `flat vector sticker of a small green compass (#4caf50), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
 | A9 | `chapter-algo-2.png` | 2 찾고 정렬하기 | 파란 돋보기 + 막대 3개 | `flat vector sticker of a blue magnifying glass over three bars of increasing height (#2196f3), bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
 | A10 | `chapter-algo-3.png` | 3 연결된 구조 | 주황 사슬 고리 3개 | `flat vector sticker of three orange chain links (#ff9800) connected in a row, bold dark navy outline (#1d2230), no text, transparent background, centered, 8% margin` |
