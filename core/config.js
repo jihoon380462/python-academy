@@ -2,7 +2,7 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.2.4',
+  APP_VERSION: '2.2.5',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
@@ -67,6 +67,7 @@ const CONFIG = {
 
   // --- 선생님 (Claude API) ---
   TUTOR: {
+    enabled: false, // v2.2.5: 선생님(Claude API) 기능 전체 끔 — 버튼·설정 카드·리뷰 숨김. 켜려면 true (사용자 결정 2026-11-02)
     url: 'https://api.anthropic.com/v1/messages',
     version: '2023-06-01',
     defaultModel: 'claude-haiku-5-5',

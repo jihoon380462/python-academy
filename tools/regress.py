@@ -40,6 +40,7 @@ with sync_playwright() as p:
     check(pg.evaluate("Store.data.xp")==385 and pg.evaluate("localStorage.getItem('python_academy_save')") is None, '코스 페이지도 같은 v2 데이터')
     check(pg.locator('#pvCoach .coach').count()==1, '텍스트 코치 표시'); check(pg.locator('.pv.focus').count()==1, '집중 모드 유지')
     check(pg.locator('.tb-hub').count()==1, '상단바 허브 버튼')
+    check(pg.locator('#btnTutor').count()==0 and pg.locator('#lpAsk').count()==0, '선생님 기능 꺼짐: 버튼 없음 (CONFIG.TUTOR.enabled=false)')
     bundle=pg.evaluate("Store.exportBundle()"); check('academy-bundle' in bundle and 'academy.course.python' in bundle and 'apiKey' not in bundle, '백업 묶음 내보내기(F8, API 키 제외)')
     check(pg.evaluate("(()=>{const q=document.querySelector('#quickkeys'); return q && q.textContent.includes('⇤') && q.textContent.includes('input');})()"), '모바일 입력 칩 ⇤·input (F12)')
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('.node').count()>20, '지도 노드')
@@ -66,7 +67,7 @@ with sync_playwright() as p:
     pg.evaluate("Store.data.settings.unlockAll=true; UI.go('problem',{pid:'X3P1',lessonId:'X3'})"); pg.wait_for_timeout(500)
     check(pg.locator('#pvExtra').count()==1 and pg.locator('#pvExtra.hide').count()==1, '실전: 더 만들어 보기 카드(클리어 전 숨김)')
     pg.evaluate("Store.data.works.push({id:'w_t', name:'테스트 작품', code:'print(1)\\nprint(2)', src:'X1P1', course:'python', date:Date.now(), mode:'text', steps:4, total:4}); Store.save(); UI.go('works')"); pg.wait_for_timeout(300)
-    check(pg.locator('.work-card').count()>=1 and pg.locator('[data-review]').count()>=1 and '단계 4/4' in pg.locator('#view').inner_text(), '내 작품 갤러리: 프로젝트 카드 + 리뷰 버튼')
+    check(pg.locator('.work-card').count()>=1 and pg.locator('[data-review]').count()==0 and '단계 4/4' in pg.locator('#view').inner_text(), '내 작품 갤러리: 프로젝트 카드 (리뷰 버튼은 선생님 꺼짐으로 없음)')
     pg.evaluate("Store.data.settings.unlockAll=false")
     for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','playground','works']:
         pg.evaluate(f"UI.go('{v}')"); pg.wait_for_timeout(300); check(len(pg.locator('#view').inner_text())>10, f'화면 {v}')

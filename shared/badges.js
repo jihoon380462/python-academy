@@ -35,7 +35,7 @@ const BADGES = [
   { id:'theme', name:'분위기 전환', desc:'설정에서 테마를 바꿨어요', icon:'🌓', cond:['themeChanged',1] },
   { id:'works3', name:'창작자', desc:'내 작품 3개 저장', icon:'🎨', cond:['worksSaved',3] },
   { id:'turtle5', name:'거북이 화가', desc:'거북이 그림 5개 저장', icon:'🐢', cond:['turtleSaved',5] },
-  { id:'tutor10', name:'질문으로 돌파', desc:'선생님에게 물어본 뒤 스스로 클리어 10회', icon:'💬', cond:['tutorBreakthrough',10] },
+  { id:'tutor10', name:'질문으로 돌파', desc:'선생님에게 물어본 뒤 스스로 클리어 10회', icon:'💬', cond:['tutorBreakthrough',10], secret: true }, // 선생님 기능 꺼짐(CONFIG.TUTOR.enabled)일 땐 비밀 뱃지로 보임
   { id:'review10', name:'기억 유지', desc:'복습 10개 완료', icon:'🧠', cond:['reviewsDone',10] },
   { id:'daily7', name:'목표 달성 7회', desc:'일일 목표 7번 달성', icon:'📅', cond:['dailyGoalsMet',7] },
   { id:'playground', name:'자유 코딩', desc:'놀이터에서 10줄 이상 코드 실행', icon:'🛝', cond:['playgroundRuns',1] },
