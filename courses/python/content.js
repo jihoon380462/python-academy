@@ -111,7 +111,7 @@ const LESSONS = [
   tutorSummary:'for i in range(n): 은 n번 반복하며 i가 0부터 n-1까지 변한다. range(a,b)는 a부터 b-1, range(a,b,step)은 step씩. 반복 안의 코드는 들여쓴다.',
   terms:{ '반복문':'같은 일을 여러 번 되풀이하게 하는 문장 (for, while)', 'range':'연속된 숫자를 만들어 주는 것. range(5)는 0,1,2,3,4' },
   pages:[
-    { title:'같은 일을 여러 번', html:`<p>"안녕"을 100번 출력하려고 print를 100줄 쓰면 손이 아프죠. [[반복문]] <code>for</code>를 쓰면 한 번만 써도 돼요.</p><p><code>for i in range(3):</code>은 "i를 0, 1, 2로 바꿔 가며 아래 들여쓴 줄을 3번 실행해라"예요. i는 반복 때마다 바뀌는 변수예요.</p>`,
+    { title:'같은 일을 여러 번', html:`<p>"안녕"을 100번 출력하려고 print를 100줄 쓰면 손이 아프죠. [[반복문]] <code>for</code>를 쓰면 한 번만 써도 돼요.</p><p><code>for i in range(3):</code>은 "i를 0, 1, 2로 바꿔 가며 아래 들여쓴 줄을 3번 실행해라"예요. i는 반복 때마다 바뀌는 변수예요. (for는 '~에 대하여', range는 '범위'라는 뜻이에요)</p>`,
       example:{ code:`for i in range(3):\n    print("안녕", i)`, trace:true } },
     { title:'range 자세히', html:`<p><code>range(5)</code>는 0, 1, 2, 3, 4예요. <b>5는 들어가지 않아요!</b> 0부터 시작해서 5 바로 앞에서 끝나요. 이걸 헷갈려서 생기는 버그가 정말 많아요.</p><p><code>range(1, 6)</code>은 1부터 5까지, <code>range(0, 10, 2)</code>는 0부터 2씩 뛰어 8까지예요. 세 번째 값이 "몇 칸씩 뛸지"예요.</p>`,
       example:{ code:`for i in range(5):\n    print(i)\nprint("---")\nfor i in range(1, 6):\n    print(i)\nprint("---")\nfor i in range(0, 10, 2):\n    print(i)` } },
@@ -126,7 +126,7 @@ const LESSONS = [
   pages:[
     { title:'~하는 동안 반복', html:`<p><code>for</code>는 횟수가 정해졌을 때, <code>while</code>은 <b>"조건이 참인 동안"</b> 계속 반복할 때 써요. 몇 번 돌지 모를 때 좋아요.</p><p><code>while n &lt; 3:</code>은 n이 3보다 작은 동안 반복해요. 반복 안에서 n을 키워야 언젠가 조건이 거짓이 되어 멈춰요.</p>`,
       example:{ code:`n = 0\nwhile n < 3:\n    print("n은", n)\n    n = n + 1\nprint("끝")`, trace:true } },
-    { title:'무한루프 탈출', html:`<p>반복 안에서 조건을 바꾸는 줄을 깜빡하면 영원히 돌아요. 이게 [[무한루프]]예요. 이 앱은 5초가 지나면 강제로 멈추고 알려 줘요.</p><p>일부러 <code>while True:</code>로 무한히 돌게 한 뒤 <code>break</code>로 빠져나오는 방법도 자주 써요. "끝"이라고 입력할 때까지 받는 프로그램이 그 예예요.</p>`,
+    { title:'무한루프 탈출', html:`<p>반복 안에서 조건을 바꾸는 줄을 깜빡하면 영원히 돌아요. 이게 [[무한루프]]예요. 이 앱은 5초가 지나면 강제로 멈추고 알려 줘요. (실제 파이썬은 멈추지 않으니 Ctrl+C로 끊어야 해요)</p><p>일부러 <code>while True:</code>로 무한히 돌게 한 뒤 <code>break</code>로 빠져나오는 방법도 자주 써요. "끝"이라고 입력할 때까지 받는 프로그램이 그 예예요.</p>`,
       example:{ code:`while True:\n    word = input()\n    if word == "끝":\n        break\n    print("입력:", word)\nprint("종료")`, stdin:'사과\n배\n끝' } },
     { title:'continue', html:`<p><code>continue</code>는 "이번 회차는 여기서 그만하고 다음 회차로 넘어가라"예요. 홀수만 건너뛰고 짝수만 출력할 때 이렇게 써요.</p>`,
       example:{ code:`for i in range(6):\n    if i % 2 == 1:\n        continue\n    print(i)` } },
@@ -137,7 +137,7 @@ const LESSONS = [
   tutorSummary:'리스트는 [a, b, c]처럼 여러 값을 순서대로 담는 상자. 인덱스는 0부터. append로 끝에 추가, pop으로 꺼내기, len으로 개수. for x in 리스트: 로 하나씩 꺼낸다.',
   terms:{ '리스트':'여러 값을 순서대로 담는 묶음. 대괄호 [ ]로 만든다', '인덱스':'리스트 안에서의 번호. 0부터 시작한다' },
   pages:[
-    { title:'줄줄이 담기', html:`<p>과일 세 개를 변수 세 개에 담으면 번거롭죠. [[리스트]]는 <b>여러 값을 한 줄로 담는 상자</b>예요. 대괄호 안에 쉼표로 나열해요.</p><p>리스트 안의 각 값은 번호가 있어요. 이걸 [[인덱스]]라고 하는데, <b>0부터 시작</b>해요. 첫 번째가 0, 두 번째가 1이에요. 마지막은 -1로도 꺼낼 수 있어요.</p>`,
+    { title:'줄줄이 담기', html:`<p>과일 세 개를 변수 세 개에 담으면 번거롭죠. [[리스트]]는 <b>여러 값을 한 줄로 담는 상자</b>예요. 대괄호 안에 쉼표로 나열해요.</p><p>리스트 안의 각 값은 번호가 있어요. 이걸 [[인덱스]](번호표)라고 하는데, <b>0부터 시작</b>해요. 첫 번째가 0, 두 번째가 1이에요. 마지막은 -1로도 꺼낼 수 있어요.</p>`,
       example:{ code:`fruits = ["사과", "배", "포도"]\nprint(fruits[0])\nprint(fruits[2])\nprint(fruits[-1])` } },
     { title:'추가하고 꺼내기', html:`<p><code>리스트.append(값)</code>은 끝에 값을 붙여요. <code>리스트.pop()</code>은 마지막 값을 꺼내서 돌려주고 리스트에서 지워요. <code>len(리스트)</code>는 몇 개 들어 있는지 알려 줘요.</p>`,
       example:{ code:`nums = [1, 2]\nnums.append(3)\nprint(nums)\nlast = nums.pop()\nprint(last)\nprint(nums)\nprint(len(nums))`, trace:true } },
@@ -150,9 +150,9 @@ const LESSONS = [
   tutorSummary:'def 이름(매개변수): 로 함수를 정의하고 이름()으로 호출. return으로 값을 돌려준다. return 뒤의 코드는 실행되지 않는다. return이 없으면 None.',
   terms:{ '함수':'여러 줄의 코드에 이름을 붙여 묶어 둔 것. 이름만 부르면 그 코드가 실행된다', '매개변수':'함수를 부를 때 넘겨 주는 재료를 받는 변수 (parameter)', 'return':'함수가 계산한 결과를 부른 쪽에 돌려주는 것' },
   pages:[
-    { title:'코드에 이름 붙이기', html:`<p>[[함수]]는 <b>레시피</b>예요. "라면 끓이기" 레시피를 한 번 써 두면, 다음부터는 "라면 끓이기!"라고 부르기만 하면 되죠.</p><p><code>def 이름():</code>으로 레시피를 쓰고(정의), <code>이름()</code>으로 불러요(호출). 정의만 하면 아무 일도 안 일어나요. <b>불러야</b> 실행돼요.</p>`,
+    { title:'코드에 이름 붙이기', html:`<p>[[함수]]는 <b>레시피</b>예요. "라면 끓이기" 레시피를 한 번 써 두면, 다음부터는 "라면 끓이기!"라고 부르기만 하면 되죠.</p><p><code>def 이름():</code>으로 레시피를 쓰고(이걸 '정의한다'고 해요. def는 define, '정하다'), <code>이름()</code>으로 불러요(호출). 정의만 하면 아무 일도 안 일어나요. <b>불러야</b> 실행돼요.</p>`,
       example:{ code:`def hello():\n    print("안녕하세요!")\n    print("반가워요")\n\nhello()\nhello()` } },
-    { title:'재료 넘기기', html:`<p>괄호 안에 [[매개변수]]를 두면 부를 때마다 다른 재료를 넘길 수 있어요. <code>def greet(name):</code>에서 name이 매개변수예요. <code>greet("민수")</code>라고 부르면 name에 "민수"가 들어가요.</p>`,
+    { title:'재료 넘기기', html:`<p>괄호 안에 [[매개변수]](재료를 받는 칸)를 두면 부를 때마다 다른 재료를 넘길 수 있어요. <code>def greet(name):</code>에서 name이 매개변수예요. <code>greet("민수")</code>라고 부르면 name에 "민수"가 들어가요.</p>`,
       example:{ code:`def greet(name, times):\n    for i in range(times):\n        print(name, "안녕!")\n\ngreet("민수", 2)\ngreet("영희", 1)`, trace:true } },
     { title:'결과 돌려주기', html:`<p>[[return]]은 함수가 계산한 <b>결과를 돌려주는 것</b>이에요. <code>result = add(2, 3)</code>처럼 돌려받은 값을 변수에 담아요.</p><p>주의! <b>return을 만나면 함수는 그 자리에서 끝나요.</b> return 아래 줄은 실행되지 않아요. return이 없는 함수는 <code>None</code>(아무것도 없음)을 돌려줘요.</p>`,
       example:{ code:`def add(a, b):\n    return a + b\n    print("이 줄은 절대 실행 안 돼요")\n\nresult = add(2, 3)\nprint(result)\nprint(add(10, 20))` } },
@@ -169,9 +169,9 @@ LESSONS.push(
   tutorSummary:'문자열 인덱스·슬라이싱 s[a:b], len, upper/lower/replace/split/strip 메서드, f-string f"{변수}"로 값 끼워 넣기.',
   terms:{ '슬라이싱':'문자열이나 리스트의 일부를 [시작:끝]으로 잘라내는 것', '메서드':'값에 점(.)을 찍고 부르는 함수. "abc".upper() 처럼', 'f-string':'앞에 f를 붙인 문자열. 중괄호 { } 안에 변수를 넣으면 값이 끼워진다' },
   pages:[
-    { title:'글자도 번호가 있어요', html:`<p>문자열도 리스트처럼 글자마다 인덱스가 있어요. <code>s[0]</code>은 첫 글자예요. <code>s[1:4]</code>처럼 쓰면 1번부터 <b>4번 앞까지</b> 잘라 와요. 이걸 [[슬라이싱]]이라고 해요.</p><p>시작을 비우면 처음부터, 끝을 비우면 끝까지예요. <code>s[::-1]</code>은 거꾸로 뒤집기라는 유명한 꼼수예요.</p>`,
+    { title:'글자도 번호가 있어요', html:`<p>문자열도 리스트처럼 글자마다 인덱스가 있어요. <code>s[0]</code>은 첫 글자예요. <code>s[1:4]</code>처럼 쓰면 1번부터 <b>4번 앞까지</b> 잘라 와요. 이걸 [[슬라이싱]](잘라내기)이라고 해요.</p><p>시작을 비우면 처음부터, 끝을 비우면 끝까지예요. <code>s[::-1]</code>은 거꾸로 뒤집기라는 유명한 꼼수예요.</p>`,
       example:{ code:`s = "python"\nprint(s[0])\nprint(s[1:4])\nprint(s[:2])\nprint(s[2:])\nprint(s[::-1])\nprint(len(s))` } },
-    { title:'문자열 메서드', html:`<p>문자열 뒤에 점을 찍고 부르는 기능을 [[메서드]]라고 해요. <code>upper()</code> 대문자로, <code>lower()</code> 소문자로, <code>replace(a, b)</code> a를 b로 바꾸기, <code>split()</code> 띄어쓰기 기준으로 잘라 리스트로, <code>strip()</code> 양끝 공백 제거.</p><p>메서드는 원래 문자열을 바꾸지 않고 <b>새 문자열을 돌려줘요</b>.</p>`,
+    { title:'문자열 메서드', html:`<p>문자열 뒤에 점(.)을 찍고 부르는 기능을 [[메서드]]라고 해요. "문자열아, 대문자로 바뀌어 줘"처럼 <b>값에게 시키는 일</b>이라고 생각하면 돼요. <code>upper()</code> 대문자로, <code>lower()</code> 소문자로, <code>replace(a, b)</code> a를 b로 바꾸기, <code>split()</code> 띄어쓰기 기준으로 잘라 리스트로, <code>strip()</code> 양끝 공백 제거.</p><p>메서드는 원래 문자열을 바꾸지 않고 <b>새 문자열을 돌려줘요</b>.</p>`,
       example:{ code:`s = "hello world"\nprint(s.upper())\nprint(s.replace("world", "python"))\nwords = s.split()\nprint(words)\nprint(len(words))\nprint("  공백  ".strip())` } },
     { title:'f-string: 값 끼워 넣기', html:`<p>"민수님, 12살이시군요"처럼 변수를 문장에 끼우려면 [[f-string]]이 제일 편해요. 따옴표 앞에 <code>f</code>를 붙이고 중괄호 안에 변수나 계산식을 넣어요.</p>`,
       example:{ code:`name = "민수"\nage = 12\nprint(f"{name}님, {age}살이시군요")\nprint(f"내년엔 {age + 1}살")` } },
@@ -195,11 +195,11 @@ LESSONS.push(
   tutorSummary:'튜플 (a, b)는 바꿀 수 없는 리스트. 집합 {a, b}는 중복 없고 순서 없음, set()으로 중복 제거. 리스트 컴프리헨션 [식 for x in 목록 if 조건]으로 한 줄에 리스트 만들기.',
   terms:{ '튜플':'한 번 만들면 바꿀 수 없는 리스트. 소괄호 ( )', '집합':'중복이 없고 순서도 없는 묶음. set', '컴프리헨션':'[식 for 변수 in 목록] 처럼 한 줄로 리스트를 만드는 문법' },
   pages:[
-    { title:'튜플: 못 바꾸는 리스트', html:`<p>[[튜플]]은 소괄호로 만드는 리스트인데 <b>한 번 만들면 못 바꿔요</b>. 바꾸려 하면 <code>TypeError</code>가 나요. 좌표 (x, y)처럼 묶음이 고정일 때 써요. <code>a, b = b, a</code>로 두 변수를 맞바꾸는 꼼수도 튜플 덕분이에요.</p>`,
+    { title:'튜플: 못 바꾸는 리스트', html:`<p>[[튜플]](tuple, '묶음')은 소괄호 ( )로 만드는 리스트인데 <b>한 번 만들면 못 바꿔요</b>. 바꾸려 하면 <code>TypeError</code>가 나요. 좌표 (x, y)처럼 묶음이 고정일 때 써요. <code>a, b = b, a</code>로 두 변수를 맞바꾸는 꼼수도 튜플 덕분이에요.</p>`,
       example:{ code:`point = (3, 4)\nprint(point[0])\na, b = 1, 2\na, b = b, a\nprint(a, b)` } },
     { title:'집합: 중복 제거', html:`<p>[[집합]]은 <b>같은 값이 두 번 들어갈 수 없어요</b>. 리스트를 <code>set()</code>에 넣으면 중복이 사라져요. 순서는 보장되지 않으니 보기 좋게 하려면 <code>sorted()</code>로 정렬해요.</p>`,
       example:{ code:`nums = [3, 1, 3, 2, 1]\ns = set(nums)\nprint(len(s))\nprint(sorted(s))\nprint(2 in s)` } },
-    { title:'한 줄로 리스트 만들기', html:`<p>"1부터 5까지 제곱한 리스트"를 for와 append로 만들면 4줄인데, [[컴프리헨션]]을 쓰면 한 줄이에요. <code>[x * x for x in range(1, 6)]</code>. 뒤에 <code>if</code>를 붙이면 골라 담아요.</p>`,
+    { title:'한 줄로 리스트 만들기', html:`<p>"1부터 5까지 제곱한 리스트"를 for와 append로 만들면 4줄인데, [[컴프리헨션]]("리스트를 한 줄로 만드는 문법"이라고만 기억해도 돼요)을 쓰면 한 줄이에요. <code>[x * x for x in range(1, 6)]</code>. 뒤에 <code>if</code>를 붙이면 골라 담아요.</p>`,
       example:{ code:`squares = [x * x for x in range(1, 6)]\nprint(squares)\nevens = [x for x in range(10) if x % 2 == 0]\nprint(evens)` } },
   ],
   summary:['튜플 (a, b)는 바꿀 수 없다','set()으로 중복 제거','[식 for x in 목록 if 조건]'] },
@@ -223,7 +223,7 @@ LESSONS.push(
   tutorSummary:'try: 위험한 코드 except 에러이름: 대처. 여러 except 가능. else는 에러 없을 때, finally는 항상. 에러 종류를 지정해 잡는 것이 좋다.',
   terms:{ '예외':'실행 중에 생기는 에러. ValueError, ZeroDivisionError 등', '예외 처리':'에러가 나도 프로그램이 멈추지 않도록 try/except로 받아내는 것' },
   pages:[
-    { title:'에러가 나도 멈추지 않게', html:`<p>지금까지는 에러가 나면 프로그램이 멈췄죠. [[예외 처리]]를 쓰면 <b>에러를 잡아서 대신 할 일을</b> 정할 수 있어요. 위험한 코드를 <code>try:</code> 안에 넣고, 에러가 났을 때 할 일을 <code>except 에러이름:</code>에 써요.</p>`,
+    { title:'에러가 나도 멈추지 않게', html:`<p>지금까지는 에러가 나면 프로그램이 멈췄죠. [[예외 처리]](예외 = 에러처럼 '예상 밖의 일')를 쓰면 <b>에러를 잡아서 대신 할 일을</b> 정할 수 있어요. 위험한 코드를 <code>try:</code> 안에 넣고, 에러가 났을 때 할 일을 <code>except 에러이름:</code>에 써요.</p>`,
       example:{ code:`try:\n    n = int("abc")\n    print(n)\nexcept ValueError:\n    print("숫자가 아니에요")\nprint("프로그램은 계속돼요")` } },
     { title:'여러 종류 잡기', html:`<p>except를 여러 개 둘 수 있어요. 에러 종류에 따라 다른 말을 해 줄 수 있죠. <code>except Exception as e:</code>로 모든 에러를 잡고 e에 메시지를 받을 수도 있지만, 가능하면 <b>종류를 정해서</b> 잡는 게 좋아요.</p>`,
       example:{ code:`def divide(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        return "0으로 못 나눠요"\n    except TypeError:\n        return "숫자만 돼요"\n\nprint(divide(10, 2))\nprint(divide(10, 0))\nprint(divide("10", 2))` } },
@@ -238,7 +238,7 @@ LESSONS.push(
   pages:[
     { title:'설계도와 물건', html:`<p>[[클래스]]는 <b>붕어빵 틀</b>, [[객체]]는 그 틀로 찍어낸 <b>붕어빵</b>이에요. 틀은 하나지만 붕어빵은 팥·슈크림 등 여러 개를 만들 수 있죠.</p><p><code>class Dog:</code>로 틀을 만들고 <code>Dog()</code>로 객체를 찍어내요. 지금까지 쓴 문자열, 리스트도 사실 모두 객체였어요.</p>`,
       example:{ code:`class Dog:\n    pass\n\nd1 = Dog()\nd2 = Dog()\nprint(type(d1))\nprint(d1 is d2)` } },
-    { title:'__init__과 속성', html:`<p><code>__init__</code>은 객체가 <b>만들어지는 순간 자동으로 실행</b>되는 특별한 함수예요. 여기서 <code>self.name = name</code>처럼 값을 저장하면 그 객체만의 [[속성]]이 돼요.</p><p>[[self]]는 "지금 만들어지고 있는 바로 이 객체"예요. 첫 매개변수로 꼭 써야 하지만, 부를 때는 넘기지 않아요. 파이썬이 알아서 넣어 줘요.</p>`,
+    { title:'__init__과 속성', html:`<p><code>__init__</code>은 객체가 <b>만들어지는 순간 자동으로 실행</b>되는 특별한 함수예요. 여기서 <code>self.name = name</code>처럼 값을 저장하면 그 객체만의 [[속성]](그 물건이 가진 값. 강아지라면 이름·나이)이 돼요.</p><p>[[self]](셀프, '나 자신')는 "지금 만들어지고 있는 바로 이 객체"예요. 첫 매개변수로 꼭 써야 하지만, 부를 때는 넘기지 않아요. 파이썬이 알아서 넣어 줘요.</p>`,
       example:{ code:`class Dog:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\nd = Dog("초코", 3)\nprint(d.name)\nprint(d.age)\nd.age = 4\nprint(d.age)`, trace:true } },
     { title:'여러 객체', html:`<p>같은 클래스로 만든 객체라도 속성 값은 각자 달라요. 객체를 리스트에 넣고 반복하면 "학생 명단"을 딕셔너리보다 깔끔하게 다룰 수 있어요.</p>`,
       example:{ code:`class Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n\nstudents = [Student("민수", 90), Student("영희", 85)]\nfor s in students:\n    print(s.name, s.score)` } },
@@ -249,9 +249,9 @@ LESSONS.push(
   tutorSummary:'클래스 안의 함수가 메서드. 첫 매개변수 self로 자기 속성에 접근. class 자식(부모): 로 상속하면 부모 메서드를 물려받고 같은 이름으로 덮어쓸 수 있다. __str__은 print할 때 보일 문자열.',
   terms:{ '상속':'기존 클래스의 기능을 물려받아 새 클래스를 만드는 것', '오버라이딩':'부모에게 물려받은 메서드를 자식이 같은 이름으로 다시 정의해 덮어쓰는 것' },
   pages:[
-    { title:'객체의 행동: 메서드', html:`<p>클래스 안에 정의한 함수가 메서드예요. <code>self</code>로 자기 속성을 읽고 바꿔요. <code>d.bark()</code>처럼 점을 찍어 불러요. 문자열의 <code>upper()</code>도 이런 메서드였어요.</p>`,
+    { title:'객체의 행동: 메서드', html:`<p>클래스 안에 만든 함수가 메서드예요. 그 물건이 <b>할 줄 아는 행동</b>(강아지라면 짖기·앉기)이라고 보면 돼요. <code>self</code>로 자기 속성을 읽고 바꿔요. <code>d.bark()</code>처럼 점을 찍어 불러요. 문자열의 <code>upper()</code>도 이런 메서드였어요.</p>`,
       example:{ code:`class Counter:\n    def __init__(self):\n        self.count = 0\n    def up(self):\n        self.count += 1\n    def show(self):\n        print("현재:", self.count)\n\nc = Counter()\nc.up()\nc.up()\nc.show()` } },
-    { title:'상속: 물려받기', html:`<p><code>class Dog(Animal):</code>이라고 쓰면 Dog는 Animal의 모든 것을 [[상속]]받아요. 공통 기능은 부모에 한 번만 쓰고, 다른 부분만 자식에서 바꾸면 돼요. 같은 이름의 메서드를 자식에 다시 쓰면 자식 것이 우선이에요([[오버라이딩]]).</p>`,
+    { title:'상속: 물려받기', html:`<p><code>class Dog(Animal):</code>이라고 쓰면 Dog는 Animal의 모든 것을 [[상속]]받아요(부모의 것을 물려받는다는 뜻). 공통 기능은 부모에 한 번만 쓰고, 다른 부분만 자식에서 바꾸면 돼요. 같은 이름의 메서드를 자식에 다시 쓰면 자식 것이 우선이에요(이걸 [[오버라이딩]], '덮어쓰기'라고 해요).</p>`,
       example:{ code:`class Animal:\n    def __init__(self, name):\n        self.name = name\n    def speak(self):\n        print(self.name, "이(가) 소리를 내요")\n\nclass Dog(Animal):\n    def speak(self):\n        print(self.name, ": 멍멍!")\n\nAnimal("동물").speak()\nDog("초코").speak()` } },
     { title:'__str__: 예쁘게 출력', html:`<p>객체를 print하면 <code>&lt;__main__.Dog object at ...&gt;</code> 같은 못생긴 글자가 나와요. <code>__str__(self)</code> 메서드가 문자열을 돌려주게 하면 그걸 대신 보여 줘요. 부모의 <code>__init__</code>을 재사용하려면 <code>super().__init__(...)</code>을 써요.</p>`,
       example:{ code:`class Dog:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n    def __str__(self):\n        return f"{self.name}({self.age}살)"\n\nclass Puppy(Dog):\n    def __init__(self, name):\n        super().__init__(name, 0)\n\nprint(Dog("초코", 3))\nprint(Puppy("콩이"))` } },
@@ -262,7 +262,7 @@ LESSONS.push(
   tutorSummary:'import 모듈 로 가져와 모듈.함수() 사용. from 모듈 import 이름 으로 바로 사용. random(randint, choice, seed), math(sqrt, pi, floor), datetime(date, timedelta).',
   terms:{ '모듈':'미리 만들어진 코드 묶음(도구 상자). import로 가져온다', '표준 라이브러리':'파이썬에 기본으로 들어 있는 모듈 모음' },
   pages:[
-    { title:'도구 상자 가져오기', html:`<p>[[모듈]]은 누군가 미리 만들어 둔 <b>도구 상자</b>예요. <code>import math</code>로 가져와 <code>math.sqrt(16)</code>처럼 써요. 파이썬에 기본으로 들어 있는 모듈들을 [[표준 라이브러리]]라고 해요.</p><p><code>from math import sqrt</code>라고 쓰면 <code>sqrt(16)</code>처럼 앞에 모듈 이름 없이 써요.</p>`,
+    { title:'도구 상자 가져오기', html:`<p>[[모듈]](module, '부품')은 누군가 미리 만들어 둔 <b>도구 상자</b>예요. <code>import math</code>로 가져와 <code>math.sqrt(16)</code>처럼 써요. 파이썬에 기본으로 들어 있는 모듈들을 [[표준 라이브러리]](파이썬이 기본으로 들고 다니는 도구 상자 모음)라고 해요.</p><p><code>from math import sqrt</code>라고 쓰면 <code>sqrt(16)</code>처럼 앞에 모듈 이름 없이 써요.</p>`,
       example:{ code:`import math\nprint(math.sqrt(16))\nprint(math.pi)\nprint(math.floor(3.7))\nfrom math import ceil\nprint(ceil(3.2))` } },
     { title:'random: 무작위', html:`<p><code>random.randint(1, 6)</code>은 1~6 중 하나(주사위), <code>random.choice(리스트)</code>는 리스트에서 하나를 골라요. <code>random.seed(숫자)</code>를 먼저 부르면 매번 <b>같은 순서</b>의 무작위 값이 나와서 테스트하기 좋아요.</p>`,
       example:{ code:`import random\nrandom.seed(1)\nprint(random.randint(1, 6))\nprint(random.choice(["가위", "바위", "보"]))\nnums = [1, 2, 3, 4, 5]\nrandom.shuffle(nums)\nprint(nums)` } },
@@ -290,7 +290,7 @@ LESSONS.push(
   tutorSummary:'lambda 매개변수: 식 은 한 줄짜리 이름 없는 함수. sorted(목록, key=함수, reverse=True). map(함수, 목록), filter(함수, 목록)은 list()로 감싼다. enumerate, zip, sum/min/max, join.',
   terms:{ '람다':'lambda x: x * 2 처럼 한 줄로 쓰는 이름 없는 작은 함수' },
   pages:[
-    { title:'한 줄짜리 함수', html:`<p>[[람다]]는 이름 없이 한 줄로 쓰는 작은 함수예요. <code>lambda x: x * 2</code>는 <code>def f(x): return x * 2</code>와 같아요. 다른 함수에 "기준"을 넘겨줄 때 많이 써요.</p>`,
+    { title:'한 줄짜리 함수', html:`<p>[[람다]](lambda, 그리스 글자 이름이에요. 뜻은 신경 쓰지 마세요)는 이름 없이 한 줄로 쓰는 작은 함수예요. <code>lambda x: x * 2</code>는 <code>def f(x): return x * 2</code>와 같아요. 다른 함수에 "기준"을 넘겨줄 때 많이 써요.</p>`,
       example:{ code:`double = lambda x: x * 2\nprint(double(5))\nwords = ["banana", "kiwi", "apple"]\nprint(sorted(words, key=lambda w: len(w)))\nprint(sorted(words, reverse=True))` } },
     { title:'map, filter', html:`<p><code>map(함수, 목록)</code>은 모든 값에 함수를 적용하고, <code>filter(함수, 목록)</code>은 함수가 True인 값만 골라요. 결과는 <code>list()</code>로 감싸야 리스트로 보여요. 컴프리헨션과 같은 일을 해요.</p>`,
       example:{ code:`nums = ["1", "2", "3"]\nprint(list(map(int, nums)))\nprint(sum(map(int, nums)))\nprint(list(filter(lambda x: x % 2 == 0, range(10))))` } },

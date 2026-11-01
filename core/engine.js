@@ -73,11 +73,11 @@ const Content = {
     return steps;
   },
   // 텍스트(타자) 문제 따라하기 가이드: 정답 코드를 한 줄씩 "무슨 뜻인지 + 그대로 치면 되는 코드"로 풀어 준다. 초반 레슨(L0~L5)만.
-  TEXT_GUIDE_LESSONS: ['L0', 'L1', 'L2', 'L3', 'L4', 'L5'],
+  TEXT_GUIDE_LESSONS: null, // null = 모든 레슨 (v2.0.1부터). 특정 레슨만 켜려면 ['L0', ...]
   textGuideFor(p) {
     const hand = (typeof GUIDES_TEXT !== 'undefined' && GUIDES_TEXT[p.id]);
     if (hand) return hand;
-    const sol = p.solution || (p.parsons && p.parsons.solution); if (!sol || !this.TEXT_GUIDE_LESSONS.includes(p.lesson)) return null;
+    const sol = p.solution || (p.parsons && p.parsons.solution); if (!sol || (this.TEXT_GUIDE_LESSONS && !this.TEXT_GUIDE_LESSONS.includes(p.lesson))) return null;
     const steps = []; const lines = sol.split('\n'); let prevColon = false;
     for (let i = 0; i < lines.length; i++) {
       const raw = lines[i]; const t = raw.trim(); if (!t) continue;
@@ -100,6 +100,30 @@ const Content = {
       else if ((m = t.match(/^import (\w+)$/))) why = `<b>import</b> 로 <code>${m[1]}</code> 도구 상자를 가져와요. 맨 위에 한 번만 쓰면 돼요.`;
       else if ((m = t.match(/^turtle\.(\w+)\((.*)\)$/))) why = `거북이에게 명령해요: <code>${m[1]}</code>${{ forward: '= 앞으로 가기', left: '= 왼쪽으로 돌기', right: '= 오른쪽으로 돌기', backward: '= 뒤로 가기', circle: '= 원 그리기', penup: '= 펜 들기', pendown: '= 펜 내리기', color: '= 색 바꾸기' }[m[1]] || ''}${m[2] ? ` (괄호 안 <code>${esc(m[2])}</code> 만큼)` : ''}.`;
       else if ((m = t.match(/^(\w+)\.append\((.*)\)$/))) why = `리스트 <code>${m[1]}</code> 의 맨 끝에 <code>${esc(m[2])}</code> 을 추가해요.`;
+      else if (t === 'break') why = `<b>break</b> 는 "지금 당장 반복에서 빠져나가라"예요. 반복문 안에서만 써요.`;
+      else if (t === 'continue') why = `<b>continue</b> 는 "이번 회차는 여기서 그만두고 다음 회차로"예요.`;
+      else if (t === 'try:') why = `<b>try</b> 는 "일단 해 봐"예요. 아래 들여쓴 줄에서 에러가 나면 멈추지 않고 <b>except</b> 로 넘어가요. 줄 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^except(?: (\w+))?(?: as (\w+))?:$/))) why = `<b>except</b> 는 "에러가 나면 이렇게 해"예요.${m[1] ? ` <code>${m[1]}</code> 은 잡을 에러의 이름이에요.` : ''} try 와 <b>같은 위치</b>에 쓰고 끝에 콜론(:)!`;
+      else if ((m = t.match(/^from (\w+) import (\w+)$/))) why = `<code>${m[1]}</code> 도구 상자에서 <code>${m[2]}</code> 하나만 꺼내 와요.`;
+      else if ((m = t.match(/^class (\w+)(?:\((\w+)\))?:$/))) why = `<b>class</b> 로 <code>${m[1]}</code> 이라는 <b>설계도</b>를 만들어요.${m[2] ? ` 괄호 안 <code>${m[2]}</code> 의 기능을 물려받아요(상속).` : ''} 줄 끝에 <b>콜론(:)</b>! 클래스 이름은 대문자로 시작해요.`;
+      else if ((m = t.match(/^def __init__\((.*)\):$/))) why = `<b>__init__</b> 은 "만들어질 때 자동으로 실행되는" 특별한 함수예요. 첫 번째 <code>self</code> 는 "나 자신"이고, 뒤의 값들은 만들 때 받아요. 클래스 안이라 들여쓰기가 있어요.`;
+      else if ((m = t.match(/^def (\w+)\(self(?:, (.*))?\):$/))) why = `클래스 안의 함수(메서드) <code>${m[1]}</code> 이에요. 첫 번째 <code>self</code> 는 항상 "나 자신"이고 부를 때는 안 넣어요.${m[2] ? ` 뒤의 <code>${esc(m[2])}</code> 은 받을 값.` : ''} 끝에 콜론(:)!`;
+      else if ((m = t.match(/^self\.(\w+) = (.*)$/))) why = `<code>self.${m[1]}</code> 은 "나의 ${m[1]}" 상자예요. 거기에 <code>${esc(m[2])}</code> 을 담아 둬요. 그래야 다른 메서드에서도 꺼내 쓸 수 있어요.`;
+      else if ((m = t.match(/^self\.(\w+) ([+-])= (.*)$/))) why = `"나의 ${m[1]}" 값에서 <code>${esc(m[3])}</code> 만큼 ${m[2] === '+' ? '더해요' : '빼요'}.`;
+      else if ((m = t.match(/^(\w+)\.(\w+) ([+-])= (.*)$/))) why = `<code>${m[1]}</code> 의 <code>${m[2]}</code> 값에서 <code>${esc(m[4])}</code> 만큼 ${m[3] === '+' ? '더해요' : '빼요'}.`;
+      else if ((m = t.match(/^(\w+)\.(\w+) = (.*)$/))) why = `<code>${m[1]}</code> 의 <code>${m[2]}</code> 에 <code>${esc(m[3])}</code> 을 담아요.`;
+      else if ((m = t.match(/^(\w+(?:, \w+)+) = input\(\)\.split\(\)$/))) why = `입력 한 줄을 <b>띄어쓰기로 잘라</b>(<code>split()</code>) 여러 변수 <code>${m[1]}</code> 에 한꺼번에 나눠 담아요. (전부 글자 상태예요)`;
+      else if ((m = t.match(/^(\w+(?:, \w+)+) = (.*)$/))) why = `오른쪽 값들을 순서대로 <code>${m[1]}</code> 에 한꺼번에 나눠 담아요.`;
+      else if ((m = t.match(/^with open\(([^,]+), *"?(\w)"?.*\) as (\w+):$/))) why = `파일 ${esc(m[1])} 을 ${m[2] === 'w' ? '<b>쓰기</b>' : m[2] === 'a' ? '<b>이어 쓰기</b>' : '<b>읽기</b>'} 모드로 열어 <code>${m[3]}</code> 이라고 불러요. <b>with</b> 를 쓰면 다 쓴 뒤 파일이 자동으로 닫혀요. 끝에 콜론(:)!`;
+      else if ((m = t.match(/^(\w+)\.write\((.*)\)$/))) why = `파일 <code>${m[1]}</code> 에 <code>${esc(m[2])}</code> 을 써요. 줄을 바꾸려면 <code>"\\n"</code> 을 붙여야 해요.`;
+      else if ((m = t.match(/^for (\w+), (\w+) in (\w+)\.items\(\):$/))) why = `딕셔너리 <code>${m[3]}</code> 의 <b>키와 값을 한 쌍씩</b> 꺼내 <code>${m[1]}</code>, <code>${m[2]}</code> 에 담으며 반복해요. 끝에 콜론(:)!`;
+      else if ((m = t.match(/^for (\w+), (\w+) in (.+):$/))) why = `<code>${esc(m[3])}</code> 의 항목(두 개짜리 묶음)을 <code>${m[1]}</code>, <code>${m[2]}</code> 로 나눠 받으며 반복해요. 끝에 콜론(:)!`;
+      else if ((m = t.match(/^for (\w+) in (.+):$/))) why = `<code>${esc(m[2])}</code> 의 항목을 하나씩 <code>${m[1]}</code> 에 담아 가며 반복해요. 끝에 콜론(:)!`;
+      else if ((m = t.match(/^(\w+)\[(.+)\] = (\w+)\.get\(\2, 0\) \+ (.*)$/))) why = `딕셔너리에서 <code>${esc(m[2])}</code> 의 값을 꺼내되 <b>없으면 0</b>(<code>get(키, 0)</code>)으로 보고, 거기에 ${esc(m[4])} 을 더해 다시 저장해요. "개수 세기"의 정석이에요.`;
+      else if ((m = t.match(/^(\w+)\[(.+)\] = (.*)$/))) why = `딕셔너리 <code>${m[1]}</code> 에 키 <code>${esc(m[2])}</code> → 값 <code>${esc(m[3])}</code> 을 넣어요. (키가 이미 있으면 값이 바뀌어요)`;
+      else if ((m = t.match(/^random\.seed\((.*)\)$/))) why = `<code>random.seed(…)</code> 는 랜덤의 <b>씨앗</b>을 심어요. 같은 씨앗이면 "랜덤"도 매번 같은 순서로 나와서, 채점이 결과를 맞춰 볼 수 있어요.`;
+      else if ((m = t.match(/^(\w+)\.sort\((.*)\)$/))) why = `리스트 <code>${m[1]}</code> 을 제자리에서 정렬해요.${/key=lambda/.test(m[2]) ? ' <code>key=lambda …</code> 는 "무엇을 기준으로 줄 세울지"예요.' : ''}${/reverse=True/.test(m[2]) ? ' <code>reverse=True</code> 는 큰 것부터.' : ''}`;
+      else if ((m = t.match(/^(\w+)\.(\w+)\((.*)\)$/))) why = `<code>${m[1]}</code> 에게 <code>${m[2]}</code> 를 시켜요(메서드 호출).${m[3] ? ` 괄호 안 <code>${esc(m[3])}</code> 을 넘겨요.` : ''}`;
       else if ((m = t.match(/^(\w+)\((.*)\)$/))) why = `만들어 둔 함수 <code>${m[1]}</code> 을 불러요(실행해요).`;
       else why = `이 줄을 그대로 치세요.`;
       let indTxt = '';

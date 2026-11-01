@@ -2,6 +2,10 @@
 
 배포한 버전마다 한 항목. 형식: `## vX.Y.Z — YYYY-MM-DD` + 바뀐 것(사용자가 보는 변화 → 내부 변화 순). 배포 커밋에 HANDOFF.md 상태판과 함께 포함한다(작업 규칙).
 
+## v2.0.1 — 2026-11-01
+- 텍스트 모드 따라하기 코치가 **모든 레슨**에서 나와요(전에는 L0~L5). 클래스(`class`, `__init__`, `self.x`)·`try/except`·`with open`·딕셔너리 세기·`sort(key=…)`·메서드 호출·`break/continue`·`random.seed` 줄도 뜻을 설명해요.
+- 레슨 5~18 설명에 어려운 용어 옆 읽는 법·뜻 추가(인덱스=번호표, 매개변수=재료 칸, 메서드=값에게 시키는 일, 상속=물려받기, 오버라이딩=덮어쓰기 등 17곳).
+
 ## v2.0.0 — 2026-11-01
 - **Phase 0 (EXPANSION.md 2절)**: `src/`+`build.sh` → `core/`·`courses/python/`·`shared/`·`tools/` 구조(코드는 옮기기만, 전역 이름·순서 유지). 허브 `index.html`(오늘의 할 일·이어서 하기·코스 카드 5개) + `core/hub.js`. 저장 스키마 v2(`academy.profile/course.<id>/tutor.<id>/works/sync`, `Store.data`는 그대로 한 객체; v1 자동 이전 + `academy.backup.v1` 보관 + 설정 "v1 데이터 다시 가져오기"; 4MB 넘으면 "오래된 코드 정리"). 상단바 ⌂ 허브 버튼, `Store.data.last`로 이어서 하기, 코스 페이지 딥링크 해시. Actions `verify` 잡(validate_content + run_solutions) 통과 시에만 배포. `python_academy.html`은 리다이렉트, v1.3.0 원본은 `legacy/python_academy_v1.html`.
 

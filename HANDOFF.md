@@ -7,9 +7,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| **현재 버전** | v2.0.0 (2026-11-01 배포, Phase 0) |
-| **마지막 작업** | Phase 0: `src/`+`build.sh` → `core/`·`courses/python/`·`shared/`·`tools/` 구조, 허브(`index.html`+`core/hub.js`), 저장 스키마 v2(`academy.*`, v1 자동 이전·백업·되돌리기), Actions 검증 게이트, `python_academy.html` 리다이렉트, `legacy/` 보관. 상세: CHANGELOG.md |
-| **다음 후보** | ① v2.0.0 실사용 확인(허브 수치·실제 Blockly 화면·기기 연동 병합) 후 피드백 패치 ② Phase 1 알고리즘 코스(EXPANSION.md 5절 → v2.1.0) ③ 텍스트 코치 L6 이후 확장 / 레슨 5 이후 쉬운 말 |
+| **현재 버전** | v2.0.1 (2026-11-01 배포) |
+| **마지막 작업** | v2.0.1: 텍스트 따라하기 코치를 전 레슨으로 확장(`Content.TEXT_GUIDE_LESSONS = null`; 클래스·try·with·딕셔너리·메서드 등 패턴 설명 추가) + 레슨 5~18 설명 쉬운 말(용어 옆에 읽는 법·뜻 17곳). 그 전 v2.0.0 Phase 0: `src/`+`build.sh` → `core/`·`courses/python/`·`shared/`·`tools/` 구조, 허브(`index.html`+`core/hub.js`), 저장 스키마 v2(`academy.*`, v1 자동 이전·백업·되돌리기), Actions 검증 게이트, `python_academy.html` 리다이렉트, `legacy/` 보관. 상세: CHANGELOG.md |
+| **다음 후보** | ① Phase 1 알고리즘 코스(EXPANSION.md 5절 → v2.1.0) — 진행 중 ② v2.0.x 실사용 확인(허브 수치·실제 Blockly 화면·기기 연동 병합) 후 피드백 패치 |
 
 ## 1. 이게 뭔가
 - **파이썬 아카데미**: 완전 초보자용 학습 사이트. v2.0.0(Phase 0)부터 **허브 + 코스 페이지** 구조 (확장 계획은 `EXPANSION.md`; "Phase N을 진행해"가 의뢰 단위).
