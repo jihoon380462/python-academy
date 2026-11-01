@@ -8,7 +8,7 @@
 - 라이브 주소: **https://jihoon380462.github.io/python-academy/** (GitHub Pages, `main` 브랜치에 push하면 Actions가 1~2분 안에 자동 배포)
 - 저장소: `github.com/jihoon380462/python-academy` (public)
 - 기술: Pyodide 0.27.5(Web Worker, 메인스레드 폴백) · Blockly 11.2.2(블록 코딩) · CodeMirror 6(텍스트 에디터) · 모두 CDN. Claude API 선생님(사용자 API 키를 localStorage에 저장).
-- 현재 버전: **v1.2.0** (설정 화면 맨 아래에 표시됨. 수정할 때마다 `src/10_config.js`의 `APP_VERSION`을 올린다 — 사용자가 이 숫자로 반영 여부를 확인한다)
+- 현재 버전: **v1.3.0** (설정 화면 맨 아래에 표시됨. 수정할 때마다 `src/10_config.js`의 `APP_VERSION`을 올린다 — 사용자가 이 숫자로 반영 여부를 확인한다)
 
 ## 2. 작업 방법 (반드시 이 순서)
 1. 저장소를 클론/attach한다. 소스는 **`src/` 조각 파일**이 원본이다. `index.html`을 직접 고치지 말 것.
@@ -37,6 +37,7 @@
 - 답변은 짧게, 결과 먼저.
 
 ## 5. 지금까지 반영한 피드백 이력 (최근순)
+- v1.3.0 후보 2~7 일괄: ① 레슨 0~4 설명 쉬운 말로(읽는 법·뜻 병기, 몫/나머지 초등 나눗셈 비유) ② **텍스트 모드 따라하기 코치** (`Content.textGuideFor` in 30: L0~L5 정답 코드를 한 줄씩 "뜻 + 이렇게 치세요 + 📋복사"로 자동 생성, 손글 `GUIDES_TEXT[pid]`로 덮어쓰기 가능; `Coach.mount(..., 'text')`, 42 텍스트 분기에 `#pvCoach`) ③ 빈 작업판 **손가락 드래그 데모** (`.bg-demo` CSS 애니메이션, 41 guide; 애니메이션 '끔'이면 숨김) ④ 변수 만들기 창 **추천 이름 칩** (`UI.prompt` `chips` 옵션, 41 `suggest()`: 정답 코드 변수 → 공통 이름) ⑤ **집중 모드** (`settings.focus`, `.pv.focus` 설명 숨김 + `.pv-focusbar`에 제목/설명모달/힌트/선생님; 모바일은 탭이라 버튼 숨김) ⑥ 블록 배율 PC 1.1 / 모바일 0.85
 - v1.2.0 **PC↔모바일 기기 연동**(`Sync` in 31): 사용자 GitHub 비공개 gist(`python_academy_save.json`)에 진행 데이터 저장. 토큰(classic, gist 권한)으로 첫 연결 → "연동 코드"(`PA-SYNC:`+base64{t,g})를 다른 기기에 붙여넣기. `Store.save()`가 `updatedAt` 찍고 3초 디바운스로 push, 시작·탭 복귀·online 때 pull→`merge`(진행은 max/합집합, 설정·문자열은 최근 쪽, `resetAt`이 더 새로우면 그쪽 통째). API 키는 동기화 제외. 설정 카드 `Sync.card()/bind()`, 상단바 ☁ 아이콘. 스텁 테스트: scratchpad `sync_test.js` 패턴(가짜 fetch).
 - v1.1.2 L3 설명에서 `+ - *` 한 칩 → 기호별 칩으로 분리
 - v1.1.1 L2P5/L3P1 기본값 a=3, b=4 (곱과 합이 같아지는 2,2 방지)
@@ -50,12 +51,9 @@
 - v1.0.3 이하: 본문 버튼명 `.uibtn` 칩, 폰트 확대 방지, 모바일 Worker 폴백, GitHub Pages 배포 구축
 
 ## 6. 열려 있는 다음 후보 (사용자에게 선택지로 제시했던 것)
-1. 레슨 0~4 설명을 완전 초보 시점으로 재점검(어려운 표현 → 쉬운 말)
-2. 따라하기 코치를 텍스트 문제 초반(L3~L4)에도 확장("한 줄씩 뭘 치는지")
-3. 블록 끌어다 놓는 손가락 데모 애니메이션
-4. 변수 이름 입력창에 추천 이름 버튼(age, name, score…)
-5. 집중 모드(문제 설명 접고 작업판 전체 폭)
-6. 블록 기본 배율 0.95 → 1.1
+1. 기기 연동(v1.2.0)·v1.3.0 기능들 실사용 피드백 반영 (사용자가 브라우저에서 확인 후 스크린샷)
+2. 텍스트 코치를 L6 이후로 확장 (또는 손글 `GUIDES_TEXT` 보강)
+3. 레슨 5 이후 설명 재점검
 
 ## 7. 핵심 데이터 규칙 요약
 - 문제 스키마는 `src/20_content_a.js` 맨 위 주석. `vary:{a:[lo,hi]}`의 **기본값은 lo**(`Content.defaultParams`) — 기본값끼리 겹치는 출력이 안 나오게 주의.

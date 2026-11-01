@@ -58,7 +58,8 @@ const Content = {
     const v = expr(); if (i < toks.length) throw new Error('trailing'); return v;
   },
   // 블록 문제 따라하기 가이드. 손으로 쓴 guide가 있으면 그것, 없으면 정답 코드 줄에서 자동 생성
-  guideFor(p) {
+  guideFor(p, mode = 'block') {
+    if (mode === 'text') return this.textGuideFor(p);
     const hand = p.guide || (typeof GUIDES !== 'undefined' && GUIDES[p.id]);
     if (hand) { const params = p.params || {}; const sub = (x) => typeof x !== 'string' ? x : x.replace(/\{\{([^}]+)\}\}/g, (m, e) => { try { return String(this.evalExpr(e, params)); } catch (err) { return m; } }); return hand.map(g => ({ ...g, t: sub(g.t), c: Array.isArray(g.c) ? g.c.map(sub) : sub(g.c) })); }
     if (p.type !== 'block' || !p.solution) return null;
@@ -85,6 +86,48 @@ const Content = {
       steps.push({ t: txt, c: t, cat, auto: true });
     }
     steps.push({ t: '다 만들었으면 <b>▶ 실행</b>으로 결과를 확인하고, <b>✔ 제출하기</b>를 누르세요!' });
+    return steps;
+  },
+  // 텍스트(타자) 문제 따라하기 가이드: 정답 코드를 한 줄씩 "무슨 뜻인지 + 그대로 치면 되는 코드"로 풀어 준다. 초반 레슨(L0~L5)만.
+  TEXT_GUIDE_LESSONS: ['L0', 'L1', 'L2', 'L3', 'L4', 'L5'],
+  textGuideFor(p) {
+    const hand = (typeof GUIDES_TEXT !== 'undefined' && GUIDES_TEXT[p.id]);
+    if (hand) return hand;
+    const sol = p.solution || (p.parsons && p.parsons.solution); if (!sol || !this.TEXT_GUIDE_LESSONS.includes(p.lesson)) return null;
+    const steps = []; const lines = sol.split('\n'); let prevColon = false;
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i]; const t = raw.trim(); if (!t) continue;
+      const ind = raw.length - raw.trimStart().length; const lvl = Math.round(ind / 4);
+      let why = '', m;
+      if ((m = t.match(/^print\((.*)\)$/))) why = `<b>print( )</b> 는 괄호 안의 것을 화면에 보여줘요.${/^["']/.test(m[1]) ? ' 글자는 <b>따옴표</b>로 감싸야 해요.' : /,/.test(m[1]) ? ' 쉼표로 나누면 띄어쓰기로 이어서 보여줘요.' : ' 변수나 계산 결과는 따옴표 <b>없이</b> 써요.'}`;
+      else if ((m = t.match(/^(\w+) = int\(input\(\)\)$/))) why = `<b>input()</b> 으로 입력 한 줄을 받고, <b>int( )</b> 로 숫자로 바꿔서 변수 <code>${m[1]}</code> 에 담아요. (입력은 글자로 들어오니까 숫자로 바꿔야 계산돼요)`;
+      else if ((m = t.match(/^(\w+) = input\(\)$/))) why = `<b>input()</b> 으로 입력 한 줄을 받아 변수 <code>${m[1]}</code> 에 담아요.`;
+      else if ((m = t.match(/^(\w+) \+= (.*)$/))) why = `<code>${m[1]} += ${esc(m[2])}</code> 는 "<code>${m[1]}</code> 에 ${esc(m[2])} 을 더해서 다시 담아라"예요. (<code>${m[1]} = ${m[1]} + ${esc(m[2])}</code> 와 같아요)`;
+      else if ((m = t.match(/^(\w+) = (\w+) \+ (.*)$/)) && m[1] === m[2]) why = `<code>${m[1]}</code> 에 ${esc(m[3])} 을 더해서 <code>${m[1]}</code> 에 다시 담아요. 오른쪽을 먼저 계산하고 왼쪽 상자에 넣는다고 생각하세요.`;
+      else if ((m = t.match(/^(\w+) = (.*)$/))) why = `<b>=</b> 는 "같다"가 아니라 <b>"오른쪽 값을 왼쪽 이름에 담아라"</b>예요. 변수 <code>${m[1]}</code> 에 <code>${esc(m[2])}</code> 을 담아요.`;
+      else if ((m = t.match(/^for (\w+) in range\((.*)\):$/))) why = `<b>for</b> 반복문이에요. <code>${m[1]}</code> 이 <code>range(${esc(m[2])})</code> 의 숫자를 하나씩 받으며 아래 들여쓴 줄을 반복해요. 줄 끝 <b>콜론(:)</b>을 꼭 붙이세요.`;
+      else if ((m = t.match(/^for (\w+) in (\w+):$/))) why = `<code>${m[2]}</code> 안의 항목을 하나씩 <code>${m[1]}</code> 에 담아 가며 반복해요. 줄 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^while (.*):$/))) why = `<b>while</b> 은 조건 <code>${esc(m[1])}</code> 이 참인 동안 아래 줄을 계속 반복해요. 줄 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^if (.*):$/))) why = `<b>if</b> 는 "만약 <code>${esc(m[1])}</code> 이면"이에요. 참일 때만 아래 들여쓴 줄이 실행돼요. 줄 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^elif (.*):$/))) why = `<b>elif</b> 는 "아니고 만약 <code>${esc(m[1])}</code> 이면". 위 if가 거짓일 때만 검사해요. if 와 <b>같은 위치</b>(들여쓰기 없이)에 쓰고 끝에 콜론(:)!`;
+      else if (t === 'else:') why = `<b>else</b> 는 "위 조건이 전부 아니면". if 와 <b>같은 위치</b>에 쓰고 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^def (\w+)\((.*)\):$/))) why = `<b>def</b> 로 함수 <code>${m[1]}</code> 을 만들어요.${m[2] ? ` 괄호 안 <code>${esc(m[2])}</code> 은 받을 값의 이름이에요.` : ''} 줄 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^return (.*)$/))) why = `<b>return</b> 은 함수의 결과를 돌려줘요. 함수 안이라서 들여쓰기가 있어요.`;
+      else if ((m = t.match(/^import (\w+)$/))) why = `<b>import</b> 로 <code>${m[1]}</code> 도구 상자를 가져와요. 맨 위에 한 번만 쓰면 돼요.`;
+      else if ((m = t.match(/^turtle\.(\w+)\((.*)\)$/))) why = `거북이에게 명령해요: <code>${m[1]}</code>${{ forward: '= 앞으로 가기', left: '= 왼쪽으로 돌기', right: '= 오른쪽으로 돌기', backward: '= 뒤로 가기', circle: '= 원 그리기', penup: '= 펜 들기', pendown: '= 펜 내리기', color: '= 색 바꾸기' }[m[1]] || ''}${m[2] ? ` (괄호 안 <code>${esc(m[2])}</code> 만큼)` : ''}.`;
+      else if ((m = t.match(/^(\w+)\.append\((.*)\)$/))) why = `리스트 <code>${m[1]}</code> 의 맨 끝에 <code>${esc(m[2])}</code> 을 추가해요.`;
+      else if ((m = t.match(/^(\w+)\((.*)\)$/))) why = `만들어 둔 함수 <code>${m[1]}</code> 을 불러요(실행해요).`;
+      else why = `이 줄을 그대로 치세요.`;
+      let indTxt = '';
+      if (lvl > 0) indTxt = ` <span class="coach-ind">앞에 <b>빈칸 ${lvl * 4}칸</b>${lvl === 1 ? '(스페이스 4번 또는 Tab 1번)' : `(Tab ${lvl}번)`} — 위 줄의 "안쪽"이라는 뜻이에요.</span>`;
+      else if (prevColon) indTxt = '';
+      else if (i > 0 && steps.length && steps[steps.length - 1].lvl > 0) indTxt = ` <span class="coach-ind">들여쓰기 <b>없이</b> 맨 앞에서 시작해요 (반복/조건에서 나왔다는 뜻).</span>`;
+      const code = '    '.repeat(lvl) + t;
+      steps.push({ t: `${why}${indTxt}<div class="coach-code"><span class="muted small">이렇게 치세요 (${steps.length + 1}번째 줄)</span><pre class="code"><code>${esc(code)}</code></pre><button class="btn xs coach-copy" data-code="${esc(code)}">📋 복사</button></div>`, c: t, lvl, auto: true });
+      prevColon = t.endsWith(':');
+    }
+    if (!steps.length) return null;
+    steps.push({ t: '다 쳤으면 <b>▶ 실행</b>으로 결과를 확인하고, <b>✔ 제출하기</b>를 누르세요!' });
     return steps;
   },
   instantiate(p, params) {

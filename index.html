@@ -37,6 +37,7 @@ select{padding:8px 10px;border-radius:8px;border:1px solid var(--border);backgro
 /* 상단바 */
 #topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;padding:6px 12px;background:var(--surface);border-bottom:1px solid var(--border);min-height:52px}
 .tb-btn{min-width:44px;min-height:44px;border:0;background:transparent;color:var(--text);font-size:1.3em;border-radius:10px;display:flex;align-items:center;justify-content:center}.tb-btn:hover{background:var(--surface2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}.chip{padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:var(--mono);font-size:.9em;min-height:32px}.chip:hover,.chip.on{border-color:var(--primary);background:var(--primary);color:#fff}
 .tb-sync{font-size:1.05em;color:var(--muted)}.tb-sync.ok{color:var(--accent)}.tb-sync.err{color:var(--warn)}.tb-sync.syncing{animation:spin 1s linear infinite}.tb-sync.dirty{color:var(--primary)}@keyframes spin{to{transform:rotate(360deg)}}
 .tb-title{flex:1;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tb-xp{display:flex;align-items:center;gap:6px;font-size:.85em}.tb-lv{font-weight:800;color:var(--gold)}.tb-xpn{color:var(--muted);font-size:.85em}
@@ -118,6 +119,10 @@ dfn.term{font-style:normal;font-weight:800;font-size:1.12em;text-decoration:unde
 .blocklyTreeRow.coach-hl{outline:3px solid var(--warn);outline-offset:2px;animation:coachpulse 1s ease-in-out infinite}@keyframes coachpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,179,71,.6)}50%{box-shadow:0 0 0 8px rgba(255,179,71,0)}}
 .bed-guide{position:absolute;left:46%;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;text-align:center;color:#334;background:rgba(255,255,255,.92);border:2px dashed var(--primary);border-radius:14px;padding:14px 12px;font-size:1.02em;line-height:1.5;box-shadow:0 6px 20px rgba(0,0,0,.12);transition:opacity .25s}.bed-guide.hide{opacity:0}
 .bed-guide .bg-arrow{font-size:2em;line-height:1;color:var(--primary);animation:bgnudge 1.1s ease-in-out infinite}.bed-guide .bg-t b{color:var(--primary)}.bed-guide .bg-s{margin-top:6px;font-size:.86em;color:#667}
+.bg-demo{position:relative;height:64px;margin:8px auto 2px;max-width:240px;--dx:150px;--dy:0px}.bg-demo .bg-blk{position:absolute;left:10px;top:18px;width:78px;height:30px;border-radius:8px;background:#5ba55b;box-shadow:0 2px 0 #3f7f3f;color:#fff;font-size:.72em;font-weight:700;display:flex;align-items:center;justify-content:center;animation:bgblk 3.2s ease-in-out infinite}.bg-demo .bg-blk::before{content:'';position:absolute;left:12px;top:-5px;width:16px;height:6px;border-radius:3px 3px 0 0;background:#5ba55b}.bg-demo .bg-hand{position:absolute;left:36px;top:30px;font-size:1.8em;line-height:1;animation:bghand 3.2s ease-in-out infinite;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+@keyframes bgblk{0%,14%{transform:translate(0,0);opacity:.55}18%{opacity:1}68%,100%{transform:translate(var(--dx),var(--dy));opacity:1}}
+@keyframes bghand{0%{transform:translate(0,-10px);opacity:0}8%{transform:translate(0,-10px);opacity:1}14%{transform:translate(0,0) scale(.9)}68%{transform:translate(var(--dx),var(--dy)) scale(.9)}76%{transform:translate(var(--dx),calc(var(--dy) - 12px)) scale(1);opacity:1}90%,100%{transform:translate(var(--dx),calc(var(--dy) - 14px));opacity:0}}
+.bed.horiz .bg-demo{--dx:40px;--dy:-34px;height:76px}.bed.horiz .bg-demo .bg-blk{top:40px}.bed.horiz .bg-demo .bg-hand{top:52px}[data-anim="0"] .bg-demo{display:none}
 .bed.single .bed-guide{left:50%}.bed.horiz .bed-guide{left:14px;right:14px;top:34%;transform:none}.bed.horiz .bg-arrow{animation-name:bgnudgev}
 @keyframes bgnudge{0%,100%{transform:translateX(0)}50%{transform:translateX(-10px)}}@keyframes bgnudgev{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
 .codeview{min-width:0}.codeview .code{height:calc(100% - 26px);min-height:300px;overflow:auto;padding:8px}.cvl{padding:0 6px;border-radius:4px;cursor:pointer;white-space:pre}.cvl.hl{background:rgba(80,160,255,.3)}
@@ -140,7 +145,8 @@ dfn.term{font-style:normal;font-weight:800;font-size:1.12em;text-decoration:unde
 .pv-tags{margin-top:8px}.pv-hints{display:flex;flex-direction:column;gap:6px;margin-top:10px}
 .hint{padding:8px 12px;border-radius:8px;border-left:3px solid var(--gold);background:rgba(255,209,102,.1);font-size:.95em;animation:pop .3s}.hint.ans{border-left-color:var(--danger)}.hint pre{margin-top:6px}
 .pv-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.pv-nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.pv-work{min-width:0}
+.pv-work{min-width:0}.pv-focusbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.pv.focus{grid-template-columns:1fr}.pv.focus .pv-desc{display:none}.pv-focus-title{font-weight:800;font-size:1.05em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pv.focus .bed{height:min(760px,calc(100vh - 200px))}
+.coach-code{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}.coach-code .code{margin:0;padding:6px 10px;flex:1;min-width:160px;font-size:1.05em}.coach-code .muted{flex-basis:100%}.coach-ind{display:block;margin-top:4px;color:var(--warn)}
 .quiz{display:flex;flex-direction:column;gap:8px}.qopt{text-align:left;padding:12px 14px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text);min-height:48px}.qopt:hover:not(:disabled){border-color:var(--primary)}.qopt.right{border-color:var(--accent);background:rgba(43,182,115,.15)}.qopt.wrong{border-color:var(--danger);background:rgba(255,93,108,.15);animation:shake .4s}
 .code.fill{line-height:2}.blank{font-family:var(--mono);font-size:var(--code-size);padding:2px 6px;border-radius:6px;border:2px solid var(--primary);background:var(--surface);color:var(--text);min-width:60px}.blank.wrong{border-color:var(--danger);background:rgba(255,93,108,.2)}
 .buglines{background:var(--ed-bg);color:var(--ed-fg);border-radius:8px;padding:6px 0;font-family:var(--mono);font-size:var(--code-size)}.bugline{display:flex;gap:10px;padding:4px 12px;cursor:pointer;border-left:3px solid transparent}.bugline:hover{background:rgba(128,128,128,.15)}.bugline .ln{color:var(--ed-com);width:24px;text-align:right}.bugline code{white-space:pre}.bugline.right{background:rgba(43,182,115,.25);border-left-color:var(--accent)}.bugline.wrong{background:rgba(255,93,108,.25);border-left-color:var(--danger)}
@@ -195,7 +201,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
  #view{padding:10px;padding-bottom:70px}.home{grid-template-columns:1fr}.side{order:-1}.side .card{padding:10px}.side .cal{display:none}
  .node{width:calc(50% - 6px)}.node.boss{width:100%}
  .pv,.pv.mode-block{grid-template-columns:1fr}.pv-tabs{display:flex;margin-bottom:10px;background:var(--surface2);border-radius:10px;overflow:hidden}.pv-tabs button{flex:1;min-height:44px;border:0;background:transparent;color:var(--muted);font-weight:700}.pv-tabs button.on{background:var(--primary);color:#fff}
- .pv:not([data-tab]) .pv-work,.pv[data-tab=desc] .pv-work{display:none}.pv[data-tab=work] .pv-desc{display:none}
+ .pv:not([data-tab]) .pv-work,.pv[data-tab=desc] .pv-work{display:none}.pv[data-tab=work] .pv-desc{display:none}.pv-focusbar{display:none}.pv.focus .pv-desc{display:block}.pv.focus[data-tab=work] .pv-desc{display:none}
  .block-wrap{grid-template-columns:1fr}.bed{height:380px}.codeview .code{height:160px}.parsons{grid-template-columns:1fr}.tc-body{grid-template-columns:1fr}.tr-body{grid-template-columns:1fr}
  .pg{grid-template-columns:1fr}#tutorPanel{width:100%;top:auto;height:78vh;border-left:0;border-top:1px solid var(--border);border-radius:16px 16px 0 0;transform:translateY(105%)}
  .tb-xpn{display:none}.xpbar{width:60px}.out{max-height:200px}.pc-grid{grid-template-columns:repeat(2,1fr)}
@@ -215,7 +221,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '1.2.0',
+  APP_VERSION: '1.3.0',
   SAVE_KEY: 'python_academy_save',
   SCHEMA_VERSION: 1,
 
@@ -362,23 +368,23 @@ const LESSONS = [
   pages:[
     { title:'버튼을 눌러 보세요', html:`<p>이 앱에서는 <b>진짜 파이썬</b>이 바로 실행돼요. 아래 코드는 화면에 <code>안녕!</code>이라고 말하라는 뜻이에요.</p><p>아무것도 몰라도 괜찮아요. 일단 <b>실행해 보기</b> 버튼을 눌러 보세요.</p>`,
       example:{ code:`print("안녕!")` } },
-    { title:'프로그래밍이란', html:`<p>[[프로그래밍]]은 컴퓨터에게 <b>할 일을 순서대로 적어 주는 것</b>이에요. 요리 레시피와 비슷해요. "물을 끓인다 → 면을 넣는다 → 3분 기다린다"처럼요.</p><p>그 레시피를 컴퓨터가 알아듣는 말로 쓴 것이 [[코드]]이고, 우리가 쓸 말이 [[파이썬]]이에요. 파이썬은 사람 말과 가장 닮은 프로그래밍 언어라서 처음 배우기 좋아요.</p>` },
+    { title:'프로그래밍이란', html:`<p>[[프로그래밍]]은 컴퓨터에게 <b>할 일을 순서대로 적어 주는 것</b>이에요. 요리 레시피와 비슷해요. "물을 끓인다 → 면을 넣는다 → 3분 기다린다"처럼요.</p><p>그 레시피를 컴퓨터가 알아듣는 말로 쓴 것이 [[코드]]이고, 우리가 쓸 말이 [[파이썬]]이에요. 파이썬은 사람이 쓰는 영어 문장과 가장 닮은 컴퓨터 언어라서 처음 배우기 좋아요.</p>` },
     { title:'코드는 위에서 아래로', html:`<p>컴퓨터는 코드를 <b>맨 윗줄부터 한 줄씩 차례대로</b> 실행해요. 아래 예제는 세 줄이니까 세 번 말해요. 순서를 바꾸면 말하는 순서도 바뀌어요.</p><p>직접 줄 순서를 바꿔서 실행해 보세요. 예제 코드는 마음껏 고쳐도 돼요.</p>`,
       example:{ code:`print("첫 번째")\nprint("두 번째")\nprint("세 번째")` } },
     { title:'에러는 실패가 아니에요', html:`<p>코드를 잘못 쓰면 컴퓨터가 빨간 글씨로 [[에러]]를 보여 줘요. 겁먹지 마세요. <b>에러는 실패가 아니라 컴퓨터가 보내는 힌트</b>예요. "여기가 이상해요"라고 알려 주는 거죠.</p><p>아래 예제는 일부러 따옴표를 하나 빠뜨렸어요. 실행해서 에러를 구경한 다음, 따옴표를 채워 다시 실행해 보세요. 에러를 만나는 것도 뱃지 조건이랍니다.</p>`,
       example:{ code:`print("따옴표를 빠뜨렸어요)` } },
-    { title:'이 앱 사용법', html:`<p><b>지도</b>에서 레슨을 고르고, <b>설명</b>을 읽은 뒤 <b>문제</b>를 풀어요. 문제를 풀면 XP를 얻고 레벨이 올라요.</p><ul><li>막히면 <b>힌트</b> 버튼 (별이 조금 줄어요)</li><li>더 막히면 <b>선생님에게 물어보기</b> (설정에서 API 키 필요, 벌점 없음)</li><li>매일 조금씩 풀면 <b>스트릭</b> 불꽃이 커져요</li></ul><p>그럼 퀴즈 3개로 몸을 풀어 볼까요?</p>` },
+    { title:'이 앱 사용법', html:`<p><b>지도</b>에서 레슨을 고르고, <b>설명</b>을 읽은 뒤 <b>문제</b>를 풀어요. 문제를 풀면 XP를 얻고 레벨이 올라요.</p><ul><li>막히면 <b>힌트</b> 버튼 (별이 조금 줄어요)</li><li>더 막히면 <b>선생님에게 물어보기</b> (설정에서 API 키 필요, 벌점 없음)</li><li>매일 조금씩 풀면 <b>스트릭</b>(며칠 연속으로 했는지) 불꽃이 커져요</li></ul><p>그럼 퀴즈 3개로 몸을 풀어 볼까요?</p>` },
   ],
   summary:['프로그래밍은 컴퓨터에게 할 일을 순서대로 적는 것','코드는 위에서 아래로 한 줄씩 실행된다','에러는 실패가 아니라 힌트'] },
 
 { id:'L1', ch:1, n:1, title:'print로 말하기', minutes:10, mode:'block', blocks:['text_print','text','text_join'],
   tutorSummary:'print()는 괄호 안의 내용을 화면에 보여 준다. 글자(문자열)는 따옴표로 감싼다. print를 여러 번 쓰면 여러 줄이 나온다.',
   pages:[
-    { title:'print는 말하기', html:`<p>[[print]]는 "이걸 화면에 보여 줘"라는 명령이에요. 괄호 안에 보여 줄 내용을 넣어요.</p><p>글자를 보여 주고 싶으면 반드시 <b>따옴표</b>로 감싸야 해요. 따옴표로 감싼 글자를 [[문자열]]이라고 불러요. 따옴표는 큰따옴표 <code>"</code>와 작은따옴표 <code>'</code> 둘 다 돼요. 단, 시작과 끝은 같은 종류여야 해요.</p>`,
+    { title:'print는 말하기', html:`<p>[[print]]는 "이걸 화면에 보여 줘"라는 명령이에요. 괄호 <code>( )</code> 안에 보여 줄 내용을 넣어요. (print는 '프린트'라고 읽고, '찍어 내다'라는 뜻이에요)</p><p>글자를 보여 주고 싶으면 반드시 <b>따옴표</b>로 감싸야 해요. 따옴표로 감싼 글자를 [[문자열]](글자를 줄줄이 이어 놓은 것)이라고 불러요. 따옴표는 큰따옴표 <code>"</code>와 작은따옴표 <code>'</code> 둘 다 돼요. 단, 시작과 끝은 같은 종류여야 해요.</p>`,
       example:{ code:`print("오늘 날씨 좋다")\nprint('작은따옴표도 돼요')` } },
-    { title:'따옴표가 없으면?', html:`<p>따옴표 없이 <code>print(안녕)</code>이라고 쓰면 컴퓨터는 "안녕"을 글자가 아니라 <b>어떤 이름</b>으로 생각해요. 그런 이름은 없으니 <code>NameError</code>가 나요.</p><p>반대로 숫자는 따옴표가 없어도 돼요. <code>print(7)</code>은 7을 보여 줘요.</p>`,
+    { title:'따옴표가 없으면?', html:`<p>따옴표 없이 <code>print(안녕)</code>이라고 쓰면 컴퓨터는 "안녕"을 글자가 아니라 <b>어떤 것의 이름</b>으로 생각해요. 그런 이름은 만든 적이 없으니 "그런 이름 몰라요"라는 뜻의 <code>NameError</code>가 나요.</p><p>반대로 숫자는 따옴표가 없어도 돼요. <code>print(7)</code>은 7을 보여 줘요.</p>`,
       example:{ code:`print(7)\nprint("7")\nprint(안녕)` } },
-    { title:'여러 줄, 여러 개', html:`<p>print를 여러 번 쓰면 줄이 바뀌면서 차례로 나와요. 하나의 print 안에 쉼표로 여러 개를 넣으면 <b>띄어쓰기 한 칸</b>으로 이어져서 한 줄에 나와요.</p><p>블록 모드에서는 "다음 내용 출력" 블록을 쌓으면 돼요. 블록을 움직이면 오른쪽 코드가 같이 바뀌는 걸 꼭 지켜보세요.</p>`,
+    { title:'여러 줄, 여러 개', html:`<p>print를 여러 번 쓰면 줄이 바뀌면서 차례로 나와요. 하나의 print 안에 쉼표로 여러 개를 넣으면 <b>띄어쓰기 한 칸</b>으로 이어져서 한 줄에 나와요.</p><p>블록 모드에서는 <b>출력</b> 블록을 위아래로 쌓으면 돼요. 블록을 움직이면 오른쪽 코드가 같이 바뀌는 걸 꼭 지켜보세요.</p>`,
       example:{ code:`print("사과")\nprint("배")\nprint("사과", "배", "포도")` } },
   ],
   summary:['print(내용)은 화면에 내용을 보여 준다','글자는 따옴표로 감싼다 (문자열)','print를 쌓으면 줄이 바뀐다'] },
@@ -400,11 +406,11 @@ const LESSONS = [
   tutorSummary:'사칙연산 + - * /, 나머지 %, 몫 //, 거듭제곱 **. input()은 사용자가 입력한 글자(문자열)를 돌려준다. 숫자로 계산하려면 int()로 바꿔야 한다.',
   terms:{ '형 변환':'값의 종류를 바꾸는 것. int("3")은 글자 "3"을 숫자 3으로 바꾼다' },
   pages:[
-    { title:'계산기처럼', html:`<p>파이썬은 계산기예요. <code>+</code>는 더하기, <code>-</code>는 빼기, <code>*</code>는 곱하기, <code>/</code>는 나누기예요. 곱하기는 x가 아니라 <b>별표 <code>*</code></b>를 써요.</p><p><code>**</code>는 거듭제곱이에요. <code>2 ** 3</code>은 2를 세 번 곱한 8이에요.</p>`,
+    { title:'계산기처럼', html:`<p>파이썬은 계산기예요. <code>+</code>는 더하기, <code>-</code>는 빼기, <code>*</code>는 곱하기, <code>/</code>는 나누기예요. 곱하기는 x가 아니라 <b>별표 <code>*</code></b>를 써요.</p><p>별표 두 개 <code>**</code>는 "같은 수를 여러 번 곱하기"예요. <code>2 ** 3</code>은 2를 세 번 곱한 것(2×2×2)이라서 8이에요.</p>`,
       example:{ code:`print(3 + 4)\nprint(10 - 7)\nprint(6 * 7)\nprint(2 ** 10)` } },
-    { title:'나머지와 몫', html:`<p>나누기 <code>/</code>는 결과가 항상 소수예요. <code>7 / 2</code>는 3.5이고, <code>8 / 2</code>도 4가 아니라 <b>4.0</b>이 나와요.</p><p>정수로 된 <b>몫</b>만 원하면 <code>//</code>, <b>나머지</b>만 원하면 <code>%</code>를 써요. 나머지는 짝수·홀수를 구분할 때 아주 자주 써요. <code>n % 2</code>가 0이면 짝수예요.</p>`,
+    { title:'나머지와 몫', html:`<p>나누기 <code>/</code>는 결과에 항상 소수점이 붙어요. <code>7 / 2</code>는 3.5이고, <code>8 / 2</code>도 4가 아니라 <b>4.0</b>이 나와요.</p><p>초등학교 나눗셈처럼 "7 나누기 2는 <b>3</b>, <b>1</b> 남음"으로 보고 싶을 때가 있죠. 그 <b>3(몫)</b>만 원하면 <code>//</code>, <b>1(나머지)</b>만 원하면 <code>%</code>를 써요. 나머지는 짝수·홀수를 구분할 때 아주 자주 써요. <code>n % 2</code>가 0이면(2로 나눠서 남는 게 없으면) 짝수예요.</p>`,
       example:{ code:`print(7 / 2)\nprint(7 // 2)\nprint(7 % 2)\nprint(8 / 2)` } },
-    { title:'input: 사용자에게 묻기', html:`<p>[[input]]은 사용자가 키보드로 적은 것을 받아 와요. <code>name = input()</code>처럼 변수에 담아 쓰죠. 이 앱에서는 에디터 아래 <b>입력값 칸</b>에 미리 적어 둔 내용을 한 줄씩 읽어요.</p><p>중요한 점: input이 돌려주는 값은 <b>항상 글자(문자열)</b>예요. "7"을 입력해도 글자 "7"이에요. 숫자로 계산하려면 <code>int()</code>로 바꿔 줘야 해요. 이걸 [[형 변환]]이라고 해요.</p>`,
+    { title:'input: 사용자에게 묻기', html:`<p>[[input]]('인풋', 들어오는 것)은 사용자가 키보드로 적은 것을 받아 와요. <code>name = input()</code>처럼 변수에 담아 쓰죠. 이 앱에서는 에디터 아래 <b>입력값 칸</b>에 미리 적어 둔 내용을 한 줄씩 읽어요.</p><p>중요한 점: input이 가져온 값은 <b>항상 글자(문자열)</b>예요. 7을 입력해도 숫자 7이 아니라 글자 "7"이에요. 숫자로 계산하려면 <code>int()</code>('인트', 정수)로 감싸서 숫자로 바꿔 줘야 해요. 이렇게 값의 종류를 바꾸는 걸 [[형 변환]]이라고 해요.</p>`,
       example:{ code:`n = input()\nprint(n + n)\nm = int(n)\nprint(m + m)`, stdin:'7' } },
   ],
   summary:['+ - * / 와 나머지 %, 몫 //','input()은 항상 문자열을 돌려준다','숫자로 쓰려면 int()로 바꾼다'] },
@@ -413,11 +419,11 @@ const LESSONS = [
   tutorSummary:'if 조건: 으로 조건이 참일 때만 실행. elif로 다른 조건, else로 나머지. 비교는 == != < > <= >=, 논리는 and or not. 콜론 뒤 줄은 들여쓰기.',
   terms:{ '조건문':'조건이 맞을 때만 어떤 코드를 실행하게 하는 문장 (if)', '들여쓰기':'줄 앞에 공백 4칸을 넣어 "이 줄은 위 문장에 속한다"고 표시하는 것' },
   pages:[
-    { title:'만약 ~라면', html:`<p>[[조건문]] <code>if</code>는 "만약 ~라면 이걸 해라"예요. <code>if 조건:</code> 다음 줄부터 <b>공백 4칸 들여쓴 줄</b>이 조건이 참일 때 실행돼요.</p><p>이 [[들여쓰기]]가 파이썬의 핵심 규칙이에요. 들여쓴 줄은 if에 속하고, 들여쓰기를 되돌리면 if 밖이에요. 콜론 <code>:</code>을 빠뜨리면 에러가 나요.</p>`,
+    { title:'만약 ~라면', html:`<p>[[조건문]] <code>if</code>('이프', 만약)는 "만약 ~라면 이걸 해라"예요. <code>if 조건:</code> 다음 줄부터 <b>앞에 빈칸 4칸(스페이스 키 4번)을 넣어 들여쓴 줄</b>이, 조건이 맞을 때(참일 때)만 실행돼요.</p><p>이 [[들여쓰기]]가 파이썬의 핵심 규칙이에요. 들여쓴 줄은 if에 속하고, 들여쓰기를 다시 없애면 if 밖이에요. 줄 끝의 콜론 <code>:</code>(쌍점, Shift+;)을 빠뜨리면 에러가 나요.</p>`,
       example:{ code:`age = 15\nif age >= 13:\n    print("청소년이에요")\nprint("이 줄은 항상 나와요")` } },
-    { title:'아니면 (elif, else)', html:`<p>조건이 거짓일 때 할 일은 <code>else:</code>에 써요. 조건이 여러 개면 중간에 <code>elif 조건:</code>을 넣어요. 위에서부터 검사해서 <b>처음 맞는 하나만</b> 실행돼요.</p>`,
+    { title:'아니면 (elif, else)', html:`<p>조건이 안 맞을 때(거짓일 때) 할 일은 <code>else:</code>('엘스', 아니면)에 써요. 조건이 여러 개면 중간에 <code>elif 조건:</code>('엘리프', 아니고 만약)을 넣어요. 위에서부터 검사해서 <b>처음 맞는 하나만</b> 실행돼요.</p>`,
       example:{ code:`score = 85\nif score >= 90:\n    print("A")\nelif score >= 80:\n    print("B")\nelse:\n    print("C")` } },
-    { title:'비교와 논리', html:`<p>비교할 때는 <code>== != &lt; &gt; &lt;= &gt;=</code>를 써요. <b>같다는 <code>==</code> (등호 두 개)</b>예요. 등호 하나 <code>=</code>는 변수에 넣는 것이었죠.</p><p>조건 두 개를 묶을 땐 <code>and</code>(둘 다), <code>or</code>(하나라도), 뒤집을 땐 <code>not</code>을 써요.</p>`,
+    { title:'비교와 논리', html:`<p>비교할 때는 <code>== != &lt; &gt; &lt;= &gt;=</code>를 써요. <b>같다는 <code>==</code> (등호 두 개)</b>예요. 등호 하나 <code>=</code>는 변수에 넣는 것이었죠.</p><p>조건 두 개를 묶을 땐 <code>and</code>(그리고: 둘 다 맞아야), <code>or</code>(또는: 하나라도 맞으면), 뒤집을 땐 <code>not</code>(아니다)을 써요.</p>`,
       example:{ code:`x = 7\nprint(x == 7)\nprint(x > 10)\nprint(x > 0 and x < 10)\nprint(not x == 7)` } },
   ],
   summary:['if 조건: 아래 들여쓴 줄이 참일 때 실행','elif / else 로 갈래를 나눈다','같다는 == (두 개), 넣기는 = (한 개)'] },
@@ -1331,7 +1337,8 @@ const Content = {
     const v = expr(); if (i < toks.length) throw new Error('trailing'); return v;
   },
   // 블록 문제 따라하기 가이드. 손으로 쓴 guide가 있으면 그것, 없으면 정답 코드 줄에서 자동 생성
-  guideFor(p) {
+  guideFor(p, mode = 'block') {
+    if (mode === 'text') return this.textGuideFor(p);
     const hand = p.guide || (typeof GUIDES !== 'undefined' && GUIDES[p.id]);
     if (hand) { const params = p.params || {}; const sub = (x) => typeof x !== 'string' ? x : x.replace(/\{\{([^}]+)\}\}/g, (m, e) => { try { return String(this.evalExpr(e, params)); } catch (err) { return m; } }); return hand.map(g => ({ ...g, t: sub(g.t), c: Array.isArray(g.c) ? g.c.map(sub) : sub(g.c) })); }
     if (p.type !== 'block' || !p.solution) return null;
@@ -1358,6 +1365,48 @@ const Content = {
       steps.push({ t: txt, c: t, cat, auto: true });
     }
     steps.push({ t: '다 만들었으면 <b>▶ 실행</b>으로 결과를 확인하고, <b>✔ 제출하기</b>를 누르세요!' });
+    return steps;
+  },
+  // 텍스트(타자) 문제 따라하기 가이드: 정답 코드를 한 줄씩 "무슨 뜻인지 + 그대로 치면 되는 코드"로 풀어 준다. 초반 레슨(L0~L5)만.
+  TEXT_GUIDE_LESSONS: ['L0', 'L1', 'L2', 'L3', 'L4', 'L5'],
+  textGuideFor(p) {
+    const hand = (typeof GUIDES_TEXT !== 'undefined' && GUIDES_TEXT[p.id]);
+    if (hand) return hand;
+    const sol = p.solution || (p.parsons && p.parsons.solution); if (!sol || !this.TEXT_GUIDE_LESSONS.includes(p.lesson)) return null;
+    const steps = []; const lines = sol.split('\n'); let prevColon = false;
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i]; const t = raw.trim(); if (!t) continue;
+      const ind = raw.length - raw.trimStart().length; const lvl = Math.round(ind / 4);
+      let why = '', m;
+      if ((m = t.match(/^print\((.*)\)$/))) why = `<b>print( )</b> 는 괄호 안의 것을 화면에 보여줘요.${/^["']/.test(m[1]) ? ' 글자는 <b>따옴표</b>로 감싸야 해요.' : /,/.test(m[1]) ? ' 쉼표로 나누면 띄어쓰기로 이어서 보여줘요.' : ' 변수나 계산 결과는 따옴표 <b>없이</b> 써요.'}`;
+      else if ((m = t.match(/^(\w+) = int\(input\(\)\)$/))) why = `<b>input()</b> 으로 입력 한 줄을 받고, <b>int( )</b> 로 숫자로 바꿔서 변수 <code>${m[1]}</code> 에 담아요. (입력은 글자로 들어오니까 숫자로 바꿔야 계산돼요)`;
+      else if ((m = t.match(/^(\w+) = input\(\)$/))) why = `<b>input()</b> 으로 입력 한 줄을 받아 변수 <code>${m[1]}</code> 에 담아요.`;
+      else if ((m = t.match(/^(\w+) \+= (.*)$/))) why = `<code>${m[1]} += ${esc(m[2])}</code> 는 "<code>${m[1]}</code> 에 ${esc(m[2])} 을 더해서 다시 담아라"예요. (<code>${m[1]} = ${m[1]} + ${esc(m[2])}</code> 와 같아요)`;
+      else if ((m = t.match(/^(\w+) = (\w+) \+ (.*)$/)) && m[1] === m[2]) why = `<code>${m[1]}</code> 에 ${esc(m[3])} 을 더해서 <code>${m[1]}</code> 에 다시 담아요. 오른쪽을 먼저 계산하고 왼쪽 상자에 넣는다고 생각하세요.`;
+      else if ((m = t.match(/^(\w+) = (.*)$/))) why = `<b>=</b> 는 "같다"가 아니라 <b>"오른쪽 값을 왼쪽 이름에 담아라"</b>예요. 변수 <code>${m[1]}</code> 에 <code>${esc(m[2])}</code> 을 담아요.`;
+      else if ((m = t.match(/^for (\w+) in range\((.*)\):$/))) why = `<b>for</b> 반복문이에요. <code>${m[1]}</code> 이 <code>range(${esc(m[2])})</code> 의 숫자를 하나씩 받으며 아래 들여쓴 줄을 반복해요. 줄 끝 <b>콜론(:)</b>을 꼭 붙이세요.`;
+      else if ((m = t.match(/^for (\w+) in (\w+):$/))) why = `<code>${m[2]}</code> 안의 항목을 하나씩 <code>${m[1]}</code> 에 담아 가며 반복해요. 줄 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^while (.*):$/))) why = `<b>while</b> 은 조건 <code>${esc(m[1])}</code> 이 참인 동안 아래 줄을 계속 반복해요. 줄 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^if (.*):$/))) why = `<b>if</b> 는 "만약 <code>${esc(m[1])}</code> 이면"이에요. 참일 때만 아래 들여쓴 줄이 실행돼요. 줄 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^elif (.*):$/))) why = `<b>elif</b> 는 "아니고 만약 <code>${esc(m[1])}</code> 이면". 위 if가 거짓일 때만 검사해요. if 와 <b>같은 위치</b>(들여쓰기 없이)에 쓰고 끝에 콜론(:)!`;
+      else if (t === 'else:') why = `<b>else</b> 는 "위 조건이 전부 아니면". if 와 <b>같은 위치</b>에 쓰고 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^def (\w+)\((.*)\):$/))) why = `<b>def</b> 로 함수 <code>${m[1]}</code> 을 만들어요.${m[2] ? ` 괄호 안 <code>${esc(m[2])}</code> 은 받을 값의 이름이에요.` : ''} 줄 끝에 <b>콜론(:)</b>!`;
+      else if ((m = t.match(/^return (.*)$/))) why = `<b>return</b> 은 함수의 결과를 돌려줘요. 함수 안이라서 들여쓰기가 있어요.`;
+      else if ((m = t.match(/^import (\w+)$/))) why = `<b>import</b> 로 <code>${m[1]}</code> 도구 상자를 가져와요. 맨 위에 한 번만 쓰면 돼요.`;
+      else if ((m = t.match(/^turtle\.(\w+)\((.*)\)$/))) why = `거북이에게 명령해요: <code>${m[1]}</code>${{ forward: '= 앞으로 가기', left: '= 왼쪽으로 돌기', right: '= 오른쪽으로 돌기', backward: '= 뒤로 가기', circle: '= 원 그리기', penup: '= 펜 들기', pendown: '= 펜 내리기', color: '= 색 바꾸기' }[m[1]] || ''}${m[2] ? ` (괄호 안 <code>${esc(m[2])}</code> 만큼)` : ''}.`;
+      else if ((m = t.match(/^(\w+)\.append\((.*)\)$/))) why = `리스트 <code>${m[1]}</code> 의 맨 끝에 <code>${esc(m[2])}</code> 을 추가해요.`;
+      else if ((m = t.match(/^(\w+)\((.*)\)$/))) why = `만들어 둔 함수 <code>${m[1]}</code> 을 불러요(실행해요).`;
+      else why = `이 줄을 그대로 치세요.`;
+      let indTxt = '';
+      if (lvl > 0) indTxt = ` <span class="coach-ind">앞에 <b>빈칸 ${lvl * 4}칸</b>${lvl === 1 ? '(스페이스 4번 또는 Tab 1번)' : `(Tab ${lvl}번)`} — 위 줄의 "안쪽"이라는 뜻이에요.</span>`;
+      else if (prevColon) indTxt = '';
+      else if (i > 0 && steps.length && steps[steps.length - 1].lvl > 0) indTxt = ` <span class="coach-ind">들여쓰기 <b>없이</b> 맨 앞에서 시작해요 (반복/조건에서 나왔다는 뜻).</span>`;
+      const code = '    '.repeat(lvl) + t;
+      steps.push({ t: `${why}${indTxt}<div class="coach-code"><span class="muted small">이렇게 치세요 (${steps.length + 1}번째 줄)</span><pre class="code"><code>${esc(code)}</code></pre><button class="btn xs coach-copy" data-code="${esc(code)}">📋 복사</button></div>`, c: t, lvl, auto: true });
+      prevColon = t.endsWith(':');
+    }
+    if (!steps.length) return null;
+    steps.push({ t: '다 쳤으면 <b>▶ 실행</b>으로 결과를 확인하고, <b>✔ 제출하기</b>를 누르세요!' });
     return steps;
   },
   instantiate(p, params) {
@@ -2050,7 +2099,7 @@ const UI = {
     });
   },
   async confirm(msg, ok = '확인', cancel = '취소') { const r = await this.modal({ title: '확인', body: `<p>${msg}</p>`, buttons: [{ label: cancel, value: false }, { label: ok, cls: 'primary', value: true }] }); return r === true; },
-  prompt(title, placeholder = '', value = '', opt = {}) { return new Promise(resolve => { const ov = document.createElement('div'); ov.className = 'modal-ov'; ov.innerHTML = `<div class="modal"><div class="modal-title">${title}</div><div class="modal-body">${opt.hint ? `<p class="muted" style="margin:0 0 8px;font-size:.92em;line-height:1.5">${opt.hint}</p>` : ''}<input class="input" placeholder="${esc(placeholder)}" value="${esc(value)}" maxlength="40" autocomplete="off" spellcheck="false"></div><div class="modal-btns"><button class="btn" data-a="c">${opt.cancel || T.close}</button><button class="btn primary" data-a="ok">${opt.ok || T.save}</button></div></div>`; document.body.appendChild(ov); const inp = $('input', ov); setTimeout(() => inp.focus(), 50); const done = (v) => { ov.remove(); resolve(v); }; $('[data-a=c]', ov).onclick = () => done(null); $('[data-a=ok]', ov).onclick = () => done(inp.value.trim() || null); inp.onkeydown = (e) => { if (e.key === 'Enter') done(inp.value.trim() || null); }; }); },
+  prompt(title, placeholder = '', value = '', opt = {}) { return new Promise(resolve => { const ov = document.createElement('div'); ov.className = 'modal-ov'; ov.innerHTML = `<div class="modal"><div class="modal-title">${title}</div><div class="modal-body">${opt.hint ? `<p class="muted" style="margin:0 0 8px;font-size:.92em;line-height:1.5">${opt.hint}</p>` : ''}<input class="input" placeholder="${esc(placeholder)}" value="${esc(value)}" maxlength="40" autocomplete="off" spellcheck="false">${opt.chips ? `<div class="chips"><span class="muted small">추천:</span>${opt.chips.map(c => `<button class="chip" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : ''}</div><div class="modal-btns"><button class="btn" data-a="c">${opt.cancel || T.close}</button><button class="btn primary" data-a="ok">${opt.ok || T.save}</button></div></div>`; document.body.appendChild(ov); const inp = $('input', ov); setTimeout(() => inp.focus(), 50); $$('.chip', ov).forEach(c => c.onclick = () => { inp.value = c.dataset.c; inp.focus(); $$('.chip', ov).forEach(x => x.classList.toggle('on', x === c)); }); const done = (v) => { ov.remove(); resolve(v); }; $('[data-a=c]', ov).onclick = () => done(null); $('[data-a=ok]', ov).onclick = () => done(inp.value.trim() || null); inp.onkeydown = (e) => { if (e.key === 'Enter') done(inp.value.trim() || null); }; }); },
   isMobile() { return innerWidth < 768; },
   applyTheme() { const s = Store.data.settings; document.documentElement.dataset.theme = s.theme; document.documentElement.dataset.font = s.font; document.documentElement.dataset.anim = s.anim; const et = INVENTORY.editorTheme.find(x => x.id === s.editorTheme) || INVENTORY.editorTheme[0]; for (const k in et.css) document.documentElement.style.setProperty('--ed-' + k, et.css[k]); },
   go(view, params = {}, push = true) { if (push && this.view) this.history.push([this.view, this.params]); this.view = view; this.params = params; if (this.current && this.current.destroy) try { this.current.destroy(); } catch (e) {} this.current = null; Tutor.ui && Tutor.ui.close(); const root = $('#view'); root.className = 'view-' + view; root.scrollTop = 0; window.scrollTo(0, 0); const V = Views[view]; const seq = ++this._seq; const res = V(root, params); if (seq !== this._seq) return; /* 뷰 안에서 다른 화면으로 넘어간 경우 */ this.current = res || null; this.renderTopbar(); },
@@ -2181,9 +2230,12 @@ const Blocks = {
   setup() {
     // 블록을 끼울 때 붙는 판정 범위를 넓게 (기본 28px → 초보자가 대충 가져가도 붙도록)
     try { Blockly.config.snapRadius = 64; Blockly.config.connectingSnapRadius = 84; Blockly.config.currentConnectionPreference = 20; } catch (e) {}
+    const RES = new Set('False,None,True,and,as,assert,break,class,continue,def,del,elif,else,except,finally,for,from,global,if,import,in,is,lambda,nonlocal,not,or,pass,raise,return,try,while,with,yield,print,input,int,str,len,list,dict,range'.split(','));
     // Blockly 기본 창(window.prompt/confirm/alert) 대신 앱 안의 모달 사용 — 변수 만들기/이름 바꾸기/지우기
     try {
-      Blockly.dialog.setPrompt((msg, def, cb) => { const isNew = !def; UI.prompt(isNew ? '🧰 새 변수 만들기' : '✏️ 변수 이름 바꾸기', '예: age, name, score', def || '', { ok: isNew ? '만들기' : '바꾸기', cancel: '취소', hint: '변수는 값을 담아 두는 <b>이름표 붙은 상자</b>예요.<br>영어 소문자로 짓고 띄어쓰기 대신 _ 를 쓰세요. (예: <code>my_age</code>)' }).then(v => cb(v === null ? null : v.replace(/\s+/g, '_'))); });
+      // 추천 변수 이름: 지금 문제의 정답 코드에 나오는 이름 먼저, 그다음 자주 쓰는 이름
+      const suggest = () => { const out = []; try { if (UI.view === 'problem' && UI.params.pid) { const p = Content.problem(UI.params.pid); const sol = (p && p.solution) || ''; for (const m of sol.matchAll(/^\s*([A-Za-z_]\w*)\s*(?:\+|-|\*)?=/gm)) out.push(m[1]); for (const m of sol.matchAll(/\bfor\s+([A-Za-z_]\w*)\s+in\b/g)) out.push(m[1]); } } catch (e) {} for (const g of ['name', 'age', 'score', 'count', 'total', 'i', 'answer', 'items']) out.push(g); return [...new Set(out.filter(n => !RES.has(n)))].slice(0, 8); };
+      Blockly.dialog.setPrompt((msg, def, cb) => { const isNew = !def; UI.prompt(isNew ? '🧰 새 변수 만들기' : '✏️ 변수 이름 바꾸기', '예: age, name, score', def || '', { ok: isNew ? '만들기' : '바꾸기', cancel: '취소', chips: suggest(), hint: '변수는 값을 담아 두는 <b>이름표 붙은 상자</b>예요.<br>영어 소문자로 짓고 띄어쓰기 대신 _ 를 쓰세요. (예: <code>my_age</code>)' }).then(v => cb(v === null ? null : v.replace(/\s+/g, '_'))); });
       Blockly.dialog.setConfirm((msg, cb) => { UI.confirm(msg, '확인', '취소').then(cb); });
       Blockly.dialog.setAlert((msg, cb) => { UI.modal({ title: '알림', body: `<p>${esc(msg)}</p>` }).then(() => cb && cb()); });
     } catch (e) { console.info('Blockly dialog override skipped', e); }
@@ -2191,7 +2243,6 @@ const Blocks = {
     gen.INDENT = '    ';
     const origInit = gen.init.bind(gen); gen.init = (ws) => { origInit(ws); gen.definitions_['variables'] = ''; };
     // 변수 이름: 파이썬 식별자로 유효하면 그대로 사용 (한글 허용)
-    const RES = new Set('False,None,True,and,as,assert,break,class,continue,def,del,elif,else,except,finally,for,from,global,if,import,in,is,lambda,nonlocal,not,or,pass,raise,return,try,while,with,yield,print,input,int,str,len,list,dict,range'.split(','));
     const origGV = gen.getVariableName.bind(gen);
     gen.getVariableName = (nameOrId) => { try { const ws = gen._ws; const v = ws && (ws.getVariableById ? ws.getVariableById(nameOrId) : null); const nm = v ? (v.name || (v.getName && v.getName())) : null; if (nm && /^[^\W\d][\w]*$/u.test(nm) && !RES.has(nm)) return nm; } catch (e) {} return origGV(nameOrId); };
     const origWTC = gen.workspaceToCode.bind(gen); gen.workspaceToCode = (ws) => { gen._ws = ws; return origWTC(ws); };
@@ -2251,14 +2302,15 @@ class BlockEditor {
     this.parent.innerHTML = ''; const div = document.createElement('div'); div.className = 'bed-ws'; this.parent.appendChild(div);
     const mobile = UI.isMobile(); const tb = Blocks.toolbox(allowed); const single = !!tb._single; delete tb._single;
     this.parent.classList.toggle('horiz', mobile); this.parent.classList.toggle('single', single);
-    this.ws = Blockly.inject(div, { toolbox: tb, horizontalLayout: mobile, toolboxPosition: mobile ? 'end' : 'start', scrollbars: true, trashcan: true, zoom: { controls: true, wheel: true, startScale: mobile ? 0.8 : 0.95, maxScale: 2, minScale: 0.4, pinch: true }, move: { scrollbars: true, drag: true, wheel: false }, renderer: 'zelos', grid: { spacing: 20, length: 2, colour: 'rgba(128,128,128,.15)', snap: true } });
+    this.ws = Blockly.inject(div, { toolbox: tb, horizontalLayout: mobile, toolboxPosition: mobile ? 'end' : 'start', scrollbars: true, trashcan: true, zoom: { controls: true, wheel: true, startScale: mobile ? 0.85 : 1.1, maxScale: 2, minScale: 0.4, pinch: true }, move: { scrollbars: true, drag: true, wheel: false }, renderer: 'zelos', grid: { spacing: 20, length: 2, colour: 'rgba(128,128,128,.15)', snap: true } });
     if (state) { try { Blockly.serialization.workspaces.load(state, this.ws); } catch (e) { console.warn('블록 상태 복원 실패', e); } }
     // 빈 작업판 안내: 블록이 하나도 없을 때만 보임
     const guide = document.createElement('div'); guide.className = 'bed-guide';
     const from = mobile ? '아래' : '왼쪽', arrow = mobile ? '⬇' : '⬅';
+    const demo = `<div class="bg-demo" aria-hidden="true"><span class="bg-blk">출력 ❝안녕❞</span><span class="bg-hand">👆</span></div>`;
     guide.innerHTML = single
-      ? `<div class="bg-arrow">${arrow}</div><div class="bg-t">${from}에 있는 <b>블록을 손가락(마우스)으로 끌어서</b><br>이 흰 바탕에 놓으세요</div><div class="bg-s">놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`
-      : `<div class="bg-arrow">${arrow}</div><div class="bg-t"><b>①</b> ${from} 메뉴(출력·변수…)를 눌러 블록을 꺼내고<br><b>②</b> 블록을 끌어서 이 흰 바탕에 놓으세요</div><div class="bg-s">놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`;
+      ? `<div class="bg-arrow">${arrow}</div><div class="bg-t">${from}에 있는 <b>블록을 손가락(마우스)으로 끌어서</b><br>이 흰 바탕에 놓으세요</div>${demo}<div class="bg-s">꾹 누른 채 끌고 와서 손을 떼면 돼요 · 놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`
+      : `<div class="bg-arrow">${arrow}</div><div class="bg-t"><b>①</b> ${from} 메뉴(출력·변수…)를 눌러 블록을 꺼내고<br><b>②</b> 블록을 끌어서 이 흰 바탕에 놓으세요</div>${demo}<div class="bg-s">꾹 누른 채 끌고 와서 손을 떼면 돼요 · 놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`;
     this.parent.appendChild(guide); this.guide = guide;
     const updGuide = () => { if (!this.ws) return; guide.classList.toggle('hide', this.ws.getAllBlocks(false).length > 0); };
     updGuide();
@@ -2423,8 +2475,8 @@ const TracePanel = {
 // 정답 코드가 만들어지는 과정을 단계별로 안내하고, 생성된 코드를 보고 자동으로 다음 단계로 넘어간다.
 const Coach = {
   norm(code) { return String(code || '').replace(/\s+/g, '').replace(/'/g, '"'); },
-  mount(el, p, rec, getEd) {
-    const steps = Content.guideFor(p); if (!steps || !steps.length || !el) return null;
+  mount(el, p, rec, getEd, mode = 'block') {
+    const steps = Content.guideFor(p, mode); if (!steps || !steps.length || !el) return null; const isText = mode === 'text';
     const key = 'coach_' + p.id; const st = { i: 0, open: !(rec.status === 'clear'), all: false, done: new Set() };
     const self = {
       check(step, code) {
@@ -2442,7 +2494,7 @@ const Coach = {
       skip() { if (st.i < steps.length - 1) { st.i++; self.render(); } },
       back() { if (st.i > 0) { st.i--; self.render(); } },
       highlightCat(name) {
-        $$('.blocklyTreeRow.coach-hl').forEach(r => r.classList.remove('coach-hl')); if (!name) return;
+        $$('.blocklyTreeRow.coach-hl').forEach(r => r.classList.remove('coach-hl')); if (!name || isText) return;
         $$('.blocklyTreeRow').forEach(r => { const lbl = $('.blocklyTreeLabel', r); if (lbl && lbl.textContent.trim() === name) r.classList.add('coach-hl'); });
       },
       render() {
@@ -2454,10 +2506,11 @@ const Coach = {
           <div class="coach-head"><span class="coach-title">🧭 따라하기 <b>${st.i + 1}</b>/${steps.length}</span><span class="coach-dots">${dots}</span><span class="grow"></span><button class="lnk" id="coachAll">${st.all ? '현재 단계만' : '전체 단계 보기'}</button><button class="lnk" id="coachClose">접기</button></div>
           <div class="coach-body"><span class="coach-num">${last ? '🎉' : st.i + 1}</span><div class="coach-text">${cur.t}</div></div>
           ${list}
-          <div class="coach-foot">${st.i > 0 ? '<button class="btn sm" id="coachBack">◀ 이전 단계</button>' : ''}${!last ? '<button class="btn sm" id="coachSkip">이 단계는 했어요 ▶</button>' : ''}<span class="muted sm">${last ? '' : '블록을 맞게 놓으면 자동으로 다음 단계로 넘어가요'}</span></div>
+          <div class="coach-foot">${st.i > 0 ? '<button class="btn sm" id="coachBack">◀ 이전 단계</button>' : ''}${!last ? '<button class="btn sm" id="coachSkip">이 단계는 했어요 ▶</button>' : ''}<span class="muted sm">${last ? '' : isText ? '줄을 맞게 치면 자동으로 다음 단계로 넘어가요' : '블록을 맞게 놓으면 자동으로 다음 단계로 넘어가요'}</span></div>
         </div>`;
         self.flash = false;
         const b = (id, fn) => { const x = $(id, el); if (x) x.onclick = fn; };
+        $$('.coach-copy', el).forEach(x => x.onclick = async () => { try { await navigator.clipboard.writeText(x.dataset.code); UI.toast('복사했어요. 에디터에 붙여넣기(Ctrl+V)'); } catch (e) { UI.toast('복사가 안 되면 직접 쳐 보세요'); } });
         b('#coachAll', () => { st.all = !st.all; self.render(); }); b('#coachClose', () => { st.open = false; self.render(); }); b('#coachBack', self.back); b('#coachSkip', () => { Audio.click(); self.skip(); });
         setTimeout(() => self.highlightCat(last ? null : cur.cat), 200);
       },
@@ -2487,7 +2540,8 @@ Views.problem = (root, params) => {
     st.mode = await decideMode();
     const typeLabel = typeName(p.type) + (st.mode === 'text' && p.type !== 'code' ? ' → 텍스트' : '');
     const xpBase = isBoss ? Game.bossXp(p) : (p.xp || CONFIG.XP[p.type]);
-    root.innerHTML = `<div class="pv ${isBoss ? 'boss' : ''}">
+    const focus = !!Store.data.settings.focus;
+    root.innerHTML = `<div class="pv ${isBoss ? 'boss' : ''} ${focus ? 'focus' : ''}">
       <div class="pv-tabs"><button data-t="desc" class="on">설명</button><button data-t="work">작업</button></div>
       <div class="pv-desc">
         <div class="pv-head"><span class="chip type-${p.type}">${typeLabel}</span>${isBoss ? '<span class="chip boss">BOSS</span>' : ''}${inReview ? '<span class="chip">복습</span>' : ''}${inChallenge ? '<span class="chip hot">도전 XP 2배</span>' : ''}<span class="chip xp">${xpBase} XP</span>${rec.status === 'clear' ? UI.stars(rec.stars) : ''}<span class="muted small">${idx + 1}/${probs.length}</span></div>
@@ -2501,6 +2555,7 @@ Views.problem = (root, params) => {
         <div class="pv-nav"><button class="btn sm" id="btnLesson">📖 레슨 설명 보기</button>${idx > 0 ? `<button class="btn sm" id="btnPrevP">◀ 이전 문제</button>` : ''}${idx < probs.length - 1 ? `<button class="btn sm" id="btnNextP">다음 문제 ▶</button>` : ''}<button class="btn sm" id="btnResetP" title="이 문제의 진행·코드만 지워요">↺ 이 문제 초기화</button></div>
       </div>
       <div class="pv-work">
+        <div class="pv-focusbar"><button class="btn sm" id="btnFocus" title="문제 설명을 접고 작업판을 넓게 써요">${focus ? '⛶ 집중 모드 끄기' : '⛶ 집중 모드'}</button>${focus ? `<span class="pv-focus-title" title="${esc(p.title)}">${esc(p.title)}</span><button class="btn sm" id="fbDesc">📄 설명</button><button class="btn sm" id="fbHint">💡 힌트</button><button class="btn sm tutor" id="fbTutor">💬 선생님</button>` : ''}</div>
         ${isBoss ? `<div class="bosshp"><div class="bosshp-h">👾 보스 HP</div><div class="hpbar"><div class="hpfill" style="width:100%"></div></div><div class="bosshp-n">${tests.length}/${tests.length}</div></div>` : ''}
         <div class="pv-mode" id="pvMode"></div>
         <div class="pv-io" id="pvIo"></div>
@@ -2512,6 +2567,11 @@ Views.problem = (root, params) => {
     $$('.pv-tabs button', root).forEach(b => b.onclick = () => { $$('.pv-tabs button', root).forEach(x => x.classList.remove('on')); b.classList.add('on'); root.querySelector('.pv').dataset.tab = b.dataset.t; });
     $('#btnLesson').onclick = () => UI.go('lesson', { lessonId: base.lesson, page: 0 }); const pp = $('#btnPrevP'); if (pp) pp.onclick = () => UI.go('problem', { pid: probs[idx - 1].id, lessonId: base.lesson }); const np = $('#btnNextP'); if (np) np.onclick = () => UI.go('problem', { pid: probs[idx + 1].id, lessonId: base.lesson });
     $('#btnResetP').onclick = async () => { if (!await UI.confirm('이 문제의 별점·힌트·저장된 코드를 지우고 처음부터 풀까요? (XP는 그대로예요)', '초기화')) return; Store.resetProblem(pid); UI.go('problem', { pid, lessonId: base.lesson }, false); };
+    $('#btnFocus').onclick = () => { Store.data.settings.focus = !focus; Store.save(); Audio.click(); render(); };
+    const fb = (id, fn) => { const x = $(id, root); if (x) x.onclick = fn; };
+    fb('#fbDesc', () => UI.modal({ title: esc(p.title), wide: true, body: `<div class="pv-prompt">${UI.terms(p.prompt)}</div>${p.inputExample ? `<div class="pv-inex"><b>입력 예시</b><pre>${esc(p.inputExample)}</pre></div>` : ''}${rec.hints ? `<div class="pv-hints">${p.hints.slice(0, rec.hints).map((t, i) => `<div class="hint h${i + 1}"><b>힌트 ${i + 1}</b> ${esc(t)}</div>`).join('')}</div>` : ''}`, onOpen: (ov) => UI.bindTerms(ov) }));
+    fb('#fbHint', () => { if (rec.hints >= 3) { UI.toast('힌트를 모두 봤어요'); return; } useHint(); UI.modal({ title: `💡 힌트 ${rec.hints}/3`, body: `<div class="hint h${rec.hints}">${esc(p.hints[rec.hints - 1])}</div>` }); });
+    fb('#fbTutor', () => $('#btnTutor').click());
     $('#btnHint').onclick = useHint; $('#btnAnswer').onclick = seeAnswer; $('#btnTutor').onclick = () => { rec.tutorAsked = true; Store.save(); Tutor.ui.open({ lesson: l, problem: p, getCode, getLastRun: () => st.lastRun, hints: rec.hints, answerSeen: rec.answerSeen, key: pid, cleared: rec.status === 'clear', onNewProblem: (q) => UI.go('problem', { pid: q.id, lessonId: q.lesson }) }); };
     if (p.project) { const done = (Store.data.lessons['proj_' + pid] || []); $$('[data-step]', root).forEach(cb => { cb.checked = !!done[+cb.dataset.step]; cb.onchange = () => { done[+cb.dataset.step] = cb.checked; Store.data.lessons['proj_' + pid] = done; Store.save(); Audio.click(); }; }); }
     renderHints(); renderMode();
@@ -2531,7 +2591,7 @@ Views.problem = (root, params) => {
     else if (st.mode === 'parsons') { host.innerHTML = `<div id="pvPz"></div><div class="row"><button class="btn accent" id="btnGrade">✔ 제출하기</button><button class="btn" id="btnRun">▶ 실행해 보기</button></div><div class="out-wrap"><pre class="out" id="pvOut"></pre></div>`; let state = null; try { if (rec.mode === 'parsons' && rec.code) state = JSON.parse(rec.code); } catch (e) {} st.parsons = new ParsonsEditor($('#pvPz'), { problem: p, state }); $('#btnGrade').onclick = gradeParsons; $('#btnRun').onclick = () => runCode(false); }
     else if (st.mode === 'block') { const pvEl = host.closest('.pv'); if (pvEl) pvEl.classList.add('mode-block'); host.innerHTML = `<div id="pvCoach"></div><div class="block-wrap"><div class="block-ed" id="pvBlock"></div><div class="codeview"><div class="lbl">생성된 파이썬 코드 <span class="muted">(블록을 누르면 줄이 반짝여요)</span></div><pre class="code" id="pvCodeView"></pre></div></div>`; let state = null; try { if (rec.mode === 'block' && rec.code) state = JSON.parse(rec.code); } catch (e) {} const cv = $('#pvCodeView'); const showCode = (code, hl = []) => { cv.innerHTML = (code || '# 아직 블록이 없어요\n# 왼쪽 블록을 흰 바탕으로 끌어오면\n# 여기에 파이썬 코드가 나타나요').split('\n').map((ln, i) => `<div class="cvl ${hl.includes(i + 1) ? 'hl' : ''}" data-ln="${i + 1}">${esc(ln) || '&nbsp;'}</div>`).join(''); $$('.cvl', cv).forEach(el => el.onclick = () => { const id = st.blockEd.blockForLine(+el.dataset.ln); st.blockEd.highlight(id); $$('.cvl', cv).forEach(x => x.classList.remove('hl')); el.classList.add('hl'); }); }; st.coach = Coach.mount($('#pvCoach'), p, rec, () => st.blockEd); st.blockEd = new BlockEditor($('#pvBlock'), { allowed: Content.blocksUpTo(base.lesson), state, onChange: (code) => { showCode(code); st.coach && st.coach.update(code); } }); st.blockEd.onSelect = (id) => { showCode(st.blockEd.getCode(), id ? st.blockEd.blockLines(id) : []); }; io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun(); }
     else { // text
-      host.innerHTML = `<div class="ed-wrap"><div id="pvEd"></div></div>`; const init = (rec.mode === 'text' && rec.code != null) ? rec.code : (p.starter || ''); st.editor = new TextEditor($('#pvEd'), { value: init, onChange: () => { st.editor.setErrorLine(null); clearTimeout(st.synTimer); st.synTimer = setTimeout(syntaxCheck, 700); } }); io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun();
+      host.innerHTML = `<div id="pvCoach"></div><div class="ed-wrap"><div id="pvEd"></div></div>`; const init = (rec.mode === 'text' && rec.code != null) ? rec.code : (p.starter || ''); st.coach = Coach.mount($('#pvCoach'), p, rec, () => st.editor, 'text'); st.editor = new TextEditor($('#pvEd'), { value: init, onChange: (code) => { st.editor.setErrorLine(null); clearTimeout(st.synTimer); st.synTimer = setTimeout(syntaxCheck, 700); st.coach && st.coach.update(code); } }); if (st.coach) st.coach.update(init); io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun();
     }
     renderTests();
   };

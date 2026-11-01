@@ -65,9 +65,12 @@ const Blocks = {
   setup() {
     // 블록을 끼울 때 붙는 판정 범위를 넓게 (기본 28px → 초보자가 대충 가져가도 붙도록)
     try { Blockly.config.snapRadius = 64; Blockly.config.connectingSnapRadius = 84; Blockly.config.currentConnectionPreference = 20; } catch (e) {}
+    const RES = new Set('False,None,True,and,as,assert,break,class,continue,def,del,elif,else,except,finally,for,from,global,if,import,in,is,lambda,nonlocal,not,or,pass,raise,return,try,while,with,yield,print,input,int,str,len,list,dict,range'.split(','));
     // Blockly 기본 창(window.prompt/confirm/alert) 대신 앱 안의 모달 사용 — 변수 만들기/이름 바꾸기/지우기
     try {
-      Blockly.dialog.setPrompt((msg, def, cb) => { const isNew = !def; UI.prompt(isNew ? '🧰 새 변수 만들기' : '✏️ 변수 이름 바꾸기', '예: age, name, score', def || '', { ok: isNew ? '만들기' : '바꾸기', cancel: '취소', hint: '변수는 값을 담아 두는 <b>이름표 붙은 상자</b>예요.<br>영어 소문자로 짓고 띄어쓰기 대신 _ 를 쓰세요. (예: <code>my_age</code>)' }).then(v => cb(v === null ? null : v.replace(/\s+/g, '_'))); });
+      // 추천 변수 이름: 지금 문제의 정답 코드에 나오는 이름 먼저, 그다음 자주 쓰는 이름
+      const suggest = () => { const out = []; try { if (UI.view === 'problem' && UI.params.pid) { const p = Content.problem(UI.params.pid); const sol = (p && p.solution) || ''; for (const m of sol.matchAll(/^\s*([A-Za-z_]\w*)\s*(?:\+|-|\*)?=/gm)) out.push(m[1]); for (const m of sol.matchAll(/\bfor\s+([A-Za-z_]\w*)\s+in\b/g)) out.push(m[1]); } } catch (e) {} for (const g of ['name', 'age', 'score', 'count', 'total', 'i', 'answer', 'items']) out.push(g); return [...new Set(out.filter(n => !RES.has(n)))].slice(0, 8); };
+      Blockly.dialog.setPrompt((msg, def, cb) => { const isNew = !def; UI.prompt(isNew ? '🧰 새 변수 만들기' : '✏️ 변수 이름 바꾸기', '예: age, name, score', def || '', { ok: isNew ? '만들기' : '바꾸기', cancel: '취소', chips: suggest(), hint: '변수는 값을 담아 두는 <b>이름표 붙은 상자</b>예요.<br>영어 소문자로 짓고 띄어쓰기 대신 _ 를 쓰세요. (예: <code>my_age</code>)' }).then(v => cb(v === null ? null : v.replace(/\s+/g, '_'))); });
       Blockly.dialog.setConfirm((msg, cb) => { UI.confirm(msg, '확인', '취소').then(cb); });
       Blockly.dialog.setAlert((msg, cb) => { UI.modal({ title: '알림', body: `<p>${esc(msg)}</p>` }).then(() => cb && cb()); });
     } catch (e) { console.info('Blockly dialog override skipped', e); }
@@ -75,7 +78,6 @@ const Blocks = {
     gen.INDENT = '    ';
     const origInit = gen.init.bind(gen); gen.init = (ws) => { origInit(ws); gen.definitions_['variables'] = ''; };
     // 변수 이름: 파이썬 식별자로 유효하면 그대로 사용 (한글 허용)
-    const RES = new Set('False,None,True,and,as,assert,break,class,continue,def,del,elif,else,except,finally,for,from,global,if,import,in,is,lambda,nonlocal,not,or,pass,raise,return,try,while,with,yield,print,input,int,str,len,list,dict,range'.split(','));
     const origGV = gen.getVariableName.bind(gen);
     gen.getVariableName = (nameOrId) => { try { const ws = gen._ws; const v = ws && (ws.getVariableById ? ws.getVariableById(nameOrId) : null); const nm = v ? (v.name || (v.getName && v.getName())) : null; if (nm && /^[^\W\d][\w]*$/u.test(nm) && !RES.has(nm)) return nm; } catch (e) {} return origGV(nameOrId); };
     const origWTC = gen.workspaceToCode.bind(gen); gen.workspaceToCode = (ws) => { gen._ws = ws; return origWTC(ws); };
@@ -135,14 +137,15 @@ class BlockEditor {
     this.parent.innerHTML = ''; const div = document.createElement('div'); div.className = 'bed-ws'; this.parent.appendChild(div);
     const mobile = UI.isMobile(); const tb = Blocks.toolbox(allowed); const single = !!tb._single; delete tb._single;
     this.parent.classList.toggle('horiz', mobile); this.parent.classList.toggle('single', single);
-    this.ws = Blockly.inject(div, { toolbox: tb, horizontalLayout: mobile, toolboxPosition: mobile ? 'end' : 'start', scrollbars: true, trashcan: true, zoom: { controls: true, wheel: true, startScale: mobile ? 0.8 : 0.95, maxScale: 2, minScale: 0.4, pinch: true }, move: { scrollbars: true, drag: true, wheel: false }, renderer: 'zelos', grid: { spacing: 20, length: 2, colour: 'rgba(128,128,128,.15)', snap: true } });
+    this.ws = Blockly.inject(div, { toolbox: tb, horizontalLayout: mobile, toolboxPosition: mobile ? 'end' : 'start', scrollbars: true, trashcan: true, zoom: { controls: true, wheel: true, startScale: mobile ? 0.85 : 1.1, maxScale: 2, minScale: 0.4, pinch: true }, move: { scrollbars: true, drag: true, wheel: false }, renderer: 'zelos', grid: { spacing: 20, length: 2, colour: 'rgba(128,128,128,.15)', snap: true } });
     if (state) { try { Blockly.serialization.workspaces.load(state, this.ws); } catch (e) { console.warn('블록 상태 복원 실패', e); } }
     // 빈 작업판 안내: 블록이 하나도 없을 때만 보임
     const guide = document.createElement('div'); guide.className = 'bed-guide';
     const from = mobile ? '아래' : '왼쪽', arrow = mobile ? '⬇' : '⬅';
+    const demo = `<div class="bg-demo" aria-hidden="true"><span class="bg-blk">출력 ❝안녕❞</span><span class="bg-hand">👆</span></div>`;
     guide.innerHTML = single
-      ? `<div class="bg-arrow">${arrow}</div><div class="bg-t">${from}에 있는 <b>블록을 손가락(마우스)으로 끌어서</b><br>이 흰 바탕에 놓으세요</div><div class="bg-s">놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`
-      : `<div class="bg-arrow">${arrow}</div><div class="bg-t"><b>①</b> ${from} 메뉴(출력·변수…)를 눌러 블록을 꺼내고<br><b>②</b> 블록을 끌어서 이 흰 바탕에 놓으세요</div><div class="bg-s">놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`;
+      ? `<div class="bg-arrow">${arrow}</div><div class="bg-t">${from}에 있는 <b>블록을 손가락(마우스)으로 끌어서</b><br>이 흰 바탕에 놓으세요</div>${demo}<div class="bg-s">꾹 누른 채 끌고 와서 손을 떼면 돼요 · 놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`
+      : `<div class="bg-arrow">${arrow}</div><div class="bg-t"><b>①</b> ${from} 메뉴(출력·변수…)를 눌러 블록을 꺼내고<br><b>②</b> 블록을 끌어서 이 흰 바탕에 놓으세요</div>${demo}<div class="bg-s">꾹 누른 채 끌고 와서 손을 떼면 돼요 · 놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`;
     this.parent.appendChild(guide); this.guide = guide;
     const updGuide = () => { if (!this.ws) return; guide.classList.toggle('hide', this.ws.getAllBlocks(false).length > 0); };
     updGuide();

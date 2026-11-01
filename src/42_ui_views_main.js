@@ -104,8 +104,8 @@ const TracePanel = {
 // 정답 코드가 만들어지는 과정을 단계별로 안내하고, 생성된 코드를 보고 자동으로 다음 단계로 넘어간다.
 const Coach = {
   norm(code) { return String(code || '').replace(/\s+/g, '').replace(/'/g, '"'); },
-  mount(el, p, rec, getEd) {
-    const steps = Content.guideFor(p); if (!steps || !steps.length || !el) return null;
+  mount(el, p, rec, getEd, mode = 'block') {
+    const steps = Content.guideFor(p, mode); if (!steps || !steps.length || !el) return null; const isText = mode === 'text';
     const key = 'coach_' + p.id; const st = { i: 0, open: !(rec.status === 'clear'), all: false, done: new Set() };
     const self = {
       check(step, code) {
@@ -123,7 +123,7 @@ const Coach = {
       skip() { if (st.i < steps.length - 1) { st.i++; self.render(); } },
       back() { if (st.i > 0) { st.i--; self.render(); } },
       highlightCat(name) {
-        $$('.blocklyTreeRow.coach-hl').forEach(r => r.classList.remove('coach-hl')); if (!name) return;
+        $$('.blocklyTreeRow.coach-hl').forEach(r => r.classList.remove('coach-hl')); if (!name || isText) return;
         $$('.blocklyTreeRow').forEach(r => { const lbl = $('.blocklyTreeLabel', r); if (lbl && lbl.textContent.trim() === name) r.classList.add('coach-hl'); });
       },
       render() {
@@ -135,10 +135,11 @@ const Coach = {
           <div class="coach-head"><span class="coach-title">🧭 따라하기 <b>${st.i + 1}</b>/${steps.length}</span><span class="coach-dots">${dots}</span><span class="grow"></span><button class="lnk" id="coachAll">${st.all ? '현재 단계만' : '전체 단계 보기'}</button><button class="lnk" id="coachClose">접기</button></div>
           <div class="coach-body"><span class="coach-num">${last ? '🎉' : st.i + 1}</span><div class="coach-text">${cur.t}</div></div>
           ${list}
-          <div class="coach-foot">${st.i > 0 ? '<button class="btn sm" id="coachBack">◀ 이전 단계</button>' : ''}${!last ? '<button class="btn sm" id="coachSkip">이 단계는 했어요 ▶</button>' : ''}<span class="muted sm">${last ? '' : '블록을 맞게 놓으면 자동으로 다음 단계로 넘어가요'}</span></div>
+          <div class="coach-foot">${st.i > 0 ? '<button class="btn sm" id="coachBack">◀ 이전 단계</button>' : ''}${!last ? '<button class="btn sm" id="coachSkip">이 단계는 했어요 ▶</button>' : ''}<span class="muted sm">${last ? '' : isText ? '줄을 맞게 치면 자동으로 다음 단계로 넘어가요' : '블록을 맞게 놓으면 자동으로 다음 단계로 넘어가요'}</span></div>
         </div>`;
         self.flash = false;
         const b = (id, fn) => { const x = $(id, el); if (x) x.onclick = fn; };
+        $$('.coach-copy', el).forEach(x => x.onclick = async () => { try { await navigator.clipboard.writeText(x.dataset.code); UI.toast('복사했어요. 에디터에 붙여넣기(Ctrl+V)'); } catch (e) { UI.toast('복사가 안 되면 직접 쳐 보세요'); } });
         b('#coachAll', () => { st.all = !st.all; self.render(); }); b('#coachClose', () => { st.open = false; self.render(); }); b('#coachBack', self.back); b('#coachSkip', () => { Audio.click(); self.skip(); });
         setTimeout(() => self.highlightCat(last ? null : cur.cat), 200);
       },
@@ -168,7 +169,8 @@ Views.problem = (root, params) => {
     st.mode = await decideMode();
     const typeLabel = typeName(p.type) + (st.mode === 'text' && p.type !== 'code' ? ' → 텍스트' : '');
     const xpBase = isBoss ? Game.bossXp(p) : (p.xp || CONFIG.XP[p.type]);
-    root.innerHTML = `<div class="pv ${isBoss ? 'boss' : ''}">
+    const focus = !!Store.data.settings.focus;
+    root.innerHTML = `<div class="pv ${isBoss ? 'boss' : ''} ${focus ? 'focus' : ''}">
       <div class="pv-tabs"><button data-t="desc" class="on">설명</button><button data-t="work">작업</button></div>
       <div class="pv-desc">
         <div class="pv-head"><span class="chip type-${p.type}">${typeLabel}</span>${isBoss ? '<span class="chip boss">BOSS</span>' : ''}${inReview ? '<span class="chip">복습</span>' : ''}${inChallenge ? '<span class="chip hot">도전 XP 2배</span>' : ''}<span class="chip xp">${xpBase} XP</span>${rec.status === 'clear' ? UI.stars(rec.stars) : ''}<span class="muted small">${idx + 1}/${probs.length}</span></div>
@@ -182,6 +184,7 @@ Views.problem = (root, params) => {
         <div class="pv-nav"><button class="btn sm" id="btnLesson">📖 레슨 설명 보기</button>${idx > 0 ? `<button class="btn sm" id="btnPrevP">◀ 이전 문제</button>` : ''}${idx < probs.length - 1 ? `<button class="btn sm" id="btnNextP">다음 문제 ▶</button>` : ''}<button class="btn sm" id="btnResetP" title="이 문제의 진행·코드만 지워요">↺ 이 문제 초기화</button></div>
       </div>
       <div class="pv-work">
+        <div class="pv-focusbar"><button class="btn sm" id="btnFocus" title="문제 설명을 접고 작업판을 넓게 써요">${focus ? '⛶ 집중 모드 끄기' : '⛶ 집중 모드'}</button>${focus ? `<span class="pv-focus-title" title="${esc(p.title)}">${esc(p.title)}</span><button class="btn sm" id="fbDesc">📄 설명</button><button class="btn sm" id="fbHint">💡 힌트</button><button class="btn sm tutor" id="fbTutor">💬 선생님</button>` : ''}</div>
         ${isBoss ? `<div class="bosshp"><div class="bosshp-h">👾 보스 HP</div><div class="hpbar"><div class="hpfill" style="width:100%"></div></div><div class="bosshp-n">${tests.length}/${tests.length}</div></div>` : ''}
         <div class="pv-mode" id="pvMode"></div>
         <div class="pv-io" id="pvIo"></div>
@@ -193,6 +196,11 @@ Views.problem = (root, params) => {
     $$('.pv-tabs button', root).forEach(b => b.onclick = () => { $$('.pv-tabs button', root).forEach(x => x.classList.remove('on')); b.classList.add('on'); root.querySelector('.pv').dataset.tab = b.dataset.t; });
     $('#btnLesson').onclick = () => UI.go('lesson', { lessonId: base.lesson, page: 0 }); const pp = $('#btnPrevP'); if (pp) pp.onclick = () => UI.go('problem', { pid: probs[idx - 1].id, lessonId: base.lesson }); const np = $('#btnNextP'); if (np) np.onclick = () => UI.go('problem', { pid: probs[idx + 1].id, lessonId: base.lesson });
     $('#btnResetP').onclick = async () => { if (!await UI.confirm('이 문제의 별점·힌트·저장된 코드를 지우고 처음부터 풀까요? (XP는 그대로예요)', '초기화')) return; Store.resetProblem(pid); UI.go('problem', { pid, lessonId: base.lesson }, false); };
+    $('#btnFocus').onclick = () => { Store.data.settings.focus = !focus; Store.save(); Audio.click(); render(); };
+    const fb = (id, fn) => { const x = $(id, root); if (x) x.onclick = fn; };
+    fb('#fbDesc', () => UI.modal({ title: esc(p.title), wide: true, body: `<div class="pv-prompt">${UI.terms(p.prompt)}</div>${p.inputExample ? `<div class="pv-inex"><b>입력 예시</b><pre>${esc(p.inputExample)}</pre></div>` : ''}${rec.hints ? `<div class="pv-hints">${p.hints.slice(0, rec.hints).map((t, i) => `<div class="hint h${i + 1}"><b>힌트 ${i + 1}</b> ${esc(t)}</div>`).join('')}</div>` : ''}`, onOpen: (ov) => UI.bindTerms(ov) }));
+    fb('#fbHint', () => { if (rec.hints >= 3) { UI.toast('힌트를 모두 봤어요'); return; } useHint(); UI.modal({ title: `💡 힌트 ${rec.hints}/3`, body: `<div class="hint h${rec.hints}">${esc(p.hints[rec.hints - 1])}</div>` }); });
+    fb('#fbTutor', () => $('#btnTutor').click());
     $('#btnHint').onclick = useHint; $('#btnAnswer').onclick = seeAnswer; $('#btnTutor').onclick = () => { rec.tutorAsked = true; Store.save(); Tutor.ui.open({ lesson: l, problem: p, getCode, getLastRun: () => st.lastRun, hints: rec.hints, answerSeen: rec.answerSeen, key: pid, cleared: rec.status === 'clear', onNewProblem: (q) => UI.go('problem', { pid: q.id, lessonId: q.lesson }) }); };
     if (p.project) { const done = (Store.data.lessons['proj_' + pid] || []); $$('[data-step]', root).forEach(cb => { cb.checked = !!done[+cb.dataset.step]; cb.onchange = () => { done[+cb.dataset.step] = cb.checked; Store.data.lessons['proj_' + pid] = done; Store.save(); Audio.click(); }; }); }
     renderHints(); renderMode();
@@ -212,7 +220,7 @@ Views.problem = (root, params) => {
     else if (st.mode === 'parsons') { host.innerHTML = `<div id="pvPz"></div><div class="row"><button class="btn accent" id="btnGrade">✔ 제출하기</button><button class="btn" id="btnRun">▶ 실행해 보기</button></div><div class="out-wrap"><pre class="out" id="pvOut"></pre></div>`; let state = null; try { if (rec.mode === 'parsons' && rec.code) state = JSON.parse(rec.code); } catch (e) {} st.parsons = new ParsonsEditor($('#pvPz'), { problem: p, state }); $('#btnGrade').onclick = gradeParsons; $('#btnRun').onclick = () => runCode(false); }
     else if (st.mode === 'block') { const pvEl = host.closest('.pv'); if (pvEl) pvEl.classList.add('mode-block'); host.innerHTML = `<div id="pvCoach"></div><div class="block-wrap"><div class="block-ed" id="pvBlock"></div><div class="codeview"><div class="lbl">생성된 파이썬 코드 <span class="muted">(블록을 누르면 줄이 반짝여요)</span></div><pre class="code" id="pvCodeView"></pre></div></div>`; let state = null; try { if (rec.mode === 'block' && rec.code) state = JSON.parse(rec.code); } catch (e) {} const cv = $('#pvCodeView'); const showCode = (code, hl = []) => { cv.innerHTML = (code || '# 아직 블록이 없어요\n# 왼쪽 블록을 흰 바탕으로 끌어오면\n# 여기에 파이썬 코드가 나타나요').split('\n').map((ln, i) => `<div class="cvl ${hl.includes(i + 1) ? 'hl' : ''}" data-ln="${i + 1}">${esc(ln) || '&nbsp;'}</div>`).join(''); $$('.cvl', cv).forEach(el => el.onclick = () => { const id = st.blockEd.blockForLine(+el.dataset.ln); st.blockEd.highlight(id); $$('.cvl', cv).forEach(x => x.classList.remove('hl')); el.classList.add('hl'); }); }; st.coach = Coach.mount($('#pvCoach'), p, rec, () => st.blockEd); st.blockEd = new BlockEditor($('#pvBlock'), { allowed: Content.blocksUpTo(base.lesson), state, onChange: (code) => { showCode(code); st.coach && st.coach.update(code); } }); st.blockEd.onSelect = (id) => { showCode(st.blockEd.getCode(), id ? st.blockEd.blockLines(id) : []); }; io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun(); }
     else { // text
-      host.innerHTML = `<div class="ed-wrap"><div id="pvEd"></div></div>`; const init = (rec.mode === 'text' && rec.code != null) ? rec.code : (p.starter || ''); st.editor = new TextEditor($('#pvEd'), { value: init, onChange: () => { st.editor.setErrorLine(null); clearTimeout(st.synTimer); st.synTimer = setTimeout(syntaxCheck, 700); } }); io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun();
+      host.innerHTML = `<div id="pvCoach"></div><div class="ed-wrap"><div id="pvEd"></div></div>`; const init = (rec.mode === 'text' && rec.code != null) ? rec.code : (p.starter || ''); st.coach = Coach.mount($('#pvCoach'), p, rec, () => st.editor, 'text'); st.editor = new TextEditor($('#pvEd'), { value: init, onChange: (code) => { st.editor.setErrorLine(null); clearTimeout(st.synTimer); st.synTimer = setTimeout(syntaxCheck, 700); st.coach && st.coach.update(code); } }); if (st.coach) st.coach.update(init); io.innerHTML = ioHtml(tests.some(t => t.input)); bindRun();
     }
     renderTests();
   };

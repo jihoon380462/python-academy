@@ -2,7 +2,7 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '1.2.0',
+  APP_VERSION: '1.3.0',
   SAVE_KEY: 'python_academy_save',
   SCHEMA_VERSION: 1,
 
