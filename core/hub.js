@@ -41,7 +41,7 @@ const Hub = {
       ? `<div class="hc-body">${this.ring(pr.pct, c.color || 'var(--primary)')}<div class="hc-txt"><div class="hc-sub">${pr.cleared}/${pr.total} 문제 · ★ ${pr.stars}/${pr.maxStars}</div><div class="hc-sub muted">${pr.cleared >= pr.total ? '완주! 🎉' : `남은 시간 약 ${pr.mins >= 60 ? Math.round(pr.mins / 60) + '시간' : pr.mins + '분'}`}</div></div></div>`
       : `<div class="hc-body"><div class="hc-soon">🚧 준비 중 <small>(Phase ${c.phase})</small></div>${c.requires ? `<div class="hc-sub muted">🔒 ${esc(c.requires.label)}</div>` : ''}</div>`;
     const lockNote = locked ? `<div class="hc-sub muted">🔒 ${esc(c.requires.label)} <span class="small">(설정에서 "전제 무시" 가능)</span></div>` : '';
-    const inner = `<div class="hc-head"><span class="hc-icon">${c.icon}</span><span class="hc-name">${esc(c.name)}</span>${locked ? '<span class="chip">🔒</span>' : ''}</div><div class="hc-desc muted small">${esc(c.desc)}</div>${body}${lockNote}`;
+    const inner = `<div class="hc-head">${UI.img(`course-${c.id}.png`, c.icon, 'hc-icon')}<span class="hc-name">${esc(c.name)}</span>${locked ? '<span class="chip">🔒</span>' : ''}</div><div class="hc-desc muted small">${esc(c.desc)}</div>${body}${lockNote}`;
     return ready && !locked ? `<a class="card hc ready" href="${this.courseUrl(c)}" style="--hc:${c.color || 'var(--primary)'}">${inner}</a>` : `<div class="card hc ${ready ? 'locked' : 'soon'}">${inner}</div>`;
   },
 };

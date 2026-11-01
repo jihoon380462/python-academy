@@ -252,3 +252,5 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 @media (max-width:767px){.only-pc{display:none}}
 .chip-btn.on{background:var(--primary);color:#fff;border-color:transparent}
 .pitem.locked{opacity:.6}
+/* ===== 아트 리소스 (IMAGES.md) ===== */
+img.aimg{display:inline-block;vertical-align:middle;object-fit:contain}img.aimg.hc-icon{width:44px;height:44px}img.aimg.boss-img{width:64px;height:64px;margin-right:6px}.bosshp.dead img.aimg{filter:grayscale(1) opacity(.5)}

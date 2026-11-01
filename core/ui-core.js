@@ -47,6 +47,8 @@ const UI = {
   shake(el) { if (!el || Store.data.settings.anim === 0) return; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 500); },
   // PC 기준 위치 표현을 모바일 배치에 맞게 (블록 메뉴·코드 창이 아래에 있음)
   layoutWords(html) { if (!this.isMobile()) return html; return String(html).replace(/오른쪽 흰 바탕/g, '위쪽 흰 바탕').replace(/왼쪽에 보이는/g, '아래에 보이는').replace(/왼쪽 <b>변수<\/b> 메뉴/g, '아래 <b>변수</b> 메뉴').replace(/오른쪽 코드 창/g, '아래 코드 창').replace(/오른쪽 코드가/g, '아래 코드가').replace(/오른쪽에 파이썬 코드가/g, '아래에 파이썬 코드가'); },
+  // 그림 또는 이모지 (IMAGES.md): 파일이 없으면 onerror 로 이모지 span 으로 바뀐다
+  img(name, fallback, cls = '') { return `<img class="aimg ${cls}" src="${assetUrl(name)}" alt="" onerror="this.outerHTML='<span class=&quot;${cls}&quot;>${esc(fallback).replace(/'/g, '&#39;')}</span>'">`; },
   // 여러 줄 코드를 인라인 <code>에 <br>로 넣으면 줄마다 네모칸이 생긴다 → 블록 코드로 바꿔 그린다 (v2.2.6 수정)
   multiCode(html) { return String(html == null ? '' : html).replace(/<code>((?:(?!<\/code>)[\s\S])*?<br\s*\/?>(?:(?!<\/code>)[\s\S])*?)<\/code>/g, (m, c) => `<pre class="code qcode">${c.replace(/<br\s*\/?>/g, '\n').replace(/&nbsp;/g, ' ')}</pre>`); },
   terms(html) { html = this.multiCode(this.layoutWords(html)); html = html.replace(/<b>(실행해 보기|실행|제출하기|힌트|정답 보기|선생님에게 물어보기|한 줄씩 보기|놀이터로 가져가기|다음|확인)<\/b>/g, (m, t) => `<span class="uibtn ${['실행해 보기','실행'].includes(t) ? 'primary' : t === '제출하기' || t === '확인' ? 'accent' : t === '선생님에게 물어보기' ? 'tutor' : ''}">${t === '실행해 보기' || t === '실행' ? '▶ ' : t === '힌트' ? '💡 ' : t === '선생님에게 물어보기' ? '💬 ' : t === '정답 보기' ? '🔓 ' : t === '제출하기' ? '✔ ' : ''}${t}</span>`); return html.replace(/\[\[([^\]]+)\]\]/g, (m, t) => GLOSSARY[t] ? `<dfn class="term" data-term="${esc(t)}" title="${esc(GLOSSARY[t])}">${esc(t)}</dfn>` : t); },

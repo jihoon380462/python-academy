@@ -217,7 +217,7 @@ Views.problem = (root, params) => {
       <div class="pv-work">
         ${instant ? '' : `<div class="pv-brief"><div class="pv-brief-t">${esc(p.title)}</div><div class="pv-brief-p">${UI.terms(p.prompt)}</div><button class="lnk" id="briefDesc">설명 전체 보기 ▸</button></div>`}
         <div class="pv-focusbar"><button class="btn sm" id="btnFocus" title="문제 설명을 접고 작업판을 넓게 써요">${focus ? '⛶ 집중 모드 끄기' : '⛶ 집중 모드'}</button>${focus ? `<span class="pv-focus-title" title="${esc(p.title)}">${esc(p.title)}</span><button class="btn sm" id="fbDesc">📄 설명</button><button class="btn sm" id="fbHint">💡 힌트</button><button class="btn sm tutor" id="fbTutor">💬 선생님</button>` : ''}</div>
-        ${isBoss ? `<div class="bosshp"><div class="bosshp-h">👾 보스 HP</div><div class="hpbar"><div class="hpfill" style="width:100%"></div></div><div class="bosshp-n">${tests.length}/${tests.length}</div></div>` : ''}
+        ${isBoss ? `<div class="bosshp"><div class="bosshp-h">${UI.img(`boss-${Store.course}-${l.ch}.png`, '👾', 'boss-img')} 보스 HP</div><div class="hpbar"><div class="hpfill" style="width:100%"></div></div><div class="bosshp-n">${tests.length}/${tests.length}</div></div>` : ''}
         <div class="pv-mode" id="pvMode"></div>
         <div class="pv-io" id="pvIo"></div>
         <div class="pv-tests" id="pvTests"></div>
