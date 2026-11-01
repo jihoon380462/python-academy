@@ -7,9 +7,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| **현재 버전** | v2.0.3 (2026-11-01 배포) |
-| **마지막 작업** | v2.0.3: 따라하기 코치 기본 접힘(Parsons만 처음 펼침) + **Parsons 푸는 방법 코치**(`Content.parsonsGuideFor`, `@pz:k` 체크, `ParsonsEditor.onChange`) + 실행 때 입력값 칸이 비어 있으면 테스트 1 입력 자동 사용(EOFError인데 제출은 통과하던 혼란 해소). 그 전 v2.0.2: 에디터에서 `else:`/`elif`/`except:`/`finally:` 를 치면 짝 `if/try` 들여쓰기로 자동 맞춤(`dedentTarget`, CM·textarea 둘 다) + 따라하기 코치가 단계 바뀔 때만 다시 그림(타이핑마다 깜빡임 제거). Phase 1(알고리즘 코스) 작업 진행 중(미배포: core/visualize.js, runners/python.js 구조 스냅샷). 그 전 v2.0.1: 텍스트 따라하기 코치를 전 레슨으로 확장(`Content.TEXT_GUIDE_LESSONS = null`; 클래스·try·with·딕셔너리·메서드 등 패턴 설명 추가) + 레슨 5~18 설명 쉬운 말(용어 옆에 읽는 법·뜻 17곳). 그 전 v2.0.0 Phase 0: `src/`+`build.sh` → `core/`·`courses/python/`·`shared/`·`tools/` 구조, 허브(`index.html`+`core/hub.js`), 저장 스키마 v2(`academy.*`, v1 자동 이전·백업·되돌리기), Actions 검증 게이트, `python_academy.html` 리다이렉트, `legacy/` 보관. 상세: CHANGELOG.md |
-| **다음 후보** | ① Phase 1 알고리즘 코스(EXPANSION.md 5절 → v2.1.0) — 진행 중(시각화 엔진 작성됨, 콘텐츠 다음) ② v2.0.x 실사용 확인(허브 수치·실제 Blockly 화면·기기 연동 병합) 후 피드백 패치 |
+| **현재 버전** | v2.1.0 (2026-11-01 배포, Phase 1) |
+| **마지막 작업** | **Phase 1 완료(v2.1.0)**: 코스 2 알고리즘·자료구조 `courses/algo/`(레슨 16+보스 4, 문제 101, 모의고사 15문제 풀) + `core/visualize.js` 시각화 8종(레슨 예제 `example.visualize`·문제 `visualize`·추적 퀴즈 `quiz.code`) + 시간 제한 채점(`limits.time`, `inputGen`, `Py.bench`) + 모의고사 모드(`Views.mock`, `Sessions.mock`) + 새 유형 kind(trace/bigo/choose/ct) + 허브 알고리즘 카드(전제 B3, 설정 '전제 무시') + 알고리즘 뱃지 4개. 상세: DESIGN.md 12절, CHANGELOG. |
+| **다음 후보** | ① v2.1.0 실사용 확인(알고리즘 코스 시각화·시간 제한·모의고사, 실제 Pyodide) 후 패치 ② **Phase 2**: 코스 3 터미널·Git + 셸·Git 시뮬레이터(EXPANSION.md 6절 → v2.2.0) ③ 레슨 A0·A1 n 슬라이더 UI 노출, 허브 복습 큐 코스 통합 |
 
 ## 1. 이게 뭔가
 - **파이썬 아카데미**: 완전 초보자용 학습 사이트. v2.0.0(Phase 0)부터 **허브 + 코스 페이지** 구조 (확장 계획은 `EXPANSION.md`; "Phase N을 진행해"가 의뢰 단위).
@@ -21,7 +21,8 @@
 ## 2. 작업 방법 (반드시 이 순서)
 1. 저장소를 클론/attach한다. **빌드 없음** — 파일을 고치면 그게 곧 배포물이다. 로드 순서는 `courses/python/index.html`의 `<script>` 순서(바꾸지 말 것).
    - `core/config.js` 버전·CDN·수치·문구(T)·허브 코스 목록(COURSES) · `core/util.js` 유틸 · `core/storage.js` 저장(스키마 v2) · `core/sync.js` 기기 연동 · `core/engine.js` Content(인덱스·변형·가이드 생성)·Grader · `core/runners/python.js` Pyodide 워커·거북이 · `core/game.js` Game·Review · `core/tutor.js` 선생님 API+패널 · `core/fx.js` 효과음·색종이·마스코트 · `core/ui-core.js` UI 공통(모달·토스트·상단바·용어 칩) · `core/ui-editors.js` 텍스트/블록/Parsons 에디터 · `core/ui-views-main.js` 홈·레슨·문제·Coach · `core/ui-views-more.js` 나머지 화면·설정·온보딩·코스 페이지 초기화(딥링크 `#problem/ID`, `#lesson/ID`, `#settings`) · `core/hub.js` 허브 · `core/ui.css`
-   - `courses/python/content.js` 레슨 24·문제 104·CHAPTERS·MAP_DECOR·GUIDES(블록 코치) · `courses/python/course.json` 코스 메타 · `shared/errors.js`·`glossary.js`·`badges.js`(BADGES·INVENTORY)
+   - `courses/python/content.js` 레슨 24·문제 104·CHAPTERS·MAP_DECOR·GUIDES(블록 코치)·CHECKUPS·WEAKNESS_TAGS·PLAYGROUND_BLOCKS_UPTO · `courses/algo/content.js` 코스 2(COURSE 메타·tutorPersona, 레슨 16+보스 4, 문제 101; 머리말에 확장 필드 설명) · 각 `course.json` · `shared/errors.js`·`glossary.js`·`badges.js`(BADGES·INVENTORY)
+   - `core/visualize.js` 시각화 엔진(Viz.player/runAndShow/frame, 8종) — 알고리즘 코스 페이지만 로드. 러너 `Py.run({vis, maxsteps, timeoutMs})`가 구조 스냅샷(step.vis)을 돌려줌
    - 허브 `index.html`은 러너 없이 config·util·badges·python content·storage·sync·engine·game·fx·ui-core·hub.js만 읽는다.
 2. `APP_VERSION` 올리기 → `node tools/stamp.mjs` → 검증: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` → 가능하면 `python3 tools/regress.py`(헤드리스 크롬 회귀: 마이그레이션·허브·전 화면·모바일).
 3. 커밋 & push:

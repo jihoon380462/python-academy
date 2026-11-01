@@ -2,7 +2,7 @@
 # tools/run_solutions.py — 배포 전 게이트 2. 모든 코스의 정답 코드를 CPython으로 돌려 테스트 케이스를 전부 통과하는지 확인한다.
 #   사용: node tools/extract.mjs && python3 tools/run_solutions.py   (Actions와 로컬 동일)
 #   runner별: python → CPython -I (거북이는 심), sql → sqlite3 (Phase 3), shell → Node 시뮬레이터 (Phase 2), web → Playwright (Phase 4)
-import json, subprocess, sys, tempfile, os, re
+import json, subprocess, sys, tempfile, os, re, time
 HERE=os.path.dirname(os.path.abspath(__file__)); OUT=os.path.join(HERE,'.out')
 if not os.path.exists(os.path.join(OUT,'problems.json')): subprocess.run(['node',os.path.join(HERE,'extract.mjs'),OUT],check=True)
 P=json.load(open(os.path.join(OUT,'problems.json'),encoding='utf-8'))
@@ -31,7 +31,7 @@ def run(code, stdin='', call=None, turtle=False):
     with tempfile.TemporaryDirectory() as d:
         f=os.path.join(d,'s.py'); open(f,'w',encoding='utf-8').write(src)
         try:
-            r=subprocess.run([sys.executable,'-I',f],input=stdin,capture_output=True,text=True,timeout=5,cwd=d)
+            r=subprocess.run([sys.executable,'-I',f],input=stdin,capture_output=True,text=True,timeout=10,cwd=d)
         except subprocess.TimeoutExpired: return None,'TIMEOUT',None
         out=r.stdout; ret=None
         if call:
@@ -51,14 +51,23 @@ for p in P:
     if not p['solution']: fails.append((p['id'],'no solution')); continue
     if not tests: fails.append((p['id'],'no tests')); continue
     for i,t in enumerate(tests):
-        out,err,extra=run(p['solution'], t.get('input','') , t.get('call'), p['turtle'])
+        stdin=t.get('input','')
+        if t.get('inputGen'):
+            g=subprocess.run([sys.executable,'-I','-c','import sys; sys.stdout.write(str('+t['inputGen']+'))'],capture_output=True,text=True,timeout=20)
+            if g.returncode: fails.append((p['id'],f'test{i+1} inputGen error: {g.stderr.strip()[-200:]}')); continue
+            stdin=g.stdout
+        t0=time.perf_counter()
+        out,err,extra=run(p['solution'], stdin , t.get('call'), p['turtle'])
+        el=time.perf_counter()-t0
+        if p.get('limits') and p['limits'].get('time') and el>p['limits']['time']*0.5: fails.append((p['id'],f'test{i+1} 정답이 제한의 50%를 넘음 ({el:.2f}s > {p["limits"]["time"]*0.5:.2f}s)'))
         if err=='TIMEOUT': fails.append((p['id'],f'test{i+1} 시간 초과(5초)')); continue
         if err: fails.append((p['id'],f'test{i+1} error: {err.strip()[-300:]}')); continue
         if p['turtle']:
             if not extra: fails.append((p['id'],f'test{i+1} no segments')); continue
             continue
         if t.get('call'):
-            if extra!=t['ret']: fails.append((p['id'],f'test{i+1} ret {extra!r} != {t["ret"]!r}'))
+            if t['ret']=='__COMPUTED__': computed.setdefault(p['id'],{})[i]=extra
+            elif extra!=t['ret']: fails.append((p['id'],f'test{i+1} ret {extra!r} != {t["ret"]!r}'))
         else:
             exp=t['output']
             if exp=='__COMPUTED__': computed.setdefault(p['id'],{})[i]=norm(out)

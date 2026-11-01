@@ -32,7 +32,7 @@ const Game = {
     if (!wasClear) { rec.firstTry = !!firstTry; this.stat('clears'); if (firstTry) this.stat('firstTryClears'); if (rec.fails >= 5) this.stat('fail5Clear'); if (rec.hadError) this.stat('errorsOvercome'); }
     if (hints === 0 && !rec.answerSeen) { this.noHintStreak++; this.statMax('noHintStreak', this.noHintStreak); } else this.noHintStreak = 0;
     if (mode === 'text' && p.type === 'code') this.stat('textClears'); if (p.type === 'parsons') this.stat('parsonsClears');
-    if (p.boss) { d.stats['boss_' + p.lesson] = 1; this.stat('bossClears'); }
+    if (p.boss && !p.mock && Content.problemsOf(p.lesson).every(q => q.id === p.id || Store.prob(q.id).status === 'clear')) { d.stats['boss_' + p.lesson] = 1; this.stat('bossClears'); if (Store.course === 'algo' && !d.lessons['bossMarked_' + p.lesson]) { d.lessons['bossMarked_' + p.lesson] = 1; this.stat('algoBosses'); } }
     if (usedTutor) this.stat('tutorBreakthrough');
     const h = new Date().getHours(); if (h >= 0 && h < 4) this.stat('nightClear');
     // 복습 큐
@@ -60,7 +60,7 @@ const Game = {
   // 잠금: 보스를 깨야 다음 챕터
   chapterOpen(ch) { if (ch <= 1) return true; const prevBoss = LESSONS.find(l => l.boss && l.ch === ch - 1); return !prevBoss || !!Store.data.stats['boss_' + prevBoss.id]; },
   lessonOpen(l) { if (!this.chapterOpen(l.ch)) return false; const idx = LESSONS.findIndex(x => x.id === l.id); if (idx === 0) return true; const prev = LESSONS[idx - 1]; if (prev.ch !== l.ch) return true; return this.lessonDone(prev); },
-  lessonDone(l) { const ps = Content.problemsOf(l.id); return ps.length > 0 && ps.every(p => Store.prob(p.id).status === 'clear'); },
+  lessonDone(l) { if (l.mock) return !!Store.data.stats['boss_' + l.id]; const ps = Content.problemsOf(l.id); return ps.length > 0 && ps.every(p => Store.prob(p.id).status === 'clear'); },
   lessonStars(l) { const ps = Content.problemsOf(l.id); if (!ps.length) return 0; return Math.min(...ps.map(p => Store.prob(p.id).stars)); },
   currentLesson() { for (const l of LESSONS) { if (this.lessonOpen(l) && !this.lessonDone(l)) return l; } return LESSONS[LESSONS.length - 1]; },
 };

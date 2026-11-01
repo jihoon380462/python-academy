@@ -275,3 +275,32 @@ v1.0.1에서 **메인 스레드 보조 실행기**를 추가했습니다. 워커
 - core: config 118 · util 13 · storage 68 · sync 130 · engine 180 · runners/python 288 · game 75 · tutor 74 · fx 63 · ui-core 80 · ui-editors 207 · ui-views-main 279 · ui-views-more 166 · hub 42 · ui.css 212
 - courses/python: content.js 798 (≈100KB) · shared: errors 41 · glossary 43 · badges 84
 - 허브 전송량 ≈ 160KB, 파이썬 코스 페이지 ≈ 380KB (gzip 전).
+
+
+## 12. v2.1.0 Phase 1 — 코스 2 알고리즘·자료구조 (설계 결정 요약)
+
+**산출물**: `courses/algo/`(index.html·content.js·course.json) 레슨 16 + 보스 4(마지막은 모의고사), 문제 101(코드 60·퀴즈 30·버그 5·빈칸 4·Parsons 2), 시각화 엔진 `core/visualize.js` 8종(bars·boxes·linked·tree·graph·grid·table·callstack), 모의고사 모드, 시간 제한 채점.
+
+**임의로 정한 수치**
+- 시간 제한 배율 `CONFIG.ALGO.slowdown = 3` (Pyodide/CPython). 기기 보정 `Py.bench()`: 100만 번 덧셈 루프를 기준 350ms와 비교해 0.5~4배로 클램프(코스 페이지 로드 직후 1회). 채점 기준 = `limits.time × 3 × 보정`; 워커 강제 종료는 그 1.5배 또는 5초 중 큰 값.
+- 검증 스크립트는 정답이 CPython에서 **제한의 50%** 안에 돌아야 통과(`run_solutions.py`). 101개 전부 통과.
+- 시각화 추적 단계 5,000(`traceMaxSteps`), 변수 repr 스냅샷은 500단계까지만(payload 억제), 구조 스냅샷은 리스트 300개·딕셔너리 200개·깊이 8·객체 속성 20개 제한.
+- 모의고사: 풀 15문제 중 랜덤 3, 60분, 2문제 이상 통과 시 클리어 + 150 XP. 코딩테스트 문제 XP 80, 보스 문제 60~70.
+- 큰 입력 테스트는 `inputGen`(파이썬 식)으로 생성 — 최대 n=200,000.
+
+**지시서와 다르게 한 것과 이유**
+- 태그는 코스 접두사(`algo.sort`) 대신 한국어(`정렬`)로. 약점 분석·태그 칩이 `#태그`를 그대로 보여 주고, 문제가 코스 파일로 이미 구분되므로 접두사가 사용자에게 보일 이유가 없음. 코스 간 통합 약점 분석(Phase 5)은 코스 id + 태그 2단계로 한다.
+- 새 문제 유형 3종(추적 퀴즈·복잡도 맞히기·자료구조 고르기)은 별도 type 대신 `type:'quiz'` + `kind` + 확장 필드(`quiz.code/input/q/then`)로 구현. 채점·XP·통계 코드를 건드리지 않고 표시만 바꾸는 쪽이 회귀 위험이 적음. 코딩테스트 형식은 `kind:'ct'`.
+- "데모 모드"는 미리 만든 애니메이션 대신 **예제 코드를 실제로 추적 실행**해서 그린다(`example.visualize`, `autoViz`). 입력 배열을 바꿔 다시 재생하는 요구는 "예제 코드를 고쳐서 재생"으로 자연히 충족되고, 두 모드가 같은 엔진을 쓴다. 레슨 A0·A1의 n 슬라이더는 `example.slider`로 첫 줄 값을 바꾸는 방식(UI는 다음 패치에서 노출 — 현재는 코드 직접 수정).
+- 러너 인터페이스(load/run/grade/reset/snapshot/view)는 아직 `Py`·`Grader`를 직접 호출. 시각화 엔진은 `Py.run({vis, maxsteps})` 옵션으로 붙였다. 러너가 2종 이상 생기는 Phase 2에서 래퍼를 도입한다.
+- 보스 챕터 열기는 보스 레슨의 **모든 문제** 클리어로(파이썬 코스는 보스 1문제라 동일 동작).
+- 모의고사 풀은 보스 레슨 AB4의 문제들(`mock:true`). 지도 노드는 `stats.boss_AB4`로 완료 표시.
+- `terms`에 적은 레슨 용어를 공용 GLOSSARY에 합류(`Content.init`). 코스별 용어집 분리는 Phase 5.
+
+**알려진 제약과 다음 Phase에 넘긴 것**
+- 실제 Pyodide에서의 시각화·시간 제한·bench는 샌드박스에서 못 봄 → 사용자 확인 필요(특히 모의고사 큰 입력 테스트 속도).
+- 시각화 변수 이름을 문제가 지정하므로 다른 이름을 쓰면 그림이 비어 보임("변수 이름은 ○○" 안내로 대응).
+- 허브는 다른 코스 진행률을 `CONFIG.COURSES.total`(검증 스크립트가 실제 수와 대조)로 계산. 복습 큐는 아직 파이썬만.
+- `tools/schema.json` 미작성(검증은 코드로).
+
+**파일별 줄 수 / 용량**: `courses/algo/content.js` ≈ 118KB(레슨 16·문제 101), `core/visualize.js` 118줄 ≈ 22KB. 알고리즘 코스 페이지 전송량 ≈ 420KB(CDN 제외).

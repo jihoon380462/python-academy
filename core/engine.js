@@ -3,7 +3,7 @@
 const Content = {
   lessonMap: {}, problemMap: {}, byLesson: {},
   init() {
-    LESSONS.forEach(l => { this.lessonMap[l.id] = l; this.byLesson[l.id] = []; });
+    LESSONS.forEach(l => { this.lessonMap[l.id] = l; this.byLesson[l.id] = []; if (l.terms && typeof GLOSSARY !== 'undefined') for (const [k, v] of Object.entries(l.terms)) if (!(k in GLOSSARY)) GLOSSARY[k] = v; }); // 레슨이 정의한 용어는 공용 용어집에 합류(코스별 용어)
     PROBLEMS.forEach(p => { this.problemMap[p.id] = p; (this.byLesson[p.lesson] = this.byLesson[p.lesson] || []).push(p); });
     // 자체 검사
     const seen = new Set(); const warn = (m) => console.warn('[콘텐츠 검사] ' + m);

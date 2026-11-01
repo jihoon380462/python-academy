@@ -2,7 +2,7 @@
 
 브라우저에서 진짜 파이썬이 실행되는 초보자용 학습 사이트. v2.0.0부터 여러 코스가 모이는 "아카데미" 구조.
 
-- 사이트(허브): https://jihoon380462.github.io/python-academy/ · 파이썬 코스: https://jihoon380462.github.io/python-academy/courses/python/
+- 사이트(허브): https://jihoon380462.github.io/python-academy/ · 파이썬 코스: `/courses/python/` · 알고리즘·자료구조 코스: `/courses/algo/`
 - 설계 결정: DESIGN.md · 문제 목록: PROBLEMS.md · 확장 지시서(멀티 코스): EXPANSION.md
 
 ## 개발/인수인계

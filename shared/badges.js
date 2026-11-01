@@ -1,5 +1,10 @@
 // shared/badges.js — 공통 뱃지(BADGES)·보관함 아이템(INVENTORY)
 const BADGES = [
+  // --- 알고리즘 코스 (course:'algo') ---
+  { id: 'algo_viz10', name: '눈으로 보는 사람', desc: '시각화 10번 재생', icon: '👀', cond: ['vizRuns', 10], course: 'algo' },
+  { id: 'algo_tle', name: 'O(n²)에서 O(n log n)으로', desc: '시간 초과 뒤 같은 문제 통과', icon: '⏱', cond: ['tleRecovered', 1], course: 'algo' },
+  { id: 'algo_mock', name: '모의고사 통과', desc: '코딩테스트 모의고사 통과', icon: '📝', cond: ['mockPass', 1], course: 'algo' },
+  { id: 'algo_boss4', name: '알고리즘 탐험가', desc: '알고리즘 코스 보스 4개 클리어', icon: '🧭', cond: ['algoBosses', 4], course: 'algo' },
   { id:'first_run', name:'첫 실행', desc:'코드를 처음 실행했어요', icon:'▶', cond:['runs',1] },
   { id:'first_clear', name:'첫 클리어', desc:'문제를 처음 풀었어요', icon:'✓', cond:['clears',1] },
   { id:'first_error', name:'첫 에러', desc:'에러를 처음 만났어요. 힌트를 받은 거예요', icon:'!', cond:['errors',1] },

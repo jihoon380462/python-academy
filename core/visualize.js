@@ -130,7 +130,7 @@ const Viz = {
   player(host, { steps, spec, onLine, truncated, title }) {
     const specs = Array.isArray(spec) ? spec : [spec]; if (!steps || !steps.length) { host.innerHTML = '<div class="muted">기록된 단계가 없어요. 코드가 실행되는지 먼저 확인하세요.</div>'; return null; }
     // 시각화 변수가 바뀐 단계만 남긴다 (설명 줄 하나하나가 아니라 "그림이 변하는 순간")
-    const keyOf = (s) => JSON.stringify([s.vis, specs.some(x => x.kind === 'callstack') ? s.stack : null]); const frames = []; let last = null; steps.forEach((s, i) => { const k = keyOf(s); if (k !== last) { frames.push({ ...s, idx: i }); last = k; } }); if (frames.length > 1 && frames[frames.length - 1] !== steps[steps.length - 1]) frames.push({ ...steps[steps.length - 1], idx: steps.length - 1 });
+    const keyOf = (s) => JSON.stringify([s.vis, specs.some(x => x.kind === 'callstack') ? s.stack : null]); const frames = []; let last = null; steps.forEach((s, i) => { const k = keyOf(s); if (k !== last) { frames.push({ ...s, idx: i }); last = k; } }); if (frames.length && frames[frames.length - 1].idx !== steps.length - 1) frames.push({ ...steps[steps.length - 1], idx: steps.length - 1 });
     let i = 0, playing = false, timer = null, raf = null; const speeds = [0.25, 0.5, 1, 2, 4]; let sp = 2;
     host.innerHTML = `<div class="viz"><div class="viz-head"><b>👀 ${esc(title || '시각화')}</b> <span class="muted" id="vzPos"></span>${truncated ? `<span class="warn small">너무 길어서 ${CONFIG.ALGO.traceMaxSteps}단계까지만</span>` : ''}<span class="grow"></span><button class="btn xs" id="vzClose">${T.close}</button></div>
       <div class="viz-canvases">${specs.map((s, k) => `<canvas class="viz-c" data-k="${k}"></canvas>`).join('')}</div>

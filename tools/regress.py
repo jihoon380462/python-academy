@@ -10,6 +10,7 @@ V1={"v":1,"nick":"테스터","mascotColor":1,"onboarded":True,"xp":385,"badges":
     "lessons":{"L0":{"page":4},"terms":{"print":True}},"streak":{"cur":3,"best":5,"last":time.strftime('%Y-%m-%d')},"days":{time.strftime('%Y-%m-%d'):2},"dailyGoal":5,"dailyGoalDates":{},
     "settings":{"theme":"light","font":2,"sound":True,"vibrate":True,"anim":2,"apiKey":"sk-ant-test","model":"claude-haiku-5-5","editorTheme":"classic","confetti":"rainbow","soundSet":"bell","accessory":"none","turtleSpeed":6,"focus":True},
     "works":[{"id":"w1","name":"구구단","code":"print(1)","date":1}],"tutorChats":{"L3P2":[{"role":"user","content":"hi"}]},"myProblems":[],"bestTimes":{"L1":42},"dailyChallenge":None,"checkups":{"1":80},"playgroundXp":{"date":"","amount":0},"polished":{},"examplesEdited":{},"reviewToday":{"date":"","count":0},"chapterPerfect":{},"updatedAt":1700000000000}
+VIZ_JS = """()=>{ const host=document.createElement('div'); host.style.width='600px'; document.body.appendChild(host); const steps=[{line:1,vis:{a:[3,1,2],j:0},stack:[]},{line:2,vis:{a:[1,3,2],j:1},stack:[]},{line:3,vis:{a:[1,2,3],j:2},stack:[]}]; const pl=Viz.player(host,{steps,spec:{kind:'bars',var:'a',hl:['j']},title:'t'}); const ok1=!!host.querySelector('canvas'); const kinds=['boxes','linked','tree','graph','grid','table','callstack']; const specs={boxes:{kind:'boxes',var:'a'},linked:{kind:'linked',var:'h'},tree:{kind:'tree',var:'r'},graph:{kind:'graph',var:'g',visited:'v'},grid:{kind:'grid',var:'gr',visited:'vv'},table:{kind:'table',var:'dp'},callstack:{kind:'callstack'}}; const snap={a:[1,2],h:{__cls:'Node',__id:1,val:1,next:{__cls:'Node',__id:2,val:2,next:null}},r:{__cls:'Node',__id:3,val:5,left:{__cls:'Node',__id:4,val:3,left:null,right:null},right:null},g:{A:['B'],B:['A']},v:{__set:['A']},gr:[[0,1],[0,0]],vv:[[true,false],[false,false]],dp:[1,1,2,3]}; let errs=0; const c=document.createElement('canvas'); c.style.width='400px'; c.style.height='200px'; document.body.appendChild(c); for(const k of kinds){ try{ Viz.frame(c,specs[k],{vis:snap,stack:['f','g'],vars:{n:1}},null,1); const ctx=c.getContext('2d'); }catch(e){errs++; console.error('viz',k,e.message);} } return {ok1, frames:pl.frames.length, errs}; }"""
 fails=[]
 def check(cond, msg):
     print(('  ✓ ' if cond else '  ✗ ')+msg)
@@ -61,6 +62,30 @@ with sync_playwright() as p:
     check(pg.locator('.card.sync').count()==1 and pg.locator('#syncOff').count()==1, '설정: 기기 연동 카드(연동 상태)'); check(pg.locator('#sRestoreV1').count()==1, '설정: v1 데이터 다시 가져오기 버튼'); check(('v'+pg.evaluate('CONFIG.APP_VERSION')) in pg.locator('#view').inner_text(), '설정 하단 버전 표시')
     ex=pg.evaluate("JSON.parse(Store.exportJSON())"); check(ex['xp']>=385 and 'problems' in ex and 'works' in ex and 'tutorChats' in ex, '내보내기 JSON은 v1과 같은 모양')
     pg.evaluate("UI.go('checkup',{n:1})"); pg.wait_for_timeout(300); check(pg.locator('.qopt,.blank').count()>0, '종합 점검')
+    # ---- 2b. 알고리즘 코스 페이지
+    print('[알고리즘 코스]'); ALGO='file://'+os.path.join(ROOT,'courses/algo/index.html')
+    pg.goto(ALGO+'#lesson/A2'); pg.wait_for_timeout(1500); pg.evaluate("Loader.minimized=true;Loader.render()")
+    check(pg.evaluate("Store.course")=='algo' and pg.evaluate("UI.view")=='lesson', '코스 id=algo, 레슨 딥링크')
+    check(pg.locator('#exViz').count()==1, '레슨 예제에 👀 시각화 재생 버튼')
+    check(pg.evaluate("localStorage.getItem('academy.course.algo')") is not None, 'algo 진행 조각 저장')
+    check(pg.evaluate("Store.data.xp")>=385, 'XP(프로필) 공유')
+    pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('.node').count()>=20 and pg.locator('.node.boss').count()==4, "알고리즘 지도: 노드 %d · 보스 %d" % (pg.locator('.node').count(), pg.locator('.node.boss').count()))
+    pg.evaluate("UI.go('problem',{pid:'A1P1',lessonId:'A1'})"); pg.wait_for_timeout(300); check(pg.locator('.quiz-code').count()==1 and '복잡도' in pg.locator('.pv-head').inner_text(), '복잡도 퀴즈: 코드 블록 + 유형명')
+    pg.evaluate("UI.go('problem',{pid:'A2P1',lessonId:'A2'})"); pg.wait_for_timeout(300); check(pg.locator('#btnQuizViz').count()==1, '추적 퀴즈: 시각화 버튼')
+    pg.evaluate("UI.go('problem',{pid:'A3P5',lessonId:'A3'})"); pg.wait_for_timeout(300); pg.click('.qopt[data-i="1"]'); pg.wait_for_timeout(400); check(pg.locator('.qopt[data-k]').count()==4, '자료구조 고르기: 2단계(이유) 표시')
+    pg.click('.qopt[data-k="1"]'); pg.wait_for_timeout(1500)
+    for _ in range(3):
+        if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
+    check(pg.locator('.result.ok').count()==1, '2단계 정답 → 클리어')
+    pg.evaluate("UI.go('problem',{pid:'A5P2',lessonId:'A5'})"); pg.wait_for_timeout(500); check(pg.locator('#btnViz').count()==1, '코드 문제: 👀 시각화 버튼')
+    pg.evaluate("UI.go('lesson',{lessonId:'AB4'})"); pg.wait_for_timeout(300); check(pg.evaluate("UI.view")=='mock' and pg.locator('#mockStart').count()==1, '보스 AB4 → 모의고사 화면')
+    pg.evaluate("UI.go('problem',{pid:'AB4P1',lessonId:'AB4'})"); pg.wait_for_timeout(400); check('입력 형식' in pg.locator('.pv-prompt').inner_text() and '코딩테스트' in pg.locator('.pv-head').inner_text(), '코딩테스트 형식 문제')
+    pg.evaluate("UI.go('playground')"); pg.wait_for_timeout(300); check(pg.locator('[data-m="block"]').count()==0, '놀이터에 블록 탭 없음')
+    pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300); check(pg.locator('#sUnlock').count()==1, '설정: 전제 무시 스위치')
+    vz = pg.evaluate(VIZ_JS)
+    check(vz['ok1'] and vz['frames']==3 and vz['errs']==0, "시각화 플레이어·8종 그리기 (frames=%s, errs=%s)" % (vz['frames'], vz['errs']))
+    pg.goto(HUB); pg.wait_for_timeout(600); hc = pg.evaluate("()=>[...document.querySelectorAll('.hc')].map(e=>e.className+'|'+e.innerText.replace(/\\n/g,' ').slice(0,60))")
+    check(any('알고리즘' in x and ('ready' in x or 'locked' in x) for x in hc), '허브에 알고리즘 코스 카드: '+([x for x in hc if '알고리즘' in x]+['?'])[0][:70])
     # ---- 3. 모바일
     print('[모바일 390px]'); pg.set_viewport_size({'width':390,'height':800})
     pg.goto(HUB); pg.wait_for_timeout(500); check(pg.evaluate('document.documentElement.scrollWidth')<=390, '허브 가로 스크롤 없음'); pg.screenshot(path=SHOT+'/hub_m.png', full_page=True)
