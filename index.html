@@ -37,6 +37,7 @@ select{padding:8px 10px;border-radius:8px;border:1px solid var(--border);backgro
 /* 상단바 */
 #topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;padding:6px 12px;background:var(--surface);border-bottom:1px solid var(--border);min-height:52px}
 .tb-btn{min-width:44px;min-height:44px;border:0;background:transparent;color:var(--text);font-size:1.3em;border-radius:10px;display:flex;align-items:center;justify-content:center}.tb-btn:hover{background:var(--surface2)}
+.tb-sync{font-size:1.05em;color:var(--muted)}.tb-sync.ok{color:var(--accent)}.tb-sync.err{color:var(--warn)}.tb-sync.syncing{animation:spin 1s linear infinite}.tb-sync.dirty{color:var(--primary)}@keyframes spin{to{transform:rotate(360deg)}}
 .tb-title{flex:1;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tb-xp{display:flex;align-items:center;gap:6px;font-size:.85em}.tb-lv{font-weight:800;color:var(--gold)}.tb-xpn{color:var(--muted);font-size:.85em}
 .xpbar{width:90px;height:10px;background:var(--surface2);border-radius:999px;overflow:hidden;border:1px solid var(--border)}.xpbar.big{width:100%;height:14px;margin:8px 0}.xpfill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .6s}
@@ -214,7 +215,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '1.1.2',
+  APP_VERSION: '1.2.0',
   SAVE_KEY: 'python_academy_save',
   SCHEMA_VERSION: 1,
 
@@ -1388,12 +1389,12 @@ const Store = {
     this.data = this.blank();
   },
   migrate() { /* 향후 스키마 변경 시 v 비교해 변환 */ this.data.v = CONFIG.SCHEMA_VERSION; },
-  save() { try { localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(this.data)); } catch (e) { console.warn('저장 실패(용량?)', e); } },
+  save(opt = {}) { if (!opt.silent) { this.data.updatedAt = Date.now(); if (typeof Sync !== 'undefined' && Sync.on) Sync.schedulePush(); } try { localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(this.data)); } catch (e) { console.warn('저장 실패(용량?)', e); } },
   prob(id) { const d = this.data; if (!d.problems[id]) d.problems[id] = { status: 'none', stars: 0, hints: 0, attempts: 0, fails: 0, code: null, mode: null, firstTry: null, answerSeen: false, tutorAsked: false, review: null, clearedAt: null }; return d.problems[id]; },
   setCode(id, code, mode) { const p = this.prob(id); if (code != null && byteLen(code) <= CONFIG.MAX_CODE_SAVE_BYTES) { p.code = code; p.mode = mode; } this.save(); },
   exportJSON() { return JSON.stringify(this.data, null, 1); },
   importJSON(text) { const d = JSON.parse(text); if (!d || typeof d !== 'object' || !('problems' in d)) throw new Error('형식이 맞지 않아요'); this.data = Object.assign(this.blank(), d); this.migrate(); this.save(); },
-  reset() { this.data = this.blank(); this.save(); },
+  reset() { this.data = this.blank(); this.data.resetAt = Date.now(); this.save(); },
   resetProblem(id) { delete this.data.problems[id]; delete this.data.tutorChats[id]; this.save(); },
 };
 
@@ -1868,6 +1869,136 @@ const TurtleView = {
   },
 };
 // =====================================================================
+// === SYNC ===  기기 연동 (PC ↔ 모바일). GitHub Gist(비공개)에 진행 데이터를 저장해 여러 기기에서 이어서 한다.
+//   - 토큰(classic, gist 권한)만 있으면 됨. 두 번째 기기는 "연동 코드"(토큰+gist id) 붙여넣기 한 번으로 끝.
+//   - 저장할 때마다(디바운스 3초) 올리고, 앱 시작·화면 복귀 때 내려받아 합친다. 클로드 API 키는 동기화하지 않는다.
+// =====================================================================
+const Sync = {
+  KEY: 'python_academy_sync', FILE: 'python_academy_save.json', DESC: '파이썬 아카데미 진행 데이터 (자동 동기화 · 지우지 마세요)',
+  API: 'https://api.github.com', TOKEN_URL: 'https://github.com/settings/tokens/new?scopes=gist&description=python-academy-sync',
+  DEBOUNCE_MS: 3000, CODE_PREFIX: 'PA-SYNC:',
+  cfg: null, timer: null, state: 'off', msg: '', busy: false, pending: false, hook: null,
+  get on() { return !!(this.cfg && this.cfg.token && this.cfg.gistId); },
+  load() { try { this.cfg = JSON.parse(localStorage.getItem(this.KEY) || 'null'); } catch (e) { this.cfg = null; } this.state = this.on ? 'idle' : 'off'; },
+  saveCfg() { try { if (this.cfg) localStorage.setItem(this.KEY, JSON.stringify(this.cfg)); else localStorage.removeItem(this.KEY); } catch (e) {} },
+  set(state, msg = '') { this.state = state; this.msg = msg; try { if (this.hook) this.hook(); } catch (e) {} if (UI.view && UI.view !== 'settings' && UI.renderTopbar) UI.renderTopbar(); },
+  statusText() { return { syncing: '🔄 동기화 중…', ok: '✅ 연동됨 · 마지막 동기화 ' + this.ago(), err: '⚠ ' + this.msg, dirty: '✏ 변경됨 · 곧 올려요', idle: '☁ 연동됨 · 마지막 동기화 ' + this.ago() }[this.state] || ''; },
+
+  // ----- GitHub API -----
+  async api(method, path, body, token) {
+    let res;
+    try { res = await fetch(this.API + path, { method, headers: { Authorization: 'Bearer ' + (token || this.cfg.token), Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', ...(body ? { 'Content-Type': 'application/json' } : {}) }, body: body ? JSON.stringify(body) : undefined }); }
+    catch (e) { throw new Error('NET'); }
+    if (res.status === 401) throw new Error('AUTH');
+    if (res.status === 404 || res.status === 403) { const have = res.headers.get('x-oauth-scopes'); const tk = token || this.cfg.token; if (/^github_pat_/.test(tk)) throw new Error('FINE'); if (have != null && !/\bgist\b/.test(have)) throw new Error('SCOPE'); if (res.status === 403) throw new Error('RATE'); throw new Error('NOTFOUND'); }
+    if (res.status === 429) throw new Error('RATE');
+    if (!res.ok) { let m = ''; try { m = (await res.json()).message || ''; } catch (e) {} throw new Error('HTTP ' + res.status + (m ? ': ' + m : '')); }
+    if (res.status === 204) return null; return res.json();
+  },
+  errMsg(e) { const m = e && e.message || ''; return { NET: '인터넷 연결을 확인해 주세요', AUTH: '토큰이 틀렸거나 만료됐어요', SCOPE: '토큰에 gist 권한이 없어요 (토큰 만들 때 gist 체크)', FINE: 'Fine-grained 토큰은 gist를 지원하지 않아요. Tokens (classic)으로 만들어 주세요', NOTFOUND: '저장소(gist)를 찾을 수 없어요. 연동을 해제하고 다시 연결해 주세요', RATE: 'GitHub 요청 한도예요. 잠시 후 다시 시도해 주세요' }[m] || ('오류: ' + m); },
+
+  // ----- 데이터 -----
+  payload() { const d = JSON.parse(JSON.stringify(Store.data)); if (d.settings) delete d.settings.apiKey; d.syncDevice = this.deviceName(); return d; },
+  deviceName() { const ua = navigator.userAgent; return /Android/i.test(ua) ? '안드로이드' : /iPhone|iPad/i.test(ua) ? '아이폰/아이패드' : /Windows/i.test(ua) ? 'Windows PC' : /Mac/i.test(ua) ? 'Mac' : '다른 기기'; },
+  makeCode() { return this.CODE_PREFIX + btoa(unescape(encodeURIComponent(JSON.stringify({ t: this.cfg.token, g: this.cfg.gistId })))); },
+  parseInput(text) { text = (text || '').trim(); if (text.startsWith(this.CODE_PREFIX)) { try { const o = JSON.parse(decodeURIComponent(escape(atob(text.slice(this.CODE_PREFIX.length))))); if (o.t && o.g) return { token: o.t, gistId: o.g }; } catch (e) {} throw new Error('연동 코드 형식이 맞지 않아요'); } if (/^(ghp_|github_pat_|gho_)/.test(text) || text.length >= 30) return { token: text }; throw new Error('토큰 또는 연동 코드를 붙여넣어 주세요'); },
+
+  // 두 기기의 데이터 합치기. 둘 다 바뀐 경우 필드별로 합친다(진행은 많은 쪽, 설정은 최근 쪽).
+  merge(local, remote) {
+    const lt = local.updatedAt || 0, rt = remote.updatedAt || 0;
+    if ((local.resetAt || 0) > rt) return local; if ((remote.resetAt || 0) > lt) return remote; // 한쪽에서 "전체 초기화"했으면 그쪽을 따른다
+    const newerR = rt >= lt;
+    const RANK = { none: 0, try: 1, clear: 2 };
+    const mv = (a, b, path) => {
+      if (a === undefined || a === null) return b; if (b === undefined || b === null) return a;
+      const key = path[path.length - 1];
+      if (Array.isArray(a) && Array.isArray(b)) { const seen = new Set(); const out = []; for (const x of (newerR ? [...b, ...a] : [...a, ...b])) { const k = x && typeof x === 'object' && x.id != null ? 'id:' + x.id : JSON.stringify(x); if (!seen.has(k)) { seen.add(k); out.push(x); } } return out; }
+      if (typeof a === 'object' && typeof b === 'object') { const out = {}; for (const k of new Set([...Object.keys(a), ...Object.keys(b)])) out[k] = mv(a[k], b[k], [...path, k]); return out; }
+      if (typeof a === 'number' && typeof b === 'number') { if (path[0] === 'bestTimes') return Math.min(a, b); if (['updatedAt', 'resetAt', 'date', 'last', 'cur', 'dailyGoal', 'mascotColor', 'page', 'amount', 'count'].includes(key) || path[0] === 'settings') return newerR ? b : a; return Math.max(a, b); }
+      if (typeof a === 'boolean' && typeof b === 'boolean') return path[0] === 'settings' ? (newerR ? b : a) : (a || b);
+      if (key === 'status' && RANK[a] != null && RANK[b] != null) return RANK[b] > RANK[a] ? b : RANK[a] > RANK[b] ? a : (newerR ? b : a);
+      if (typeof a === 'string' && typeof b === 'string' && (a === '' || b === '')) return a || b; // 빈 값보다 채워진 값
+      return newerR ? b : a;
+    };
+    const out = mv(local, remote, []); out.updatedAt = Math.max(lt, rt); return out;
+  },
+  apply(remote) { // 내려받은 데이터를 로컬에 반영 (API 키는 로컬 것 유지)
+    const apiKey = Store.data.settings.apiKey; const local = Store.data; const fresh = !this.cfg.lastSyncAt && !local.xp && !Object.keys(local.problems || {}).length && !(local.works || []).length; // 이 기기는 처음 연동 + 아직 아무것도 안 함 → 다른 기기 것을 통째로
+    const merged = fresh ? JSON.parse(JSON.stringify(remote)) : this.merge(local, remote); const changed = JSON.stringify(merged) !== JSON.stringify(Store.data);
+    Store.data = Object.assign(Store.blank(), merged); Store.data.settings = Object.assign(Store.blank().settings, merged.settings || {}); Store.data.settings.apiKey = apiKey; Store.migrate(); Store.save({ silent: true });
+    return changed;
+  },
+
+  // ----- 연결 -----
+  async connect(text) {
+    const { token, gistId } = this.parseInput(text); this.set('syncing', '연결 중…');
+    let id = gistId;
+    if (!id) { const list = await this.api('GET', '/gists?per_page=100', null, token); const g = list.find(x => x.files && x.files[this.FILE]); id = g ? g.id : (await this.api('POST', '/gists', { description: this.DESC, public: false, files: { [this.FILE]: { content: JSON.stringify(this.payload()) } } }, token)).id; }
+    else { await this.api('GET', '/gists/' + id, null, token); }
+    this.cfg = { token, gistId: id, lastSyncAt: 0, lastRemoteUpdated: 0, lastLocalUpdated: 0 }; this.saveCfg(); this.state = 'idle';
+    await this.syncNow(true); return id;
+  },
+  disconnect() { clearTimeout(this.timer); this.cfg = null; this.saveCfg(); this.set('off'); },
+
+  // ----- 동기화 -----
+  async pull() {
+    const g = await this.api('GET', '/gists/' + this.cfg.gistId); const f = g.files && g.files[this.FILE]; if (!f) throw new Error('NOTFOUND');
+    let text = f.content; if (f.truncated) { const r = await fetch(f.raw_url); text = await r.text(); }
+    let remote; try { remote = JSON.parse(text); } catch (e) { return false; } if (!remote || typeof remote !== 'object' || !('problems' in remote)) return false;
+    if ((remote.updatedAt || 0) === this.cfg.lastRemoteUpdated && (Store.data.updatedAt || 0) <= this.cfg.lastLocalUpdated) return false; // 양쪽 다 그대로
+    const changed = this.apply(remote); this.cfg.lastRemoteUpdated = remote.updatedAt || 0; this.saveCfg(); return changed;
+  },
+  async push() {
+    const data = this.payload(); await this.api('PATCH', '/gists/' + this.cfg.gistId, { files: { [this.FILE]: { content: JSON.stringify(data) } } });
+    this.cfg.lastRemoteUpdated = data.updatedAt || 0; this.cfg.lastLocalUpdated = data.updatedAt || 0; this.cfg.lastSyncAt = Date.now(); this.saveCfg();
+  },
+  async syncNow(force = false) { // 내려받아 합치고, 로컬이 바뀌었으면 올린다
+    if (!this.on) return false; if (this.busy) { this.pending = true; return false; } this.busy = true; clearTimeout(this.timer);
+    try {
+      this.set('syncing'); const changed = await this.pull();
+      if (force || (Store.data.updatedAt || 0) > this.cfg.lastLocalUpdated || changed) await this.push();
+      this.cfg.lastSyncAt = Date.now(); this.saveCfg(); this.set('ok');
+      if (changed) { UI.toast('☁ 다른 기기의 진행 상황을 가져왔어요'); if (UI.view && !['problem', 'lesson', 'playground'].includes(UI.view)) UI.go(UI.view, UI.params, false); else UI.renderTopbar(); }
+      return changed;
+    } catch (e) { this.set('err', this.errMsg(e)); console.warn('sync', e); return false; }
+    finally { this.busy = false; if (this.pending) { this.pending = false; this.schedulePush(); } }
+  },
+  schedulePush() { if (!this.on) return; clearTimeout(this.timer); this.state = 'dirty'; this.timer = setTimeout(() => this.syncNow(), this.DEBOUNCE_MS); },
+  flush() { if (!this.on || this.state !== 'dirty') return; clearTimeout(this.timer); this.syncNow(); },
+  ago() { const t = this.cfg && this.cfg.lastSyncAt; if (!t) return '아직 안 함'; const s = Math.round((Date.now() - t) / 1000); return s < 60 ? '방금' : s < 3600 ? Math.round(s / 60) + '분 전' : s < 86400 ? Math.round(s / 3600) + '시간 전' : Math.round(s / 86400) + '일 전'; },
+  icon() { return { off: '', idle: '☁', dirty: '☁', syncing: '🔄', ok: '☁', err: '⚠' }[this.state] || '☁'; },
+  init() {
+    this.load(); if (!this.on) return;
+    this.syncNow();
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') this.syncNow(); else this.flush(); });
+    window.addEventListener('pagehide', () => this.flush()); window.addEventListener('online', () => this.syncNow());
+  },
+  // 설정 화면 카드
+  card() {
+    const on = this.on; const st = this.statusText();
+    return `<div class="card sync"><div class="card-h">📱 기기 연동 (PC ↔ 모바일)</div>
+      ${on ? `<div id="syncSt" class="small">${st}</div><div class="muted small" style="margin:6px 0 8px">진행 상황·XP·뱃지·설정이 자동으로 맞춰져요. 문제를 풀면 3초 뒤 올리고, 앱을 다시 열면 내려받아요. <b>클로드 API 키는 기기마다 따로</b> 넣어야 해요.</div>
+        <div class="row"><button class="btn primary" id="syncNow">🔄 지금 동기화</button><button class="btn" id="syncCode">📋 연동 코드 복사</button><button class="btn" id="syncOff">연동 해제</button></div>
+        <div class="muted small" style="margin-top:8px">다른 기기에서: 이 사이트 열기 → ⚙ 설정 → 이 칸에 <b>연동 코드 붙여넣기 → 연동하기</b>. 끝!</div>`
+      : `<div class="muted small" style="margin-bottom:8px">PC에서 풀던 걸 폰에서 이어서 풀 수 있어요. 내 GitHub 계정의 <b>비공개 gist</b>에 저장되고, 다른 사람은 못 봐요.</div>
+        <div class="muted small" style="margin-bottom:8px"><b>처음 한 번(PC):</b> ① <a href="${this.TOKEN_URL}" target="_blank" rel="noopener">이 링크</a>를 열어 GitHub 로그인 → ② Expiration을 <b>No expiration</b>으로 → ③ 맨 아래 <b>Generate token</b> → ④ 나온 <code>ghp_…</code>를 아래 칸에 붙여넣고 연동하기 (gist 권한은 링크에 미리 체크돼 있어요)<br><b>두 번째 기기(폰):</b> PC 설정에서 복사한 <b>연동 코드</b>를 아래 칸에 붙여넣고 연동하기</div>
+        <div class="row"><input class="input" type="password" id="syncIn" placeholder="ghp_… 토큰 또는 PA-SYNC:… 연동 코드" autocomplete="off" style="flex:1;min-width:200px"><button class="btn primary" id="syncGo">연동하기</button></div><div id="syncSt" class="small" style="margin-top:6px"></div>`}
+    </div>`;
+  },
+  bind(root, rerender) {
+    const stEl = $('#syncSt', root);
+    const go = $('#syncGo', root); if (go) go.onclick = async () => { const v = $('#syncIn', root).value; go.disabled = true; stEl.textContent = '🔄 연결 중…'; try { await this.connect(v); UI.toast('☁ 연동 완료!'); rerender(); await this.showCode('연동 완료! 폰에서도 이어서 하려면'); } catch (e) { stEl.textContent = '❌ ' + (e.message && /^(AUTH|NET|SCOPE|FINE|NOTFOUND|RATE|HTTP)/.test(e.message) ? this.errMsg(e) : e.message); this.set('off'); go.disabled = false; } };
+    const now = $('#syncNow', root); if (now) now.onclick = async () => { await this.syncNow(true); rerender(); };
+    const code = $('#syncCode', root); if (code) code.onclick = () => this.showCode('연동 코드');
+    const off = $('#syncOff', root); if (off) off.onclick = async () => { if (!await UI.confirm('이 기기의 연동을 해제할까요? (저장된 진행 데이터는 그대로예요. gist도 남아 있어서 다시 연결하면 이어져요)', '해제')) return; this.disconnect(); rerender(); };
+    this.hook = () => { if (!document.body.contains(root)) { this.hook = null; return; } const el = $('#syncSt', root); if (el && this.on) el.textContent = this.statusText(); };
+  },
+  async showCode(title) {
+    const code = this.makeCode(); let copied = false; try { await navigator.clipboard.writeText(code); copied = true; } catch (e) {}
+    await UI.modal({ title: '📋 ' + title, wide: true, body: `<p>${copied ? '연동 코드를 <b>복사했어요</b>.' : '아래 코드를 길게 눌러 <b>전체 선택 → 복사</b>하세요.'} 다른 기기(폰)에서 이 사이트를 열고 <b>⚙ 설정 → 📱 기기 연동</b> 칸에 붙여넣은 뒤 <b>연동하기</b>를 누르면 끝이에요.</p><textarea class="input" readonly style="width:100%;height:90px;font-family:var(--mono);font-size:.8em;word-break:break-all">${esc(code)}</textarea><p class="muted small">이 코드에는 GitHub 토큰이 들어 있어요. 카카오톡 "나와의 채팅"처럼 나만 보는 곳으로 보내세요.</p>`, buttons: [{ label: '다시 복사', onClick: () => { try { navigator.clipboard.writeText(code); UI.toast('복사했어요'); } catch (e) {} return false; } }, { label: T.close, cls: 'primary' }], onOpen: (ov) => { const ta = $('textarea', ov); ta.onclick = () => ta.select(); } });
+  },
+};
+// =====================================================================
 // === UI ===  (화면·스타일·연출)
 // =====================================================================
 
@@ -1931,8 +2062,8 @@ const UI = {
     $('#topbar').innerHTML = `<button class="tb-btn" id="tbHome" title="${T.home}">${this.view === 'home' ? myMascot({ size: 30 }) : '🏠'}</button><div class="tb-title">${esc(title)}</div>
       <div class="tb-xp" title="레벨 ${lv.level} · ${Game.title(lv.level)}"><span class="tb-lv">Lv.${lv.level}</span><div class="xpbar"><div class="xpfill" style="width:${lv.need ? Math.round(100 * lv.into / lv.need) : 100}%"></div></div><span class="tb-xpn">${lv.into}/${lv.need || '최대'}</span></div>
       ${Game.combo >= 2 ? `<div class="tb-combo t${Game.combo >= 10 ? 3 : Game.combo >= 5 ? 2 : Game.combo >= 3 ? 1 : 0}" title="${T.combo}">⚡×${Game.combo}</div>` : ''}<div class="tb-streak ${streak ? 'on' : ''}" title="${T.streak}">🔥${streak}</div>
-      <button class="tb-btn" id="tbSettings" title="${T.settings}">⚙</button>`;
-    $('#tbHome').onclick = () => UI.go('home'); $('#tbSettings').onclick = () => UI.go('settings');
+      ${typeof Sync !== 'undefined' && Sync.on ? `<button class="tb-btn tb-sync ${Sync.state}" id="tbSync" title="기기 연동: ${Sync.state === 'err' ? Sync.msg : '마지막 동기화 ' + Sync.ago() + ' (누르면 지금 동기화)'}">${Sync.icon()}</button>` : ''}<button class="tb-btn" id="tbSettings" title="${T.settings}">⚙</button>`;
+    $('#tbHome').onclick = () => UI.go('home'); $('#tbSettings').onclick = () => UI.go('settings'); const sy = $('#tbSync'); if (sy) sy.onclick = () => { if (Sync.state === 'err') UI.toast('⚠ ' + Sync.msg); Sync.syncNow(true); };
   },
   // 연출
   async celebrate(events, anchorEl) {
@@ -2527,6 +2658,7 @@ Views.settings = (root) => {
     <div class="card"><div class="card-h">화면</div><div class="srow"><span>테마</span><div class="seg"><button data-theme="dark" class="${s.theme === 'dark' ? 'on' : ''}">다크</button><button data-theme="light" class="${s.theme === 'light' ? 'on' : ''}">라이트</button></div></div><div class="srow"><span>글자 크기</span><div class="seg">${[0, 1, 2].map(i => `<button data-font="${i}" class="${s.font === i ? 'on' : ''}">${['작게', '보통', '크게'][i]}</button>`).join('')}</div></div><div class="srow"><span>애니메이션</span><div class="seg">${[0, 1, 2].map(i => `<button data-anim="${i}" class="${s.anim === i ? 'on' : ''}">${['끔', '약하게', '보통'][i]}</button>`).join('')}</div></div><div class="srow"><span>효과음</span><input type="checkbox" id="sSound" ${s.sound ? 'checked' : ''}></div><div class="srow"><span>진동 (모바일)</span><input type="checkbox" id="sVib" ${s.vibrate ? 'checked' : ''}></div></div>
     <div class="card"><div class="card-h">학습</div><div class="srow"><span>${T.dailyGoal}</span><div class="seg">${CONFIG.DAILY_GOAL_OPTIONS.map(n => `<button data-goal="${n}" class="${d.dailyGoal === n ? 'on' : ''}">${n}문제</button>`).join('')}</div></div><div class="srow"><span>온보딩 다시 보기</span><button class="btn sm" id="sOnb">보기</button></div><div class="srow"><span>${T.glossary} / ${T.errorDict}</span><div class="row"><button class="btn sm" id="sGl">용어집</button><button class="btn sm" id="sEr">에러 사전</button></div></div></div>
     <div class="card"><div class="card-h">클로드 선생님 (Claude API)</div><div class="muted small">키는 내 브라우저(localStorage)에만 저장돼요. 이 파일에는 절대 쓰이지 않아요. 키 발급: <a href="${CONFIG.TUTOR.consoleUrl}" target="_blank" rel="noopener">${CONFIG.TUTOR.consoleUrl}</a></div><div class="srow"><span>API 키</span><input class="input" type="password" id="sKey" value="${esc(s.apiKey)}" placeholder="sk-ant-..."></div><div class="srow"><span>모델</span><div class="row"><select id="sModelSel"><option value="${CONFIG.TUTOR.defaultModel}">${CONFIG.TUTOR.defaultModel} (빠르고 저렴)</option><option value="${CONFIG.TUTOR.altModel}">${CONFIG.TUTOR.altModel} (더 똑똑)</option><option value="__custom">직접 입력</option></select><input class="input" id="sModel" value="${esc(s.model)}" placeholder="모델 문자열"></div></div><div class="row"><button class="btn primary" id="sKeySave">저장</button><button class="btn" id="sKeyTest">연결 테스트</button><span id="sKeyMsg" class="muted small"></span></div></div>
+    ${Sync.card()}
     <div class="card"><div class="card-h">진행 데이터</div><div class="row"><button class="btn" id="sExport">📤 내보내기 (JSON)</button><button class="btn" id="sImport">📥 가져오기</button><input type="file" id="sImportFile" accept=".json" style="display:none"></div><div class="row" style="margin-top:8px"><button class="btn danger" id="sReset">전체 초기화</button></div></div>
     <div class="muted small center">${T.appName} v${CONFIG.APP_VERSION} · Pyodide ${CONFIG.PYODIDE_VERSION}</div></div>`;
   const re = () => { Store.save(); UI.applyTheme(); UI.renderTopbar(); Views.settings(root); };
@@ -2537,9 +2669,10 @@ Views.settings = (root) => {
   const sel = $('#sModelSel'); sel.value = [CONFIG.TUTOR.defaultModel, CONFIG.TUTOR.altModel].includes(s.model) ? s.model : '__custom'; sel.onchange = () => { if (sel.value !== '__custom') $('#sModel').value = sel.value; };
   $('#sKeySave').onclick = () => { s.apiKey = $('#sKey').value.trim(); s.model = $('#sModel').value.trim() || CONFIG.TUTOR.defaultModel; Store.save(); $('#sKeyMsg').textContent = '저장했어요'; };
   $('#sKeyTest').onclick = async () => { s.apiKey = $('#sKey').value.trim(); s.model = $('#sModel').value.trim() || CONFIG.TUTOR.defaultModel; Store.save(); const m = $('#sKeyMsg'); m.textContent = '확인 중…'; try { await Tutor.test(); m.textContent = '✅ ' + T.keyOk; } catch (e) { m.textContent = '❌ ' + Tutor.errMsg(e); } };
+  Sync.bind(root, () => Views.settings(root));
   $('#sExport').onclick = () => { const a = document.createElement('a'); a.download = `python_academy_${todayKey()}.json`; a.href = URL.createObjectURL(new Blob([Store.exportJSON()], { type: 'application/json' })); a.click(); UI.toast(T.exported); };
   $('#sImport').onclick = () => $('#sImportFile').click(); $('#sImportFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; if (!await UI.confirm(T.importConfirm)) return; try { Store.importJSON(await f.text()); UI.applyTheme(); UI.toast('불러왔어요'); UI.go('home'); } catch (err) { UI.toast('불러오기 실패: ' + err.message); } };
-  $('#sReset').onclick = async () => { if (!await UI.confirm(T.confirmReset, '초기화')) return; if (!await UI.confirm(T.confirmReset2, '정말 초기화')) return; Store.reset(); UI.applyTheme(); location.reload(); };
+  $('#sReset').onclick = async () => { if (!await UI.confirm(T.confirmReset, '초기화')) return; if (!await UI.confirm(T.confirmReset2, '정말 초기화')) return; Store.reset(); UI.applyTheme(); if (Sync.on) { UI.toast('초기화를 다른 기기에도 알리는 중…'); await Sync.syncNow(true); } location.reload(); };
 };
 
 // ---------- 용어집 / 에러 사전 ----------
@@ -2650,10 +2783,12 @@ const Onboarding = {
 window.addEventListener('DOMContentLoaded', () => {
   Store.load(); Content.init(); (Store.data.myProblems || []).forEach(np => { if (!Content.problemMap[np.id]) { Content.problemMap[np.id] = np; (Content.byLesson[np.lesson] = Content.byLesson[np.lesson] || []).push(np); PROBLEMS.push(np); } });
   UI.applyTheme(); Confetti.init(); Loader.init(); QuickKeys.init(); Tutor.ui.init();
+  Sync.load();
   Py.start(); // 홈 진입과 동시에 백그라운드 로딩
   Game.touchStreak(); Store.save();
   document.addEventListener('click', () => { Audio._ctx(); }, { once: true });
   if (!Store.data.onboarded) { UI.go('home', {}, false); Onboarding.start(); } else UI.go('home', {}, false);
+  Sync.init(); // 연동돼 있으면 다른 기기 진행 상황을 내려받아 합친다
 });
 
 </script>

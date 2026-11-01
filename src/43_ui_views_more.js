@@ -69,6 +69,7 @@ Views.settings = (root) => {
     <div class="card"><div class="card-h">화면</div><div class="srow"><span>테마</span><div class="seg"><button data-theme="dark" class="${s.theme === 'dark' ? 'on' : ''}">다크</button><button data-theme="light" class="${s.theme === 'light' ? 'on' : ''}">라이트</button></div></div><div class="srow"><span>글자 크기</span><div class="seg">${[0, 1, 2].map(i => `<button data-font="${i}" class="${s.font === i ? 'on' : ''}">${['작게', '보통', '크게'][i]}</button>`).join('')}</div></div><div class="srow"><span>애니메이션</span><div class="seg">${[0, 1, 2].map(i => `<button data-anim="${i}" class="${s.anim === i ? 'on' : ''}">${['끔', '약하게', '보통'][i]}</button>`).join('')}</div></div><div class="srow"><span>효과음</span><input type="checkbox" id="sSound" ${s.sound ? 'checked' : ''}></div><div class="srow"><span>진동 (모바일)</span><input type="checkbox" id="sVib" ${s.vibrate ? 'checked' : ''}></div></div>
     <div class="card"><div class="card-h">학습</div><div class="srow"><span>${T.dailyGoal}</span><div class="seg">${CONFIG.DAILY_GOAL_OPTIONS.map(n => `<button data-goal="${n}" class="${d.dailyGoal === n ? 'on' : ''}">${n}문제</button>`).join('')}</div></div><div class="srow"><span>온보딩 다시 보기</span><button class="btn sm" id="sOnb">보기</button></div><div class="srow"><span>${T.glossary} / ${T.errorDict}</span><div class="row"><button class="btn sm" id="sGl">용어집</button><button class="btn sm" id="sEr">에러 사전</button></div></div></div>
     <div class="card"><div class="card-h">클로드 선생님 (Claude API)</div><div class="muted small">키는 내 브라우저(localStorage)에만 저장돼요. 이 파일에는 절대 쓰이지 않아요. 키 발급: <a href="${CONFIG.TUTOR.consoleUrl}" target="_blank" rel="noopener">${CONFIG.TUTOR.consoleUrl}</a></div><div class="srow"><span>API 키</span><input class="input" type="password" id="sKey" value="${esc(s.apiKey)}" placeholder="sk-ant-..."></div><div class="srow"><span>모델</span><div class="row"><select id="sModelSel"><option value="${CONFIG.TUTOR.defaultModel}">${CONFIG.TUTOR.defaultModel} (빠르고 저렴)</option><option value="${CONFIG.TUTOR.altModel}">${CONFIG.TUTOR.altModel} (더 똑똑)</option><option value="__custom">직접 입력</option></select><input class="input" id="sModel" value="${esc(s.model)}" placeholder="모델 문자열"></div></div><div class="row"><button class="btn primary" id="sKeySave">저장</button><button class="btn" id="sKeyTest">연결 테스트</button><span id="sKeyMsg" class="muted small"></span></div></div>
+    ${Sync.card()}
     <div class="card"><div class="card-h">진행 데이터</div><div class="row"><button class="btn" id="sExport">📤 내보내기 (JSON)</button><button class="btn" id="sImport">📥 가져오기</button><input type="file" id="sImportFile" accept=".json" style="display:none"></div><div class="row" style="margin-top:8px"><button class="btn danger" id="sReset">전체 초기화</button></div></div>
     <div class="muted small center">${T.appName} v${CONFIG.APP_VERSION} · Pyodide ${CONFIG.PYODIDE_VERSION}</div></div>`;
   const re = () => { Store.save(); UI.applyTheme(); UI.renderTopbar(); Views.settings(root); };
@@ -79,9 +80,10 @@ Views.settings = (root) => {
   const sel = $('#sModelSel'); sel.value = [CONFIG.TUTOR.defaultModel, CONFIG.TUTOR.altModel].includes(s.model) ? s.model : '__custom'; sel.onchange = () => { if (sel.value !== '__custom') $('#sModel').value = sel.value; };
   $('#sKeySave').onclick = () => { s.apiKey = $('#sKey').value.trim(); s.model = $('#sModel').value.trim() || CONFIG.TUTOR.defaultModel; Store.save(); $('#sKeyMsg').textContent = '저장했어요'; };
   $('#sKeyTest').onclick = async () => { s.apiKey = $('#sKey').value.trim(); s.model = $('#sModel').value.trim() || CONFIG.TUTOR.defaultModel; Store.save(); const m = $('#sKeyMsg'); m.textContent = '확인 중…'; try { await Tutor.test(); m.textContent = '✅ ' + T.keyOk; } catch (e) { m.textContent = '❌ ' + Tutor.errMsg(e); } };
+  Sync.bind(root, () => Views.settings(root));
   $('#sExport').onclick = () => { const a = document.createElement('a'); a.download = `python_academy_${todayKey()}.json`; a.href = URL.createObjectURL(new Blob([Store.exportJSON()], { type: 'application/json' })); a.click(); UI.toast(T.exported); };
   $('#sImport').onclick = () => $('#sImportFile').click(); $('#sImportFile').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; if (!await UI.confirm(T.importConfirm)) return; try { Store.importJSON(await f.text()); UI.applyTheme(); UI.toast('불러왔어요'); UI.go('home'); } catch (err) { UI.toast('불러오기 실패: ' + err.message); } };
-  $('#sReset').onclick = async () => { if (!await UI.confirm(T.confirmReset, '초기화')) return; if (!await UI.confirm(T.confirmReset2, '정말 초기화')) return; Store.reset(); UI.applyTheme(); location.reload(); };
+  $('#sReset').onclick = async () => { if (!await UI.confirm(T.confirmReset, '초기화')) return; if (!await UI.confirm(T.confirmReset2, '정말 초기화')) return; Store.reset(); UI.applyTheme(); if (Sync.on) { UI.toast('초기화를 다른 기기에도 알리는 중…'); await Sync.syncNow(true); } location.reload(); };
 };
 
 // ---------- 용어집 / 에러 사전 ----------
@@ -192,8 +194,10 @@ const Onboarding = {
 window.addEventListener('DOMContentLoaded', () => {
   Store.load(); Content.init(); (Store.data.myProblems || []).forEach(np => { if (!Content.problemMap[np.id]) { Content.problemMap[np.id] = np; (Content.byLesson[np.lesson] = Content.byLesson[np.lesson] || []).push(np); PROBLEMS.push(np); } });
   UI.applyTheme(); Confetti.init(); Loader.init(); QuickKeys.init(); Tutor.ui.init();
+  Sync.load();
   Py.start(); // 홈 진입과 동시에 백그라운드 로딩
   Game.touchStreak(); Store.save();
   document.addEventListener('click', () => { Audio._ctx(); }, { once: true });
   if (!Store.data.onboarded) { UI.go('home', {}, false); Onboarding.start(); } else UI.go('home', {}, false);
+  Sync.init(); // 연동돼 있으면 다른 기기 진행 상황을 내려받아 합친다
 });

@@ -62,8 +62,8 @@ const UI = {
     $('#topbar').innerHTML = `<button class="tb-btn" id="tbHome" title="${T.home}">${this.view === 'home' ? myMascot({ size: 30 }) : '🏠'}</button><div class="tb-title">${esc(title)}</div>
       <div class="tb-xp" title="레벨 ${lv.level} · ${Game.title(lv.level)}"><span class="tb-lv">Lv.${lv.level}</span><div class="xpbar"><div class="xpfill" style="width:${lv.need ? Math.round(100 * lv.into / lv.need) : 100}%"></div></div><span class="tb-xpn">${lv.into}/${lv.need || '최대'}</span></div>
       ${Game.combo >= 2 ? `<div class="tb-combo t${Game.combo >= 10 ? 3 : Game.combo >= 5 ? 2 : Game.combo >= 3 ? 1 : 0}" title="${T.combo}">⚡×${Game.combo}</div>` : ''}<div class="tb-streak ${streak ? 'on' : ''}" title="${T.streak}">🔥${streak}</div>
-      <button class="tb-btn" id="tbSettings" title="${T.settings}">⚙</button>`;
-    $('#tbHome').onclick = () => UI.go('home'); $('#tbSettings').onclick = () => UI.go('settings');
+      ${typeof Sync !== 'undefined' && Sync.on ? `<button class="tb-btn tb-sync ${Sync.state}" id="tbSync" title="기기 연동: ${Sync.state === 'err' ? Sync.msg : '마지막 동기화 ' + Sync.ago() + ' (누르면 지금 동기화)'}">${Sync.icon()}</button>` : ''}<button class="tb-btn" id="tbSettings" title="${T.settings}">⚙</button>`;
+    $('#tbHome').onclick = () => UI.go('home'); $('#tbSettings').onclick = () => UI.go('settings'); const sy = $('#tbSync'); if (sy) sy.onclick = () => { if (Sync.state === 'err') UI.toast('⚠ ' + Sync.msg); Sync.syncNow(true); };
   },
   // 연출
   async celebrate(events, anchorEl) {

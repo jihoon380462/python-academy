@@ -8,11 +8,11 @@
 - 라이브 주소: **https://jihoon380462.github.io/python-academy/** (GitHub Pages, `main` 브랜치에 push하면 Actions가 1~2분 안에 자동 배포)
 - 저장소: `github.com/jihoon380462/python-academy` (public)
 - 기술: Pyodide 0.27.5(Web Worker, 메인스레드 폴백) · Blockly 11.2.2(블록 코딩) · CodeMirror 6(텍스트 에디터) · 모두 CDN. Claude API 선생님(사용자 API 키를 localStorage에 저장).
-- 현재 버전: **v1.1.2** (설정 화면 맨 아래에 표시됨. 수정할 때마다 `src/10_config.js`의 `APP_VERSION`을 올린다 — 사용자가 이 숫자로 반영 여부를 확인한다)
+- 현재 버전: **v1.2.0** (설정 화면 맨 아래에 표시됨. 수정할 때마다 `src/10_config.js`의 `APP_VERSION`을 올린다 — 사용자가 이 숫자로 반영 여부를 확인한다)
 
 ## 2. 작업 방법 (반드시 이 순서)
 1. 저장소를 클론/attach한다. 소스는 **`src/` 조각 파일**이 원본이다. `index.html`을 직접 고치지 말 것.
-   - `src/00_head.html` CSS + body 골격 · `10_config.js` 설정/문구(T) · `20~21_content_*.js` 레슨 · `22~23_problems_*.js` 문제 104개 · `24_content_misc.js` 챕터/뱃지/에러사전/용어집/**GUIDES(따라하기 코치 데이터)** · `30_engine.js` 실행·채점·게임·Content · `40_ui_core.js` UI 공통(모달·토스트·용어 칩) · `41_ui_editors.js` 텍스트/블록/Parsons 에디터 · `42_ui_views_main.js` 홈·레슨·문제 화면·Coach · `43_ui_views_more.js` 나머지 화면·초기화 · `99_tail.html`
+   - `src/00_head.html` CSS + body 골격 · `10_config.js` 설정/문구(T) · `20~21_content_*.js` 레슨 · `22~23_problems_*.js` 문제 104개 · `24_content_misc.js` 챕터/뱃지/에러사전/용어집/**GUIDES(따라하기 코치 데이터)** · `30_engine.js` 실행·채점·게임·Content · **`31_sync.js` 기기 연동(GitHub Gist)** · `40_ui_core.js` UI 공통(모달·토스트·용어 칩) · `41_ui_editors.js` 텍스트/블록/Parsons 에디터 · `42_ui_views_main.js` 홈·레슨·문제 화면·Coach · `43_ui_views_more.js` 나머지 화면·초기화 · `99_tail.html`
 2. `APP_VERSION` 올리기 → `./build.sh` (조각 합치기 + `node --check`) → `index.html`, `python_academy.html` 둘 다 갱신됨.
 3. 커밋 & push:
    ```
@@ -37,6 +37,7 @@
 - 답변은 짧게, 결과 먼저.
 
 ## 5. 지금까지 반영한 피드백 이력 (최근순)
+- v1.2.0 **PC↔모바일 기기 연동**(`Sync` in 31): 사용자 GitHub 비공개 gist(`python_academy_save.json`)에 진행 데이터 저장. 토큰(classic, gist 권한)으로 첫 연결 → "연동 코드"(`PA-SYNC:`+base64{t,g})를 다른 기기에 붙여넣기. `Store.save()`가 `updatedAt` 찍고 3초 디바운스로 push, 시작·탭 복귀·online 때 pull→`merge`(진행은 max/합집합, 설정·문자열은 최근 쪽, `resetAt`이 더 새로우면 그쪽 통째). API 키는 동기화 제외. 설정 카드 `Sync.card()/bind()`, 상단바 ☁ 아이콘. 스텁 테스트: scratchpad `sync_test.js` 패턴(가짜 fetch).
 - v1.1.2 L3 설명에서 `+ - *` 한 칩 → 기호별 칩으로 분리
 - v1.1.1 L2P5/L3P1 기본값 a=3, b=4 (곱과 합이 같아지는 2,2 방지)
 - v1.1.0 **블록 문제 "따라하기" 코치**(`Coach` in 42, 데이터 `GUIDES` in 24, 자동생성 `Content.guideFor` in 30) · 블록 스냅 반경 64px

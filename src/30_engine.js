@@ -116,12 +116,12 @@ const Store = {
     this.data = this.blank();
   },
   migrate() { /* 향후 스키마 변경 시 v 비교해 변환 */ this.data.v = CONFIG.SCHEMA_VERSION; },
-  save() { try { localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(this.data)); } catch (e) { console.warn('저장 실패(용량?)', e); } },
+  save(opt = {}) { if (!opt.silent) { this.data.updatedAt = Date.now(); if (typeof Sync !== 'undefined' && Sync.on) Sync.schedulePush(); } try { localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(this.data)); } catch (e) { console.warn('저장 실패(용량?)', e); } },
   prob(id) { const d = this.data; if (!d.problems[id]) d.problems[id] = { status: 'none', stars: 0, hints: 0, attempts: 0, fails: 0, code: null, mode: null, firstTry: null, answerSeen: false, tutorAsked: false, review: null, clearedAt: null }; return d.problems[id]; },
   setCode(id, code, mode) { const p = this.prob(id); if (code != null && byteLen(code) <= CONFIG.MAX_CODE_SAVE_BYTES) { p.code = code; p.mode = mode; } this.save(); },
   exportJSON() { return JSON.stringify(this.data, null, 1); },
   importJSON(text) { const d = JSON.parse(text); if (!d || typeof d !== 'object' || !('problems' in d)) throw new Error('형식이 맞지 않아요'); this.data = Object.assign(this.blank(), d); this.migrate(); this.save(); },
-  reset() { this.data = this.blank(); this.save(); },
+  reset() { this.data = this.blank(); this.data.resetAt = Date.now(); this.save(); },
   resetProblem(id) { delete this.data.problems[id]; delete this.data.tutorChats[id]; this.save(); },
 };
 

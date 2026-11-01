@@ -37,6 +37,7 @@ select{padding:8px 10px;border-radius:8px;border:1px solid var(--border);backgro
 /* 상단바 */
 #topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;padding:6px 12px;background:var(--surface);border-bottom:1px solid var(--border);min-height:52px}
 .tb-btn{min-width:44px;min-height:44px;border:0;background:transparent;color:var(--text);font-size:1.3em;border-radius:10px;display:flex;align-items:center;justify-content:center}.tb-btn:hover{background:var(--surface2)}
+.tb-sync{font-size:1.05em;color:var(--muted)}.tb-sync.ok{color:var(--accent)}.tb-sync.err{color:var(--warn)}.tb-sync.syncing{animation:spin 1s linear infinite}.tb-sync.dirty{color:var(--primary)}@keyframes spin{to{transform:rotate(360deg)}}
 .tb-title{flex:1;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tb-xp{display:flex;align-items:center;gap:6px;font-size:.85em}.tb-lv{font-weight:800;color:var(--gold)}.tb-xpn{color:var(--muted);font-size:.85em}
 .xpbar{width:90px;height:10px;background:var(--surface2);border-radius:999px;overflow:hidden;border:1px solid var(--border)}.xpbar.big{width:100%;height:14px;margin:8px 0}.xpfill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .6s}
