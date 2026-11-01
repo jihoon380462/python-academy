@@ -3,6 +3,14 @@
 > 새 채팅에서 이 파일을 먼저 읽으면 바로 이어서 작업할 수 있다.
 > 사용자(jihoon380462)는 한국어로 대화하며, 사이트 화면을 스크린샷으로 보내고 "이거 고쳐" 식으로 피드백을 준다.
 
+## 0. 상태판 (배포할 때마다 이 칸을 갱신한다 — 작업 규칙)
+
+| 항목 | 내용 |
+| --- | --- |
+| **현재 버전** | v2.0.0 (2026-11-01 배포, Phase 0) |
+| **마지막 작업** | Phase 0: `src/`+`build.sh` → `core/`·`courses/python/`·`shared/`·`tools/` 구조, 허브(`index.html`+`core/hub.js`), 저장 스키마 v2(`academy.*`, v1 자동 이전·백업·되돌리기), Actions 검증 게이트, `python_academy.html` 리다이렉트, `legacy/` 보관. 상세: CHANGELOG.md |
+| **다음 후보** | ① v2.0.0 실사용 확인(허브 수치·실제 Blockly 화면·기기 연동 병합) 후 피드백 패치 ② Phase 1 알고리즘 코스(EXPANSION.md 5절 → v2.1.0) ③ 텍스트 코치 L6 이후 확장 / 레슨 5 이후 쉬운 말 |
+
 ## 1. 이게 뭔가
 - **파이썬 아카데미**: 완전 초보자용 학습 사이트. v2.0.0(Phase 0)부터 **허브 + 코스 페이지** 구조 (확장 계획은 `EXPANSION.md`; "Phase N을 진행해"가 의뢰 단위).
 - 라이브 주소: 허브 **https://jihoon380462.github.io/python-academy/** · 파이썬 코스 `/courses/python/` (GitHub Pages, `main`에 push → Actions가 **검증(validate+run_solutions) 통과 시** 1~2분 안에 자동 배포)
@@ -22,6 +30,7 @@
    git push origin main
    ```
    (커밋 메시지 끝에 Co-Authored-By 줄은 세션 지침대로)
+   **작업 규칙(사용자 지시)**: 배포하는 커밋에는 반드시 ① 이 파일 **0. 상태판**의 "현재 버전 / 마지막 작업 / 다음 후보" 갱신과 ② **`CHANGELOG.md`** 새 항목(버전·날짜·바뀐 것)을 **같은 커밋에 포함**한다. 코드만 푸시하고 문서를 나중에 올리지 말 것.
 4. 배포 확인: `gh run list --workflow "Deploy to GitHub Pages" --limit 1` 이 `success`면 끝(verify 잡 실패 시 배포 안 됨 → `gh run view <id> --log-failed`). 사용자에게 "vX.Y.Z 배포 완료, Ctrl+F5" 라고 알린다.
 
 ## 3. 환경 제약 (작업 샌드박스)
@@ -38,25 +47,11 @@
 - 반복되는 수동 절차를 싫어함("일일이 하라고?") → 자동화해서 링크 하나로 끝나게.
 - 답변은 짧게, 결과 먼저.
 
-## 5. 지금까지 반영한 피드백 이력 (최근순)
-- v2.0.0 **Phase 0 (EXPANSION.md 2절)**: `src/`+`build.sh` → `core/`·`courses/python/`·`shared/`·`tools/` 구조(코드는 옮기기만, 전역 이름·순서 유지). 허브 `index.html`(오늘의 할 일·이어서 하기·코스 카드 5개) + `core/hub.js`. 저장 스키마 v2(`academy.profile/course.<id>/tutor.<id>/works/sync`, `Store.data`는 그대로 한 객체; v1 자동 이전 + `academy.backup.v1` 보관 + 설정 "v1 데이터 다시 가져오기"; 4MB 넘으면 "오래된 코드 정리"). 상단바 ⌂ 허브 버튼, `Store.data.last`로 이어서 하기, 코스 페이지 딥링크 해시. Actions `verify` 잡(validate_content + run_solutions) 통과 시에만 배포. `python_academy.html`은 리다이렉트, v1.3.0 원본은 `legacy/python_academy_v1.html`.
-- v1.3.0 후보 2~7 일괄: ① 레슨 0~4 설명 쉬운 말로(읽는 법·뜻 병기, 몫/나머지 초등 나눗셈 비유) ② **텍스트 모드 따라하기 코치** (`Content.textGuideFor` in 30: L0~L5 정답 코드를 한 줄씩 "뜻 + 이렇게 치세요 + 📋복사"로 자동 생성, 손글 `GUIDES_TEXT[pid]`로 덮어쓰기 가능; `Coach.mount(..., 'text')`, 42 텍스트 분기에 `#pvCoach`) ③ 빈 작업판 **손가락 드래그 데모** (`.bg-demo` CSS 애니메이션, 41 guide; 애니메이션 '끔'이면 숨김) ④ 변수 만들기 창 **추천 이름 칩** (`UI.prompt` `chips` 옵션, 41 `suggest()`: 정답 코드 변수 → 공통 이름) ⑤ **집중 모드** (`settings.focus`, `.pv.focus` 설명 숨김 + `.pv-focusbar`에 제목/설명모달/힌트/선생님; 모바일은 탭이라 버튼 숨김) ⑥ 블록 배율 PC 1.1 / 모바일 0.85
-- v1.2.0 **PC↔모바일 기기 연동**(`Sync` in 31): 사용자 GitHub 비공개 gist(`python_academy_save.json`)에 진행 데이터 저장. 토큰(classic, gist 권한)으로 첫 연결 → "연동 코드"(`PA-SYNC:`+base64{t,g})를 다른 기기에 붙여넣기. `Store.save()`가 `updatedAt` 찍고 3초 디바운스로 push, 시작·탭 복귀·online 때 pull→`merge`(진행은 max/합집합, 설정·문자열은 최근 쪽, `resetAt`이 더 새로우면 그쪽 통째). API 키는 동기화 제외. 설정 카드 `Sync.card()/bind()`, 상단바 ☁ 아이콘. 스텁 테스트: scratchpad `sync_test.js` 패턴(가짜 fetch).
-- v1.1.2 L3 설명에서 `+ - *` 한 칩 → 기호별 칩으로 분리
-- v1.1.1 L2P5/L3P1 기본값 a=3, b=4 (곱과 합이 같아지는 2,2 방지)
-- v1.1.0 **블록 문제 "따라하기" 코치**(`Coach` in 42, 데이터 `GUIDES` in 24, 자동생성 `Content.guideFor` in 30) · 블록 스냅 반경 64px
-- v1.0.9 Blockly 변수 만들기 창을 브라우저 prompt 대신 앱 모달로(`Blockly.dialog.setPrompt`, `UI.prompt`에 hint/ok 옵션)
-- v1.0.8 설명 속 `<code>` 칩: 줄바꿈 금지 + 고대비(호박색) `--code-bg/fg/bd`
-- v1.0.7 "채점하기" → "제출하기"
-- v1.0.6 블록 작업판 확대(`.pv.mode-block` 24%/76%, `#view.view-problem` 1720px, `.bed` 높이 최대 600)
-- v1.0.5 카테고리 1개면 flyoutToolbox, 빈 작업판 안내 오버레이(`.bed-guide`), 메뉴 자동 열기, 메뉴 버튼화
-- v1.0.4 용어 `dfn.term` 굵기 800/1.12em
-- v1.0.3 이하: 본문 버튼명 `.uibtn` 칩, 폰트 확대 방지, 모바일 Worker 폴백, GitHub Pages 배포 구축
+## 5. 변경 이력
+- **CHANGELOG.md** 참고 (버전별 변경 내용). 상태판(0절)에는 최신 버전만 적는다.
 
-## 6. 열려 있는 다음 후보 (사용자에게 선택지로 제시했던 것)
-1. v2.0.0 실사용 확인(허브·마이그레이션·기기 연동) 후 피드백 반영 — EXPANSION.md 2절 회귀 체크리스트 중 사용자 확인 항목(실제 Pyodide/Blockly 화면, 기기 연동 병합)
-2. **Phase 1**: 코스 2 알고리즘·자료구조 + 시각화 엔진 (EXPANSION.md 5절) → v2.1.0
-3. 텍스트 코치를 L6 이후로 확장 / 레슨 5 이후 설명 재점검 (파이썬 코스 패치)
+## 6. 열려 있는 다음 후보
+- 상태판(0절)의 "다음 후보"가 최신이다. 사용자에게는 번호 붙인 선택지로 제시한다.
 
 ## 7. 핵심 데이터 규칙 요약
 - 문제 스키마는 `courses/python/content.js` 맨 위 주석(+ EXPANSION.md 4절의 확장 필드 runner/grader/setup/limits/visualize). `vary:{a:[lo,hi]}`의 **기본값은 lo**(`Content.defaultParams`) — 기본값끼리 겹치는 출력이 안 나오게 주의.
