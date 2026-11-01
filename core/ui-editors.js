@@ -154,8 +154,8 @@ class BlockEditor {
     const from = mobile ? '아래' : '왼쪽', arrow = mobile ? '⬇' : '⬅';
     const demo = `<div class="bg-demo" aria-hidden="true"><span class="bg-blk">출력 ❝안녕❞</span><span class="bg-hand">👆</span></div>`;
     guide.innerHTML = single
-      ? `<div class="bg-arrow">${arrow}</div><div class="bg-t">${from}에 있는 <b>블록을 손가락(마우스)으로 끌어서</b><br>이 흰 바탕에 놓으세요</div>${demo}<div class="bg-s">꾹 누른 채 끌고 와서 손을 떼면 돼요 · 놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`
-      : `<div class="bg-arrow">${arrow}</div><div class="bg-t"><b>①</b> ${from} 메뉴(출력·변수…)를 눌러 블록을 꺼내고<br><b>②</b> 블록을 끌어서 이 흰 바탕에 놓으세요</div>${demo}<div class="bg-s">꾹 누른 채 끌고 와서 손을 떼면 돼요 · 놓으면 오른쪽에 파이썬 코드가 자동으로 만들어져요</div>`;
+      ? `<div class="bg-arrow">${arrow}</div><div class="bg-t">${from}에 있는 <b>블록을 손가락(마우스)으로 끌어서</b><br>이 흰 바탕에 놓으세요</div>${demo}<div class="bg-s">꾹 누른 채 끌고 와서 손을 떼면 돼요 · 놓으면 ${mobile ? '아래' : '오른쪽'}에 파이썬 코드가 자동으로 만들어져요</div>`
+      : `<div class="bg-arrow">${arrow}</div><div class="bg-t"><b>①</b> ${from} 메뉴(출력·변수…)를 눌러 블록을 꺼내고<br><b>②</b> 블록을 끌어서 이 흰 바탕에 놓으세요</div>${demo}<div class="bg-s">꾹 누른 채 끌고 와서 손을 떼면 돼요 · 놓으면 ${mobile ? '아래' : '오른쪽'}에 파이썬 코드가 자동으로 만들어져요</div>`;
     this.parent.appendChild(guide); this.guide = guide;
     const updGuide = () => { if (!this.ws) return; guide.classList.toggle('hide', this.ws.getAllBlocks(false).length > 0); };
     updGuide();
