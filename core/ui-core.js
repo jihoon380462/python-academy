@@ -33,6 +33,7 @@ const UI = {
   // 연출
   async celebrate(events, anchorEl) {
     for (const ev of events) {
+      if (ev.type === 'xp' && ev.rerun) { Audio.click && Audio.click(); continue; }
       if (ev.type === 'xp') { Confetti.burst(140); Audio.clear(); Haptic.tap(40); this.flyXp(ev.amount, ev.stars, anchorEl); if (ev.combo >= 3) { Audio.combo(ev.combo); } await sleep(500); }
       else if (ev.type === 'levelUp') { await this.levelUpOverlay(ev); }
       else if (ev.type === 'badge') { this.badgeFly(ev.badge); await sleep(400); }

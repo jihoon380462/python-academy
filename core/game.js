@@ -14,6 +14,7 @@ const Game = {
   clearProblem(p, { mode, hints, firstTry, usedTutor, inReview, inChallenge, inTimeAttack }) {
     const rec = Store.prob(p.id); const d = Store.data; const events = []; const wasClear = rec.status === 'clear';
     const stars = rec.answerSeen ? 0 : 3 - Math.min(3, hints);
+    const rerun = wasClear && !inReview && !inChallenge && !inTimeAttack && stars <= rec.stars; // 이미 클리어한 문제를 그냥 다시 제출(별 향상 없음): XP·콤보·일일 횟수 없음 (v2.2.7)
     let xp = p.xp || CONFIG.XP[p.type] || 10;
     if (p.boss) xp = this.bossXp(p);
     xp *= CONFIG.HINT_XP_MULT[Math.min(3, rec.answerSeen ? 3 : hints)];
@@ -21,10 +22,11 @@ const Game = {
     if (firstTry && !wasClear) xp *= 1 + CONFIG.FIRST_TRY_BONUS;
     if (inChallenge) xp *= CONFIG.DAILY_CHALLENGE_MULT;
     // 콤보
-    if (!inTimeAttack) { if (hints === 0 && !rec.answerSeen) { this.combo++; } else { this.combo = 0; } }
+    if (!inTimeAttack && !rerun) { if (hints === 0 && !rec.answerSeen) { this.combo++; } else { this.combo = 0; } }
     this.statMax('maxCombo', this.combo);
     xp *= this.comboMult();
-    if (wasClear && !inReview && !inChallenge) xp = Math.round(xp * 0.3); // 다시 풀기는 30%
+    if (wasClear && !inReview && !inChallenge) xp = Math.round(xp * 0.3); // 별이 올라간 다시 풀기는 30%
+    if (rerun) xp = 0;
     if (inReview) xp = CONFIG.REVIEW_XP_BONUS_PER;
     // 기록
     rec.status = 'clear'; rec.clearedAt = Date.now();
@@ -37,14 +39,14 @@ const Game = {
     if (usedTutor) this.stat('tutorBreakthrough');
     const h = new Date().getHours(); if (h >= 0 && h < 4) this.stat('nightClear');
     // 복습 큐
-    if (!inReview) { const stage = (hints > 0 || rec.fails >= 3) ? 0 : 1; /* 힌트·3회 실패는 1일, 깔끔한 클리어는 3일부터 */ rec.review = { stage, due: addDays(todayKey(), CONFIG.REVIEW_INTERVALS[stage]) }; }
+    if (!inReview && !rerun) { const stage = (hints > 0 || rec.fails >= 3) ? 0 : 1; /* 힌트·3회 실패는 1일, 깔끔한 클리어는 3일부터 */ rec.review = { stage, due: addDays(todayKey(), CONFIG.REVIEW_INTERVALS[stage]) }; }
     // 일일/스트릭
-    const today = todayKey(); d.days[today] = (d.days[today] || 0) + 1; this.touchStreak();
+    const today = todayKey(); if (!rerun) { d.days[today] = (d.days[today] || 0) + 1; } this.touchStreak();
     if (d.days[today] === d.dailyGoal && !d.dailyGoalDates[today]) { d.dailyGoalDates[today] = true; this.stat('dailyGoalsMet'); events.push({ type: 'dailyGoal' }); Store.data.xp += CONFIG.DAILY_GOAL_BONUS; }
     // 레슨 전체 별 3
     const lp = Content.problemsOf(p.lesson); if (lp.length && lp.every(q => Store.prob(q.id).stars === 3) && !d.lessons['star3_' + p.lesson]) { d.lessons['star3_' + p.lesson] = true; this.stat('lessonsAll3'); }
     if (PROBLEMS.every(q => Store.prob(q.id).status === 'clear')) d.stats.allClear = 1;
-    const r = this.addXp(xp); events.push({ type: 'xp', amount: r.amount, stars, combo: this.combo, mult: this.comboMult() }); r.levelUps.forEach(u => events.push({ type: 'levelUp', ...u }));
+    const r = this.addXp(xp); events.push({ type: 'xp', amount: r.amount, stars, combo: this.combo, mult: this.comboMult(), rerun }); r.levelUps.forEach(u => events.push({ type: 'levelUp', ...u }));
     this.checkChapterPerfect(p);
     this.checkBadges().forEach(b => events.push({ type: 'badge', badge: b }));
     Store.save(); return events;
