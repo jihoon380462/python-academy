@@ -11,7 +11,7 @@
 | 50 | 알고 시각화: deque·set 이 안 그려짐(「그리기 오류」) | BFS·큐 레슨 4곳·문제 9개 👀 가 깨짐 | core (Fable 설계 쪽) | core/runners/python.js 85행 deque → list, core/visualize.js boxes·queue 에 `__set` |
 | 51 | 알고 시각화: dict 를 table 로 못 그림(항상 「비어 있어요」) | 메모이제이션·역색인 화면 5곳 | core | core/visualize.js `drawTable` 에 dict 처리 |
 | 52 | 알고 함수 정의형 문제 27개 👀 에 그림이 없음 | 지문은 「쓰면 시각화돼요」라고 약속 | core | core/ui-views-main.js 273행 실행 코드 뒤에 `tests[0].call` |
-| 60 | 파이썬 L17P2 힌트 3 그대로 쓰면 에러 | 파일을 다시 여는 줄 없음 | 콘텐츠 | python content.js 718행 |
+
 
 ## 2. 그다음 (하)
 
