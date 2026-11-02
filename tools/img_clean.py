@@ -11,7 +11,7 @@ except ImportError:
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); DIR = os.path.join(ROOT, 'assets', 'img')
 check_only = '--check' in sys.argv; args = [a for a in sys.argv[1:] if not a.startswith('--')]
 files = args or sorted(f for f in os.listdir(DIR) if f.endswith('.png'))
-EXPECT = {'badge-': (256, 256), 'hero-': (1200, None), 'course-': (512, 512), 'boss-': (512, 512), 'chapter-': (512, 512), 'empty-': (512, 512)}
+EXPECT = {'badge-': (256, 256), 'hero-': (1200, None), 'course-': (512, 512), 'boss-': (512, 512), 'chapter-': (512, 512), 'empty-': (512, 512), 'area-': (512, 512)}
 def rim_pixels(im):
     w, h = im.size; px = im.load(); out = []
     for y in range(h):
