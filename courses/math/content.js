@@ -1,4 +1,4 @@
-// courses/math/content.js — 수학 공간 콘텐츠 (v2.3.0 M1: 영역 1·3·5, 노드 25개 · v2.3.2 보강 +3 = 28개 · 콘텐츠팀 C10 영역 4 +6 = 34개). EXPANSION.md 14절.
+// courses/math/content.js — 수학 공간 콘텐츠 (v2.3.0 M1: 영역 1·3·5, 노드 25개 · v2.3.2 보강 +3 = 28개 · 콘텐츠팀 C10 영역 4 +6 = 34개 · C10 2부 영역 2 +4 = 38개). EXPANSION.md 14절.
 //   노드 = 레슨 스키마 + { subtitle, level, stars(1~3), prereq:[id], uses:[], star(대학 맛보기), icon, params:[{id,label,min,max,step,default,unit}] }
 //   pages[0] 은 반드시 figure(만지는 그림): { title, scene(쓰임 한 컷), figure:{kind,...}, html(3줄 이내), observe:[질문] }
 //   pages[1] 은 식과 코드: { title, html, formula:[{latex, note}], example:{code} } — 슬라이더 ↔ 코드의 `id = 값` 줄이 동기화된다
@@ -6,12 +6,13 @@
 //   그림 종류는 core/figure.js. 그림 안 함수(sim·theory·classify)는 JS 함수라 JSON 추출에서는 빠진다(채점과 무관).
 const CHAPTERS = [
   { ch: 1, name: '수와 컴퓨터', color: '#2bb673', icon: '🔢' },
+  { ch: 2, name: '논리·집합·증명', color: '#00acc1', icon: '🔗' },
   { ch: 3, name: '경우의 수·확률·통계', color: '#ffb347', icon: '🎲' },
   { ch: 4, name: '함수·변화·미적분', color: '#9c27b0', icon: '📈' },
   { ch: 5, name: '벡터·행렬', color: '#6c8cff', icon: '🧮' },
 ];
-const MAP_DECOR = { 1: '🔢', 3: '🎲', 4: '📈', 5: '🧮' };
-const WEAKNESS_TAGS = ['나머지', '소수', '최대공약수', '약수', '진법', '부동소수점', '거듭제곱', '로그', '수열', '시그마', '경우의수', '확률', '조건부확률', '기댓값', '분포', '몬테카를로', '베이즈', '상관', '벡터', '정규화', '내적', '행렬', '변환', '동차좌표', '함수', '삼각함수', '극한', '미분'];
+const MAP_DECOR = { 1: '🔢', 2: '🔗', 3: '🎲', 4: '📈', 5: '🧮' };
+const WEAKNESS_TAGS = ['나머지', '소수', '최대공약수', '약수', '진법', '부동소수점', '거듭제곱', '로그', '수열', '시그마', '경우의수', '확률', '조건부확률', '기댓값', '분포', '몬테카를로', '베이즈', '상관', '벡터', '정규화', '내적', '행렬', '변환', '동차좌표', '함수', '삼각함수', '극한', '미분', '집합', '논리', '비둘기집'];
 const THEME_PATHS = [
   { label: '🎮 게임 만들 거면 5 → (4)', nodes: ['M5_vec', 'M5_add', 'M5_dist', 'M5_norm', 'M5_dot', 'M5_rotate', 'M4_quad', 'M4_trig', 'M5_scale', 'M5_compose', 'M5_homog'], note: '캐릭터 이동·추적·회전부터, 점프 포물선·원 궤도는 영역 4에서' },
   { label: '🧭 코딩테스트면 1 → (6) → 3', nodes: ['M1_mod', 'M1_prime', 'M1_divisor', 'M1_gcd', 'M1_binary', 'M1_power', 'M1_log', 'M3_perm', 'M3_prob'], note: '나머지·소수·비트·로그(복잡도)·경우의 수' },
@@ -154,7 +155,7 @@ const LESSONS = [
   summary: ['약수: n % i == 0 인 i — 짝(i, n // i)으로 오니 √n 까지만', '약수 개수 = 소인수분해 지수에 1씩 더해 곱 · 제곱수만 홀수 개', '완전수: 자기 자신을 뺀 약수의 합 = n (6, 28, 496, 8128)'] },
 
 // =============== 영역 3 경우의 수·확률·통계 ===============
-{ id: 'M3_perm', ch: 3, n: 1, title: '줄 세우기와 고르기', subtitle: '순열과 조합', level: '고2', stars: 2, prereq: [], uses: ['algo', 'game'], icon: '🌳', minutes: 15, mode: 'text',
+{ id: 'M3_perm', ch: 3, n: 1, title: '줄 세우기와 고르기', subtitle: '순열과 조합', level: '고1', stars: 2, prereq: [], uses: ['algo', 'game'], icon: '🌳', minutes: 15, mode: 'text',
   params: [{ id: 'n', label: 'n (전체)', min: 2, max: 6, step: 1, default: 4 }, { id: 'r', label: 'r (뽑는 수)', min: 1, max: 4, step: 1, default: 2 }, { id: 'ordered', label: '순서 있음(1)/없음(0)', min: 0, max: 1, step: 1, default: 1 }],
   terms: {},
   pages: [
@@ -220,7 +221,7 @@ const LESSONS = [
   pages: [
     { title: '만져 보기: 점을 뿌려 원주율 재기', scene: '🕹 "이 밸런스로 보스가 평균 몇 턴 만에 죽나"처럼 식이 없는 문제는 그냥 10만 번 돌려 세면 돼요. 그게 [[몬테카를로]].', figure: { kind: 'montecarlo', note: '파랑 = 원 안, 회색 = 원 밖. 비율 × 4 ≈ π' },
       html: '<p>정사각형에 점을 고르게 뿌리면 <b>원 안에 떨어지는 비율 = 원 넓이 / 정사각형 넓이 = π/4</b>. 점이 많을수록 추정값이 π에 붙어요.</p>',
-      observe: ['100개일 때와 50,000개일 때 오차는 어떻게 다른가요?', '점 수를 4배로 하면 오차는 대략 몇 분의 1이 되나요? (√ 규칙)', '점 수를 100만 바꿔도 추정값이 들쭉날쭉한 이유는?'] },
+      observe: ['100개일 때와 50,000개일 때 오차는 어떻게 다른가요?', '점 수를 4배로 하면 오차는 대략 몇 분의 1이 되나요? (√ 규칙)', '점 수를 100씩만 바꿔도 추정값이 들쭉날쭉한 이유는?'] },
     { title: '식과 코드', html: '<p>추정값의 오차는 표본 수의 제곱근에 반비례해요: 100배 많이 돌리면 오차는 10분의 1. 재현 가능하게 <code>random.seed</code>를 고정하는 습관. 큰 수의 법칙이 이론, 몬테카를로가 그 실전이에요.</p>',
       formula: [{ latex: '\\frac{\\text{원 안 점 수}}{\\text{전체 점 수}} \\approx \\frac{\\pi r^{2}}{(2r)^{2}} = \\frac{\\pi}{4}', note: '넓이 비 = 점 비' }, { latex: '\\text{오차} \\propto \\frac{1}{\\sqrt{N}}', note: '표본 100배 → 오차 1/10' }],
       example: { code: 'import random\nrandom.seed(42)\nn = 2000\ninside = 0\nfor _ in range(n):\n    x, y = random.random(), random.random()\n    if x * x + y * y <= 1:\n        inside += 1\nprint("π ≈", 4 * inside / n)\n# 식이 없는 문제: 주사위 2개 합이 7 이상일 확률\nhit = sum(1 for _ in range(n) if random.randint(1, 6) + random.randint(1, 6) >= 7)\nprint("합 ≥ 7:", hit / n, "(이론 21/36 =", round(21 / 36, 4), ")")', trace: true } },
@@ -250,7 +251,7 @@ const LESSONS = [
       example: { code: 'xs = [1, 2, 3, 4, 5, 6, 7, 8]\nys = [2, 3.5, 3, 5, 5.5, 7, 6.5, 8.5]\nn = len(xs)\nmx, my = sum(xs) / n, sum(ys) / n\nsxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))\nsxx = sum((x - mx) ** 2 for x in xs)\nsyy = sum((y - my) ** 2 for y in ys)\nr = sxy / (sxx * syy) ** 0.5\na = sxy / sxx\nb = my - a * mx\nprint("r =", round(r, 3), " 추세선 y =", round(a, 3), "x +", round(b, 3))', trace: true } },
   ],
   summary: ['r: 1 같이 커짐, −1 반대, 0 무관', 'r = 공분산 / (σx σy), 이상값 하나에 크게 흔들린다', '추세선 = 잔차 제곱합 최소. 상관 ≠ 인과'] },
-{ id: 'M3_geom', ch: 3, n: 9, title: '몇 번 만에 성공하나', subtitle: '기하분포', level: '고2', stars: 2, prereq: ['M3_expect'], uses: ['game', 'data'], icon: '🎰', minutes: 15, mode: 'text',
+{ id: 'M3_geom', ch: 3, n: 9, title: '몇 번 만에 성공하나', subtitle: '기하분포', level: '대학', stars: 2, star: true, prereq: ['M3_expect'], uses: ['game', 'data'], icon: '🎰', minutes: 15, mode: 'text',
   params: [{ id: 'pct', label: '성공 확률 p', min: 10, max: 90, step: 5, default: 20, unit: '%' }],
   terms: { '기하분포': '성공 확률 p인 시도를 성공할 때까지 반복할 때, 첫 성공까지 걸린 횟수의 분포. 평균 1/p 번' },
   pages: [
@@ -422,7 +423,7 @@ const LESSONS = [
   ],
   summary: ['단위원 위 점 = (cos θ, sin θ)', 'sin 은 높이, cos 은 가로 — 돌리면 파도', 'math.sin 은 라디안: math.radians(deg)'] },
 { id: 'M4_limit', ch: 4, n: 5, title: '가까이 갈수록', subtitle: '극한의 수치 체험', level: '고2', stars: 2, prereq: ['M4_linear'], uses: ['data'], icon: '🔭', minutes: 15, mode: 'text',
-  params: [{ id: 'xp', label: 'x', min: -3, max: 3, step: 0.05, default: 1 }],
+  params: [{ id: 'xp', label: 'x', min: -8, max: 8, step: 0.05, default: 1 }],
   terms: { '극한': 'x를 어떤 값에 한없이 가까이 할 때 식의 값이 가까워지는 값. 그 점에서의 값이 없어도 된다' },
   pages: [
     { title: '만져 보기: 구멍 난 곳을 향해', scene: '🔭 0 ÷ 0 은 계산할 수 없지만, 0에 "아주 가까운" 곳의 값은 잴 수 있어요. 미분·연속 복리·수치 계산이 전부 이 "가까이 가 보기"에서 시작해요.', figure: { kind: 'plot', fns: [{ expr: 'sin(x)/x', label: 'sin x ÷ x' }], xr: [-8, 8], yr: [-0.4, 1.2], probe: 'xp', note: '점선을 0 쪽으로 끌어 보세요 — x = 0 바로 위 꼭대기에 그래프가 끊긴 구멍이 있어요' },
@@ -445,6 +446,55 @@ const LESSONS = [
       example: { code: 'a = 1\nh = 1.5\nf = lambda x: x * x\nprint("할선 기울기", (f(a + h) - f(a)) / h)\nfor step in [1, 0.1, 0.01, 0.001]:\n    print("h =", step, "→", (f(a + step) - f(a)) / step)\nprint("접선 기울기 2a =", 2 * a)', trace: true } },
   ],
   summary: ['할선 기울기 = (f(a+h) − f(a)) ÷ h', 'h → 0 이면 접선 기울기 = 미분', 'x² 의 미분은 2x — 코드는 작은 h 로 근사'] },
+// ================= 영역 2 · 논리·집합·증명 (콘텐츠팀 C10 2부 — 기존 그림 kind 만: venn·bits·plot·cells) =================
+{ id: 'M2_set', ch: 2, n: 1, title: '겹치는 것, 합치는 것', subtitle: '집합 연산', level: '고1', stars: 1, prereq: [], uses: ['data', 'algo'], icon: '⭕', minutes: 12, mode: 'text',
+  params: [{ id: 'pa', label: 'A %', min: 10, max: 80, step: 5, default: 40 }, { id: 'pb', label: 'B %', min: 10, max: 80, step: 5, default: 50 }, { id: 'pab', label: 'A∩B %', min: 0, max: 60, step: 5, default: 20 }],
+  terms: { '교집합': 'A와 B 둘 다에 있는 것 A∩B. 파이썬 a & b', '합집합': 'A나 B 중 하나라도에 있는 것 A∪B. 파이썬 a | b', '차집합': 'A에는 있고 B에는 없는 것 A − B. 파이썬 a - b' },
+  pages: [
+    { title: '만져 보기: 두 원이 겹치는 만큼', scene: '🎮 반 친구 100명 중 게임하는 친구(A)와 코딩하는 친구(B). "둘 다"·"하나라도"·"게임만"은 전부 다른 수예요. 중복 제거·태그 검색·추천 기능의 공통 재료.', figure: { kind: 'venn', note: '전체 100명이라고 보면 %가 곧 사람 수예요 — 겹친 곳은 둘 다인 사람' },
+      html: '<p>[[집합]] 두 개로 만들 수 있는 것은 셋: 둘 다인 [[교집합]] A∩B, 하나라도인 [[합집합]] A∪B, A에만 있는 [[차집합]] A − B. 합집합은 A와 B를 그냥 더하면 <b>겹친 곳을 두 번 세니까</b> 한 번 빼요.</p>',
+      observe: ['A∩B를 0으로 하면 두 원은 어떻게 되나요? 그때 하나라도 하는 사람(A∪B)은 몇 명인가요?', 'A·B는 그대로 두고 A∩B만 키우면 A∪B는 커지나요, 작아지나요?', 'A∩B가 A와 같아지면 A 원은 B와 어떤 관계가 되나요?'] },
+    { title: '식과 코드', html: '<p>파이썬 <code>set</code> 이 집합 그대로예요: <code>a &amp; b</code> 교집합, <code>a | b</code> 합집합, <code>a - b</code> 차집합, <code>len()</code> 이 원소 수. 리스트를 <code>set()</code> 으로 바꾸면 중복이 사라지고, <code>x in s</code> 는 리스트보다 훨씬 빨라요(알고리즘 코스의 해시).</p>',
+      formula: [{ latex: '|A \\cup B| = |A| + |B| - |A \\cap B|', note: '포함-배제 — 겹친 곳을 한 번 빼기' }, { latex: '|A - B| = |A| - |A \\cap B|', note: 'A에서 겹친 곳만 빼면 A에만 있는 것' }],
+      example: { code: 'pa = 40\npb = 50\npab = 20\nprint("하나라도:", pa + pb - pab, "명 · A만:", pa - pab, "명 · 둘 다 아님:", 100 - (pa + pb - pab), "명")\ngame = {"민지", "준호", "서연", "도윤"}\ncode = {"서연", "도윤", "하준"}\nprint("둘 다", sorted(game & code), "· 하나라도", len(game | code), "명 · 게임만", sorted(game - code))', trace: true } },
+  ],
+  summary: ['A∩B 둘 다, A∪B 하나라도, A − B A에만', '|A∪B| = |A| + |B| − |A∩B| (겹친 곳 한 번 빼기)', '파이썬 set: & | - , 중복 제거·빠른 in'] },
+{ id: 'M2_logic', ch: 2, n: 2, title: '참과 거짓의 조합', subtitle: '명제와 진리표', level: '고1', stars: 1, prereq: [], uses: ['algo'], icon: '🔀', minutes: 12, mode: 'text',
+  params: [{ id: 'v', label: '조합 번호 v', min: 0, max: 7, step: 1, default: 5 }],
+  terms: { '명제': '참(True)이나 거짓(False)이 분명한 문장. 코드의 조건식', '진리표': '변수들의 참·거짓 조합을 전부 적고 결과를 채운 표. 변수 n개면 2ⁿ 줄', '드모르간 법칙': 'not (p and q) 는 (not p) or (not q), not (p or q) 는 (not p) and (not q)' },
+  pages: [
+    { title: '만져 보기: 전구 셋 = 명제 셋', scene: '🔐 "로그인했고(p) 관리자이거나(q) 글쓴이면(r) 삭제 버튼" — if 문의 조건은 참·거짓의 조합이에요. 조합이 몇 가지인지 알면 테스트할 경우를 빠짐없이 셀 수 있어요.', figure: { kind: 'bits', bits: 3, note: '왼쪽부터 p · q · r — 켜지면 참(1), 꺼지면 거짓(0). 상자를 눌러도 돼요' },
+      html: '<p>[[명제]] 하나는 참/거짓 2가지, 셋이면 2 × 2 × 2 = 8가지 — 이 8가지가 0~7 의 2진수와 정확히 짝이에요. 모든 조합에 결과를 적은 것이 [[진리표]]. and 는 전부 참일 때만, or 는 하나라도 참이면 참.</p>',
+      observe: ['v를 0부터 7까지 하나씩 올리면 p·q·r 조합이 몇 가지 나오나요? 겹치는 게 있나요?', 'p and q and r 이 참인 v는 몇 개인가요?', 'p or q or r 이 거짓인 v는 몇 개인가요?'] },
+    { title: '식과 코드', html: '<p>파이썬의 <code>and or not</code> 이 그대로 논리 연산이에요. 반복을 겹쳐(또는 <code>itertools.product([False, True], repeat=3)</code>) 진리표를 만들면 조건식이 어떤 경우에 참인지 전부 확인할 수 있어요 — 테스트 케이스를 빠짐없이 설계하는 법. [[드모르간 법칙]]은 not 을 괄호 안으로 넣을 때 and ↔ or 가 바뀌는 규칙이에요.</p>',
+      formula: [{ latex: '\\neg (p \\text{ and } q) \\iff \\neg p \\text{ or } \\neg q', note: '드모르간: not 을 안으로 넣으면 and ↔ or' }, { latex: 'p \\Rightarrow q \\iff \\neg p \\text{ or } q', note: '"p 이면 q" 는 p 가 거짓이면 늘 참 — p 참·q 거짓일 때만 거짓' }],
+      example: { code: 'v = 5\np, q, r = bool(v & 4), bool(v & 2), bool(v & 1)\nprint("v =", v, "→ p q r =", p, q, r)\nprint("p and q and r:", p and q and r, "· p or q or r:", p or q or r)\nfor p in [False, True]:\n    for q in [False, True]:\n        print(int(p), int(q), "| and", int(p and q), "· or", int(p or q), "· p→q", int((not p) or q))', trace: true } },
+  ],
+  summary: ['명제 n개 → 참·거짓 조합 2ⁿ (2진수와 짝)', 'and 전부 참, or 하나라도 참, not 뒤집기', '드모르간: not (p and q) = not p or not q'] },
+{ id: 'M2_func', ch: 2, n: 3, title: '짝이 하나씩', subtitle: '함수·일대일·역함수', level: '고1', stars: 2, prereq: ['M4_linear'], uses: ['data'], icon: '🔁', minutes: 14, mode: 'text',
+  params: [{ id: 'a', label: '기울기 a', min: 0.5, max: 3, step: 0.5, default: 2 }, { id: 'b', label: 'b', min: -3, max: 3, step: 1, default: 1 }],
+  terms: { '일대일 함수': '서로 다른 입력이 늘 서로 다른 출력으로 가는 함수. 출력만 보고 입력을 되찾을 수 있다', '역함수': 'f 가 x → y 이면 y → x 로 되돌리는 함수 f⁻¹. 일대일 함수에만 있다' },
+  pages: [
+    { title: '만져 보기: 거울에 비친 직선', scene: '🔐 암호화 ↔ 복호화, 섭씨 ↔ 화씨, 이름 → 번호 → 이름. 되돌릴 수 있는 변환은 전부 "짝이 하나씩"인 함수예요.', figure: { kind: 'plot', fns: [{ expr: 'a*x+b', label: 'f(x) = ax + b' }, { expr: '(x-b)/a', label: 'f⁻¹(x)' }, { expr: 'x', label: 'y = x', dash: true }], xr: [-6, 6], yr: [-6, 6], probe: 'xp', defaults: { xp: 1 }, note: '세로 점선을 끌어 같은 x에서 두 함수 값을 읽어 보세요' },
+      html: '<p>함수는 입력 하나에 출력 <b>하나</b>. 서로 다른 입력이 늘 서로 다른 출력으로 가면 [[일대일 함수]] — 그래야 출력에서 입력을 되찾는 [[역함수]] f⁻¹ 가 있어요. 그래프로는 y = x 를 접는 선으로 접은 모양.</p>',
+      observe: ['점선을 x = 1 에 두면 파랑 f(1) 은 얼마인가요? 그 값으로 점선을 옮기면 빨강 f⁻¹ 은?', 'a·b를 바꿔도 두 그래프가 늘 대칭인 선은 무엇인가요?', 'a를 크게 하면 f 는 가팔라지고 f⁻¹ 은 어떻게 되나요?'] },
+    { title: '식과 코드', html: '<p>코드의 함수도 같은 입력엔 늘 같은 출력이에요. 암호화·압축·인코딩처럼 <b>되돌릴 수 있어야</b> 하는 변환은 일대일이어야 해요(<code>encode</code> ↔ <code>decode</code>). y = x² 는 2 와 −2 가 둘 다 4 로 가서 일대일이 아니라 역함수가 없어요(√ 는 양수 쪽만 되돌림). 딕셔너리로 만든 변환은 값이 겹치지 않을 때만 <code>{v: k for k, v in d.items()}</code> 로 뒤집을 수 있어요.</p>',
+      formula: [{ latex: 'y = ax + b \\iff x = \\frac{y - b}{a}', note: 'x 에 대해 풀면 역함수 — a ≠ 0 일 때' }, { latex: 'f^{-1}(f(x)) = x', note: '갔다가 돌아오면 제자리' }],
+      example: { code: 'a = 2\nb = 1\nf = lambda x: a * x + b\ng = lambda y: (y - b) / a   # 역함수\nfor x in [0, 1, 2, 3]:\n    print(x, "→", f(x), "→", g(f(x)))\nnum = {"사과": 1, "배": 2, "포도": 3}\nback = {v: k for k, v in num.items()}   # 값이 겹치지 않아서 뒤집기 가능\nprint(back[2])', trace: true } },
+  ],
+  summary: ['함수: 입력 하나 → 출력 하나', '일대일이어야 역함수(되돌리기)가 있다', '역함수 그래프 = y = x 에 대해 접은 모양'] },
+{ id: 'M2_pigeon', ch: 2, n: 4, title: '비둘기가 상자보다 많으면', subtitle: '비둘기집 원리', level: '대학', stars: 2, star: true, prereq: [], uses: ['algo'], icon: '🐦', minutes: 12, mode: 'text',
+  params: [{ id: 'n', label: '사람 n', min: 1, max: 24, step: 1, default: 8 }, { id: 'k', label: '상자 k', min: 2, max: 10, step: 1, default: 7 }],
+  terms: { '비둘기집 원리': 'n개를 k칸에 넣을 때 n > k 이면 어떤 칸에는 반드시 2개 이상. 일반형: 어떤 칸에는 ⌈n ÷ k⌉개 이상', '올림': '⌈x⌉ — x보다 작지 않은 가장 작은 정수. 파이썬 math.ceil(x), 정수끼리는 (n + k - 1) // k' },
+  pages: [
+    { title: '만져 보기: 가장 고르게 나눠도', scene: '📅 8명이 모이면 같은 요일에 태어난 사람이 반드시 있어요. 해시 칸보다 키가 많으면 충돌이 반드시 생기는 것도 같은 이유.', figure: { kind: 'cells', count: 24, cols: 6, classify: (p, N) => { const n = Math.round(p.n), k = Math.round(p.k); const cols = ['#6c8cff', '#ff5d6c', '#2bb673', '#ffb347', '#9c27b0', '#00acc1', '#ffd166', '#8d6e63', '#ec407a', '#7cb342']; const out = []; for (let i = 0; i < k; i++) { const c = Math.floor(n / k) + (i < n % k ? 1 : 0); if (c) out.push({ color: cols[i % cols.length], count: c, label: `${i + 1}번 상자` }); } return out; }, summary: (kinds, p) => { const n = Math.round(p.n), k = Math.round(p.k); return n > k ? `한 상자에 최소 ${Math.ceil(n / k)}명` : '안 겹치게 가능'; }, note: '칸 하나 = 사람 한 명, 색 = 들어간 상자. 가장 고르게 나눈 배치예요' },
+      html: '<p>사람이 상자보다 많으면 <b>어떻게 넣어도</b> 두 명 이상 들어간 상자가 생겨요 — [[비둘기집 원리]]. 그림은 가장 고르게 나눈 경우인데, 그래도 가장 붐비는 상자에 [[올림]] ⌈n ÷ k⌉명. 고르게 나눈 게 최선이라 다른 배치는 더 붐벼요.</p>',
+      observe: ['k = 7(요일)로 두고 n을 7 → 8로 늘리면 무엇이 달라지나요?', 'n = 15, k = 7 이면 가장 붐비는 상자에는 몇 명인가요? ⌈15 ÷ 7⌉ 과 같나요?', 'n ≤ k 일 때도 겹치는 상자가 생길 수 있나요? 반드시 생기나요?'] },
+    { title: '식과 코드', html: '<p>"반드시 있다"를 하나하나 찾지 않고 <b>세기만으로</b> 증명하는 방법이에요. 해시 테이블 칸이 k개인데 키가 k + 1개면 충돌이 반드시 생기고, 32비트 해시(약 43억 칸)도 키가 그보다 많으면 충돌을 피할 수 없어요. 무손실 압축이 <b>모든</b> 파일을 줄일 수는 없는 이유도 같아요 — 더 짧은 파일의 가짓수가 더 적으니까.</p>',
+      formula: [{ latex: 'n > k \\Rightarrow \\text{어떤 칸에 2개 이상}', note: '기본형' }, { latex: '\\text{어떤 칸에 } \\lceil n / k \\rceil \\text{개 이상}', note: '일반형 — 고르게 나눠도 이만큼은 몰린다' }],
+      example: { code: 'import math\nn = 8\nk = 7\nprint("가장 붐비는 상자 최소", math.ceil(n / k), "명")\nboxes = [0] * k\nfor i in range(n):\n    boxes[i % k] += 1   # 가장 고르게 넣기\nprint(boxes, "→ 최대", max(boxes))\nprint("366일(윤년)에 367명이면 같은 생일 최소", math.ceil(367 / 366), "명")', trace: true } },
+  ],
+  summary: ['n > k 이면 어떤 칸에 반드시 2개 이상', '일반형: 어떤 칸에 ⌈n ÷ k⌉개 이상', '해시 충돌·압축 한계를 세기만으로 증명'] },
 ];
 
 // =====================================================================
@@ -491,7 +541,7 @@ const PROBLEMS = [
   answer: { value: 120, tol: 0, why: 'gcd(1920, 1080) = 120. 1920/120 = 16, 1080/120 = 9.' }, starter: 'import math\nprint(math.gcd(1920, 1080))', solution: 'import math\nprint(math.gcd(1920, 1080))',
   hints: ['math.gcd(1920, 1080)', '1920 = 16 × ?', '120'] },
 { id: 'M1_gcd_q4', lesson: 'M1_gcd', type: 'code', title: '코드: 유클리드 호제법', prompt: '두 양의 정수 a, b(한 줄)를 입력받아 <code>math.gcd</code> 없이 유클리드 호제법으로 최대공약수와 최소공배수를 <code>gcd g lcm l</code>로 출력하세요.', tags: ['최대공약수', '나머지'], inputExample: '24 18',
-  starter: 'a, b = map(int, input().split())\nx, y = a, b\nwhile y:\n    pass\n', solution: 'a, b = map(int, input().split())\nx, y = a, b\nwhile y:\n    x, y = y, x % y\nprint("gcd", x, "lcm", a * b // x)',
+  starter: 'a, b = map(int, input().split())\nx, y = a, b\nwhile y:\n    break  # ← 이 줄을 지우고: x, y 를 한 줄로 바꿔요(나머지)\n', solution: 'a, b = map(int, input().split())\nx, y = a, b\nwhile y:\n    x, y = y, x % y\nprint("gcd", x, "lcm", a * b // x)',
   tests: [{ input: '24 18', output: 'gcd 6 lcm 72' }, { input: '1920 1080', output: 'gcd 120 lcm 17280' }, { input: '7 5', output: 'gcd 1 lcm 35' }, { input: '12 12', output: 'gcd 12 lcm 12' }, { input: '100 75', output: 'gcd 25 lcm 300' }],
   hints: ['x, y = y, x % y 를 y가 0이 될 때까지', 'lcm = a * b // gcd', 'print("gcd", x, "lcm", a * b // x)'] },
 // ---- M1_binary ----
@@ -547,7 +597,7 @@ const PROBLEMS = [
   answer: { value: 19, tol: 0, why: '2^19 = 524,288 ≤ 100만 < 2^20 이라 19번 나누면 1. 이진 탐색 100만 개 ≈ 20번의 근거.' }, starter: 'n = 1_000_000\ncount = 0\nwhile n > 1:\n    n //= 2\n    count += 1\nprint(count)', solution: 'n = 1_000_000\ncount = 0\nwhile n > 1:\n    n //= 2\n    count += 1\nprint(count)',
   hints: ['while n > 1: n //= 2; count += 1', 'log₂(1,000,000) ≈ 19.9', '19'] },
 { id: 'M1_log_q4', lesson: 'M1_log', type: 'code', title: '코드: 이진 탐색 횟수', prompt: '정렬된 n개에서 이진 탐색은 최대 몇 번 비교할까요? 정수 n을 입력받아 "범위를 반으로 줄여 1이 될 때까지" 센 횟수 + 1을 <code>최대 k번</code>으로, 둘째 줄에 <code>n.bit_length()</code> 값을 출력하세요.', tags: ['로그'], inputExample: '1000000',
-  starter: 'n = int(input())\nk = 0\nsize = n\nwhile size > 1:\n    pass\n', solution: 'n = int(input())\nk = 0\nsize = n\nwhile size > 1:\n    size //= 2\n    k += 1\nprint(f"최대 {k + 1}번")\nprint(n.bit_length())',
+  starter: 'n = int(input())\nk = 0\nsize = n\nwhile size > 1:\n    break  # ← 이 줄을 지우고: size 를 반으로, k 를 하나 늘려요\n', solution: 'n = int(input())\nk = 0\nsize = n\nwhile size > 1:\n    size //= 2\n    k += 1\nprint(f"최대 {k + 1}번")\nprint(n.bit_length())',
   tests: [{ input: '1000000', output: '최대 20번\n20' }, { input: '1', output: '최대 1번\n1' }, { input: '1024', output: '최대 11번\n11' }, { input: '100', output: '최대 7번\n7' }],
   hints: ['size //= 2 를 1이 될 때까지, 횟수 k', 'print(f"최대 {k + 1}번")', 'n.bit_length() 는 2진수 자릿수'] },
 // ---- M1_seq ----
@@ -665,7 +715,7 @@ const PROBLEMS = [
 // ---- M3_monte ----
 { id: 'M3_monte_q1', lesson: 'M3_monte', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 점이 많아지면', prompt: '점 수를 100에서 50,000까지 옮기며 오차를 보세요.', tags: ['몬테카를로'],
   quiz: { q: '점이 많아질수록 추정값의 오차는?', opts: ['대체로 작아진다 (가끔 요동치더라도)', '커진다', '정확히 0이 된다', '변하지 않는다'], ans: 0, why: '큰 수의 법칙. 다만 1/√N 로 느리게 줄어서 자릿수 하나 더 맞추려면 100배가 필요해요.' },
-  hints: ['100개: 오차 0.1 정도', '50,000개: 0.01 정도', '작아진다'] },
+  hints: ['100개: 오차 0.1 정도', '50,000개: 0.002 정도', '작아진다'] },
 { id: 'M3_monte_q2', lesson: 'M3_monte', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 4배로 늘리면', prompt: '점 수를 여러 값으로 바꿔 오차를 보세요. 한 번의 비교는 들쭉날쭉해요 — 1/√N 은 여러 번 했을 때의 평균적인 경향이에요.', tags: ['몬테카를로'],
   quiz: { q: '표본을 4배로 하면 오차는 대략?', opts: ['절반 (1/√4)', '1/4', '같다', '2배'], ans: 0, why: '오차 ∝ 1/√N. 4배 → 1/2, 100배 → 1/10.' },
   hints: ['√4 = 2', '오차 ∝ 1/√N', '절반'] },
@@ -855,10 +905,10 @@ const PROBLEMS = [
 { id: 'M4_linear_q3', lesson: 'M4_linear', type: 'num', title: '숫자 답: 두 점의 기울기', prompt: '두 점 (2, 7)과 (6, 19)를 지나는 직선의 <b>기울기</b>는?', tags: ['함수'],
   answer: { value: 3, tol: 0.001, why: '(19 − 7) ÷ (6 − 2) = 12 ÷ 4 = 3.' }, starter: 'x1, y1 = 2, 7\nx2, y2 = 6, 19\nprint()', solution: 'x1, y1 = 2, 7\nx2, y2 = 6, 19\nprint((y2 - y1) / (x2 - x1))',
   hints: ['기울기 = y의 차 ÷ x의 차', '(19 − 7) ÷ (6 − 2)', '3'] },
-{ id: 'M4_linear_q4', lesson: 'M4_linear', type: 'code', title: '코드: 두 점으로 직선 찾기', prompt: '한 줄에 두 점 <code>x1 y1 x2 y2</code>(정수)를 입력받아 첫 줄에 <code>기울기 a</code>, 둘째 줄에 <code>y절편 b</code>를 소수 둘째 자리로 출력하세요. x1 = x2 이면 한 줄 <code>세로선이에요</code>만.', tags: ['함수'], inputExample: '2 7 6 19',
-  starter: 'x1, y1, x2, y2 = map(int, input().split())\n', solution: 'x1, y1, x2, y2 = map(int, input().split())\nif x1 == x2:\n    print("세로선이에요")\nelse:\n    a = (y2 - y1) / (x2 - x1)\n    b = y1 - a * x1\n    print(f"기울기 {a:.2f}")\n    print(f"y절편 {b:.2f}")',
+{ id: 'M4_linear_q4', lesson: 'M4_linear', type: 'code', title: '코드: 두 점으로 직선 찾기', prompt: '한 줄에 두 점 <code>x1 y1 x2 y2</code>(정수)를 입력받아 첫 줄에 <code>기울기 a</code>, 둘째 줄에 <code>y절편 b</code>를 소수 둘째 자리로 출력하세요. x1 = x2 이면 한 줄 <code>세로선이에요</code>만. <code>-0.00</code>이 나오지 않게 기울기에 <code>+ 0</code>을 붙여 다듬어요.', tags: ['함수'], inputExample: '2 7 6 19',
+  starter: 'x1, y1, x2, y2 = map(int, input().split())\n', solution: 'x1, y1, x2, y2 = map(int, input().split())\nif x1 == x2:\n    print("세로선이에요")\nelse:\n    a = (y2 - y1) / (x2 - x1) + 0\n    b = y1 - a * x1\n    print(f"기울기 {a:.2f}")\n    print(f"y절편 {b:.2f}")',
   tests: [{ input: '2 7 6 19', output: '기울기 3.00\ny절편 1.00' }, { input: '0 0 4 2', output: '기울기 0.50\ny절편 0.00' }, { input: '1 5 3 5', output: '기울기 0.00\ny절편 5.00' }, { input: '3 1 3 9', output: '세로선이에요' }, { input: '-2 3 2 -5', output: '기울기 -2.00\ny절편 -1.00' }],
-  hints: ['기울기를 먼저 구하고, 한 점을 y = ax + b 에 넣으면 b 가 나와요', 'a = (y2 - y1) / (x2 - x1), b = y1 - a * x1. x1 == x2 면 나누기 전에 따로 처리', 'if x1 == x2:\n    print("세로선이에요")\nelse:\n    a = (y2 - y1) / (x2 - x1)\n    b = y1 - a * x1\n    print(f"기울기 {a:.2f}")\n    print(f"y절편 {b:.2f}")'] },
+  hints: ['기울기를 먼저 구하고, 한 점을 y = ax + b 에 넣으면 b 가 나와요', 'a = (y2 - y1) / (x2 - x1) + 0, b = y1 - a * x1. x1 == x2 면 나누기 전에 따로 처리', 'if x1 == x2:\n    print("세로선이에요")\nelse:\n    a = (y2 - y1) / (x2 - x1) + 0\n    b = y1 - a * x1\n    print(f"기울기 {a:.2f}")\n    print(f"y절편 {b:.2f}")'] },
 // ---- M4_quad ----
 { id: 'M4_quad_q1', lesson: 'M4_quad', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: a 의 부호', prompt: 'a를 −1에서 1로 바꿔 보세요.', tags: ['함수'],
   quiz: { q: 'a의 부호가 바뀌면 포물선은?', opts: ['위아래로 뒤집힌다 (a > 0 이면 골짜기, a < 0 이면 산)', '좌우로 뒤집힌다', '직선이 된다', '변화 없다'], ans: 0, why: 'x² 앞의 수가 음수면 x 가 커질수록 아래로, 양수면 위로 휘어요. 그래서 a 의 부호가 산과 골짜기를 정해요.' },
@@ -866,22 +916,22 @@ const PROBLEMS = [
 { id: 'M4_quad_q2', lesson: 'M4_quad', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: a = 0', prompt: 'a를 0으로 두어 보세요.', tags: ['함수'],
   quiz: { q: 'a = 0이면 그래프는?', opts: ['직선(y = bx + c)이 되고 꼭짓점 선이 사라진다', '점 하나가 된다', '원이 된다', '여전히 포물선이다'], ans: 0, why: 'x² 항이 없어지면 y = bx + c — 일차함수예요. 꼭짓점 x = −b ÷ (2a) 는 0 으로 나누게 되어 없어요.' },
   hints: ['x² 앞의 수가 0 이면 식에 무엇이 남나요?', 'y = bx + c 는 어떤 그래프?', '직선, 꼭짓점 없음'] },
-{ id: 'M4_quad_q3', lesson: 'M4_quad', type: 'num', title: '숫자 답: 가장 높이', prompt: '공을 위로 던졌더니 t초 뒤 높이가 <code>h = 20t − 5t²</code>(미터)예요. 공이 올라가는 <b>가장 높은 높이</b>는?', tags: ['함수'],
+{ id: 'M4_quad_q3', lesson: 'M4_quad', type: 'num', title: '숫자 답: 가장 높은 높이', prompt: '공을 위로 던졌더니 t초 뒤 높이가 <code>h = 20t − 5t²</code>(미터)예요. 공이 올라가는 <b>가장 높은 높이</b>는?', tags: ['함수'],
   answer: { value: 20, tol: 0.01, unit: 'm', why: '꼭짓점 t = −20 ÷ (2 × −5) = 2초, 높이 20×2 − 5×4 = 20m.' }, starter: 'a, b = -5, 20\nt = -b / (2 * a)\nprint(t)', solution: 'a, b = -5, 20\nt = -b / (2 * a)\nprint(b * t + a * t * t)',
   hints: ['가장 높은 곳 = 꼭짓점', 't = −b ÷ (2a) = 2초, 그 t 를 식에 넣기', '20'] },
 { id: 'M4_quad_q4', lesson: 'M4_quad', type: 'code', title: '코드: x축과 만나는 곳', prompt: '한 줄에 <code>a b c</code>(정수, a ≠ 0)를 입력받아 y = ax² + bx + c 가 x축과 만나는 x를 출력하세요: 두 개면 작은 것부터 <code>x = -1.00, 3.00</code>, 하나면 <code>x = 2.00 (중근)</code>, 없으면 <code>실근 없음</code>.', tags: ['함수'], inputExample: '-1 2 3',
-  starter: 'import math\na, b, c = map(int, input().split())\nD = b * b - 4 * a * c\n', solution: 'import math\na, b, c = map(int, input().split())\nD = b * b - 4 * a * c\nif D > 0:\n    r1 = (-b - math.sqrt(D)) / (2 * a)\n    r2 = (-b + math.sqrt(D)) / (2 * a)\n    lo, hi = min(r1, r2), max(r1, r2)\n    print(f"x = {lo:.2f}, {hi:.2f}")\nelif D == 0:\n    print(f"x = {-b / (2 * a):.2f} (중근)")\nelse:\n    print("실근 없음")',
+  starter: 'import math\na, b, c = map(int, input().split())\nD = b * b - 4 * a * c\n', solution: 'import math\na, b, c = map(int, input().split())\nD = b * b - 4 * a * c\nif D > 0:\n    r1 = (-b - math.sqrt(D)) / (2 * a)\n    r2 = (-b + math.sqrt(D)) / (2 * a)\n    lo, hi = min(r1, r2), max(r1, r2)\n    print(f"x = {lo:.2f}, {hi:.2f}")\nelif D == 0:\n    print(f"x = {-b / (2 * a) + 0:.2f} (중근)")\nelse:\n    print("실근 없음")',
   tests: [{ input: '-1 2 3', output: 'x = -1.00, 3.00' }, { input: '1 -4 4', output: 'x = 2.00 (중근)' }, { input: '1 0 1', output: '실근 없음' }, { input: '2 -3 1', output: 'x = 0.50, 1.00' }, { input: '1 0 -2', output: 'x = -1.41, 1.41' }],
-  hints: ['판별식 D = b² − 4ac 의 부호로 세 갈래를 나눠요', 'D > 0 이면 근의 공식 두 개(a < 0 이면 순서가 바뀌니 min·max 로), D == 0 이면 −b ÷ (2a)', 'if D > 0:\n    r1 = (-b - math.sqrt(D)) / (2 * a)\n    r2 = (-b + math.sqrt(D)) / (2 * a)\n    print(f"x = {min(r1, r2):.2f}, {max(r1, r2):.2f}")\nelif D == 0:\n    print(f"x = {-b / (2 * a):.2f} (중근)")\nelse:\n    print("실근 없음")'] },
+  hints: ['판별식 D = b² − 4ac 의 부호로 세 갈래를 나눠요', 'D > 0 이면 근의 공식 두 개(a < 0 이면 순서가 바뀌니 min·max 로), D == 0 이면 −b ÷ (2a)', 'if D > 0:\n    r1 = (-b - math.sqrt(D)) / (2 * a)\n    r2 = (-b + math.sqrt(D)) / (2 * a)\n    print(f"x = {min(r1, r2):.2f}, {max(r1, r2):.2f}")\nelif D == 0:\n    print(f"x = {-b / (2 * a) + 0:.2f} (중근)")\nelse:\n    print("실근 없음")'] },
 // ---- M4_explog ----
 { id: 'M4_explog_q1', lesson: 'M4_explog', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 늘 지나는 점', prompt: 'b를 1.5, 2, 3으로 바꿔 가며 점선을 x = 0에 두고 파랑(지수) 값을 보세요.', tags: ['거듭제곱', '함수'],
   quiz: { q: 'b를 바꿔도 지수 곡선 y = bˣ 이 늘 지나는 점은?', opts: ['(0, 1) — 어떤 수든 0제곱은 1', '(1, 0)', '(0, 0)', '(1, 1)'], ans: 0, why: 'b⁰ = 1 이라 x = 0 에서 언제나 1. 거울에 비친 로그 곡선은 (1, 0) 을 늘 지나요(log_b 1 = 0).' },
   hints: ['점선을 x = 0 에 두면 파랑 값은?', 'b⁰ 은 b 와 상관없이 얼마?', '(0, 1)'] },
-{ id: 'M4_explog_q2', lesson: 'M4_explog', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 거울', prompt: 'b = 2에서 점선을 x = 1, 2, 4로 옮기며 두 곡선의 값을 비교해 보세요(2¹ = 2 ↔ log₂ 2 = 1 …).', tags: ['로그', '함수'],
+{ id: 'M4_explog_q2', lesson: 'M4_explog', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 거울', prompt: 'b = 2에서 점선을 x = 1, 2로 옮기며 파란 곡선(2ˣ) 값을, x = 2, 4로 옮기며 빨간 곡선(log₂ x) 값을 읽어 비교해 보세요(2² = 4 ↔ log₂ 4 = 2 …).', tags: ['로그', '함수'],
   quiz: { q: '지수함수와 로그함수의 관계는?', opts: ['y = x 에 대해 대칭 — 서로 역함수', 'x축에 대해 대칭', '같은 곡선이다', '아무 관계 없다'], ans: 0, why: '2² = 4 이면 log₂ 4 = 2 — 입력과 출력이 맞바뀌어요. 그래서 그래프는 y = x 를 접는 선으로 접으면 겹쳐요.' },
   hints: ['x = 2 에서 파랑은 4, x = 4 에서 빨강은?', '입력·출력이 맞바뀐 관계', 'y = x 대칭, 역함수'] },
 { id: 'M4_explog_q3', lesson: 'M4_explog', type: 'num', title: '숫자 답: 반감기', prompt: '반감기가 5년인 물질 100g이 있어요(5년마다 절반). <b>1g 아래로</b> 처음 떨어지는 건 몇 년 뒤인가요?', tags: ['로그', '거듭제곱'],
-  answer: { value: 35, tol: 0, unit: '년', why: '100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.5625 → 0.78125. 7번 절반 = 35년. 로그로: log₂ 100 ≈ 6.64 → 7번.' }, starter: 'amount = 100\nyears = 0\nwhile amount >= 1:\n    pass\nprint(years)', solution: 'amount = 100\nyears = 0\nwhile amount >= 1:\n    amount /= 2\n    years += 5\nprint(years)',
+  answer: { value: 35, tol: 0, unit: '년', why: '100 → 50 → 25 → 12.5 → 6.25 → 3.125 → 1.5625 → 0.78125. 7번 절반 = 35년. 로그로: log₂ 100 ≈ 6.64 → 7번.' }, starter: 'amount = 100\nyears = 0\nwhile amount >= 1:\n    break  # ← 이 줄을 지우고: amount 를 절반으로, years 를 늘려요\nprint(years)', solution: 'amount = 100\nyears = 0\nwhile amount >= 1:\n    amount /= 2\n    years += 5\nprint(years)',
   hints: ['5년마다 절반 — 몇 번 절반이 되어야 1 아래?', '100 ÷ 2ⁿ < 1 이 되는 가장 작은 n, 년수는 5n', '7번 → 35'] },
 { id: 'M4_explog_q4', lesson: 'M4_explog', type: 'code', title: '코드: 목표 금액까지 몇 년', prompt: '한 줄에 원금 P, 연이율 r(%), 목표 금액 T(정수)를 입력받아, 매년 이자가 붙을 때(<code>금액 *= 1 + r / 100</code>) <b>처음으로 T 이상</b>이 되는 해와 그때 금액을 <code>8년 214.36</code>처럼 출력하세요. 처음부터 T 이상이면 0년.', tags: ['거듭제곱', '로그'], inputExample: '100 10 200',
   starter: 'P, r, T = map(int, input().split())\namount = P\nyears = 0\n', solution: 'P, r, T = map(int, input().split())\namount = P\nyears = 0\nwhile amount < T:\n    amount *= 1 + r / 100\n    years += 1\nprint(f"{years}년 {amount:.2f}")',
@@ -903,7 +953,7 @@ const PROBLEMS = [
   hints: ['k번째 점의 각도는 360 × k ÷ n, 위치는 (r·cos, r·sin)', 'math.radians 로 라디안으로 바꾸고, x = round(r * math.cos(t), 2) + 0', 'for k in range(n):\n    t = math.radians(360 * k / n)\n    x = round(r * math.cos(t), 2) + 0\n    y = round(r * math.sin(t), 2) + 0\n    print(f"({x:.2f}, {y:.2f})")'] },
 // ---- M4_limit ----
 { id: 'M4_limit_q1', lesson: 'M4_limit', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 0 쪽으로', prompt: '점선을 x = 1 → 0.5 → 0.1 → 0.05로 옮기며 값을 읽어 보세요.', tags: ['극한'],
-  quiz: { q: 'x가 0에 가까워질수록 sin x ÷ x 는?', opts: ['1에 가까워진다', '0에 가까워진다', '한없이 커진다', '왔다 갔다 한다'], ans: 0, why: 'x = 1 → 0.84, 0.5 → 0.96, 0.1 → 0.998 … 점점 1 에 붙어요. 극한값 1.' },
+  quiz: { q: 'x가 0에 가까워질수록 sin x ÷ x 는?', opts: ['1에 가까워진다', '0에 가까워진다', '한없이 커진다', '왔다 갔다 한다'], ans: 0, why: 'x = 1 → 0.84, 0.5 → 0.96, 0.1 → 0.998 … 점점 1 에 붙어요(그림 글자는 소수 둘째 자리로 반올림해서 0.1 근처부터는 1.00 으로 보여요). 극한값 1.' },
   hints: ['값을 차례로 적어 보세요: 0.84, 0.96, …', '세로축의 1 높이와 비교', '1 에 가까워진다'] },
 { id: 'M4_limit_q2', lesson: 'M4_limit', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 정확히 0', prompt: '점선을 정확히 x = 0에 두어 보세요(슬라이더로 0).', tags: ['극한'],
   quiz: { q: 'x = 0 에서 sin x ÷ x 의 값은?', opts: ['정의되지 않는다(0 ÷ 0) — 그래도 극한은 1', '1', '0', '무한대'], ans: 0, why: '그래프에 구멍이 있고 값 표시도 사라져요. 그 점의 값이 없어도 다가가는 목적지(극한)는 1 이에요 — 극한과 함숫값은 다른 개념.' },
@@ -929,5 +979,62 @@ const PROBLEMS = [
   starter: 'a = float(input())\nf = lambda x: x * x\n', solution: 'a = float(input())\nf = lambda x: x * x\nfor h in [1, 0.1, 0.01, 0.001]:\n    print(f"h = {h}: {(f(a + h) - f(a)) / h:.4f}")\nprint(f"접선 기울기 {2 * a:.4f}")',
   tests: [{ input: '1', output: 'h = 1: 3.0000\nh = 0.1: 2.1000\nh = 0.01: 2.0100\nh = 0.001: 2.0010\n접선 기울기 2.0000' }, { input: '0', output: 'h = 1: 1.0000\nh = 0.1: 0.1000\nh = 0.01: 0.0100\nh = 0.001: 0.0010\n접선 기울기 0.0000' }, { input: '-1', output: 'h = 1: -1.0000\nh = 0.1: -1.9000\nh = 0.01: -1.9900\nh = 0.001: -1.9990\n접선 기울기 -2.0000' }, { input: '2.5', output: 'h = 1: 6.0000\nh = 0.1: 5.1000\nh = 0.01: 5.0100\nh = 0.001: 5.0010\n접선 기울기 5.0000' }, { input: '3', output: 'h = 1: 7.0000\nh = 0.1: 6.1000\nh = 0.01: 6.0100\nh = 0.001: 6.0010\n접선 기울기 6.0000' }],
   hints: ['h 를 줄여 가며 같은 할선 기울기 식을 반복해요', 'for h in [1, 0.1, 0.01, 0.001]: 안에서 (f(a + h) - f(a)) / h', 'for h in [1, 0.1, 0.01, 0.001]:\n    print(f"h = {h}: {(f(a + h) - f(a)) / h:.4f}")\nprint(f"접선 기울기 {2 * a:.4f}")'] },
+// ---- 영역 2 (콘텐츠팀 C10 2부) ----
+// ---- M2_set ----
+{ id: 'M2_set_q1', lesson: 'M2_set', type: 'quiz', kind: 'explore', requireInteract: true, unlockWhen: (p) => Math.round(p.pab) === 0, unlockText: '🎚 A∩B 슬라이더를 0으로 맞추면 보기가 열려요', title: '탐구: 하나도 안 겹치면', prompt: 'A 40%, B 50% 그대로 두고 A∩B를 0으로 맞춰 보세요.', tags: ['집합'],
+  quiz: { q: 'A∩B = 0 이면 두 원과 A∪B(하나라도)는?', opts: ['떨어지고, A∪B = 40 + 50 = 90명', '완전히 겹치고, A∪B = 50명', '떨어지고, A∪B = 40명', '그대로 겹치고, A∪B = 70명'], ans: 0, why: '겹친 사람이 없으면 두 원은 떨어지고(서로소), 하나라도 하는 사람은 그냥 더한 40 + 50 = 90명. 뺄 겹침이 0 이니까요.' },
+  hints: ['겹친 곳이 없으면 두 번 세는 사람도 없어요', '|A∪B| = 40 + 50 − 0', '떨어짐, 90'] },
+{ id: 'M2_set_q2', lesson: 'M2_set', type: 'quiz', kind: 'explore', requireInteract: true, unlockWhen: (p) => Math.round(p.pab) === 40, unlockText: '🎚 A∩B 슬라이더를 40까지 키우면 보기가 열려요', title: '탐구: 겹침을 키우면', prompt: 'A 40%, B 50% 그대로 두고 A∩B를 0 → 20 → 40으로 키워 보세요.', tags: ['집합'],
+  quiz: { q: 'A∩B를 키우면 A∪B(하나라도)는?', opts: ['줄어든다 — 90 → 70 → 50명', '늘어난다', '그대로다', '두 배가 된다'], ans: 0, why: 'A∪B = 40 + 50 − A∩B. 겹침이 0 → 20 → 40 이면 90 → 70 → 50명. A∩B = 40 = A 이면 A 원이 B 안에 쏙 들어가서(부분집합) 하나라도 = B 50명.' },
+  hints: ['포함-배제 식에서 A∩B 는 빼는 쪽이에요', '40 + 50 − 40 = ?', '줄어든다'] },
+{ id: 'M2_set_q3', lesson: 'M2_set', type: 'num', title: '숫자 답: 하나라도', prompt: '코딩 동아리 32명, 로봇 동아리 25명, 둘 다 하는 학생 9명. 두 동아리 중 <b>하나라도</b> 하는 학생은 몇 명?', tags: ['집합'],
+  answer: { value: 48, tol: 0.001, unit: '명', why: '32 + 25 − 9 = 48. 둘 다 하는 9명을 두 번 세었으니 한 번 빼요.' }, starter: 'a = 32\nb = 25\nboth = 9\nprint()', solution: 'a = 32\nb = 25\nboth = 9\nprint(a + b - both)',
+  hints: ['두 동아리를 더하면 누가 두 번 세어지나요?', '|A∪B| = |A| + |B| − |A∩B|', '48'] },
+{ id: 'M2_set_q4', lesson: 'M2_set', type: 'code', title: '코드: 두 반 신청자 정리', prompt: '첫 줄에 A반 신청자, 둘째 줄에 B반 신청자 이름(공백으로 구분, 같은 이름이 여러 번 나올 수 있음)을 입력받아 세 줄로 출력하세요: <code>둘 다 2: 도윤 서연</code>, <code>하나라도 5</code>, <code>A만 2: 민지 준호</code>. 이름은 <code>sorted</code> 순서, 한 명도 없으면 이름 자리에 <code>없음</code>.', tags: ['집합'], inputExample: '민지 준호 서연 도윤\n서연 도윤 하준',
+  starter: 'a = set(input().split())\nb = set(input().split())\n', solution: 'a = set(input().split())\nb = set(input().split())\nboth = a & b\nonly_a = a - b\nprint(f"둘 다 {len(both)}: {\' \'.join(sorted(both)) or \'없음\'}")\nprint(f"하나라도 {len(a | b)}")\nprint(f"A만 {len(only_a)}: {\' \'.join(sorted(only_a)) or \'없음\'}")',
+  tests: [{ input: '민지 준호 서연 도윤\n서연 도윤 하준', output: '둘 다 2: 도윤 서연\n하나라도 5\nA만 2: 민지 준호' }, { input: '가 가 나\n나 나 다', output: '둘 다 1: 나\n하나라도 3\nA만 1: 가' }, { input: '가\n나', output: '둘 다 0: 없음\n하나라도 2\nA만 1: 가' }, { input: '나 다\n가 나 다 라', output: '둘 다 2: 나 다\n하나라도 4\nA만 0: 없음' }, { input: '하준 하준 하준\n하준', output: '둘 다 1: 하준\n하나라도 1\nA만 0: 없음' }],
+  hints: ['set 으로 바꾸면 중복은 저절로 사라져요. 둘 다 = &, 하나라도 = |, A만 = -', 'both = a & b, only_a = a - b. 이름 줄은 " ".join(sorted(…)) — 비어 있으면 빈 문자열이라 or "없음"', 'both = a & b\nonly_a = a - b\nprint(f"둘 다 {len(both)}: {\' \'.join(sorted(both)) or \'없음\'}")\nprint(f"하나라도 {len(a | b)}")\nprint(f"A만 {len(only_a)}: {\' \'.join(sorted(only_a)) or \'없음\'}")'] },
+// ---- M2_logic ----
+{ id: 'M2_logic_q1', lesson: 'M2_logic', type: 'quiz', kind: 'explore', requireInteract: true, unlockWhen: (p) => Math.round(p.v) === 7, unlockText: '🎚 세 전구를 전부 켜면(v = 7) 보기가 열려요', title: '탐구: 셋 다 참', prompt: 'p·q·r 을 전부 켜 보세요(v = 7).', tags: ['논리'],
+  quiz: { q: '8가지 조합 중 p and q and r 이 참인 것은 몇 개?', opts: ['1개 — 셋 다 참(111)일 때만', '3개', '4개', '7개'], ans: 0, why: 'and 는 전부 참이어야 해서 111(v = 7) 하나뿐. 거꾸로 p or q or r 이 거짓인 것도 000(v = 0) 하나뿐이라 or 는 8개 중 7개가 참이에요.' },
+  hints: ['and 는 하나라도 거짓이면 거짓', '세 칸이 전부 1 인 2진수는?', '1개 (v = 7)'] },
+{ id: 'M2_logic_q2', lesson: 'M2_logic', type: 'quiz', kind: 'explore', requireInteract: true, unlockWhen: (p) => { const v = Math.round(p.v); return ((v >> 2) & 1) === 1 && ((v >> 1) & 1) === 0; }, unlockText: '🎚 p(왼쪽)는 켜고 q(가운데)는 끈 조합(v = 4 또는 5)을 만들면 보기가 열려요', title: '탐구: p 이면 q', prompt: '"비가 오면(p) 우산을 쓴다(q)" — p 는 켜고 q 는 끈 조합을 만들어 보세요.', tags: ['논리'],
+  quiz: { q: '"p 이면 q"(p → q) 가 거짓이 되는 경우는?', opts: ['p 참, q 거짓일 때만', 'p 가 거짓일 때', 'q 가 참일 때', '언제나 참이다'], ans: 0, why: '약속을 어긴 건 비가 오는데(p 참) 우산을 안 쓴(q 거짓) 경우뿐이에요. 비가 안 오면 우산을 쓰든 말든 약속을 어긴 게 아니에요 → p → q 는 (not p) or q 와 같아요.' },
+  hints: ['"비가 오면 우산을 쓴다"는 약속이 깨지는 상황을 떠올려요', '비가 안 오는 날(p 거짓)은 약속과 상관없어요', 'p 참, q 거짓'] },
+{ id: 'M2_logic_q3', lesson: 'M2_logic', type: 'num', title: '숫자 답: 테스트할 경우의 수', prompt: 'if 문의 조건이 참·거짓 명제 <b>5개</b>로 이루어져 있어요. 모든 참·거짓 조합을 빠짐없이 테스트하려면 몇 가지 경우?', tags: ['논리'],
+  answer: { value: 32, tol: 0.001, unit: '가지', why: '명제 하나마다 2가지씩, 5개면 2 × 2 × 2 × 2 × 2 = 2⁵ = 32. 진리표의 줄 수예요.' }, starter: 'n = 5\nprint()', solution: 'n = 5\nprint(2 ** n)',
+  hints: ['명제 하나는 참/거짓 2가지', '셋이면 2 × 2 × 2 = 8, 다섯이면?', '2 ** 5 = 32'] },
+{ id: 'M2_logic_q4', lesson: 'M2_logic', type: 'code', title: '코드: 진리표 만들기', prompt: '정수 n(1~4)을 입력받아 명제 n개의 참·거짓 조합을 0과 1로 <b>0…0 부터 1…1 까지 차례로</b> 한 줄씩 출력하고, 각 줄 끝에 or(하나라도 참) 결과를 <code>0 1 → 1</code>처럼 붙이세요. 마지막 줄은 <code>참 3개 / 전체 4개</code>.', tags: ['논리'], inputExample: '2',
+  starter: 'n = int(input())\ncnt = 0\nfor v in range(2 ** n):\n    # v 를 n자리 0/1 목록으로 바꾸기\n    pass\n', solution: 'n = int(input())\ncnt = 0\nfor v in range(2 ** n):\n    bits = [(v >> (n - 1 - i)) & 1 for i in range(n)]\n    res = 1 if any(bits) else 0\n    cnt += res\n    print(" ".join(str(b) for b in bits), "→", res)\nprint(f"참 {cnt}개 / 전체 {2 ** n}개")',
+  tests: [{ input: '2', output: '0 0 → 0\n0 1 → 1\n1 0 → 1\n1 1 → 1\n참 3개 / 전체 4개' }, { input: '1', output: '0 → 0\n1 → 1\n참 1개 / 전체 2개' }, { input: '3', output: '0 0 0 → 0\n0 0 1 → 1\n0 1 0 → 1\n0 1 1 → 1\n1 0 0 → 1\n1 0 1 → 1\n1 1 0 → 1\n1 1 1 → 1\n참 7개 / 전체 8개' }, { input: '4', output: '0 0 0 0 → 0\n0 0 0 1 → 1\n0 0 1 0 → 1\n0 0 1 1 → 1\n0 1 0 0 → 1\n0 1 0 1 → 1\n0 1 1 0 → 1\n0 1 1 1 → 1\n1 0 0 0 → 1\n1 0 0 1 → 1\n1 0 1 0 → 1\n1 0 1 1 → 1\n1 1 0 0 → 1\n1 1 0 1 → 1\n1 1 1 0 → 1\n1 1 1 1 → 1\n참 15개 / 전체 16개' }],
+  hints: ['0 ~ 2ⁿ − 1 의 2진수가 곧 모든 조합이에요(그림의 v 처럼). 왼쪽 자리부터 꺼내요', '왼쪽에서 i번째 자리 = (v >> (n - 1 - i)) & 1. or 결과는 any(bits)', 'bits = [(v >> (n - 1 - i)) & 1 for i in range(n)]\nres = 1 if any(bits) else 0\ncnt += res\nprint(" ".join(str(b) for b in bits), "→", res)\n# 반복이 끝난 뒤\nprint(f"참 {cnt}개 / 전체 {2 ** n}개")'] },
+// ---- M2_func ----
+{ id: 'M2_func_q1', lesson: 'M2_func', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 갔다가 돌아오기', prompt: 'a = 2, b = 1 로 두고 점선을 x = 1 에, 그다음 x = 3 에 두고 파랑·빨강 값을 읽어 보세요.', tags: ['함수'],
+  quiz: { q: 'f(1) = 3 일 때 f⁻¹(3) 은?', opts: ['1 — 출력에서 입력으로 되돌아온다', '3', '7', '1/3'], ans: 0, why: 'f(1) = 2 × 1 + 1 = 3, 역함수는 거꾸로 3 → (3 − 1) ÷ 2 = 1. 그래프에서 (1, 3) 과 (3, 1) 은 y = x 를 사이에 둔 맞은편 점이에요.' },
+  hints: ['x = 1 에서 파랑 값, x = 3 에서 빨강 값', 'f⁻¹(y) = (y − b) ÷ a', '1'] },
+{ id: 'M2_func_q2', lesson: 'M2_func', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 대칭선', prompt: 'a와 b를 여러 값으로 바꿔 보세요.', tags: ['함수'],
+  quiz: { q: '파랑(f)과 빨강(f⁻¹)은 늘 어떤 선에 대해 대칭인가요?', opts: ['y = x (초록 점선)', 'x축', 'y축', '원점을 지나는 세로선'], ans: 0, why: '역함수는 x 와 y 를 맞바꾼 것이라, 점 (p, q) 가 (q, p) 로 가요 — y = x 를 접는 선으로 접은 자리예요. 지수·로그(M4_explog)도 같은 관계.' },
+  hints: ['초록 점선을 접는 선이라고 상상해요', '(p, q) 와 (q, p) 를 잇는 선의 가운데는?', 'y = x'] },
+{ id: 'M2_func_q3', lesson: 'M2_func', type: 'num', title: '숫자 답: 화씨를 섭씨로', prompt: '섭씨 → 화씨 변환은 <code>F = 1.8 × C + 32</code>. 이 함수의 역함수로 <b>98.6°F</b>를 섭씨로 바꾸면?', tags: ['함수'],
+  answer: { value: 37, tol: 0.01, unit: '°C', why: 'C 에 대해 풀면 C = (F − 32) ÷ 1.8. (98.6 − 32) ÷ 1.8 = 66.6 ÷ 1.8 = 37 — 사람 체온.' }, starter: 'F = 98.6\nprint()', solution: 'F = 98.6\nprint((F - 32) / 1.8)',
+  hints: ['F = 1.8C + 32 를 C = … 꼴로 풀어요', 'C = (F − 32) ÷ 1.8', '37'] },
+{ id: 'M2_func_q4', lesson: 'M2_func', type: 'code', title: '코드: 뒤집을 수 있나', prompt: '한 줄에 <code>키:값</code> 쌍들(공백으로 구분, 키는 서로 다름)을 입력받아, 값이 전부 다르면(일대일) 첫 줄 <code>일대일</code>, 둘째 줄에 뒤집은 짝을 입력 순서대로 <code>1:a 2:b</code>처럼. 값이 겹치면 <b>처음 겹친 값</b>으로 <code>일대일 아님: 2</code> 한 줄만.', tags: ['함수'], inputExample: 'a:1 b:2 c:3',
+  starter: 'pairs = [t.split(":") for t in input().split()]\nback = {}\ndup = None\n', solution: 'pairs = [t.split(":") for t in input().split()]\nback = {}\ndup = None\nfor k, v in pairs:\n    if v in back:\n        dup = v\n        break\n    back[v] = k\nif dup is None:\n    print("일대일")\n    print(" ".join(f"{v}:{k}" for v, k in back.items()))\nelse:\n    print("일대일 아님:", dup)',
+  tests: [{ input: 'a:1 b:2 c:3', output: '일대일\n1:a 2:b 3:c' }, { input: 'x:7 y:7', output: '일대일 아님: 7' }, { input: 'cat:고양이 dog:개', output: '일대일\n고양이:cat 개:dog' }, { input: 'a:1 b:2 c:1 d:2', output: '일대일 아님: 1' }, { input: 'solo:1', output: '일대일\n1:solo' }],
+  hints: ['값 → 키 딕셔너리(back)를 채우다가 이미 있는 값이 나오면 일대일이 아니에요', 'for k, v in pairs: 안에서 if v in back: 이면 dup = v 하고 멈추기, 아니면 back[v] = k', 'for k, v in pairs:\n    if v in back:\n        dup = v\n        break\n    back[v] = k\nif dup is None:\n    print("일대일")\n    print(" ".join(f"{v}:{k}" for v, k in back.items()))\nelse:\n    print("일대일 아님:", dup)'] },
+// ---- M2_pigeon ----
+{ id: 'M2_pigeon_q1', lesson: 'M2_pigeon', type: 'quiz', kind: 'explore', requireInteract: true, unlockWhen: (p) => Math.round(p.k) === 7 && Math.round(p.n) === 8, unlockText: '🎚 상자 k = 7(요일), 사람 n = 8 로 맞추면 보기가 열려요', title: '탐구: 8명과 요일', prompt: '상자를 요일 7개, 사람을 8명으로 맞춰 보세요.', tags: ['비둘기집'],
+  quiz: { q: '8명이 모이면 같은 요일에 태어난 사람이?', opts: ['반드시 있다 — 7칸에 8명', '있을 수도, 없을 수도 있다', '반드시 없다', '14명은 모여야 반드시 있다'], ans: 0, why: '7명까지는 요일마다 한 명씩 다르게 넣을 수 있지만, 8번째 사람은 이미 누가 있는 요일에 들어갈 수밖에 없어요. 누가 어느 요일인지 몰라도 "반드시"라고 말할 수 있어요.' },
+  hints: ['7명까지는 요일을 하나씩 다르게 줄 수 있어요', '8번째 사람은 어디로 가나요?', '반드시 있다'] },
+{ id: 'M2_pigeon_q2', lesson: 'M2_pigeon', type: 'quiz', kind: 'explore', requireInteract: true, unlockWhen: (p) => Math.round(p.k) === 5 && Math.round(p.n) === 16, unlockText: '🎚 상자 k = 5, 사람 n = 16 으로 맞추면 보기가 열려요', title: '탐구: 고르게 나눠도', prompt: '상자를 5개로 두고 사람을 6 → 11 → 16명으로 늘려 보세요.', tags: ['비둘기집'],
+  quiz: { q: 'n = 16, k = 5 이면 어떤 상자에는 반드시 몇 명 이상?', opts: ['4명 (⌈16 ÷ 5⌉)', '3명', '5명', '16명'], ans: 0, why: '가장 고르게 넣어도 4·3·3·3·3명이라 한 상자는 4명. 모든 상자를 3명 이하로 하면 최대 15명밖에 못 넣으니, 16명이면 어떤 배치든 4명 이상인 상자가 있어요.' },
+  hints: ['그림의 가장 붐비는 상자를 보세요', '모든 상자가 3명 이하라면 최대 몇 명까지 넣을 수 있나요?', '4명'] },
+{ id: 'M2_pigeon_q3', lesson: 'M2_pigeon', type: 'num', title: '숫자 답: 양말 한 켤레', prompt: '서랍에 빨강·파랑·검정 양말이 잔뜩 섞여 있어요. 눈을 감고 꺼낼 때 <b>같은 색 2짝</b>이 반드시 나오려면 최소 몇 짝을 꺼내야 하나요?', tags: ['비둘기집'],
+  answer: { value: 4, tol: 0.001, unit: '짝', why: '색(상자) 3개. 3짝이면 운 나쁘게 세 색이 하나씩일 수 있지만, 4짝이면 어떤 색에는 2짝 — 비둘기 4, 상자 3.' }, starter: 'colors = 3\nprint()', solution: 'colors = 3\nprint(colors + 1)',
+  hints: ['색이 상자, 양말이 비둘기예요', '가장 운 나쁜 경우: 색마다 한 짝씩', '3 + 1 = 4'] },
+{ id: 'M2_pigeon_q4', lesson: 'M2_pigeon', type: 'code', title: '코드: 반드시 몇 명?', prompt: '한 줄에 사람 수 n, 상자 수 k(양의 정수)를 입력받아 첫 줄에 <code>최소 m명</code>(어떻게 넣어도 어떤 상자에는 m명 이상인 가장 큰 m), 둘째 줄에 n > k 이면 <code>반드시 겹쳐요</code>, 아니면 <code>안 겹치게 넣을 수 있어요</code>. 실수 나눗셈 없이 정수로 올림하세요.', tags: ['비둘기집'], inputExample: '8 7',
+  starter: 'n, k = map(int, input().split())\n', solution: 'n, k = map(int, input().split())\nm = (n + k - 1) // k\nprint(f"최소 {m}명")\nprint("반드시 겹쳐요" if n > k else "안 겹치게 넣을 수 있어요")',
+  tests: [{ input: '8 7', output: '최소 2명\n반드시 겹쳐요' }, { input: '7 7', output: '최소 1명\n안 겹치게 넣을 수 있어요' }, { input: '16 5', output: '최소 4명\n반드시 겹쳐요' }, { input: '3 10', output: '최소 1명\n안 겹치게 넣을 수 있어요' }, { input: '367 366', output: '최소 2명\n반드시 겹쳐요' }],
+  hints: ['m 은 n ÷ k 의 올림 ⌈n ÷ k⌉ 이에요', '정수 올림: (n + k - 1) // k (예: 16, 5 → 20 // 5 = 4)', 'm = (n + k - 1) // k\nprint(f"최소 {m}명")\nprint("반드시 겹쳐요" if n > k else "안 겹치게 넣을 수 있어요")'] },
 ];
 const GUIDES = {};
