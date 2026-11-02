@@ -41,7 +41,22 @@ Views.playground = (root, params = {}) => {
 };
 
 // ---------- 뱃지 ----------
-Views.badges = (root) => { const d = Store.data; root.innerHTML = `<div class="page"><h2>🏅 ${T.badges} <small>${d.badges.length}/${BADGES.length}</small></h2><div class="badges">${BADGES.map(b => { const got = d.badges.includes(b.id); return `<div class="badge ${got ? 'got' : 'no'}"><div class="b-ic">${got ? UI.img('badge-' + b.id + '.png', b.icon, 'badge-img') : (b.secret ? '❔' : UI.img('badge-' + b.id + '.png', b.icon, 'badge-img'))}</div><div class="b-n">${got ? esc(b.name) : (b.secret ? '???' : esc(b.name))}</div><div class="b-d">${got ? esc(b.desc) : (b.secret ? '비밀 뱃지' : esc(b.desc))}</div>${got ? `<div class="b-date">${new Date(d.badgeDates[b.id] || 0).toLocaleDateString()}</div>` : ''}</div>`; }).join('')}</div></div>`; };
+Views.badges = (root) => {
+  // v2.2.24: 그림 뱃지 대비 화면 개선 — 진행 막대·필터(전체/획득/거의 다 됨/미획득)·새 뱃지 반짝(마지막 방문 이후 획득)·미획득 뱃지 진행률(cond 통계 기준, 비밀 뱃지 제외)·획득 순 정렬
+  const d = Store.data; const seenAt = d.stats.badgesSeenAt || 0; const now = Date.now();
+  const rows = BADGES.map(b => { const got = d.badges.includes(b.id); const [k, v] = b.cond; const cur = Math.min(v, d.stats[k] || 0); const pct = got ? 100 : (b.secret ? 0 : Math.round(100 * cur / v)); const isNew = got && (d.badgeDates[b.id] || 0) > seenAt; return { b, got, cur, v, pct, isNew, date: d.badgeDates[b.id] || 0 }; });
+  const gotN = rows.filter(r => r.got).length; const nearN = rows.filter(r => !r.got && !r.b.secret && r.pct >= 50).length; const newN = rows.filter(r => r.isNew).length;
+  const card = (r) => { const { b, got, pct, isNew } = r; const icon = got || !b.secret ? UI.img('badge-' + b.id + '.png', b.icon, 'badge-img') : '<span class="b-q">❔</span>';
+    return `<div class="badge ${got ? 'got' : 'no'} ${isNew ? 'new' : ''} ${b.secret ? 'secret' : ''}" data-f="${got ? 'got' : (!b.secret && pct >= 50 ? 'near' : 'todo')}" title="${esc(got ? b.desc : (b.secret ? '비밀 뱃지 — 조건을 찾아보세요' : b.desc))}"><div class="b-ic">${icon}${isNew ? '<span class="b-new">NEW</span>' : ''}</div><div class="b-n">${got || !b.secret ? esc(b.name) : '???'}</div><div class="b-d">${got ? esc(b.desc) : (b.secret ? '비밀 뱃지' : esc(b.desc))}</div>${got ? (r.date ? `<div class="b-date">${new Date(r.date).toLocaleDateString()}</div>` : '') : (b.secret ? '' : `<div class="b-prog" aria-label="진행 ${pct}%"><i style="width:${pct}%"></i></div><div class="b-pct">${r.cur}/${r.v}</div>`)}</div>`; };
+  const rank = (r) => r.isNew ? 0 : r.got ? 1 : (!r.b.secret && r.pct >= 50) ? 2 : r.b.secret ? 4 : 3; rows.forEach((r, i) => r.i = i);
+  const sorted = rows.slice().sort((a, b) => rank(a) - rank(b) || (rank(a) === 1 ? b.date - a.date : rank(a) === 2 ? b.pct - a.pct : a.i - b.i)); // 새 뱃지 → 획득(최근순) → 거의 다 됨(진행순) → 나머지(원래 순서) → 비밀
+  root.innerHTML = `<div class="page"><h2>🏅 ${T.badges} <small>${gotN}/${BADGES.length}</small></h2>
+    <div class="b-sum"><div class="b-bar"><i style="width:${Math.round(100 * gotN / BADGES.length)}%"></i></div><div class="b-sumt">획득 ${gotN}개 · 거의 다 됨 ${nearN}개${newN ? ` · <b class="b-newt">새 뱃지 ${newN}개</b>` : ''}</div></div>
+    <div class="hs-chips b-filter">${[['all', '전체'], ['got', '획득'], ['near', '거의 다 됨'], ['todo', '미획득']].map(([k, v]) => `<button class="chip-btn ${k === 'all' ? 'on' : ''}" data-bf="${k}">${v}</button>`).join('')}</div>
+    <div class="badges">${sorted.map(card).join('')}</div></div>`;
+  root.querySelectorAll('[data-bf]').forEach(btn => btn.onclick = () => { root.querySelectorAll('[data-bf]').forEach(x => x.classList.toggle('on', x === btn)); const f = btn.dataset.bf; root.querySelectorAll('.badge').forEach(el => el.classList.toggle('hide', f !== 'all' && el.dataset.f !== f)); });
+  d.stats.badgesSeenAt = now; Store.save();
+};
 
 // ---------- 프로필 ----------
 Views.profile = (root) => {

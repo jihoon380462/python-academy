@@ -85,6 +85,11 @@ with sync_playwright() as p:
     pg.evaluate("Store.data.settings.unlockAll=false")
     for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','playground','works']:
         pg.evaluate(f"UI.go('{v}')"); pg.wait_for_timeout(300); check(len(pg.locator('#view').inner_text())>10, f'화면 {v}')
+    pg.evaluate("Store.data.stats.badgesSeenAt=0; Store.data.badgeDates.first_clear=Date.now(); Store.data.stats.runs=12; UI.go('badges')"); pg.wait_for_timeout(300)
+    check(pg.locator('.badge.got').count()==2 and pg.locator('.badge.new').count()>=1 and pg.locator('.b-prog').count()>=20 and pg.locator('.badge.secret .b-q').count()>=4 and pg.locator('[data-bf]').count()==4, '뱃지 화면: 획득 2·NEW·미획득 진행 막대·비밀 ❔·필터')
+    pg.click('[data-bf="got"]'); pg.wait_for_timeout(100); check(pg.locator('.badge:not(.hide)').count()==2, '뱃지 필터: 획득만')
+    pg.evaluate("UI.go('badges')"); pg.wait_for_timeout(300); check(pg.locator('.badge.new').count()==0, '뱃지 다시 열면 NEW 사라짐(badgesSeenAt)')
+    pg.evaluate("UI.badgeFly(BADGES[6])"); pg.wait_for_timeout(100); check(pg.locator('.badge-fly .bf-icon').count()==1, '뱃지 획득 알림에 그림 자리')
     pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300)
     check(pg.locator('.card.sync').count()==1 and pg.locator('#syncOff').count()==1, '설정: 기기 연동 카드(연동 상태)'); check(pg.locator('#sRestoreV1').count()==1, '설정: v1 데이터 다시 가져오기 버튼'); check(('v'+pg.evaluate('CONFIG.APP_VERSION')) in pg.locator('#view').inner_text(), '설정 하단 버전 표시')
     ex=pg.evaluate("JSON.parse(Store.exportJSON())"); check(ex['xp']>=385 and 'problems' in ex and 'works' in ex and 'tutorChats' in ex, '내보내기 JSON은 v1과 같은 모양')
