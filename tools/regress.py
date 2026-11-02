@@ -41,6 +41,15 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('problem',{pid:'L7P3'})"); pg.wait_for_timeout(200); check(pg.evaluate("Object.keys(localStorage).some(k=>{ if(!k.startsWith('academy.')) return false; try { const v=JSON.parse(localStorage.getItem(k)); return v && v.last && v.last.params && v.last.params.pid==='L7P3'; } catch(e){ return false; } })"), '문제 열기만 해도 이어서 하기 위치 저장 (QA #4)'); pg.evaluate("UI.go('problem',{pid:'L3P2'})"); pg.wait_for_timeout(200)
     check(pg.locator('#pvCoach .coach').count()==1, '텍스트 코치 표시'); check(pg.locator('.pv.focus').count()==1, '집중 모드 유지')
     check(pg.locator('.tb-hub').count()==1, '상단바 허브 버튼')
+    pg.evaluate("(()=>{ const r=Store.prob('L8P1'); window.__bak=JSON.stringify(r); Store.setCode('L8P1','# 내 예전 답','text'); r.status='clear'; })()")
+    edv="(()=>{ const t=document.querySelector('#pvEd textarea, #pvEd .cm-content'); return t ? (t.value!==undefined ? t.value : t.innerText) : ''; })()"
+    rf={}
+    for k,prm in [('normal',"{pid:'L8P1',lessonId:'L8'}"),('review',"{pid:'L8P1',lessonId:'L8',inReview:true}"),('chal',"{pid:'L8P1',lessonId:'L8',inChallenge:true}")]:
+        pg.evaluate(f"UI.go('problem',{prm})"); pg.wait_for_timeout(400); rf[k]=pg.evaluate(edv); rf[k+'Nav']=pg.locator('#btnPrevP, #btnNextP').count()
+    check('예전 답' in rf['normal'] and '예전 답' not in rf['review'] and '예전 답' not in rf['chal'] and rf['reviewNav']==0 and rf['chalNav']==0, '복습·도전은 내 예전 답 없이 시작·이전/다음 버튼 숨김, 일반 화면은 이어서 (QA #89~#91): '+str(rf))
+    pg.evaluate("UI.go('reviewMore')"); pg.wait_for_timeout(400); rm=pg.evaluate("({v:UI.view, ex:!!(UI.params.session && UI.params.session.extraReview), clear:!!(UI.params.session && UI.params.session.pids.every(id=>Store.prob(id).status==='clear'))})"); rm=rm['v']=='problem' and rm['ex'] and rm['clear']
+    pg.evaluate("(()=>{ Object.assign(Store.prob('L8P1'), JSON.parse(window.__bak)); UI.go('home'); })()"); pg.wait_for_timeout(300)
+    check(rm and pg.locator('[data-go=reviewMore]').count()>=1, '홈 「더 복습하기」 → 클리어한 문제로 복습 세션 (QA #92)')
     check(pg.locator('#btnTutor').count()==0 and pg.locator('#lpAsk').count()==0, '선생님 기능 꺼짐: 버튼 없음 (CONFIG.TUTOR.enabled=false)')
     bundle=pg.evaluate("Store.exportBundle()"); check('academy-bundle' in bundle and 'academy.course.python' in bundle and 'apiKey' not in bundle, '백업 묶음 내보내기(F8, API 키 제외)')
     check(pg.evaluate("(()=>{const q=document.querySelector('#quickkeys'); return q && q.textContent.includes('⇤') && q.textContent.includes('input');})()"), '모바일 입력 칩 ⇤·input (F12)')
