@@ -6,7 +6,7 @@
 const Sync = {
   KEY: 'academy.sync', FILE: 'python_academy_save.json', DESC: '파이썬 아카데미 진행 데이터 (자동 동기화 · 지우지 마세요)',
   API: 'https://api.github.com', TOKEN_URL: 'https://github.com/settings/tokens/new?scopes=gist&description=python-academy-sync',
-  DEBOUNCE_MS: 3000, CODE_PREFIX: 'PA-SYNC:',
+  DEBOUNCE_MS: 3000, CODE_PREFIX: 'PA-SYNC:', FORMAT: 'academy-sync-2',
   cfg: null, timer: null, state: 'off', msg: '', busy: false, pending: false, hook: null,
   get on() { return !!(this.cfg && this.cfg.token && this.cfg.gistId); },
   load() { try { this.cfg = JSON.parse(localStorage.getItem(this.KEY) || 'null'); } catch (e) { this.cfg = null; } this.state = this.on ? 'idle' : 'off'; },
@@ -28,7 +28,16 @@ const Sync = {
   errMsg(e) { const m = e && e.message || ''; return { NET: '인터넷 연결을 확인해 주세요', AUTH: '토큰이 틀렸거나 만료됐어요', SCOPE: '토큰에 gist 권한이 없어요 (토큰 만들 때 gist 체크)', FINE: 'Fine-grained 토큰은 gist를 지원하지 않아요. Tokens (classic)으로 만들어 주세요', NOTFOUND: '저장소(gist)를 찾을 수 없어요. 연동을 해제하고 다시 연결해 주세요', RATE: 'GitHub 요청 한도예요. 잠시 후 다시 시도해 주세요' }[m] || ('오류: ' + m); },
 
   // ----- 데이터 -----
-  payload() { const d = JSON.parse(JSON.stringify(Store.data)); if (d.settings) delete d.settings.apiKey; d.syncDevice = this.deviceName(); return d; },
+  // QA #67: 예전에는 지금 열린 코스 하나의 Store.data 를 올려서, 다른 코스 페이지가 받으면 그 코스 기록에 섞였다.
+  //   형식 2 = 모든 코스 묶음 { format, updatedAt, profile, courses:{id:조각}, tutor:{id:대화}, works }. 옛 형식(problems 가 맨 위)도 받아서 id 로 코스를 나눠 합친다.
+  bundle() { try { Store.split(); } catch (e) {} const courses = {}, tutor = {}; Store.keysWithPrefix('academy.course.').forEach(c => courses[c] = Store._get(Store.KEYS.course(c)) || {}); Store.keysWithPrefix('academy.tutor.').forEach(c => tutor[c] = Store._get(Store.KEYS.tutor(c)) || {}); const profile = Store._get(Store.KEYS.profile) || {}; return { format: this.FORMAT, updatedAt: profile.updatedAt || 0, profile, courses, tutor, works: Store._get(Store.KEYS.works) || [] }; },
+  payload() { const b = JSON.parse(JSON.stringify(this.bundle())); if (b.profile.settings) delete b.profile.settings.apiKey; b.syncDevice = this.deviceName(); return b; },
+  fromLegacy(r) { // 옛 형식(Store.data 한 덩어리) → 묶음. 문제·레슨·선생님 대화는 id 로 코스를 나누고, 나머지 코스 칸(체크업 등)은 파이썬으로
+    const F = Store.COURSE_FIELDS; const profile = {}; const courses = {}; const tutor = {}; const put = (c, f, k, v) => { const o = courses[c] || (courses[c] = {}); (o[f] || (o[f] = {}))[k] = v; };
+    for (const [k, v] of Object.entries(r)) { if (k === 'works' || k === 'tutorChats' || k === 'syncDevice') continue; if (!F.includes(k)) { profile[k] = v; continue; } if ((k === 'problems' || k === 'lessons') && v && typeof v === 'object') { for (const [id, rec] of Object.entries(v)) put(Store.courseOfId(id) || 'python', k, id, rec); } else (courses.python || (courses.python = {}))[k] = v; }
+    for (const [id, chat] of Object.entries(r.tutorChats || {})) { const c = Store.courseOfId(id) || 'python'; (tutor[c] || (tutor[c] = {}))[id] = chat; }
+    return { format: this.FORMAT, updatedAt: r.updatedAt || 0, profile, courses, tutor, works: r.works || [] };
+  },
   deviceName() { const ua = navigator.userAgent; return /Android/i.test(ua) ? '안드로이드' : /iPhone|iPad/i.test(ua) ? '아이폰/아이패드' : /Windows/i.test(ua) ? 'Windows PC' : /Mac/i.test(ua) ? 'Mac' : '다른 기기'; },
   makeCode() { return this.CODE_PREFIX + btoa(unescape(encodeURIComponent(JSON.stringify({ t: this.cfg.token, g: this.cfg.gistId })))); },
   parseInput(text) { text = (text || '').trim(); if (text.startsWith(this.CODE_PREFIX)) { try { const o = JSON.parse(decodeURIComponent(escape(atob(text.slice(this.CODE_PREFIX.length))))); if (o.t && o.g) return { token: o.t, gistId: o.g }; } catch (e) {} throw new Error('연동 코드 형식이 맞지 않아요'); } if (/^(ghp_|github_pat_|gho_)/.test(text) || text.length >= 30) return { token: text }; throw new Error('토큰 또는 연동 코드를 붙여넣어 주세요'); },
@@ -52,14 +61,19 @@ const Sync = {
     };
     const out = mv(local, remote, []); out.updatedAt = Math.max(lt, rt); return out;
   },
-  apply(remote) { // 내려받은 데이터를 로컬에 반영 (API 키는 로컬 것 유지)
-    const apiKey = Store.data.settings.apiKey; const local = Store.data; const fresh = !this.cfg.lastSyncAt && !local.xp && !Object.keys(local.problems || {}).length && !(local.works || []).length; // 이 기기는 처음 연동 + 아직 아무것도 안 함 → 다른 기기 것을 통째로
-    const merged = fresh ? JSON.parse(JSON.stringify(remote)) : this.merge(local, remote);
-    // "바뀌었다"는 시각(updatedAt)·기기 이름 같은 메타는 빼고, 진행·설정이 실제로 달라졌을 때만 (안 그러면 다른 기기가 저장할 때마다 토스트가 떠서 시선을 뺏음)
-    const strip = (d) => { const o = Object.assign({}, d); delete o.updatedAt; delete o.syncDevice; delete o.last; return JSON.stringify(o); };
-    const changed = strip(merged) !== strip(Store.data);
-    Store.data = Object.assign(Store.blank(), merged); Store.data.settings = Object.assign(Store.blank().settings, merged.settings || {}); Store.data.settings.apiKey = apiKey; Store.migrate(); Store.save({ silent: true });
-    return changed;
+  apply(remote) { // 내려받은 데이터를 로컬에 반영 (API 키는 로컬 것 유지). 코스별로 따로 합친다(QA #67)
+    const apiKey = Store.data.settings.apiKey; const strip = (d) => { const o = Object.assign({}, d); delete o.updatedAt; delete o.syncDevice; delete o.last; return JSON.stringify(o); };
+    const before = strip(Store.data); const L = this.bundle(); const R = remote && remote.format === this.FORMAT ? remote : this.fromLegacy(remote || {});
+    const fresh = !this.cfg.lastSyncAt && !(L.profile.xp) && !Object.values(L.courses).some(c => Object.keys(c.problems || {}).length) && !(L.works || []).length; // 이 기기는 처음 연동 + 아직 아무것도 안 함 → 다른 기기 것을 통째로
+    const lt = L.updatedAt || 0, rt = R.updatedAt || 0, lr = L.profile.resetAt || 0, rr = (R.profile || {}).resetAt || 0;
+    const mergeObj = (a, b) => { if (fresh) return b != null ? JSON.parse(JSON.stringify(b)) : a; if (a == null) return b; if (b == null) return a; const o = this.merge(Object.assign({}, a, { updatedAt: lt, resetAt: lr }), Object.assign({}, b, { updatedAt: rt, resetAt: rr })); if (!('resetAt' in a) && !('resetAt' in b)) delete o.resetAt; return o; };
+    const prof = mergeObj(L.profile, R.profile); prof.updatedAt = Math.max(lt, rt); if (prof.settings) prof.settings.apiKey = apiKey; Store._set(Store.KEYS.profile, prof);
+    for (const c of new Set([...Object.keys(L.courses), ...Object.keys(R.courses || {})])) { const o = mergeObj(L.courses[c], (R.courses || {})[c]); if (o) { delete o.updatedAt; delete o.resetAt; Store._set(Store.KEYS.course(c), o); } }
+    for (const c of new Set([...Object.keys(L.tutor), ...Object.keys(R.tutor || {})])) { const o = mergeObj(L.tutor[c], (R.tutor || {})[c]); if (o) { delete o.updatedAt; delete o.resetAt; Store._set(Store.KEYS.tutor(c), o); } }
+    const w = fresh ? (R.works || L.works) : this.merge({ works: L.works || [], updatedAt: lt }, { works: R.works || [], updatedAt: rt }).works; Store._set(Store.KEYS.works, w || []);
+    try { Store.untangle(); } catch (e) {} // 옛 형식이 섞어 둔 것까지 정리
+    const d = Store.assemble(); Store.data = Object.assign(Store.blank(), d); Store.data.settings = Object.assign(Store.blank().settings, d.settings || {}); Store.data.settings.apiKey = apiKey; Store.migrate(); Store.save({ silent: true });
+    return strip(Store.data) !== before;
   },
 
   // ----- 연결 -----
@@ -77,7 +91,7 @@ const Sync = {
   async pull() {
     const g = await this.api('GET', '/gists/' + this.cfg.gistId); const f = g.files && g.files[this.FILE]; if (!f) throw new Error('NOTFOUND');
     let text = f.content; if (f.truncated) { const r = await fetch(f.raw_url); text = await r.text(); }
-    let remote; try { remote = JSON.parse(text); } catch (e) { return false; } if (!remote || typeof remote !== 'object' || !('problems' in remote)) return false;
+    let remote; try { remote = JSON.parse(text); } catch (e) { return false; } if (!remote || typeof remote !== 'object' || !(remote.format === this.FORMAT || 'problems' in remote)) return false;
     if ((remote.updatedAt || 0) === this.cfg.lastRemoteUpdated && (Store.data.updatedAt || 0) <= this.cfg.lastLocalUpdated) return false; // 양쪽 다 그대로
     const changed = this.apply(remote); this.cfg.lastRemoteUpdated = remote.updatedAt || 0; this.saveCfg(); return changed;
   },
