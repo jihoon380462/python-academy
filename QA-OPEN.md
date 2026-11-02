@@ -14,6 +14,7 @@
 | 50 | 알고 시각화: deque·set 이 안 그려짐(「그리기 오류」) | BFS·큐 레슨 4곳·문제 9개 👀 가 깨짐 | core (Fable 설계 쪽) | core/runners/python.js 85행 deque → list, core/visualize.js boxes·queue 에 `__set` |
 | 51 | 알고 시각화: dict 를 table 로 못 그림(항상 「비어 있어요」) | 메모이제이션·역색인 화면 5곳 | core | core/visualize.js `drawTable` 에 dict 처리 |
 | 52 | 알고 함수 정의형 문제 27개 👀 에 그림이 없음 | 지문은 「쓰면 시각화돼요」라고 약속 | core | core/ui-views-main.js 273행 실행 코드 뒤에 `tests[0].call` |
+| 83 | 수학 M4_linear_q4 — 수학적으로 같은 식으로 풀면 `-0.00` 이 나와 맞는 풀이가 떨어짐 (C10) | 채점 오답 | 콘텐츠 | math content.js 859–860행 `+ 0` (M4_trig_q4 방식) |
 | 60 | 파이썬 L17P2 힌트 3 그대로 쓰면 에러 | 파일을 다시 여는 줄 없음 | 콘텐츠 | python content.js 718행 |
 
 ## 2. 그다음 (하)
@@ -30,6 +31,11 @@
 | 77 | 알고 A20 1쪽 슬라이더 최대 4000 — 폰에서 시간 초과 가능 + 출력 문구 `n=3000` 고정 | 콘텐츠(예제) | algo content.js 927행 `max: 2000`, 출력에 `{n}` |
 | 78 | 알고 A5P5 힌트 1 「비교표」(없음) | 콘텐츠 | algo content.js 380행 |
 | 79 | 수학 M3_monte_q1 힌트 2 「0.01 정도」 → 「0.002 정도」 | 콘텐츠 | math content.js 594행 |
+| 84 | 수학 M4_explog_q2 「x = 4」 는 그림 범위 밖 | 콘텐츠 | math content.js 880행 |
+| 85 | 수학 M4_limit 슬라이더 −3~3 vs 그림 −8~8 어긋남 | 콘텐츠 | math content.js 425행 |
+| 86 | 수학 M4_limit_q1 why 반올림 오해 · M4_quad_q3 제목 오타 | 콘텐츠 | math content.js 906·869행 |
+| 87 | 수학 starter 3개 `while …: pass` 무한 루프(보조 실행기 멈춤) | 콘텐츠 | M4_explog_q3·M1_gcd_q4·M1_log_q4 |
+| 88 | `-0.00` 표시: M4_quad_q4 solution · unitcircle 그림 값 | 콘텐츠 + core | `+ 0` |
 | 33 | 수학 M3_geom 난이도 「고2」 표기 기준 | 콘텐츠(C9) | 28노드 표기 기준 재점검 |
 
 ## 3. 사람이 폰·브라우저에서 직접 봐야 하는 것 (샌드박스에서 CDN 차단으로 확인 불가)
