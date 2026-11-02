@@ -33,6 +33,16 @@ const Store = {
     this._set(this.KEYS.profile, prof); this._set(this.KEYS.course(course), c); this._set(this.KEYS.tutor(course), d.tutorChats || {}); this._set(this.KEYS.works, d.works || []);
   },
   hasV2() { return localStorage.getItem(this.KEYS.profile) != null; },
+  // ---- 코스 구분 (QA #67) ----
+  courseOfId(id) { const P = (typeof CONFIG !== 'undefined' && CONFIG.COURSE_ID_PATTERNS) || {}; for (const c in P) if (new RegExp(P[c]).test(String(id))) return c; return null; },
+  keysWithPrefix(pre) { const out = []; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith(pre)) out.push(k.slice(pre.length)); } return out; },
+  betterRec(a, b) { const R = { none: 0, try: 1, clear: 2 }; const ra = R[(a || {}).status] || 0, rb = R[(b || {}).status] || 0; if (rb !== ra) return rb > ra ? b : a; return ((b || {}).stars || 0) > ((a || {}).stars || 0) ? b : a; },
+  // 다른 코스 조각에 들어간 문제·레슨 기록을 그 코스 조각으로 옮긴다(옛 기기 연동이 현재 코스 하나만 올리고 받아서 섞음). 몇 개 옮겼는지 돌려줌. 여러 번 불러도 안전
+  untangle() {
+    const ids = this.keysWithPrefix('academy.course.'); const slices = {}; ids.forEach(c => slices[c] = this._get(this.KEYS.course(c)) || {}); let moved = 0; const touched = new Set();
+    for (const c of ids) for (const f of ['problems', 'lessons']) { const m = slices[c][f]; if (!m || typeof m !== 'object') continue; for (const k of Object.keys(m)) { const own = this.courseOfId(k); if (!own || own === c) continue; const dst = slices[own] || (slices[own] = {}); dst[f] = dst[f] || {}; dst[f][k] = k in dst[f] ? (f === 'problems' ? this.betterRec(dst[f][k], m[k]) : dst[f][k]) : m[k]; delete m[k]; moved++; touched.add(c); touched.add(own); } }
+    touched.forEach(c => this._set(this.KEYS.course(c), slices[c])); if (moved) console.info(`다른 코스 기록 ${moved}개를 제자리로 옮겼어요 (QA #67)`); return moved;
+  },
   // v1(단일 키) → v2. 원본은 academy.backup.v1 에 보관. 돌려주는 값: 마이그레이션 했는지
   migrateV1() {
     const raw = localStorage.getItem(this.KEYS.v1); if (!raw || this.hasV2()) return false;
@@ -49,7 +59,7 @@ const Store = {
   hasV1Backup() { return localStorage.getItem(this.KEYS.backup) != null; },
   load(course) {
     if (course) this.course = course;
-    try { this.migrateV1(); const d = this.assemble(); if (d) { this.data = d; this.migrate(); return; } } catch (e) { console.warn('저장 데이터 읽기 실패', e); }
+    try { this.migrateV1(); try { this.untangle(); } catch (e) { console.warn('untangle', e); } const d = this.assemble(); if (d) { this.data = d; this.migrate(); return; } } catch (e) { console.warn('저장 데이터 읽기 실패', e); }
     this.data = this.blank();
   },
   migrate() { /* 향후 스키마 변경 시 v 비교해 변환 */ this.data.v = CONFIG.SCHEMA_VERSION; },

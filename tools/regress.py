@@ -179,6 +179,11 @@ with sync_playwright() as p:
     pg.goto(ALGO+'#lesson/AB4'); pg.wait_for_timeout(800); pg.evaluate("Store.data.settings.unlockAll=true;UI.go('lesson',{lessonId:'AB4'})"); pg.wait_for_timeout(400); check(pg.locator('#mockStart').count()==1 and pg.evaluate('document.documentElement.scrollWidth')<=390, '모의고사 안내 화면 모바일')
     # ---- 4. 예전 주소
     pg.goto('file://'+os.path.join(ROOT,'python_academy.html')); pg.wait_for_timeout(800); check(pg.url.endswith('courses/python/index.html') or '/courses/python/' in pg.url, '예전 주소 → 코스 페이지 리다이렉트 ('+pg.url[-40:]+')')
+    print('[기기 연동 코스 구분 (QA #67)]'); sx=b.new_context(); sp=sx.new_page(); sp.on('pageerror', lambda e: errors.append(str(e)[:500]))
+    sp.goto('file://'+os.path.join(ROOT,'courses/math/index.html')); sp.wait_for_timeout(900)
+    sr=sp.evaluate("""()=>{ Store.data.onboarded=true; const r0=Store.prob('M1_mod_q1'); r0.status='clear'; r0.stars=3; Store.save(); Sync.cfg={lastSyncAt:1}; Sync.apply({updatedAt:Date.now()+5000, xp:9, settings:{}, problems:{L0P1:{status:'clear',stars:3}, M1_mod_q2:{status:'clear',stars:2}}}); const g=c=>{ const m=JSON.parse(localStorage.getItem('academy.course.'+c)||'{}'); return Object.keys(m.problems||{}).filter(k=>m.problems[k].status==='clear').sort().join(','); }; const p=Sync.payload(); return {math:g('math'), py:g('python'), fmt:p.format, keys:Object.keys(p.courses).sort().join(',')}; }""")
+    check(sr['math']=='M1_mod_q1,M1_mod_q2' and sr['py']=='L0P1' and sr['fmt']=='academy-sync-2' and 'math' in sr['keys'] and 'python' in sr['keys'], '옛 형식 payload 를 수학 화면에서 받아도 코스별로 나뉨 + 새 payload 는 코스 묶음 (%s)' % sr)
+    sx.close()
     b.close()
 cdn=[e for e in errors if 'importScripts' in e or 'pyodide' in e.lower()]
 real=[e for e in errors if e not in cdn]
