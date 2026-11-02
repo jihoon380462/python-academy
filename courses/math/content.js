@@ -471,7 +471,7 @@ const LESSONS = [
       example: { code: 'v = 5\np, q, r = bool(v & 4), bool(v & 2), bool(v & 1)\nprint("v =", v, "→ p q r =", p, q, r)\nprint("p and q and r:", p and q and r, "· p or q or r:", p or q or r)\nfor p in [False, True]:\n    for q in [False, True]:\n        print(int(p), int(q), "| and", int(p and q), "· or", int(p or q), "· p→q", int((not p) or q))', trace: true } },
   ],
   summary: ['명제 n개 → 참·거짓 조합 2ⁿ (2진수와 짝)', 'and 전부 참, or 하나라도 참, not 뒤집기', '드모르간: not (p and q) = not p or not q'] },
-{ id: 'M2_func', ch: 2, n: 3, title: '짝이 하나씩', subtitle: '함수·일대일·역함수', level: '고2', stars: 2, prereq: ['M4_linear'], uses: ['data'], icon: '🔁', minutes: 14, mode: 'text',
+{ id: 'M2_func', ch: 2, n: 3, title: '짝이 하나씩', subtitle: '함수·일대일·역함수', level: '고1', stars: 2, prereq: ['M4_linear'], uses: ['data'], icon: '🔁', minutes: 14, mode: 'text',
   params: [{ id: 'a', label: '기울기 a', min: 0.5, max: 3, step: 0.5, default: 2 }, { id: 'b', label: 'b', min: -3, max: 3, step: 1, default: 1 }],
   terms: { '일대일 함수': '서로 다른 입력이 늘 서로 다른 출력으로 가는 함수. 출력만 보고 입력을 되찾을 수 있다', '역함수': 'f 가 x → y 이면 y → x 로 되돌리는 함수 f⁻¹. 일대일 함수에만 있다' },
   pages: [
