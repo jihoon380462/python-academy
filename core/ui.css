@@ -278,3 +278,6 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 .ch-title span{word-break:keep-all}.ch-toggle{white-space:nowrap}
 .hc.soon .hc-body{flex-direction:column;align-items:flex-start;gap:4px}
 .ch-title .chip{white-space:nowrap;flex:none} /* 사용자 제보: 챕터 「완료 ✓」 칩 두 줄 */
+/* ⌨ 백문이불여일타 범위 고르기 (11/3) */
+.typing .ty-ch{margin:10px 0;padding:10px 12px}.ty-row{display:flex;align-items:center;gap:10px;padding:6px 2px;cursor:pointer}.ty-row input{width:20px;height:20px;flex:none}.ty-row span{flex:1}.ty-chrow{border-bottom:1px solid var(--border);margin-bottom:4px}
+.ty-note{border-left:4px solid var(--primary);padding:10px 12px;margin:8px 0}

@@ -10,8 +10,9 @@ for (const id of courses()) {
   const c = loadCourse(id); const lessonIds = new Set(); const pids = new Set();
   if (!c.meta.id || c.meta.id !== id) err(`${id}: course.json의 id가 폴더 이름과 달라요`);
   for (const l of c.LESSONS) { if (lessonIds.has(l.id)) err(`${id}: 레슨 id 중복 ${l.id}`); lessonIds.add(l.id); if (!l.title) err(`${id}: 레슨 ${l.id} 제목 없음`); if (!l.boss && !(l.pages && l.pages.length)) err(`${id}: 레슨 ${l.id} 페이지 없음`); }
-  for (const p of c.PROBLEMS) {
+  for (const p of [...c.PROBLEMS, ...(c.DRILLS || [])]) {
     const where = `${id}/${p.id}`;
+    if ((c.DRILLS || []).includes(p)) { if (p.type !== 'code') err(`${where}: 타자 연습(DRILLS)은 type 'code' 만`); if (!(p.tests && p.tests.length >= 2)) err(`${where}: 타자 연습 테스트 2개 이상`); if (p.boss || p.project) err(`${where}: 타자 연습에 boss/project 불가`); }
     if (pids.has(p.id)) err(`${where}: 문제 id 중복`); pids.add(p.id);
     if (!lessonIds.has(p.lesson)) err(`${where}: 없는 레슨 참조 ${p.lesson}`);
     if (!p.title) err(`${where}: 제목 없음`); if (!p.type) err(`${where}: type 없음`);
@@ -40,12 +41,12 @@ for (const id of courses()) {
   for (const gid of Object.keys(c.GUIDES)) if (!pids.has(gid)) err(`${id}: GUIDES에 없는 문제 ${gid}`);
   const termSet = Object.assign({}, c.GLOSSARY); c.LESSONS.forEach(l => Object.assign(termSet, l.terms || {}));
   for (const l of c.LESSONS) (l.pages || []).forEach((pg, i) => { for (const m of (pg.html || '').matchAll(/\[\[([^\]]+)\]\]/g)) if (!(m[1] in termSet)) err(`${id}: 레슨 ${l.id} p${i} 용어 [[${m[1]}]] 가 용어집에 없음`); });
-  { const pat = (c.CONFIG.COURSE_ID_PATTERNS || {})[id]; if (!pat) err(`${id}: CONFIG.COURSE_ID_PATTERNS 에 이 코스의 id 규칙이 없어요 (기기 연동이 코스를 구분하는 데 씀, QA #67)`); else { const re = new RegExp(pat); const bad = [...c.LESSONS, ...c.PROBLEMS].map(x => x.id).filter(x => !re.test(x)); if (bad.length) err(`${id}: id 규칙(${pat})에 안 맞는 id ${bad.slice(0, 5).join(', ')}`); for (const [o, op] of Object.entries(c.CONFIG.COURSE_ID_PATTERNS)) if (o !== id) { const clash = [...c.LESSONS, ...c.PROBLEMS].map(x => x.id).filter(x => new RegExp(op).test(x)); if (clash.length) err(`${id}: id ${clash.slice(0, 3).join(', ')} 가 ${o} 코스 규칙에도 맞아요 — 기기 연동이 헷갈려요`); } } }
+  { const pat = (c.CONFIG.COURSE_ID_PATTERNS || {})[id]; if (!pat) err(`${id}: CONFIG.COURSE_ID_PATTERNS 에 이 코스의 id 규칙이 없어요 (기기 연동이 코스를 구분하는 데 씀, QA #67)`); else { const re = new RegExp(pat); const bad = [...c.LESSONS, ...c.PROBLEMS, ...(c.DRILLS || [])].map(x => x.id).filter(x => !re.test(x)); if (bad.length) err(`${id}: id 규칙(${pat})에 안 맞는 id ${bad.slice(0, 5).join(', ')}`); for (const [o, op] of Object.entries(c.CONFIG.COURSE_ID_PATTERNS)) if (o !== id) { const clash = [...c.LESSONS, ...c.PROBLEMS, ...(c.DRILLS || [])].map(x => x.id).filter(x => new RegExp(op).test(x)); if (clash.length) err(`${id}: id ${clash.slice(0, 3).join(', ')} 가 ${o} 코스 규칙에도 맞아요 — 기기 연동이 헷갈려요`); } } }
   const cfgCourse = (c.CONFIG.COURSES || []).find(x => x.id === id); if (cfgCourse && cfgCourse.ready) { if (cfgCourse.total !== c.PROBLEMS.length) err(`${id}: CONFIG.COURSES total ${cfgCourse.total} ≠ 실제 문제 수 ${c.PROBLEMS.length} (core/config.js 갱신)`); if (cfgCourse.lessons !== c.LESSONS.length) err(`${id}: CONFIG.COURSES lessons ${cfgCourse.lessons} ≠ 실제 레슨 수 ${c.LESSONS.length}`); }
   for (const l of c.LESSONS) if (l.practical && !c.PROBLEMS.some(p => p.lesson === l.id && p.project)) err(`${id}: 실전 레슨 ${l.id} 에 project 문제가 없음`);
   for (const p of c.PROBLEMS) if (p.boss) { const tests = p.type === 'bug' ? p.bug.tests : p.tests; if (tests && tests.length < 5) err(`${id}/${p.id}: 보스 테스트 5개 미만`); }
   totals.lessons += c.LESSONS.length; totals.problems += c.PROBLEMS.length;
-  console.log(`✓ ${id}: 레슨 ${c.LESSONS.length} · 문제 ${c.PROBLEMS.length} · 가이드 ${Object.keys(c.GUIDES).length}`);
+  console.log(`✓ ${id}: 레슨 ${c.LESSONS.length} · 문제 ${c.PROBLEMS.length}${(c.DRILLS || []).length ? ` · 타자 연습 ${c.DRILLS.length}` : ""} · 가이드 ${Object.keys(c.GUIDES).length}`);
 }
 // ?v= 버전 일치 (캐시 깨기): 모든 html의 ?v= 가 APP_VERSION 과 같아야 함
 const cfg = fs.readFileSync(path.join(ROOT, 'core/config.js'), 'utf8'); const ver = (cfg.match(/APP_VERSION:\s*'([^']+)'/) || [])[1];
