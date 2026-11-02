@@ -56,6 +56,7 @@
 
 ## 6. 열려 있는 다음 후보
 - 상태판(0절)의 "다음 후보"가 최신이다. 사용자에게는 번호 붙인 선택지로 제시한다.
+- **예정 코스 7개(설계 전)**: `TODO.md` — CS · 운영체제 · 디버깅·테스트 · 데이터 분석 · 객체지향·설계 · AI·머신러닝 기초 · AI와 협업 (사용자 2026-11-03). Fable 이 설계해 EXPANSION.md 로 옮긴다.
 
 ## 7. 핵심 데이터 규칙 요약
 - **수학 공간(v2.3.0)**: `courses/math/content.js` 맨 위 주석이 노드·문제 스키마. 노드 = 레슨 + `subtitle/level/stars/prereq/star/icon/params[]`, `pages[0].figure`(필수)·`observe`, `pages[1].formula[{latex,note}]`·`example`(슬라이더 동기화는 `id = 값` 줄). 문제 유형 `quiz kind:'explore' requireInteract` · `num answer:{value,tol,unit,why}`(+solution 계산 코드) · `match match:{params,tol}` · `pair pair:{left,right,answer}`. 그림 종류와 옵션은 `core/figure.js` 맨 위 주석. 잠금은 보스가 아니라 `prereq`.
