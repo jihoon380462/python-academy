@@ -121,6 +121,8 @@ with sync_playwright() as p:
     check(pg.evaluate("() => { const c=document.createElement('canvas'); c.style.width='300px'; c.style.height='200px'; document.body.appendChild(c); try { Viz.frame(c, {kind:'grid', var:'grid', visited:'visited', pos:'pos'}, {vis:{grid:[['.','*','#'],['.','.','.']], visited:{__set:[[0,0],[1,0]]}, pos:[1,1]}, stack:[], vars:{}}, null, 1); return true; } catch (e) { return 'ERR ' + e.message; } }")==True, '격자 시각화: pos 튜플 변수 + 글자 칸(*)')
     pg.evaluate("UI.go('lesson',{lessonId:'AB4'})"); pg.wait_for_timeout(300); check(pg.evaluate("UI.view")=='mock' and pg.locator('#mockStart').count()==1, '보스 AB4 → 모의고사 화면')
     pg.evaluate("UI.go('problem',{pid:'AB4P1',lessonId:'AB4'})"); pg.wait_for_timeout(400); check('입력 형식' in pg.locator('.pv-prompt').inner_text() and '코딩테스트' in pg.locator('.pv-head').inner_text(), '코딩테스트 형식 문제')
+    cm=pg.locator('#pvCoach').inner_html(); pg.evaluate("UI.go('problem',{pid:'AB4P1',lessonId:'AB4',session:{mock:true,pids:['AB4P1'],goto(){},startAt:Date.now()}})"); pg.wait_for_timeout(400)
+    check(len(cm)>0 and pg.locator('#pvCoach').inner_html()=='' and pg.locator('#btnAnswer').count()==0 and pg.locator('#btnHint').count()==1, '모의고사 중에는 따라하기·정답 보기 없음, 힌트는 있음 (QA #3)')
     pg.evaluate("UI.go('playground')"); pg.wait_for_timeout(300); check(pg.locator('[data-m="block"]').count()==0, '놀이터에 블록 탭 없음')
     pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300); check(pg.locator('#sUnlock').count()==1, '설정: 전제 무시 스위치')
     vz = pg.evaluate(VIZ_JS)
