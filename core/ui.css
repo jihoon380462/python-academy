@@ -281,3 +281,7 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 /* ⌨ 백문이불여일타 범위 고르기 (11/3) */
 .typing .ty-ch{margin:10px 0;padding:10px 12px}.ty-row{display:flex;align-items:center;gap:10px;padding:6px 2px;cursor:pointer}.ty-row input{width:20px;height:20px;flex:none}.ty-row span{flex:1}.ty-chrow{border-bottom:1px solid var(--border);margin-bottom:4px}
 .ty-note{border-left:4px solid var(--primary);padding:10px 12px;margin:8px 0}
+/* QA 1103: 긴 <code> 가 white-space:nowrap 이라 폰 폭을 넘던 것 — 넘칠 때만 줄바꿈 */
+.pv-prompt code,.lp-html code,.quiz code,.tutor-panel code,.result code{white-space:normal;overflow-wrap:anywhere;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+/* QA 1103(L12P4): 줄 맞추기 조각의 긴 줄(students = [{…}, …])이 1280px 화면도 넘던 것 — 들여쓰기는 지키고 넘칠 때만 줄바꿈 */
+.pz-tile code{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}

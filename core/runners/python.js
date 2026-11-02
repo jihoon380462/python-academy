@@ -220,8 +220,9 @@ self.onmessage=(ev)=>{
     let result;
     try{
       // 파일 입출력: 실행 전에 업로드/고정 파일을 쓰고, 결과 파일은 지웠다가 실행 뒤 읽어 돌려준다
-      for(const f of (m.files||[])){ try{ pyodide.FS.writeFile(f.name, f.text||'', {encoding:'utf8'}); }catch(e){} }
+      // QA 1103(X3P1): 결과 파일을 먼저 지우고 그다음 업로드 파일을 써야 해요 — 같은 이름(todo.json 처럼 읽고 다시 저장하는 파일)이면 반대 순서에서는 방금 올린 파일이 지워져요
       for(const n of (m.outFiles||[])){ try{ pyodide.FS.unlink(n); }catch(e){} }
+      for(const f of (m.files||[])){ try{ pyodide.FS.writeFile(f.name, f.text||'', {encoding:'utf8'}); }catch(e){} }
       const fn=pyodide.globals.get('__pa_run');
       const t0=Date.now(); const r=fn(m.code, m.call||null, !!m.trace, m.maxsteps||500, m.vis||null);
       result=JSON.parse(r); result.ms=Date.now()-t0; fn.destroy && fn.destroy();
@@ -282,7 +283,7 @@ const Py = {
       if (job.kind === 'compile') { try { result = JSON.parse(this.py.runPython('__pa_compile(' + JSON.stringify(job.code) + ')')); } catch (e) { result = { ok: true }; } }
       else {
         this.cur = job; this.inputLines = (job.input || '').replace(/\r/g, '').split('\n'); if (this.inputLines.length && this.inputLines[this.inputLines.length - 1] === '') this.inputLines.pop(); this.inputIdx = 0;
-        try { for (const f of (job.files || [])) { try { this.py.FS.writeFile(f.name, f.text || '', { encoding: 'utf8' }); } catch (e) {} } for (const n of (job.outFiles || [])) { try { this.py.FS.unlink(n); } catch (e) {} } const t0 = Date.now(); const fn = this.py.globals.get('__pa_run'); const r = fn(job.code, job.call || null, !!job.trace, job.maxsteps || CONFIG.TRACE_MAX_STEPS, job.vis ? JSON.stringify(job.vis) : null); result = JSON.parse(r); result.ms = Date.now() - t0; fn.destroy && fn.destroy(); if (job.outFiles && job.outFiles.length) { result.outFiles = {}; for (const n of job.outFiles) { try { result.outFiles[n] = this.py.FS.readFile(n, { encoding: 'utf8' }); } catch (e) {} } } } catch (e) { result = { ok: false, ename: 'InternalError', emsg: String(e && e.message || e) }; }
+        try { /* QA 1103: 지우기 → 쓰기 순서(워커와 같게) */ for (const n of (job.outFiles || [])) { try { this.py.FS.unlink(n); } catch (e) {} } for (const f of (job.files || [])) { try { this.py.FS.writeFile(f.name, f.text || '', { encoding: 'utf8' }); } catch (e) {} } const t0 = Date.now(); const fn = this.py.globals.get('__pa_run'); const r = fn(job.code, job.call || null, !!job.trace, job.maxsteps || CONFIG.TRACE_MAX_STEPS, job.vis ? JSON.stringify(job.vis) : null); result = JSON.parse(r); result.ms = Date.now() - t0; fn.destroy && fn.destroy(); if (job.outFiles && job.outFiles.length) { result.outFiles = {}; for (const n of job.outFiles) { try { result.outFiles[n] = this.py.FS.readFile(n, { encoding: 'utf8' }); } catch (e) {} } } } catch (e) { result = { ok: false, ename: 'InternalError', emsg: String(e && e.message || e) }; }
         result.inputUsed = this.inputIdx; this.cur = null;
       }
       delete this.pending[id]; this.busy = false; job.resolve(result); this._next();
