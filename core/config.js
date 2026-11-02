@@ -6,7 +6,7 @@ const CONFIG = {
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
-  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+(P\\d+)?$', algo: '^(A|AB|E)\\d+(P\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$' },
+  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+([PD]\\d+)?$', algo: '^(A|AB|E)\\d+(P\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
     { id: 'python', name: '파이썬', icon: '🐍', desc: '블록에서 텍스트까지, 브라우저에서 진짜 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 148, lessons: 36 },
     { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '코드가 돌아가는 모습을 눈으로 보며, 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 145, lessons: 32, requires: { course: 'python', boss: 'B3', label: '파이썬 챕터 3까지 끝내면 열려요' } },
@@ -67,6 +67,8 @@ const CONFIG = {
   DAILY_CHALLENGE_MULT: 2,
   CHECKUP_SIZE: 10, CHECKUP_PASS: 0.8, CHECKUP_BONUS: 40,
   REVIEW_XP_BONUS_PER: 5,
+  DRILL_XP: 5, // ⌨ 타자 연습(DRILLS) 한 문제 기본 XP — 사용자 요청 11/3: 초반 문법을 손에 익히는 선택 연습
+  DRILL_BATCH: 5, // 타자 연습 한 번에 몇 문제씩
   POLISH_XP: 10,
 
   // --- 선생님 (Claude API) ---

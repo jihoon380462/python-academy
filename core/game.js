@@ -31,7 +31,7 @@ const Game = {
     // 기록
     rec.status = 'clear'; rec.clearedAt = Date.now();
     if (!wasClear || stars > rec.stars) rec.stars = Math.max(rec.stars, stars);
-    if (!wasClear) { rec.firstTry = !!firstTry; this.stat('clears'); if (firstTry) this.stat('firstTryClears'); if (rec.fails >= 5) this.stat('fail5Clear'); if (rec.hadError) this.stat('errorsOvercome'); }
+    if (!wasClear) { rec.firstTry = !!firstTry; if (p.drill) this.stat('drillClears'); else this.stat('clears'); if (firstTry) this.stat('firstTryClears'); if (rec.fails >= 5) this.stat('fail5Clear'); if (rec.hadError) this.stat('errorsOvercome'); }
     if (hints === 0 && !rec.answerSeen) { this.noHintStreak++; this.statMax('noHintStreak', this.noHintStreak); } else this.noHintStreak = 0;
     if (mode === 'text' && p.type === 'code') this.stat('textClears'); if (p.type === 'parsons') this.stat('parsonsClears');
     { const ll = Content.lesson(p.lesson); if (ll && ll.practical) { const allPr = PROBLEMS.filter(q => q.project && (Content.lesson(q.lesson) || {}).practical); /* QA #73: 연습 문제(C8)는 마스터 조건이 아님 */ if (allPr.every(q => q.id === p.id || Store.prob(q.id).status === 'clear')) this.stat('master_' + Store.course); } } // 실전 챕터 전부 클리어 → 코스 마스터

@@ -1,10 +1,11 @@
 // core/engine.js — 콘텐츠 인덱스(Content)·채점(Grader). 언어별 실행은 runners/ 뒤에 있음
 // ---------- 콘텐츠 인덱스 & 자체 검사 ----------
 const Content = {
-  lessonMap: {}, problemMap: {}, byLesson: {},
+  lessonMap: {}, problemMap: {}, byLesson: {}, drillsByLesson: {},
   init() {
     LESSONS.forEach(l => { this.lessonMap[l.id] = l; this.byLesson[l.id] = []; if (l.terms && typeof GLOSSARY !== 'undefined') for (const [k, v] of Object.entries(l.terms)) if (!(k in GLOSSARY)) GLOSSARY[k] = v; }); // 레슨이 정의한 용어는 공용 용어집에 합류(코스별 용어)
     PROBLEMS.forEach(p => { this.problemMap[p.id] = p; (this.byLesson[p.lesson] = this.byLesson[p.lesson] || []).push(p); });
+    /* ⌨ 타자 연습(사용자 요청 11/3): 코스 content.js 의 DRILLS — 레슨 완료 조건이 아닌 선택 연습. problemMap 에만 넣고 PROBLEMS·byLesson 에는 넣지 않아 진도·총계·뱃지 계산은 그대로 */ (typeof DRILLS !== 'undefined' ? DRILLS : []).forEach(p => { p.drill = true; if (p.xp == null) p.xp = CONFIG.DRILL_XP; this.problemMap[p.id] = p; (this.drillsByLesson[p.lesson] = this.drillsByLesson[p.lesson] || []).push(p); });
     // 자체 검사
     const seen = new Set(); const warn = (m) => console.warn('[콘텐츠 검사] ' + m);
     PROBLEMS.forEach(p => {
@@ -21,6 +22,8 @@ const Content = {
   lesson(id) { return this.lessonMap[id]; },
   problem(id) { return this.problemMap[id]; },
   problemsOf(lid) { return this.byLesson[lid] || []; },
+  drillsOf(lid) { return this.drillsByLesson[lid] || []; },
+  allDrills() { return Object.values(this.drillsByLesson).flat(); },
   tests(p) { return p.type === 'bug' ? (p.bug.tests || []) : (p.tests || []); },
   lessonsOfChapter(ch) { return LESSONS.filter(l => l.ch === ch); },
   orderedLessons() { return LESSONS.slice(); },
