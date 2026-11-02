@@ -20,6 +20,7 @@
 - 현재 버전: **v2.2.26** (`core/config.js`의 `APP_VERSION`. 설정 맨 아래·허브 푸터에 표시. 수정할 때마다 올리고 `node tools/stamp.mjs`로 HTML의 `?v=`도 맞춘다 — 사용자가 이 숫자로 반영 여부를 확인한다)
 
 ## 2. 작업 방법 (반드시 이 순서)
+0. **`specs/workflow.md`를 먼저 읽는다** — Fable/Opus 분담, `[core]` 커밋 표시, 지금이 "Fable 절약 주간"인지.
 0. 그림(아트 리소스)이 필요하면 코드에서 직접 그리지 말고 `IMAGES.md` 2절에 요청을 추가하고 `UI.img()`로 자리만 만든다(이모지 폴백). 그림은 ChatGPT 등 다른 쪽이 만들어 `assets/img/`에 넣는다.
 1. 저장소를 클론/attach한다. **빌드 없음** — 파일을 고치면 그게 곧 배포물이다. 로드 순서는 `courses/python/index.html`의 `<script>` 순서(바꾸지 말 것).
    - `core/config.js` 버전·CDN·수치·문구(T)·허브 코스 목록(COURSES) · `core/util.js` 유틸 · `core/storage.js` 저장(스키마 v2) · `core/sync.js` 기기 연동 · `core/engine.js` Content(인덱스·변형·가이드 생성)·Grader · `core/runners/python.js` Pyodide 워커·거북이 · `core/game.js` Game·Review · `core/tutor.js` 선생님 API+패널 · `core/fx.js` 효과음·색종이·마스코트 · `core/ui-core.js` UI 공통(모달·토스트·상단바·용어 칩) · `core/ui-editors.js` 텍스트/블록/Parsons 에디터 · `core/ui-views-main.js` 홈·레슨·문제·Coach · `core/ui-views-more.js` 나머지 화면·설정·온보딩·코스 페이지 초기화(딥링크 `#problem/ID`, `#lesson/ID`, `#settings`) · `core/hub.js` 허브 · `core/ui.css`
