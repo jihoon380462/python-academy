@@ -70,6 +70,8 @@ Fable 세션(엔진·설계·검토·릴리스) 외에 **Opus 채팅 네 개를 
 - 아트 검수·요청팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → IMAGES.md → specs/art-team.md 순서로 읽은 뒤 art-team.md 4절의 첫 과제(A0 전수 재검수)를 시작해. 결과는 IMAGES.md 검수 메모에 적고 art/ 브랜치로 PR을 내. main 직접 푸시 금지.`
 - 유지보수팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → QA.md → specs/maintenance-team.md 순서로 읽은 뒤 QA.md의 「열림」 항목을 심각도 순으로 고쳐 fix/ 브랜치로 PR을 내. 담당이 Fable인 항목은 건드리지 말고 재현 절차만 보강해. main 직접 푸시 금지.`
 
+**이번 주(11/2~11/5) 임시 예외**: Fable 한도 절약 — 릴리스 당번과 위임된 `[core]` 항목은 `specs/schedule-week.md` 0절·3절·4절을 따른다. 목요일에 Fable 이 전부 검토한다.
+
 ## 8. 브랜치·PR 규칙 — "먼저 끝낸 쪽이 바로 배포" 금지 (2026-11-02)
 
 **배포 권한은 Fable 이상(Fable·사용자)에게만 있다. Opus(QA팀·콘텐츠팀·core 작업 포함)는 배포하지 않는다** — main 푸시, PR 병합, `APP_VERSION` 올림, `node tools/stamp.mjs`, HANDOFF 상태판 갱신 전부 Fable 의 릴리스 커밋에서만 한다. main 에 푸시되면 곧바로 GitHub Pages 에 배포되기 때문이다. 팀 작업은 전부 브랜치 → PR → (Fable) 검토 → 병합 → 릴리스 순서다.
