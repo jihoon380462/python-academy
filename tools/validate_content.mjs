@@ -14,6 +14,9 @@ for (const id of courses()) {
     const where = `${id}/${p.id}`;
     if ((c.DRILLS || []).includes(p)) { if (p.type !== 'code') err(`${where}: 타자 연습(DRILLS)은 type 'code' 만`); if (!(p.tests && p.tests.length >= 2)) err(`${where}: 타자 연습 테스트 2개 이상`); if (p.boss || p.project) err(`${where}: 타자 연습에 boss/project 불가`); }
     if (pids.has(p.id)) err(`${where}: 문제 id 중복`); pids.add(p.id);
+    // QA 6회전: 「이렇게 나오면 돼요」 출력 상자는 테스트 1 출력과 같아야 해요(글자 그대로의 \n 이 화면에 보이던 회귀 방지)
+    { const m = (p.prompt || '').match(/이렇게 나오면 돼요<\/b>[\s\S]*?<pre>([\s\S]*?)<\/pre>/); const t0 = p.tests && p.tests[0]; if (m && t0 && t0.output != null && !/__COMPUTED__/.test(t0.output)) { const shown = m[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&'); const norm = (x) => String(x).split('\n').map(l => l.trimEnd()).join('\n').trim(); if (norm(shown) !== norm(t0.output)) err(`${where}: 「이렇게 나오면 돼요」 상자가 테스트 1 출력과 달라요 (${JSON.stringify(shown.slice(0, 40))} ↔ ${JSON.stringify(String(t0.output).slice(0, 40))})`); } }
+    if (p.quiz && typeof p.quiz.why === 'string' && /<[a-z][^>]*>/i.test(p.quiz.why)) err(`${where}: quiz.why 는 글자 그대로 보여요(이스케이프) — HTML 태그를 쓰지 마세요`);
     if (!lessonIds.has(p.lesson)) err(`${where}: 없는 레슨 참조 ${p.lesson}`);
     if (!p.title) err(`${where}: 제목 없음`); if (!p.type) err(`${where}: type 없음`);
     if (!Array.isArray(p.hints) || p.hints.length < 3) err(`${where}: 힌트 3개 미만`);
