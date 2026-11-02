@@ -157,11 +157,8 @@ Create ONE PNG badge for a consistent educational game medal set. Flat vector st
 **검수 기준(아트팀, art-team.md 2절)**: `img_clean --check` → 다크/라이트 축소본(영역 32px·뱃지 48/56px)에서 소재 식별 + 2절 `area-math-1/3`·`badge-math_area_1/3/5`와 나란히 한 작가 느낌 → 앱 렌더(C10 병합 뒤 수학 지도·뱃지 화면). 하나라도 걸리면 이 표 「상태」에 「반려: 이유」와 고친 프롬프트.
 
 **납품 체크리스트(6차부터 — workflow 8절)**: 지정 파일명·크기로 `assets/img/`에 저장 → `python3 tools/img_clean.py --check`(현재 이 도구는 `area-` 크기를 안 봄 → 512×512인지 직접 확인) → 생성 프롬프트를 `assets/img/README.md` 맨 아래에 「6차 E」로 기록 → 이 표 「상태」를 `납품`으로 → **`art/6차` 브랜치에 커밋 → PR**. `APP_VERSION`·`node tools/stamp.mjs`·HANDOFF 상태판은 **손대지 않는다**(릴리스 때 함께). 2절 완료 표로 옮기는 것은 아트팀 검수 통과 뒤.
-<<<<<<< HEAD
-=======
 
 **납품 메모(2026-11-02, Codex)**: E1-4 → E1-2 → E2-4 → E2-2 순서로 4장 생성. 위 영어 프롬프트와 지정 참조 그림을 변경 없이 사용. 영역 512×512·뱃지 256×256 RGBA, 사방 여백 47/23px, `img_clean --check` 통과. 다크/라이트 32px·48/56px 축소본에서 소재 식별 확인. 생성 결과에 약한 색조 변화가 남아 있어 완전 단색 여부는 아트팀 최종 검수 대상. C10 미병합 상태라 실제 지도·뱃지 렌더 검수는 C10 병합 후 진행. 상태는 납품이며 2절 완료 표로 이동하지 않음.
->>>>>>> origin/art/6차
 
 ## 4. 그 뒤 (자리 없음 — 만들지 말 것)
 
