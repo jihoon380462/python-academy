@@ -317,8 +317,8 @@ Grader.checkNum = function (p, raw) {
   if (ok) return { ok: true, tips: [] };
   const near = (x, y, t = tol) => Math.abs(x - y) <= Math.max(t, Math.abs(y) * 0.01);
   if (near(-v, target)) tips.push('부호가 반대예요. 빼는 순서(끝 − 시작)나 방향(위/아래, 시계/반시계)을 확인하세요.');
-  else if (target !== 0 && near(v, target * 2)) tips.push('정확히 2배예요. 같은 것을 두 번 세거나, 지름/반지름·전체/절반을 바꿔 썼을 수 있어요.');
-  else if (target !== 0 && near(v, target / 2)) tips.push('정확히 절반이에요. 양쪽을 다 세야 하는데 한쪽만 셌거나, 2로 한 번 더 나눴을 수 있어요.');
+  else if ((Math.abs(target) > 2 || !Number.isInteger(target)) && target !== 0 && near(v, target * 2)) tips.push('정확히 2배예요. 같은 것을 두 번 세거나, 지름/반지름·전체/절반을 바꿔 썼을 수 있어요.');
+  else if ((Math.abs(target) > 2 || !Number.isInteger(target)) && target !== 0 && near(v, target / 2)) tips.push('정확히 절반이에요. 양쪽을 다 세야 하는데 한쪽만 셌거나, 2로 한 번 더 나눴을 수 있어요.');
   else if (near(v * Math.PI / 180, target) || near(v * 180 / Math.PI, target)) tips.push('단위 착오예요 — 도(°)와 라디안이 바뀌었어요. 파이썬 math.sin/cos 는 라디안을 받아요 (math.radians(도)).');
   else if (near(Math.round(v), target) || near(Math.round(target), v)) tips.push('반올림 차이예요. 문제에서 요구한 소수 자릿수(또는 정수) 그대로 넣으세요.');
   else if (target !== 0 && (near(v, target * 100) || near(v, target / 100))) tips.push('100배 차이예요 — 퍼센트(%)와 비율(0~1)이 바뀌었어요.');

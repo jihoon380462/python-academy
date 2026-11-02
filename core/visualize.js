@@ -144,7 +144,7 @@ const Viz = {
     $('#vzPlay', host).onclick = () => playing ? stop() : play(); $('#vzPrev', host).onclick = () => { stop(); go(i - 1); }; $('#vzNext', host).onclick = () => { stop(); go(i + 1); }; $('#vzFirst', host).onclick = () => { stop(); go(0); };
     $('#vzSlider', host).oninput = (e) => { stop(); go(+e.target.value); }; $('#vzSpeed', host).onclick = () => { sp = (sp + 1) % speeds.length; $('#vzSpeed', host).textContent = '×' + speeds[sp]; if (playing) { stop(); play(); } };
     $('#vzClose', host).onclick = () => { stop(); host.innerHTML = ''; if (onLine) onLine(null); };
-    const ro = new ResizeObserver(() => render(1)); cvs.forEach(c => ro.observe(c)); render(1);
+    const ro = new ResizeObserver(() => { if (!host.isConnected || !cvs[0].isConnected) { ro.disconnect(); return; } render(1); }); cvs.forEach(c => ro.observe(c)); render(1);
     return { stop, go, play, get index() { return i; }, frames };
   },
   // 코드를 추적 실행해서 플레이어로 (lesson 데모·문제 "시각화" 버튼 공용)
