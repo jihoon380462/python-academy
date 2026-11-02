@@ -14,18 +14,18 @@
 | 1 | 수학 M1_prime 첫 그림(sieve) | 공통 | 그림 아래 안내가 「50까지 소수는 49개」(정답 15개). 아직 안 지운 수를 소수로 셈 — 단계마다 숫자가 바뀜 | 노드 열기(N=50, 버튼 누르기 전) | 중 | Fable(core/figure.js sieve: 안내 개수는 체를 끝까지 돌린 소수 수로) | 열림 |
 | 2 | 수학 레슨 「∑ 식으로 보기」 글자 폴백 | KaTeX 실패·오프라인 | 수식 62개 중 약 43개가 깨져 보임: `bmod`·`quad`·`operatornamelcm`·`\\left`→`≤ft(…right)`·`binomnr = frac_nP_rr!`·`text간격`·`\\cdots`→`·s` | M1_mod 2쪽 → 식으로 보기(CDN 막힘) | 중 | Fable(core/ui-views-math.js `plain()`: `\\le` 가 `\\left` 를 먹는 순서, 중첩 `\\frac`, 미처리 명령) | 열림 |
 | 3 | 알고 AB4 모의고사 | 공통 | 시험 중에도 「🧭 따라하기 안내」가 정답 코드를 한 줄씩(📋 복사 포함) 보여 줌 + 힌트·정답 보기 버튼 있음 → 베껴서 통과 가능 | 모의고사 시작 → 1번 → 따라하기 펼치기 | 중 | Fable(core/ui-views-main.js: `session.mock`이면 Coach·정답 보기 숨김) | 열림 |
-| 4 | 허브 「오늘의 할 일」 이어서 하기 | 공통 | 문제를 열기만 하고 허브로 가면 그 문제가 아니라 예전 위치로 감(`UI.go`가 `Store.data.last`를 메모리에만 기록, 저장은 다른 동작 때) | 파이썬 L7P3 열기 → 상단 허브 → 이어서 하기 | 하 | Fable(core/ui-core.js: `last` 기록 뒤 `Store.save({silent:true})`) | 열림 |
+| 4 | 허브 「오늘의 할 일」 이어서 하기 | 공통 | 문제를 열기만 하고 허브로 가면 그 문제가 아니라 예전 위치로 감(`UI.go`가 `Store.data.last`를 메모리에만 기록, 저장은 다른 동작 때) | 파이썬 L7P3 열기 → 상단 허브 → 이어서 하기 | 하 | 유지보수 [core] — 저장 `Store.save({silent:true})`(지시서의 `Store.save()` 대신 — 화면 이동마다 연동 push 안 하게) | 닫힘 [core] fix/core-a (Fable 검토 대기) |
 | 5 | 허브 이어서 하기(레슨) | 공통 | 레슨 3쪽에서 나가도 `#lesson/L3` → 1쪽부터 | L3 3쪽 → 허브 → 이어서 보기 | 하 | Fable(링크에 page 포함 또는 레슨 진행 쪽 복원) | 열림 |
-| 6 | 알고 레슨 👀 시각화 | 공통 | 콘솔 에러 `Cannot set properties of null (setting 'textContent')` — `visualize.js` 플레이어 `render` 가 ResizeObserver 에서 호출될 때 `#vzPos` 없음(화면 영향 없음, v2.3.6 d931f00 뒤에도 재현) | A0 3쪽·A12 1쪽 등 👀 누르기 | 하 | Fable(core/visualize.js: 콜백에서 `host.isConnected` 아니면 `ro.disconnect()`) | 열림 |
-| 7 | 수학 숫자 답 오답 설명 | 공통 | 정답 1 에 2 를 넣으면 「정확히 2배예요… 지름/반지름」 — 작은 정수의 하나 차이를 2배 규칙이 잡음 | M1_mod_q3 → 2 제출 | 하 | Fable(core/engine.js 2배 규칙: \|정답\| ≤ 2 정수면 건너뛰기) | 열림 |
+| 6 | 알고 레슨 👀 시각화 | 공통 | 콘솔 에러 `Cannot set properties of null (setting 'textContent')` — `visualize.js` 플레이어 `render` 가 ResizeObserver 에서 호출될 때 `#vzPos` 없음(화면 영향 없음, v2.3.6 d931f00 뒤에도 재현) | A0 3쪽·A12 1쪽 등 👀 누르기 | 하 | 유지보수 [core] — 가드를 `!host.isConnected \|\| !cvs[0].isConnected` 로 — 👀 다시 누르기·닫기(host 는 붙어 있고 canvas 만 빠짐)에서도 재현돼 host 만으로는 부족 | 닫힘 [core] fix/core-a (Fable 검토 대기) |
+| 7 | 수학 숫자 답 오답 설명 | 공통 | 정답 1 에 2 를 넣으면 「정확히 2배예요… 지름/반지름」 — 작은 정수의 하나 차이를 2배 규칙이 잡음 | M1_mod_q3 → 2 제출 | 하 | 유지보수 [core] | 닫힘 [core] fix/core-a (Fable 검토 대기) |
 | 8 | 설정 → 오프라인 캐시 | 공통(http) | 「앱 158/115」처럼 저장 수가 전체보다 큼(런타임 캐시된 같은 출처 파일·이미지까지 셈) | 여러 화면을 돈 뒤 설정 열기 | 하 | Fable(sw.js status: ASSETS 에 든 것만 세기) | 열림 |
-| 9 | 설정 → 전체 초기화 | 고대비+다크 | 흰 글자 on `--danger #ff7a86` 대비 약 2.6:1 | 접근성 고대비 켜고 설정 맨 아래 | 하 | Fable(ui.css: 고대비에서 `.btn.danger` 글자색 어둡게, 한 줄) | 열림 |
-| 10 | 파이썬 지도 접힌 챕터 제목 | PC ≥900px | 지도 열이 320px 고정이라 「챕터 5 마무/리」「실/전」「펼치/기 ▾」처럼 글자 중간에서 줄바꿈 | 홈(1100px) → 챕터 2~7 접힌 줄 | 하 | Fable(ui.css: 챕터 머리 `word-break:keep-all`, 펼치기 `white-space:nowrap`) | 열림 |
-| 11 | 허브 웹·HTTP·API 카드 | 모바일 390·PC | 「🚧 준비 중 (Phase 4)」와 「🔒 파이썬 챕터 2까지…」가 한 줄에 눌려 둘 다 줄바꿈 | 허브 | 하 | Fable(hub.js/ui.css: 잠금 문구 다음 줄로) | 열림 |
+| 9 | 설정 → 전체 초기화 | 고대비+다크 | 흰 글자 on `--danger #ff7a86` 대비 약 2.6:1 | 접근성 고대비 켜고 설정 맨 아래 | 하 | 유지보수 [core] — 다크 고대비만(`[data-theme=dark]` 한정 — 라이트 고대비 `--danger #c3203a` 에 어두운 글자는 2.7:1 로 오히려 나빠짐). 다크 6.3:1 | 닫힘 [core] fix/core-a (Fable 검토 대기) |
+| 10 | 파이썬 지도 접힌 챕터 제목 | PC ≥900px | 지도 열이 320px 고정이라 「챕터 5 마무/리」「실/전」「펼치/기 ▾」처럼 글자 중간에서 줄바꿈 | 홈(1100px) → 챕터 2~7 접힌 줄 | 하 | 유지보수 [core] | 닫힘 [core] fix/core-a (Fable 검토 대기) |
+| 11 | 허브 웹·HTTP·API 카드 | 모바일 390·PC | 「🚧 준비 중 (Phase 4)」와 「🔒 파이썬 챕터 2까지…」가 한 줄에 눌려 둘 다 줄바꿈 | 허브 | 하 | 유지보수 [core] | 닫힘 [core] fix/core-a (Fable 검토 대기) |
 | 12 | 허브 수학 카드 문구 | 공통 | 카드 설명 끝 「별도 구역 · 코스 순서와 무관」이 바로 위 구역 제목 「공간 코스 순서와 무관 — 언제든」과 중복. 이어서 하기도 「수학 공간 **코스** 이어서 하기」, 노드 완료 시 「레슨 완료! 다음 레슨」 | 허브 · 수학 노드 마지막 문제 클리어 | 하 | Fable(core/config.js `hubLabel`·hub.js·ui-views-main 문구) | 열림 |
 | 13 | 파이썬 L5P6 힌트 2(블록) | 브라우저 확인 필요 | 「"여러 개 출력" 블록에 n, "x", i, "=", n×i 를 차례로」 — 값이 5개인데 `py_print_many` 블록은 칸 4개(`출력 %1 %2 %3 %4`) | L5P6 힌트 2 → 블록 꺼내 보기 | 중 | Fable(블록 칸 수) 또는 콘텐츠팀(힌트를 글자 합치기 방식으로) | 열림 |
 | 14 | 파이썬 L4P1·L4P5 힌트(만약 톱니바퀴) | 브라우저 확인 필요 | 힌트는 「다른 경우」「아니라면」, 블록 라벨은 「아니고 만약」「아니면」. 톱니바퀴 창 조각(`CONTROLS_IF_ELSEIF_TITLE_ELSEIF`·`CONTROLS_IF_ELSE_TITLE_ELSE`)은 덮어쓰지 않아 Blockly 한국어 기본값일 수 있음 | L4P5 → 만약 블록 톱니바퀴 | 하 | Fable(ui-editors.js 두 Msg 를 라벨과 같게) → 그 뒤 힌트 통일 | 열림 |
-| 15 | 실전 X3 내려받기 파일 이름 | 공통 | 올린 파일과 결과 파일 이름이 같으면 `todo_todo.json` | X3P1 todo.json 올리고 실행 → 📥 | 하 | Fable(이름이 같으면 접미사 생략) | 열림 |
+| 15 | 실전 X3 내려받기 파일 이름 | 공통 | 올린 파일과 결과 파일 이름이 같으면 `todo_todo.json` | X3P1 todo.json 올리고 실행 → 📥 | 하 | 유지보수 [core] | 닫힘 [core] fix/core-a (Fable 검토 대기) |
 | 16 | 파이썬 L19 3쪽 · L19P5 | 공통 | 「"2026-1-5" < "2026-10-1"은 틀린 답」이라는데 실제로는 True(우연히 맞음) → 차이를 볼 수 없음. L19P5 버그 코드도 날짜는 맞고 형식만 다름 | 레슨 L19 3쪽 예제 실행 | 중 | QA 수정 [qa] bfeab40 (2026-9-5 로) | 닫힘 |
 | 17 | 파이썬 L22P2 지문 | 공통 | 「에러 1개 + 논리 2개」인데 starter 는 에러 없이 실행됨(버그 3개 모두 논리) | starter 실행 | 중 | QA 수정 [qa] bfeab40 | 닫힘 |
 | 18 | 파이썬 L21P2 힌트 1 | 공통 | 「처음엔 통과 1/4」→ 실제 2/4 | starter 실행 | 중 | QA 수정 [qa] bfeab40 | 닫힘 |
