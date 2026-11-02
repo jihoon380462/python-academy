@@ -32,7 +32,7 @@
 | **WP-A** | 알고리즘 코스 보강(점검 목록 반영) + v2.2.0 실전 챕터 실기기 피드백 | 2.2.x | 중 | **1차 완료(v2.2.2)** — A-1·A-3 반영, A-2는 F2 슬라이더만 남음 |
 | **WP-F** | 전체 기능 개선 백로그(두 코스 공통 엔진·허브·학습 기능) | 2.2.x | 중 | **1차 완료(v2.2.4)**: F1·F2·F5·F8·F12. 남음: F3 F4 F6 F7 F9 F10 F11 |
 | **WP-G** | 실전 프로젝트 확장(코스당 프로젝트 추가 + 실전 공통 기능) | 2.2.x | 중 | **1차 완료(v2.2.3)** — G1·G2·G3·G4·G5·G6 반영 |
-| WP-B | Phase 2 터미널·Git | 2.3.0 | 대 | **보류** (뼈대만 있음) |
+| WP-B | Phase 2 터미널·Git | 다음 마이너(2.4.0 예정) | 대 | **보류** (뼈대만 있음) |
 | **WP-M** | 수학 공간 (EXPANSION 14절) | M1 2.3.0 ✅ · M2·M3 다음 마이너 | 중 | **M1 완료(v2.3.0)** 영역 1·3·5. M2 = 영역 4(함수·변화·미적분)·2(논리·집합·증명) + 시각화 surface/steps + 14-2 색 동기화. M3 = 영역 6 + 코스 레슨 「수학 보기 →」 칩 + 실전 프로젝트 6 |
 | WP-C | 9절 ③ 캡스톤 | 2.6.0 | 중 | 보류 (코딩테스트 도전만 지금 가능) |
 | WP-D | 9절 ④ PC형 실전 | 2.6.0 | 중 | 보류 (WP-B의 TG 레슨 전제) |
@@ -96,7 +96,7 @@
 
 ---
 
-## WP-B. Phase 2 터미널·Git 코스 (v2.3.0) — 설계 EXPANSION.md 6절
+## WP-B. Phase 2 터미널·Git 코스 (다음 마이너, 2.4.0 예정) — 설계 EXPANSION.md 6절
 
 **진행 상태 (v2.2.15)**: 1단계 셸 명령 ✅ · 2단계 에러 사전 ✅(`ERRORS_SHELL`, `Shell.explain`) · 3단계 Git 시뮬레이터 ✅(init status add commit(-m -am --amend) log(--oneline --graph --all) diff(--staged) restore(--staged) reset(soft/mixed/hard HEAD~n) branch(-d/-D) switch(-c) checkout(-b) merge(ff·3-way·충돌 마커·--abort) rebase(--abort) stash(push/pop/list) tag remote(add -v) push(-u, 거부) pull(ff·병합·충돌) clone, .gitignore, 동료 푸시 시뮬 = 원격 store에 커밋 심기) · 4단계 중 `Grader.matchState` ✅ — `tools/test_shell.mjs` 111건 통과. **남은 것**: 4단계 나머지(엔진 디스패치: `Grader.runTests` mission 분기, 문제 화면 터미널 뷰, 레슨 `example.shell`, 놀이터, `tools/run_mission.mjs`, validate), 5단계 UI, 6단계 콘텐츠, 7·8단계.
 

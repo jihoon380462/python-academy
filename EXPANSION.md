@@ -49,6 +49,8 @@ Nov 1, 2026 · @정지훈 · 개정: Claude (현재 배포 버전 v1.3.0 시점�
 | 4 | 2.5.0 | 코스 5 웹·HTTP·API + iframe 러너·가짜 서버 (+ 실전 챕터 2개) | 코스 5 전체 |
 | 5 | 2.6.0 | 삽입 주제, 캡스톤(③), PC형 실전(④), 허브 고도화, 게임 확장 마무리 | 전체 통합 |
 
+> 버전 칸은 계획 당시 번호다. v2.3.0은 수학 공간 M1(14절)이 먼저 썼으므로 Phase 2부터는 **배포 순서대로 다음 마이너**를 쓴다(specs/workflow.md 6절). 실제 번호는 CHANGELOG가 기준.
+
 **1차 지시서와의 관계**: 1차 지시서(파이썬 코스)의 모든 조항은 유효하다(구현 요약은 DESIGN.md). 이 문서는 그 위에 얹는 확장이며, 충돌하면 이 문서가 우선한다. 단일 HTML 제약과 `build.sh` 합치기는 Phase 0부터 해제한다(2절).
 
 ## 2. Phase 0 — 저장소·파일 구조 전환
@@ -501,7 +503,7 @@ Nov 1, 2026 · @정지훈 · 개정: Claude (현재 배포 버전 v1.3.0 시점�
 - 푸시 전 로컬 검증(`validate_content` + `run_solutions`, 가능하면 `regress.py`) 통과. Actions 게이트가 다시 확인. `tools/stamp.mjs`로 `?v=` 갱신.
 - 배포 후 실제 주소에서: 허브 로딩 → 해당 코스 레슨 0 → 첫 실행형 문제 클리어 → 보상 연출 → 허브 복귀 시 XP 반영, 이 흐름을 PC와 모바일 폭(390px)에서 각 1회.
 - 1차 10절의 검증 항목(무한루프, 긴 출력, 문법 오류, 위험 입력)은 새 러너에도 같이 적용: SQL은 10만 행 반환 쿼리·문법 오류·`DROP TABLE`, 셸은 `rm -rf /`·무한 파이프·없는 명령, 웹은 무한루프 JS·`while(true)`에서 iframe 강제 재생성·거대 DOM.
-- `APP_VERSION`(core/config.js)은 Phase 0 = 2.0.0, Phase 1 = 2.1.0, Phase 1.5(실전 챕터) = 2.2.0, Phase 2 = 2.3.0 … (1절 표 기준), 피드백 수정은 패치 버전. 설정 화면 하단과 허브 푸터에 표시. 커밋 메시지는 "v2.1.0: 알고리즘 코스 추가" 형식. Phase마다 HANDOFF.md·DESIGN.md·PROBLEMS.md 갱신.
+- `APP_VERSION`(core/config.js)은 Phase 0 = 2.0.0, Phase 1 = 2.1.0, Phase 1.5(실전 챕터) = 2.2.0, Phase 2 이후는 배포 순서대로 다음 마이너(1절 표 아래 메모, v2.3.0은 수학 M1), 피드백 수정은 패치 버전. 설정 화면 하단과 허브 푸터에 표시. 커밋 메시지는 "v2.1.0: 알고리즘 코스 추가" 형식. Phase마다 HANDOFF.md·DESIGN.md·PROBLEMS.md 갱신.
 
 **Phase별 납품물**
 
@@ -707,6 +709,7 @@ M1은 이 25개 노드로 시작하고, 노드당 문제 3~5개(총 90개 안팎
 | 노드 = 레슨 | 레슨 스키마 `{id, ch, n, title, minutes, mode, terms, pages[{title, html, example}], summary}` | **노드는 레슨 스키마를 그대로 쓴다**(`ch` = 영역 1~6). 추가 필드: `prereq:[]`, `stars`, `uses:[]`, `params:[]`, `figure:{}`, `formula:[]`, `level`. `pages[0]`에 `figure`가 있으면 첫 화면이 그림. 엔진의 레슨 렌더·요약·용어·모르겠어요가 그대로 동작한다 |
 | 지도 | 챕터별 세로 지도(`CHAPTERS`, `MAP_DECOR`) | `course.json`에 `"map":"graph"`를 두면 지식 지도 레이아웃(노드 + `prereq` 선, 영역별 색). 잠금 규칙은 챕터 보스 대신 `prereq` 완료 |
 | 시각화 | `core/visualize.js`는 **추적 스냅샷 기반**(`Viz.player`, `Viz.runAndShow`, kind 8종) | 수학 그림은 **파라미터 기반**: `Viz.figure(host, spec, params)`를 새로 두고 JS만으로 즉시 그린다(슬라이더 응답에 Pyodide 왕복 없음). `fn` 문자열은 JS 식으로 평가(`x`, 파라미터 id만 허용). 코드 탭의 재실행·문제 채점만 Pyodide. 추적 기반 그림(예: 갈턴 보드 단계)은 기존 `Viz.player` 재사용 |
+| ↳ 실제 구현(v2.3.0) | — | 파라미터 그림은 `Viz.figure`가 아니라 **`core/figure.js`의 `Fig.mount(host, figure, params, {defs,onChange,static})`**(16종), 지식 지도·유형 UI는 `core/ui-views-math.js`, 채점은 `Grader.checkNum/checkMatch/checkPair`. M2의 `surface`·`steps` 등은 `Fig`에 kind를 추가한다 |
 | 슬라이더 | `example.slider:{var,min,max,step}` 하나 | `params[]`의 각 항목이 같은 모양. 노드의 `params`가 있으면 `pages[].example`에 자동 연결(코드의 `var = 값` 줄 치환 → 재실행) |
 | 문제 유형 | `type`: quiz/fill/bug/parsons/block/code, 표시용 `kind` | 새 `type` 3개: `num`(`answer:{value,tol,unit}`), `match`(`match:{params,tol}`, 그림 맞추기), `pair`(식↔그래프 짝짓기). 탐구 퀴즈는 `type:'quiz'` + `kind:'explore'` + `requireInteract:true`. 시뮬레이션은 `type:'code'` + `sim:{seed,trials,target,tol}`. `validate_content`·`run_solutions`·`Grader`에 세 유형 추가 |
 | 개념 태그 | 코스별 `WEAKNESS_TAGS` 한국어 | 수학도 한국어 태그: `'나머지','소수','진법','거듭제곱','로그','수열','경우의수','확률','조건부확률','기댓값','분포','상관','벡터','내적','행렬','변환'` 등. 접두사 없음(알고리즘 코스와 동일) |
@@ -717,6 +720,6 @@ M1은 이 25개 노드로 시작하고, 노드당 문제 3~5개(총 90개 안팎
 | 그림 파일 | `IMAGES.md` 요청서 + `assets/img/` 자동 표시 | 3차 목록에 영역 아이콘 6장, 박사모 장비 1장, 수학 공간 카드 1장 추가 |
 | 모바일 문구 | `UI.layoutWords`(왼쪽/오른쪽 → 아래) | 그림 안내 문구도 같은 치환 사용 |
 | 검증 | `validate_content`가 CONFIG 문제 수·힌트·태그·시간 제한 검사 | 추가: `pages[0].figure` 필수, `params` 1~3개, `observe` 2~3개, `num.tol` 필수, `prereq` id 존재, 순환 참조 없음 |
-| 버전 | Phase N = 2.N.0, 패치 = 2.N.x | M1 = 다음 마이너(현재 기준 v2.3.0), M2·M3도 각각 마이너 |
+| 버전 | Phase N = 2.N.0, 패치 = 2.N.x | M1 = v2.3.0 ✅, M2·M3는 각각 그때의 다음 마이너 |
 
-위 표에 따라 M1의 실제 작업 순서: ① `Viz.figure` + `numberline plot unitcircle vector hist` 5종 ② `type` num/match/pair + explainDiff 규칙 ③ 지식 지도 레이아웃 ④ `courses/math/` 25노드 콘텐츠 ⑤ 검증 스크립트 확장 ⑥ 허브 카드·뱃지·장비 ⑦ regress 스크린샷.
+위 표에 따라 M1의 실제 작업 순서(✅ v2.3.0 완료, `Viz.figure` → 실제는 `Fig.mount`): ① `Viz.figure` + `numberline plot unitcircle vector hist` 5종 ② `type` num/match/pair + explainDiff 규칙 ③ 지식 지도 레이아웃 ④ `courses/math/` 25노드 콘텐츠 ⑤ 검증 스크립트 확장 ⑥ 허브 카드·뱃지·장비 ⑦ regress 스크린샷.
