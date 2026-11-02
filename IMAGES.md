@@ -44,9 +44,15 @@
 
 **검수 메모(2차)**: 2차 16장 중 6장(알고·SQL·웹 아이콘, 빈 작품, 알고 마스터 뱃지, 배너)에 **흰 스티커 테두리**가 있어 다크 테마에서 흰 띠로 보였음 → `tools/img_clean.py`로 투명 배경에 닿은 흰~회색 테두리를 지워 해결(내부 흰색은 윤곽선에 막혀 유지). 앞으로는 납품 전에 `python3 tools/img_clean.py --check`로 확인하고, 테두리가 있으면 `python3 tools/img_clean.py`(인자 없음)로 정리한 뒤 커밋. 배너는 아래 빈 공간을 잘라 1200×274가 됨 — 가로 배너는 **내용이 캔버스를 꽉 채우게** 그리는 편이 좋다.
 
-## 3. 요청 목록 — 3차 잔여 (B: 수학 공간 8장)
+## 3. 요청 목록 — 3차 잔여 (C: 챕터 장식 1장 — 지금 가능 · B: 수학 공간 8장 — 보류)
 
 규칙은 1절 + 2절 검수 메모(흰 테두리 금지 — 바깥 윤곽선은 어두운 남색 `#1d2230`으로 끝나야 함).
+
+### C. 챕터 장식 추가 (v2.2.22 — **지금 만들어도 됨**)
+
+| # | 파일 | 쓰이는 곳 | 설명 | 프롬프트 |
+| --- | --- | --- | --- | --- |
+| C1 | `chapter-algo-6.png` | 홈 지도 알고리즘 6 「한 걸음 더」 제목 옆 32px | 파이썬 7(청록 망원경)과 짝 — **청록 쌍안경**(같은 청록 #00acc1 계열, 2차 챕터 장식 13장과 같은 작가 느낌, 512×512 투명, 8% 여백, 어두운 남색 윤곽선) | Flat vector sticker icon of a pair of teal binoculars (#00acc1 body, #ffd166 lens rims), thick dark navy (#1d2230) outline, no text, no white halo, transparent background, centered with 8% margin, 512×512, matching a set of simple chapter icons (sprout, trophy, telescope) |
 
 ### B. 수학 공간 (EXPANSION.md 14절 준비 — 자리는 M1에서 생김, **M1 착수 전엔 만들지 말 것**)
 
