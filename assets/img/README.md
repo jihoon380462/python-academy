@@ -300,3 +300,318 @@ Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline,
 ```text
 Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A round yellow #ffd166 medal with a small playground slide. One simple slide with steps and curved chute. Same round medal silhouette as reference, but no snake, no crown and no extra ribbons. One large central subject, thick lines, readable at 48-56px.
 ```
+
+
+## 4차 C-2~C-7 — v2.3.1 (2026-11-02)
+
+38장. ImageGen으로 개별 생성(퍼펙트 2~5는 perfect1의 리본 색 편집). 256×256 RGBA로 정규화, 투명 여백 최소 23px. 외곽 흰 테두리 검사와 다크/라이트 48·56px 축소본 확인. 실제 브라우저 검수는 별도. 아래는 사용한 프롬프트 원문이다.
+
+### `badge-nohint3.png` — C-2
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round green medal with a compass rose, 256×256
+```
+
+### `badge-nohint10.png` — C-2
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round green medal with a graduation cap and a small star, 256×256
+```
+
+### `badge-firsttry10.png` — C-2
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round blue medal with a target and one arrow in the bullseye, 256×256
+```
+
+### `badge-firsttry30.png` — C-2
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round blue medal with a bow and three arrows in the bullseye, gold rim, 256×256 Exactly THREE arrow shafts/fletchings and one bow must be distinguishable.
+```
+
+### `badge-lesson3star.png` — C-2
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round yellow medal with one big shining star, 256×256
+```
+
+### `badge-lesson3star5.png` — C-2
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round yellow medal with a small jar full of stars, 256×256 Use three large stars visible inside a simple glass jar, not many tiny details.
+```
+
+### `badge-combo10.png` — C-3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round orange medal with a single flame, 256×256 Calendar pages must have no dates or digits; use only large simple marks. Keep props chunky.
+```
+
+### `badge-combo20.png` — C-3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round red medal with a big flame and a burst, 256×256 Calendar pages must have no dates or digits; use only large simple marks. Keep props chunky.
+```
+
+### `badge-streak3.png` — C-3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round orange medal with a small calendar showing three marked days as three dots in a row, 256×256 Calendar pages must have no dates or digits; use only large simple marks. Keep props chunky.
+```
+
+### `badge-streak7.png` — C-3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round orange medal with a calendar and a flame on top, 256×256 Calendar pages must have no dates or digits; use only large simple marks. Keep props chunky.
+```
+
+### `badge-streak30.png` — C-3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round gold medal with a trophy and a calendar page, 256×256 Calendar pages must have no dates or digits; use only large simple marks. Keep props chunky.
+```
+
+### `badge-daily7.png` — C-3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round green medal with a calendar page and a big checkmark, 256×256 Calendar pages must have no dates or digits; use only large simple marks. Keep props chunky.
+```
+
+### `badge-review10.png` — C-3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round purple medal with a friendly brain with a small sparkle, 256×256 Calendar pages must have no dates or digits; use only large simple marks. Keep props chunky.
+```
+
+### `badge-explore10.png` — C-3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round teal medal with a microscope, 256×256 Calendar pages must have no dates or digits; use only large simple marks. Keep props chunky.
+```
+
+### `badge-boss1.png` — C-4
+
+참조: `badge-first_clear.png`, `boss-python-1.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round bronze medal with a tiny purple cute monster face with question-mark horns in the center, 256×256 First reference is medal shape and style. Second reference is this exact boss species and face identity. Show only its head and minimal upper body inside the medal, not full body or its scene. Keep angular eyebrows, cheeky grin and small fang. No letters or numbers.
+```
+
+### `badge-boss2.png` — C-4
+
+참조: `badge-first_clear.png`, `boss-python-2.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round bronze medal with a tiny blue cute monster face with dice-pattern horns, 256×256 First reference is medal shape and style. Second reference is this exact boss species and face identity. Show only its head and minimal upper body inside the medal, not full body or its scene. Keep angular eyebrows, cheeky grin and small fang. No letters or numbers.
+```
+
+### `badge-boss3.png` — C-4
+
+참조: `badge-first_clear.png`, `boss-python-3.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round silver medal with a tiny orange cute monster face with coin horns, 256×256 First reference is medal shape and style. Second reference is this exact boss species and face identity. Show only its head and minimal upper body inside the medal, not full body or its scene. Keep angular eyebrows, cheeky grin and small fang. No letters or numbers.
+```
+
+### `badge-boss4.png` — C-4
+
+참조: `badge-first_clear.png`, `boss-python-4.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round silver medal with a tiny purple three-armed cute monster face, 256×256 First reference is medal shape and style. Second reference is this exact boss species and face identity. Show only its head and minimal upper body inside the medal, not full body or its scene. Keep angular eyebrows, cheeky grin and small fang. No letters or numbers. Show exactly three short cartoon arms around the purple face.
+```
+
+### `badge-boss5.png` — C-4
+
+참조: `badge-first_clear.png`, `boss-python-5.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round gold medal with a tiny red cute monster face wearing a crown, 256×256 First reference is medal shape and style. Second reference is this exact boss species and face identity. Show only its head and minimal upper body inside the medal, not full body or its scene. Keep angular eyebrows, cheeky grin and small fang. No letters or numbers.
+```
+
+### `badge-perfect1.png` — C-4
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round gold medal with a big "first place" style laurel wreath and a blue (#6c8cff) ribbon, no numbers, 256×256 Symmetric gold laurel wreath encircling a plain gold center, no digit or lettering. A simple BLUE #6c8cff ribbon with two tails at the bottom. This will be the MASTER for four identical variants changing only the ribbon color. Keep crisp flat fills and simple geometry.
+```
+
+### `badge-perfect2.png` — C-4
+
+참조: `badge-perfect1.png`
+
+```text
+Edit this exact medal. Change ONLY the TWO BLUE RIBBON TAILS at the bottom to green #2bb673. Keep all gold pixels, laurel leaves, central blank gold disk, circular outline, proportions, position, silhouette, and transparent background exactly unchanged. No new elements, no lettering, no numbers. This is a color variant of the same medal, not a redesign.
+```
+
+### `badge-perfect3.png` — C-4
+
+참조: `badge-perfect1.png`
+
+```text
+Edit this exact medal. Change ONLY the TWO BLUE RIBBON TAILS at the bottom to orange #ffb347. Keep all gold pixels, laurel leaves, central blank gold disk, circular outline, proportions, position, silhouette, and transparent background exactly unchanged. No new elements, no lettering, no numbers. This is a color variant of the same medal, not a redesign.
+```
+
+### `badge-perfect4.png` — C-4
+
+참조: `badge-perfect1.png`
+
+```text
+Edit this exact medal. Change ONLY the TWO BLUE RIBBON TAILS at the bottom to purple #9c27b0. Keep all gold pixels, laurel leaves, central blank gold disk, circular outline, proportions, position, silhouette, and transparent background exactly unchanged. No new elements, no lettering, no numbers. This is a color variant of the same medal, not a redesign.
+```
+
+### `badge-perfect5.png` — C-4
+
+참조: `badge-perfect1.png`
+
+```text
+Edit this exact medal. Change ONLY the TWO BLUE RIBBON TAILS at the bottom to red #ff5d6c. Keep all gold pixels, laurel leaves, central blank gold disk, circular outline, proportions, position, silhouette, and transparent background exactly unchanged. No new elements, no lettering, no numbers. This is a color variant of the same medal, not a redesign.
+```
+
+### `badge-all_clear.png` — C-4
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round gold medal with a checkered finish flag, 256×256
+```
+
+### `badge-checkup.png` — C-4
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round blue medal with a clipboard and a big checkmark, 256×256
+```
+
+### `badge-algo_viz10.png` — C-5
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round blue medal with a big friendly eye looking at three small bars, 256×256 No actual writing on exam paper or stopwatch. Bold simple marks only.
+```
+
+### `badge-algo_tle.png` — C-5
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round orange medal with a stopwatch and a small lightning bolt, 256×256 No actual writing on exam paper or stopwatch. Bold simple marks only.
+```
+
+### `badge-algo_mock.png` — C-5
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round green medal with an exam paper and a pencil, 256×256 No actual writing on exam paper or stopwatch. Bold simple marks only.
+```
+
+### `badge-algo_boss4.png` — C-5
+
+참조: `badge-first_clear.png`, `course-algo.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round teal medal with a compass and a small owl head (matching the algorithm course owl mascot), 256×256 No actual writing on exam paper or stopwatch. Bold simple marks only. Second reference supplies the blue owl's face identity; show a small head beside the compass, not full body or graph.
+```
+
+### `badge-theme.png` — C-6
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round medal split half dark navy half light with a sun on one side and a crescent moon on the other, 256×256 Put sun on light half and moon on dark half. Keep a pale inner rim to separate dark portion from dark app background.
+```
+
+### `badge-works3.png` — C-6
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round purple medal with an artist palette and brush, 256×256
+```
+
+### `badge-turtle5.png` — C-6
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round green medal with a cute turtle holding a paintbrush, 256×256 A simple friendly green turtle with recognizable rounded segmented shell, large face and short legs, holding one paintbrush.
+```
+
+### `badge-tutor10.png` — C-6
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round blue medal with a speech bubble containing a lightbulb, 256×256
+```
+
+### `badge-secret_hello.png` — C-7
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round yellow medal with a waving hand and a tiny speech bubble (empty, no text), 256×256
+```
+
+### `badge-secret_night.png` — C-7
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round dark navy medal with a crescent moon and two stars, light inner rim so it reads on dark backgrounds, 256×256 Exactly TWO stars, no other decorative sparkles. Light inner rim against dark field.
+```
+
+최종 색상 보정:
+
+```text
+Edit this badge: replace ALL vivid blue medal field and blue ring areas with solid deep dark navy #1d2230 and a slightly lighter navy #29344d. Keep the pale icy blue thin INNER rim for contrast. Preserve exactly the yellow crescent and TWO yellow stars, their layout, shapes and bold dark outlines. All fills flat solid, no gradients or 3D shading. Preserve dark outer edge, transparent background, square centered composition, empty margins. No other changes.
+```
+
+### `badge-secret_fast.png` — C-7
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round yellow medal with a big lightning bolt, 256×256
+```
+
+### `badge-secret_turtle.png` — C-7
+
+참조: `badge-first_clear.png`, `badge-turtle5.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round green medal with a turtle leaving a long spiral trail, 256×256 Match the cute turtle in reference 2, but remove paintbrush and show a large simple spiral walking trail behind it.
+```
