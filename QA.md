@@ -45,7 +45,7 @@
 | 85 | 수학 M4_limit 슬라이더 범위 (C10) | 공통 | `xp` 슬라이더 −3~3 인데 그림 `xr` −8~8 → 점선을 x = 5 로 끌면 슬라이더는 3 에 멈춘 채 라벨·예제 코드는 5 | 첫 그림 점선 끌기 | 하 | 콘텐츠팀(425행 params `min: -8, max: 8`) | 닫힘 [fix] fix/qa3-math |
 | 86 | 수학 M4_limit_q1 why · M4_quad_q3 제목 (C10) | 공통 | why 「0.1 → 0.998」인데 그림은 소수 둘째 자리라 0.1 에서 「1」로 보여 오해 · 제목 「숫자 답: 가장 높이」 오타 | 채점 후 why · 문제 목록 | 하 | 콘텐츠팀(906행 why 에 「그림은 반올림이라 1로 보여요」, 869행 「가장 높은 높이」) | 닫힘 [fix] fix/qa3-math |
 | 87 | 수학 M4_explog_q3·M1_gcd_q4·M1_log_q4 starter | 보조 실행기 | starter 가 `while …: pass` 라 그대로 실행하면 무한 루프 — 워커는 5초 뒤 멈추지만 보조(메인 스레드) 실행기는 화면이 멈춤 | starter 그대로 ▶ | 하 | 콘텐츠팀(884행 등: 루프가 끝나는 뼈대로, 예 `amount /= 2` 넣고 `# years 는 몇씩?`) | 닫힘 [fix] fix/qa3-math |
-| 88 | 수학 M4_quad_q4 · unitcircle 그림 값 | 공통 | `-1 0 0` → `x = -0.00 (중근)` (테스트엔 없음) · M4_trig 그림 아래 값이 270° 에서 `cos -0.00`, 360° 에서 `sin -0.00` | 입력 `-1 0 0` · deg 270 | 하 | solution: 콘텐츠팀(+ 0) · 그림: Fable/유지보수 core(core/figure.js unitcircle 값에 `+ 0`) | 닫힘 [core] fix/core-e (사용자 승인 11/2 17:38, Fable 검토 대기) |
+| 88 | 수학 M4_quad_q4 · unitcircle 그림 값 | 공통 | `-1 0 0` → `x = -0.00 (중근)` (테스트엔 없음) · M4_trig 그림 아래 값이 270° 에서 `cos -0.00`, 360° 에서 `sin -0.00` | 입력 `-1 0 0` · deg 270 | 하 | solution: 콘텐츠팀(+ 0) · 그림: Fable/유지보수 core(core/figure.js unitcircle 값에 `+ 0`) | 닫힘 — solution [fix] fix/qa3-math · 그림 [core] fix/core-e (사용자 승인 11/2 17:38, Fable 검토 대기) |
 
 ## 사용자 제보 — 2026-11-02 오후 (PC, v2.3.9 — #64~#69)
 
