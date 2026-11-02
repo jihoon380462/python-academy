@@ -44,32 +44,126 @@
 
 **검수 메모(2차)**: 2차 16장 중 6장(알고·SQL·웹 아이콘, 빈 작품, 알고 마스터 뱃지, 배너)에 **흰 스티커 테두리**가 있어 다크 테마에서 흰 띠로 보였음 → `tools/img_clean.py`로 투명 배경에 닿은 흰~회색 테두리를 지워 해결(내부 흰색은 윤곽선에 막혀 유지). 앞으로는 납품 전에 `python3 tools/img_clean.py --check`로 확인하고, 테두리가 있으면 `python3 tools/img_clean.py`(인자 없음)로 정리한 뒤 커밋. 배너는 아래 빈 공간을 잘라 1200×274가 됨 — 가로 배너는 **내용이 캔버스를 꽉 채우게** 그리는 편이 좋다.
 
-## 3. 요청 목록 — 3차 잔여 (C: 챕터 장식 1장 — 지금 가능 · B: 수학 공간 8장 — 보류)
+## 3. 요청 목록 — 4차 (49장: 챕터 장식 1 · 보스 2 · 뱃지 46) ← **지금 만들 것**
 
-규칙은 1절 + 2절 검수 메모(흰 테두리 금지 — 바깥 윤곽선은 어두운 남색 `#1d2230`으로 끝나야 함).
+규칙은 1절 + 2절 검수 메모(흰 테두리 금지 — 바깥 윤곽선은 어두운 남색 `#1d2230`으로 끝나야 함). 순서대로 A → B → C. 한 번에 다 못 하면 **A·B 먼저, C는 C-1부터** 나눠 납품해도 된다(파일이 있는 것만 자동으로 쓰인다).
 
-### C. 챕터 장식 추가 (v2.2.22 — **지금 만들어도 됨**)
+공통 영어 베이스 프롬프트(모든 항목 앞에 붙임):
+> Flat vector sticker-style icon, bold dark navy (#1d2230) outline, bright clean colors (palette: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0), no text, no letters, no gradients, no 3D, no photo texture, transparent background, single subject centered with 8% empty margin, no white halo or white border around the shape, matching a consistent set of simple educational game icons. —
 
-| # | 파일 | 쓰이는 곳 | 설명 | 프롬프트 |
+### A. 챕터 장식 1장 (512×512)
+
+| # | 파일 | 쓰이는 곳 | 설명 | 프롬프트(베이스 뒤에) |
 | --- | --- | --- | --- | --- |
-| C1 | `chapter-algo-6.png` | 홈 지도 알고리즘 6 「한 걸음 더」 제목 옆 32px | 파이썬 7(청록 망원경)과 짝 — **청록 쌍안경**(같은 청록 #00acc1 계열, 2차 챕터 장식 13장과 같은 작가 느낌, 512×512 투명, 8% 여백, 어두운 남색 윤곽선) | Flat vector sticker icon of a pair of teal binoculars (#00acc1 body, #ffd166 lens rims), thick dark navy (#1d2230) outline, no text, no white halo, transparent background, centered with 8% margin, 512×512, matching a set of simple chapter icons (sprout, trophy, telescope) |
+| A1 | `chapter-algo-6.png` | 홈 지도 알고리즘 6 「한 걸음 더」 제목 옆 32px | 파이썬 7(청록 망원경)과 짝 — **청록 쌍안경**(#00acc1 계열). 2절 챕터 장식 13장과 같은 작가 느낌 | a pair of teal (#00acc1) binoculars with yellow (#ffd166) lens rims, 512×512 |
 
-### B. 수학 공간 (EXPANSION.md 14절 준비 — 자리는 M1에서 생김, **M1 착수 전엔 만들지 말 것**)
+### B. 보스 2장 (512×512) — 2절 보스 9장과 **같은 종족**(꼬마 괴물: 둥근 몸, 작은 뿔, 귀여운 악당 표정, 망토·소품으로 주제 표현)
+
+| # | 파일 | 쓰이는 곳 | 설명 | 프롬프트(베이스 뒤에) |
+| --- | --- | --- | --- | --- |
+| B1 | `boss-python-7.png` | 파이썬 챕터 7 보스 「학교 알림 메시지 분석기」 HP 패널 56px·지도 40px | **청록 꼬마 괴물**이 확성기(알림)와 돋보기(정규식)를 듦, 어깨에 달력 조각 | a small round teal (#00acc1) cute monster villain with tiny horns and a mischievous grin, holding a megaphone in one hand and a magnifying glass in the other, a little calendar page pinned to its cape, 512×512 |
+| B2 | `boss-algo-6.png` | 알고리즘 챕터 6 보스 「암호 해독 사령부」 HP 패널 56px·지도 40px | **남색+청록 꼬마 괴물 사령관**이 군모를 쓰고 자물쇠 달린 암호 두루마리를 듦, 뒤에 0·1 느낌의 작은 점 무늬(글자 금지 → 점·사각형으로) | a small round dark-blue cute monster commander with tiny horns, wearing a teal (#00acc1) military cap, holding a scroll with a padlock, tiny square dot pattern on its cape suggesting binary (no actual digits), 512×512 |
+
+### C. 뱃지 46장 (256×256) — 뱃지 화면 56px·프로필 공유 카드 48px. 2절 `badge-master_python.png`(왕관 쓴 뱀)·`badge-master_algo.png`(부엉이 금메달)와 같은 **둥근 메달/스티커** 느낌. 비밀 뱃지(C-7)도 획득 후에는 그림이 보이므로 만든다. 작은 크기에서 보이게 **소재 1개 + 큰 실루엣**, 가는 선 금지
+
+파일 이름은 `badge-<id>.png`. 아래 표의 id를 그대로 쓴다(예: `badge-first_run.png`).
+
+**C-1. 시작·기본 (8장)**
+
+| id | 뱃지 | 조건(의도) | 프롬프트(베이스 뒤에) |
+| --- | --- | --- | --- |
+| first_run | 첫 실행 | 코드를 처음 실행 | a round green (#2bb673) medal with a big white play triangle in the center, 256×256 |
+| first_clear | 첫 클리어 | 문제를 처음 품 | a round blue (#6c8cff) medal with a big white checkmark, small sparkle, 256×256 |
+| first_error | 첫 에러 | 에러를 처음 만남(힌트를 받은 것) | a round orange (#ffb347) medal with a friendly bandaged bug character smiling, 256×256 |
+| error_10 | 에러 극복 | 에러 10번 극복 | a round orange medal with a wrench and a small fixed bug with a checkmark, 256×256 |
+| fail5_clear | 끈기 | 5번 실패 뒤 클리어 | a round red (#ff5d6c) medal with a flexed cartoon arm muscle, 256×256 |
+| grad_block | 블록 졸업 | 첫 텍스트 문제 클리어 | a round blue medal with a puzzle block turning into a keyboard key, 256×256 |
+| grad_parsons | Parsons 졸업 | Parsons 문제 5개 | a round purple (#9c27b0) medal with three stacked puzzle pieces in order, 256×256 |
+| playground | 자유 코딩 | 놀이터에서 10줄 이상 실행 | a round yellow (#ffd166) medal with a small playground slide, 256×256 |
+
+**C-2. 자립·정확도 (6장)**
+
+| id | 뱃지 | 조건(의도) | 프롬프트(베이스 뒤에) |
+| --- | --- | --- | --- |
+| nohint3 | 자립 | 힌트 없이 3연속 | a round green medal with a compass rose, 256×256 |
+| nohint10 | 독학왕 | 힌트 없이 10연속 | a round green medal with a graduation cap and a small star, 256×256 |
+| firsttry10 | 한 번에 | 첫 시도 클리어 10회 | a round blue medal with a target and one arrow in the bullseye, 256×256 |
+| firsttry30 | 명사수 | 첫 시도 클리어 30회 | a round blue medal with a bow and three arrows in the bullseye, gold rim, 256×256 |
+| lesson3star | 완벽한 레슨 | 한 레슨 전부 별 3개 | a round yellow medal with one big shining star, 256×256 |
+| lesson3star5 | 별 수집가 | 별 3개 레슨 5개 | a round yellow medal with a small jar full of stars, 256×256 |
+
+**C-3. 콤보·연속·목표 (8장)**
+
+| id | 뱃지 | 조건(의도) | 프롬프트(베이스 뒤에) |
+| --- | --- | --- | --- |
+| combo10 | 콤보 10 | 콤보 10 | a round orange medal with a single flame, 256×256 |
+| combo20 | 콤보 20 | 콤보 20 | a round red medal with a big flame and a burst, 256×256 |
+| streak3 | 3일 연속 | 3일 연속 학습 | a round orange medal with a small calendar showing three marked days as three dots in a row, 256×256 |
+| streak7 | 7일 연속 | 7일 연속 학습 | a round orange medal with a calendar and a flame on top, 256×256 |
+| streak30 | 30일 연속 | 30일 연속 학습 | a round gold medal with a trophy and a calendar page, 256×256 |
+| daily7 | 목표 달성 7회 | 일일 목표 7번 | a round green medal with a calendar page and a big checkmark, 256×256 |
+| review10 | 기억 유지 | 복습 10개 완료 | a round purple medal with a friendly brain with a small sparkle, 256×256 |
+| explore10 | 탐험가 | 예제를 고쳐서 10번 실행 | a round teal medal with a microscope, 256×256 |
+
+**C-4. 보스·퍼펙트·완주 (12장)** — 보스는 2절 보스 종족 얼굴을 **작게 메달 안에**, 퍼펙트는 같은 금메달에 **리본 색만** 바꿔 구분(1 파랑·2 초록·3 주황·4 보라·5 빨강)
+
+| id | 뱃지 | 조건(의도) | 프롬프트(베이스 뒤에) |
+| --- | --- | --- | --- |
+| boss1 | 보스 1 | 챕터 1 보스 | a round bronze medal with a tiny purple cute monster face with question-mark horns in the center, 256×256 |
+| boss2 | 보스 2 | 챕터 2 보스 | a round bronze medal with a tiny blue cute monster face with dice-pattern horns, 256×256 |
+| boss3 | 보스 3 | 챕터 3 보스 | a round silver medal with a tiny orange cute monster face with coin horns, 256×256 |
+| boss4 | 보스 4 | 챕터 4 보스 | a round silver medal with a tiny purple three-armed cute monster face, 256×256 |
+| boss5 | 보스 5 | 챕터 5 보스 | a round gold medal with a tiny red cute monster face wearing a crown, 256×256 |
+| perfect1 | 퍼펙트 1 | 챕터 1 힌트 없이 한 번에 | a round gold medal with a big "first place" style laurel wreath and a blue (#6c8cff) ribbon, no numbers, 256×256 |
+| perfect2 | 퍼펙트 2 | 챕터 2 | same gold laurel medal with a green (#2bb673) ribbon, 256×256 |
+| perfect3 | 퍼펙트 3 | 챕터 3 | same gold laurel medal with an orange (#ffb347) ribbon, 256×256 |
+| perfect4 | 퍼펙트 4 | 챕터 4 | same gold laurel medal with a purple (#9c27b0) ribbon, 256×256 |
+| perfect5 | 퍼펙트 5 | 챕터 5 | same gold laurel medal with a red (#ff5d6c) ribbon, 256×256 |
+| all_clear | 완주 | 모든 문제 클리어 | a round gold medal with a checkered finish flag, 256×256 |
+| checkup | 종합 점검 통과 | 종합 점검 80% 이상 | a round blue medal with a clipboard and a big checkmark, 256×256 |
+
+**C-5. 알고리즘 (4장)**
+
+| id | 뱃지 | 조건(의도) | 프롬프트(베이스 뒤에) |
+| --- | --- | --- | --- |
+| algo_viz10 | 눈으로 보는 사람 | 시각화 10번 재생 | a round blue medal with a big friendly eye looking at three small bars, 256×256 |
+| algo_tle | O(n²)에서 O(n log n)으로 | 시간 초과 뒤 통과 | a round orange medal with a stopwatch and a small lightning bolt, 256×256 |
+| algo_mock | 모의고사 통과 | 코딩테스트 모의고사 통과 | a round green medal with an exam paper and a pencil, 256×256 |
+| algo_boss4 | 알고리즘 탐험가 | 알고리즘 보스 4개 | a round teal medal with a compass and a small owl head (matching the algorithm course owl mascot), 256×256 |
+
+**C-6. 창작·기타 (4장)**
+
+| id | 뱃지 | 조건(의도) | 프롬프트(베이스 뒤에) |
+| --- | --- | --- | --- |
+| theme | 분위기 전환 | 테마 바꿈 | a round medal split half dark navy half light with a sun on one side and a crescent moon on the other, 256×256 |
+| works3 | 창작자 | 내 작품 3개 저장 | a round purple medal with an artist palette and brush, 256×256 |
+| turtle5 | 거북이 화가 | 거북이 그림 5개 저장 | a round green medal with a cute turtle holding a paintbrush, 256×256 |
+| tutor10 | 질문으로 돌파 | 선생님에게 물은 뒤 스스로 클리어 10회(현재 선생님 기능 꺼짐 — 후순위) | a round blue medal with a speech bubble containing a lightbulb, 256×256 |
+
+**C-7. 비밀 뱃지 (4장)** — 획득 전엔 ❔로 가려지고, 획득하면 그림이 보인다
+
+| id | 뱃지(획득 후 이름 없음) | 조건(의도) | 프롬프트(베이스 뒤에) |
+| --- | --- | --- | --- |
+| secret_hello | ??? | print("안녕") 100번 | a round yellow medal with a waving hand and a tiny speech bubble (empty, no text), 256×256 |
+| secret_night | ??? | 자정~새벽 4시 클리어 | a round dark navy medal with a crescent moon and two stars, light inner rim so it reads on dark backgrounds, 256×256 |
+| secret_fast | ??? | 타임 어택 5문제 60초 | a round yellow medal with a big lightning bolt, 256×256 |
+| secret_turtle | ??? | 거북이로 선 100개 | a round green medal with a turtle leaving a long spiral trail, 256×256 |
+
+**납품 체크리스트 (4차)**: 파일을 `assets/img/`에(뱃지는 256×256, 나머지 512×512) → `python3 tools/img_clean.py --check`(문제 있으면 인자 없이 실행해 정리) → 이 파일 2절 표로 옮기고 3절에서 지운다 → `core/config.js` `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → `CHANGELOG.md`·`HANDOFF.md` 상태판 한 줄 → 커밋. 뱃지는 나눠서 납품해도 되고, 납품할 때마다 같은 절차.
+
+### 보류 — 수학 공간 (EXPANSION.md 14절 준비 — 자리는 M1에서 생김, **M1 착수 전엔 만들지 말 것**)
 
 | # | 파일 | 쓰이는 곳 | 설명 |
 | --- | --- | --- | --- |
-| B1 | `course-math.png` | 허브 수학 공간 카드 | 박사모 쓴 거북이(느리지만 확실히)가 자와 컴퍼스를 듦 |
-| B2 | `gear-cap.png` | 마스코트 장비 「박사모」 | 검은 사각모 + 금술, 마스코트 머리 위에 얹히는 투명 PNG(256) |
-| B3 | `area-math-1~6.png` | 지식 지도 영역 아이콘 6 | 수·논리·확률·함수·벡터·그래프 소품 |
-
-**납품 체크리스트 (3차)**: 파일을 `assets/img/`에 → `python3 tools/img_clean.py --check`(문제 있으면 인자 없이 실행해 정리) → 이 파일 2절 표로 옮기고 3절에서 지운다 → `core/config.js` `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → `CHANGELOG.md`·`HANDOFF.md` 상태판 한 줄 → 커밋.
+| M1 | `course-math.png` | 허브 수학 공간 카드 | 박사모 쓴 거북이(느리지만 확실히)가 자와 컴퍼스를 듦 |
+| M2 | `gear-cap.png` | 마스코트 장비 「박사모」 | 검은 사각모 + 금술, 마스코트 머리 위에 얹히는 투명 PNG(256) |
+| M3 | `area-math-1~6.png` | 지식 지도 영역 아이콘 6 | 수·논리·확률·함수·벡터·그래프 소품 |
 
 ## 4. 그 뒤 (자리 없음 — 만들지 말 것)
 
 | 파일 | 크기 | 쓰이는 곳 | 메모 |
 | --- | --- | --- | --- |
 | `mascot-<stage>-<color>.png` | 512 | 상단바·프로필 마스코트(지금은 코드로 그린 SVG, 색·장비를 사용자가 고름) | 색·장비 조합이 많아 SVG가 유리 — 그림으로 바꿀지 미정 |
-| `badge-<id>.png` 나머지 뱃지 ~40개 | 256 | 뱃지 화면 | 자리는 이미 있음(`badge-<id>.png`가 있으면 이모지 대신 표시) |
 | `lesson-<course>-<id>.png` | 640×360 | 레슨 첫 페이지 머리 그림 | 레슨 수가 많아(52) 후순위 |
 
 ## 5. 사이트 쪽 연결 (개발 메모)
