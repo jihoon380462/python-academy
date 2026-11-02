@@ -737,3 +737,30 @@ Create ONE PNG badge for a consistent educational game medal set. Flat vector st
 ```text
 Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round teal (#00acc1) medal with two large fully filled overlapping circles in the center (Venn diagram): left circle yellow (#ffd166), right circle cream white, the overlap filled orange (#ffb347), all with bold dark navy outlines. No stars, no chain links, no other objects. 256x256.
 ```
+
+
+## 6차 E — 재요청(2차), 2026-11-02
+
+출처: `art/6차-검수` (0b13c17dc3b992e9d7430b25d9abbf51cffebe13) IMAGES.md 3절. E1-4 → E2-4 수정 프롬프트로 재생성. 영역 512×512, 뱃지 256×256 RGBA, 여백 47/23px. img_clean 및 다크/라이트 32·48/56px 축소본 확인.
+
+### E1-4 `area-math-4.png`
+
+요청서 참조: `area-math-1.png`, `area-math-3.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Must stay readable at 32px: chunky FILLED shapes only — no thin lines, no dashed lines, no axes, no grid. No circular medal or backdrop. Reference is style only; replace its subject entirely. Subject: a LOW and WIDE thick purple (#9c27b0) parabola band — width at least twice its height, like a gentle hill-shaped arc drawn as one chunky rounded band (not a thin curve), both ends on an invisible baseline. One round yellow (#ffd166) ball sits ON THE RIGHT DOWNHILL SIDE of the arc (about two-thirds along, NOT at the top center), and two smaller solid yellow dots trail behind it along the top of the arc toward the upper left, showing the ball's path. The whole icon must NOT look like a person, user avatar or head-and-shoulders symbol: never put the ball centered above the arc, never make the arc tall and narrow. No ground, no arrows, no second curve, no sparkles. 512x512.
+```
+
+### E2-4 `badge-math_area_4.png`
+
+요청서 참조: `badge-math_area_1.png`, `badge-math_area_3.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round purple (#9c27b0) medal with one LOW and WIDE thick light lavender parabola band across the medal face (width at least twice its height, chunky rounded band), a single round yellow (#ffd166) ball on its RIGHT downhill side (not at the top center) and two smaller solid yellow dots trailing behind it along the arc. Must NOT look like a person or user avatar icon. No stars, no graph axes, no other objects. 256x256.
+```
+
+곡선 방향 교정 편집(참조 1: 최초 생성 뱃지, 참조 2: 이번 `area-math-4.png` 생성 원본):
+
+```text
+Edit the FIRST reference medal. Keep its purple circular medal and rim unchanged. Replace the curved central symbol with the exact low wide HILL-shaped parabola silhouette and ball arrangement in the SECOND reference. The arc must be CONCAVE DOWN like an upside-down shallow bowl: both ends at equal LOW height, center HIGHER, width at least twice height. Color this thick band LIGHT LAVENDER. Place the large yellow ball on its RIGHT DOWNHILL slope, two smaller yellow trail dots behind toward upper left, matching reference 2. No banana, no crescent, no valley shape, no person silhouette. Center this group inside medal. Dark navy outlines, flat solid fills, transparent outside medal, no text, preserve clear margins.
+```
