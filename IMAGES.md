@@ -17,7 +17,7 @@
 
 프롬프트는 영어로 적어 두었다(생성기가 영어를 더 잘 알아듣는다). 한국어 설명은 의도 확인용.
 
-## 2. 완료된 그림 (검수 통과 ✅ — 31장, v2.2.21 기준. 3차 챕터 장식 13장 검수: 2026-11-02 — 흰 테두리 없음, 32px에서 전부 식별 가능, 지도 렌더 확인. **스타일 기준**: 새 그림은 이 세트와 나란히 놓았을 때 한 작가가 그린 것처럼 보여야 한다)
+## 2. 완료된 그림 (검수 통과 ✅ — 42장, v2.2.26 기준. 3차 챕터 장식 13장 검수: 2026-11-02 — 흰 테두리 없음, 32px에서 전부 식별 가능, 지도 렌더 확인. **스타일 기준**: 새 그림은 이 세트와 나란히 놓았을 때 한 작가가 그린 것처럼 보여야 한다)
 
 | 파일 | 내용 | 쓰이는 곳 |
 | --- | --- | --- |
@@ -39,47 +39,34 @@
 | `chapter-algo-3.png` | ✅ 완료 — 주황 사슬 고리 3개 | 홈 지도 3 연결된 구조 제목 옆 32px |
 | `chapter-algo-4.png` | ✅ 완료 — 보라 퍼즐 조각 | 홈 지도 4 패턴 제목 옆 32px |
 | `chapter-algo-5.png` | ✅ 완료 — 금 트로피(파이썬 6과 같은 것 재사용 가능 — 같은 파일 복사) | 홈 지도 5 실전 제목 옆 32px |
+| `chapter-algo-6.png` | ✅ 완료 — 파이썬 7(청록 망원경)과 짝 — **청록 쌍안경**(#00acc1 계열). 2절 챕터 장식 13장과 같은 작가 느낌 | 홈 지도 알고리즘 6 「한 걸음 더」 제목 옆 32px |
+| `boss-python-7.png` | ✅ 완료 — **청록 꼬마 괴물**이 확성기(알림)와 돋보기(정규식)를 듦, 어깨에 달력 조각 | 파이썬 챕터 7 보스 「학교 알림 메시지 분석기」 HP 패널 56px·지도 PC 78px·모바일 104px |
+| `boss-algo-6.png` | ✅ 완료 — **남색+청록 꼬마 괴물 사령관**이 군모를 쓰고 자물쇠 달린 암호 두루마리를 듦, 뒤에 0·1 느낌의 작은 점 무늬(글자 금지 → 점·사각형으로) | 알고리즘 챕터 6 보스 「암호 해독 사령부」 HP 패널 56px·지도 PC 78px·모바일 104px |
+| `badge-first_run.png` | ✅ 완료 — 첫 실행 | 뱃지 56px·공유 카드 48px |
+| `badge-first_clear.png` | ✅ 완료 — 첫 클리어 | 뱃지 56px·공유 카드 48px |
+| `badge-first_error.png` | ✅ 완료 — 첫 에러 | 뱃지 56px·공유 카드 48px |
+| `badge-error_10.png` | ✅ 완료 — 에러 극복 | 뱃지 56px·공유 카드 48px |
+| `badge-fail5_clear.png` | ✅ 완료 — 끈기 | 뱃지 56px·공유 카드 48px |
+| `badge-grad_block.png` | ✅ 완료 — 블록 졸업 | 뱃지 56px·공유 카드 48px |
+| `badge-grad_parsons.png` | ✅ 완료 — Parsons 졸업 | 뱃지 56px·공유 카드 48px |
+| `badge-playground.png` | ✅ 완료 — 자유 코딩 | 뱃지 56px·공유 카드 48px |
+
+**검수 메모(4차 A·B·C-1)**: 11장 ✅ 완료. 챕터·보스 512×512, 뱃지 256×256 RGBA. 사방 8% 이상 여백과 `python3 tools/img_clean.py --check` 통과. 다크/라이트 배경에서 챕터 32px·보스 40/56px 및 최신 지도 78/104px·뱃지 48/56px 축소본 확인. 생성 프롬프트는 `assets/img/README.md`.
 
 **검수 메모(3차 A)**: 챕터 장식 13장(파이썬 0~7·알고 1~5) ✅ 완료. 512×512 RGBA, 사방 8% 이상 여백, `img_clean.py --check` 통과. 다크/라이트 배경에서 32px 축소본 확인. A12 트로피는 A7과 같은 파일 복사. 생성 프롬프트는 `assets/img/README.md`.
 
 **검수 메모(2차)**: 2차 16장 중 6장(알고·SQL·웹 아이콘, 빈 작품, 알고 마스터 뱃지, 배너)에 **흰 스티커 테두리**가 있어 다크 테마에서 흰 띠로 보였음 → `tools/img_clean.py`로 투명 배경에 닿은 흰~회색 테두리를 지워 해결(내부 흰색은 윤곽선에 막혀 유지). 앞으로는 납품 전에 `python3 tools/img_clean.py --check`로 확인하고, 테두리가 있으면 `python3 tools/img_clean.py`(인자 없음)로 정리한 뒤 커밋. 배너는 아래 빈 공간을 잘라 1200×274가 됨 — 가로 배너는 **내용이 캔버스를 꽉 채우게** 그리는 편이 좋다.
 
-## 3. 요청 목록 — 4차 (49장: 챕터 장식 1 · 보스 2 · 뱃지 46) ← **지금 만들 것**
+## 3. 요청 목록 — 4차 잔여 (C-2~C-7 뱃지 38장)
 
-규칙은 1절 + 2절 검수 메모(흰 테두리 금지 — 바깥 윤곽선은 어두운 남색 `#1d2230`으로 끝나야 함). 순서대로 A → B → C. 한 번에 다 못 하면 **A·B 먼저, C는 C-1부터** 나눠 납품해도 된다(파일이 있는 것만 자동으로 쓰인다).
+규칙은 1절 + 2절 검수 메모(흰 테두리 금지 — 바깥 윤곽선은 어두운 남색 `#1d2230`으로 끝나야 함). A·B·C-1은 2절에 납품 완료. 다음은 **C-2부터** 순서대로 나눠 납품해도 된다(파일이 있는 것만 자동으로 쓰인다).
 
 공통 영어 베이스 프롬프트(모든 항목 앞에 붙임):
 > Flat vector sticker-style icon, bold dark navy (#1d2230) outline, bright clean colors (palette: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0), no text, no letters, no gradients, no 3D, no photo texture, transparent background, single subject centered with 8% empty margin, no white halo or white border around the shape, matching a consistent set of simple educational game icons. —
 
-### A. 챕터 장식 1장 (512×512)
+### C. 남은 뱃지 38장 (256×256) — 뱃지 화면 56px·프로필 공유 카드 48px. 2절 `badge-master_python.png`(왕관 쓴 뱀)·`badge-master_algo.png`(부엉이 금메달)와 같은 **둥근 메달/스티커** 느낌. 비밀 뱃지(C-7)도 획득 후에는 그림이 보이므로 만든다. 작은 크기에서 보이게 **소재 1개 + 큰 실루엣**, 가는 선 금지
 
-| # | 파일 | 쓰이는 곳 | 설명 | 프롬프트(베이스 뒤에) |
-| --- | --- | --- | --- | --- |
-| A1 | `chapter-algo-6.png` | 홈 지도 알고리즘 6 「한 걸음 더」 제목 옆 32px | 파이썬 7(청록 망원경)과 짝 — **청록 쌍안경**(#00acc1 계열). 2절 챕터 장식 13장과 같은 작가 느낌 | a pair of teal (#00acc1) binoculars with yellow (#ffd166) lens rims, 512×512 |
-
-### B. 보스 2장 (512×512) — 2절 보스 9장과 **같은 종족**(꼬마 괴물: 둥근 몸, 작은 뿔, 귀여운 악당 표정, 망토·소품으로 주제 표현)
-
-| # | 파일 | 쓰이는 곳 | 설명 | 프롬프트(베이스 뒤에) |
-| --- | --- | --- | --- | --- |
-| B1 | `boss-python-7.png` | 파이썬 챕터 7 보스 「학교 알림 메시지 분석기」 HP 패널 56px·지도 40px | **청록 꼬마 괴물**이 확성기(알림)와 돋보기(정규식)를 듦, 어깨에 달력 조각 | a small round teal (#00acc1) cute monster villain with tiny horns and a mischievous grin, holding a megaphone in one hand and a magnifying glass in the other, a little calendar page pinned to its cape, 512×512 |
-| B2 | `boss-algo-6.png` | 알고리즘 챕터 6 보스 「암호 해독 사령부」 HP 패널 56px·지도 40px | **남색+청록 꼬마 괴물 사령관**이 군모를 쓰고 자물쇠 달린 암호 두루마리를 듦, 뒤에 0·1 느낌의 작은 점 무늬(글자 금지 → 점·사각형으로) | a small round dark-blue cute monster commander with tiny horns, wearing a teal (#00acc1) military cap, holding a scroll with a padlock, tiny square dot pattern on its cape suggesting binary (no actual digits), 512×512 |
-
-### C. 뱃지 46장 (256×256) — 뱃지 화면 56px·프로필 공유 카드 48px. 2절 `badge-master_python.png`(왕관 쓴 뱀)·`badge-master_algo.png`(부엉이 금메달)와 같은 **둥근 메달/스티커** 느낌. 비밀 뱃지(C-7)도 획득 후에는 그림이 보이므로 만든다. 작은 크기에서 보이게 **소재 1개 + 큰 실루엣**, 가는 선 금지
-
-파일 이름은 `badge-<id>.png`. 아래 표의 id를 그대로 쓴다(예: `badge-first_run.png`).
-
-**C-1. 시작·기본 (8장)**
-
-| id | 뱃지 | 조건(의도) | 프롬프트(베이스 뒤에) |
-| --- | --- | --- | --- |
-| first_run | 첫 실행 | 코드를 처음 실행 | a round green (#2bb673) medal with a big white play triangle in the center, 256×256 |
-| first_clear | 첫 클리어 | 문제를 처음 품 | a round blue (#6c8cff) medal with a big white checkmark, small sparkle, 256×256 |
-| first_error | 첫 에러 | 에러를 처음 만남(힌트를 받은 것) | a round orange (#ffb347) medal with a friendly bandaged bug character smiling, 256×256 |
-| error_10 | 에러 극복 | 에러 10번 극복 | a round orange medal with a wrench and a small fixed bug with a checkmark, 256×256 |
-| fail5_clear | 끈기 | 5번 실패 뒤 클리어 | a round red (#ff5d6c) medal with a flexed cartoon arm muscle, 256×256 |
-| grad_block | 블록 졸업 | 첫 텍스트 문제 클리어 | a round blue medal with a puzzle block turning into a keyboard key, 256×256 |
-| grad_parsons | Parsons 졸업 | Parsons 문제 5개 | a round purple (#9c27b0) medal with three stacked puzzle pieces in order, 256×256 |
-| playground | 자유 코딩 | 놀이터에서 10줄 이상 실행 | a round yellow (#ffd166) medal with a small playground slide, 256×256 |
+파일 이름은 `badge-<id>.png`. 아래 표의 id를 그대로 쓴다(예: `badge-nohint3.png`).
 
 **C-2. 자립·정확도 (6장)**
 

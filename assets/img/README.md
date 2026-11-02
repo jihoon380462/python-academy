@@ -207,3 +207,96 @@ Use case: stylized-concept. Asset type: educational game chapter decoration PNG,
 ```text
 Use case: stylized-concept. Asset type: educational game chapter decoration PNG, displayed at only 32 pixels. Create one isolated simple flat vector-style rounded sticker icon on a truly transparent square background. Bold uniform dark navy #1d2230 outlines, solid flat bright fills, rounded corners, visually readable silhouette. Thin lighter accent INSIDE the dark outline if useful. The outermost visible edge must be dark navy, never white. No white sticker border, no halo, no drop shadow, no ground, no gradients, no 3D, no texture, no extra decoration, no lettering, no numbers, no watermark. Center the single subject with at least 8 percent clear margin on all sides. Subject: A small teal #00acc1 telescope on a short tripod. A simple diagonal telescope tube with one large lens, exactly three sturdy tripod legs. No extra sky objects. Reference image is STYLE ONLY: do not include the snake or laptop.
 ```
+
+
+## 4차 A → B → C-1 — 11장
+
+내장 `image_gen` 사용. 챕터·보스 512×512, 뱃지 256×256 RGBA·8% 이상 여백. `img_clean.py --check`와 다크/라이트 32/40/48/56px 축소본 및 최신 지도 보스 78/104px 검수 통과. 참조 이미지는 기존 프로젝트의 스타일/보스 종족을 맞추는 용도로만 사용했다.
+
+### `chapter-algo-6.png`
+
+스타일 참조: `chapter-python-7.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A pair of teal #00acc1 binoculars with yellow #ffd166 lens rims. Two unmistakable chunky barrels joined by a central bridge, clear blue lenses facing viewer at a slight angle. Companion to the reference telescope, do not include a tripod. Displayed at 32px.
+```
+
+### `boss-python-7.png`
+
+스타일 참조: `boss-python-1.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A small round TEAL #00acc1 monster villain of the SAME SPECIES as the reference: stocky powerful body, broad arms, short legs, clawed feet, tiny gold side horns, strong angular eyebrows, mischievous confident grin with one small fang. Navy cape with red lining and gold clasp. Holding a megaphone in one hand and a magnifying glass in the other. One little calendar page pinned to cape at shoulder, simple blank grid with no digits. No question-mark horn, no number cards. Full body imposing planted stance, friendly educational boss, not scary. Props simple and distinct at 40-56px.
+```
+
+### `boss-algo-6.png`
+
+스타일 참조: `boss-python-1.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A small round DARK BLUE monster commander of the SAME SPECIES as reference: stocky powerful body, broad arms, short legs, clawed feet, tiny gold horns, strong angular eyebrows, mischievous confident grin with one fang. Wearing a TEAL #00acc1 military cap, no real insignia. Navy cape with teal lining and small gold clasps. Holding one rolled-open scroll with a large padlock centered on it. A few tiny square and round dots on cape suggest binary, NO actual digits or letters. No question-mark horn, no number cards. Full body imposing planted stance, friendly educational boss, not scary. Clear silhouette at 40-56px.
+```
+
+### `badge-first_run.png`
+
+스타일 참조: `badge-master_python.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A round green #2bb673 medal with a big white play triangle in the center. Same round medal silhouette as reference, but no snake, no crown and no extra ribbons. One large central subject, thick lines, readable at 48-56px.
+```
+
+### `badge-first_clear.png`
+
+스타일 참조: `badge-master_python.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A round blue #6c8cff medal with a big white checkmark and one small sparkle. Same round medal silhouette as reference, but no snake, no crown and no extra ribbons. One large central subject, thick lines, readable at 48-56px.
+```
+
+### `badge-first_error.png`
+
+스타일 참조: `badge-master_python.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A round orange #ffb347 medal with a friendly bandaged bug character smiling. Same round medal silhouette as reference, but no snake, no crown and no extra ribbons. One large central subject, thick lines, readable at 48-56px.
+```
+
+### `badge-error_10.png`
+
+스타일 참조: `badge-master_python.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A round orange medal with a wrench and a small fixed bug with a checkmark. Wrench is large and readable, bug simple. Same round medal silhouette as reference, but no snake, no crown and no extra ribbons. One large central subject, thick lines, readable at 48-56px.
+```
+
+### `badge-fail5_clear.png`
+
+스타일 참조: `badge-master_python.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A round red #ff5d6c medal with a flexed cartoon arm muscle. Same round medal silhouette as reference, but no snake, no crown and no extra ribbons. One large central subject, thick lines, readable at 48-56px.
+```
+
+### `badge-grad_block.png`
+
+스타일 참조: `badge-master_python.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A round blue medal with a puzzle block turning into a keyboard key. One large puzzle block on left and one blank keyboard key on right, a tiny arrow between them conveys transformation. No lettering on key. Same round medal silhouette as reference, but no snake, no crown and no extra ribbons. One large central subject, thick lines, readable at 48-56px.
+```
+
+### `badge-grad_parsons.png`
+
+스타일 참조: `badge-master_python.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A round purple #9c27b0 medal with exactly three stacked puzzle pieces in order. Three chunky horizontal pieces fitted into an orderly vertical stack. Same round medal silhouette as reference, but no snake, no crown and no extra ribbons. One large central subject, thick lines, readable at 48-56px.
+```
+
+### `badge-playground.png`
+
+스타일 참조: `badge-master_python.png`
+
+```text
+Flat vector sticker-style educational game icon. Bold dark navy #1d2230 outline, bright clean solid colors: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0. No text or letters or numbers, no gradients, no 3D, no photo texture. True transparent background. Single centered subject with at least 8% empty margin. No white halo, no white border around the shape: outermost edge dark navy, thin pale highlights INSIDE only. Simple chunky shapes legible at small sizes. Match reference line weight and flat illustration style, no unrelated reference subjects. A round yellow #ffd166 medal with a small playground slide. One simple slide with steps and curved chute. Same round medal silhouette as reference, but no snake, no crown and no extra ribbons. One large central subject, thick lines, readable at 48-56px.
+```
