@@ -53,11 +53,13 @@ Claude 요금제의 주간 한도가 "모든 모델"과 "Fable 전용"으로 나
 
 ## 7. 팀 운영 — QA팀·콘텐츠팀 (Opus 채팅, 2026-11-02 사용자 결정)
 
-Fable 세션(엔진·설계·검토) 외에 **Opus 채팅 두 개를 팀처럼 돌린다.** 각 팀은 자기 지시서를 읽고 1절 권한표 안에서만 일한다. 같은 `core` 파일을 두 채팅이 동시에 건드리지 않는다(5절).
+Fable 세션(엔진·설계·검토·릴리스) 외에 **Opus 채팅 네 개를 팀처럼 돌린다**(QA → 유지보수, 콘텐츠, 아트). 각 팀은 자기 지시서를 읽고 1절 권한표 안에서만 일한다. 같은 `core` 파일을 두 채팅이 동시에 건드리지 않는다(5절).
 
 | 팀 | 지시서 | 하는 일 | 산출물 | 못 하는 일 |
 | --- | --- | --- | --- | --- |
 | **QA팀** | `specs/qa-team.md` | 배포본을 실제로 플레이(PC·모바일 폭·다크/라이트·고대비)하며 버그·문구·UX 문제를 찾고, 재현 절차와 함께 기록. 콘텐츠 오류(정답·힌트·테스트)는 직접 고쳐 커밋 가능 | `QA.md`(발견 목록·상태), 콘텐츠 패치 커밋, `tools/regress.py` 체크 추가(허용) | `core/` 설계 변경(→ "Fable 작업"으로 QA.md에 표시) |
+| **아트 검수·요청팀** | `specs/art-team.md` | IMAGES.md 요청서 작성(코드에 자리 있는 그림만), ChatGPT 납품 검수(`img_clean --check`·축소본 대조·앱 렌더), 통과분 2절 이동 | IMAGES.md·`assets/img/` 정리 PR(`art/<차수>`) | 그림 자리 새로 만들기(core), 버전·캐시 stamp |
+| **유지보수팀** | `specs/maintenance-team.md` | QA.md 「열림」 항목을 재현 → 수정 → 확인 → 닫힘. 담당 `Fable`인 항목은 재현 절차·원인 추정만 보강 | 수정 PR(`fix/<QA#>-<주제>`), QA.md 상태 갱신, regress check 추가 | core 설계 변경(Fable), 버전·stamp·HANDOFF 상태판 |
 | **콘텐츠팀** | `specs/content-team.md` | 기존 스키마·그림 종류 안에서 레슨·문제·힌트·용어·예제 추가, 기존 문제 품질 개선(힌트 3단계, 테스트 경계값, 설명 문구) | `courses/*/content.js` 커밋 + PROBLEMS.md·CHANGELOG·HANDOFF | 새 문제 type·새 그림 kind·`core/` 수정 |
 
 공통 규칙: ① 시작할 때 `git fetch && git reset --hard origin/main` ② **main 직접 푸시 금지 — 자기 브랜치에 올리고 PR(8절)** ③ 검증 게이트(3절) 통과 없이는 PR 금지 ④ 커밋 메시지 맨 앞에 `[qa]` 또는 `[content]` ⑤ `APP_VERSION`·`node tools/stamp.mjs`·HANDOFF 상태판은 **건드리지 않는다**(릴리스 때 Fable이 한 번에). Fable은 열린 PR 목록(`gh pr list`)을 검토·병합한다.
@@ -65,6 +67,8 @@ Fable 세션(엔진·설계·검토) 외에 **Opus 채팅 두 개를 팀처럼 �
 **Opus 채팅을 열 때 첫 메시지(복사용)**
 - QA팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/qa-team.md 순서로 읽은 뒤 qa-team.md 2절 체크리스트대로 1회전 QA를 시작해. 결과는 QA.md에 기록하고 콘텐츠 오류는 고쳐서 [qa] 커밋으로 올려.`
 - 콘텐츠팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/content-team.md 순서로 읽은 뒤 content-team.md 3절의 첫 과제부터 시작해. [content] 커밋으로 올려.`
+- 아트 검수·요청팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → IMAGES.md → specs/art-team.md 순서로 읽은 뒤 art-team.md 4절의 첫 과제(A0 전수 재검수)를 시작해. 결과는 IMAGES.md 검수 메모에 적고 art/ 브랜치로 PR을 내. main 직접 푸시 금지.`
+- 유지보수팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → QA.md → specs/maintenance-team.md 순서로 읽은 뒤 QA.md의 「열림」 항목을 심각도 순으로 고쳐 fix/ 브랜치로 PR을 내. 담당이 Fable인 항목은 건드리지 말고 재현 절차만 보강해. main 직접 푸시 금지.`
 
 ## 8. 브랜치·PR 규칙 — "먼저 끝낸 쪽이 바로 배포" 금지 (2026-11-02)
 
