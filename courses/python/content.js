@@ -715,7 +715,7 @@ PROBLEMS.push(
 { id:'L17P2', lesson:'L17', type:'code', title:'줄 수 세기', prompt:'첫 줄에 n, 다음 n줄의 문장을 <code>lines.txt</code>에 한 줄씩 저장하세요. 그런 다음 파일을 읽어 몇 줄인지 <code>n줄</code> 형식으로 출력하세요.', tags:['파일','반복'], inputExample:'3\n사과\n배\n포도',
   solution:'n = int(input())\nwith open("lines.txt", "w", encoding="utf-8") as f:\n    for i in range(n):\n        f.write(input() + "\\n")\nwith open("lines.txt", "r", encoding="utf-8") as f:\n    lines = f.readlines()\nprint(f"{len(lines)}줄")', tests:[{input:'3\n사과\n배\n포도', output:'3줄'},{input:'1\nx', output:'1줄'},{input:'5\na\nb\nc\nd\ne', output:'5줄'}],
   starter:'n = int(input())\nwith open("lines.txt", "w", encoding="utf-8") as f:\n    # n줄을 받아 한 줄씩 쓰기 (끝에 "\\n")\n    pass\n# 다시 읽어 줄 수를 "n줄" 형식으로 출력\n',
-  hints:['write할 때 줄 끝에 "\\n"을 붙여야 줄이 나뉘어요','readlines()는 줄 목록을 돌려줘요','lines = f.readlines() / print(f"{len(lines)}줄")'] },
+  hints:['write할 때 줄 끝에 "\\n"을 붙여야 줄이 나뉘어요','readlines()는 줄 목록을 돌려줘요','    for i in range(n):\n        f.write(input() + "\\n")\nwith open("lines.txt", "r", encoding="utf-8") as f:   # 읽기 모드로 다시 열기\n    lines = f.readlines()\nprint(f"{len(lines)}줄")'] },
 { id:'L17P3', lesson:'L17', type:'quiz', title:'w와 a', prompt:'이미 내용이 있는 파일을 <code>open("a.txt", "w")</code>로 열어 쓰면?', tags:['파일'],
   quiz:{ opts:['기존 내용 뒤에 이어 써진다','기존 내용이 지워지고 새로 써진다','에러가 난다','읽기만 된다'], ans:1, why:'"w"는 새로 쓰기라 기존 내용이 사라져요. 이어 쓰려면 "a"(append)를 써요.' },
   hints:['w는 write, a는 append','새로 쓰기 vs 이어 쓰기','기존 내용이 지워져요'] },

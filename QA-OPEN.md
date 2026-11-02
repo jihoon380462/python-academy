@@ -15,7 +15,6 @@
 | 51 | 알고 시각화: dict 를 table 로 못 그림(항상 「비어 있어요」) | 메모이제이션·역색인 화면 5곳 | core | core/visualize.js `drawTable` 에 dict 처리 |
 | 52 | 알고 함수 정의형 문제 27개 👀 에 그림이 없음 | 지문은 「쓰면 시각화돼요」라고 약속 | core | core/ui-views-main.js 273행 실행 코드 뒤에 `tests[0].call` |
 | 83 | 수학 M4_linear_q4 — 수학적으로 같은 식으로 풀면 `-0.00` 이 나와 맞는 풀이가 떨어짐 (C10) | 채점 오답 | 콘텐츠 | math content.js 859–860행 `+ 0` (M4_trig_q4 방식) |
-| 60 | 파이썬 L17P2 힌트 3 그대로 쓰면 에러 | 파일을 다시 여는 줄 없음 | 콘텐츠 | python content.js 718행 |
 
 ## 2. 그다음 (하)
 
