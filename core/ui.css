@@ -285,3 +285,7 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 .pv-prompt code,.lp-html code,.quiz code,.tutor-panel code,.result code{white-space:normal;overflow-wrap:anywhere;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 /* QA 1103(L12P4): 줄 맞추기 조각의 긴 줄(students = [{…}, …])이 1280px 화면도 넘던 것 — 들여쓰기는 지키고 넘칠 때만 줄바꿈 */
 .pz-tile code{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
+/* QA 6회전(알고 A10P2·A12P2·A13P2): 추적 퀴즈 코드(pre)의 긴 줄이 폰 화면 전체를 넓히던 것 — 상자 안에서만 가로 스크롤 */
+.quiz-code{max-width:100%;overflow-x:auto}.pv-desc,.pv-work{min-width:0}
+/* QA 6회전: <p>로 시작·끝나는 지문(71문제)의 위아래 빈 줄 — 상자 안 첫·마지막 문단 바깥 여백 없앰 */
+.pv-prompt>p:first-child{margin-top:0}.pv-prompt>p:last-child{margin-bottom:0}
