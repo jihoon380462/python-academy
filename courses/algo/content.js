@@ -1132,3 +1132,22 @@ PROBLEMS.push(
   ],
   hints: ['명령: F 는 nr, nc 계산 → inside 면 이동·visited.add·먼지면 "." 로 바꾸고 cleaned += 1. R: (d+1)%4, L: (d+3)%4. 출력은 f"먼지 {cleaned}개 청소, 위치 ({r}, {c}), 방향 {d}" 뒤 show(visited, (r, c))', 'bfs: while queue: r, c = queue.popleft(); for d in range(4): nr, nc = … ; if inside(nr, nc) and (nr, nc) not in dist: dist[(nr, nc)] = dist[(r, c)] + 1; queue.append((nr, nc))', '자동: while True: dist = bfs(pos); targets = [(dist[p], p) for p in dist if grid[p[0]][p[1]] == "*"]; 비면 break; dd, p = min(targets); steps += dd; pos = p; grid 를 "." 로; order.append(p)'] },
 );
+
+// ---------------- v2.3.5 콘텐츠팀 C3: 챕터 6 추적 퀴즈 (레슨마다 trace + 시각화 1문제) ----------------
+PROBLEMS.push(
+{ id: 'A16P6', lesson: 'A16', type: 'quiz', kind: 'trace', title: '두 포인터로 뒤집기', prompt: '<p>문자열은 바꿀 수 없으니 <b>글자 리스트</b>로 바꿔 양 끝에서 맞바꿔요. 출력은? 👀 시각화로 <code>s</code>가 바뀌는 모습(주황 = i 자리)을 볼 수 있어요.</p>', tags: ['문자열', '투포인터'], visualize: { kind: 'table', var: 's', hl: ['i'] },
+  quiz: { code: 's = list("stressed")\ni, j = 0, len(s) - 1\nswaps = 0\nwhile i < j:\n    s[i], s[j] = s[j], s[i]\n    swaps += 1\n    i += 1\n    j -= 1\nprint("".join(s), swaps)', opts: ['desserts 4', 'desserts 8', 'stressed 4', 'dessert 3'], ans: 0, why: '8글자를 양 끝에서 한 쌍씩 맞바꾸면 i < j 인 동안 4번이면 끝나요(가운데에서 만남). 8번 바꾸면 다시 원래대로 돌아가요.' },
+  hints: ['i는 앞에서, j는 뒤에서 한 칸씩 가운데로', '8글자면 쌍은 몇 개? i < j 가 깨지는 순간을 세어 보세요', 'desserts 4'] },
+{ id: 'A17P6', lesson: 'A17', type: 'quiz', kind: 'trace', title: '비트 하나씩 꺼내기', prompt: '<p><code>n &amp; 1</code>은 맨 끝 비트, <code>n &gt;&gt;= 1</code>은 한 자리 밀기예요. 출력은? 👀 시각화로 <code>bits</code>가 쌓이는 순서를 보세요.</p>', tags: ['비트'], visualize: { kind: 'table', var: 'bits' },
+  quiz: { code: 'n = 13\nbits = []\nwhile n > 0:\n    bits.append(n & 1)\n    n >>= 1\nprint(bits[::-1], sum(bits))', opts: ['[1, 1, 0, 1] 3', '[1, 0, 1, 1] 3', '[1, 1, 0, 1] 4', '[1, 1, 1] 3'], ans: 0, why: '13 = 1101(2). 끝 비트부터 꺼내니 bits는 [1, 0, 1, 1]로 쌓이고, 뒤집으면 [1, 1, 0, 1]. 1의 개수는 3.' },
+  hints: ['13을 2진수로: 8 + 4 + 1', '끝 비트부터 쌓이니 마지막에 [::-1]로 뒤집어요', '[1, 1, 0, 1] 3'] },
+{ id: 'A18P6', lesson: 'A18', type: 'quiz', kind: 'trace', title: '명령 따라 격자 칠하기', prompt: '<p>로봇이 (0, 0)에서 <b>오른쪽</b>을 보고 시작해요. F = 앞으로 한 칸(지나간 칸에 순서 번호), R·L = 제자리 회전. 출력 <code>r c step</code>은? 👀 시각화로 격자와 로봇 위치를 보세요.</p>', tags: ['시뮬레이션', '구현'], visualize: { kind: 'grid', var: 'grid', pos: ['r', 'c'] },
+  quiz: { code: 'grid = [[0] * 4 for _ in range(3)]\ndr = [-1, 0, 1, 0]   # 상 우 하 좌\ndc = [0, 1, 0, -1]\nr, c, d = 0, 0, 1\nstep = 1\ngrid[r][c] = step\nfor cmd in "FFRFLF":\n    if cmd == "R":\n        d = (d + 1) % 4\n    elif cmd == "L":\n        d = (d + 3) % 4\n    else:\n        r, c = r + dr[d], c + dc[d]\n        step += 1\n        grid[r][c] = step\nprint(r, c, step)', opts: ['1 3 5', '2 2 5', '1 3 6', '0 3 5'], ans: 0, why: 'F F → (0, 2), R → 아래, F → (1, 2), L → 다시 오른쪽, F → (1, 3). 앞으로 간 건 4번이라 step = 1 + 4 = 5 (회전은 칸을 세지 않아요).' },
+  hints: ['d = 1(우)에서 시작 — R은 +1, L은 +3', 'F만 칸을 옮기고 step을 늘려요. F가 몇 번인지 세어 보세요', '1 3 5'] },
+{ id: 'A19P6', lesson: 'A19', type: 'quiz', kind: 'trace', title: '백트래킹 출력 순서', prompt: '<p>고르고(append) → 들어가고(재귀) → 되돌리는(pop) 순열 생성이에요. <b>세 번째로</b> 출력되는 줄은? 👀 시각화로 호출 스택이 깊어졌다 돌아오는 모습을 보세요.</p>', tags: ['완전탐색', '재귀'], visualize: { kind: 'callstack' },
+  quiz: { code: 'def go(path, left):\n    if not left:\n        print("".join(path))\n        return\n    for i in range(len(left)):\n        path.append(left[i])\n        go(path, left[:i] + left[i + 1:])\n        path.pop()\n\ngo([], ["a", "b", "c"])', opts: ['bac', 'bca', 'acb', 'cab'], ans: 0, why: 'a로 시작하는 둘(abc, acb)을 다 만든 뒤 pop으로 되돌아와 b를 고르고, 남은 [a, c] 중 a부터 → bac. 출력 순서: abc, acb, bac, bca, cab, cba.' },
+  hints: ['첫 글자 a를 고른 상태에서 나오는 줄을 먼저 전부 세요', 'a 다음은 pop 후 b — 남은 글자는 a, c 순서', 'bac'] },
+{ id: 'A20P6', lesson: 'A20', type: 'quiz', kind: 'trace', title: '누적합 인덱스 경계', prompt: '<p>누적합 <code>pre</code>는 길이가 <b>n + 1</b>이고 <code>pre[i]</code> = 앞 i개의 합이에요. 출력은? (경계 실수가 잦은 곳 — 👀 시각화로 <code>pre</code>를 확인하세요)</p>', tags: ['누적합'], visualize: { kind: 'bars', var: 'pre', hl: ['i'] },
+  quiz: { code: 'a = [3, 1, 4, 1, 5]\npre = [0] * (len(a) + 1)\nfor i in range(len(a)):\n    pre[i + 1] = pre[i] + a[i]\nprint(pre[4] - pre[1])', opts: ['6', '9', '10', '5'], ans: 0, why: 'pre = [0, 3, 4, 8, 9, 14]. pre[4] − pre[1] = 9 − 3 = 6 = a[1] + a[2] + a[3]. 구간 a[l..r]의 합은 pre[r + 1] − pre[l].' },
+  hints: ['pre를 끝까지 직접 채워 보세요: [0, 3, …]', 'pre[4]는 앞 4개의 합, pre[1]은 앞 1개의 합', '9 − 3 = 6'] },
+);
