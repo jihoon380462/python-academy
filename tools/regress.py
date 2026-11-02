@@ -141,6 +141,9 @@ with sync_playwright() as p:
     check(pg.locator('#lpFormula .mf').count()==2 and ('n = 40' in pg.evaluate("document.querySelector('#exEd textarea')?.value || ''")), '식과 코드 페이지: 수식 2 + 슬라이더 → 코드 n = 40 동기화')
     pg.evaluate("UI.go('problem',{pid:'M1_mod_q1',lessonId:'M1_mod'})"); pg.wait_for_timeout(500); gate=pg.evaluate("[...document.querySelectorAll('.qopt')].every(b=>b.disabled)"); pg.evaluate("const s=document.querySelector('#pvFig input[data-p=n]'); s.value=30; s.dispatchEvent(new Event('input'))"); pg.wait_for_timeout(200)
     check(gate and pg.evaluate("[...document.querySelectorAll('.qopt')].every(b=>!b.disabled)"), '탐구 퀴즈: 그림을 움직여야 보기가 열림')
+    pg.evaluate("UI.go('problem',{pid:'M1_mod_q2',lessonId:'M1_mod'})"); pg.wait_for_timeout(400); sl="const s=document.querySelector('#pvFig input[data-p=n]'); s.value=%d; s.dispatchEvent(new Event('input'))"; lk="[...document.querySelectorAll('.qopt')].every(b=>b.disabled)"
+    pg.evaluate(sl % 25); pg.wait_for_timeout(150); l1=pg.evaluate(lk); pg.evaluate(sl % 24); pg.wait_for_timeout(150); l2=pg.evaluate(lk)
+    check(l1 and not l2 and '배수' in pg.locator('#exGate').inner_text() + (pg.evaluate("Content.problemMap.M1_mod_q2.unlockText") or ''), '탐구 퀴즈 unlockWhen: n=25 잠김 → n=24(배수) 열림 (QA #62)')
     pg.evaluate("UI.go('problem',{pid:'M1_mod_q3',lessonId:'M1_mod'})"); pg.wait_for_timeout(500); pg.fill('#numIn','-1'); pg.click('#btnGrade'); pg.wait_for_timeout(300); tip=pg.locator('.result.bad').inner_text(); pg.fill('#numIn','1'); pg.click('#btnGrade'); pg.wait_for_timeout(1200)
     for _ in range(3):
         if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
