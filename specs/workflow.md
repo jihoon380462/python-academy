@@ -81,3 +81,29 @@ Fable 세션(엔진·설계·검토·릴리스) 외에 **Opus 채팅 네 개를 
 5. **병합·릴리스(Fable)**: `gh pr list` → 4절 체크리스트로 검토 → `gh pr merge <번호> --squash --delete-branch` → main 에서 **릴리스 커밋 한 번**: `APP_VERSION` 패치/마이너 올림 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 를 `## vX.Y.Z — 날짜` 로 바꿈 → HANDOFF 상태판 → 푸시 → 배포 확인. 여러 PR 을 한 릴리스로 묶어도 된다.
 6. **브랜치 보호(사용자가 GitHub 에서 한 번 설정)**: 저장소 페이지 → **Settings** 탭 → 왼쪽 **Branches** → **Add branch ruleset**(또는 Add classic branch protection rule) → Branch name pattern `main` → 체크: **Require a pull request before merging**(승인 수 0 이어도 됨), **Require status checks to pass before merging** → 검색창에 `verify` 입력해 선택, **Do not allow bypassing the above settings** 는 끈 채로 → Create. 이렇게 하면 팀 채팅이 실수로 `git push origin main` 해도 거부된다. (이 설정은 API 로 못 하고 소유자가 UI 에서 해야 한다.)
 7. **예외**: 아트 납품(ChatGPT) 커밋은 `assets/img/`·IMAGES.md·버전만 바꾸므로 지금처럼 main 직접 푸시 허용 — 단 다른 PR 과 `APP_VERSION` 이 겹치지 않게 **아트 납품도 PR 로 올리는 걸 권장**(`art/<차수>` 브랜치).
+
+## 9. 파도(wave) 계획 — 병렬 처리 순서 (2026-11-02)
+
+원칙: **Fable 은 core 하나에 집중, 네 팀은 서로 다른 파일을 동시에, 릴리스는 하루 2번(오전·오후) 묶어서.** 충돌은 같은 `core` 파일과 같은 `content.js` 의 **같은 줄**에서만 난다. 파일 끝 추가(콘텐츠)와 기존 줄 수정(유지보수)은 같은 파일이어도 자동 병합된다.
+
+### 1차 파도 (지금)
+
+| 팀 | 일 | 건드리는 파일 | 전제·주의 |
+| --- | --- | --- | --- |
+| Fable | 수학 M2 core(surface·steps 그림, 영역 4·2 노드 골격, 식↔그림 색 동기화) + QA.md Fable 담당 항목(#1~15·#32) | `core/figure.js` `core/ui-views-math.js` `core/engine.js` `courses/math/content.js` | — |
+| QA팀 | 2회전: v2.3.7 기준 알고리즘·수학 정적 전수 검사(퀴즈 ans·why·수식·숫자 답) + 블록 문제·KaTeX·모의고사 시간은 사용자 브라우저 확인 요청 | QA.md | 릴리스 직후 시작이 효율적 |
+| 유지보수팀 | QA.md 「열림」 중 담당 `QA 수정`/`콘텐츠팀`/`유지보수` 항목(지문·정답·테스트·문구·CSS 한 줄) | 기존 줄 수정 | **힌트 항목은 콘텐츠 C6·C7 PR 병합 뒤에**(같은 줄 충돌 방지). `Fable` 담당은 재현 보강만 |
+| 콘텐츠팀 | C6 파이썬 L9~L18 힌트, C7 알고 힌트, C8 알고 실전 연습 문제 | `courses/python` `courses/algo` | **수학 content.js 금지**(Fable M2 와 겹침) |
+| 아트팀 | A0 완료본 90장 전수 재검수(라이트 32px 식별성) | IMAGES.md | — |
+| ChatGPT | 대기 | — | 6차 요청서(A1)까지 |
+
+### 2차 파도 (M2 = v2.4.0 릴리스 뒤)
+
+Fable: 터미널·Git WP-B 4~5 또는 M3 · QA: 3회전(영역 4·2 집중) · 유지보수: 2회전 항목 · 콘텐츠: C9 + 수학 영역 4·2 보강 노드(기존 그림 종류만) · 아트: A1 6차 요청서(영역 4·2 아이콘·뱃지) → ChatGPT 생성 → 검수 PR.
+
+### 리듬
+
+- Fable 릴리스 창: 오전·오후 각 1회 — `gh pr list` → 4절 체크리스트 → 병합 → 버전 하나로 릴리스. 그 사이 PR 이 몇 개 쌓여도 된다.
+- 팀은 PR 내기 직전 `git fetch origin && git rebase origin/main` 한 번. 릴리스 뒤 "다시 당겨서 새 브랜치"로 다음 과제.
+- QA 회전은 릴리스 직후 시작(새로 들어간 것만 보면 됨). 유지보수는 QA.md 에 「열림」이 있을 때만 돌린다 — 없으면 쉬는 게 맞다(한도 절약).
+- 병목 신호: 유지보수팀이 할 게 없다 = QA 가 밀린 것 / Fable 담당 열림이 10개를 넘는다 = Fable 이 core 작업을 잠시 멈추고 처리.
