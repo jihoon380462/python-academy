@@ -343,3 +343,9 @@ v1.0.1에서 **메인 스레드 보조 실행기**를 추가했습니다. 워커
 - `Grader.explainDiff`는 정규화된 출력(`norm`)끼리 비교해 규칙을 순서대로 적용, 팁 최대 3개. 규칙 추가 위치는 `core/engine.js` 맨 아래. 코드(`r.code`)는 input("…") 안내문 검출에만 씀.
 - `sw.js`: 앱 셸은 버전 캐시(`academy-shell-<ver>`)에 설치 때 미리, HTML은 네트워크 우선(새 배포 즉시 반영) → 오프라인이면 캐시, `?v=` 붙은 파일은 캐시 우선. CDN은 `academy-cdn-1` 런타임 캐시(처음 쓸 때). 러너 CDN 버전을 바꾸면 URL이 달라져 자연히 새로 받고, 옛 항목은 설정의 「캐시 지우기」로. file:// 와 미지원 브라우저는 조용히 건너뜀. 용량: Pyodide 한 벌 ≈ 12MB(브라우저 캐시 한도 안).
 - 「모르겠어요」는 AI 없이 콘텐츠가 이미 가진 것(용어·예제·요약·이전 페이지)을 한 곳에 모은 것. 누른 횟수는 `lessons.confused[lessonId:page]`, 통계 `stats.confused` — 약점 복습 연결은 다음 후보.
+
+## 15. 유지보수 위임 `[core]` — 지시서(specs/schedule-week.md 3절)와 다르게 한 것 (2026-11-02, Opus·유지보수)
+
+- **QA #4** 이어서 하기 위치 저장: 지시서 `Store.save()` 대신 `Store.save({ silent: true })`. 화면 이동마다 `updatedAt` 을 올리고 기기 연동 push 를 예약하면 문제를 열기만 해도 동기화가 돌고 다른 기기와 충돌 판정이 잦아진다. 위치는 다음 실제 저장 때 같이 올라간다.
+- **QA #6** 시각화 ResizeObserver 가드: 지시서 `!host.isConnected` 에 `|| !cvs[0].isConnected` 추가. 에러가 나는 흔한 경로는 host 가 붙어 있는 채로 내용만 바뀌는 경우(👀 다시 누르기 = `runAndShow` 가 host.innerHTML 교체, 닫기 버튼 = host.innerHTML = '')라 host 검사만으로는 재현이 그대로 남았다.
+- **QA #9** 고대비 「전체 초기화」 글자색: 지시서 `[data-contrast="1"] .btn.danger` 를 `[data-contrast="1"][data-theme=dark] .btn.danger` 로 좁힘. 라이트 고대비의 `--danger #c3203a` 위에 `#1d2230` 글자는 2.7:1 로 원래(흰 글자 5.9:1)보다 나빠진다. 다크는 2.5 → 6.3:1.
