@@ -115,11 +115,50 @@
 
 **검수 메모(2차)**: 2차 16장 중 6장(알고·SQL·웹 아이콘, 빈 작품, 알고 마스터 뱃지, 배너)에 **흰 스티커 테두리**가 있어 다크 테마에서 흰 띠로 보였음 → `tools/img_clean.py`로 투명 배경에 닿은 흰~회색 테두리를 지워 해결(내부 흰색은 윤곽선에 막혀 유지). 앞으로는 납품 전에 `python3 tools/img_clean.py --check`로 확인하고, 테두리가 있으면 `python3 tools/img_clean.py`(인자 없음)로 정리한 뒤 커밋. 배너는 아래 빈 공간을 잘라 1200×274가 됨 — 가로 배너는 **내용이 캔버스를 꽉 채우게** 그리는 편이 좋다.
 
-## 3. 요청 목록 — 5차 D 완료 ✅
+## 3. 요청 목록 — 6차 E 수학 영역 4·2 (4장, 2026-11-03 요청 · 아트팀 A1)
 
-수학 공간 D1 → D2 → D3 **10장 납품 완료**, 2절 완료 표로 이동했다. 전체 이미지 90장. 영역 2·4·6 아이콘과 뱃지는 M2·M3 뒤 별도 요청까지 보류한다.
+> 이전 차수(5차 D 10장)는 완료 → 2절. 이번 차수는 **수학 영역 4 「함수·변화·미적분」(보라 #9c27b0)·영역 2 「논리·집합·증명」(청록 #00acc1)** 의 장식 2장 + 영역 완료 뱃지 2장이다.
+> **그림 자리**: 영역 장식은 `core/ui-views-math.js` 영역 머리의 `area-math-<영역번호>.png`, 뱃지는 `badge-<id>.png` — 둘 다 이미 있는 자리다. 영역 4·2와 뱃지 `math_area_4`·`math_area_2`는 콘텐츠팀 C10 PR(`specs/schedule-week.md` 5절)이 `CHAPTERS`·`shared/badges.js`에 추가하면 화면에 나온다. 그 전에 납품돼도 사이트는 깨지지 않는다(안 쓰이는 파일일 뿐).
+> **A0 재검수에서 나온 기준(2절 검수 메모)**: 32px에서는 **굵게 채운 덩어리 모양**만 남는다 — `area-math-5`처럼 가는 선·점선은 금지. 박사모·거북이·사슬(이미 3장·2장·1장 있음)은 쓰지 않는다. 같은 영역의 장식과 뱃지는 **같은 소재**를 쓴다(영역 1 블록·영역 3 주사위·영역 5 화살표와 같은 규칙).
 
-**납품 체크리스트**: 지정 파일명·크기로 `assets/img/`에 저장 → `python3 tools/img_clean.py --check` → 완료 항목을 2절로 이동 → `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG·HANDOFF 갱신 → 커밋.
+순서: **E1 영역 장식 2장 → E2 뱃지 2장.**
+
+| # | 파일 | 크기 | 쓰이는 곳 | 한국어 설명 | 참조 그림 | 상태 |
+| --- | --- | --- | --- | --- | --- | --- |
+| E1-4 | `area-math-4.png` | 512×512 | 수학 지식 지도 「영역 4 · 함수·변화·미적분」 제목 옆 **32px** | 보라색 **두꺼운 아치**(뒤집힌 U자 포물선 모양 띠, 무지개다리처럼 통통하게) 꼭대기에 **노란 공** 하나 — 던진 공의 포물선·꼭짓점 | `area-math-1.png`, `area-math-3.png` | 납품 |
+| E1-2 | `area-math-2.png` | 512×512 | 「영역 2 · 논리·집합·증명」 제목 옆 **32px** | **꽉 채운 원 두 개가 겹친 벤 다이어그램** — 왼쪽 청록, 오른쪽 파랑, 겹친 부분은 진한 남청록 | `area-math-1.png`, `area-math-3.png` | 납품 |
+| E2-4 | `badge-math_area_4.png` | 256×256 | 뱃지 화면 56px·획득 알림·공유 카드 48px (영역 4 전부 완료) | 보라 메달 + 영역 4 장식과 같은 아치와 노란 공 | `badge-math_area_1.png`, `badge-math_area_3.png` | 납품 |
+| E2-2 | `badge-math_area_2.png` | 256×256 | 같은 자리 (영역 2 전부 완료) | 청록 메달 + 겹친 원 두 개(노랑·흰색, 겹친 부분 주황) | `badge-math_area_1.png`, `badge-math_area_3.png` | 납품 |
+
+### E1-4 `area-math-4.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Must stay readable at 32px: chunky FILLED shapes only — no thin lines, no dashed lines, no axes, no grid. No circular medal or backdrop. Reference is style only; replace its subject entirely. Subject: one thick solid purple (#9c27b0) arch shaped like an upside-down U parabola, drawn as a single wide rounded band (chunky like a toy rainbow bridge, NOT a thin curve), both feet resting on an invisible baseline, with one round yellow (#ffd166) ball sitting exactly on the top of the arch. Optional thin pale purple highlight inside the band. Nothing else: no ground, no arrows, no second curve, no sparkles. 512x512.
+```
+
+### E1-2 `area-math-2.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Must stay readable at 32px: chunky FILLED shapes only — no thin lines, no dashed lines, no axes, no grid. No circular medal or backdrop. Reference is style only; replace its subject entirely. Subject: a Venn diagram made of two large FULLY FILLED overlapping circles of equal size, side by side, overlapping by about one third. Left circle solid teal (#00acc1), right circle solid blue (#6c8cff), the shared lens-shaped overlap filled solid darker navy-teal (#1d6f8a). Every circle edge and the overlap edge has the same bold dark navy outline. No dots, no labels, no outer rectangle, no chain links. 512x512.
+```
+
+### E2-4 `badge-math_area_4.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round purple (#9c27b0) medal with one very large thick light lavender upside-down U arch (chunky band, parabola shape) and a single round yellow (#ffd166) ball on its top, centered on the medal face. No stars, no graph axes, no other objects. 256x256.
+```
+
+### E2-2 `badge-math_area_2.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round teal (#00acc1) medal with two large fully filled overlapping circles in the center (Venn diagram): left circle yellow (#ffd166), right circle cream white, the overlap filled orange (#ffb347), all with bold dark navy outlines. No stars, no chain links, no other objects. 256x256.
+```
+
+**검수 기준(아트팀, art-team.md 2절)**: `img_clean --check` → 다크/라이트 축소본(영역 32px·뱃지 48/56px)에서 소재 식별 + 2절 `area-math-1/3`·`badge-math_area_1/3/5`와 나란히 한 작가 느낌 → 앱 렌더(C10 병합 뒤 수학 지도·뱃지 화면). 하나라도 걸리면 이 표 「상태」에 「반려: 이유」와 고친 프롬프트.
+
+**납품 체크리스트(6차부터 — workflow 8절)**: 지정 파일명·크기로 `assets/img/`에 저장 → `python3 tools/img_clean.py --check`(현재 이 도구는 `area-` 크기를 안 봄 → 512×512인지 직접 확인) → 생성 프롬프트를 `assets/img/README.md` 맨 아래에 「6차 E」로 기록 → 이 표 「상태」를 `납품`으로 → **`art/6차` 브랜치에 커밋 → PR**. `APP_VERSION`·`node tools/stamp.mjs`·HANDOFF 상태판은 **손대지 않는다**(릴리스 때 함께). 2절 완료 표로 옮기는 것은 아트팀 검수 통과 뒤.
+
+**납품 메모(2026-11-02, Codex)**: E1-4 → E1-2 → E2-4 → E2-2 순서로 4장 생성. 위 영어 프롬프트와 지정 참조 그림을 변경 없이 사용. 영역 512×512·뱃지 256×256 RGBA, 사방 여백 47/23px, `img_clean --check` 통과. 다크/라이트 32px·48/56px 축소본에서 소재 식별 확인. 생성 결과에 약한 색조 변화가 남아 있어 완전 단색 여부는 아트팀 최종 검수 대상. C10 미병합 상태라 실제 지도·뱃지 렌더 검수는 C10 병합 후 진행. 상태는 납품이며 2절 완료 표로 이동하지 않음.
 
 ## 4. 그 뒤 (자리 없음 — 만들지 말 것)
 
