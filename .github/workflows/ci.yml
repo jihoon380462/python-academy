@@ -1,0 +1,30 @@
+name: PR Check
+# 팀(Opus QA·콘텐츠) 브랜치의 PR 게이트. main 으로 가는 PR 마다: 스키마 검사 + 정답 코드 CPython 실행 + 셸 시뮬레이터 테스트 + 브라우저 회귀(Playwright).
+# main 의 브랜치 보호 규칙에서 "verify" 체크를 필수로 걸면, 이 잡이 초록이 아닌 PR 은 병합할 수 없다 (specs/workflow.md 8절).
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: validate_content
+        run: node tools/validate_content.mjs
+      - name: run_solutions
+        run: node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
+      - name: test_shell
+        run: node tools/test_shell.mjs
+      - name: regress (Playwright)
+        run: |
+          pip install --quiet playwright pillow
+          python3 -m playwright install --with-deps chromium
+          python3 tools/regress.py
