@@ -167,6 +167,7 @@
 | L21 | 테스트 작성 | L21P1 quiz · L21P2 code clamp 테스트 · L21P3 quiz 경계값 · L21P4 bug · L21P5 code assert 5개 |
 | L22 | 디버깅 사고법 | L22P1 quiz · L22P2 code 버그 3개 · L22P3 quiz · L22P4 bug 경계 · L22P5 code print 추적 |
 | L23 | 코드 설계와 리팩터링 | L23P1 quiz · L23P2 code 이름 · L23P3 code 함수 분리 · L23P4 quiz 매직 넘버 · L23P5 code 중복 제거 |
+| (v2.3.3 C2) | 챕터 7 연습 보강 | L19P6 bug 글자끼리 빼기 · L20P6 fill re.sub 띄어쓰기 · L21P6 fill assert·not · L22P6 bug range 끝 · L23P6 fill return·상수 |
 | B7 | 보스: 학교 알림 메시지 분석기 | B7P1 D-day(6 tests) · B7P2 돈과 번호(5 tests) |
 
 ---

@@ -1254,3 +1254,22 @@ PROBLEMS.push(
   ],
   hints: ['check: missing = [name for name, fn in RULES if not fn(pw)] → (5 - len(missing), missing)', '등급: 5 강함 / 3~4 보통 / 0~2 약함. 부족이 있으면 " — 부족: " + ", ".join(missing)', 'generate: chars = [choice(lower), choice(upper), choice(digits), choice(special)] → for _ in range(n-4): chars.append(choice(lower+upper+digits+special)) → shuffle → join. 테스트: assert check("Abc!2345") == (5, [])'] },
 );
+
+// ---------------- v2.3.3 콘텐츠팀 C2: 챕터 7 연습 보강 (레슨마다 bug/fill 1문제) ----------------
+PROBLEMS.push(
+{ id: 'L19P6', lesson: 'L19', type: 'bug', title: '글자끼리 빼기', prompt: '두 날짜(YYYY-MM-DD)를 두 줄로 받아 며칠 차이인지 출력하려는데 <code>TypeError</code>가 나요. 틀린 줄을 고르고 고치세요.', tags: ['날짜', '오개념'],
+  bug: { code: 'from datetime import date\nstart = input()\nend = input()\ngap = end - start\nprint(f"{gap.days}일")', bugLine: 4, solution: 'from datetime import date\nstart = input()\nend = input()\ngap = date.fromisoformat(end) - date.fromisoformat(start)\nprint(f"{gap.days}일")', tests: [{ input: '2026-11-02\n2026-12-25', output: '53일' }, { input: '2026-01-01\n2026-01-01', output: '0일' }, { input: '2024-02-28\n2024-03-01', output: '2일' }, { input: '2026-12-31\n2027-01-01', output: '1일' }] },
+  hints: ['input()으로 받은 건 날짜가 아니라 글자(str)예요 — 글자끼리는 뺄 수 없어요', '빼기 전에 date.fromisoformat(...)으로 날짜 객체로 바꿔요', 'gap = date.fromisoformat(end) - date.fromisoformat(start)'] },
+{ id: 'L20P6', lesson: 'L20', type: 'fill', title: '빈칸 채우기: 띄어쓰기 정리', prompt: '여러 칸 띄어 쓴 곳을 <b>한 칸</b>으로 줄이는 빈칸을 채우세요. (예: <code>안녕   파이썬    세상</code> → <code>안녕 파이썬 세상</code>)', tags: ['정규식', '문자열'],
+  fill: { code: 'import re\ns = input()\nprint(re.___1___(r"___2___", " ", s).strip())', blanks: [{ a: ['sub'], opt: ['sub', 'findall', 'fullmatch', 'split'] }, { a: ['\\s+', ' +'], opt: ['\\s+', '\\s', '\\d+', '.+'] }], why: 're.sub(패턴, 바꿀 글자, 글)은 패턴에 맞는 곳을 전부 바꿔요. 공백 1개 이상(\\s+)을 한 칸 " "으로 바꾸면 끝.' },
+  hints: ['찾아서 "바꾸는" 함수예요', '공백 문자는 \\s, "1개 이상"은 +', 'sub / \\s+'] },
+{ id: 'L21P6', lesson: 'L21', type: 'fill', title: '빈칸 채우기: 테스트 두 줄', prompt: '<code>is_even</code>을 검사하는 테스트 두 줄을 완성하세요. 둘째 줄은 "7은 짝수가 <b>아니어야</b> 한다"는 검사예요.', tags: ['테스트'],
+  fill: { code: 'def is_even(n):\n    return n % 2 == 0\n\n___1___ is_even(4)\nassert ___2___ is_even(7), "7은 홀수예요"\nprint("테스트 통과")', blanks: [{ a: ['assert'], opt: ['assert', 'if', 'test', 'check'] }, { a: ['not'], opt: ['not', '!', 'no', 'False'] }], why: 'assert 조건 은 조건이 거짓이면 멈춰요. "아니어야 한다"는 not 으로 뒤집어요(파이썬에는 ! 가 없어요).' },
+  hints: ['조건이 참인지 확인하고, 아니면 멈추는 키워드', '"거짓이어야 한다"는 조건 앞에 뒤집는 낱말', 'assert / not'] },
+{ id: 'L22P6', lesson: 'L22', type: 'bug', title: '하나 모자란 합', prompt: '1부터 n까지 더해야 하는데 5를 넣으면 15가 아니라 10이 나와요. 반복문 안에 <code>print(i)</code>를 넣어 본 뒤, 틀린 줄을 고르고 고치세요.', tags: ['디버깅', '반복'],
+  bug: { code: 'n = int(input())\ntotal = 0\nfor i in range(1, n):\n    total += i\nprint(total)', bugLine: 3, solution: 'n = int(input())\ntotal = 0\nfor i in range(1, n + 1):\n    total += i\nprint(total)', tests: [{ input: '5', output: '15' }, { input: '1', output: '1' }, { input: '10', output: '55' }, { input: '100', output: '5050' }] },
+  hints: ['print(i)로 찍어 보면 마지막 i가 몇인가요?', 'range(시작, 끝)은 끝을 포함하지 않아요', 'for i in range(1, n + 1):'] },
+{ id: 'L23P6', lesson: 'L23', type: 'fill', title: '빈칸 채우기: 매직 넘버 없애기', prompt: '할인율을 상수로 빼낸 코드예요. 함수가 할인가를 <b>돌려주도록</b> 빈칸을 채우세요.', tags: ['설계', '함수'],
+  fill: { code: 'DISCOUNT_RATE = 0.1   # 할인율은 한 곳에서만\n\ndef discounted(price):\n    ___1___ int(price * (1 - ___2___))\n\nfor p in [10000, 25000]:\n    print(discounted(p))', blanks: [{ a: ['return'], opt: ['return', 'print', 'yield', 'pass'] }, { a: ['DISCOUNT_RATE'], opt: ['DISCOUNT_RATE', '0.1', 'rate', 'price'] }], why: '계산 함수는 print 대신 return 으로 값을 돌려줘야 다른 곳에서 쓸 수 있어요. 0.1을 직접 쓰지 않고 상수 이름을 쓰면 할인율이 바뀔 때 한 줄만 고치면 돼요.' },
+  hints: ['함수 밖에서 print(discounted(p))로 쓰려면 값을 "돌려줘야" 해요', '0.1 숫자 대신 위에서 만든 대문자 이름', 'return / DISCOUNT_RATE'] },
+);
