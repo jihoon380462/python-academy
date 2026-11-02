@@ -36,7 +36,6 @@
 | 86 | 수학 M4_limit_q1 why 반올림 오해 · M4_quad_q3 제목 오타 | 콘텐츠 | math content.js 906·869행 |
 | 87 | 수학 starter 3개 `while …: pass` 무한 루프(보조 실행기 멈춤) | 콘텐츠 | M4_explog_q3·M1_gcd_q4·M1_log_q4 |
 | 88 | `-0.00` 표시: M4_quad_q4 solution · unitcircle 그림 값 | 콘텐츠 + core | `+ 0` |
-| 33 | 수학 M3_geom 난이도 「고2」 표기 기준 | 콘텐츠(C9) | 28노드 표기 기준 재점검 |
 
 ## 3. 사람이 폰·브라우저에서 직접 봐야 하는 것 (샌드박스에서 CDN 차단으로 확인 불가)
 
