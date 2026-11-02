@@ -307,3 +307,28 @@ Grader.matchState = function (st, ex) {
   for (const f of ex.historyIncludes || []) { const re = f instanceof RegExp ? f : new RegExp('(^|&&|;|\\|)\\s*' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); if (!(st.history || []).some(h => re.test(h))) fails.push(`${f} 명령을 써 보세요`); }
   return { ok: !fails.length, fails };
 };
+
+// ---------- 수학 공간 채점 (v2.3.0, EXPANSION.md 14절) ----------
+// num: p.answer = { value, tol(절대 오차, 기본 상대 1%), unit?:'rad'|'deg'|... }  → Grader.checkNum(p, 입력값) = { ok, tips:[규칙 설명] }
+Grader.checkNum = function (p, raw) {
+  const a = p.answer || {}; const v = typeof raw === 'number' ? raw : parseFloat(String(raw).replace(/,/g, '').trim()); const tips = [];
+  if (raw === '' || raw == null || isNaN(v)) return { ok: false, tips: ['숫자를 넣어 주세요 (예: 3.14, -2, 0.5). 분수는 소수로 바꿔서.'] };
+  const target = a.value; const tol = a.tol != null ? a.tol : Math.max(1e-9, Math.abs(target) * 0.01); const ok = Math.abs(v - target) <= tol + 1e-12;
+  if (ok) return { ok: true, tips: [] };
+  const near = (x, y, t = tol) => Math.abs(x - y) <= Math.max(t, Math.abs(y) * 0.01);
+  if (near(-v, target)) tips.push('부호가 반대예요. 빼는 순서(끝 − 시작)나 방향(위/아래, 시계/반시계)을 확인하세요.');
+  else if (target !== 0 && near(v, target * 2)) tips.push('정확히 2배예요. 같은 것을 두 번 세거나, 지름/반지름·전체/절반을 바꿔 썼을 수 있어요.');
+  else if (target !== 0 && near(v, target / 2)) tips.push('정확히 절반이에요. 양쪽을 다 세야 하는데 한쪽만 셌거나, 2로 한 번 더 나눴을 수 있어요.');
+  else if (near(v * Math.PI / 180, target) || near(v * 180 / Math.PI, target)) tips.push('단위 착오예요 — 도(°)와 라디안이 바뀌었어요. 파이썬 math.sin/cos 는 라디안을 받아요 (math.radians(도)).');
+  else if (near(Math.round(v), target) || near(Math.round(target), v)) tips.push('반올림 차이예요. 문제에서 요구한 소수 자릿수(또는 정수) 그대로 넣으세요.');
+  else if (target !== 0 && (near(v, target * 100) || near(v, target / 100))) tips.push('100배 차이예요 — 퍼센트(%)와 비율(0~1)이 바뀌었어요.');
+  else if (target !== 0 && Math.abs(Math.log10(Math.abs(v) / Math.abs(target))) >= 1) tips.push(`자릿수가 ${Math.round(Math.abs(Math.log10(Math.abs(v) / Math.abs(target))))}자리 달라요. 단위(초/밀리초, 바이트/비트)나 지수(2^n 의 n)를 확인하세요.`);
+  else if (target !== 0 && Math.abs(v - target) / Math.abs(target) < 0.1) tips.push('거의 맞아요 — 10% 안쪽이에요. 중간 계산을 반올림하지 말고 끝에 한 번만 하세요. "코드로 계산하기"를 쓰면 정확해요.');
+  else tips.push('값이 꽤 달라요. 그림에서 내 답이 어디쯤인지 보고, 식의 각 항을 코드로 하나씩 출력해 보세요.');
+  if (a.hint) tips.push(a.hint);
+  return { ok: false, tips };
+};
+// match: p.match = { params:{a:2,b:1}, tol:{a:0.1} | 0.1 } ← 내 그림 파라미터와 비교. 반환 { ok, wrong:[id], diffs:{id:차이} }
+Grader.checkMatch = function (p, params) { const m = p.match || {}; const wrong = [], diffs = {}; Object.entries(m.params || {}).forEach(([k, v]) => { const t = typeof m.tol === 'object' ? (m.tol[k] != null ? m.tol[k] : 0.01) : (m.tol != null ? m.tol : 0.01); const d = (params[k] == null ? NaN : params[k]) - v; diffs[k] = d; if (!(Math.abs(d) <= t + 1e-9)) wrong.push(k); }); return { ok: !wrong.length, wrong, diffs }; };
+// pair: p.pair = { left:[{text|latex}], right:[{figure params | text}], answer:[rightIndex per left] } ← answers:[index]
+Grader.checkPair = function (p, answers) { const ans = p.pair.answer; const wrong = []; ans.forEach((r, i) => { if (answers[i] !== r) wrong.push(i); }); return { ok: !wrong.length, wrong }; };

@@ -35,7 +35,7 @@ Nov 1, 2026 · @정지훈 · 개정: Claude (현재 배포 버전 v1.3.0 시점�
 | 4 | 데이터베이스(SQL) | sql.js (SQLite WebAssembly) | 14 + 보스 3 | 없음 |
 | 5 | 웹·HTTP·API | iframe 샌드박스 + 가짜 API 서버 | 13 + 보스 3 | 파이썬 챕터 2까지 |
 
-**수학 공간**은 코스와 별도 구역(14절), 제작 단계 M1~M3은 코스 Phase와 독립, M1 = v2.3.0.
+**수학 공간**은 코스와 별도 구역(14절), 제작 단계 M1~M3은 코스 Phase와 독립, M1 = v2.3.0 (**완료 2026-11-02**: 영역 1·3·5 노드 25·문제 100, 그림 16종, 유형 4종). M2·M3 남음.
 
 **제작 단계** — 한 Phase가 하나의 의뢰 단위다. 각 Phase는 이 문서 + HANDOFF.md를 읽고 "Phase N을 진행해"로 맡기며, 끝날 때마다 배포·버전 올림·설계 결정 요약(DESIGN.md)·HANDOFF.md 갱신을 받는다. 다음 Phase는 이전 Phase가 배포되어 사용자가 확인한 뒤 시작한다.
 
@@ -608,7 +608,7 @@ Nov 1, 2026 · @정지훈 · 개정: Claude (현재 배포 버전 v1.3.0 시점�
 
 | 단계 | 내용 |
 | --- | --- |
-| M1 | 수학 탭·지식 지도 UI, KaTeX, 시각화 `numberline plot unitcircle vector hist`, 영역 1·3·5 (쓰임이 제일 바로 보이는 세 영역) |
+| M1 ✅ v2.3.0 | 수학 탭·지식 지도 UI, KaTeX, 시각화 `numberline plot unitcircle vector hist`(+ sieve euclid bits floatline bars tree venn montecarlo cells scatter transform 까지 16종을 `core/figure.js`에 구현), 영역 1·3·5 (쓰임이 제일 바로 보이는 세 영역). 미구현: 14-2 색 동기화(식 항 ↔ 그림 부분), 복습 변형 vary, 알고리즘 코스 "수학 보기 →" 칩 |
 | M2 | 시각화 `transform scatter surface steps`, 영역 4·2 |
 | M3 | 영역 6, 코스 연결 칩, 실전 프로젝트 6개, 테마 경로 |
 

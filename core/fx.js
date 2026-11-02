@@ -56,6 +56,7 @@ function mascotSVG({ stage = 0, mood = 'normal', color = 0, accessory = 'none', 
     headphone: `<path d="M16 32 q0 -22 18 -22 q18 0 18 22" stroke="#333" stroke-width="3" fill="none"/><rect x="12" y="28" width="8" height="12" rx="3" fill="#333"/><rect x="48" y="28" width="8" height="12" rx="3" fill="#333"/>`,
     flower: `<circle cx="48" cy="18" r="3" fill="#ff6b6b"/><circle cx="52" cy="14" r="3" fill="#ff6b6b"/><circle cx="44" cy="14" r="3" fill="#ff6b6b"/><circle cx="48" cy="10" r="3" fill="#ff6b6b"/><circle cx="48" cy="14" r="2.5" fill="#ffd93d"/>`,
     halo: `<ellipse cx="34" cy="8" rx="14" ry="4" stroke="#ffd700" stroke-width="3" fill="none"/>`,
+    gradcap: `<path d="M10 18 l24 -10 l24 10 l-24 10 z" fill="#1d2230"/><rect x="24" y="20" width="20" height="8" fill="#1d2230"/><path d="M52 20 l0 10" stroke="#ffd166" stroke-width="2"/><circle cx="52" cy="31" r="2.5" fill="#ffd166"/>`,
     crown2: `<path d="M20 20 l5 -12 l9 8 l9 -8 l5 12 z" fill="#ffd700" stroke="#b8860b"/><circle cx="25" cy="10" r="2" fill="#e74c3c"/><circle cx="34" cy="14" r="2" fill="#3498db"/><circle cx="43" cy="10" r="2" fill="#2ecc71"/>`,
   }[accessory] || '';
   return `<svg class="mascot" viewBox="0 0 68 68" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">${body}${hat}${acc}</svg>`;

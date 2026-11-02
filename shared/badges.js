@@ -50,6 +50,13 @@ const BADGES = [
   { id:'secret_night', name:'???', desc:'자정부터 새벽 4시 사이에 문제 클리어', icon:'🌙', secret:true, cond:['nightClear',1] },
   { id:'secret_fast', name:'???', desc:'타임 어택 5문제를 60초 안에', icon:'⚡', secret:true, cond:['timeAttackFast',1] },
   { id:'secret_turtle', name:'???', desc:'거북이로 선을 100개 이상 그렸어요', icon:'🐢', secret:true, cond:['turtleLines100',1] },
+  // 수학 공간 (v2.3.0, M1 = 영역 1·3·5). 영역 뱃지는 영역의 노드 전부 풀이 완료, ★ 는 대학 맛보기 노드
+  { id:'math_first', name:'이름 붙이기', desc:'수학 노드 첫 완료 — 이미 쓰던 걸 이름 붙였어요', icon:'📐', cond:['mathNodes',1], course:'math' },
+  { id:'math_nodes10', name:'지도 탐험가', desc:'수학 노드 10개 완료', icon:'🗺', cond:['mathNodes',10], course:'math' },
+  { id:'math_area_1', name:'수와 컴퓨터', desc:'영역 1 「수와 컴퓨터」 전부 완료', icon:'🔢', cond:['math_area_1',1], course:'math' },
+  { id:'math_area_3', name:'확률의 눈', desc:'영역 3 「경우의 수·확률·통계」 전부 완료', icon:'🎲', cond:['math_area_3',1], course:'math' },
+  { id:'math_area_5', name:'벡터 조종사', desc:'영역 5 「벡터·행렬」 전부 완료', icon:'🧮', cond:['math_area_5',1], course:'math' },
+  { id:'math_star3', name:'대학 맛보기', desc:'★ 노드(대학 1학년 맛보기) 3개 완료', icon:'🎓', cond:['mathStarNodes',3], course:'math' },
 ];
 
 // 에러 사전
@@ -86,6 +93,7 @@ const INVENTORY = {
     { id:'flower', name:'꽃', unlock:{badge:'turtle5'} },
     { id:'halo', name:'천사 링', unlock:{badge:'nohint10'} },
     { id:'crown2', name:'보석 왕관', unlock:{level:45} },
+    { id:'gradcap', name:'박사모', unlock:{badge:'math_first'} },
   ],
 };
 

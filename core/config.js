@@ -2,7 +2,7 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.2.26',
+  APP_VERSION: '2.3.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
@@ -10,6 +10,7 @@ const CONFIG = {
     { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '코드가 돌아가는 모습을 눈으로 보며, 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 134, lessons: 32, requires: { course: 'python', boss: 'B3', label: '파이썬 챕터 3까지 끝내면 열려요' } },
     { id: 'terminal-git', name: '터미널·Git', icon: '🎧', desc: '검은 창이 무섭지 않게. 가상 터미널과 Git 시뮬레이터', phase: 2 },
     { id: 'sql', name: '데이터베이스(SQL)', icon: '🗄️', desc: '동네 카페 데이터로 배우는 진짜 SQLite', phase: 3 },
+    { id: 'math', name: '수학 공간', icon: '📐', desc: '프로그래머 수학 — 그림을 만지며 배우고, 계산은 파이썬이', path: 'courses/math/', color: '#e91e63', ready: true, total: 100, lessons: 25, space: true, map: 'graph', hubLabel: '별도 구역 · 코스 순서와 무관' },
     { id: 'web', name: '웹·HTTP·API', icon: '🌐', desc: '내가 만든 걸 남에게 보여주려면', requires: { course: 'python', boss: 'B2', label: '파이썬 챕터 2까지 끝내면 열려요' }, phase: 4 },
   ],
 
@@ -43,7 +44,8 @@ const CONFIG = {
   HUB: { minutesPerProblem: 4 },           // 허브 '남은 시간' 추정치 (문제당 분)
 
   // --- XP / 레벨 ---
-  XP: { quiz: 10, fill: 15, bug: 20, parsons: 20, block: 25, code: 30 },
+  XP: { quiz: 10, fill: 15, bug: 20, parsons: 20, block: 25, code: 30, num: 20, match: 20, pair: 20 }, // num·match·pair: 수학 공간 유형 (v2.3.0)
+  KATEX: { css: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css', js: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js' }, // 수학 공간 수식 (없어도 글자 수식으로 대체)
   HINT_XP_MULT: [1, 0.7, 0.4, 0],        // 힌트 0,1,2,3단계 사용 시 배율 (정답 보기 = 0)
   TEXT_MODE_MULT: 1.5,                    // Parsons/텍스트 선택 가능 문제를 텍스트로 풀면
   FIRST_TRY_BONUS: 0.5,                   // 첫 시도 클리어 +50%

@@ -14,7 +14,7 @@
    node tools/stamp.mjs && node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py && node tools/test_shell.mjs && python3 tools/regress.py
    ```
    `regress.py`는 헤드리스 크롬(file://, CDN 없음 → Pyodide·Blockly·CodeMirror 폴백). 새 화면·요소를 추가하면 거기에 `check(...)` 한 줄을 보탠다.
-4. **버전**: `core/config.js`의 `APP_VERSION`을 올리고 `node tools/stamp.mjs`. WP-A(피드백·보강)는 패치(2.2.x), WP-B는 2.3.0, SQL 2.4.0, 웹 2.5.0, WP-C/WP-D(Phase 5)는 2.6.0 (EXPANSION.md 1절 표).
+4. **버전**: `core/config.js`의 `APP_VERSION`을 올리고 `node tools/stamp.mjs`. WP-A(피드백·보강)는 패치(2.2.x), WP-B(터미널·Git)는 다음 마이너(2.4.0 — v2.3.0은 수학 공간 M1이 가져감), SQL 2.5.0, 웹 2.5.0, WP-C/WP-D(Phase 5)는 2.6.0 (EXPANSION.md 1절 표).
 5. **같은 커밋에 반드시**: `HANDOFF.md` 0절 상태판(현재 버전·마지막 작업·다음 후보), `CHANGELOG.md`(사용자가 보는 변화 → 내부 변화 순), 설계가 바뀌면 `DESIGN.md`(새 절: "임의로 정한 수치 / 지시서와 다르게 한 것과 이유 / 알려진 한계 / 파일별 용량"), 문제가 늘면 `PROBLEMS.md`.
 6. **커밋·배포**:
    ```
@@ -33,6 +33,7 @@
 | **WP-F** | 전체 기능 개선 백로그(두 코스 공통 엔진·허브·학습 기능) | 2.2.x | 중 | **1차 완료(v2.2.4)**: F1·F2·F5·F8·F12. 남음: F3 F4 F6 F7 F9 F10 F11 |
 | **WP-G** | 실전 프로젝트 확장(코스당 프로젝트 추가 + 실전 공통 기능) | 2.2.x | 중 | **1차 완료(v2.2.3)** — G1·G2·G3·G4·G5·G6 반영 |
 | WP-B | Phase 2 터미널·Git | 2.3.0 | 대 | **보류** (뼈대만 있음) |
+| **WP-M** | 수학 공간 (EXPANSION 14절) | M1 2.3.0 ✅ · M2·M3 다음 마이너 | 중 | **M1 완료(v2.3.0)** 영역 1·3·5. M2 = 영역 4(함수·변화·미적분)·2(논리·집합·증명) + 시각화 surface/steps + 14-2 색 동기화. M3 = 영역 6 + 코스 레슨 「수학 보기 →」 칩 + 실전 프로젝트 6 |
 | WP-C | 9절 ③ 캡스톤 | 2.6.0 | 중 | 보류 (코딩테스트 도전만 지금 가능) |
 | WP-D | 9절 ④ PC형 실전 | 2.6.0 | 중 | 보류 (WP-B의 TG 레슨 전제) |
 

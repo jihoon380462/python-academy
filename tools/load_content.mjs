@@ -20,5 +20,5 @@ export function instantiate(p) {
 // run_solutions.py가 읽는 평면 JSON
 export function flatProblems(course) {
   return course.PROBLEMS.map(instantiate).map(p => ({ id: p.id, course: course.id, lesson: p.lesson, type: p.type, title: p.title, boss: !!p.boss, turtle: !!p.turtle, runner: p.runner || course.meta.runner,
-    solution: p.type === 'bug' ? p.bug.solution : (p.solution || (p.parsons && p.parsons.solution) || null), tests: p.type === 'bug' ? p.bug.tests : (p.tests || []), parsons: p.parsons ? { solution: p.parsons.solution } : null, limits: p.limits || null, files: p.files || null, project: p.project || null }));
+    solution: p.type === 'bug' ? p.bug.solution : (p.solution || (p.parsons && p.parsons.solution) || null), tests: p.type === 'bug' ? p.bug.tests : (p.tests || []), parsons: p.parsons ? { solution: p.parsons.solution } : null, limits: p.limits || null, files: p.files || null, answer: p.answer || null, kind: p.kind || null, project: p.project || null }));
 }

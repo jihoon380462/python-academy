@@ -149,7 +149,7 @@ const Viz = {
   },
   // 코드를 추적 실행해서 플레이어로 (lesson 데모·문제 "시각화" 버튼 공용)
   async runAndShow(host, { code, input = '', spec, editor, title, autoplay = true }) {
-    const specs = Array.isArray(spec) ? spec : [spec]; const vars = [...new Set(specs.flatMap(s => [s.var, s.cur, s.visited, s.queue, s.dist, s.order, s.path, ...(s.hl || []), ...(s.pos || [])].filter(Boolean)))];
+    const specs = Array.isArray(spec) ? spec : [spec]; const vars = [...new Set(specs.flatMap(s => [s.var, s.cur, s.visited, s.queue, s.dist, s.order, s.path, ...(s.hl || []), ...(Array.isArray(s.pos) ? s.pos : s.pos ? [s.pos] : [])].filter(Boolean)))];
     host.innerHTML = '<div class="muted">실행하며 기록하는 중…</div>';
     const r = await Py.run({ code, input, trace: true, vis: vars, maxsteps: CONFIG.ALGO.traceMaxSteps, timeoutMs: CONFIG.RUN_TIMEOUT_MS * 2 });
     if (!r.ok && !(r.trace && r.trace.length)) { host.innerHTML = `<div class="errbox"><b>${esc(r.ename || '오류')}</b>: ${esc(r.emsg || '')}<br><span class="errko">💡 ${esc(Py.explain(r))}</span></div>`; return null; }

@@ -32,7 +32,8 @@ const Hub = {
         <div class="hub-stats"><span>🎯 일일 목표 <b>${Math.min(todayCount, d.dailyGoal)}/${d.dailyGoal}</b></span><span>🧠 복습 큐 <b>${rd.reduce((a, x) => a + x.n, 0)}</b>개${rd.length ? ' · ' + rd.map(x => `<a href="${this.courseUrl(x.c, 'review')}">${esc(x.c.name)} ${x.n}</a>`).join(' · ') : ''}</span><span>🔥 ${chal}</span></div>
       </div>
       <h2 class="hub-h">코스</h2>
-      <div class="hub-courses">${CONFIG.COURSES.map(c => this.courseCard(c)).join('')}</div>
+      <div class="hub-courses">${CONFIG.COURSES.filter(c => !c.space).map(c => this.courseCard(c)).join('')}</div>
+      ${CONFIG.COURSES.some(c => c.space) ? `<h2 class="hub-h">공간 <small class="muted">코스 순서와 무관 — 언제든</small></h2><div class="hub-courses hub-spaces">${CONFIG.COURSES.filter(c => c.space).map(c => this.courseCard(c)).join('')}</div>` : ''}
       <div class="muted small center hub-foot">${T.appName} v${CONFIG.APP_VERSION} · <b>완전 무료</b> · 계정 없음 · 진행은 내 기기에만 저장(설정에서 백업·기기 연동) · 한 번 연 뒤엔 오프라인도 OK</div>
     </div>`;
   },
@@ -42,7 +43,7 @@ const Hub = {
       ? `<div class="hc-body">${this.ring(pr.pct, c.color || 'var(--primary)')}<div class="hc-txt"><div class="hc-sub">${pr.cleared}/${pr.total} 문제 · ★ ${pr.stars}/${pr.maxStars}</div><div class="hc-sub muted">${pr.cleared >= pr.total ? '완주! 🎉' : `남은 시간 약 ${pr.mins >= 60 ? Math.round(pr.mins / 60) + '시간' : pr.mins + '분'}`}</div></div></div>`
       : `<div class="hc-body"><div class="hc-soon">🚧 준비 중 <small>(Phase ${c.phase})</small></div>${c.requires ? `<div class="hc-sub muted">🔒 ${esc(c.requires.label)}</div>` : ''}</div>`;
     const lockNote = locked ? `<div class="hc-sub muted">🔒 ${esc(c.requires.label)} <span class="small">(설정에서 "전제 무시" 가능)</span></div>` : '';
-    const inner = `<div class="hc-head">${UI.img(`course-${c.id}.png`, c.icon, 'hc-icon')}<span class="hc-name">${esc(c.name)}</span>${locked ? '<span class="chip">🔒</span>' : ''}</div><div class="hc-desc muted small">${esc(c.desc)}</div>${body}${lockNote}`;
+    const inner = `<div class="hc-head">${UI.img(`course-${c.id}.png`, c.icon, 'hc-icon')}<span class="hc-name">${esc(c.name)}</span>${locked ? '<span class="chip">🔒</span>' : ''}${c.space ? '<span class="chip">공간</span>' : ''}</div><div class="hc-desc muted small">${esc(c.desc)}${c.hubLabel ? ` · ${esc(c.hubLabel)}` : ''}</div>${body}${lockNote}`;
     return ready && !locked ? `<a class="card hc ready" href="${this.courseUrl(c)}" style="--hc:${c.color || 'var(--primary)'}">${inner}</a>` : `<div class="card hc ${ready ? 'locked' : 'soon'}">${inner}</div>`;
   },
 };

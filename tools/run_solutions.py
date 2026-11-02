@@ -52,7 +52,17 @@ for p in P:
     if p.get('runner') not in (None,'python'):
         fails.append((p['id'],f"runner {p['runner']} 검증기는 아직 없음 (해당 Phase에서 추가)")); continue
     tests=p['tests'] or []
-    if p['type'] in ('quiz','fill'): table.append((p,len(tests))); continue
+    if p['type'] in ('quiz','fill','match','pair'): table.append((p,len(tests))); continue
+    if p['type']=='num':   # 수학 공간 숫자 답: 정답 코드가 print 한 마지막 숫자가 answer.value 와 tol 안에서 같아야 한다 (v2.3.0)
+        a=p.get('answer') or {}
+        if not p['solution']: fails.append((p['id'],'num: solution(계산 코드) 없음')); continue
+        out,err,_,_=run(p['solution'],'')
+        if err: fails.append((p['id'],f'num error: {err.strip()[-200:]}')); continue
+        nums=re.findall(r'-?\d+(?:\.\d+)?(?:e[-+]?\d+)?', out or '', re.I)
+        if not nums: fails.append((p['id'],'num: 정답 코드가 숫자를 출력하지 않음')); continue
+        v=float(nums[-1]); tol=a.get('tol') if a.get('tol') is not None else abs(a['value'])*0.01
+        if abs(v-a['value'])>tol+1e-9: fails.append((p['id'],f"num: 코드 결과 {v} ≠ answer.value {a['value']} (tol {tol})"))
+        table.append((p,1)); continue
     if not p['solution']: fails.append((p['id'],'no solution')); continue
     if not tests: fails.append((p['id'],'no tests')); continue
     for i,t in enumerate(tests):
