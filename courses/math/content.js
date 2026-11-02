@@ -1,4 +1,4 @@
-// courses/math/content.js — 수학 공간 콘텐츠 (v2.3.0 M1: 영역 1·3·5, 노드 25개). EXPANSION.md 14절.
+// courses/math/content.js — 수학 공간 콘텐츠 (v2.3.0 M1: 영역 1·3·5, 노드 25개 · v2.3.2 보강 +3 = 28개). EXPANSION.md 14절.
 //   노드 = 레슨 스키마 + { subtitle, level, stars(1~3), prereq:[id], uses:[], star(대학 맛보기), icon, params:[{id,label,min,max,step,default,unit}] }
 //   pages[0] 은 반드시 figure(만지는 그림): { title, scene(쓰임 한 컷), figure:{kind,...}, html(3줄 이내), observe:[질문] }
 //   pages[1] 은 식과 코드: { title, html, formula:[{latex, note}], example:{code} } — 슬라이더 ↔ 코드의 `id = 값` 줄이 동기화된다
@@ -10,10 +10,10 @@ const CHAPTERS = [
   { ch: 5, name: '벡터·행렬', color: '#6c8cff', icon: '🧮' },
 ];
 const MAP_DECOR = { 1: '🔢', 3: '🎲', 5: '🧮' };
-const WEAKNESS_TAGS = ['나머지', '소수', '최대공약수', '진법', '부동소수점', '거듭제곱', '로그', '수열', '시그마', '경우의수', '확률', '조건부확률', '기댓값', '분포', '몬테카를로', '베이즈', '상관', '벡터', '정규화', '내적', '행렬', '변환', '동차좌표'];
+const WEAKNESS_TAGS = ['나머지', '소수', '최대공약수', '약수', '진법', '부동소수점', '거듭제곱', '로그', '수열', '시그마', '경우의수', '확률', '조건부확률', '기댓값', '분포', '몬테카를로', '베이즈', '상관', '벡터', '정규화', '내적', '행렬', '변환', '동차좌표'];
 const THEME_PATHS = [
-  { label: '🎮 게임 만들 거면 5 → (4)', nodes: ['M5_vec', 'M5_add', 'M5_norm', 'M5_dot', 'M5_rotate', 'M5_scale', 'M5_compose', 'M5_homog'], note: '캐릭터 이동·추적·회전부터. 영역 4(변화·미적분)는 M2에서 열려요' },
-  { label: '🧭 코딩테스트면 1 → (6) → 3', nodes: ['M1_mod', 'M1_prime', 'M1_gcd', 'M1_binary', 'M1_power', 'M1_log', 'M3_perm', 'M3_prob'], note: '나머지·소수·비트·로그(복잡도)·경우의 수' },
+  { label: '🎮 게임 만들 거면 5 → (4)', nodes: ['M5_vec', 'M5_add', 'M5_dist', 'M5_norm', 'M5_dot', 'M5_rotate', 'M5_scale', 'M5_compose', 'M5_homog'], note: '캐릭터 이동·추적·회전부터. 영역 4(변화·미적분)는 M2에서 열려요' },
+  { label: '🧭 코딩테스트면 1 → (6) → 3', nodes: ['M1_mod', 'M1_prime', 'M1_divisor', 'M1_gcd', 'M1_binary', 'M1_power', 'M1_log', 'M3_perm', 'M3_prob'], note: '나머지·소수·비트·로그(복잡도)·경우의 수' },
   { label: '📊 데이터·AI면 3 → (4) → 5', nodes: ['M3_prob', 'M3_expect', 'M3_normal', 'M3_monte', 'M3_bayes', 'M3_corr', 'M5_vec', 'M5_dot'], note: '확률·분포·상관부터 벡터 내적(유사도)까지' },
 ];
 // "이미 쓰고 있는 수학": 다른 코스에서 클리어한 문제 → 수학 노드 (14-1)
@@ -139,6 +139,18 @@ const LESSONS = [
       example: { code: 'n = 8\ntotal = 0\nfor i in range(1, n + 1):   # Σ_{i=1}^{n}\n    total += i\nprint(total, "=", n * (n + 1) // 2)\nprint(sum(i * i for i in range(1, n + 1)), "= Σ i²")\nscores = [80, 95, 70]\nprint("평균 =", sum(scores) / len(scores))', trace: true } },
   ],
   summary: ['Σ_{i=1}^{n} f(i) = for i in range(1, n+1): total += f(i)', '1+…+n = n(n+1)/2', '합은 나눠 더해도 같고, 상수는 밖으로'] },
+{ id: 'M1_divisor', ch: 1, n: 10, title: '나누어떨어지는 수 모으기', subtitle: '약수의 개수와 완전수', level: '고1', stars: 2, prereq: ['M1_prime', 'M1_sigma'], uses: ['algo'], icon: '🧩', minutes: 15, mode: 'text',
+  params: [{ id: 'n', label: 'n', min: 1, max: 40, step: 1, default: 12 }],
+  terms: { '약수': 'n을 나누어떨어지게 하는 수. n % i == 0 인 i. 12의 약수는 1, 2, 3, 4, 6, 12', '완전수': '자기 자신을 뺀 약수를 전부 더하면 자기 자신이 되는 수. 6 = 1 + 2 + 3, 28 = 1 + 2 + 4 + 7 + 14' },
+  pages: [
+    { title: '만져 보기: 나누어떨어질 때만 막대가 선다', scene: '🍕 피자 12조각을 똑같이 나눌 수 있는 인원은 1·2·3·4·6·12명. 화면 격자 칸 나누기, 팀 짜기, 반복 주기 맞추기가 전부 약수 찾기예요.', figure: { kind: 'bars', term: 'n % i == 0 ? i : 0', note: 'i를 1부터 n까지 늘리며 n % i == 0 일 때만 높이 i 막대가 서요. 빨간 합 = 지금까지 찾은 약수의 합' },
+      html: '<p>i를 1부터 n까지 하나씩 대 보며 <code>n % i == 0</code>이면 [[약수]]예요. 막대가 선 칸을 세면 약수의 개수, 막대 높이를 다 더하면 약수의 합. 자기 자신(맨 끝 막대)을 뺀 합이 딱 n이면 [[완전수]]예요.</p>',
+      observe: ['n = 12, 16, 36 에서 「끝까지」를 누르고 막대 개수를 세 보세요. 개수가 홀수인 n은 어떤 수인가요?', 'n이 소수(7, 13 …)이면 막대는 몇 개인가요?', 'n = 6, 28 에서 빨간 합은 n의 몇 배인가요?'] },
+    { title: '식과 코드', html: '<p>약수는 <b>짝</b>으로 와요: i가 약수면 n // i도 약수(12 = 2 × 6 = 3 × 4). 그래서 √n까지만 찾으면 나머지 반쪽은 저절로 나와요 — 소수 판별을 √n까지만 하는 것과 같은 이유. 짝이 자기 자신인 경우(i × i = n)만 하나로 세니까 <b>제곱수만 약수 개수가 홀수</b>예요.</p><p>소인수분해를 알면 세지 않고도 개수가 나와요: 360 = 2³ × 3² × 5 → 지수에 1씩 더해 곱한 (3+1)(2+1)(1+1) = 24개. 완전수는 아주 드물어서 1만 이하에 6, 28, 496, 8128 네 개뿐이에요.</p>',
+      formula: [{ latex: 'n = p_1^{a_1} p_2^{a_2} \\cdots \\Rightarrow d(n) = (a_1 + 1)(a_2 + 1)\\cdots', note: '각 소인수를 0번~a번 고르는 경우의 수를 곱한다' }, { latex: '\\sum_{i \\mid n,\\ i < n} i = n \\iff n \\text{ 은 완전수}', note: 'i | n 은 "i가 n을 나눈다"(n % i == 0). 자기 자신을 뺀 약수의 합 = n' }],
+      example: { code: 'n = 12\ndivs = [i for i in range(1, n + 1) if n % i == 0]\nprint("약수", divs, "개수", len(divs), "합", sum(divs))\n# √n 까지만 보고 짝으로 모으기\nsmall, big = [], []\ni = 1\nwhile i * i <= n:\n    if n % i == 0:\n        small.append(i)\n        if i != n // i:\n            big.append(n // i)\n    i += 1\nprint(small + big[::-1])\nprint("500 이하 완전수", [m for m in range(2, 500) if sum(d for d in range(1, m) if m % d == 0) == m])', trace: true } },
+  ],
+  summary: ['약수: n % i == 0 인 i — 짝(i, n // i)으로 오니 √n 까지만', '약수 개수 = 소인수분해 지수에 1씩 더해 곱 · 제곱수만 홀수 개', '완전수: 자기 자신을 뺀 약수의 합 = n (6, 28, 496, 8128)'] },
 
 // =============== 영역 3 경우의 수·확률·통계 ===============
 { id: 'M3_perm', ch: 3, n: 1, title: '줄 세우기와 고르기', subtitle: '순열과 조합', level: '고2', stars: 2, prereq: [], uses: ['algo', 'game'], icon: '🌳', minutes: 15, mode: 'text',
@@ -237,6 +249,18 @@ const LESSONS = [
       example: { code: 'xs = [1, 2, 3, 4, 5, 6, 7, 8]\nys = [2, 3.5, 3, 5, 5.5, 7, 6.5, 8.5]\nn = len(xs)\nmx, my = sum(xs) / n, sum(ys) / n\nsxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))\nsxx = sum((x - mx) ** 2 for x in xs)\nsyy = sum((y - my) ** 2 for y in ys)\nr = sxy / (sxx * syy) ** 0.5\na = sxy / sxx\nb = my - a * mx\nprint("r =", round(r, 3), " 추세선 y =", round(a, 3), "x +", round(b, 3))', trace: true } },
   ],
   summary: ['r: 1 같이 커짐, −1 반대, 0 무관', 'r = 공분산 / (σx σy), 이상값 하나에 크게 흔들린다', '추세선 = 잔차 제곱합 최소. 상관 ≠ 인과'] },
+{ id: 'M3_geom', ch: 3, n: 9, title: '몇 번 만에 성공하나', subtitle: '기하분포', level: '고2', stars: 2, prereq: ['M3_expect'], uses: ['game', 'data'], icon: '🎰', minutes: 15, mode: 'text',
+  params: [{ id: 'pct', label: '성공 확률 p', min: 10, max: 90, step: 5, default: 20, unit: '%' }],
+  terms: { '기하분포': '성공 확률 p인 시도를 성공할 때까지 반복할 때, 첫 성공까지 걸린 횟수의 분포. 평균 1/p 번' },
+  pages: [
+    { title: '만져 보기: 첫 성공까지 세기', scene: '🎁 드롭률 20% 아이템은 평균 5번 만에 나와요. 그런데 1번 만에 뽑는 사람이 제일 많고, 15번 넘게 걸리는 사람도 꼭 있어요. 가챠 천장·로그인 재시도·네트워크 재전송이 전부 이 그림이에요.', figure: { kind: 'hist', sim: (rng, p) => { const q = p.pct / 100; let k = 1; while (rng() >= q && k < 500) k++; return k; }, domain: (p) => [1, Math.min(40, Math.max(8, Math.ceil(400 / p.pct))), 1], theory: (k, p) => { const q = p.pct / 100; return Math.pow(1 - q, k - 1) * q; }, compare: (st, p) => { let s = 0; for (const k in st.counts) s += +k * st.counts[k]; return `실제 평균 ${(s / st.total).toFixed(2)}번 · 1/p = ${(100 / p.pct).toFixed(2)}번`; }, trials: [10, 100, 10000], note: '실험 한 번 = 성공할 때까지 시도. 막대 = 첫 성공이 k번째였던 비율' },
+      html: '<p>성공 확률 p인 시도를 <b>성공할 때까지</b> 반복하고, 몇 번째에 처음 성공했는지 기록해요. 이 횟수의 분포가 [[기하분포]]. k번째에 처음 성공하려면 앞의 k − 1번은 전부 실패해야 하니, 막대는 오른쪽으로 한 칸 갈 때마다 (1 − p)배씩 낮아져요.</p>',
+      observe: ['p = 20%로 +10,000번을 누르면 가장 높은 막대는 몇 번째인가요?', 'p를 10%, 20%, 50%로 바꾸면 그림 아래 「실제 평균」은 각각 몇 번 근처인가요?', '평균보다 훨씬 오래 걸린 경우(오른쪽 꼬리)는 얼마나 남아 있나요?'] },
+    { title: '식과 코드', html: '<p>k번째에 처음 성공할 확률 = 실패 k − 1번 × 성공 1번 = (1 − p)<sup>k−1</sup> p. 평균은 딱 1/p번 — 20%면 5번, 1%면 100번. 하지만 평균은 "약속"이 아니에요: k번 시도해서 <b>전부 실패</b>할 확률 (1 − p)<sup>k</sup>는 생각보다 천천히 줄어서, 5% 가챠를 50번 돌려도 못 뽑는 사람이 약 13명 중 1명이에요. 그래서 게임은 「천장」(최대 횟수 보장)을 둬요.</p><p>재미있는 성질: 이미 10번 실패했어도 앞으로 걸릴 횟수의 분포는 처음과 똑같아요(<b>무기억성</b>). "이제 나올 때가 됐다"는 착각이에요.</p>',
+      formula: [{ latex: 'P(X = k) = (1 - p)^{k-1}\\, p', note: '앞의 k−1번 실패, k번째 성공' }, { latex: 'E[X] = \\frac{1}{p},\\qquad P(X > k) = (1 - p)^{k}', note: '평균 1/p 번 · k번 안에 못 끝낼 확률 = k번 연속 실패' }],
+      example: { code: 'import random\nrandom.seed(3)\npct = 20\np = pct / 100\ntrials = []\nfor _ in range(10000):\n    k = 1\n    while random.random() >= p:\n        k += 1\n    trials.append(k)\nprint("실제 평균", sum(trials) / len(trials), "이론 1/p =", 1 / p)\nprint("1번 만에", trials.count(1) / len(trials), "이론", p)\nprint("20번 넘게 걸림", sum(1 for k in trials if k > 20) / len(trials), "이론", round((1 - p) ** 20, 4))', trace: true } },
+  ],
+  summary: ['기하분포: 성공할 때까지 반복한 횟수 — P(X=k) = (1−p)^(k−1)·p', '가장 흔한 건 1번 만에, 평균은 1/p 번', 'k번 연속 실패 (1−p)^k — 평균은 보장이 아니다(천장이 필요한 이유)'] },
 
 // =============== 영역 5 벡터·행렬 ===============
 { id: 'M5_vec', ch: 5, n: 1, title: '크기와 방향', subtitle: '2D 벡터', level: '고2', stars: 1, prereq: [], uses: ['game'], icon: '➡️', minutes: 12, mode: 'text',
@@ -335,6 +359,18 @@ const LESSONS = [
       example: { code: 'import math\ntx, ty = 1.5, 1\ndeg = 30\nt = math.radians(deg)\nM = [[math.cos(t), -math.sin(t), tx],\n     [math.sin(t),  math.cos(t), ty],\n     [0, 0, 1]]\ndef apply(M, x, y):\n    v = (x, y, 1)\n    return tuple(round(sum(M[i][k] * v[k] for k in range(3)), 3) for i in range(2))\nprint("원점 →", apply(M, 0, 0), "(= 이동)")\nprint("(1, 0) →", apply(M, 1, 0))\nprint("(2, 1) →", apply(M, 2, 1))', trace: true } },
   ],
   summary: ['(x, y, 1)로 쓰면 이동도 행렬 곱', '3×3: 왼쪽 위 회전·크기, 마지막 열 이동', 'M = T·R·S (크기 → 회전 → 이동), 부모×자식'] },
+{ id: 'M5_dist', ch: 5, n: 9, title: '얼마나 떨어져 있나', subtitle: '두 점 사이 거리와 충돌 판정', level: '고1', stars: 1, prereq: ['M5_add'], uses: ['game'], icon: '💥', minutes: 15, mode: 'text',
+  params: [{ id: 'ax', label: 'A.x', min: -5, max: 5, step: 0.5, default: -3 }, { id: 'ay', label: 'A.y', min: -5, max: 5, step: 0.5, default: 1 }, { id: 'bx', label: 'B.x', min: -5, max: 5, step: 0.5, default: 1 }],
+  terms: { '두 점 사이 거리': '(x₁, y₁)과 (x₂, y₂) 사이 거리 = √((x₂−x₁)² + (y₂−y₁)²). 차 벡터 B − A의 길이', '충돌 판정': '두 물체가 겹치는지 검사하는 것. 원끼리는 중심 사이 거리 ≤ 반지름의 합이면 충돌' },
+  pages: [
+    { title: '만져 보기: 두 점을 잇는 화살표', scene: '💥 총알이 적에게 맞았나, 캐릭터가 동전을 먹었나, 마우스가 버튼 위에 있나 — 게임은 매 프레임 수백 번 "둘 사이 거리"를 재요.', figure: { kind: 'vector', defaults: { by: 4 }, vecs: [{ x: 'ax', y: 'ay', label: 'A' }, { x: 'bx', y: 'by', label: 'B' }], op: 'diff', note: '점 A·B = 화살표 끝. 초록 = B − A (A에서 B로), 거리 = 초록 화살표의 길이. B는 끝을 끌어 위아래로도' },
+      html: '<p>두 점 사이 거리는 <b>차 벡터 B − A의 길이</b>예요. 초록 화살표의 가로·세로 성분 (dx, dy)로 직각삼각형을 만들면 피타고라스로 √(dx² + dy²) — 이게 [[두 점 사이 거리]]. 반지름이 r₁, r₂인 원 두 개는 중심 사이 거리가 r₁ + r₂ 이하일 때 겹쳐요([[충돌 판정]]).</p>',
+      observe: ['A = (1, 1), B = (4, 5)로 놓으면 초록 화살표의 성분과 길이는?', 'A와 B의 자리를 맞바꾸면 화살표와 거리는 어떻게 되나요?', 'A와 B의 y를 같게 두면 거리는 무엇과 같나요?'] },
+    { title: '식과 코드', html: '<p>원 두 개(중심 A·B, 반지름 r₁·r₂)는 중심 사이 거리 d를 반지름의 합과 비교하면 끝: d가 r₁ + r₂보다 작으면 겹침, 같으면 딱 닿음, 크면 떨어짐. 가장자리 사이 틈은 d − (r₁ + r₂).</p><p>게임 엔진의 요령: <b>제곱끼리 비교</b>해요. dx² + dy² ≤ (r₁ + r₂)² 는 같은 판정인데 √ 계산이 없어서 빠르고, 정수 좌표면 오차도 없어요. 적 1000마리 × 총알 100발을 매 프레임 검사할 때 차이가 커요.</p>',
+      formula: [{ latex: 'd = \\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2} = |B - A|', note: '차 벡터의 길이 = math.hypot(dx, dy)' }, { latex: 'd \\le r_1 + r_2 \\iff dx^2 + dy^2 \\le (r_1 + r_2)^2', note: '양쪽 다 0 이상이라 제곱해도 판정이 같다 → √ 없이 비교' }],
+      example: { code: 'import math\nax, ay = -3, 1\nbx, by = 1, 4\ndx, dy = bx - ax, by - ay        # B - A\nprint("차 벡터", (dx, dy), "거리", math.hypot(dx, dy))\nr1, r2 = 3, 2.5\nd2 = dx * dx + dy * dy\nif d2 < (r1 + r2) ** 2:\n    print("겹침! 겹친 깊이", round((r1 + r2) - math.sqrt(d2), 2))\nelif d2 == (r1 + r2) ** 2:\n    print("딱 닿음")\nelse:\n    print("떨어짐, 틈", round(math.sqrt(d2) - (r1 + r2), 2))', trace: true } },
+  ],
+  summary: ['거리 = |B − A| = √(dx² + dy²) = math.hypot(dx, dy)', '원 충돌: 중심 거리 ≤ r₁ + r₂', '게임에서는 제곱끼리 비교 — √ 없이 빠르고 정확'] },
 ];
 
 // =====================================================================
@@ -468,6 +504,20 @@ const PROBLEMS = [
   starter: 'n = int(input())\ns1 = s2 = s3 = 0\nfor i in range(1, n + 1):\n    pass\n', solution: 'n = int(input())\ns1 = s2 = s3 = 0\nfor i in range(1, n + 1):\n    s1 += i\n    s2 += i * i\n    s3 += 2 * i - 1\nprint(f"Σi = {s1}")\nprint(f"Σi² = {s2}")\nprint(f"Σ(2i-1) = {s3}")',
   tests: [{ input: '5', output: 'Σi = 15\nΣi² = 55\nΣ(2i-1) = 25' }, { input: '1', output: 'Σi = 1\nΣi² = 1\nΣ(2i-1) = 1' }, { input: '10', output: 'Σi = 55\nΣi² = 385\nΣ(2i-1) = 100' }],
   hints: ['range(1, n + 1) 로 n 포함', '세 합을 같은 반복문에서 누적', '홀수 합은 n² 이 나와요 — 확인해 보세요'] },
+// ---- M1_divisor ----
+{ id: 'M1_divisor_q1', lesson: 'M1_divisor', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 약수가 홀수 개', prompt: 'n을 12, 16, 36, 10 으로 바꿔 가며 「끝까지」를 누르고 막대 개수를 세 보세요.', tags: ['약수'],
+  quiz: { q: '약수의 개수가 홀수인 n은?', opts: ['제곱수 (4, 9, 16, 36 …)', '소수', '짝수', '10의 배수'], ans: 0, why: '약수는 i와 n // i 짝으로 오는데, 제곱수는 4 × 4처럼 짝이 자기 자신인 약수가 하나 있어서 홀수 개가 돼요. 16: 1·16, 2·8, 4 → 5개.' },
+  hints: ['12는 막대 6개, 16은 5개 — 무엇이 다를까요?', '16 = 4 × 4 — 짝이 자기 자신인 약수', '제곱수'] },
+{ id: 'M1_divisor_q2', lesson: 'M1_divisor', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 합이 딱 2배', prompt: 'n = 6 과 n = 28 에서 「끝까지」를 눌러 빨간 합을 보세요. n = 12 와도 비교해 보세요.', tags: ['약수', '시그마'],
+  quiz: { q: 'n = 6, 28 에서 약수 전부의 합은?', opts: ['정확히 2n — 자기 자신을 빼면 나머지 약수의 합이 n', '정확히 n', '정확히 3n', '규칙이 없다'], ans: 0, why: '6: 1+2+3+6 = 12, 28: 1+2+4+7+14+28 = 56. 자기 자신을 빼면 6, 28 — 그래서 완전수예요. 12는 자기 자신을 뺀 합이 16으로 12보다 커서 과잉수.' },
+  hints: ['6의 약수는 1, 2, 3, 6', '합 12 = 6 × 2', '정확히 2n'] },
+{ id: 'M1_divisor_q3', lesson: 'M1_divisor', type: 'num', title: '숫자 답: 360의 약수', prompt: '360의 <b>약수의 개수</b>는? (코드로 세거나 소인수분해로)', tags: ['약수', '소수'],
+  answer: { value: 24, tol: 0, why: '360 = 2³ × 3² × 5 → (3+1)(2+1)(1+1) = 24. 나누는 방법이 이렇게 많아서 원의 각도를 360으로 잡았어요.' }, starter: 'n = 360\ncount = 0\nfor i in range(1, n + 1):\n    pass\nprint(count)', solution: 'n = 360\ncount = 0\nfor i in range(1, n + 1):\n    if n % i == 0:\n        count += 1\nprint(count)',
+  hints: ['n % i == 0 인 i를 세요', 'range(1, n + 1) — 360 포함, if 안에서 count += 1', '24'] },
+{ id: 'M1_divisor_q4', lesson: 'M1_divisor', type: 'code', title: '코드: 완전수 판정기', prompt: '정수 n(1 ≤ n ≤ 10000)을 입력받아 세 줄을 출력하세요: ① 약수를 작은 순서로 띄어 쓰기 ② <code>개수 k</code> ③ 자기 자신을 뺀 약수의 합 s가 n과 같으면 <code>완전수</code>, n보다 작으면 <code>부족수</code>, 크면 <code>과잉수</code>.', tags: ['약수'], inputExample: '6',
+  starter: 'n = int(input())\ndivs = []\nfor i in range(1, n + 1):\n    pass\n', solution: 'n = int(input())\ndivs = []\nfor i in range(1, n + 1):\n    if n % i == 0:\n        divs.append(i)\nprint(*divs)\nprint("개수", len(divs))\ns = sum(divs) - n\nif s == n:\n    print("완전수")\nelif s < n:\n    print("부족수")\nelse:\n    print("과잉수")',
+  tests: [{ input: '6', output: '1 2 3 6\n개수 4\n완전수' }, { input: '12', output: '1 2 3 4 6 12\n개수 6\n과잉수' }, { input: '1', output: '1\n개수 1\n부족수' }, { input: '13', output: '1 13\n개수 2\n부족수' }, { input: '28', output: '1 2 4 7 14 28\n개수 6\n완전수' }],
+  hints: ['1부터 n까지 나누어떨어지는 i만 리스트에 모아요', 'print(*divs) 로 띄어 쓰고, s = sum(divs) - n (자기 자신 빼기)', 'if s == n: 완전수 / elif s < n: 부족수 / else: 과잉수'] },
 // ---- M3_perm ----
 { id: 'M3_perm_q1', lesson: 'M3_perm', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 순서를 무시하면', prompt: 'n = 4, r = 2 에서 순서 있음(1) ↔ 없음(0)을 바꾸며 잎 수를 비교하세요. r = 3도.', tags: ['경우의수'],
   quiz: { q: '순서를 무시하면 잎이 몇 배로 줄어드나요?', opts: ['r! 배 (r = 2면 2배, r = 3이면 6배)', '항상 2배', 'n배', '줄지 않는다'], ans: 0, why: '같은 r개의 줄 세우기 r! 가지가 하나로 묶여요. nCr = nPr / r!.' },
@@ -580,6 +630,20 @@ const PROBLEMS = [
   starter: 'n = int(input())\nxs = list(map(float, input().split()))\nys = list(map(float, input().split()))\nmx, my = sum(xs) / n, sum(ys) / n\n', solution: 'n = int(input())\nxs = list(map(float, input().split()))\nys = list(map(float, input().split()))\nmx, my = sum(xs) / n, sum(ys) / n\nsxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))\nsxx = sum((x - mx) ** 2 for x in xs)\nsyy = sum((y - my) ** 2 for y in ys)\nr = sxy / (sxx * syy) ** 0.5\na = sxy / sxx\nb = my - a * mx\nprint(f"r={r:.3f} a={a:.3f} b={b:.3f}")',
   tests: [{ input: '4\n1 2 3 4\n2 4 6 8', output: 'r=1.000 a=2.000 b=0.000' }, { input: '8\n1 2 3 4 5 6 7 8\n2 3.5 3 5 5.5 7 6.5 8.5', output: 'r=0.968 a=0.869 b=1.214' }, { input: '4\n1 2 3 4\n8 6 4 2', output: 'r=-1.000 a=-2.000 b=10.000' }, { input: '5\n1 2 3 4 5\n3 1 4 1 5', output: 'r=0.354 a=0.400 b=1.600' }],
   hints: ['sxy, sxx, syy 를 편차로', 'r = sxy / √(sxx·syy), a = sxy / sxx, b = my − a·mx', 'f"r={r:.3f} a={a:.3f} b={b:.3f}"'] },
+// ---- M3_geom ----
+{ id: 'M3_geom_q1', lesson: 'M3_geom', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 가장 흔한 횟수', prompt: 'p = 20%로 두고 +10,000번을 눌러 막대를 보세요.', tags: ['분포', '확률'],
+  quiz: { q: '첫 성공까지 걸린 횟수 중 가장 흔한 것은?', opts: ['1번 — 첫 시도에 성공할 확률 p가 가장 크다', '5번 — 평균이니까', '모든 횟수가 비슷하다', '10번'], ans: 0, why: 'P(1) = p이고, 한 칸 갈 때마다 (1 − p)배씩 줄어요. 평균 5번은 오른쪽 긴 꼬리가 끌어올린 값이라 가장 흔한 값과 달라요.' },
+  hints: ['가장 왼쪽 막대와 다섯 번째 막대를 비교해 보세요', 'k가 하나 늘 때마다 막대는 (1 − p)배', '1번'] },
+{ id: 'M3_geom_q2', lesson: 'M3_geom', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 평균은 몇 번', prompt: 'p를 10%, 20%, 50%로 바꿔 가며 각각 +10,000번을 누르고 그림 아래 「실제 평균」을 보세요.', tags: ['분포', '기댓값'],
+  quiz: { q: '성공 확률이 p일 때 평균 몇 번 만에 성공하나요?', opts: ['1/p 번 (10% → 10번, 50% → 2번)', 'p × 10 번', '1/(1 − p) 번', 'p와 상관없이 5번'], ans: 0, why: 'E[X] = 1/p. 확률이 절반이 되면 평균 횟수는 2배가 돼요.' },
+  hints: ['p = 50%일 때 실제 평균은 약 2번', '2 = 1 ÷ 0.5', '1/p'] },
+{ id: 'M3_geom_q3', lesson: 'M3_geom', type: 'num', title: '숫자 답: 50번 돌려도', prompt: '뽑힐 확률 5%인 가챠를 <b>50번 돌려도 한 번도 안 나올</b> 확률은? (소수 셋째 자리, 예: 0.123)', tags: ['분포', '확률'],
+  answer: { value: 0.077, tol: 0.001, why: '50번 연속 실패 = 0.95^50 ≈ 0.0769. 약 13명 중 1명은 평균(20번)의 2.5배를 돌려도 못 뽑아요.' }, starter: 'p = 0.05\nk = 50\n# k번 연속 실패할 확률\nprint()', solution: 'p = 0.05\nk = 50\nprint((1 - p) ** k)',
+  hints: ['한 번 실패할 확률은 1 − 0.05 = 0.95', '50번 연속 실패 = 0.95를 50번 곱하기 → (1 - p) ** k', '0.95 ** 50 ≈ 0.077'] },
+{ id: 'M3_geom_q4', lesson: 'M3_geom', type: 'code', title: '코드: 몇 번 안에 뽑을까', prompt: '성공 확률 p(%)와 횟수 k(한 줄, 정수, k ≥ 1)를 입력받아 세 줄을 출력하세요: <code>정확히 k번째: 확률</code>, <code>k번 안에: 확률</code>(둘 다 소수 넷째 자리), <code>평균 1/p번</code>(소수 둘째 자리). 예: <code>20 3</code> → <code>정확히 3번째: 0.1280</code> / <code>3번 안에: 0.4880</code> / <code>평균 5.00번</code>', tags: ['분포', '확률'], inputExample: '20 3',
+  starter: 'pct, k = map(int, input().split())\np = pct / 100\n', solution: 'pct, k = map(int, input().split())\np = pct / 100\nexact = (1 - p) ** (k - 1) * p\nwithin = 1 - (1 - p) ** k\nprint(f"정확히 {k}번째: {exact:.4f}")\nprint(f"{k}번 안에: {within:.4f}")\nprint(f"평균 {1 / p:.2f}번")',
+  tests: [{ input: '20 3', output: '정확히 3번째: 0.1280\n3번 안에: 0.4880\n평균 5.00번' }, { input: '50 1', output: '정확히 1번째: 0.5000\n1번 안에: 0.5000\n평균 2.00번' }, { input: '100 1', output: '정확히 1번째: 1.0000\n1번 안에: 1.0000\n평균 1.00번' }, { input: '10 10', output: '정확히 10번째: 0.0387\n10번 안에: 0.6513\n평균 10.00번' }, { input: '5 20', output: '정확히 20번째: 0.0189\n20번 안에: 0.6415\n평균 20.00번' }],
+  hints: ['k번째에 처음 성공 = 앞의 k − 1번 실패 × 마지막 성공', 'k번 안에 성공 = 1 − (k번 연속 실패) = 1 - (1 - p) ** k', 'exact = (1 - p) ** (k - 1) * p, 평균은 1 / p'] },
 // ---- M5_vec ----
 { id: 'M5_vec_q1', lesson: 'M5_vec', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 길이가 같은 화살표', prompt: '화살표 끝을 끌어 길이가 3인 위치를 여러 곳 찾아보세요 (아래 길이 표시 참고).', tags: ['벡터'],
   quiz: { q: '길이가 같은 화살표들의 끝점은 어디에 모이나요?', opts: ['원점을 중심으로 한 원 위', '한 직선 위', '정사각형 위', '아무 데나'], ans: 0, why: '길이 = √(x²+y²) = r 은 반지름 r인 원의 식. 정규화 노드에서 단위원으로 다시 만나요.' },
@@ -692,5 +756,19 @@ const PROBLEMS = [
   starter: 'import math\ntx, ty, deg = map(float, input().split())\nn = int(input())\nt = math.radians(deg)\nM = [[math.cos(t), -math.sin(t), tx],\n     [math.sin(t),  math.cos(t), ty],\n     [0, 0, 1]]\nfor _ in range(n):\n    x, y = map(float, input().split())\n    v = (x, y, 1)\n    pass\n', solution: 'import math\ntx, ty, deg = map(float, input().split())\nn = int(input())\nt = math.radians(deg)\nM = [[math.cos(t), -math.sin(t), tx],\n     [math.sin(t),  math.cos(t), ty],\n     [0, 0, 1]]\nfor _ in range(n):\n    x, y = map(float, input().split())\n    v = (x, y, 1)\n    nx = sum(M[0][k] * v[k] for k in range(3))\n    ny = sum(M[1][k] * v[k] for k in range(3))\n    print(f"({round(nx, 2) + 0:.2f}, {round(ny, 2) + 0:.2f})")',
   tests: [{ input: '2 0 90\n2\n1 0\n0 0', output: '(2.00, 1.00)\n(2.00, 0.00)' }, { input: '1.5 1 30\n1\n2 1', output: '(2.73, 2.87)' }, { input: '0 0 0\n2\n3 4\n-1 2', output: '(3.00, 4.00)\n(-1.00, 2.00)' }, { input: '-1 -1 180\n1\n1 1', output: '(-2.00, -2.00)' }],
   hints: ['nx = M[0][0]*x + M[0][1]*y + M[0][2]*1', 'ny 도 같은 방식으로 둘째 행', 'f"({round(nx,2)+0:.2f}, …)"'] },
+// ---- M5_dist ----
+{ id: 'M5_dist_q1', lesson: 'M5_dist', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 3-4-5', prompt: 'A를 (1, 1), B를 (4, 5)로 옮겨 보세요 (슬라이더 또는 화살표 끝 끌기).', tags: ['벡터'],
+  quiz: { q: '초록 화살표 B − A와 두 점 사이 거리는?', opts: ['(3, 4), 거리 5', '(5, 6), 거리 11', '(3, 4), 거리 7', '(4, 5), 거리 6.4'], ans: 0, why: '4 − 1 = 3, 5 − 1 = 4. √(3² + 4²) = √25 = 5. 성분을 그냥 더한 7은 격자를 따라 걷는 "택시 거리"예요.' },
+  hints: ['B − A 를 성분별로 빼 보세요', '(3, 4) → 3² + 4² = 25', '√25 = 5'] },
+{ id: 'M5_dist_q2', lesson: 'M5_dist', type: 'quiz', kind: 'explore', requireInteract: true, title: '탐구: 자리 바꾸기', prompt: 'A와 B의 좌표를 맞바꿔 보세요 (예: 처음 A = (−3, 1), B = (1, 4) → A = (1, 4), B = (−3, 1)).', tags: ['벡터'],
+  quiz: { q: 'A와 B를 맞바꾸면?', opts: ['화살표 방향만 반대가 되고 거리는 같다', '거리가 2배가 된다', '화살표도 거리도 그대로다', '거리가 0이 된다'], ans: 0, why: 'A − B = −(B − A). 성분 부호만 바뀌는데 제곱하면 같아서 거리는 그대로예요. 방향(누가 누구를 향하나)은 순서가 중요하지만 거리는 상관없어요.' },
+  hints: ['초록 화살표 성분의 부호를 보세요', '(4, 3)과 (−4, −3)을 각각 제곱해 더하면?', '방향만 반대, 거리는 같다'] },
+{ id: 'M5_dist_q3', lesson: 'M5_dist', type: 'num', title: '숫자 답: 두 원 사이 틈', prompt: '원 A는 중심 (1, 2)·반지름 3, 원 B는 중심 (7, 10)·반지름 4예요. 두 원의 <b>가장자리 사이 틈</b>은? (겹치면 음수)', tags: ['벡터'],
+  answer: { value: 3, tol: 0.01, why: '중심 거리 √(6² + 8²) = 10, 반지름 합 7 → 틈 10 − 7 = 3. 양수라서 안 부딪혀요.' }, starter: 'import math\nd = math.hypot(7 - 1, 10 - 2)\nprint(d)', solution: 'import math\nd = math.hypot(7 - 1, 10 - 2)\nprint(d - (3 + 4))',
+  hints: ['먼저 중심 사이 거리 (dx = 6, dy = 8)', '거리에서 반지름의 합을 빼요', '10 − 7 = 3'] },
+{ id: 'M5_dist_q4', lesson: 'M5_dist', type: 'code', title: '코드: 원 충돌 판정', prompt: '두 줄에 원 하나씩 <code>x y r</code>(정수)를 입력받아 첫 줄에 중심 사이 거리를 <code>거리 4.00</code>처럼 소수 둘째 자리로, 둘째 줄에 <code>겹침</code> / <code>닿음</code> / <code>떨어짐</code>을 출력하세요. 판정은 √ 없이 <b>제곱끼리</b> 비교하세요.', tags: ['벡터'], inputExample: '0 0 3\n4 0 2',
+  starter: 'import math\nx1, y1, r1 = map(int, input().split())\nx2, y2, r2 = map(int, input().split())\ndx, dy = x2 - x1, y2 - y1\n', solution: 'import math\nx1, y1, r1 = map(int, input().split())\nx2, y2, r2 = map(int, input().split())\ndx, dy = x2 - x1, y2 - y1\nprint(f"거리 {math.hypot(dx, dy):.2f}")\nd2 = dx * dx + dy * dy\ns2 = (r1 + r2) ** 2\nif d2 < s2:\n    print("겹침")\nelif d2 == s2:\n    print("닿음")\nelse:\n    print("떨어짐")',
+  tests: [{ input: '0 0 3\n4 0 2', output: '거리 4.00\n겹침' }, { input: '0 0 1\n3 4 4', output: '거리 5.00\n닿음' }, { input: '1 2 3\n7 10 4', output: '거리 10.00\n떨어짐' }, { input: '5 5 2\n5 5 1', output: '거리 0.00\n겹침' }, { input: '-3 -1 2\n2 3 4', output: '거리 6.40\n떨어짐' }],
+  hints: ['중심 사이 거리와 반지름의 합을 비교해요 — 제곱끼리', 'd2 = dx * dx + dy * dy, s2 = (r1 + r2) ** 2', 'd2 < s2 → 겹침, d2 == s2 → 닿음, 그 외 → 떨어짐'] },
 ];
 const GUIDES = {};

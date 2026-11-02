@@ -132,7 +132,7 @@ with sync_playwright() as p:
     # ---- 3. 모바일
     print('[수학 공간]'); MATH='file://'+os.path.join(ROOT,'courses/math/index.html'); pg.set_viewport_size({'width':1100,'height':800})
     pg.goto(MATH); pg.wait_for_timeout(1500); pg.evaluate("Loader.minimized=true;Loader.render(); document.querySelectorAll('.modal-ov').forEach(e=>e.remove()); Store.data.onboarded=true; UI.go('home',{},false)"); pg.wait_for_timeout(500)
-    check(pg.evaluate("Store.course")=='math' and pg.evaluate("Game.isGraph()") and pg.locator('.mnode').count()==25 and pg.locator('.mnode.locked').count()==20 and pg.evaluate("document.querySelectorAll('#mathLinks path').length")>=20, '지식 지도: 노드 25 · 잠김 20(prereq) · 선수 관계 선')
+    check(pg.evaluate("Store.course")=='math' and pg.evaluate("Game.isGraph()") and pg.locator('.mnode').count()==pg.evaluate("LESSONS.length") and pg.locator('.mnode.locked').count()==pg.evaluate("LESSONS.filter(l=>(l.prereq||[]).length).length") and pg.evaluate("document.querySelectorAll('#mathLinks path').length")>=20, '지식 지도: 노드 %d · 잠김 = prereq 있는 노드 수 · 선수 관계 선' % pg.evaluate("LESSONS.length"))
     pg.evaluate("UI.go('lesson',{lessonId:'M1_mod',page:0})"); pg.wait_for_timeout(500); check(pg.locator('#lpFig canvas').count()==1 and pg.locator('#lpFig input[type=range]').count()==2 and pg.locator('.fig-observe li').count()==3, '노드 첫 페이지: 만지는 그림 + 슬라이더 2 + 관찰 질문 3')
     pg.evaluate("UI.go('lesson',{lessonId:'M1_mod',page:1})"); pg.wait_for_timeout(500); pg.evaluate("const s=document.querySelector('#lpFig input[data-p=n]'); s.value=40; s.dispatchEvent(new Event('input'))"); pg.wait_for_timeout(400)
     check(pg.locator('#lpFormula .mf').count()==2 and ('n = 40' in pg.evaluate("document.querySelector('#exEd textarea')?.value || ''")), '식과 코드 페이지: 수식 2 + 슬라이더 → 코드 n = 40 동기화')
@@ -153,7 +153,7 @@ with sync_playwright() as p:
         pg.evaluate(f"Store.data.settings.unlockAll=true; UI.go('lesson',{{lessonId:'{lid}',page:0}})"); pg.wait_for_timeout(200)
         n=pg.evaluate("(()=>{const c=document.querySelector('#lpFig canvas'); if(!c) return -1; const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data; let n=0; for(let i=0;i<d.length;i+=4*97){ if(d[i]!==d[i+1]||d[i+1]!==d[i+2]) n++; } return n;})()")
         if n<5 or '오류' in pg.evaluate("document.querySelector('[data-note]')?.textContent||''"): figbad.append(lid)
-    check(not figbad, '노드 25개 첫 그림 전부 그려짐 (%s)' % (figbad or 'OK')); pg.evaluate("Store.data.settings.unlockAll=false")
+    check(not figbad, '노드 %d개 첫 그림 전부 그려짐 (%s)' % (pg.evaluate("LESSONS.length"), figbad or 'OK')); pg.evaluate("Store.data.settings.unlockAll=false")
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); pg.set_viewport_size({'width':390,'height':800}); pg.evaluate("UI.go('home',{},false)"); pg.wait_for_timeout(400); check(pg.evaluate('document.documentElement.scrollWidth')<=390, '수학 공간 모바일 가로 스크롤 없음 (콤보 ×3 상단바 포함)')
     pg.evaluate("UI.go('lesson',{lessonId:'M5_dot',page:0})"); pg.wait_for_timeout(400); check(pg.evaluate('document.documentElement.scrollWidth')<=390 and 'NaN' not in pg.locator('#lpFig').inner_text(), '수학 레슨 모바일(벡터 그림, NaN 없음)')
     pg.goto(HUB); pg.wait_for_timeout(600); check(pg.locator('.hub-spaces .hc').count()==1 and '수학 공간' in pg.locator('.hub-spaces').inner_text(), '허브: 「공간」 구역에 수학 공간 카드')
