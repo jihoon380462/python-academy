@@ -55,6 +55,7 @@ const BADGES = [
   { id:'math_nodes10', name:'지도 탐험가', desc:'수학 노드 10개 완료', icon:'🗺', cond:['mathNodes',10], course:'math' },
   { id:'math_area_1', name:'수와 컴퓨터', desc:'영역 1 「수와 컴퓨터」 전부 완료', icon:'🔢', cond:['math_area_1',1], course:'math' },
   { id:'math_area_3', name:'확률의 눈', desc:'영역 3 「경우의 수·확률·통계」 전부 완료', icon:'🎲', cond:['math_area_3',1], course:'math' },
+  { id:'math_area_4', name:'변화 탐험가', desc:'영역 4 「함수·변화·미적분」 전부 완료', icon:'📈', cond:['math_area_4',1], course:'math' },
   { id:'math_area_5', name:'벡터 조종사', desc:'영역 5 「벡터·행렬」 전부 완료', icon:'🧮', cond:['math_area_5',1], course:'math' },
   { id:'math_star3', name:'대학 맛보기', desc:'★ 노드(대학 1학년 맛보기) 3개 완료', icon:'🎓', cond:['mathStarNodes',3], course:'math' },
 ];
