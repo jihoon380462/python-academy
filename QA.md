@@ -12,6 +12,8 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 60 | 파이썬 L17P2 힌트 3 (C6 수정분) | 공통 | `lines = f.readlines() / print(f"{len(lines)}줄")` — 파일을 `"r"` 로 다시 여는 줄이 1~3단계 어디에도 없어 그대로 쓰면 `ValueError: I/O operation on closed file`(블록 밖) 또는 `UnsupportedOperation: not readable`(블록 안) | 힌트 3 그대로 실행 | 중 | 콘텐츠팀(718행 힌트 3 → `with open("lines.txt", "r", encoding="utf-8") as f: lines = f.readlines() / print(f"{len(lines)}줄")`, 실행해 「3줄」 확인) | 열림 |
 | 61 | 알고 레슨 👀 시각화 (#6 재열림) | 공통 | v2.3.8 에도 콘솔 에러 `Cannot set properties of null (setting 'textContent')` — 스택: `render ← tick`(visualize.js 140행, 재생 타이머) · `stop`(142행, 재생 버튼 글자). 👀 재생 중에 ✕ 닫기(`host.innerHTML = ''`) 하거나 다른 화면으로 가면 타이머가 남아 없는 `#vzPos`·`#vzPlay` 를 씀. 화면 영향 없음 | A0 3쪽 👀 → 재생 중 ✕ · A12 1쪽 👀 → ✕ | 하 | 유지보수/Fable(core/visualize.js: `tick` 첫 줄 `if (!host.isConnected) return stop();`, `stop` 안 DOM 접근을 `const b = $('#vzPlay', host); if (b) …` 로) — 3절 위임 목록 밖이라 Fable 재확인 | 열림 |
+| 62 | 수학 M1_mod_q2 탐구 퀴즈 (U-1) | 폰 | 「버튼이 안눌림」 — 보기가 잠겨 있는데 무엇을 해야 열리는지 안 보임. 그림의 원(파란 11)은 끌 수 없고 슬라이더만 움직이며, 아무 값으로나 움직이면 열려 지문(「배수로 맞춰 보세요」)과 상관없이 풀 수 있었음 | M1_mod 노드 → 탐구: 배수일 때 → 보기 누르기 | 중 | 유지보수 [core] — `modeExplore` 에 `unlockWhen`(조건이 참이 될 때만 열림)·`unlockText`(무엇을 맞추면 열리는지) + 6문제(M1_mod_q2·M1_gcd_q2·M1_seq_q2·M3_cond_q2·M5_add_q1·M5_dot_q1)에 조건. validate 규칙 | 닫힘 [core] fix/core-d (Fable 검토 대기) |
+| 63 | 수학 그림 글자 (U-2) | 폰 390px | M1_mod 그림 오른쪽 설명 네 줄이 캔버스 밖으로 잘림. 같은 점검으로 floatline·montecarlo·cells·transform 글자도 넘침(6종) | M1_mod 1쪽(폰 폭) | 하 | 유지보수 [core] — modring 은 폭 480 미만이면 원 위·글자 아래 가운데, floatline 은 두 줄, 나머지는 `Fig.text` 가 넘치면 80%까지 줄이고 안쪽으로 밀기(회전 글자 제외) | 닫힘 [core] fix/core-d (Fable 검토 대기) |
 
 ## QA 2회전 — 2026-11-02 (Opus·QA)
 
