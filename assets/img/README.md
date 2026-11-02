@@ -763,4 +763,35 @@ Create ONE PNG badge for a consistent educational game medal set. Flat vector st
 
 ```text
 Edit the FIRST reference medal. Keep its purple circular medal and rim unchanged. Replace the curved central symbol with the exact low wide HILL-shaped parabola silhouette and ball arrangement in the SECOND reference. The arc must be CONCAVE DOWN like an upside-down shallow bowl: both ends at equal LOW height, center HIGHER, width at least twice height. Color this thick band LIGHT LAVENDER. Place the large yellow ball on its RIGHT DOWNHILL slope, two smaller yellow trail dots behind toward upper left, matching reference 2. No banana, no crescent, no valley shape, no person silhouette. Center this group inside medal. Dark navy outlines, flat solid fills, transparent outside medal, no text, preserve clear margins.
+
+## 6차 E — E1-4 재요청(3차), 2026-11-02
+
+출처: `art/6차-검수` (`9a1f7a423c4f32f5a7a1ecdcee28657fa29773ee`) IMAGES.md 3절. `main` (`486e272a18ba25c86f1e1d0985cea319415ef772`)에서 분기한 `art/6차-3`에 납품. 변경 그림은 `area-math-4.png` 한 장이다. 내장 이미지 생성 도구 사용.
+
+참조: 검수 브랜치의 `badge-math_area_4.png`(2차 통과본, 구도; blob `ca8b3228f1ae049ed47142a91e465c738587fa6b`), `area-math-2.png`·`area-math-1.png`(굵기·스타일). 참조 파일 자체는 수정하지 않는다.
+
+최종 선택: 최초 생성 → 1차 굵기/단색 보정 → 2차 띠 아래쪽 확장 편집. 이후 별도 재생성 후보는 더 얇아 제외했다. 최종 원본의 눈에 보이는 외곽을 기준으로 크기·여백 정규화(428×236 콘텐츠를 512×512 중앙에 배치). RGBA/알파 보존, 최소 여백 42px, 콘텐츠 높이 46.1%. 원본 생성에 남은 미세한 색조 변화는 별도 아트팀 검수 대상. 실제 앱 렌더는 브라우저 실행 환경 부재로 미검증.
+
+### 요청서 원문
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Must stay readable at 32px: chunky FILLED shapes only — no thin lines, no dashed lines, no axes, no grid. No circular medal or backdrop. Reference is style only; replace its subject entirely. Subject: the SAME composition as the reference purple badge's center (a low hill-shaped parabola with one yellow ball on its right downhill side and two smaller yellow dots trailing behind it), but drawn as a standalone icon with a VERY THICK band: the purple (#9c27b0) band must be about one fifth of the canvas width thick, like a fat rounded sausage or a chunky toy rainbow, with a bold dark navy outline and one pale purple highlight stripe inside. The whole icon must fill the canvas: total height at least 45% of the canvas, width ratio about 2:1 (NOT a thin flat sliver). Ball is large (about one quarter of the canvas width) and overlaps the band on the right side. Must NOT look like a person, user avatar, eyebrow or smile. No medal circle, no ground, no arrows, no second curve, no sparkles. 512x512.
+```
+
+### 최초 생성에 덧붙인 참조 역할
+
+```text
+Input image roles: Image 1 (purple badge) is the composition reference ONLY: use its hill-shaped curve and the positions of the yellow ball and two dots, omit the medal. Images 2 and 3 are style and bold shape/outline thickness references ONLY. The following is the requested production prompt, preserve all requirements:
+```
+
+### 1차 보정 편집 (입력: 최초 생성본)
+
+```text
+Edit this icon to match the requested production specifications more precisely. Keep exactly the same low, wide hill-shaped concave-DOWN parabola composition, the large yellow ball overlapping its RIGHT downhill slope, and exactly two smaller yellow dots trailing toward upper left. Keep the dark navy #1d2230 outer outlines and pale purple highlight stripe INSIDE the band. Make the purple #9c27b0 band MUCH THICKER: about 100 pixels thick in a 512x512 canvas, measured perpendicular to its curve including outline. A fat toy-rainbow tube, not an eyebrow. Entire subject bounding box approximately x=43..469, y=132..380 (width 426, height 248); ball diameter 122 pixels including outline. So the overall subject height is at least 45% of the square and band thickness is one fifth of canvas width, while remaining a LOW WIDE arch and NOT tall U/person shape. Purple body fill is one perfectly uniform solid #9c27b0, navy outline one solid #1d2230, ball and dots one solid #ffd166 with small solid cream highlights only; pale purple stripe is one uniform flat fill. Absolutely remove ALL gradient/texture/noise/mottling; crisp flat vector-style areas, no 3D lighting. True transparent background. At least 8% margins all sides. No new objects, no backdrop, no medal, no text, no sparkle, no shadow. Output square PNG intended for 512x512.
+```
+
+### 2차 보정 편집 — 최종 선택 (입력: 1차 보정본)
+
+```text
+Make a precise edit to this game icon. Preserve composition: low broad purple hill arch; one large yellow ball on the RIGHT descending slope; exactly two smaller yellow trajectory dots behind it; dark navy outlines; purple internal highlight; transparent background. Main required change: DOUBLE the thickness of the purple curved band by expanding its LOWER edge DOWNWARD toward the center of the square, leaving the top curved edge and balls in place. The lower transparent arch cutout must become MUCH SMALLER and SHALLower. It must look like a broad chunky rainbow toy, not a narrow bent stick. Center thickness should be comparable to the diameter of the LARGE yellow ball (around 23% of canvas width), and the total occupied subject height should be about 55% of canvas height. Keep both ends rounded at equal lower height. Entire icon centered with 9% empty margins left and right. Keep exactly same objects, no additions. Flatten ALL colors: uniform matte purple #9c27b0 band, uniform dark navy #1d2230 outline, uniform yellow #ffd166 balls, one flat pale purple stripe and flat cream highlights. No gradient of any kind, no texture, no shading, no rendered gloss. Keep square PNG with real transparency, intended size 512x512.
 ```

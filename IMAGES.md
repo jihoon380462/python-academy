@@ -135,14 +135,14 @@
 
 | # | 파일 | 크기 | 쓰이는 곳 | 한국어 설명 | 참조 그림 | 상태 |
 | --- | --- | --- | --- | --- | --- | --- |
-| E1-4 | `area-math-4.png` | 512×512 | 수학 지식 지도 「영역 4 · 함수·변화·미적분」 제목 옆 **32px** | (재요청) **낮고 넓은 보라 포물선 띠**(폭이 높이의 2배 이상) **오른쪽 내리막**에 노란 공, 공 뒤로 작은 노란 점 2개가 궤적 — 던진 공의 포물선. 공은 꼭대기 가운데 금지 | `area-math-1.png`, `area-math-3.png` | **반려(2차 납품, 11/2)**: 사람 모양은 해결됐지만 띠가 **가는 선** — 32px 면적 11.6%(가장 약했던 `area-math-5` 12.5%보다 낮음), 지도에서 눈썹처럼 보임. 아래 3차 프롬프트로 재생성 |
+| E1-4 | `area-math-4.png` | 512×512 | 수학 지식 지도 「영역 4 · 함수·변화·미적분」 제목 옆 **32px** | (재요청) **낮고 넓은 보라 포물선 띠**(폭이 높이의 2배 이상) **오른쪽 내리막**에 노란 공, 공 뒤로 작은 노란 점 2개가 궤적 — 던진 공의 포물선. 공은 꼭대기 가운데 금지 | `badge-math_area_4.png`(2차 통과본 구도), `area-math-2.png`·`area-math-1.png`(굵기) | 납품(3차, 2026-11-02) — 검수 브랜치 3차 프롬프트로 재생성. 굵은 띠·오른쪽 공·궤적 점 2개, 512×512 RGBA. 아트팀 최종 검수 대기 |
 | E1-2 | `area-math-2.png` | 512×512 | 「영역 2 · 논리·집합·증명」 제목 옆 **32px** | **꽉 채운 원 두 개가 겹친 벤 다이어그램** — 왼쪽 청록, 오른쪽 파랑, 겹친 부분은 진한 남청록 | `area-math-1.png`, `area-math-3.png` | ✅ 통과 → 2절 |
 | E2-4 | `badge-math_area_4.png` | 256×256 | 뱃지 화면 56px·획득 알림·공유 카드 48px (영역 4 전부 완료) | (재요청) 보라 메달 + 영역 4 장식과 같은 낮은 포물선 띠·오른쪽 공·점 궤적 | `badge-math_area_1.png`, `badge-math_area_3.png` | ✅ 통과(2차 납품) → 2절. 메달 안이라 48·56px에서 포물선·공 식별 OK. **3차 E1-4의 구도 기준** |
 | E2-2 | `badge-math_area_2.png` | 256×256 | 같은 자리 (영역 2 전부 완료) | 청록 메달 + 겹친 원 두 개(노랑·흰색, 겹친 부분 주황) | `badge-math_area_1.png`, `badge-math_area_3.png` | ✅ 통과 → 2절 |
 
-### E1-4 `area-math-4.png` — 재요청(3차)
+### E1-4 `area-math-4.png` — 재요청(3차) · 납품
 
-참조: `badge-math_area_4.png`(2차 통과본 — 구도 기준), `area-math-2.png`·`area-math-1.png`(굵기 기준)
+참조: `art/6차-검수`의 `badge-math_area_4.png`(2차 통과본 구도), `area-math-2.png`·`area-math-1.png`(굵기). 요청 원본 커밋: `9a1f7a423c4f32f5a7a1ecdcee28657fa29773ee`.
 
 ```text
 Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Must stay readable at 32px: chunky FILLED shapes only — no thin lines, no dashed lines, no axes, no grid. No circular medal or backdrop. Reference is style only; replace its subject entirely. Subject: the SAME composition as the reference purple badge's center (a low hill-shaped parabola with one yellow ball on its right downhill side and two smaller yellow dots trailing behind it), but drawn as a standalone icon with a VERY THICK band: the purple (#9c27b0) band must be about one fifth of the canvas width thick, like a fat rounded sausage or a chunky toy rainbow, with a bold dark navy outline and one pale purple highlight stripe inside. The whole icon must fill the canvas: total height at least 45% of the canvas, width ratio about 2:1 (NOT a thin flat sliver). Ball is large (about one quarter of the canvas width) and overlaps the band on the right side. Must NOT look like a person, user avatar, eyebrow or smile. No medal circle, no ground, no arrows, no second curve, no sparkles. 512x512.
@@ -173,6 +173,8 @@ Create ONE PNG badge for a consistent educational game medal set. Flat vector st
 **납품 메모(2026-11-02, Codex)**: E1-4 → E1-2 → E2-4 → E2-2 순서로 4장 생성. 위 영어 프롬프트와 지정 참조 그림을 변경 없이 사용. 영역 512×512·뱃지 256×256 RGBA, 사방 여백 47/23px, `img_clean --check` 통과. 다크/라이트 32px·48/56px 축소본에서 소재 식별 확인. 생성 결과에 약한 색조 변화가 남아 있어 완전 단색 여부는 아트팀 최종 검수 대상. C10 미병합 상태라 실제 지도·뱃지 렌더 검수는 C10 병합 후 진행. 상태는 납품이며 2절 완료 표로 이동하지 않음.
 
 **2차 납품 메모(2026-11-02, Codex)**: `art/6차-검수`의 수정 프롬프트로 E1-4 → E2-4 재생성. 낮고 넓은 포물선 띠·오른쪽 내리막의 공·작은 궤적 점 2개로 변경했다. 뱃지 최초 결과의 아래로 처진 곡선은 E1-4를 참조한 추가 편집으로 같은 언덕 모양으로 교정(프롬프트 기록: `assets/img/README.md`). 512/256 RGBA·사방 여백 47/23px·img_clean 검사 통과, 다크/라이트 32·48/56px 축소본 확인. 최종 아트팀 재검수·실제 앱 화면 확인은 별도. E1-2·E2-2 파일은 변경하지 않았다.
+
+**3차 납품 메모(2026-11-02, Codex)**: `art/6차-검수`의 E1-4 「재요청(3차)」 프롬프트와 2차 통과 뱃지 구도로 `area-math-4.png` 한 장을 재생성했다. 가늘게 나온 최초 결과에서 띠를 두껍게 하는 이미지 편집을 두 번 거쳐 선택했다. 512×512 RGBA, 최소 여백 42px, 전체 콘텐츠 428×236px(높이 46.1%). `img_clean --check` 및 다크/라이트 32px 축소본 확인. 32px 알파 면적(알파 > 128)은 2차 11.62% → 3차 23.14%, 보라 띠 중앙 두께는 약 95–98px(캔버스 약 19%). 생성 결과의 미세한 색조 변화는 남아 있어 최종 아트 검수 대상으로 명시한다. 브라우저 실행 파일·설치 다운로드 문제로 실제 앱 렌더는 미검증. `main`에서 만든 `art/6차-3`에 납품하며, 다른 그림(참조 뱃지 포함)·APP_VERSION·stamp 산출물은 변경하지 않았다. 원문·참조 역할·추가 편집 프롬프트는 `assets/img/README.md`에 기록. 2절 완료 표로 이동하지 않는다.
 
 ## 4. 그 뒤 (자리 없음 — 만들지 말 것)
 
