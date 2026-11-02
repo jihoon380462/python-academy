@@ -97,19 +97,32 @@
 
 **검수 메모(2차)**: 2차 16장 중 6장(알고·SQL·웹 아이콘, 빈 작품, 알고 마스터 뱃지, 배너)에 **흰 스티커 테두리**가 있어 다크 테마에서 흰 띠로 보였음 → `tools/img_clean.py`로 투명 배경에 닿은 흰~회색 테두리를 지워 해결(내부 흰색은 윤곽선에 막혀 유지). 앞으로는 납품 전에 `python3 tools/img_clean.py --check`로 확인하고, 테두리가 있으면 `python3 tools/img_clean.py`(인자 없음)로 정리한 뒤 커밋. 배너는 아래 빈 공간을 잘라 1200×274가 됨 — 가로 배너는 **내용이 캔버스를 꽉 채우게** 그리는 편이 좋다.
 
-## 3. 요청 목록 — A~C 완료 ✅ · D 수학 공간 대기
+## 3. 요청 목록 — 5차: D 수학 공간 10장 (4차 A~C 49장은 완료 ✅)
 
 A·B·C-1 11장과 C-2~C-7 38장, **총 49장 납품 완료**. 완료 항목은 2절로 이동했다. 이번 요청의 C-2~C-7 납품은 완료. 아래 수학 공간 요청은 별도 제작 대상이다.
 
 **납품 체크리스트 (4차)**: 파일을 `assets/img/`에(뱃지는 256×256, 나머지 512×512) → `python3 tools/img_clean.py --check`(문제 있으면 인자 없이 실행해 정리) → 이 파일 2절 표로 옮기고 3절에서 지운다 → `core/config.js` `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → `CHANGELOG.md`·`HANDOFF.md` 상태판 한 줄 → 커밋. 뱃지는 나눠서 납품해도 되고, 납품할 때마다 같은 절차.
 
-### D. 수학 공간 (v2.3.0 M1 완료 — **이제 만들어도 됨**, 자리 있음)
+### D. 수학 공간 10장 (v2.3.0 M1 완료 — **지금 만들 것**, 자리 있음) — 5차 요청
 
-| # | 파일 | 쓰이는 곳 | 설명 |
-| --- | --- | --- | --- |
-| D1 | `course-math.png` | 허브 「공간」 구역 수학 공간 카드 48px | 박사모 쓴 거북이(느리지만 확실히)가 자와 컴퍼스를 듦 — 코스 아이콘 5장과 같은 작가 느낌, 512 |
-| — | ~~gear-cap.png~~ | 박사모는 SVG 로 구현됨(core/fx.js gradcap) — 만들지 않음 | |
-| D2 | `area-math-1.png` `area-math-3.png` `area-math-5.png` | 지식 지도 영역 제목 옆 32px (챕터 장식과 같은 자리·크기 규칙) | 1: 초록 주판 또는 숫자 블록 · 3: 주황 주사위 두 개 · 5: 파랑 화살표(벡터) 두 개가 평행사변형을 이룸. 512, 챕터 장식 13장과 같은 스타일. 영역 2·4·6은 M2·M3 뒤 요청 |
+규칙은 1절 + 2절 검수 메모. 공통 영어 베이스 프롬프트는 4차와 같다(아래 재게재). 순서 D1 → D2 → D3.
+
+> Flat vector sticker-style icon, bold dark navy (#1d2230) outline, bright clean colors (palette: blue #6c8cff, green #2bb673, yellow #ffd166, red #ff5d6c, orange #ffb347, purple #9c27b0, pink #e91e63), no text, no letters, no gradients, no 3D, no photo texture, transparent background, single subject centered with 8% empty margin, no white halo or white border around the shape, matching a consistent set of simple educational game icons. —
+
+| # | 파일 | 크기 | 쓰이는 곳 | 설명 | 프롬프트(베이스 뒤에) |
+| --- | --- | --- | --- | --- | --- |
+| D1 | `course-math.png` | 512 | 허브 「공간」 구역 수학 공간 카드 48px·공유 카드 | **박사모 쓴 거북이**(느리지만 확실히)가 자와 컴퍼스를 듦. 코스 마스코트 5마리(뱀·부엉이·고양이·코끼리·여우)와 같은 작가 느낌, 분홍 #e91e63 포인트 | a cute round green turtle wearing a black graduation cap with a yellow tassel, holding a small pink (#e91e63) ruler and a compass (drawing tool), friendly smile, same style as a set of animal mascots, 512×512 |
+| D2-1 | `area-math-1.png` | 512 | 지식 지도 「영역 1 수와 컴퓨터」 제목 옆 32px | 초록 숫자 블록 3개(0·1·2 느낌의 점 무늬, 글자 금지) | three stacked green (#2bb673) cube blocks with simple dot patterns (no digits), 512×512 |
+| D2-3 | `area-math-3.png` | 512 | 「영역 3 경우의 수·확률·통계」 | 주황 주사위 두 개 | two orange (#ffb347) dice with white pips, slightly tilted, 512×512 |
+| D2-5 | `area-math-5.png` | 512 | 「영역 5 벡터·행렬」 | 파랑 화살표 두 개가 평행사변형을 이룸 | two bold blue (#6c8cff) arrows from one origin forming a parallelogram with a thin dashed outline, 512×512 |
+| D3 | `badge-math_first.png` | 256 | 뱃지 「이름 붙이기」(수학 노드 첫 완료) | 둥근 메달 + 분홍 이름표(태그) | a round pink (#e91e63) medal with a white name tag label (blank, no text), 256×256 |
+| D3 | `badge-math_nodes10.png` | 256 | 「지도 탐험가」(노드 10개) | 둥근 메달 + 점과 선으로 이어진 작은 지도 | a round teal medal with a tiny node map: three dots connected by lines, 256×256 |
+| D3 | `badge-math_area_1.png` | 256 | 「수와 컴퓨터」(영역 1 완료) | 초록 메달 + 숫자 블록 | a round green (#2bb673) medal with a small cube block, 256×256 |
+| D3 | `badge-math_area_3.png` | 256 | 「확률의 눈」(영역 3 완료) | 주황 메달 + 주사위 | a round orange (#ffb347) medal with a single die, 256×256 |
+| D3 | `badge-math_area_5.png` | 256 | 「벡터 조종사」(영역 5 완료) | 파랑 메달 + 화살표 | a round blue (#6c8cff) medal with a bold diagonal arrow, 256×256 |
+| D3 | `badge-math_star3.png` | 256 | 「대학 맛보기」(★ 노드 3개) | 금 메달 + 박사모 + 별 | a round gold medal with a black graduation cap and a small star, 256×256 |
+
+**납품 체크리스트 (5차)**: 4차와 같음 — `assets/img/`에 저장 → `python3 tools/img_clean.py --check` → 이 표를 2절로 옮기고 3절에서 지움 → `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG·HANDOFF 한 줄 → 커밋. 영역 2·4·6 아이콘과 뱃지는 M2·M3 뒤에 따로 요청한다.
 
 ## 4. 그 뒤 (자리 없음 — 만들지 말 것)
 

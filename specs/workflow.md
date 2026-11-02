@@ -49,3 +49,18 @@ Claude 요금제의 주간 한도가 "모든 모델"과 "Fable 전용"으로 나
 문서들(NEXT.md, EXPANSION.md 1절 표)에 적힌 마이너 번호는 **계획 당시의 순서 표시일 뿐**이다. 실제 번호는 **먼저 배포되는 쪽이 다음 마이너를 가져간다.** 배포할 때 NEXT.md 표와 EXPANSION.md 해당 줄을 실제 번호로 고친다.
 
 지금까지 실제로 쓴 마이너: 2.0.0 Phase 0 · 2.1.0 알고리즘 · 2.2.0 실전 챕터 · **2.3.0 수학 공간 M1**. 다음 마이너(2.4.0)는 터미널·Git(WP-B)과 수학 M2 중 먼저 배포되는 쪽.
+
+## 7. 팀 운영 — QA팀·콘텐츠팀 (Opus 채팅, 2026-11-02 사용자 결정)
+
+Fable 세션(엔진·설계·검토) 외에 **Opus 채팅 두 개를 팀처럼 돌린다.** 각 팀은 자기 지시서를 읽고 1절 권한표 안에서만 일한다. 같은 `core` 파일을 두 채팅이 동시에 건드리지 않는다(5절).
+
+| 팀 | 지시서 | 하는 일 | 산출물 | 못 하는 일 |
+| --- | --- | --- | --- | --- |
+| **QA팀** | `specs/qa-team.md` | 배포본을 실제로 플레이(PC·모바일 폭·다크/라이트·고대비)하며 버그·문구·UX 문제를 찾고, 재현 절차와 함께 기록. 콘텐츠 오류(정답·힌트·테스트)는 직접 고쳐 커밋 가능 | `QA.md`(발견 목록·상태), 콘텐츠 패치 커밋, `tools/regress.py` 체크 추가(허용) | `core/` 설계 변경(→ "Fable 작업"으로 QA.md에 표시) |
+| **콘텐츠팀** | `specs/content-team.md` | 기존 스키마·그림 종류 안에서 레슨·문제·힌트·용어·예제 추가, 기존 문제 품질 개선(힌트 3단계, 테스트 경계값, 설명 문구) | `courses/*/content.js` 커밋 + PROBLEMS.md·CHANGELOG·HANDOFF | 새 문제 type·새 그림 kind·`core/` 수정 |
+
+공통 규칙: ① 시작할 때 `git fetch && git reset --hard origin/main` ② 푸시 직전 다시 당김 ③ 검증 게이트(3절) 통과 없이는 푸시 금지 ④ 커밋 메시지 맨 앞에 `[qa]` 또는 `[content]` ⑤ HANDOFF 상태판 "마지막 작업"에 `(Opus·QA)` / `(Opus·콘텐츠)` 표시. Fable은 `git log --grep "\[qa\]\|\[content\]"`로 모아 검토한다.
+
+**Opus 채팅을 열 때 첫 메시지(복사용)**
+- QA팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/qa-team.md 순서로 읽은 뒤 qa-team.md 2절 체크리스트대로 1회전 QA를 시작해. 결과는 QA.md에 기록하고 콘텐츠 오류는 고쳐서 [qa] 커밋으로 올려.`
+- 콘텐츠팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/content-team.md 순서로 읽은 뒤 content-team.md 3절의 첫 과제부터 시작해. [content] 커밋으로 올려.`
