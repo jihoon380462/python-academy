@@ -155,7 +155,7 @@ const LESSONS = [
   summary: ['약수: n % i == 0 인 i — 짝(i, n // i)으로 오니 √n 까지만', '약수 개수 = 소인수분해 지수에 1씩 더해 곱 · 제곱수만 홀수 개', '완전수: 자기 자신을 뺀 약수의 합 = n (6, 28, 496, 8128)'] },
 
 // =============== 영역 3 경우의 수·확률·통계 ===============
-{ id: 'M3_perm', ch: 3, n: 1, title: '줄 세우기와 고르기', subtitle: '순열과 조합', level: '고2', stars: 2, prereq: [], uses: ['algo', 'game'], icon: '🌳', minutes: 15, mode: 'text',
+{ id: 'M3_perm', ch: 3, n: 1, title: '줄 세우기와 고르기', subtitle: '순열과 조합', level: '고1', stars: 2, prereq: [], uses: ['algo', 'game'], icon: '🌳', minutes: 15, mode: 'text',
   params: [{ id: 'n', label: 'n (전체)', min: 2, max: 6, step: 1, default: 4 }, { id: 'r', label: 'r (뽑는 수)', min: 1, max: 4, step: 1, default: 2 }, { id: 'ordered', label: '순서 있음(1)/없음(0)', min: 0, max: 1, step: 1, default: 1 }],
   terms: {},
   pages: [
@@ -251,7 +251,7 @@ const LESSONS = [
       example: { code: 'xs = [1, 2, 3, 4, 5, 6, 7, 8]\nys = [2, 3.5, 3, 5, 5.5, 7, 6.5, 8.5]\nn = len(xs)\nmx, my = sum(xs) / n, sum(ys) / n\nsxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))\nsxx = sum((x - mx) ** 2 for x in xs)\nsyy = sum((y - my) ** 2 for y in ys)\nr = sxy / (sxx * syy) ** 0.5\na = sxy / sxx\nb = my - a * mx\nprint("r =", round(r, 3), " 추세선 y =", round(a, 3), "x +", round(b, 3))', trace: true } },
   ],
   summary: ['r: 1 같이 커짐, −1 반대, 0 무관', 'r = 공분산 / (σx σy), 이상값 하나에 크게 흔들린다', '추세선 = 잔차 제곱합 최소. 상관 ≠ 인과'] },
-{ id: 'M3_geom', ch: 3, n: 9, title: '몇 번 만에 성공하나', subtitle: '기하분포', level: '고2', stars: 2, prereq: ['M3_expect'], uses: ['game', 'data'], icon: '🎰', minutes: 15, mode: 'text',
+{ id: 'M3_geom', ch: 3, n: 9, title: '몇 번 만에 성공하나', subtitle: '기하분포', level: '대학', stars: 2, star: true, prereq: ['M3_expect'], uses: ['game', 'data'], icon: '🎰', minutes: 15, mode: 'text',
   params: [{ id: 'pct', label: '성공 확률 p', min: 10, max: 90, step: 5, default: 20, unit: '%' }],
   terms: { '기하분포': '성공 확률 p인 시도를 성공할 때까지 반복할 때, 첫 성공까지 걸린 횟수의 분포. 평균 1/p 번' },
   pages: [
