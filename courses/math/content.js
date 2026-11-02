@@ -33,7 +33,7 @@ const LESSONS = [
 // =============== 영역 1 수와 컴퓨터 ===============
 { id: 'M1_mod', ch: 1, n: 1, title: '나눠서 남는 것', subtitle: '나머지 연산 (%)', level: '고1', stars: 1, prereq: [], uses: ['game', 'algo'], icon: '🕐', minutes: 15, mode: 'text',
   params: [{ id: 'n', label: 'n', min: 0, max: 60, step: 1, default: 23 }, { id: 'm', label: '나눔 수 m', min: 2, max: 12, step: 1, default: 12 }],
-  terms: { '나머지': 'n을 m으로 나누고 남는 수. 파이썬 n % m. 항상 0 이상 m 미만' },
+  terms: {},
   pages: [
     { title: '만져 보기: 시계 위를 도는 수', scene: '🕐 지금 23시인데 5시간 뒤는? 28시가 아니라 4시. 타일 무늬·요일·원형 큐·해시 테이블 칸 번호가 전부 이 "한 바퀴 돌면 처음으로"예요.', figure: { kind: 'modring', note: '슬라이더로 n과 m을 바꿔 보세요' },
       html: '<p>원에 m칸이 있고, n은 0부터 한 칸씩 가다가 끝에 닿으면 다시 0으로 돌아와요. <b>멈춘 칸이 [[나머지]]</b>, 돈 바퀴 수가 몫이에요.</p>',
@@ -45,7 +45,7 @@ const LESSONS = [
   summary: ['n % m = 원형 칸에서 멈춘 자리 (0 ~ m-1)', 'n == m * (n // m) + n % m', '한 바퀴 돌아 처음으로 = 시계·요일·원형 배열·해시'] },
 { id: 'M1_prime', ch: 1, n: 2, title: '더 나눌 수 없는 수', subtitle: '소수와 에라토스테네스의 체', level: '고1', stars: 2, prereq: ['M1_mod'], uses: ['algo'], icon: '🧱', minutes: 15, mode: 'text',
   params: [{ id: 'N', label: '범위 N', min: 10, max: 120, step: 10, default: 50 }],
-  terms: { '소수': '1과 자기 자신으로만 나누어지는 2 이상의 수 (2, 3, 5, 7, 11 …)' },
+  terms: {},
   pages: [
     { title: '만져 보기: 배수를 지워 나가기', scene: '🔐 해시 테이블 크기를 소수로 잡으면 충돌이 줄고, 인터넷 암호(RSA)는 큰 소수 두 개의 곱으로 자물쇠를 만들어요.', figure: { kind: 'sieve', note: '「다음 소수 지우기」를 눌러 보세요' },
       html: '<p>2부터 시작해 <b>남아 있는 가장 작은 수는 [[소수]]</b>, 그 배수는 전부 지워요. 지워지지 않고 끝까지 남은 수가 소수예요.</p>',
@@ -57,7 +57,7 @@ const LESSONS = [
   summary: ['소수 = 2 이상, 1과 자기 자신만 약수', '하나 확인은 √n 까지, 전부 찾기는 체', '체: 남은 가장 작은 수는 소수, 그 배수를 지운다'] },
 { id: 'M1_gcd', ch: 1, n: 3, title: '공통으로 나누는 수', subtitle: '최대공약수와 유클리드 호제법', level: '고1', stars: 2, prereq: ['M1_prime'], uses: ['algo'], icon: '📐', minutes: 15, mode: 'text',
   params: [{ id: 'a', label: '가로 a', min: 1, max: 40, step: 1, default: 24 }, { id: 'b', label: '세로 b', min: 1, max: 30, step: 1, default: 18 }],
-  terms: { '최대공약수': '두 수를 모두 나누는 수 중 가장 큰 것. gcd(24, 18) = 6' },
+  terms: {},
   pages: [
     { title: '만져 보기: 직사각형을 정사각형으로 자르기', scene: '🖥 1920×1080 화면 비율은? 둘을 120으로 나누면 16:9. 분수 약분, 톱니바퀴가 다시 만나는 시점도 [[최대공약수]]예요.', figure: { kind: 'euclid', note: '색 하나 = 한 단계. 같은 색 정사각형은 같은 크기' },
       html: '<p>a×b 직사각형에서 <b>가장 큰 정사각형을 잘라내고</b>, 남은 직사각형에서 또 잘라내요. 마지막에 딱 떨어지는 정사각형의 한 변이 최대공약수예요.</p>',
@@ -69,7 +69,7 @@ const LESSONS = [
   summary: ['gcd(a, b) = gcd(b, a % b), 나머지 0이면 끝', '직사각형을 정사각형으로 잘라 가면 마지막 한 변', 'lcm = a*b // gcd, 파이썬 math.gcd'] },
 { id: 'M1_binary', ch: 1, n: 4, title: '0과 1로 세기', subtitle: '2진법·16진법과 비트', level: '고1', stars: 1, prereq: ['M1_mod'], uses: ['algo', 'game'], icon: '💡', minutes: 15, mode: 'text',
   params: [{ id: 'v', label: '값 v', min: 0, max: 255, step: 1, default: 37 }],
-  terms: { '비트': '0 또는 1 한 자리. 8비트 = 1바이트 = 0~255', '16진수': '0~9와 A~F로 한 자리에 16가지. 4비트가 16진수 한 글자 (#FF8800)' },
+  terms: {},
   pages: [
     { title: '만져 보기: 전구 8개로 수 만들기', scene: '🎨 색 코드 #FF8800은 빨강 255·초록 136·파랑 0. 파일 크기 1KB = 1024바이트, 알고리즘 코스의 비트마스크 1 << i 가 전부 이 전구예요.', figure: { kind: 'bits', bits: 8, note: '상자를 눌러 켜고 끄세요. 슬라이더로 v를 바꿔도 돼요' },
       html: '<p>각 자리는 오른쪽부터 1, 2, 4, 8, …(2의 거듭제곱). <b>켜진 자리의 값을 더하면</b> 그 수예요. 10진법이 "10이 되면 올림"이듯 2진법은 "2가 되면 올림".</p>',
@@ -81,7 +81,7 @@ const LESSONS = [
   summary: ['자리값 1, 2, 4, 8, … 켜진 자리를 더한다', '2로 나눈 나머지를 모으면 2진수 (bin, int(s, 2))', '<< 1 은 ×2, >> 1 은 //2'] },
 { id: 'M1_float', ch: 1, n: 5, title: '컴퓨터가 소수를 못 담는 이유', subtitle: '부동소수점과 오차', level: '고1', stars: 2, prereq: ['M1_binary'], uses: ['data', 'game'], icon: '🫧', minutes: 15, mode: 'text',
   params: [{ id: 'c', label: '보는 위치 c', min: 1, max: 1000, step: 1, default: 1 }, { id: 'bits', label: '가수 비트', min: 3, max: 8, step: 1, default: 4 }],
-  terms: { '부동소수점': '수를 "가수 × 2^지수"로 담는 방식(float). 비트 수가 정해져 있어 대부분의 소수는 근사값', '가수': '부동소수점에서 유효 숫자 부분. 비트가 많을수록 점이 촘촘' },
+  terms: { '가수': '부동소수점에서 유효 숫자 부분. 비트가 많을수록 점이 촘촘' },
   pages: [
     { title: '만져 보기: 수직선의 점이 드문드문', scene: '💸 0.1 + 0.2 == 0.3 이 False! 돈 계산에서 1원이 사라지고, 게임에서 같은 위치 판정이 가끔 틀리는 이유예요.', figure: { kind: 'floatline', note: '파란 점만 정확히 담을 수 있는 수' },
       html: '<p>[[부동소수점]]은 수직선 위의 <b>점 몇 개만</b> 담아요. 그 사이 값은 가장 가까운 점으로 반올림되고, 그 차이가 오차예요. 점 사이 간격은 [[가수]] 비트 수와 "얼마나 큰 수인지"에 달렸어요.</p>',
@@ -93,7 +93,7 @@ const LESSONS = [
   summary: ['float는 수직선의 점 몇 개 — 사이 값은 반올림', '큰 수일수록 간격이 넓다(2^(e-52))', '0.1은 2진 무한소수. 비교는 isclose, 돈은 정수·decimal'] },
 { id: 'M1_power', ch: 1, n: 6, title: '곱하기를 반복하면', subtitle: '거듭제곱과 지수적 증가', level: '고2', stars: 1, prereq: [], uses: ['algo', 'data'], icon: '🚀', minutes: 15, mode: 'text',
   params: [{ id: 'a', label: '밑 a', min: 1.1, max: 3, step: 0.1, default: 2 }, { id: 'xmax', label: 'x 범위', min: 5, max: 40, step: 5, default: 10 }],
-  terms: { '거듭제곱': '같은 수를 여러 번 곱한 것. a^x = a를 x번 곱함. 파이썬 a ** x' },
+  terms: {},
   pages: [
     { title: '만져 보기: 세 선의 경주', scene: '🦠 감염자가 매일 2배, 이자가 매년 5%, 완전탐색의 경우의 수 2ⁿ — 전부 "곱하기 반복"이고, 어느 순간 다른 모든 것을 추월해요.', figure: { kind: 'plot', fns: [{ expr: 'pow(a, x)', label: 'a^x' }, { expr: 'x*x', label: 'x²' }, { expr: 'x', label: 'x' }], xr: [0, 'xmax'], yr: 'auto', ycap: 1e9, probe: 'xp', note: '점선을 끌어 x를 움직여 보세요' },
       html: '<p>초록 x는 더하기 증가, 빨강 x²는 다항 증가, 파랑 a^x는 <b>[[거듭제곱]](지수) 증가</b>. 처음엔 작아 보여도 x가 커지면 a^x가 전부를 삼켜요.</p>',
@@ -105,7 +105,7 @@ const LESSONS = [
   summary: ['a^x = 곱하기 반복, 결국 x²·x를 전부 추월', 'a^m · a^n = a^(m+n), (a^m)^n = a^(mn)', '2^10 ≈ 10^3: 10비트마다 1000배'] },
 { id: 'M1_log', ch: 1, n: 7, title: '거꾸로 묻기', subtitle: '로그와 "몇 번 반으로 나누나"', level: '고2', stars: 2, prereq: ['M1_power'], uses: ['algo'], icon: '🔍', minutes: 15, mode: 'text',
   params: [{ id: 'b', label: '밑 b', min: 2, max: 10, step: 1, default: 2 }, { id: 'xp', label: 'x', min: 0.5, max: 16, step: 0.5, default: 8 }],
-  terms: { '로그': 'log_b(x) = "b를 몇 번 곱해야 x가 되나". 거듭제곱의 거꾸로. log₂(1024) = 10' },
+  terms: {},
   pages: [
     { title: '만져 보기: 거울에 비친 거듭제곱', scene: '🔎 이진 탐색이 100만 개에서 20번이면 끝나는 이유, Big-O의 log n, 정렬 n log n — "몇 번 반으로 나누면 1이 되나"가 로그예요.', figure: { kind: 'plot', fns: [{ expr: 'pow(b, x)', label: 'b^x' }, { expr: 'log(x)/log(b)', label: 'log_b x' }, { expr: 'x', label: 'y = x', dash: true }], xr: [0, 16], yr: [0, 16], probe: 'xp', note: '점선을 끌어 보세요. 두 곡선은 y = x 를 기준으로 대칭' },
       html: '<p>b^x 와 log_b x 는 <b>y = x 에 대해 거울상</b>이에요. 거듭제곱이 "b를 x번 곱하면?"이면 [[로그]]는 "x가 되려면 b를 몇 번?"이라고 거꾸로 묻는 것.</p>',
@@ -117,7 +117,7 @@ const LESSONS = [
   summary: ['log_b x = "b를 몇 번 곱해야 x"', 'b^x 와 log_b x 는 y = x 대칭(역함수)', 'log₂ n = 절반씩 나누는 횟수 = 이진 탐색·비트 수'] },
 { id: 'M1_seq', ch: 1, n: 8, title: '앞 항으로 다음 항', subtitle: '수열과 점화식', level: '고2', stars: 2, prereq: [], uses: ['game', 'algo'], icon: '🪜', minutes: 15, mode: 'text',
   params: [{ id: 'a1', label: '초항 a₁', min: 1, max: 10, step: 1, default: 2 }, { id: 'd', label: '공차 d', min: 0, max: 5, step: 1, default: 3 }, { id: 'r', label: '공비 r', min: 1, max: 2, step: 0.1, default: 1.5 }],
-  terms: { '수열': '수를 순서대로 늘어놓은 것 a₁, a₂, a₃ …', '점화식': '앞 항으로 다음 항을 정하는 규칙. a_{n+1} = a_n + d' },
+  terms: { '점화식': '앞 항으로 다음 항을 정하는 규칙. a_{n+1} = a_n + d' },
   pages: [
     { title: '만져 보기: 더해 가는 수열 vs 곱해 가는 수열', scene: '🎮 레벨마다 필요한 XP(이 사이트는 30 + 4L!), 매달 붓는 적금, 피보나치 토끼 — "앞 항을 보고 다음 항"이 [[점화식]]이에요.', figure: { kind: 'plot', points: [{ expr: 'a1 + d*(i-1)', n: 12, from: 1, label: '등차 a₁+d(n−1)', line: true }, { expr: 'a1 * pow(r, i-1)', n: 12, from: 1, label: '등비 a₁·rⁿ⁻¹', line: true }], xr: [0, 13], yr: 'auto', xlabel: 'n', ylabel: 'aₙ', note: 'd를 올리면 직선이 서고, r을 올리면 곡선이 휘어요' },
       html: '<p>초록: 매번 d를 <b>더하는</b> 등차수열(직선). 주황: 매번 r을 <b>곱하는</b> 등비수열(휘어 오르는 곡선). 둘 다 "앞 항 → 다음 항" 규칙 하나로 정해져요.</p>',
@@ -129,7 +129,7 @@ const LESSONS = [
   summary: ['점화식 = 앞 항으로 다음 항 = for 반복문', '등차(더하기)는 직선, 등비(곱하기)는 휘는 곡선', '일반항이 있으면 n번째를 바로 계산'] },
 { id: 'M1_sigma', ch: 1, n: 9, title: '다 더하기', subtitle: 'Σ 기호와 반복문', level: '고2', stars: 1, prereq: ['M1_seq'], uses: ['data', 'algo'], icon: '🧮', minutes: 12, mode: 'text',
   params: [{ id: 'n', label: 'n', min: 1, max: 20, step: 1, default: 8 }],
-  terms: { '시그마': 'Σ(합 기호). i를 1부터 n까지 바꿔 가며 항을 전부 더하라는 뜻 = for 반복문의 누적' },
+  terms: {},
   pages: [
     { title: '만져 보기: 막대가 하나씩 쌓인다', scene: '📊 평균 = 합 ÷ 개수, 총점, 누적 매출, 적분의 넓이 — 전부 "i를 바꿔 가며 전부 더하기". 수학은 그걸 Σ 한 글자로 써요.', figure: { kind: 'bars', term: 'i', note: '「i 하나 더」를 누르면 막대가 쌓여요' },
       html: '<p>[[시그마]] Σ는 무서운 기호가 아니라 <b>반복문</b>이에요: 아래 i = 1에서 시작, 위 n까지, 옆의 식을 더하라. 그림의 막대 하나 = 반복 한 번.</p>',
@@ -141,7 +141,7 @@ const LESSONS = [
   summary: ['Σ_{i=1}^{n} f(i) = for i in range(1, n+1): total += f(i)', '1+…+n = n(n+1)/2', '합은 나눠 더해도 같고, 상수는 밖으로'] },
 { id: 'M1_divisor', ch: 1, n: 10, title: '나누어떨어지는 수 모으기', subtitle: '약수의 개수와 완전수', level: '고1', stars: 2, prereq: ['M1_prime', 'M1_sigma'], uses: ['algo'], icon: '🧩', minutes: 15, mode: 'text',
   params: [{ id: 'n', label: 'n', min: 1, max: 40, step: 1, default: 12 }],
-  terms: { '약수': 'n을 나누어떨어지게 하는 수. n % i == 0 인 i. 12의 약수는 1, 2, 3, 4, 6, 12', '완전수': '자기 자신을 뺀 약수를 전부 더하면 자기 자신이 되는 수. 6 = 1 + 2 + 3, 28 = 1 + 2 + 4 + 7 + 14' },
+  terms: { '완전수': '자기 자신을 뺀 약수를 전부 더하면 자기 자신이 되는 수. 6 = 1 + 2 + 3, 28 = 1 + 2 + 4 + 7 + 14' },
   pages: [
     { title: '만져 보기: 나누어떨어질 때만 막대가 선다', scene: '🍕 피자 12조각을 똑같이 나눌 수 있는 인원은 1·2·3·4·6·12명. 화면 격자 칸 나누기, 팀 짜기, 반복 주기 맞추기가 전부 약수 찾기예요.', figure: { kind: 'bars', term: 'n % i == 0 ? i : 0', note: 'i를 1부터 n까지 늘리며 n % i == 0 일 때만 높이 i 막대가 서요. 빨간 합 = 지금까지 찾은 약수의 합' },
       html: '<p>i를 1부터 n까지 하나씩 대 보며 <code>n % i == 0</code>이면 [[약수]]예요. 막대가 선 칸을 세면 약수의 개수, 막대 높이를 다 더하면 약수의 합. 자기 자신(맨 끝 막대)을 뺀 합이 딱 n이면 [[완전수]]예요.</p>',
@@ -155,7 +155,7 @@ const LESSONS = [
 // =============== 영역 3 경우의 수·확률·통계 ===============
 { id: 'M3_perm', ch: 3, n: 1, title: '줄 세우기와 고르기', subtitle: '순열과 조합', level: '고2', stars: 2, prereq: [], uses: ['algo', 'game'], icon: '🌳', minutes: 15, mode: 'text',
   params: [{ id: 'n', label: 'n (전체)', min: 2, max: 6, step: 1, default: 4 }, { id: 'r', label: 'r (뽑는 수)', min: 1, max: 4, step: 1, default: 2 }, { id: 'ordered', label: '순서 있음(1)/없음(0)', min: 0, max: 1, step: 1, default: 1 }],
-  terms: { '순열': 'n개 중 r개를 순서 있게 줄 세우는 경우의 수 nPr = n(n-1)…(n-r+1)', '조합': 'n개 중 r개를 순서 없이 고르는 경우의 수 nCr = nPr / r!' },
+  terms: {},
   pages: [
     { title: '만져 보기: 가지가 펼쳐지는 나무', scene: '🔑 4자리 비밀번호는 몇 가지? 로또 6개는? 완전탐색이 "될지 안 될지"는 결국 잎이 몇 개냐예요.', figure: { kind: 'tree', note: '잎(초록) 수 = 경우의 수. 순서 있음/없음을 바꿔 보세요' },
       html: '<p>첫 자리에 n가지, 다음 자리에 (n−1)가지… 가지가 곱으로 늘어나요. <b>순서를 무시하면</b> 같은 묶음끼리 합쳐져 잎이 r!분의 1로 줄어요([[순열]] → [[조합]]).</p>',
@@ -167,7 +167,7 @@ const LESSONS = [
   summary: ['곱의 법칙: 단계마다 가짓수를 곱한다', 'nPr = n(n−1)…(n−r+1), nCr = nPr / r!', 'permutations / combinations, math.perm / comb'] },
 { id: 'M3_prob', ch: 3, n: 2, title: '얼마나 자주', subtitle: '확률과 큰 수의 법칙', level: '고2', stars: 1, prereq: ['M3_perm'], uses: ['game', 'data'], icon: '🎲', minutes: 15, mode: 'text',
   params: [{ id: 'sides', label: '주사위 면 수', min: 2, max: 12, step: 1, default: 6 }],
-  terms: { '확률': '어떤 일이 일어날 비율. 똑같이 가능한 경우 중 그 사건의 경우 수 / 전체 경우 수', '큰 수의 법칙': '시행을 많이 할수록 실제 비율이 확률에 가까워진다' },
+  terms: { '큰 수의 법칙': '시행을 많이 할수록 실제 비율이 확률에 가까워진다' },
   pages: [
     { title: '만져 보기: 굴릴수록 평평해진다', scene: '🎁 드롭률 5%는 "20번에 한 번 꼭"이 아니에요. 10번 굴린 막대와 10만 번 굴린 막대를 비교해 보세요.', figure: { kind: 'hist', sim: (rng, p) => 1 + Math.floor(rng() * Math.round(p.sides)), domain: (p) => [1, Math.round(p.sides), 1], theory: (k, p) => 1 / Math.round(p.sides), trials: [10, 100, 10000], note: '파랑 = 실제로 나온 비율, 빨간 선 = 이론 확률 1/면 수' },
       html: '<p>[[확률]] 1/6은 "6번 중 꼭 1번"이 아니라 <b>아주 많이 하면 1/6에 가까워지는 비율</b>이에요([[큰 수의 법칙]]). 적게 굴리면 막대가 들쭉날쭉한 게 정상.</p>',
@@ -191,7 +191,7 @@ const LESSONS = [
   summary: ['P(A|B) = P(A∩B) / P(B): 전체가 B로 줄어든다', 'P(A|B) ≠ P(B|A) (분모가 다름)', '독립 = 알아도 안 변함, P(A∩B) = P(A)P(B)'] },
 { id: 'M3_expect', ch: 3, n: 4, title: '평균적으로 얼마', subtitle: '기댓값과 분산', level: '고2', stars: 2, prereq: ['M3_prob'], uses: ['game', 'data'], icon: '⚖️', minutes: 15, mode: 'text',
   params: [{ id: 'p1', label: '대박 확률 %', min: 1, max: 50, step: 1, default: 10 }, { id: 'big', label: '대박 보상', min: 10, max: 100, step: 5, default: 50 }],
-  terms: { '기댓값': '값 × 확률을 전부 더한 것. 아주 많이 하면 평균이 여기로 간다', '분산': '값이 기댓값에서 얼마나 퍼져 있나 (편차 제곱의 평균). 제곱근이 표준편차 σ' },
+  terms: {},
   pages: [
     { title: '만져 보기: 평균선과 퍼짐 띠', scene: '🎰 가챠: 90%는 1코인, 10%는 50코인. 한 번 뽑을 때 "평균" 얼마를 기대할 수 있나요? 위험(퍼짐)은?', figure: { kind: 'hist', sim: (rng, p) => rng() * 100 < p.p1 ? p.big : 1, domain: (p) => [0, Math.round(p.big), Math.max(1, Math.round(p.big / 20))], stats: true, trials: [10, 100, 10000], note: '주황 선 = 평균, 띠 = 평균 ± 표준편차' },
       html: '<p>[[기댓값]]은 값에 확률을 곱해 더한 "무게 중심". [[분산]]은 평균에서 얼마나 멀리 흩어지는지 — 같은 기댓값이라도 띠가 넓으면 한 번 한 번은 들쭉날쭉(위험).</p>',
@@ -265,7 +265,7 @@ const LESSONS = [
 // =============== 영역 5 벡터·행렬 ===============
 { id: 'M5_vec', ch: 5, n: 1, title: '크기와 방향', subtitle: '2D 벡터', level: '고2', stars: 1, prereq: [], uses: ['game'], icon: '➡️', minutes: 12, mode: 'text',
   params: [{ id: 'ax', label: 'x 성분', min: -5, max: 5, step: 0.5, default: 3 }, { id: 'ay', label: 'y 성분', min: -5, max: 5, step: 0.5, default: 2 }],
-  terms: { '벡터': '크기와 방향을 가진 화살표. 2D에서는 (x, y) 두 숫자', '벡터의 크기': '화살표 길이 = √(x² + y²) (피타고라스)' },
+  terms: { '벡터의 크기': '화살표 길이 = √(x² + y²) (피타고라스)' },
   pages: [
     { title: '만져 보기: 화살표 하나', scene: '🏃 캐릭터가 한 프레임에 (3, 2)만큼 움직인다 — 오른쪽으로 3, 위로 2. 그 화살표가 [[벡터]]고, 길이가 속력이에요.', figure: { kind: 'vector', vecs: [{ x: 'ax', y: 'ay', label: 'v' }], note: '화살표 끝을 끌어 보세요' },
       html: '<p>[[벡터]]는 "어디서"가 아니라 <b>얼마만큼 어느 쪽으로</b>예요. (x, y) 두 성분이면 끝. 길이는 점선 직각삼각형의 빗변 — 피타고라스 √(x²+y²).</p>',
@@ -289,7 +289,7 @@ const LESSONS = [
   summary: ['합: 성분끼리 더하기 = 꼬리에 머리 잇기', '차 b − a = a에서 b로 (끝 − 시작)', 'pos += vel, vel += gravity 가 물리의 뼈대'] },
 { id: 'M5_norm', ch: 5, n: 3, title: '길이를 1로', subtitle: '정규화 (단위 벡터)', level: '고2', stars: 2, prereq: ['M5_add'], uses: ['game'], icon: '🎯', minutes: 12, mode: 'text',
   params: [{ id: 'ax', label: 'x 성분', min: -5, max: 5, step: 0.5, default: 3 }, { id: 'ay', label: 'y 성분', min: -5, max: 5, step: 0.5, default: 4 }, { id: 'speed', label: '속력', min: 1, max: 5, step: 0.5, default: 2 }],
-  terms: { '단위 벡터': '길이가 1인 벡터. 방향만 남긴 것', '정규화': '벡터를 자기 길이로 나눠 단위 벡터로 만들기' },
+  terms: { '단위 벡터': '길이가 1인 벡터. 방향만 남긴 것' },
   pages: [
     { title: '만져 보기: 원 위로 줄이기', scene: '🐛 대각선으로 움직이면 더 빨라지는 버그 — 오른쪽(1,0)과 위(0,1)를 더한 (1,1)은 길이가 √2 = 1.41. 방향만 쓰고 싶으면 길이를 1로.', figure: { kind: 'vector', vecs: [{ x: 'ax', y: 'ay', label: 'v' }], op: 'normalize', unitCircle: true, note: '초록 = 정규화한 v. 끝이 항상 단위원 위' },
       html: '<p>[[정규화]] = 벡터를 <b>자기 길이로 나누기</b>. 방향은 그대로, 길이는 1이 돼서 끝이 단위원 위에 놓여요. 거기에 원하는 속력을 곱하면 "그 방향으로 정확히 그 속력".</p>',
@@ -301,7 +301,7 @@ const LESSONS = [
   summary: ['정규화 = v / |v|: 방향만 남기고 길이 1', '길이 0이면 먼저 걸러야 한다', '이동 = 정규화한 방향 × 속력 (대각선 버그 해결)'] },
 { id: 'M5_dot', ch: 5, n: 4, title: '같은 방향을 보고 있나', subtitle: '내적', level: '고2', stars: 2, prereq: ['M5_add'], uses: ['game', 'data'], icon: '👁', minutes: 15, mode: 'text',
   params: [{ id: 'ax', label: 'a.x', min: -5, max: 5, step: 0.5, default: 4 }, { id: 'ay', label: 'a.y', min: -5, max: 5, step: 0.5, default: 1 }, { id: 'bx', label: 'b.x', min: -5, max: 5, step: 0.5, default: 2 }],
-  terms: { '내적': 'a·b = axbx + ayby = |a||b|cosθ. 양수면 같은 쪽, 0이면 직각, 음수면 반대쪽' },
+  terms: {},
   pages: [
     { title: '만져 보기: 그림자의 길이', scene: '👁 적이 내 시야(앞쪽 90°) 안에 있나? 빛이 면을 얼마나 정면으로 비추나(밝기)? 추천 시스템의 "취향이 비슷한가"? 전부 [[내적]] 하나.', figure: { kind: 'vector', defaults: { by: 3 }, vecs: [{ x: 'ax', y: 'ay', label: 'a' }, { x: 'bx', y: 'by', label: 'b' }], op: 'dot', note: '주황 굵은 선 = b를 a 위에 비춘 그림자. 화살표 끝을 끌어 돌려 보세요' },
       html: '<p>b를 a 방향으로 비춘 <b>그림자 길이 × a의 길이</b>가 내적이에요. 같은 쪽을 보면 양수, 직각이면 0, 반대면 음수. 각도를 재지 않고도 "같은 방향인가"를 알 수 있어요.</p>',
@@ -325,7 +325,7 @@ const LESSONS = [
   summary: ['행렬의 열 = î, ĵ가 간 곳. 회전은 (cosθ, sinθ), (−sinθ, cosθ)', 'x\' = x cosθ − y sinθ, y\' = x sinθ + y cosθ', 'math.radians 필수, 중심 기준은 빼고 돌리고 더하기'] },
 { id: 'M5_scale', ch: 5, n: 6, title: '늘리고 기울이기', subtitle: '크기·기울임 행렬', level: '고2', stars: 2, prereq: ['M5_rotate'], uses: ['game'], icon: '↔️', minutes: 15, mode: 'text',
   params: [{ id: 'a', label: 'a (î의 x)', min: -2, max: 3, step: 0.25, default: 1.5 }, { id: 'b', label: 'b (ĵ의 x, 기울임)', min: -2, max: 2, step: 0.25, default: 0 }, { id: 'd', label: 'd (ĵ의 y)', min: -2, max: 3, step: 0.25, default: 1 }],
-  terms: { '행렬': '숫자를 직사각형으로 늘어놓은 것. 2×2 행렬 = 평면 변환 하나', '선형 변환': '격자가 평행·등간격을 유지한 채 변하는 변환(원점 고정). 회전·크기·기울임' },
+  terms: { '선형 변환': '격자가 평행·등간격을 유지한 채 변하는 변환(원점 고정). 회전·크기·기울임' },
   pages: [
     { title: '만져 보기: 원소 4개의 역할', scene: '🖼 이미지를 가로로 2배, 이탤릭처럼 기울이기, 카메라 줌 — 전부 2×2 [[행렬]] 원소 4개를 바꾸는 일이에요.', figure: { kind: 'transform', matrix: (p) => [p.a, p.b, 0, p.d], info: (p) => `대각선 a, d = 크기 · b = 기울임(ĵ가 옆으로 눕는 양)`, note: '행렬 [[a, b], [0, d]]' },
       html: '<p>대각선 a, d는 <b>x·y 방향 크기</b>, 나머지 b는 <b>기울임</b>(ĵ가 옆으로 눕는 양). 원점은 안 움직이고 격자는 평행을 유지 — 이게 [[선형 변환]].</p>',
