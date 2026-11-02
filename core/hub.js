@@ -19,7 +19,7 @@ const Hub = {
     const lastCourse = last && last.course && last.course !== 'python' ? CONFIG.COURSES.find(c => c.id === last.course) : null;
     const contCourse = lastCourse || py;
     const contHash = lastCourse ? (last.params.pid ? `problem/${last.params.pid}` : last.params.lessonId ? `lesson/${last.params.lessonId}` : '') : last ? (last.view === 'problem' && lastP ? `problem/${lastP.id}` : lastL ? `lesson/${lastL.id}` : '') : (cur ? `lesson/${cur.id}` : '');
-    const contLabel = lastCourse ? `${esc(lastCourse.name)} 코스 이어서 하기` : last && lastP ? `${esc(lastP.title)} 이어서 풀기` : last && lastL ? `레슨 "${esc(lastL.title)}" 이어서 보기` : cur ? `레슨 "${esc(cur.title)}" 시작하기` : '파이썬 코스 열기';
+    const contLabel = lastCourse ? (lastCourse.space ? `${esc(lastCourse.name)} 이어서 하기` : `${esc(lastCourse.name)} 코스 이어서 하기`) : last && lastP ? `${esc(lastP.title)} 이어서 풀기` : last && lastL ? `레슨 "${esc(lastL.title)}" 이어서 보기` : cur ? `레슨 "${esc(cur.title)}" 시작하기` : '파이썬 코스 열기';
     const chal = d.dailyChallenge && d.dailyChallenge.date === today ? (d.dailyChallenge.done ? '오늘의 도전 완료 ✓' : '오늘의 도전 1개 남음') : '오늘의 도전 1개 (코스에서)';
     $('#topbar').innerHTML = `<div class="tb-mascot">${myMascot({ size: 34 })}</div><div class="tb-title">${esc(d.nick || T.appName)} <span class="muted small">Lv.${lv.level} ${esc(Game.title(lv.level))}</span></div>
       <div class="tb-xp" title="레벨 ${lv.level}"><span class="tb-lv">Lv.${lv.level}</span><div class="xpbar"><div class="xpfill" style="width:${lv.need ? Math.round(100 * lv.into / lv.need) : 100}%"></div></div><span class="tb-xpn">${lv.into}/${lv.need || '최대'}</span></div>

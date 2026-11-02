@@ -349,3 +349,6 @@ v1.0.1에서 **메인 스레드 보조 실행기**를 추가했습니다. 워커
 - **QA #4** 이어서 하기 위치 저장: 지시서 `Store.save()` 대신 `Store.save({ silent: true })`. 화면 이동마다 `updatedAt` 을 올리고 기기 연동 push 를 예약하면 문제를 열기만 해도 동기화가 돌고 다른 기기와 충돌 판정이 잦아진다. 위치는 다음 실제 저장 때 같이 올라간다.
 - **QA #6** 시각화 ResizeObserver 가드: 지시서 `!host.isConnected` 에 `|| !cvs[0].isConnected` 추가. 에러가 나는 흔한 경로는 host 가 붙어 있는 채로 내용만 바뀌는 경우(👀 다시 누르기 = `runAndShow` 가 host.innerHTML 교체, 닫기 버튼 = host.innerHTML = '')라 host 검사만으로는 재현이 그대로 남았다.
 - **QA #9** 고대비 「전체 초기화」 글자색: 지시서 `[data-contrast="1"] .btn.danger` 를 `[data-contrast="1"][data-theme=dark] .btn.danger` 로 좁힘. 라이트 고대비의 `--danger #c3203a` 위에 `#1d2230` 글자는 2.7:1 로 원래(흰 글자 5.9:1)보다 나빠진다. 다크는 2.5 → 6.3:1.
+- **QA #2** 수식 글자 폴백(`MathUI.plain`): 지시서의 「치환 목록 추가 + `\frac` 반복」 대신 **중괄호 짝을 세는 작은 파서**로 다시 씀. 인자 안에 중괄호가 있는 `\frac{1}{\sigma\sqrt{2\pi}}`·`\frac{\sum …}{\sqrt{…}}` 는 정규식 반복으로는 안 풀려 8개가 그대로 깨졌다. 기호 치환은 `\vec{a}\cdot\vec{b}` 처럼 명령 뒤에 글자가 붙기 전에 먼저 한다. 수학 수식 58개 결과는 regress 체크(QA #2)가 지킨다.
+- **QA #8** 오프라인 캐시 개수: 지시서 `Math.min(shell.keys().length, ASSETS.length)` 대신 `ASSETS` 각각 `shell.match(u)` 로 셈. min 은 런타임 캐시(같은 출처 이미지·`courses/<id>/` 경로)가 섞이면 일부 파일이 빠져도 125/125 로 보여서 실제 오프라인 준비 상태를 못 알려 준다.
+- **QA #12** 노드 완료 버튼: 지시서의 「레슨 완료!」→「노드 완료!」에 더해 같은 버튼의 「다음 레슨:」도 수학 공간에서는 「다음 노드:」.
