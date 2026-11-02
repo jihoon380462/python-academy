@@ -615,3 +615,88 @@ Create ONE PNG badge for a consistent educational game medal set. Flat vector st
 ```text
 Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round green medal with a turtle leaving a long spiral trail, 256×256 Match the cute turtle in reference 2, but remove paintbrush and show a large simple spiral walking trail behind it.
 ```
+
+
+## 5차 D 수학 공간 — v2.3.3 (2026-11-02)
+
+D1 마스코트 1장 → D2 영역 아이콘 3장 → D3 뱃지 6장. ImageGen 개별 생성, 512/256 PNG RGBA 정규화, 사방 여백 47/23px. 외곽 흰 테두리 검사 및 다크/라이트 실사용 크기 축소본 확인. 실제 브라우저 검수는 별도.
+
+### `course-math.png` — D1
+
+참조: `course-python.png`, `course-algo.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. a cute round green turtle wearing a black graduation cap with a yellow tassel, holding a small pink (#e91e63) ruler and a compass (drawing tool), friendly smile, same style as a set of animal mascots, 512×512. FULL BODY turtle with distinct segmented round shell, large friendly face and short sturdy legs; friendly confident graduate. One hand holds a broad short pink ruler with a few plain tick marks, the other holds an open drawing compass with two clear legs joined by a hinge (NOT a navigation compass). Large simple shapes readable at 48px. Do not include reference snake or owl, no medal circle or backdrop.
+```
+
+### `area-math-1.png` — D2-1
+
+참조: `chapter-python-3.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. three stacked green (#2bb673) cube blocks with simple dot patterns (no digits), 512×512 Exactly three green cubes in a compact pyramid stack, one blank front face, one with ONE dot, one with TWO dots, chunky dark outlines. No tape, no cardboard parcel labels. No circular medal or backdrop. Reference is style only; replace its subject entirely.
+```
+
+### `area-math-3.png` — D2-3
+
+참조: `chapter-algo-3.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. two orange (#ffb347) dice with white pips, slightly tilted, 512×512 Exactly two chunky dice, one higher behind the other, white circular pips clearly separated, large legible faces, flat stylized perspective. No circular medal or backdrop. Reference is style only; replace its subject entirely.
+```
+
+### `area-math-5.png` — D2-5
+
+참조: `chapter-algo-3.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. two bold blue (#6c8cff) arrows from one origin forming a parallelogram with a thin dashed outline, 512×512 Icon of vector addition: two thick BLUE arrow shafts share EXACTLY the SAME origin at bottom left. One arrow points right, the other points diagonally up-right. Complete the parallelogram with two pale blue dashed far sides parallel to these arrows. Transparent interior, no graph axes, no grid, no letters, no labels, no third arrow. Treat as a simple decorative icon readable at 32px. No circular medal or backdrop. Reference is style only; replace its subject entirely.
+```
+
+### `badge-math_first.png` — D3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. One ROUND MEDAL badge. Match reference circular silhouette and concentric rim, large central subject readable at 48px. a round pink (#e91e63) medal with a white name tag label (blank, no text), 256×256 A large plain white gift/name tag with clipped corners, one punched hole and tiny dark ring. Entire label blank, no checkmark, no star, no lettering.
+```
+
+### `badge-math_nodes10.png` — D3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. One ROUND MEDAL badge. Match reference circular silhouette and concentric rim, large central subject readable at 48px. a round teal medal with a tiny node map: three dots connected by lines, 256×256 Exactly THREE large round node dots linked by thick simple lines in a triangular pathway, no geographic map, no text, no extra dots or stars.
+```
+
+### `badge-math_area_1.png` — D3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. One ROUND MEDAL badge. Match reference circular silhouette and concentric rim, large central subject readable at 48px. a round green (#2bb673) medal with a small cube block, 256×256 One large friendly green cube, front face with one big cream dot. No star, no letters.
+```
+
+### `badge-math_area_3.png` — D3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. One ROUND MEDAL badge. Match reference circular silhouette and concentric rim, large central subject readable at 48px. a round orange (#ffb347) medal with a single die, 256×256 One large orange die with clean white circular pips and dark outlines. No decorative sparkles or other objects.
+```
+
+### `badge-math_area_5.png` — D3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. One ROUND MEDAL badge. Match reference circular silhouette and concentric rim, large central subject readable at 48px. a round blue (#6c8cff) medal with a bold diagonal arrow, 256×256 One very large bold light blue diagonal arrow pointing upper right, navy outline, no chart, no stars or other objects.
+```
+
+### `badge-math_star3.png` — D3
+
+참조: `badge-first_clear.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. One ROUND MEDAL badge. Match reference circular silhouette and concentric rim, large central subject readable at 48px. a round gold medal with a black graduation cap and a small star, 256×256 Big BLACK graduation cap with yellow tassel, and exactly one small yellow five-point star beside it. Hat has simple solid navy/charcoal surfaces with one pale inner highlight for contrast, no numbers, no lettering.
+```
