@@ -169,7 +169,7 @@ LESSONS.push(
   tutorSummary:'문자열 인덱스·슬라이싱 s[a:b], len, upper/lower/replace/split/strip 메서드, f-string f"{변수}"로 값 끼워 넣기.',
   terms:{ '슬라이싱':'문자열이나 리스트의 일부를 [시작:끝]으로 잘라내는 것', '메서드':'값에 점(.)을 찍고 부르는 함수. "abc".upper() 처럼', 'f-string':'앞에 f를 붙인 문자열. 중괄호 { } 안에 변수를 넣으면 값이 끼워진다' },
   pages:[
-    { title:'글자도 번호가 있어요', html:`<p>문자열도 리스트처럼 글자마다 인덱스가 있어요. <code>s[0]</code>은 첫 글자예요. <code>s[1:4]</code>처럼 쓰면 1번부터 <b>4번 앞까지</b> 잘라 와요. 이걸 [[슬라이싱]](잘라내기)이라고 해요.</p><p>시작을 비우면 처음부터, 끝을 비우면 끝까지예요. <code>s[::-1]</code>은 거꾸로 뒤집기라는 유명한 꼼수예요.</p>`,
+    { title:'글자도 번호가 있어요', html:`<p>문자열도 리스트처럼 글자마다 인덱스가 있어요. <code>s[0]</code>은 첫 글자예요. <code>s[1:4]</code>처럼 쓰면 1번부터 <b>4번 앞까지</b> 잘라 와요. 이걸 [[슬라이싱]](잘라내기)이라고 해요.</p><p>시작을 비우면 처음부터, 끝을 비우면 끝까지예요. <code>s[:2]</code>는 처음부터 <b>2번 앞까지</b>(<code>py</code>), <code>s[2:]</code>는 <b>2번부터 끝까지</b>(<code>thon</code>) — 둘을 이으면 원래 글자가 돼요. <code>s[::-1]</code>은 거꾸로 뒤집기라는 유명한 꼼수예요.</p>`,
       example:{ code:`s = "python"\nprint(s[0])\nprint(s[1:4])\nprint(s[:2])\nprint(s[2:])\nprint(s[::-1])\nprint(len(s))` , trace:true } },
     { title:'문자열 메서드', html:`<p>문자열 뒤에 점(.)을 찍고 부르는 기능을 [[메서드]]라고 해요. "문자열아, 대문자로 바뀌어 줘"처럼 <b>값에게 시키는 일</b>이라고 생각하면 돼요. <code>upper()</code> 대문자로, <code>lower()</code> 소문자로, <code>replace(a, b)</code> a를 b로 바꾸기, <code>split()</code> 띄어쓰기 기준으로 잘라 리스트로, <code>strip()</code> 양끝 공백 제거.</p><p>메서드는 원래 문자열을 바꾸지 않고 <b>새 문자열을 돌려줘요</b>.</p>`,
       example:{ code:`s = "hello world"\nprint(s.upper())\nprint(s.replace("world", "python"))\nwords = s.split()\nprint(words)\nprint(len(words))\nprint("  공백  ".strip())` , trace:true } },

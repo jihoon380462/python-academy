@@ -45,6 +45,8 @@ with sync_playwright() as p:
     bundle=pg.evaluate("Store.exportBundle()"); check('academy-bundle' in bundle and 'academy.course.python' in bundle and 'apiKey' not in bundle, '백업 묶음 내보내기(F8, API 키 제외)')
     check(pg.evaluate("(()=>{const q=document.querySelector('#quickkeys'); return q && q.textContent.includes('⇤') && q.textContent.includes('input');})()"), '모바일 입력 칩 ⇤·input (F12)')
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('.node').count()>20, '지도 노드')
+    hg=pg.evaluate("(()=>{ const b=s=>document.querySelector('#view .home > '+s).getBoundingClientRect(); const m=b('.map'), d=b('.side'); return {mw:Math.round(m.width), sw:Math.round(d.width), dy:Math.round(Math.abs(m.y-d.y))}; })()")
+    check(hg['mw']>hg['sw'] and hg['dy']<4, 'PC 홈: 지도가 넓은 왼쪽 열, 옆 카드가 같은 줄 오른쪽 (QA #64, %s)' % hg)
     # 퀴즈 채점
     pg.evaluate("UI.go('problem',{pid:'L0P2',lessonId:'L0'})"); pg.wait_for_timeout(300); ans=pg.evaluate("Content.problem('L0P2').quiz.ans"); pg.click(f'.qopt[data-i="{ans}"]'); pg.wait_for_timeout(1500)
     for _ in range(3):

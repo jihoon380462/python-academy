@@ -248,7 +248,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 :focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:6px}.btn:focus-visible,.node:focus-visible,.qopt:focus-visible,.pitem:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 .kb{border-collapse:collapse;width:100%}.kb td{padding:6px 8px;border-top:1px solid var(--border)}.kb tr:first-child td{border-top:0}.kb kbd{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-family:var(--mono);white-space:nowrap}
-.hsearch{margin:8px 0 12px}.hsearch .input{width:100%;font-size:1em;padding:10px 12px}.hs-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}#homeResults{margin-top:8px}.pst{min-width:44px;text-align:center;color:var(--muted)}#homeMap.hide,#homeResults.hide{display:none}
+.hsearch{grid-column:1/-1;margin:8px 0 12px}.hsearch .input{width:100%;font-size:1em;padding:10px 12px}.hs-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}#homeResults{margin-top:8px}.pst{min-width:44px;text-align:center;color:var(--muted)}#homeMap.hide,#homeResults.hide{display:none}
 @media (max-width:767px){.only-pc{display:none}}
 .chip-btn.on{background:var(--primary);color:#fff;border-color:transparent}
 .pitem.locked{opacity:.6}
@@ -277,3 +277,4 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 [data-contrast="1"][data-theme=dark] .btn.danger{color:#1d2230}
 .ch-title span{word-break:keep-all}.ch-toggle{white-space:nowrap}
 .hc.soon .hc-body{flex-direction:column;align-items:flex-start;gap:4px}
+.ch-title .chip{white-space:nowrap;flex:none} /* 사용자 제보: 챕터 「완료 ✓」 칩 두 줄 */
