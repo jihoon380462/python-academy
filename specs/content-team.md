@@ -1,6 +1,6 @@
 # 콘텐츠팀 지시서 (Opus) — 파이썬 아카데미
 
-읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **main 에 직접 푸시 금지 — 브랜치 `content/<주제>` 에 올리고 PR(workflow 8절). 버전·stamp·HANDOFF 상태판은 Fable 이 릴리스 때 한다.** 권한: `courses/*/content.js`, `shared/glossary.js`, PROBLEMS.md·CHANGELOG·HANDOFF. **새 문제 type·새 그림 kind·core/ 수정은 금지**(필요하면 HANDOFF 다음 후보에 "Fable 작업"으로 적는다).
+읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **main 에 직접 푸시 금지 — 브랜치 `content/<주제>` 에 올리고 PR(workflow 8절). 버전·stamp·HANDOFF 상태판은 Fable 이 릴리스 때 한다. 배포 권한은 Fable 이상에게만 있다(workflow 1절 권한표).** 권한: `courses/*/content.js`, `shared/glossary.js`, PROBLEMS.md·CHANGELOG·HANDOFF. **새 문제 type·새 그림 kind·core/ 수정은 금지**(필요하면 HANDOFF 다음 후보에 "Fable 작업"으로 적는다).
 
 ## 1. 스키마 (고치지 말고 그대로 쓴다)
 

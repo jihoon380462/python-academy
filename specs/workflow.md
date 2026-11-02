@@ -14,6 +14,7 @@ Claude 요금제의 주간 한도가 "모든 모델"과 "Fable 전용"으로 나
 | `core/` 수정 — 지시서(NEXT.md·EXPANSION.md·specs/)에 **파일과 단계가 적힌 것** | ✅ 커밋에 `[core]` 표시 | ✅ |
 | `core/` 수정 — 지시서에 없는 새 설계 (새 러너·새 시각화 엔진·새 문제 type·저장 스키마 변경) | ❌ 멈추고 사용자에게 "Fable 작업"이라고 알림 | ✅ |
 | Opus의 `[core]` 커밋 검토 | — | ✅ 4절 체크리스트 |
+| **배포(main 푸시·PR 병합·릴리스 커밋·버전 올림·stamp·HANDOFF 상태판)** | ❌ **없음** — 브랜치에 올리고 PR까지만 | ✅ **Fable 이상만** (Fable 또는 사용자 본인) |
 
 어느 모델로 일을 맡길지는 사용자가 채팅의 모델을 골라서 정한다. 문서는 그 결정을 묻지 않는다.
 
@@ -67,7 +68,7 @@ Fable 세션(엔진·설계·검토) 외에 **Opus 채팅 두 개를 팀처럼 �
 
 ## 8. 브랜치·PR 규칙 — "먼저 끝낸 쪽이 바로 배포" 금지 (2026-11-02)
 
-main 에 푸시되면 곧바로 GitHub Pages 에 배포된다. 그래서 **main 에 직접 푸시하는 건 Fable 릴리스 커밋뿐**이고, 팀 작업은 전부 브랜치 → PR → 검토 → 병합 순서다.
+**배포 권한은 Fable 이상(Fable·사용자)에게만 있다. Opus(QA팀·콘텐츠팀·core 작업 포함)는 배포하지 않는다** — main 푸시, PR 병합, `APP_VERSION` 올림, `node tools/stamp.mjs`, HANDOFF 상태판 갱신 전부 Fable 의 릴리스 커밋에서만 한다. main 에 푸시되면 곧바로 GitHub Pages 에 배포되기 때문이다. 팀 작업은 전부 브랜치 → PR → (Fable) 검토 → 병합 → 릴리스 순서다.
 
 1. **브랜치 이름**: `content/<과제>` (예 `content/C4-glossary`), `qa/<날짜-주제>` (예 `qa/1102-round1`), Opus core 작업은 `core/<주제>`. 시작: `git fetch origin && git switch -c content/C4-glossary origin/main`.
 2. **커밋**: 평소대로(`[content]`·`[qa]`·`[core]` 접두). **`APP_VERSION`·`sw.js`·HTML `?v=`·HANDOFF 상태판은 손대지 않는다.** CHANGELOG 는 맨 위 `## 미배포` 절 아래에 항목만 추가한다(버전 머리글 없이). PROBLEMS.md 표 추가는 OK.
