@@ -379,7 +379,7 @@ const PROBLEMS = [
 // ---------------- L4 ----------------
 { id:'L4P1', lesson:'L4', type:'block', title:'양수인가요', prompt:'숫자를 입력받아 0보다 크면 <code>양수</code>, 아니면 <code>양수가 아니에요</code>를 출력하세요.', tags:['조건','입력'], inputExample:'5',
   solution:'n = int(input())\nif n > 0:\n    print("양수")\nelse:\n    print("양수가 아니에요")', tests:[{input:'5', output:'양수'},{input:'-3', output:'양수가 아니에요'},{input:'0', output:'양수가 아니에요'}],
-  hints:['"만약" 블록과 비교 블록이 필요해요','만약 블록의 톱니바퀴를 눌러 "아니라면"을 추가하세요','if n > 0: print("양수") / else: print("양수가 아니에요")'] },
+  hints:['"만약" 블록과 비교 블록이 필요해요','만약 블록의 톱니바퀴를 눌러 "아니면" 조각을 추가하세요','if n > 0: print("양수") / else: print("양수가 아니에요")'] },
 { id:'L4P2', lesson:'L4', type:'block', title:'짝수 홀수', prompt:'숫자를 입력받아 짝수면 <code>짝수</code>, 홀수면 <code>홀수</code>를 출력하세요.', tags:['조건','계산'], inputExample:'4',
   solution:'n = int(input())\nif n % 2 == 0:\n    print("짝수")\nelse:\n    print("홀수")', tests:[{input:'4', output:'짝수'},{input:'7', output:'홀수'},{input:'0', output:'짝수'},{input:'13', output:'홀수'}],
   hints:['2로 나눈 나머지가 0이면 짝수예요','나머지 블록(%)과 비교 블록(=)을 함께 쓰세요','if n % 2 == 0: print("짝수") / else: print("홀수")'] },
@@ -391,7 +391,7 @@ const PROBLEMS = [
   hints:['조건이 여러 개일 때 중간에 쓰는 말과, 나머지 전부를 뜻하는 말','첫 빈칸은 조건이 있고 둘째 빈칸은 조건이 없어요','elif, else'] },
 { id:'L4P5', lesson:'L4', type:'block', title:'성적 등급', prompt:'점수를 입력받아 90 이상이면 <code>A</code>, 80 이상이면 <code>B</code>, 그 외에는 <code>C</code>를 출력하세요.', tags:['조건'], inputExample:'85',
   solution:'score = int(input())\nif score >= 90:\n    print("A")\nelif score >= 80:\n    print("B")\nelse:\n    print("C")', tests:[{input:'95', output:'A'},{input:'85', output:'B'},{input:'40', output:'C'},{input:'90', output:'A'},{input:'80', output:'B'}],
-  hints:['조건이 세 갈래예요 — 큰 기준(90)부터 차례로 검사해요','만약 블록의 톱니바퀴로 "다른 경우"와 "아니라면"을 추가하고, 비교는 ≥ 를 쓰세요','if score >= 90: print("A") / elif score >= 80: print("B") / else: print("C")'] },
+  hints:['조건이 세 갈래예요 — 큰 기준(90)부터 차례로 검사해요','만약 블록의 톱니바퀴로 "아니고 만약"과 "아니면" 조각을 추가하고, 비교는 ≥ 를 쓰세요','if score >= 90: print("A") / elif score >= 80: print("B") / else: print("C")'] },
 { id:'L4P6', lesson:'L4', type:'bug', title:'빠진 기호', prompt:'10보다 크면 <code>크다</code>를 출력하려는데 문법 에러가 나요. 틀린 줄을 고르고 고치세요.', tags:['조건'],
   bug:{ code:'n = int(input())\nif n > 10\n    print("크다")\nelse:\n    print("작거나 같다")', bugLine:2, solution:'n = int(input())\nif n > 10:\n    print("크다")\nelse:\n    print("작거나 같다")', tests:[{input:'15', output:'크다'},{input:'3', output:'작거나 같다'},{input:'10', output:'작거나 같다'}] },
   hints:['if 줄 끝에 꼭 있어야 하는 기호가 있어요','else 줄과 if 줄을 비교해 보세요','if n > 10:'] },

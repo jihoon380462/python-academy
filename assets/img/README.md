@@ -700,3 +700,40 @@ Create ONE educational game asset, a flat vector-style sticker illustration matc
 ```text
 Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, eye style, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 pink #e91e63. One ROUND MEDAL badge. Match reference circular silhouette and concentric rim, large central subject readable at 48px. a round gold medal with a black graduation cap and a small star, 256×256 Big BLACK graduation cap with yellow tassel, and exactly one small yellow five-point star beside it. Hat has simple solid navy/charcoal surfaces with one pale inner highlight for contrast, no numbers, no lettering.
 ```
+
+
+## 6차 E — 2026-11-02
+
+요청 원본: `art/6-request` (2b0efad0b61acb3828e58c33091845494748409e)의 IMAGES.md 3절. E1-4 → E1-2 → E2-4 → E2-2 순서. 영어 프롬프트·참조 파일은 원문 그대로 사용했다. 영역 512×512, 뱃지 256×256 PNG RGBA로 정규화(여백 47/23px). img_clean 검사·다크/라이트 실사용 크기 축소본 확인. 약한 색조 변화와 실제 앱 렌더는 아트팀 최종 검수 대상.
+
+### E1-4 `area-math-4.png`
+
+참조: `area-math-1.png`, `area-math-3.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Must stay readable at 32px: chunky FILLED shapes only — no thin lines, no dashed lines, no axes, no grid. No circular medal or backdrop. Reference is style only; replace its subject entirely. Subject: one thick solid purple (#9c27b0) arch shaped like an upside-down U parabola, drawn as a single wide rounded band (chunky like a toy rainbow bridge, NOT a thin curve), both feet resting on an invisible baseline, with one round yellow (#ffd166) ball sitting exactly on the top of the arch. Optional thin pale purple highlight inside the band. Nothing else: no ground, no arrows, no second curve, no sparkles. 512x512.
+```
+
+### E1-2 `area-math-2.png`
+
+참조: `area-math-1.png`, `area-math-3.png`
+
+```text
+Create ONE educational game asset, a flat vector-style sticker illustration matching the supplied reference set's line weight, rounded shapes and bright palette. Bold dark navy #1d2230 outlines. Clean SOLID color fills and small solid highlights only, absolutely NO smooth gradients, no 3D render, no texture. Transparent background, one centered subject, 8% clear margin on all four sides. Outer edge dark navy; any pale accent must stay INSIDE the dark outline, no white exterior sticker halo or drop shadow. No letters, words, numerals, brands. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Must stay readable at 32px: chunky FILLED shapes only — no thin lines, no dashed lines, no axes, no grid. No circular medal or backdrop. Reference is style only; replace its subject entirely. Subject: a Venn diagram made of two large FULLY FILLED overlapping circles of equal size, side by side, overlapping by about one third. Left circle solid teal (#00acc1), right circle solid blue (#6c8cff), the shared lens-shaped overlap filled solid darker navy-teal (#1d6f8a). Every circle edge and the overlap edge has the same bold dark navy outline. No dots, no labels, no outer rectangle, no chain links. 512x512.
+```
+
+### E2-4 `badge-math_area_4.png`
+
+참조: `badge-math_area_1.png`, `badge-math_area_3.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round purple (#9c27b0) medal with one very large thick light lavender upside-down U arch (chunky band, parabola shape) and a single round yellow (#ffd166) ball on its top, centered on the medal face. No stars, no graph axes, no other objects. 256x256.
+```
+
+### E2-2 `badge-math_area_2.png`
+
+참조: `badge-math_area_1.png`, `badge-math_area_3.png`
+
+```text
+Create ONE PNG badge for a consistent educational game medal set. Flat vector sticker illustration, bold dark navy #1d2230 outlines, solid clean color shapes, no gradients, no dimensional rendering, no texture. Round medal with simple thick concentric rim and large central subject legible at 48px. Outermost edge DARK NAVY, thin lighter INNER rim, absolutely no white external sticker halo or shadow. True transparent background outside the medal. Centered square composition, at least 8% clear margins. No letters, numbers, words, brands or watermarks. Match reference medal silhouette, line weight and style, replace its central subject with requested one. Palette blue #6c8cff green #2bb673 yellow #ffd166 red #ff5d6c orange #ffb347 purple #9c27b0 teal #00acc1. Subject: a round teal (#00acc1) medal with two large fully filled overlapping circles in the center (Venn diagram): left circle yellow (#ffd166), right circle cream white, the overlap filled orange (#ffb347), all with bold dark navy outlines. No stars, no chain links, no other objects. 256x256.
+```
