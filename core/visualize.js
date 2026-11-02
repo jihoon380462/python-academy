@@ -5,7 +5,7 @@
 //     linked    { var:'head', next:'next', val:'val', cur?:'cur' }      노드 객체 → 화살표 체인
 //     tree      { var:'root', left:'left', right:'right', val:'val', cur?:'node', order?:'visited' }
 //     graph     { var:'graph', visited?:'visited', cur?:'node', queue?:'queue', dist?:'dist' }  인접 리스트 dict → 힘 기반 배치
-//     grid      { var:'grid', visited?:'visited', pos?:['r','c'], path?:'path' }  2차원 리스트 → 격자
+//     grid      { var:'grid', visited?:'visited', pos?:['r','c'] | 'pos'(튜플 변수), path?:'path' }  2차원 리스트 → 격자 (숫자·한 글자 문자('.' 제외)는 칸에 표시)
 //     table     { var:'dp', hl?:['i','j'] }                            1·2차원 리스트 → 표 (DP)
 //     callstack { }                                                     step.stack·fn·vars → 호출 스택 트리
 //   Viz.player(host, { steps, spec, onLine }) : 재생·일시정지·한 단계·슬라이더·속도. 단계 간 변화만 트윈(막대·상자).
@@ -89,10 +89,10 @@ const Viz = {
     const rows = g.length, cols = Math.max(...g.map(r => Array.isArray(r) ? r.length : 0)); const cs = Math.min(40, (W - 20) / cols, (H - 30) / rows); const ox = (W - cs * cols) / 2, oy = 24;
     const visited = spec.visited ? (this.get(snap, spec.visited) || null) : null; const vset = new Set(); if (visited) { const arr = Array.isArray(visited) ? visited : visited.__set || []; arr.forEach(v => { if (Array.isArray(v)) vset.add(v[0] + ',' + v[1]); }); if (Array.isArray(visited) && Array.isArray(visited[0]) && typeof visited[0][0] !== 'number') {} }
     const vgrid = visited && Array.isArray(visited) && Array.isArray(visited[0]) && visited.length === rows && (typeof visited[0][0] === 'boolean' || typeof visited[0][0] === 'number') ? visited : null;
-    const pos = spec.pos ? spec.pos.map(n => this.num(snap[n])) : null; const path = spec.path ? (this.get(snap, spec.path) || []) : []; const pset = new Set(path.map(p => Array.isArray(p) ? p[0] + ',' + p[1] : ''));
+    const pos = spec.pos ? (Array.isArray(spec.pos) ? spec.pos.map(n => this.num(snap[n])) : (Array.isArray(snap[spec.pos]) ? snap[spec.pos].map(v => this.num(v)) : null)) : null; const path = spec.path ? (this.get(snap, spec.path) || []) : []; const pset = new Set(path.map(p => Array.isArray(p) ? p[0] + ',' + p[1] : ''));
     for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { const v = Array.isArray(g[r]) ? g[r][c] : undefined; const x = ox + c * cs, y = oy + r * cs; const wall = v === 1 || v === '#' || v === true; const key = r + ',' + c;
       ctx.fillStyle = wall ? th.border : pset.has(key) ? th.gold : (vgrid ? !!vgrid[r][c] : vset.has(key)) ? th.accent : th.surface2; ctx.fillRect(x + 1, y + 1, cs - 2, cs - 2);
-      if (!wall && typeof v === 'number' && v !== 0 && cs >= 18) { ctx.fillStyle = th.fg; ctx.font = `${Math.min(12, cs / 2.5)}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(v), x + cs / 2, y + cs / 2); }
+      if (!wall && ((typeof v === 'number' && v !== 0) || (typeof v === 'string' && v.length === 1 && v !== '.' && v !== ' ')) && cs >= 18) { ctx.fillStyle = th.fg; ctx.font = `${Math.min(12, cs / 2.5)}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(v), x + cs / 2, y + cs / 2); }
       if (pos && pos[0] === r && pos[1] === c) { ctx.fillStyle = th.warn; ctx.beginPath(); ctx.arc(x + cs / 2, y + cs / 2, cs * 0.3, 0, Math.PI * 2); ctx.fill(); } }
     ctx.fillStyle = th.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(`${spec.var} ${rows}×${cols}${spec.visited ? ' · 초록=방문' : ''}${spec.pos ? ' · 주황=현재' : ''}${spec.path ? ' · 노랑=경로' : ''}`, 10, 14);
   },
