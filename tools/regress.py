@@ -45,6 +45,8 @@ with sync_playwright() as p:
     bundle=pg.evaluate("Store.exportBundle()"); check('academy-bundle' in bundle and 'academy.course.python' in bundle and 'apiKey' not in bundle, '백업 묶음 내보내기(F8, API 키 제외)')
     check(pg.evaluate("(()=>{const q=document.querySelector('#quickkeys'); return q && q.textContent.includes('⇤') && q.textContent.includes('input');})()"), '모바일 입력 칩 ⇤·input (F12)')
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('.node').count()>20, '지도 노드')
+    hg=pg.evaluate("(()=>{ const b=s=>document.querySelector('#view .home > '+s).getBoundingClientRect(); const m=b('.map'), d=b('.side'); return {mw:Math.round(m.width), sw:Math.round(d.width), dy:Math.round(Math.abs(m.y-d.y))}; })()")
+    check(hg['mw']>hg['sw'] and hg['dy']<4, 'PC 홈: 지도가 넓은 왼쪽 열, 옆 카드가 같은 줄 오른쪽 (QA #64, %s)' % hg)
     # 퀴즈 채점
     pg.evaluate("UI.go('problem',{pid:'L0P2',lessonId:'L0'})"); pg.wait_for_timeout(300); ans=pg.evaluate("Content.problem('L0P2').quiz.ans"); pg.click(f'.qopt[data-i="{ans}"]'); pg.wait_for_timeout(1500)
     for _ in range(3):
@@ -121,6 +123,8 @@ with sync_playwright() as p:
     check(pg.evaluate("() => { const c=document.createElement('canvas'); c.style.width='300px'; c.style.height='200px'; document.body.appendChild(c); try { Viz.frame(c, {kind:'grid', var:'grid', visited:'visited', pos:'pos'}, {vis:{grid:[['.','*','#'],['.','.','.']], visited:{__set:[[0,0],[1,0]]}, pos:[1,1]}, stack:[], vars:{}}, null, 1); return true; } catch (e) { return 'ERR ' + e.message; } }")==True, '격자 시각화: pos 튜플 변수 + 글자 칸(*)')
     pg.evaluate("UI.go('lesson',{lessonId:'AB4'})"); pg.wait_for_timeout(300); check(pg.evaluate("UI.view")=='mock' and pg.locator('#mockStart').count()==1, '보스 AB4 → 모의고사 화면')
     pg.evaluate("UI.go('problem',{pid:'AB4P1',lessonId:'AB4'})"); pg.wait_for_timeout(400); check('입력 형식' in pg.locator('.pv-prompt').inner_text() and '코딩테스트' in pg.locator('.pv-head').inner_text(), '코딩테스트 형식 문제')
+    cm=pg.locator('#pvCoach').inner_html(); pg.evaluate("UI.go('problem',{pid:'AB4P1',lessonId:'AB4',session:{mock:true,pids:['AB4P1'],goto(){},startAt:Date.now()}})"); pg.wait_for_timeout(400)
+    check(len(cm)>0 and pg.locator('#pvCoach').inner_html()=='' and pg.locator('#btnAnswer').count()==0 and pg.locator('#btnHint').count()==1, '모의고사 중에는 따라하기·정답 보기 없음, 힌트는 있음 (QA #3)')
     pg.evaluate("UI.go('playground')"); pg.wait_for_timeout(300); check(pg.locator('[data-m="block"]').count()==0, '놀이터에 블록 탭 없음')
     pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300); check(pg.locator('#sUnlock').count()==1, '설정: 전제 무시 스위치')
     vz = pg.evaluate(VIZ_JS)
@@ -179,6 +183,11 @@ with sync_playwright() as p:
     pg.goto(ALGO+'#lesson/AB4'); pg.wait_for_timeout(800); pg.evaluate("Store.data.settings.unlockAll=true;UI.go('lesson',{lessonId:'AB4'})"); pg.wait_for_timeout(400); check(pg.locator('#mockStart').count()==1 and pg.evaluate('document.documentElement.scrollWidth')<=390, '모의고사 안내 화면 모바일')
     # ---- 4. 예전 주소
     pg.goto('file://'+os.path.join(ROOT,'python_academy.html')); pg.wait_for_timeout(800); check(pg.url.endswith('courses/python/index.html') or '/courses/python/' in pg.url, '예전 주소 → 코스 페이지 리다이렉트 ('+pg.url[-40:]+')')
+    print('[기기 연동 코스 구분 (QA #67)]'); sx=b.new_context(); sp=sx.new_page(); sp.on('pageerror', lambda e: errors.append(str(e)[:500]))
+    sp.goto('file://'+os.path.join(ROOT,'courses/math/index.html')); sp.wait_for_timeout(900)
+    sr=sp.evaluate("""()=>{ Store.data.onboarded=true; const r0=Store.prob('M1_mod_q1'); r0.status='clear'; r0.stars=3; Store.save(); Sync.cfg={lastSyncAt:1}; Sync.apply({updatedAt:Date.now()+5000, xp:9, settings:{}, problems:{L0P1:{status:'clear',stars:3}, M1_mod_q2:{status:'clear',stars:2}}}); const g=c=>{ const m=JSON.parse(localStorage.getItem('academy.course.'+c)||'{}'); return Object.keys(m.problems||{}).filter(k=>m.problems[k].status==='clear').sort().join(','); }; const p=Sync.payload(); return {math:g('math'), py:g('python'), fmt:p.format, keys:Object.keys(p.courses).sort().join(',')}; }""")
+    check(sr['math']=='M1_mod_q1,M1_mod_q2' and sr['py']=='L0P1' and sr['fmt']=='academy-sync-2' and 'math' in sr['keys'] and 'python' in sr['keys'], '옛 형식 payload 를 수학 화면에서 받아도 코스별로 나뉨 + 새 payload 는 코스 묶음 (%s)' % sr)
+    sx.close()
     b.close()
 cdn=[e for e in errors if 'importScripts' in e or 'pyodide' in e.lower()]
 real=[e for e in errors if e not in cdn]

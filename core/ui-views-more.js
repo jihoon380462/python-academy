@@ -209,7 +209,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', () => { Audio._ctx(); }, { once: true });
   if (!Store.data.onboarded) { UI.go('home', {}, false); Onboarding.start(); } else UI.go('home', {}, false);
   // 허브에서 온 딥링크: #problem/L3P2 · #lesson/L1 · #settings · #review 등
-  const goHash = () => { const h = location.hash.slice(1); if (!h) return; const [v, id] = h.split('/'); try { if (v === 'problem' && Content.problemMap[id]) UI.go('problem', { pid: id, lessonId: Content.problemMap[id].lesson }); else if (v === 'lesson' && Content.lessonMap[id]) UI.go('lesson', { lessonId: id, page: 0 }); else if (Views[v] && !id) UI.go(v); } catch (e) { console.warn('deep link', e); } history.replaceState(null, '', location.pathname + location.search); };
+  const goHash = () => { const h = location.hash.slice(1); if (!h) return; const [v, id] = h.split('/'); try { if (v === 'problem' && Content.problemMap[id]) UI.go('problem', { pid: id, lessonId: Content.problemMap[id].lesson }); else if (v === 'lesson' && Content.lessonMap[id]) UI.go('lesson', { lessonId: id, page: Math.max(0, Math.min(((Store.data.lessons || {})[id] || {}).page || 0, ((Content.lessonMap[id].pages || []).length || 1) - 1)) }) /* QA #5: 저장된 진행 쪽에서 */; else if (Views[v] && !id) UI.go(v); } catch (e) { console.warn('deep link', e); } history.replaceState(null, '', location.pathname + location.search); };
   if (Store.data.onboarded) goHash();
   Sync.init(); // 연동돼 있으면 다른 기기 진행 상황을 내려받아 합친다
 });

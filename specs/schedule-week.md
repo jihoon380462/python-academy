@@ -93,3 +93,16 @@ D그룹 — 사용자 플레이 제보(11/2 14:30, 수학 탐구 퀴즈). QA.md 
 - HANDOFF 상태판: 이번 주 릴리스 버전들과 들어간 PR.
 - IMAGES.md: 6차 결과, 7차 초안.
 - 콘텐츠: C10 으로 들어간 노드 목록 → Fable 이 M2 core(새 그림 4종 + 나머지 노드 + 색 동기화)를 그 위에 얹는다.
+
+## 7. 단일 세션 모드 첫 메시지 (Opus 채팅 하나로 전부)
+
+```
+저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/schedule-week.md → QA.md 순서로 읽어.
+이번 주는 네가 QA·유지보수·콘텐츠·아트 네 팀 역할을 혼자 순서대로 한다. 매일 이 순서로:
+① 릴리스 당번(schedule-week 4절): 열린 PR 중 초록을 병합해 release/ 브랜치로 PR → 나한테 알림
+② schedule-week 1절 오늘 날짜 줄의 유지보수 → 콘텐츠 → 아트 → QA 순으로 각 팀 지시서(specs/*-team.md)대로 처리, 과제마다 브랜치 하나·PR 하나
+③ 끝나면 내일 줄을 당겨서 계속. 할 게 없으면 멈추고 보고.
+규칙: main 직접 푸시 금지, APP_VERSION·stamp·HANDOFF 상태판은 릴리스 커밋에서만, core는 schedule-week 3절에 적힌 것만 [core]로. 사용자 제보는 QA.md에 행 추가 후 유지보수 절차로.
+지금 바로 ①부터 시작해.
+```
+채팅이 길어지면 새 채팅에 같은 메시지. 상태는 전부 저장소(QA.md·HANDOFF·PR)에 있다.
