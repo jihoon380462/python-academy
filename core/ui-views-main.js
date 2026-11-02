@@ -107,10 +107,10 @@ Views.lesson = (root, { lessonId, page = 0 }) => {
       const exSl = $('#exSl'); if (exSl) { let t = null; exSl.oninput = () => { $('#exSlV').textContent = exSl.value; clearTimeout(t); t = setTimeout(() => run(false), 250); }; }
       $('#exRun').onclick = () => run(false); const tb = $('#exTrace'); if (tb) tb.onclick = () => run(true);
       const xv = $('#exViz'); if (xv) xv.onclick = async () => { if (!Py.ready) { Py.start(); out.textContent = T.loadingPy + '…'; } Audio.click(); Game.stat('runs'); Game.stat('vizRuns'); await Viz.runAndShow($('#exTracePanel'), { code: exampleEditor.getValue(), input: $('#exIn') ? $('#exIn').value : '', spec: pg.example.visualize, editor: exampleEditor, title: pg.title }); Game.checkBadges().forEach(bd => UI.badgeFly(bd)); };
-      if (pg.example.visualize && pg.example.autoViz && Store.data.settings.anim) { const tryViz = () => { if (Py.ready) xv.click(); else setTimeout(tryViz, 600); }; setTimeout(tryViz, 300); }
+      if (pg.example.visualize && pg.example.autoViz && Store.data.settings.anim) { const tryViz = () => { if (!xv.isConnected) return; /* 화면을 떠났으면 중단 (CI에서 null innerHTML 에러) */ if (Py.ready) xv.click(); else setTimeout(tryViz, 600); }; setTimeout(tryViz, 300); }
       $('#exReset').onclick = () => exampleEditor.setValue(orig);
       $('#exPlay').onclick = () => UI.go('playground', { code: exampleEditor.getValue() });
-      if (l.id === LESSONS[0].id && cur === 0 && UI.params.autoRun) { UI.params.autoRun = false; const tryRun = () => { if (Py.ready) run(false); else setTimeout(tryRun, 500); }; tryRun(); }
+      if (l.id === LESSONS[0].id && cur === 0 && UI.params.autoRun) { UI.params.autoRun = false; const tryRun = () => { if (!$('#exOut')) return; if (Py.ready) run(false); else setTimeout(tryRun, 500); }; tryRun(); }
     }
   };
   render();
