@@ -542,7 +542,7 @@ Nov 1, 2026 · @정지훈 · 개정: Claude (현재 배포 버전 v1.3.0 시점�
 
 **이 문서에서 일부러 뺀 것** (나중 별도 지시서)
 
-- C# 코스: 실행 환경(Blazor WASM)이 완전히 달라 별도 저장소·별도 지시서로. 진행 데이터 공유만 같은 오리진으로 해결.
+- ~~C# 코스: 실행 환경(Blazor WASM)이 완전히 달라 별도 저장소·별도 지시서로.~~ → **15절로 설계 완료(2026-11-03)**: 엔진은 별도 저장소 csharp-lab, 코스는 아카데미 안(타이핑 전용).
 - 계정 로그인 방식의 동기화: 서버 없는 원칙 유지. 기기 연동은 v1.2.0의 GitHub gist 방식으로 이미 해결됐고, JSON 내보내기는 백업용으로 유지.
 - 데이터 분석(pandas·시각화), 게임 개발(pygame): 후보로만 기록. Pyodide에 pandas·matplotlib이 있어 기술적으로는 가능.
 
@@ -725,3 +725,135 @@ M1은 이 25개 노드로 시작하고, 노드당 문제 3~5개(총 90개 안팎
 | 버전 | Phase N = 2.N.0, 패치 = 2.N.x | M1 = v2.3.0 ✅, M2·M3는 각각 그때의 다음 마이너 |
 
 위 표에 따라 M1의 실제 작업 순서(✅ v2.3.0 완료, `Viz.figure` → 실제는 `Fig.mount`): ① `Viz.figure` + `numberline plot unitcircle vector hist` 5종 ② `type` num/match/pair + explainDiff 규칙 ③ 지식 지도 레이아웃 ④ `courses/math/` 25노드 콘텐츠 ⑤ 검증 스크립트 확장 ⑥ 허브 카드·뱃지·장비 ⑦ regress 스크린샷.
+
+## 15. C# 코스 — 타이핑 전용 (엔진은 csharp-lab 저장소)
+
+> 2026-11-03 사용자 결정. 설계 문서(Opus 작성). 구현 단계 C0(러너 연결)은 새 러너 = `core/` 새 설계이므로 **Fable 작업**(specs/workflow.md 1절).
+
+### 15-0. 결정 요약
+
+| 항목 | 결정 |
+| --- | --- |
+| 입력 방식 | **타이핑만.** 블록(Blockly)·줄 끌기(Parsons) 없음. 파이썬 코스의 텍스트 단계·텍스트 코치·⌨ 백문이불여일타(DRILLS)를 그대로 쓴다 |
+| 실행 엔진 | 별도 저장소 **`jihoon380462/csharp-lab`** (주소 `/csharp-lab/`) — .NET 10 WebAssembly + Roslyn, Web Worker 실행. 아카데미는 빌드 없이 그 엔진을 불러 쓰기만 한다 |
+| 엔진에서 가져다 쓰는 범위 | csharp-lab `FEATURES.md` 의 **✅ 검증 완료** 항목만. 🧪 실험 중인 기능은 쓰지 않는다 |
+| 커리큘럼 | 파이썬 코스를 **개조**: 챕터 흐름·문제 유형·보상은 같고, C#에서 새로 필요한 개념(타입·컴파일·중괄호·세미콜론·클래스 중심)을 넣는다 (15-4) |
+| 저장·연동 | 다른 코스와 같다(스키마 v2, 코스 id `csharp`). 엔진과 아카데미가 같은 오리진(`jihoon380462.github.io`)이라 캐시·저장소를 공유한다 |
+
+13절 「일부러 뺀 것」의 C# 항목(Blazor WASM·별도 지시서)은 이 절로 대체한다.
+
+### 15-1. 엔진 연결 — 러너 `csharp`
+
+- 새 파일 `core/runners/csharp.js` 가 4절 러너 인터페이스를 구현한다. 엔진 본체는 아카데미에 복사하지 않고 **동적 import** 한다:
+  `const { createCsEngine } = await import('/csharp-lab/core/cs-engine.js')`
+- 인터페이스 대응
+
+| 러너 인터페이스 | csharp 러너 |
+| --- | --- |
+| `load(onProgress)` | `createCsEngine({ onProgress, onReady, onWarm })` — 진행률(받은 용량 / 전체)을 그대로 Loader 에 전달. 첫 방문 약 8MB(gzip), 이후 브라우저 캐시 |
+| `run(submission, problem, onOutput)` | `engine.run(code, stdin)` + `onOutput`(실행 중 출력 조각). 결과 `status`: `ok · compile-error · runtime-error · stopped(무한 반복 등 자동 중단) · stopped-by-user · internal-error` |
+| 취소 | `engine.stop()` — 워커 종료 후 자동 재시작(PC 약 0.5초). 문제 화면의 ■ 중지 버튼 |
+| `grade(submission, problem)` | 15-2 |
+| `reset()` | 할 일 없음(실행마다 새 어셈블리) |
+| `snapshot()` | 마지막 출력 + 컴파일 오류 목록(줄·메시지) 텍스트 |
+
+- **계약(깨지면 안 되는 것)**: `createCsEngine` 이름, `run()` 결과 모양(`status, stdout, diagnostics[{severity,id,line,column,message}], error{type,message,friendly,line}, compileMs, runMs`). csharp-lab 이 이걸 바꿔야 하면 **새 경로**(`/csharp-lab/core/v2/`)로 내고 예전 경로는 남긴다. csharp-lab FEATURES.md 에 같은 규칙을 적는다.
+- 오류 표시: 엔진이 주는 **한국어 Roslyn 메시지 + 줄 번호**를 쓰고, 그 위에 초보자용 풀이를 얹는다 — `shared/errors.js` 에 `ERRORS_CS`(오류 코드 → 쉬운 설명, 예 `CS1002` 「문장 끝에 ; 가 빠졌어요」, `CS0103` 이름 오타, `CS0029` 타입이 안 맞음, `CS1513` `}` 짝, `CS0165` 값을 넣기 전에 사용, `CS0246` 없는 타입·using, `CS1061` 없는 멤버, `CS0266` 명시적 변환 필요, `CS0161` return 빠짐, `CS0019` 연산자·타입). 실행 오류는 엔진의 `error.friendly` 를 그대로 쓴다.
+- 편집기: 지금 CodeMirror 6 에 C# 강조만 추가(`@codemirror/legacy-modes` 의 `clike` → `csharp`, CDN). 자동 들여쓰기·괄호 짝은 기존 설정.
+- **폰 타이핑 보조(필수)**: C#은 기호가 많아서 폰에서 치기 힘들다 → 편집기 위에 기호 줄 `;` `{ }` `( )` `" "` `[ ]` `< >` `=>` `$""` `Tab` 칩. 칩을 누르면 짝 기호는 커서를 가운데에 둔다. (터미널 코스 6절의 「모바일 명령 칩」과 같은 부품으로 만든다)
+
+### 15-2. 채점
+
+- 기본 `grader: stdout` — 테스트마다 `{stdin, expect}`(stdin 은 `Console.ReadLine()` 이 한 줄씩 읽음). 비교 규칙은 파이썬 코스와 같다(줄 끝 공백·마지막 빈 줄 무시).
+- 메서드 작성형 문제(`grader: return` 에 해당): 학습자는 `static int Add(int a, int b) { ... }` 같은 메서드만 쓰고, 테스트 코드가 호출해 출력한다 → 엔진에 **여러 파일(학습자 코드 + 테스트 코드) 컴파일**이 필요(15-8 ①).
+- 한 문제에 테스트가 3~5개라 매번 컴파일하면 폰에서 1~5초 → **컴파일 1번 + 입력만 바꿔 여러 번 실행**하는 일괄 채점 API 가 필요(15-8 ②).
+- 구조 조건(「for 문을 쓰세요」, 「Player 클래스에 Hp 속성」): 엔진의 Roslyn 문법 트리 검사로 `grader: custom` 규칙을 지원(15-8 ③). 그 전까지는 출력 채점만.
+- 무한 반복·무한 재귀·출력 폭주는 엔진이 자동 중단(10초·재귀 2,000단계·출력 10만 자) → 「시간 초과」 결과로 채점 실패 처리 + 친절 문구.
+
+### 15-3. 화면
+
+- 파이썬 코스의 텍스트 문제 화면을 그대로 쓴다(지문 → 편집기 → 실행/제출 → 출력·테스트 결과). 블록·Parsons 단계 버튼은 이 코스에서 숨긴다.
+- 실행 중에는 실행 버튼이 **■ 중지**로 바뀌고 출력이 실시간으로 나온다(엔진 기능).
+- 코스에 처음 들어올 때 엔진 로딩 카드(진행률 %, 「처음 한 번만 오래 걸려요」). 로딩이 끝나면 예열을 기다리지 않고 바로 편집·실행 가능.
+- 레슨 예제의 「▶ 실행해 보기」도 같은 엔진(예제 코드 그대로 실행).
+
+### 15-4. 커리큘럼 (파이썬 코스 개조안)
+
+| 챕터 | 레슨 | 주제 | 파이썬 대응 |
+| --- | --- | --- | --- |
+| 0 시작 | C0 | C#과 .NET, **컴파일**이란(컴파일 오류 vs 실행 오류), 최상위 문장 | L0 |
+| 0 | C1 | `Console.WriteLine`·`Write`, 세미콜론·중괄호·대소문자, 주석 | L0~L1 |
+| 1 값 | C2 | 변수와 **타입 선언**: `int double string bool char`, `var` | L1~L2 |
+| 1 | C3 | 연산자, 정수 나눗셈 `7/2==3`, `%`, 문자열 보간 `$"{x}"` | L2 |
+| 1 | C4 | 입력과 변환: `Console.ReadLine()`, `int.Parse`, `TryParse` | L3 |
+| 1 보스 | — | 계산기·단위 변환 | B1 |
+| 2 조건 | C5 | `if / else if / else`, 비교·논리 연산자 | L4 |
+| 2 | C6 | `switch` 문과 `switch` 식, 삼항 연산자 | — (C# 추가) |
+| 3 반복 | C7 | `for`·`while`·`do while`, `break`·`continue` | L5~L6 |
+| 3 | C8 | 중첩 반복, 별 찍기·구구단 | L6 |
+| 3 보스 | — | 숫자 맞히기·메뉴 루프 | B2·B3 |
+| 4 모음 | C9 | 배열 `int[]`, 길이, 인덱스 | L7 |
+| 4 | C10 | `List<T>`, `foreach` | L7~L8 |
+| 4 | C11 | `Dictionary<TKey,TValue>` | L10 |
+| 4 | C12 | 문자열 다루기(`Split`·`Join`·`Substring`·`StringBuilder`) | L9 |
+| 5 메서드 | C13 | 메서드 정의·매개변수·반환형·`void` | L11~L12 |
+| 5 | C14 | 오버로딩, 기본값 매개변수, `ref`/`out` 맛보기 | — (C# 추가) |
+| 5 | C15 | 재귀 | L13 |
+| 5 보스 | — | 성적 처리기 | B4 전후 |
+| 6 클래스 | C16 | 클래스·객체·필드·생성자 | L14 |
+| 6 | C17 | 속성(`get; set;`)·접근 제한자(`public private`)·`static` | L15 |
+| 6 | C18 | `struct`·`record`·`enum` | — (C# 추가) |
+| 7 객체지향 | C19 | 상속·`virtual`/`override` | L15 |
+| 7 | C20 | 인터페이스·추상 클래스·다형성 | — (TODO T5 와 겹침) |
+| 7 보스 | — | 콘솔 RPG 전투(직업 클래스 상속) | B4(가위바위보) |
+| 8 한 걸음 더 | C21 | 예외 `try/catch/finally`, `throw` | L17 |
+| 8 | C22 | LINQ 맛보기(`Where Select OrderBy Sum`), 람다 | L18 |
+| 8 | C23 | 제네릭 맛보기, `null` 과 `?`·`??` | — (C# 추가) |
+| 8 | C24 | `async/await` 맛보기(`Task.Delay`) | — |
+| 실전 | X1~X3 | 인벤토리 관리, 콘솔 RPG(턴제 전투·저장), 텍스트 퀴즈 게임 | X1~X6 방식 |
+
+- 문제 유형: 코드(출력 채점) · 빈칸(fill) · 버그 고치기(bug) · 퀴즈(quiz, 「이 코드는 컴파일될까?」 유형 추가) · ⌨ 타자 연습(DRILLS, C# 문법 손에 익히기 — 타이핑 전용 코스라 비중을 파이썬보다 크게).
+- 분량 하한: 레슨 25 + 보스 4 + 실전 3, 문제 120 이상(1차 지시서와 같이 「일부 레슨은 추후」 금지).
+- 문제 스키마: 파이썬과 같고 `runner:'csharp'`(코스 `course.json` 기본값), `tests:[{stdin?, expect}]`, `starter`·`solution` 은 C#, 태그 접두사 `cs.`(예 `cs.loop`, `cs.class`).
+- (후보) **Unity 맛보기 챕터**: `Update()` 가 프레임마다 불리는 구조를 콘솔·캔버스 시뮬레이터로 체험(사용자가 Unity 6 로 게임을 만들고 있음). csharp-lab 에서 먼저 실험(15-8 ⑦).
+
+### 15-5. 검증 게이트
+
+- `validate_content.mjs`: C# 코스도 같은 규칙(id·힌트 3·태그·테스트 2개 이상).
+- **정답 실행**: 지금 `run_solutions.py` 는 CPython 이라 C# 을 못 돈다 → csharp-lab 이 정답 검사 도구(`tools/SolutionRunner`, 엔진과 **같은 소스**를 데스크톱 .NET 에서 실행)를 제공하고, 아카데미 `ci.yml`·`pages.yml` 의 verify 에 단계 추가:
+  `actions/checkout`(repository `jihoon380462/csharp-lab`, path `.cslab`) → `actions/setup-dotnet`(10.0.x) → `dotnet run --project .cslab/tools/SolutionRunner -- tools/.out/problems.json`(extract.mjs 출력에서 `runner:'csharp'` 문제만).
+- 헤드리스 회귀(`regress.py`): 샌드박스에서 csharp-lab 의 `build-output` 브랜치를 같은 경로로 띄워 실제 실행까지 확인 가능(CDN 이 아니라 GitHub 에서 받으므로 샌드박스에서도 된다).
+
+### 15-6. 단계 (Phase)
+
+| 단계 | 내용 | 담당 | 전제 |
+| --- | --- | --- | --- |
+| L (csharp-lab) | 15-8 의 ①②(+③) 를 실험 → ✅ 검증 완료, `SolutionRunner` 도구 | csharp-lab 세션 | — |
+| C0 | 러너 `core/runners/csharp.js`, 코스 껍데기(`courses/csharp/`, course.json, CONFIG.COURSES 카드), 기호 칩, `ERRORS_CS`, CI 정답 검사, 레슨 C0~C1 + 문제 6 | **Fable** (새 러너) | L 의 ①② |
+| C1 | 챕터 0~3 (C0~C8 + 보스 2), 타자 연습 | Opus 콘텐츠 가능 | C0 배포 |
+| C2 | 챕터 4~6 (C9~C18 + 보스) | Opus 콘텐츠 가능 | C1 |
+| C3 | 챕터 7~8 + 실전 3 + 마스터 뱃지 | Opus 콘텐츠 + Fable 검토 | C2 |
+
+버전은 배포 순서대로 다음 마이너(specs/workflow.md 6절).
+
+### 15-7. 알려진 위험과 대응
+
+| 위험 | 대응 |
+| --- | --- |
+| 첫 로딩 약 8MB(파이썬 Pyodide 와 비슷) | 코스 페이지 진입 시에만 로딩, 진행률 표시, 이후 캐시. csharp-lab 에서 용량 계속 줄이기(14.3MB → 8.4MB 달성) |
+| 폰에서 컴파일 0.4~1.7초 | 일괄 채점 API(15-8 ②), 예열은 뒤에서 |
+| csharp-lab 수정이 아카데미를 깨뜨림 | 15-1 계약 + 새 경로 규칙, csharp-lab 도 QA 통과 후에만 배포 |
+| 쓸 수 있는 라이브러리 제한(파일·네트워크 없음) | 커리큘럼을 콘솔 범위로 한정, 범위 밖이면 컴파일 오류 + 「이 코스에서는 쓰지 않아요」 풀이 |
+| Console.ReadLine 이 미리 적은 입력만 읽음 | 문제 입력은 테스트의 stdin 으로 충분. 대화형 입력은 csharp-lab 실험 후보(15-8 ⑤) |
+
+### 15-8. csharp-lab 에서 먼저 실험할 것 (검증되면 FEATURES.md ✅ 로 옮겨 사용)
+
+| # | 기능 | C0 에 필요 |
+| --- | --- | --- |
+| ① | 여러 파일 컴파일(학습자 코드 + 테스트 코드) | ✱ |
+| ② | 일괄 채점: 컴파일 1번 + 입력 여러 개 실행, 테스트별 결과 | ✱ |
+| ③ | 구조 검사(문법 트리로 「for 사용」·「클래스/속성 존재」) | 있으면 좋음 |
+| ④ | 입력하면서 바로 오류 밑줄(실행 없이 진단만) | — |
+| ⑤ | 실행 중 대화형 입력(Console.ReadLine 이 화면 입력을 기다림) | — |
+| ⑥ | 폰 기호 칩 시제품(실험실 편집기에서 먼저) | 시제품 |
+| ⑦ | Unity 식 `Update()` 루프 시뮬레이터 | — |
