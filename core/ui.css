@@ -289,3 +289,7 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 .quiz-code{max-width:100%;overflow-x:auto}.pv-desc,.pv-work{min-width:0}
 /* QA 6회전: <p>로 시작·끝나는 지문(71문제)의 위아래 빈 줄 — 상자 안 첫·마지막 문단 바깥 여백 없앰 */
 .pv-prompt>p:first-child{margin-top:0}.pv-prompt>p:last-child{margin-bottom:0}
+/* 🧠 복습 미리보기·왜 나왔나·끝 요약 (사용자 요청 11/4) */
+.rv-plan .rv-head{font-size:1.05em;margin-bottom:4px}.rv-list{margin:10px 0;padding-left:1.4em;display:flex;flex-direction:column;gap:10px}.rv-list li{line-height:1.45}
+.rv-why{display:flex;flex-direction:column;gap:2px;font-size:.9em;color:var(--muted);margin-top:2px}.rv-why.rv-in{background:var(--surface);border:1px dashed var(--primary);border-radius:10px;padding:8px 12px;margin:0 0 8px;color:var(--text)}.rv-why.rv-in b{margin-bottom:2px}
+.rv-sum{display:flex;flex-direction:column;gap:6px;margin:10px 0}.rv-row{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.rv-row .ok{color:var(--accent)}.rv-row .warn{color:var(--gold)}.rv-weak{margin-top:8px}.rv-weak .chip{margin:2px}
