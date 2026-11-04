@@ -179,14 +179,14 @@ const Grader = {
   async expected(p, test, idx) { // 정답 코드 실행으로 기대값 계산
     const key = p.id + '|' + JSON.stringify(p.params || {}) + '|' + idx; if (this.solutionCache[key]) return this.solutionCache[key];
     const sol = p.type === 'bug' ? p.bug.solution : p.solution;
-    let out = ''; const r = await Py.run({ code: sol, input: test._input != null ? test._input : await this.testInput(test), call: test.call || null, files: this.testFiles(p, test), outFiles: p.files && p.files.outputs || null, onOut: (t, e) => { if (!e) out += t; }, timeoutMs: CONFIG.RUN_TIMEOUT_MS * 3 });
+    let out = ''; const r = await Py.run({ code: sol, input: test._input != null ? test._input : await this.testInput(test), call: test.call || null, files: this.testFiles(p, test), outFiles: p.files && p.files.outputs || null, onOut: (t, e) => { if (!e) out += t; }, timeoutMs: CONFIG.RUN_TIMEOUT_MS * 3, maxOut: 0 });
     const v = { out, ret: r.ret, segs: r.segs, ok: r.ok, outFiles: r.outFiles || {} }; this.solutionCache[key] = v; return v;
   },
   inputCache: {},
   // 큰 입력은 문자열 대신 파이썬 식(inputGen)으로 적어 두고 실행해서 만든다 (n=10^5 같은 코딩테스트 입력)
   // 실전 프로젝트의 파일 입력: 테스트 고정 파일 → 없으면 문제의 샘플 파일
   testFiles(p, t) { if (t && t.files) return t.files; const up = p.files && p.files.upload; return up && up.sample != null ? [{ name: up.name || 'data.csv', text: up.sample }] : null; },
-  async testInput(t) { if (!t.inputGen) return t.input || ''; if (this.inputCache[t.inputGen]) return this.inputCache[t.inputGen]; let out = ''; const r = await Py.run({ code: 'import sys\nsys.stdout.write(str(' + t.inputGen + '))', onOut: (x, e) => { if (!e) out += x; } }); if (!r.ok) throw new Error('inputGen 실패: ' + (r.emsg || '')); this.inputCache[t.inputGen] = out; return out; },
+  async testInput(t) { if (!t.inputGen) return t.input || ''; if (this.inputCache[t.inputGen]) return this.inputCache[t.inputGen]; let out = ''; const r = await Py.run({ code: 'import sys\nsys.stdout.write(str(' + t.inputGen + '))', maxOut: 0, onOut: (x, e) => { if (!e) out += x; } }); /* 큰 입력(최대 수 MB)은 출력 상한 없이 */ if (!r.ok) throw new Error('inputGen 실패: ' + (r.emsg || '')); this.inputCache[t.inputGen] = out; return out; },
   async runTests(p, code, onEach) {
     const tests = this.normTests(p); const results = []; let passed = 0;
     const limitSec = p.limits && p.limits.time ? p.limits.time : null; const limitMs = limitSec ? limitSec * 1000 * CONFIG.ALGO.slowdown * (Py.speedFactor || 1) : null;
@@ -194,7 +194,7 @@ const Grader = {
       const t = tests[i]; let out = '', err = ''; let input = '';
       try { input = await this.testInput(t); } catch (e) { results.push({ idx: i, ok: false, input: '', expected: '', actual: '', error: e.message, hidden: false, note: '', raw: {} }); continue; }
       t._input = input;
-      const r = await Py.run({ code, input, call: t.call || null, files: this.testFiles(p, t), outFiles: p.files && p.files.outputs || null, onOut: (txt, e) => { if (e) err += txt; else out += txt; }, timeoutMs: limitMs ? Math.max(CONFIG.RUN_TIMEOUT_MS, limitMs * 1.5) : null });
+      const r = await Py.run({ code, input, call: t.call || null, files: this.testFiles(p, t), outFiles: p.files && p.files.outputs || null, onOut: (txt, e) => { if (e) err += txt; else out += txt; }, timeoutMs: limitMs ? Math.max(CONFIG.RUN_TIMEOUT_MS, limitMs * 1.5) : null, maxOut: Math.max(CONFIG.MAX_OUTPUT_CHARS || 1000000, (input.length + String(t.output || '').length) * 2) }); /* QA #123: 큰 입력 문제는 출력 상한도 넉넉히 */
       let ok = false, expected = t.output, actual = out, note = '';
       const tooSlow = limitMs && r.ok && r.ms != null && r.ms > limitMs;
       if (p.turtle) {

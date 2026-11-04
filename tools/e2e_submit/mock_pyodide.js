@@ -4,7 +4,7 @@
   const enc=new TextEncoder();
   self.loadPyodide=async function(){
     let out=null, err=null, stdin=null;
-    const emit=(t)=>{ if(t&&out) out.write(enc.encode(t)); };
+    const emit=(t)=>{ if(!t||!out) return; /* 진짜 Pyodide 처럼 줄 단위로 나눠 write (출력 상한·묶어 보내기 검사용) */ const parts=t.match(/[^\n]*\n|[^\n]+$/g)||[]; for(const p of parts) out.write(enc.encode(p)); };
     return {
       setStdout(o){out=o}, setStderr(o){err=o}, setStdin(o){stdin=o},
       runPython(code){ const r=sx('/__py/run',{code}); emit(r.out); if(r.error) throw new Error(r.error); return r.v; },

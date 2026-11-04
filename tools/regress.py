@@ -115,7 +115,7 @@ with sync_playwright() as p:
     pg.evaluate("Store.data.settings.unlockAll=false")
     for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','playground','works']:
         pg.evaluate(f"UI.go('{v}')"); pg.wait_for_timeout(300); check(len(pg.locator('#view').inner_text())>10, f'화면 {v}')
-    pg.evaluate("Store.data.stats.badgesSeenAt=0; Store.data.badgeDates.first_clear=Date.now(); Store.data.stats.runs=12; UI.go('badges')"); pg.wait_for_timeout(300)
+    pg.evaluate("Store.data.stats.badgesSeenAt=0; Store.data.badgeDates.first_clear=Date.now(); Store.data.stats.runs=12; Store.data.badges=Store.data.badges.filter(b=>b!=='secret_night'); /* 밤(0~5시)에 돌리면 시각 뱃지가 붙어 개수가 달라져요 */ UI.go('badges')"); pg.wait_for_timeout(300)
     check(pg.locator('.badge.got').count()==2 and pg.locator('.badge.new').count()>=1 and pg.locator('.b-prog').count()>=20 and pg.locator('.badge.secret .b-q').count()>=4 and pg.locator('[data-bf]').count()==4, '뱃지 화면: 획득 2·NEW·미획득 진행 막대·비밀 ❔·필터')
     pg.click('[data-bf="got"]'); pg.wait_for_timeout(100); check(pg.locator('.badge:not(.hide)').count()==2, '뱃지 필터: 획득만')
     pg.evaluate("UI.go('badges')"); pg.wait_for_timeout(300); check(pg.locator('.badge.new').count()==0, '뱃지 다시 열면 NEW 사라짐(badgesSeenAt)')

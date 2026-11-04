@@ -38,6 +38,7 @@ const CONFIG = {
   // --- 실행 ---
   RUN_TIMEOUT_MS: 5000,
   MAX_OUTPUT_LINES: 2000,
+  MAX_OUTPUT_CHARS: 1000000,               // 한 번 실행 출력 상한(글자) — 넘으면 멈춤(QA #123 무한 출력 대비). 큰 입력 만들기·정답 기대값 계산은 상한 없음
   TRACE_MAX_STEPS: 500,
   PROJECT_EXTRA_XP: 10, // 실전 프로젝트 「더 만들어 보기」 항목당 (채점 없음, 한 번만)
   ALGO: { traceMaxSteps: 5000, slowdown: 3, benchBaselineMs: 350, mockMinutes: 60, mockCount: 3, mockBonusXp: 150 }, // 알고리즘 코스: 시각화 추적 단계, Pyodide/CPython 배율, 기기 벤치 기준(ms), 모의고사
