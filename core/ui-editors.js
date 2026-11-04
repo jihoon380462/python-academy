@@ -37,7 +37,7 @@ class TextEditor {
     CM.load().then(m => { if (this.destroyed) return; this.buildCM(m, this.getValue()); }).catch(() => {});
   }
   buildFallback(value) {
-    const wrap = document.createElement('div'); wrap.className = 'ted-fb'; wrap.innerHTML = `<pre class="ted-gutter"></pre><textarea class="ted-ta" spellcheck="false" autocapitalize="off" autocorrect="off" ${this.readOnly ? 'readonly' : ''}></textarea>`;
+    const wrap = document.createElement('div'); wrap.className = 'ted-fb'; wrap.innerHTML = `<pre class="ted-gutter"></pre><textarea class="ted-ta" wrap="off" spellcheck="false" autocapitalize="off" autocorrect="off" ${this.readOnly ? 'readonly' : ''}></textarea>`;
     this.parent.appendChild(wrap); this.fb = wrap; this.ta = $('textarea', wrap); this.gut = $('.ted-gutter', wrap); this.ta.value = value; this.updateGutter(); /* QA #122: 기본 편집기는 점을 못 그려서 커서 줄 들여쓰기 칸 수를 글자로 */ const ind = document.createElement('div'); ind.className = 'ted-ind'; wrap.appendChild(ind); const showInd = () => { const ta = this.ta; if (!ta) return; const pos = ta.selectionStart; const st = ta.value.lastIndexOf('\n', pos - 1) + 1; const n = (ta.value.slice(st).match(/^ */) || [''])[0].length; ind.textContent = n ? `들여쓰기 ${n}칸${n % 4 ? ' ⚠ 4의 배수가 아니에요' : ''}` : ''; ind.classList.toggle('odd', n % 4 !== 0); }; ['input', 'keyup', 'click', 'focus'].forEach(ev => this.ta.addEventListener(ev, showInd));
     this.ta.addEventListener('input', (e) => { if (e.data === ':') this.autoDedentTA(); this.updateGutter(); this.onChange && this.onChange(this.getValue()); });
     this.ta.addEventListener('scroll', () => { this.gut.scrollTop = this.ta.scrollTop; });

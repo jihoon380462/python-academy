@@ -294,7 +294,9 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 .rv-why{display:flex;flex-direction:column;gap:2px;font-size:.9em;color:var(--muted);margin-top:2px}.rv-why.rv-in{background:var(--surface);border:1px dashed var(--primary);border-radius:10px;padding:8px 12px;margin:0 0 8px;color:var(--text)}.rv-why.rv-in b{margin-bottom:2px}
 .rv-sum{display:flex;flex-direction:column;gap:6px;margin:10px 0}.rv-row{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.rv-row .ok{color:var(--accent)}.rv-row .warn{color:var(--gold)}.rv-weak{margin-top:8px}.rv-weak .chip{margin:2px}
 /* QA #117(사용자 제보 11/4): 레슨 설명 안의 코드·출력 상자(<pre>)가 글과 구분이 안 되던 것 — 지문 상자와 같은 모양(세 코스 레슨 12곳) */
-.lp-html pre{background:var(--ed-bg);color:var(--ed-fg);padding:8px 12px;border-radius:8px;margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--mono)}
+.lp-html pre{background:var(--ed-bg);color:var(--ed-fg);padding:8px 12px;border-radius:8px;margin:6px 0;white-space:pre;overflow-wrap:normal;word-break:normal;overflow-x:auto;-webkit-overflow-scrolling:touch;font-family:var(--mono);font-size:var(--code-size);line-height:1.5}.lp-html pre code{white-space:inherit;overflow-wrap:normal}
+/* 사용자 제보 11/5(폰 「코드 가독성」): 레슨 코드 상자·편집기는 줄을 접지 않고 상자 안에서 옆으로 넘겨 봐요 — 낱말 중간에서 끊기고 줄 번호와 어긋나던 것 */
+.ted-ta{white-space:pre;overflow-wrap:normal;word-break:normal;overflow-x:auto}
 .lp-more{margin:10px 0 2px;border:1px dashed var(--border);border-radius:8px;padding:6px 12px}.lp-more summary{cursor:pointer;color:var(--muted);font-weight:700}.lp-more[open] summary{margin-bottom:4px}
 /* QA #122(사용자 제보 11/4): 줄 앞 공백을 한 칸마다 점으로 — 4칸인지 3·5칸인지 바로 보이게. 4의 배수가 아니면 빨간 바탕 */
 .cm-lead{background-image:radial-gradient(circle at 50% 55%,rgba(128,128,128,.7) 0 1.3px,transparent 1.8px);background-size:1ch 100%;background-repeat:repeat-x}.cm-lead-odd{background-color:rgba(255,93,108,.22)}
