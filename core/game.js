@@ -81,8 +81,38 @@ const Game = {
 // ---------- 복습 ----------
 const Review = {
   due() { const today = todayKey(); return PROBLEMS.filter(p => { const r = Store.prob(p.id); return r.status === 'clear' && r.review && r.review.due <= today; }); },
-  afterReview(p, success, hints) { const r = Store.prob(p.id); const st = r.review ? r.review.stage : 0; const next = (success && hints === 0) ? Math.min(CONFIG.REVIEW_INTERVALS.length - 1, st + 1) : 0; r.review = { stage: next, due: addDays(todayKey(), CONFIG.REVIEW_INTERVALS[next]) }; if (success) { Game.stat('reviewsDone'); const rt = Store.data.reviewToday; if (rt.date !== todayKey()) { rt.date = todayKey(); rt.count = 0; } rt.count++; } Store.save(); },
+  afterReview(p, success, hints) { const r = Store.prob(p.id); const st = r.review ? r.review.stage : 0; const next = (success && hints === 0) ? Math.min(CONFIG.REVIEW_INTERVALS.length - 1, st + 1) : 0; r.review = { stage: next, due: addDays(todayKey(), CONFIG.REVIEW_INTERVALS[next]) }; /* 11/4: 틀린 뒤 맞혀도 복습 한 개로 셈(단계는 0 = 내일 다시) */ { Game.stat('reviewsDone'); const rt = Store.data.reviewToday; if (rt.date !== todayKey()) { rt.date = todayKey(); rt.count = 0; } rt.count++; } Store.save(); },
   tagStats() { const tags = {}; PROBLEMS.forEach(p => { const r = Store.prob(p.id); p.tags.forEach(t => { tags[t] = tags[t] || { total: 0, clear: 0, attempts: 0, fails: 0 }; const s = tags[t]; s.total++; if (r.status === 'clear') s.clear++; s.attempts += r.attempts; s.fails += r.fails; }); }); return tags; },
   weakest() { const ts = this.tagStats(); let w = null, wr = 2; Object.entries(ts).forEach(([t, s]) => { if (s.attempts + s.clear === 0) return; const rate = s.clear / Math.max(1, s.clear + s.fails); if (rate < wr) { wr = rate; w = t; } }); return w; },
+  /* 사용자 요청(11/4) 「챕터 6까지 했는데 아무거나 던지는 건 무책임하다」 — 복습 고르기를 약점·챕터 고르게·밀린 날짜로.
+     plan({ mode:'due'|'extra', lessonIds, n }) → { items:[{ id, ch, lesson, kind:'due'|'weak', reasons:[…] }], dueCount, poolCount }
+     · due  = 오늘의 복습: 다시 볼 날(review.due)이 된 문제가 먼저. 모자라면 약점(틀림·힌트·정답 보기·별 낮음·약한 주제) 문제로 채움
+     · extra = 더 복습하기: 범위 안 클리어 문제 전부에서 약점·오래된 순
+     · 점수 = 밀린 날 + 약점 + 약한 주제 + 최근 챕터 가산, 고를 때마다 같은 챕터 −18·같은 레슨 −30 → 한 챕터에 몰리지 않게 */
+  tagRates() { const out = {}; Object.entries(this.tagStats()).forEach(([t, s]) => { const n = s.clear + s.fails; if (n >= 3) out[t] = s.clear / n; }); return out; },
+  weakTags(k = 3) { return Object.entries(this.tagRates()).filter(([, r]) => r < 0.75).sort((a, b) => a[1] - b[1]).slice(0, k); },
+  candidates(lessonIds) { const set = lessonIds && lessonIds.length ? new Set(lessonIds) : null; return PROBLEMS.filter(p => { const l = Content.lesson(p.lesson) || {}; if (p.project || l.mock) return false; if (set && !set.has(p.lesson)) return false; return Store.prob(p.id).status === 'clear'; }); },
+  plan({ mode = 'due', lessonIds = null, n = CONFIG.REVIEW_SIZE || 5 } = {}) {
+    const today = todayKey(); const rates = this.tagRates(); const pool = this.candidates(lessonIds);
+    const dayDiff = (a, b) => Math.round((new Date(a) - new Date(b)) / 864e5);
+    const chOf = (p) => (Content.lesson(p.lesson) || {}).ch; const maxCh = Math.max(0, ...pool.map(chOf).filter(x => x != null));
+    const info = pool.map(p => { const r = Store.prob(p.id); const reasons = []; let s = 0, weak = 0;
+      const due = !!(r.review && r.review.due <= today);
+      if (due) { const od = Math.max(0, dayDiff(today, r.review.due)); const iv = CONFIG.REVIEW_INTERVALS[r.review.stage || 0]; s += 40 + Math.min(od, 30) * 1.5; reasons.push(od > 0 ? `다시 볼 날이 ${od}일 지났어요 (${iv}일 간격 복습)` : `오늘 다시 볼 날이에요 (${iv}일 간격 복습)`); }
+      if (r.answerSeen) { weak += 15; reasons.push('정답 보기를 열었던 문제예요'); }
+      if (r.fails > 0) { weak += Math.min(r.fails, 5) * 6; reasons.push(`지금까지 ${r.fails}번 틀렸어요`); }
+      if (r.hints > 0) { weak += Math.min(r.hints, 3) * 7; reasons.push(`힌트 ${r.hints}개를 보고 풀었어요`); }
+      else if (r.stars && r.stars < 3) { weak += (3 - r.stars) * 5; reasons.push(`별 ${'★'.repeat(r.stars)}${'☆'.repeat(3 - r.stars)} — 더 깔끔하게 풀어 봐요`); }
+      const wt = (p.tags || []).filter(t => rates[t] != null && rates[t] < 0.75).sort((a, b) => rates[a] - rates[b])[0];
+      if (wt) { weak += (0.75 - rates[wt]) * 40; reasons.push(`#${wt} 주제 정답률 ${Math.round(rates[wt] * 100)}% — 약한 주제예요`); }
+      const age = r.clearedAt ? Math.min(30, (Date.now() - r.clearedAt) / 864e5) : 30; if (mode === 'extra') s += age * 0.5;
+      const ch = chOf(p); if (ch === maxCh) s += 6; else if (ch === maxCh - 1) s += 3;
+      return { p, id: p.id, ch, lesson: p.lesson, due, weak, score: s + weak + Math.random() * 2, kind: due ? 'due' : 'weak', reasons }; });
+    let cand = info; if (mode === 'due') { const dueOnes = info.filter(x => x.due); const fill = dueOnes.length < n ? info.filter(x => !x.due && x.weak > 0) : []; fill.forEach(x => x.reasons.unshift('약점 보강 — 다시 볼 날보다 먼저 한 번 더')); cand = dueOnes.concat(fill); }
+    const picked = []; const byCh = {}, byL = {}; const left = cand.slice();
+    while (picked.length < n && left.length) { let bi = 0, bv = -Infinity; left.forEach((x, i) => { const v = x.score - 18 * (byCh[x.ch] || 0) - 30 * (byL[x.lesson] || 0); if (v > bv) { bv = v; bi = i; } }); const x = left.splice(bi, 1)[0]; picked.push(x); byCh[x.ch] = (byCh[x.ch] || 0) + 1; byL[x.lesson] = (byL[x.lesson] || 0) + 1; }
+    picked.forEach(x => { if (!x.reasons.length) x.reasons.push(mode === 'extra' ? '잊지 않게 한 번 더 — 오래전에 푼 문제예요' : '잊기 전에 한 번 더'); x.reasons = x.reasons.slice(0, 3); delete x.p; });
+    return { items: picked, dueCount: info.filter(x => x.due).length, poolCount: pool.length };
+  },
   quizPool(uptoLesson) { const idx = LESSONS.findIndex(l => l.id === uptoLesson); return PROBLEMS.filter(p => ['quiz', 'fill'].includes(p.type) && LESSONS.findIndex(l => l.id === p.lesson) <= idx); },
 };

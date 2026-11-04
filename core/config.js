@@ -62,6 +62,7 @@ const CONFIG = {
   DAILY_GOAL_BONUS: 30,
   REVIEW_BONUS: 20,                       // 복습 3개 완료 보너스
   REVIEW_INTERVALS: [1, 3, 7, 14, 30],    // 일
+  REVIEW_SIZE: 5,                         // 복습 한 번에 고르는 문제 수 (Review.plan)
   PLAYGROUND_XP: 5, PLAYGROUND_XP_DAILY_MAX: 50,
   BOSS_XP_RATIO: 0.5,
   DAILY_CHALLENGE_MULT: 2,
