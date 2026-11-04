@@ -282,7 +282,7 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 .typing .ty-ch{margin:10px 0;padding:10px 12px}.ty-row{display:flex;align-items:center;gap:10px;padding:6px 2px;cursor:pointer}.ty-row input{width:20px;height:20px;flex:none}.ty-row span{flex:1}.ty-chrow{border-bottom:1px solid var(--border);margin-bottom:4px}
 .ty-note{border-left:4px solid var(--primary);padding:10px 12px;margin:8px 0}
 /* QA 1103: 긴 <code> 가 white-space:nowrap 이라 폰 폭을 넘던 것 — 넘칠 때만 줄바꿈 */
-.pv-prompt code,.lp-html code,.quiz code,.tutor-panel code,.result code{white-space:normal;overflow-wrap:anywhere;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.pv-prompt code,.lp-html code,.quiz code,.tutor-panel code,.result code{white-space:pre-wrap;overflow-wrap:anywhere;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 /* QA 1103(L12P4): 줄 맞추기 조각의 긴 줄(students = [{…}, …])이 1280px 화면도 넘던 것 — 들여쓰기는 지키고 넘칠 때만 줄바꿈 */
 .pz-tile code{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
 /* QA 6회전(알고 A10P2·A12P2·A13P2): 추적 퀴즈 코드(pre)의 긴 줄이 폰 화면 전체를 넓히던 것 — 상자 안에서만 가로 스크롤 */

@@ -176,11 +176,12 @@ const Grader = {
     const t = Content.tests(p).slice(); if (t.length === 1) t.push({ ...t[0] }); return t;
   },
   solutionCache: {},
+  _lastExpectedStopped: false,
   async expected(p, test, idx) { // 정답 코드 실행으로 기대값 계산
     const key = p.id + '|' + JSON.stringify(p.params || {}) + '|' + idx; if (this.solutionCache[key]) return this.solutionCache[key];
     const sol = p.type === 'bug' ? p.bug.solution : p.solution;
     let out = ''; const r = await Py.run({ code: sol, input: test._input != null ? test._input : await this.testInput(test), call: test.call || null, files: this.testFiles(p, test), outFiles: p.files && p.files.outputs || null, onOut: (t, e) => { if (!e) out += t; }, timeoutMs: CONFIG.RUN_TIMEOUT_MS * 3, maxOut: 0 });
-    const v = { out, ret: r.ret, segs: r.segs, ok: r.ok, outFiles: r.outFiles || {} }; this.solutionCache[key] = v; return v;
+    const v = { out, ret: r.ret, segs: r.segs, ok: r.ok, outFiles: r.outFiles || {}, stopped: !!(r.stopped || r.timeout || r.outputLimit) }; if (v.stopped) this._lastExpectedStopped = true; else this.solutionCache[key] = v; /* QA #151: 기대값 계산 중 ⏹·시간 초과면 캐시에 남기지 않음(같은 세션에서 정답도 계속 실패하던 것) */ return v;
   },
   inputCache: {},
   // 큰 입력은 문자열 대신 파이썬 식(inputGen)으로 적어 두고 실행해서 만든다 (n=10^5 같은 코딩테스트 입력)
@@ -216,7 +217,8 @@ const Grader = {
         }
       }
       if (tooSlow) { ok = false; note = `⏱ 시간 초과 (제한 ${limitSec}초, 내 코드 ${(r.ms / 1000 / CONFIG.ALGO.slowdown / (Py.speedFactor || 1)).toFixed(1)}초 상당) — 더 빠른 자료구조나 방법이 필요해요`; actual = '(시간 초과)'; }
-      if (r.timeout && limitMs) { note = `⏱ 시간 초과 (제한 ${limitSec}초) — 더 빠른 자료구조나 방법이 필요해요`; }
+      if (r.timeout && limitMs && !r.stopped) { note = `⏱ 시간 초과 (제한 ${limitSec}초) — 더 빠른 자료구조나 방법이 필요해요`; } /* QA #154: 직접 멈춘 건 시간 초과 기록(tle)이 아님 */
+      if (this._lastExpectedStopped) { ok = false; note = '정답 기대값을 계산하다 멈췄어요 — 다시 제출해 주세요'; this._lastExpectedStopped = false; r.timeout = true; /* QA #153: 나머지 테스트도 중단 */ }
       const res = { idx: i, ok, input: t.inputGen ? (input.length <= 300 ? input : `(큰 입력 · ${input.length}자)`) : (t.input || ''), expected, actual, error: r.ok ? '' : (Py.explain(r) + (r.ename === 'SyntaxError' && Py.syntaxTips ? ' ' + Py.syntaxTips(code, r.line) : '') + (r.tb ? '\n' + r.tb : '')), hidden: i === tests.length - 1, note, raw: r, ms: r.ms };
       results.push(res); if (ok) passed++;
       if (onEach) onEach(res, i, tests.length);

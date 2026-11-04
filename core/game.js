@@ -40,7 +40,7 @@ const Game = {
     if (usedTutor) this.stat('tutorBreakthrough');
     const h = new Date().getHours(); if (h >= 0 && h < 4) this.stat('nightClear');
     // 복습 큐
-    if (!inReview && !rerun) { const stage = (hints > 0 || rec.fails >= 3) ? 0 : 1; /* 힌트·3회 실패는 1일, 깔끔한 클리어는 3일부터 */ rec.review = { stage, due: addDays(todayKey(), CONFIG.REVIEW_INTERVALS[stage]) }; }
+    if (!inReview && !rerun && Review.reviewable(p)) { const stage = (hints > 0 || rec.fails >= 3) ? 0 : 1; /* 힌트·3회 실패는 1일, 깔끔한 클리어는 3일부터 */ rec.review = { stage, due: addDays(todayKey(), CONFIG.REVIEW_INTERVALS[stage]) }; } /* QA #148: 실전 프로젝트·모의고사·타자 연습은 복습 후보가 아니므로 일정도 안 붙임(허브 큐와 숫자가 어긋나던 것) */
     // 일일/스트릭
     const today = todayKey(); if (!rerun) { d.days[today] = (d.days[today] || 0) + 1; } this.touchStreak();
     if (d.days[today] === d.dailyGoal && !d.dailyGoalDates[today]) { d.dailyGoalDates[today] = true; this.stat('dailyGoalsMet'); events.push({ type: 'dailyGoal' }); Store.data.xp += CONFIG.DAILY_GOAL_BONUS; }
@@ -80,7 +80,11 @@ const Game = {
 
 // ---------- 복습 ----------
 const Review = {
-  due() { const today = todayKey(); return PROBLEMS.filter(p => { const r = Store.prob(p.id); return r.status === 'clear' && r.review && r.review.due <= today; }); },
+  /* QA #148: 복습 후보 기준 — 실전 프로젝트·모의고사·타자 연습은 제외. due()·candidates()·clearProblem 이 같은 기준을 쓴다 */
+  reviewable(p) { if (!p || p.project || p.drill) return false; const l = Content.lesson(p.lesson) || {}; return !l.mock; },
+  /* 옛 저장(v2.3.19 전)에 붙어 있던 프로젝트·모의고사·타자 연습의 일정을 지운다 — 허브 큐(hub.js reviewDue 는 콘텐츠 없이 저장만 봄)와 홈 숫자를 맞추기 위해 */
+  prune() { let n = 0; const drop = (id) => { const r = Store.data.problems[id]; if (r && r.review) { delete r.review; n++; } }; PROBLEMS.forEach(p => { if (!this.reviewable(p)) drop(p.id); }); (typeof Content !== 'undefined' && Content.allDrills ? Content.allDrills() : []).forEach(d => drop(d.id)); if (n) Store.save({ silent: true }); return n; },
+  due() { this.prune(); const today = todayKey(); return PROBLEMS.filter(p => { const r = Store.prob(p.id); return this.reviewable(p) && r.status === 'clear' && r.review && r.review.due <= today; }); },
   afterReview(p, success, hints) { const r = Store.prob(p.id); const st = r.review ? r.review.stage : 0; const next = (success && hints === 0) ? Math.min(CONFIG.REVIEW_INTERVALS.length - 1, st + 1) : 0; r.review = { stage: next, due: addDays(todayKey(), CONFIG.REVIEW_INTERVALS[next]) }; /* 11/4: 틀린 뒤 맞혀도 복습 한 개로 셈(단계는 0 = 내일 다시) */ { Game.stat('reviewsDone'); const rt = Store.data.reviewToday; if (rt.date !== todayKey()) { rt.date = todayKey(); rt.count = 0; } rt.count++; } Store.save(); },
   tagStats() { const tags = {}; PROBLEMS.forEach(p => { const r = Store.prob(p.id); p.tags.forEach(t => { tags[t] = tags[t] || { total: 0, clear: 0, attempts: 0, fails: 0 }; const s = tags[t]; s.total++; if (r.status === 'clear') s.clear++; s.attempts += r.attempts; s.fails += r.fails; }); }); return tags; },
   weakest() { const ts = this.tagStats(); let w = null, wr = 2; Object.entries(ts).forEach(([t, s]) => { if (s.attempts + s.clear === 0) return; const rate = s.clear / Math.max(1, s.clear + s.fails); if (rate < wr) { wr = rate; w = t; } }); return w; },
@@ -91,7 +95,7 @@ const Review = {
      · 점수 = 밀린 날 + 약점 + 약한 주제 + 최근 챕터 가산, 고를 때마다 같은 챕터 −18·같은 레슨 −30 → 한 챕터에 몰리지 않게 */
   tagRates() { const out = {}; Object.entries(this.tagStats()).forEach(([t, s]) => { const n = s.clear + s.fails; if (n >= 3) out[t] = s.clear / n; }); return out; },
   weakTags(k = 3) { return Object.entries(this.tagRates()).filter(([, r]) => r < 0.75).sort((a, b) => a[1] - b[1]).slice(0, k); },
-  candidates(lessonIds) { const set = lessonIds && lessonIds.length ? new Set(lessonIds) : null; return PROBLEMS.filter(p => { const l = Content.lesson(p.lesson) || {}; if (p.project || l.mock) return false; if (set && !set.has(p.lesson)) return false; return Store.prob(p.id).status === 'clear'; }); },
+  candidates(lessonIds) { const set = lessonIds && lessonIds.length ? new Set(lessonIds) : null; return PROBLEMS.filter(p => { if (!this.reviewable(p)) return false; if (set && !set.has(p.lesson)) return false; return Store.prob(p.id).status === 'clear'; }); },
   plan({ mode = 'due', lessonIds = null, n = CONFIG.REVIEW_SIZE || 5 } = {}) {
     const today = todayKey(); const rates = this.tagRates(); const pool = this.candidates(lessonIds);
     const dayDiff = (a, b) => Math.round((new Date(a) - new Date(b)) / 864e5);
