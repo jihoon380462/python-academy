@@ -63,7 +63,7 @@ const Sync = {
   },
   apply(remote) { // 내려받은 데이터를 로컬에 반영 (API 키는 로컬 것 유지). 코스별로 따로 합친다(QA #67)
     const apiKey = Store.data.settings.apiKey; const strip = (d) => { const o = Object.assign({}, d); delete o.updatedAt; delete o.syncDevice; delete o.last; return JSON.stringify(o); };
-    const before = strip(Store.data); const L = this.bundle(); const R = remote && remote.format === this.FORMAT ? remote : this.fromLegacy(remote || {});
+    const before = strip(Store.data); const sigBefore = this.progressSig(); const L = this.bundle(); const R = remote && remote.format === this.FORMAT ? remote : this.fromLegacy(remote || {});
     const fresh = !this.cfg.lastSyncAt && !(L.profile.xp) && !Object.values(L.courses).some(c => Object.keys(c.problems || {}).length) && !(L.works || []).length; // 이 기기는 처음 연동 + 아직 아무것도 안 함 → 다른 기기 것을 통째로
     const lt = L.updatedAt || 0, rt = R.updatedAt || 0, lr = L.profile.resetAt || 0, rr = (R.profile || {}).resetAt || 0;
     const mergeObj = (a, b) => { if (fresh) return b != null ? JSON.parse(JSON.stringify(b)) : a; if (a == null) return b; if (b == null) return a; const o = this.merge(Object.assign({}, a, { updatedAt: lt, resetAt: lr }), Object.assign({}, b, { updatedAt: rt, resetAt: rr })); if (!('resetAt' in a) && !('resetAt' in b)) delete o.resetAt; return o; };
@@ -73,8 +73,11 @@ const Sync = {
     const w = fresh ? (R.works || L.works) : this.merge({ works: L.works || [], updatedAt: lt }, { works: R.works || [], updatedAt: rt }).works; Store._set(Store.KEYS.works, w || []);
     try { Store.untangle(); } catch (e) {} // 옛 형식이 섞어 둔 것까지 정리
     const d = Store.assemble(); Store.data = Object.assign(Store.blank(), d); Store.data.settings = Object.assign(Store.blank().settings, d.settings || {}); Store.data.settings.apiKey = apiKey; Store.migrate(); Store.save({ silent: true });
+    this.lastPullProgress = this.progressSig() !== sigBefore; /* 사용자 요청(11/5): 토스트는 진행이 실제로 들어왔을 때만 */
     return strip(Store.data) !== before;
   },
+  // 다른 기기에서 「진행」이 들어왔는지 보는 서명 — 클리어 수·별 합·XP·작품 수 (설정·키 순서·메타가 바뀐 건 세지 않음)
+  progressSig() { try { let clears = 0, stars = 0; Store.keysWithPrefix('academy.course.').forEach(c => { const o = Store._get(Store.KEYS.course(c)) || {}; for (const id in (o.problems || {})) { const r = o.problems[id]; if (r && r.status === 'clear') { clears++; stars += r.stars || 0; } } }); const prof = Store._get(Store.KEYS.profile) || {}; const w = Store._get(Store.KEYS.works); return `${clears}|${stars}|${prof.xp || 0}|${Array.isArray(w) ? w.length : 0}`; } catch (e) { return ''; } },
 
   // ----- 연결 -----
   async connect(text) {
@@ -105,11 +108,13 @@ const Sync = {
       this.set('syncing'); const changed = await this.pull();
       if (force || (Store.data.updatedAt || 0) > this.cfg.lastLocalUpdated || changed) await this.push();
       this.cfg.lastSyncAt = Date.now(); this.saveCfg(); this.set('ok');
-      if (changed) { if (!this._quiet) UI.toast('☁ 다른 기기의 진행 상황을 가져왔어요', 1500); if (UI.view && !['problem', 'lesson', 'playground'].includes(UI.view)) UI.go(UI.view, UI.params, false); else UI.renderTopbar(); }
+      if (changed) { if (!this._quiet && this.lastPullProgress && this.toastOk()) UI.toast('☁ 다른 기기의 진행 상황을 가져왔어요', 1500); if (UI.view && !['problem', 'lesson', 'playground'].includes(UI.view)) UI.go(UI.view, UI.params, false); else UI.renderTopbar(); }
       return changed;
     } catch (e) { this.set('err', this.errMsg(e)); console.warn('sync', e); return false; }
     finally { this.busy = false; if (this.pending) { this.pending = false; this.schedulePush(); } }
   },
+  // 사용자 요청(11/5 「팝업 적당히」): 진행이 실제로 들어온 때만, 한 기기에서 10분에 한 번만
+  toastOk() { const KEY = 'pa_sync_toast_at'; let last = 0; try { last = +localStorage.getItem(KEY) || 0; } catch (e) {} if (Date.now() - last < 10 * 60 * 1000) return false; try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {} return true; },
   async quietSync() { this._quiet = true; try { return await this.syncNow(); } finally { this._quiet = false; } }, // 복귀·온라인 복구 때는 토스트 없이
   schedulePush() { if (!this.on) return; clearTimeout(this.timer); this.state = 'dirty'; this.timer = setTimeout(() => this.syncNow(), this.DEBOUNCE_MS); },
   flush() { if (!this.on || this.state !== 'dirty') return; clearTimeout(this.timer); this.syncNow(); },
