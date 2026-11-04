@@ -176,17 +176,18 @@ const Grader = {
     const t = Content.tests(p).slice(); if (t.length === 1) t.push({ ...t[0] }); return t;
   },
   solutionCache: {},
+  _lastExpectedStopped: false,
   async expected(p, test, idx) { // 정답 코드 실행으로 기대값 계산
     const key = p.id + '|' + JSON.stringify(p.params || {}) + '|' + idx; if (this.solutionCache[key]) return this.solutionCache[key];
     const sol = p.type === 'bug' ? p.bug.solution : p.solution;
-    let out = ''; const r = await Py.run({ code: sol, input: test._input != null ? test._input : await this.testInput(test), call: test.call || null, files: this.testFiles(p, test), outFiles: p.files && p.files.outputs || null, onOut: (t, e) => { if (!e) out += t; }, timeoutMs: CONFIG.RUN_TIMEOUT_MS * 3 });
-    const v = { out, ret: r.ret, segs: r.segs, ok: r.ok, outFiles: r.outFiles || {} }; this.solutionCache[key] = v; return v;
+    let out = ''; const r = await Py.run({ code: sol, input: test._input != null ? test._input : await this.testInput(test), call: test.call || null, files: this.testFiles(p, test), outFiles: p.files && p.files.outputs || null, onOut: (t, e) => { if (!e) out += t; }, timeoutMs: CONFIG.RUN_TIMEOUT_MS * 3, maxOut: 0 });
+    const v = { out, ret: r.ret, segs: r.segs, ok: r.ok, outFiles: r.outFiles || {}, stopped: !!(r.stopped || r.timeout || r.outputLimit) }; if (v.stopped) this._lastExpectedStopped = true; else this.solutionCache[key] = v; /* QA #151: 기대값 계산 중 ⏹·시간 초과면 캐시에 남기지 않음(같은 세션에서 정답도 계속 실패하던 것) */ return v;
   },
   inputCache: {},
   // 큰 입력은 문자열 대신 파이썬 식(inputGen)으로 적어 두고 실행해서 만든다 (n=10^5 같은 코딩테스트 입력)
   // 실전 프로젝트의 파일 입력: 테스트 고정 파일 → 없으면 문제의 샘플 파일
   testFiles(p, t) { if (t && t.files) return t.files; const up = p.files && p.files.upload; return up && up.sample != null ? [{ name: up.name || 'data.csv', text: up.sample }] : null; },
-  async testInput(t) { if (!t.inputGen) return t.input || ''; if (this.inputCache[t.inputGen]) return this.inputCache[t.inputGen]; let out = ''; const r = await Py.run({ code: 'import sys\nsys.stdout.write(str(' + t.inputGen + '))', onOut: (x, e) => { if (!e) out += x; } }); if (!r.ok) throw new Error('inputGen 실패: ' + (r.emsg || '')); this.inputCache[t.inputGen] = out; return out; },
+  async testInput(t) { if (!t.inputGen) return t.input || ''; if (this.inputCache[t.inputGen]) return this.inputCache[t.inputGen]; let out = ''; const r = await Py.run({ code: 'import sys\nsys.stdout.write(str(' + t.inputGen + '))', maxOut: 0, onOut: (x, e) => { if (!e) out += x; } }); /* 큰 입력(최대 수 MB)은 출력 상한 없이 */ if (!r.ok) throw new Error('inputGen 실패: ' + (r.emsg || '')); this.inputCache[t.inputGen] = out; return out; },
   async runTests(p, code, onEach) {
     const tests = this.normTests(p); const results = []; let passed = 0;
     const limitSec = p.limits && p.limits.time ? p.limits.time : null; const limitMs = limitSec ? limitSec * 1000 * CONFIG.ALGO.slowdown * (Py.speedFactor || 1) : null;
@@ -194,7 +195,7 @@ const Grader = {
       const t = tests[i]; let out = '', err = ''; let input = '';
       try { input = await this.testInput(t); } catch (e) { results.push({ idx: i, ok: false, input: '', expected: '', actual: '', error: e.message, hidden: false, note: '', raw: {} }); continue; }
       t._input = input;
-      const r = await Py.run({ code, input, call: t.call || null, files: this.testFiles(p, t), outFiles: p.files && p.files.outputs || null, onOut: (txt, e) => { if (e) err += txt; else out += txt; }, timeoutMs: limitMs ? Math.max(CONFIG.RUN_TIMEOUT_MS, limitMs * 1.5) : null });
+      const r = await Py.run({ code, input, call: t.call || null, files: this.testFiles(p, t), outFiles: p.files && p.files.outputs || null, onOut: (txt, e) => { if (e) err += txt; else out += txt; }, timeoutMs: limitMs ? Math.max(CONFIG.RUN_TIMEOUT_MS, limitMs * 1.5) : null, maxOut: Math.max(CONFIG.MAX_OUTPUT_CHARS || 1000000, (input.length + String(t.output || '').length) * 2) }); /* QA #123: 큰 입력 문제는 출력 상한도 넉넉히 */
       let ok = false, expected = t.output, actual = out, note = '';
       const tooSlow = limitMs && r.ok && r.ms != null && r.ms > limitMs;
       if (p.turtle) {
@@ -216,7 +217,8 @@ const Grader = {
         }
       }
       if (tooSlow) { ok = false; note = `⏱ 시간 초과 (제한 ${limitSec}초, 내 코드 ${(r.ms / 1000 / CONFIG.ALGO.slowdown / (Py.speedFactor || 1)).toFixed(1)}초 상당) — 더 빠른 자료구조나 방법이 필요해요`; actual = '(시간 초과)'; }
-      if (r.timeout && limitMs) { note = `⏱ 시간 초과 (제한 ${limitSec}초) — 더 빠른 자료구조나 방법이 필요해요`; }
+      if (r.timeout && limitMs && !r.stopped) { note = `⏱ 시간 초과 (제한 ${limitSec}초) — 더 빠른 자료구조나 방법이 필요해요`; } /* QA #154: 직접 멈춘 건 시간 초과 기록(tle)이 아님 */
+      if (this._lastExpectedStopped) { ok = false; note = '정답 기대값을 계산하다 멈췄어요 — 다시 제출해 주세요'; this._lastExpectedStopped = false; r.timeout = true; /* QA #153: 나머지 테스트도 중단 */ }
       const res = { idx: i, ok, input: t.inputGen ? (input.length <= 300 ? input : `(큰 입력 · ${input.length}자)`) : (t.input || ''), expected, actual, error: r.ok ? '' : (Py.explain(r) + (r.ename === 'SyntaxError' && Py.syntaxTips ? ' ' + Py.syntaxTips(code, r.line) : '') + (r.tb ? '\n' + r.tb : '')), hidden: i === tests.length - 1, note, raw: r, ms: r.ms };
       results.push(res); if (ok) passed++;
       if (onEach) onEach(res, i, tests.length);

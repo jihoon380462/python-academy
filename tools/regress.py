@@ -47,9 +47,19 @@ with sync_playwright() as p:
     for k,prm in [('normal',"{pid:'L8P1',lessonId:'L8'}"),('review',"{pid:'L8P1',lessonId:'L8',inReview:true}"),('chal',"{pid:'L8P1',lessonId:'L8',inChallenge:true}")]:
         pg.evaluate(f"UI.go('problem',{prm})"); pg.wait_for_timeout(400); rf[k]=pg.evaluate(edv); rf[k+'Nav']=pg.locator('#btnPrevP, #btnNextP').count()
     check('예전 답' in rf['normal'] and '예전 답' not in rf['review'] and '예전 답' not in rf['chal'] and rf['reviewNav']==0 and rf['chalNav']==0, '복습·도전은 내 예전 답 없이 시작·이전/다음 버튼 숨김, 일반 화면은 이어서 (QA #89~#91): '+str(rf))
-    pg.evaluate("UI.go('reviewMore')"); pg.wait_for_timeout(400); rm=pg.evaluate("({v:UI.view, ex:!!(UI.params.session && UI.params.session.extraReview), clear:!!(UI.params.session && UI.params.session.pids.every(id=>Store.prob(id).status==='clear'))})"); rm=rm['v']=='problem' and rm['ex'] and rm['clear']
+    pg.evaluate("UI.go('reviewMore')"); pg.wait_for_timeout(400); rvp=pg.locator('.rv-list li').count(); pg.evaluate("document.querySelector('#rvGo').click()"); pg.wait_for_timeout(400); rm=pg.evaluate("({v:UI.view, ex:!!(UI.params.session && UI.params.session.extraReview), clear:!!(UI.params.session && UI.params.session.pids.every(id=>Store.prob(id).status==='clear'))})"); rm=rm['v']=='problem' and rm['ex'] and rm['clear']
     pg.evaluate("(()=>{ Object.assign(Store.prob('L8P1'), JSON.parse(window.__bak)); UI.go('home'); })()"); pg.wait_for_timeout(300)
-    check(rm and pg.locator('[data-go=reviewMore]').count()>=1, '홈 「더 복습하기」 → 클리어한 문제로 복습 세션 (QA #92)')
+    check(rvp>=1 and rm and pg.locator('[data-go=reviewMore]').count()>=1, '홈 「더 복습하기」 → 미리보기 → 클리어한 문제로 복습 세션 (QA #92·#116)')
+    # QA #116 (사용자 요청 11/4): 복습 고르기 = 약점·밀린 날·챕터 고르게 + 왜 나왔나 + 이번에 연 힌트만
+    rv=pg.evaluate("""(()=>{ const bak=JSON.stringify(Store.data.problems); const ids=[]; const today=todayKey();
+      PROBLEMS.filter(p=>['L1','L2','L5','L6','L9','L10'].includes(p.lesson)).forEach((p,k)=>{ const r=Store.prob(p.id); r.status='clear'; r.stars=3; r.hints=0; r.fails=0; r.answerSeen=false; r.review={stage:1,due:addDays(today,-1)}; });
+      Object.assign(Store.prob('L5P1'),{fails:4,hints:2,stars:1});
+      const pl=Review.plan({mode:'due'}); const chs=new Set(pl.items.map(x=>x.ch)); const first=pl.items[0];
+      const only=Review.plan({mode:'extra',lessonIds:['L9']}).items.every(x=>x.lesson==='L9');
+      window.__rvbak=bak; UI.go('problem',{pid:'L5P1',lessonId:'L5',inReview:true,session:{reasons:{L5P1:first.reasons},rv:{},pids:['L5P1'],results:{},goto(){}}});
+      return {n:pl.items.length, chs:chs.size, first:first.id, only}; })()""")
+    pg.wait_for_timeout(500); rv.update(pg.evaluate("(()=>{ const why=!!document.querySelector('.rv-in'); const hintsOpen=document.querySelectorAll('#pvHints .hint').length; Store.data.problems=JSON.parse(window.__rvbak); UI.go('home'); return {why, hintsOpen}; })()")); pg.wait_for_timeout(300)
+    check(rv['n']==5 and rv['chs']>=3 and rv['first']=='L5P1' and rv['why'] and rv['hintsOpen']==0 and rv['only'], '복습: 약점 문제가 먼저·5문제가 3챕터 이상에 고르게·범위 지정·「왜 나왔나」·예전 힌트 접힘 (QA #116): '+str(rv))
     pg.evaluate("UI.go('lesson',{lessonId:'L3',page:(Content.lesson('L3').pages||[]).length})"); pg.wait_for_timeout(300); dc=pg.locator('#startDrills').count()
     if dc: pg.click('#startDrills'); pg.wait_for_timeout(500)
     dr=pg.evaluate("({pid:UI.params.pid, drill:!!(UI.params.session&&UI.params.session.drill), ed:!!document.querySelector('#pvEd'), n:Content.drillsOf('L3').length, total:PROBLEMS.length, inProbs:PROBLEMS.some(p=>p.drill)})")
@@ -105,7 +115,7 @@ with sync_playwright() as p:
     pg.evaluate("Store.data.settings.unlockAll=false")
     for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','playground','works']:
         pg.evaluate(f"UI.go('{v}')"); pg.wait_for_timeout(300); check(len(pg.locator('#view').inner_text())>10, f'화면 {v}')
-    pg.evaluate("Store.data.stats.badgesSeenAt=0; Store.data.badgeDates.first_clear=Date.now(); Store.data.stats.runs=12; UI.go('badges')"); pg.wait_for_timeout(300)
+    pg.evaluate("Store.data.stats.badgesSeenAt=0; Store.data.badgeDates.first_clear=Date.now(); Store.data.stats.runs=12; Store.data.badges=Store.data.badges.filter(b=>b!=='secret_night'); /* 밤(0~5시)에 돌리면 시각 뱃지가 붙어 개수가 달라져요 */ UI.go('badges')"); pg.wait_for_timeout(300)
     check(pg.locator('.badge.got').count()==2 and pg.locator('.badge.new').count()>=1 and pg.locator('.b-prog').count()>=20 and pg.locator('.badge.secret .b-q').count()>=4 and pg.locator('[data-bf]').count()==4, '뱃지 화면: 획득 2·NEW·미획득 진행 막대·비밀 ❔·필터')
     pg.click('[data-bf="got"]'); pg.wait_for_timeout(100); check(pg.locator('.badge:not(.hide)').count()==2, '뱃지 필터: 획득만')
     pg.evaluate("UI.go('badges')"); pg.wait_for_timeout(300); check(pg.locator('.badge.new').count()==0, '뱃지 다시 열면 NEW 사라짐(badgesSeenAt)')

@@ -174,6 +174,10 @@ const WORKER_SRC = `
 const PYODIDE_URL=${JSON.stringify(CONFIG.PYODIDE_URL)}, INDEX=${JSON.stringify(CONFIG.PYODIDE_INDEX)};
 const PRELUDE=${JSON.stringify(PY_PRELUDE)};
 let pyodide=null, inputLines=[], inputIdx=0, curId=null;
+/* QA #123(사용자 11/5 「무한루프 막는 장치 없어?」): 출력은 8KB 씩 묶어 보내고(수십만 번 메시지로 화면이 굳던 것), 한 번 실행에 MAX_OUT 글자를 넘으면 멈춰요 */
+const MAX_OUT_DEFAULT=${JSON.stringify(CONFIG.MAX_OUTPUT_CHARS || 1000000)}; let outBuf='', outN=0, outW=0, outMax=0, outCut=false, lastFlush=0;
+/* QA #150: 처음 200번의 write 와 그 뒤 50ms 마다는 바로 보내고(시간 초과·⏹ 로 워커가 꺼져도 앞 출력이 남게), 그 뒤만 8KB 씩 묶는다 */
+function flushOut(){ if(outBuf){ postMessage({type:'out',id:curId,text:outBuf}); outBuf=''; } lastFlush=Date.now(); }
 const dec=new TextDecoder();
 async function prefetch(files){
   let total=0, got=0; const sizes={};
@@ -198,10 +202,11 @@ async function init(){
     await prefetch(['pyodide.asm.js','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json']);
     postMessage({type:'progress',pct:95,phase:'init'});
     pyodide=await loadPyodide({indexURL:INDEX});
-    pyodide.setStdout({write:(b)=>{ postMessage({type:'out',id:curId,text:dec.decode(b,{stream:true})}); return b.length; }});
-    pyodide.setStderr({write:(b)=>{ postMessage({type:'err',id:curId,text:dec.decode(b,{stream:true})}); return b.length; }});
+    pyodide.setStdout({write:(b)=>{ if(outCut) throw new Error('PA_OUTPUT_LIMIT'); const t=dec.decode(b,{stream:true}); outN+=t.length; if(outMax && outN>outMax){ outCut=true; flushOut(); throw new Error('PA_OUTPUT_LIMIT'); } outBuf+=t; outW++; if(outW<=200 || outBuf.length>=8192 || Date.now()-lastFlush>50) flushOut(); return b.length; }});
+    pyodide.setStderr({write:(b)=>{ flushOut(); /* QA #153: stdout 먼저 보내 순서 유지 */ postMessage({type:'err',id:curId,text:dec.decode(b,{stream:true})}); return b.length; }});
     pyodide.setStdin({stdin:()=>{ if(inputIdx<inputLines.length) return inputLines[inputIdx++]+'\\n'; return null; }, autoEOF:false, isatty:false});
     pyodide.runPython(PRELUDE);
+    try{ pyodide.runPython('import sys\\ntry:\\n    sys.stdout.reconfigure(line_buffering=True); sys.stderr.reconfigure(line_buffering=True)\\nexcept Exception: pass'); }catch(e){} /* QA #150: 줄마다 바로 넘기기 */
     postMessage({type:'progress',pct:100,phase:'ready'});
     postMessage({type:'ready'});
   }catch(e){ postMessage({type:'initError',msg:String(e&&e.message||e)}); }
@@ -216,7 +221,7 @@ self.onmessage=(ev)=>{
     return;
   }
   if(m.type==='run'){
-    curId=m.id; inputLines=(m.input||'').replace(/\\r/g,'').split('\\n'); if(inputLines.length && inputLines[inputLines.length-1]==='' ) inputLines.pop(); inputIdx=0;
+    curId=m.id; outBuf=''; outN=0; outW=0; outCut=false; outMax=(m.maxOut==null?MAX_OUT_DEFAULT:m.maxOut); inputLines=(m.input||'').replace(/\\r/g,'').split('\\n'); if(inputLines.length && inputLines[inputLines.length-1]==='' ) inputLines.pop(); inputIdx=0;
     let result;
     try{
       // 파일 입출력: 실행 전에 업로드/고정 파일을 쓰고, 결과 파일은 지웠다가 실행 뒤 읽어 돌려준다
@@ -230,6 +235,7 @@ self.onmessage=(ev)=>{
     }catch(e){ result={ok:false,ename:'InternalError',emsg:String(e&&e.message||e)}; }
     result.inputUsed=inputIdx;
     try{ pyodide.runPython('import sys; sys.stdout.flush(); sys.stderr.flush()'); }catch(e){}
+    flushOut(); if(outCut){ result={...result, ok:false, outputLimit:true, ename:'OutputLimit', emsg:'출력이 너무 많아서 멈췄어요', limit:outMax}; }
     postMessage({type:'done',id:m.id,result});
     curId=null;
   }
@@ -270,10 +276,10 @@ const Py = {
       await loadScript(CONFIG.PYODIDE_URL); this.progress = 20; this._emit();
       const py = await loadPyodide({ indexURL: CONFIG.PYODIDE_INDEX }); this.progress = 95; this.phase = 'init'; this._emit();
       const dec = new TextDecoder();
-      py.setStdout({ write: (b) => { if (this.cur && this.cur.onOut) this.cur.onOut(dec.decode(b, { stream: true }), false); return b.length; } });
+      py.setStdout({ write: (b) => { const c = this.cur; if (c) { if (c._cut) throw new Error('PA_OUTPUT_LIMIT'); c._n = (c._n || 0) + b.length; const mx = c.maxOut == null ? (CONFIG.MAX_OUTPUT_CHARS || 1000000) : c.maxOut; if (mx && c._n > mx) { c._cut = true; throw new Error('PA_OUTPUT_LIMIT'); } if (c.onOut) c.onOut(dec.decode(b, { stream: true }), false); } return b.length; } });
       py.setStderr({ write: (b) => { if (this.cur && this.cur.onOut) this.cur.onOut(dec.decode(b, { stream: true }), true); return b.length; } });
       py.setStdin({ stdin: () => this.inputIdx < this.inputLines.length ? this.inputLines[this.inputIdx++] + '\n' : null, autoEOF: false, isatty: false });
-      py.runPython(PY_PRELUDE); this.py = py; this.ready = true; this.phase = 'ready'; this.progress = 100; this._emit(); this._next();
+      py.runPython(PY_PRELUDE); try { py.runPython('import sys\ntry:\n    sys.stdout.reconfigure(line_buffering=True); sys.stderr.reconfigure(line_buffering=True)\nexcept Exception: pass'); } catch (e) {} this.py = py; this.ready = true; this.phase = 'ready'; this.progress = 100; this._emit(); this._next();
     } catch (e) { this.failed = true; this.error = String(e && e.message || e); this.phase = 'error'; this._emit(); this.main = false; }
     finally { console.warn = quiet.warn; console.error = quiet.error; }
   },
@@ -284,12 +290,13 @@ const Py = {
       else {
         this.cur = job; this.inputLines = (job.input || '').replace(/\r/g, '').split('\n'); if (this.inputLines.length && this.inputLines[this.inputLines.length - 1] === '') this.inputLines.pop(); this.inputIdx = 0;
         try { /* QA 1103: 지우기 → 쓰기 순서(워커와 같게) */ for (const n of (job.outFiles || [])) { try { this.py.FS.unlink(n); } catch (e) {} } for (const f of (job.files || [])) { try { this.py.FS.writeFile(f.name, f.text || '', { encoding: 'utf8' }); } catch (e) {} } const t0 = Date.now(); const fn = this.py.globals.get('__pa_run'); const r = fn(job.code, job.call || null, !!job.trace, job.maxsteps || CONFIG.TRACE_MAX_STEPS, job.vis ? JSON.stringify(job.vis) : null); result = JSON.parse(r); result.ms = Date.now() - t0; fn.destroy && fn.destroy(); if (job.outFiles && job.outFiles.length) { result.outFiles = {}; for (const n of job.outFiles) { try { result.outFiles[n] = this.py.FS.readFile(n, { encoding: 'utf8' }); } catch (e) {} } } } catch (e) { result = { ok: false, ename: 'InternalError', emsg: String(e && e.message || e) }; }
-        result.inputUsed = this.inputIdx; this.cur = null;
+        result.inputUsed = this.inputIdx; if (job._cut) result = { ...result, ok: false, outputLimit: true, ename: 'OutputLimit', emsg: '출력이 너무 많아서 멈췄어요' }; this.cur = null;
       }
       delete this.pending[id]; this.busy = false; job.resolve(result); this._next();
     }, 0);
   },
-  restart() { if (this.worker) { try { this.worker.terminate(); } catch (e) {} } this.worker = null; this.ready = false; this.busy = false; Object.values(this.pending).forEach(p => { clearTimeout(p.timer); p.resolve({ ok: false, ename: 'Timeout', emsg: T.timeout, timeout: true }); }); this.pending = {}; this.start(); },
+  stop() { /* QA #123: ⏹ 멈추기 — 지금 실행을 끊고 엔진을 다시 켜요(무한루프 5초를 기다리지 않게) */ if (this.main) return false; /* QA #152: 워커 없는 실행기는 끊을 수 없음(restart 하면 영구 정지) */ if (!this.busy) return false; const ids = Object.keys(this.pending); ids.forEach(id => { const p = this.pending[id]; if (p) p._stopped = true; }); this.restart(); return true; },
+  restart() { if (this.worker) { try { this.worker.terminate(); } catch (e) {} } this.worker = null; this.ready = false; this.busy = false; Object.values(this.pending).forEach(p => { clearTimeout(p.timer); p.resolve(p._stopped ? { ok: false, ename: '멈춤', emsg: '직접 멈췄어요', stopped: true, timeout: true } : { ok: false, ename: 'Timeout', emsg: T.timeout, timeout: true }); }); this.pending = {}; this.start(); },
   _next() {
     if (!this.ready || this.busy || !this.queue.length) return;
     const job = this.queue.shift(); this.busy = true;
@@ -297,7 +304,7 @@ const Py = {
     if (this.main) return this._runMain(id, job);
     if (job.kind === 'run') {
       job.timer = setTimeout(() => { if (this.pending[id]) { delete this.pending[id]; job.resolve({ ok: false, ename: 'Timeout', emsg: T.timeout, timeout: true, ms: job.timeoutMs || CONFIG.RUN_TIMEOUT_MS }); this.restart(); } }, job.timeoutMs || CONFIG.RUN_TIMEOUT_MS);
-      this.worker.postMessage({ type: 'run', id, code: job.code, input: job.input, call: job.call, trace: job.trace, maxsteps: job.maxsteps || CONFIG.TRACE_MAX_STEPS, vis: job.vis ? JSON.stringify(job.vis) : null, files: job.files || null, outFiles: job.outFiles || null });
+      this.worker.postMessage({ type: 'run', id, code: job.code, input: job.input, call: job.call, trace: job.trace, maxsteps: job.maxsteps || CONFIG.TRACE_MAX_STEPS, vis: job.vis ? JSON.stringify(job.vis) : null, files: job.files || null, outFiles: job.outFiles || null, maxOut: job.maxOut });
     } else { this.worker.postMessage({ type: 'compile', id, code: job.code }); }
   },
   // 보이지 않는 문자 정리 (v2.2.16): 모바일 키보드가 넣는 NBSP·전각 기호(：（）“”)·제로폭 문자·탭 때문에 생기는 SyntaxError 를 막는다.
@@ -317,9 +324,9 @@ const Py = {
       out += ch; }
     return { code: out, changes: [...changes] };
   },
-  run({ code, input = '', call = null, trace = false, onOut = null, vis = null, maxsteps = null, timeoutMs = null, files = null, outFiles = null }) {
+  run({ code, input = '', call = null, trace = false, onOut = null, vis = null, maxsteps = null, timeoutMs = null, files = null, outFiles = null, maxOut = null }) {
     const nz = this.normalize(code); code = nz.code;
-    return new Promise(resolve => { this.queue.push({ kind: 'run', code, input, call, trace, onOut, vis, maxsteps, timeoutMs, files, outFiles, resolve: (r) => { if (r && nz.changes.length) r.normalized = nz.changes; resolve(r); } }); if (!this.worker && !this.main) this.start(); this._next(); });
+    return new Promise(resolve => { this.queue.push({ kind: 'run', code, input, call, trace, onOut, vis, maxsteps, timeoutMs, files, outFiles, maxOut, resolve: (r) => { if (r && nz.changes.length) r.normalized = nz.changes; resolve(r); } }); if (!this.worker && !this.main) this.start(); this._next(); });
   },
   // 기기 속도 보정: 같은 작업을 한 번 돌려 기준 시간과 비교 (알고리즘 코스 시간 제한 채점에 곱함). 1회만.
   speedFactor: 1, benched: false,
@@ -345,7 +352,9 @@ const Py = {
   },
   explain(result) { // 에러 → 한국어 한 줄
     if (!result || result.ok) return '';
+    if (result.stopped) return '⏹ 멈추기를 눌러 실행을 멈췄어요.';
     if (result.timeout) return T.timeout;
+    if (result.outputLimit) return '출력이 너무 많아서 멈췄어요. 반복이 끝나지 않고 계속 print 하는 건 아닌지(while 조건, 반복 안에서 값을 바꾸는지) 확인해 보세요.';
     if (result.ename === 'EOFError') return T.needInput((result.inputUsed || 0) + 1);
     if (result.ename === 'IndentationError' || result.ename === 'TabError') { const m = result.emsg || ''; const ln = result.line ? `${result.line}번 줄` : '이 줄'; if (/expected an indented block/.test(m)) return `${ln}은 위 줄(콜론 :으로 끝난 줄)보다 안쪽에 있어야 해요. 앞에 공백 4칸을 넣으세요.`; if (/unexpected indent/.test(m)) return `${ln}은 위 줄과 같은 칸에서 시작해야 해요. 앞의 공백을 지우세요.`; if (/unindent does not match/.test(m)) return `${ln}의 들여쓰기 칸수가 위 묶음과 맞지 않아요. 같은 묶음은 같은 칸수여야 해요.`; }
     return ERROR_HINTS[result.ename] || '에러가 났어요. 메시지를 읽어 보세요.';

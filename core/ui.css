@@ -282,10 +282,24 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 .typing .ty-ch{margin:10px 0;padding:10px 12px}.ty-row{display:flex;align-items:center;gap:10px;padding:6px 2px;cursor:pointer}.ty-row input{width:20px;height:20px;flex:none}.ty-row span{flex:1}.ty-chrow{border-bottom:1px solid var(--border);margin-bottom:4px}
 .ty-note{border-left:4px solid var(--primary);padding:10px 12px;margin:8px 0}
 /* QA 1103: 긴 <code> 가 white-space:nowrap 이라 폰 폭을 넘던 것 — 넘칠 때만 줄바꿈 */
-.pv-prompt code,.lp-html code,.quiz code,.tutor-panel code,.result code{white-space:normal;overflow-wrap:anywhere;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.pv-prompt code,.lp-html code,.quiz code,.tutor-panel code,.result code{white-space:pre-wrap;overflow-wrap:anywhere;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 /* QA 1103(L12P4): 줄 맞추기 조각의 긴 줄(students = [{…}, …])이 1280px 화면도 넘던 것 — 들여쓰기는 지키고 넘칠 때만 줄바꿈 */
 .pz-tile code{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
 /* QA 6회전(알고 A10P2·A12P2·A13P2): 추적 퀴즈 코드(pre)의 긴 줄이 폰 화면 전체를 넓히던 것 — 상자 안에서만 가로 스크롤 */
 .quiz-code{max-width:100%;overflow-x:auto}.pv-desc,.pv-work{min-width:0}
 /* QA 6회전: <p>로 시작·끝나는 지문(71문제)의 위아래 빈 줄 — 상자 안 첫·마지막 문단 바깥 여백 없앰 */
 .pv-prompt>p:first-child{margin-top:0}.pv-prompt>p:last-child{margin-bottom:0}
+/* 🧠 복습 미리보기·왜 나왔나·끝 요약 (사용자 요청 11/4) */
+.rv-plan .rv-head{font-size:1.05em;margin-bottom:4px}.rv-list{margin:10px 0;padding-left:1.4em;display:flex;flex-direction:column;gap:10px}.rv-list li{line-height:1.45}
+.rv-why{display:flex;flex-direction:column;gap:2px;font-size:.9em;color:var(--muted);margin-top:2px}.rv-why.rv-in{background:var(--surface);border:1px dashed var(--primary);border-radius:10px;padding:8px 12px;margin:0 0 8px;color:var(--text)}.rv-why.rv-in b{margin-bottom:2px}
+.rv-sum{display:flex;flex-direction:column;gap:6px;margin:10px 0}.rv-row{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.rv-row .ok{color:var(--accent)}.rv-row .warn{color:var(--gold)}.rv-weak{margin-top:8px}.rv-weak .chip{margin:2px}
+/* QA #117(사용자 제보 11/4): 레슨 설명 안의 코드·출력 상자(<pre>)가 글과 구분이 안 되던 것 — 지문 상자와 같은 모양(세 코스 레슨 12곳) */
+.lp-html pre{background:var(--ed-bg);color:var(--ed-fg);padding:8px 12px;border-radius:8px;margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--mono)}
+.lp-more{margin:10px 0 2px;border:1px dashed var(--border);border-radius:8px;padding:6px 12px}.lp-more summary{cursor:pointer;color:var(--muted);font-weight:700}.lp-more[open] summary{margin-bottom:4px}
+/* QA #122(사용자 제보 11/4): 줄 앞 공백을 한 칸마다 점으로 — 4칸인지 3·5칸인지 바로 보이게. 4의 배수가 아니면 빨간 바탕 */
+.cm-lead{background-image:radial-gradient(circle at 50% 55%,rgba(128,128,128,.7) 0 1.3px,transparent 1.8px);background-size:1ch 100%;background-repeat:repeat-x}.cm-lead-odd{background-color:rgba(255,93,108,.22)}
+.ted-fb{position:relative}.ted-ind{position:absolute;right:8px;bottom:4px;font-size:.75em;color:var(--muted);pointer-events:none;background:var(--ed-bg);padding:0 4px;border-radius:4px}.ted-ind.odd{color:var(--danger)}
+/* QA #120: 세션 중 레슨 설명 창 */
+.lpk-nav{display:flex;gap:6px;align-items:center;margin-bottom:8px}.lpk-nav select{flex:1;min-width:0;padding:6px;border-radius:8px;background:var(--surface2);color:var(--text);border:1px solid var(--border)}.lpk-page{max-height:60vh;overflow:auto}.lpk-page h3{margin:4px 0 8px}
+/* QA #123: 실행 중 멈추기 버튼 */
+.pv-stop{margin:4px 0;border-color:var(--danger);color:var(--danger)}

@@ -2,17 +2,17 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.3.18',
+  APP_VERSION: '2.3.19',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
-  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+([PD]\\d+)?$', algo: '^(A|AB|E)\\d+(P\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$' },
+  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+([PD]\\d+)?$', algo: '^(A|AB|E)\\d+([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
     { id: 'python', name: '파이썬', icon: '🐍', desc: '블록에서 텍스트까지, 브라우저에서 진짜 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 148, lessons: 36 },
     { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '코드가 돌아가는 모습을 눈으로 보며, 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 145, lessons: 32, requires: { course: 'python', boss: 'B3', label: '파이썬 챕터 3까지 끝내면 열려요' } },
     { id: 'terminal-git', name: '터미널·Git', icon: '🎧', desc: '검은 창이 무섭지 않게. 가상 터미널과 Git 시뮬레이터', phase: 2 },
     { id: 'sql', name: '데이터베이스(SQL)', icon: '🗄️', desc: '동네 카페 데이터로 배우는 진짜 SQLite', phase: 3 },
-    { id: 'math', name: '수학 공간', icon: '📐', desc: '프로그래머 수학 — 그림을 만지며 배우고, 계산은 파이썬이', path: 'courses/math/', color: '#e91e63', ready: true, total: 152, lessons: 38, space: true, map: 'graph', hubLabel: '언제든 들어와도 돼요' },
+    { id: 'math', name: '수학 공간', icon: '📐', desc: '프로그래머 수학 — 그림을 만지며 배우고, 계산은 파이썬이', path: 'courses/math/', color: '#e91e63', ready: true, total: 180, lessons: 45, space: true, map: 'graph', hubLabel: '언제든 들어와도 돼요' },
     { id: 'web', name: '웹·HTTP·API', icon: '🌐', desc: '내가 만든 걸 남에게 보여주려면', requires: { course: 'python', boss: 'B2', label: '파이썬 챕터 2까지 끝내면 열려요' }, phase: 4 },
   ],
 
@@ -38,6 +38,7 @@ const CONFIG = {
   // --- 실행 ---
   RUN_TIMEOUT_MS: 5000,
   MAX_OUTPUT_LINES: 2000,
+  MAX_OUTPUT_CHARS: 1000000,               // 한 번 실행 출력 상한(글자) — 넘으면 멈춤(QA #123 무한 출력 대비). 큰 입력 만들기·정답 기대값 계산은 상한 없음
   TRACE_MAX_STEPS: 500,
   PROJECT_EXTRA_XP: 10, // 실전 프로젝트 「더 만들어 보기」 항목당 (채점 없음, 한 번만)
   ALGO: { traceMaxSteps: 5000, slowdown: 3, benchBaselineMs: 350, mockMinutes: 60, mockCount: 3, mockBonusXp: 150 }, // 알고리즘 코스: 시각화 추적 단계, Pyodide/CPython 배율, 기기 벤치 기준(ms), 모의고사
@@ -62,6 +63,7 @@ const CONFIG = {
   DAILY_GOAL_BONUS: 30,
   REVIEW_BONUS: 20,                       // 복습 3개 완료 보너스
   REVIEW_INTERVALS: [1, 3, 7, 14, 30],    // 일
+  REVIEW_SIZE: 5,                         // 복습 한 번에 고르는 문제 수 (Review.plan)
   PLAYGROUND_XP: 5, PLAYGROUND_XP_DAILY_MAX: 50,
   BOSS_XP_RATIO: 0.5,
   DAILY_CHALLENGE_MULT: 2,
