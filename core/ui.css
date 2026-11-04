@@ -295,3 +295,4 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 .rv-sum{display:flex;flex-direction:column;gap:6px;margin:10px 0}.rv-row{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.rv-row .ok{color:var(--accent)}.rv-row .warn{color:var(--gold)}.rv-weak{margin-top:8px}.rv-weak .chip{margin:2px}
 /* QA #117(사용자 제보 11/4): 레슨 설명 안의 코드·출력 상자(<pre>)가 글과 구분이 안 되던 것 — 지문 상자와 같은 모양(세 코스 레슨 12곳) */
 .lp-html pre{background:var(--ed-bg);color:var(--ed-fg);padding:8px 12px;border-radius:8px;margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--mono)}
+.lp-more{margin:10px 0 2px;border:1px dashed var(--border);border-radius:8px;padding:6px 12px}.lp-more summary{cursor:pointer;color:var(--muted);font-weight:700}.lp-more[open] summary{margin-bottom:4px}
