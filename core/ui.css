@@ -296,3 +296,8 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 /* QA #117(사용자 제보 11/4): 레슨 설명 안의 코드·출력 상자(<pre>)가 글과 구분이 안 되던 것 — 지문 상자와 같은 모양(세 코스 레슨 12곳) */
 .lp-html pre{background:var(--ed-bg);color:var(--ed-fg);padding:8px 12px;border-radius:8px;margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--mono)}
 .lp-more{margin:10px 0 2px;border:1px dashed var(--border);border-radius:8px;padding:6px 12px}.lp-more summary{cursor:pointer;color:var(--muted);font-weight:700}.lp-more[open] summary{margin-bottom:4px}
+/* QA #122(사용자 제보 11/4): 줄 앞 공백을 한 칸마다 점으로 — 4칸인지 3·5칸인지 바로 보이게. 4의 배수가 아니면 빨간 바탕 */
+.cm-lead{background-image:radial-gradient(circle at 50% 55%,rgba(128,128,128,.7) 0 1.3px,transparent 1.8px);background-size:1ch 100%;background-repeat:repeat-x}.cm-lead-odd{background-color:rgba(255,93,108,.22)}
+.ted-fb{position:relative}.ted-ind{position:absolute;right:8px;bottom:4px;font-size:.75em;color:var(--muted);pointer-events:none;background:var(--ed-bg);padding:0 4px;border-radius:4px}.ted-ind.odd{color:var(--danger)}
+/* QA #120: 세션 중 레슨 설명 창 */
+.lpk-nav{display:flex;gap:6px;align-items:center;margin-bottom:8px}.lpk-nav select{flex:1;min-width:0;padding:6px;border-radius:8px;background:var(--surface2);color:var(--text);border:1px solid var(--border)}.lpk-page{max-height:60vh;overflow:auto}.lpk-page h3{margin:4px 0 8px}

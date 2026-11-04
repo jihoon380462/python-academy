@@ -235,7 +235,7 @@ Views.problem = (root, params) => {
     $$('.pv-tabs button', root).forEach(b => b.onclick = () => { $$('.pv-tabs button', root).forEach(x => x.classList.remove('on')); b.classList.add('on'); root.querySelector('.pv').dataset.tab = b.dataset.t; });
     if (instant && UI.isMobile()) { const w = $('.pv-work', root), pr = $('.pv-prompt', root); if (w && pr) pr.insertAdjacentElement('afterend', w); } // 즉시 채점형: 보기를 지문 바로 아래에
     const bd = $('#briefDesc', root); if (bd) bd.onclick = () => { const tb = $('.pv-tabs button[data-t=desc]', root); if (tb) tb.click(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
-    $('#btnLesson').onclick = () => UI.go('lesson', { lessonId: base.lesson, page: 0 }); const pp = $('#btnPrevP'); if (pp) pp.onclick = () => UI.go('problem', { pid: probs[idx - 1].id, lessonId: base.lesson }); const np = $('#btnNextP'); if (np) np.onclick = () => UI.go('problem', { pid: probs[idx + 1].id, lessonId: base.lesson });
+    $('#btnLesson').onclick = () => (session || fresh) ? UI.lessonPeek(base.lesson) : UI.go('lesson', { lessonId: base.lesson, page: 0 }); /* QA #120(사용자 제보 11/4): 백문이불여일타·복습·도전 중에는 레슨으로 떠나지 않고 창으로 — 닫으면 그 문제·친 코드 그대로 */ const pp = $('#btnPrevP'); if (pp) pp.onclick = () => UI.go('problem', { pid: probs[idx - 1].id, lessonId: base.lesson }); const np = $('#btnNextP'); if (np) np.onclick = () => UI.go('problem', { pid: probs[idx + 1].id, lessonId: base.lesson });
     $('#btnResetP').onclick = async () => { if (!await UI.confirm('이 문제의 별점·힌트·저장된 코드를 지우고 처음부터 풀까요? (XP는 그대로예요)', '초기화')) return; Store.resetProblem(pid); UI.go('problem', { pid, lessonId: base.lesson }, false); };
     $$('[data-mock]', root).forEach(b => b.onclick = () => { saveCode(); session.goto(+b.dataset.mock); }); const me = $('#mockEnd'); if (me) me.onclick = async () => { if (!await UI.confirm('지금 끝낼까요? 남은 문제는 틀린 것으로 처리돼요.', '끝내기')) return; saveCode(); Sessions.finish(session); };
     $('#btnFocus').onclick = () => { Store.data.settings.focus = !focus; Store.save(); Audio.click(); render(); };
@@ -340,3 +340,10 @@ Views.problem = (root, params) => {
   render();
   return { destroy() { document.removeEventListener('keydown', keyHandler); saveCode(); st.editor && st.editor.destroy(); st.blockEd && st.blockEd.destroy(); if (st.stopTurtle) st.stopTurtle(); if (st.fig) st.fig.destroy(); if (st.num && st.num.fig) st.num.fig.destroy(); if (st.num && st.num.editor) st.num.editor.destroy(); if (st.match && st.match.fig) st.match.fig.destroy(); } };
 };
+
+/* QA #120: 레슨 설명을 창으로 보기(세션 중) — 쪽 목록·이전/다음, 예제는 코드 상자로(실행은 레슨 화면에서) */
+UI.lessonPeek = (lessonId, start = 0) => { const l = Content.lesson(lessonId); const pages = (l && l.pages) || []; if (!pages.length) { UI.toast('이 레슨은 설명 쪽이 없어요'); return; } let i = Math.min(start, pages.length - 1);
+  UI.modal({ title: `📖 ${esc(l.title)}`, wide: true, body: '<div id="lpkBody"></div>', buttons: [{ label: '✕ 닫고 문제로', cls: 'primary' }], onOpen: (ov) => { const host = $('#lpkBody', ov); const render = () => { const pg = pages[i];
+    host.innerHTML = `<div class="lpk-nav"><button class="btn sm" id="lpkPrev" ${i ? '' : 'disabled'}>◀</button><select id="lpkSel">${pages.map((p, k) => `<option value="${k}" ${k === i ? 'selected' : ''}>${k + 1}. ${esc(p.title)}</option>`).join('')}</select><button class="btn sm" id="lpkNext" ${i < pages.length - 1 ? '' : 'disabled'}>▶</button></div><div class="lp-html lpk-page"><h3>${esc(pg.title)}</h3>${UI.terms(pg.html)}${pg.example ? `<div class="lbl">따라 하기 코드</div><pre class="code">${esc(pg.example.code)}</pre>` : ''}</div>`;
+    UI.bindTerms(host); $('#lpkPrev', host).onclick = () => { if (i > 0) { i--; render(); } }; $('#lpkNext', host).onclick = () => { if (i < pages.length - 1) { i++; render(); } }; $('#lpkSel', host).onchange = (e) => { i = +e.target.value; render(); }; };
+    render(); } }); };
