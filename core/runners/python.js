@@ -359,6 +359,7 @@ const Py = {
     if (result.outputLimit) return '출력이 너무 많아서 멈췄어요. 반복이 끝나지 않고 계속 print 하는 건 아닌지(while 조건, 반복 안에서 값을 바꾸는지) 확인해 보세요.';
     if (result.ename === 'EOFError') return T.needInput((result.inputUsed || 0) + 1);
     if (result.ename === 'IndentationError' || result.ename === 'TabError') { const m = result.emsg || ''; const ln = result.line ? `${result.line}번 줄` : '이 줄'; if (/expected an indented block/.test(m)) return `${ln}은 위 줄(콜론 :으로 끝난 줄)보다 안쪽에 있어야 해요. 앞에 공백 4칸을 넣으세요.`; if (/unexpected indent/.test(m)) return `${ln}은 위 줄과 같은 칸에서 시작해야 해요. 앞의 공백을 지우세요.`; if (/unindent does not match/.test(m)) return `${ln}의 들여쓰기 칸수가 위 묶음과 맞지 않아요. 같은 묶음은 같은 칸수여야 해요.`; }
+    if (result.ename === 'NameError') { const m = /name '([A-Za-z_]\w*)' is not defined/.exec(result.emsg || ''); if (m) { const n = m[1]; return /^[A-Z]/.test(n) ? `${n} 라는 이름이 아직 없어요. 만들어야 하는 클래스라면 class ${n}: 로 먼저 만들었는지, 이름 오타는 없는지 확인하세요.` : `${n} 라는 이름이 아직 없어요. 함수라면 def ${n}(...): 로 먼저 만들었는지, 변수라면 값을 먼저 넣었는지·오타인지, 글자라면 따옴표를 빠뜨렸는지 확인하세요.`; } } /* PR#94 P1-13 */
     return ERROR_HINTS[result.ename] || '에러가 났어요. 메시지를 읽어 보세요.';
   },
 };
