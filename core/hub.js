@@ -5,8 +5,8 @@ const Hub = {
   // 코스 진행 요약. 지금은 파이썬 콘텐츠만 로드되어 있으므로 다른 코스는 저장 조각의 문제 수로만 계산
   progress(c) {
     const cd = Store.courseData(c.id); const probs = cd.problems || {};
-    if (c.id === Store.course) { const total = PROBLEMS.length; const cleared = PROBLEMS.filter(p => (probs[p.id] || {}).status === 'clear').length; const stars = PROBLEMS.reduce((s, p) => s + ((probs[p.id] || {}).stars || 0), 0); return { total, cleared, stars, maxStars: total * 3, pct: total ? Math.round(100 * cleared / total) : 0, mins: Math.round((total - cleared) * CONFIG.HUB.minutesPerProblem) }; }
-    const ids = Object.keys(probs); const cleared = ids.filter(id => probs[id].status === 'clear').length; const stars = ids.reduce((s, id) => s + (probs[id].stars || 0), 0); const total = c.total || 0; return { total, cleared, stars, maxStars: total * 3, pct: total ? Math.round(100 * cleared / total) : 0, mins: Math.round(Math.max(0, total - cleared) * CONFIG.HUB.minutesPerProblem) };
+    if (c.id === Store.course) { const total = PROBLEMS.length; const cleared = PROBLEMS.filter(p => (probs[p.id] || {}).status === 'clear').length; const stars = PROBLEMS.reduce((s, p) => s + ((probs[p.id] || {}).stars || 0), 0); return { total, cleared, stars, maxStars: total * 3, pct: total ? Math.round(100 * cleared / total) : 0 }; }
+    const ids = Object.keys(probs); const cleared = ids.filter(id => probs[id].status === 'clear').length; const stars = ids.reduce((s, id) => s + (probs[id].stars || 0), 0); const total = c.total || 0; return { total, cleared, stars, maxStars: total * 3, pct: total ? Math.round(100 * cleared / total) : 0 };
   },
   // 복습 큐를 코스 공통으로(v2.2.4, NEXT.md F1): 각 코스 저장 조각의 problems[].review.due 만 보면 되므로 콘텐츠가 없어도 셀 수 있다
   reviewDue() { const today = todayKey(); return CONFIG.COURSES.filter(c => c.ready).map(c => { const probs = Store.courseData(c.id).problems || {}; const n = Object.values(probs).filter(r => r && r.status === 'clear' && r.review && r.review.due <= today).length; return { c, n }; }).filter(x => x.n); },
@@ -40,7 +40,7 @@ const Hub = {
   courseCard(c) {
     const pr = this.progress(c); const ready = !!c.ready; const locked = ready && this.locked(c);
     const body = ready
-      ? `<div class="hc-body">${this.ring(pr.pct, c.color || 'var(--primary)')}<div class="hc-txt"><div class="hc-sub">${pr.cleared}/${pr.total} 문제 · ★ ${pr.stars}/${pr.maxStars}</div><div class="hc-sub muted">${pr.cleared >= pr.total ? '완주! 🎉' : `남은 시간 약 ${pr.mins >= 60 ? Math.round(pr.mins / 60) + '시간' : pr.mins + '분'}`}</div></div></div>`
+      ? `<div class="hc-body">${this.ring(pr.pct, c.color || 'var(--primary)')}<div class="hc-txt"><div class="hc-sub">${pr.cleared}/${pr.total} 문제 · ★ ${pr.stars}/${pr.maxStars}</div><div class="hc-sub muted">${pr.cleared >= pr.total ? '완주! 🎉' : `남은 문제 ${pr.total - pr.cleared}개`}</div></div></div>`
       : `<div class="hc-body"><div class="hc-soon">🚧 준비 중 <small>(Phase ${c.phase})</small></div>${c.requires ? `<div class="hc-sub muted">🔒 ${esc(c.requires.label)}</div>` : ''}</div>`;
     const lockNote = locked ? `<div class="hc-sub muted">🔒 ${esc(c.requires.label)} <span class="small">(설정에서 "전제 무시" 가능)</span></div>` : '';
     const inner = `<div class="hc-head">${UI.img(`course-${c.id}.png`, c.icon, 'hc-icon')}<span class="hc-name">${esc(c.name)}</span>${locked ? '<span class="chip">🔒</span>' : ''}${c.space ? '<span class="chip">공간</span>' : ''}</div><div class="hc-desc muted small">${esc(c.desc)}${c.hubLabel ? ` · ${esc(c.hubLabel)}` : ''}</div>${body}${lockNote}`;

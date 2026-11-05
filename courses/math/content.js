@@ -34,7 +34,7 @@ const ALREADY_USING = [
 
 const LESSONS = [
 // =============== 영역 1 수와 컴퓨터 ===============
-{ id: 'M1_mod', ch: 1, n: 1, title: '나눠서 남는 것', subtitle: '나머지 연산 (%)', level: '고1', stars: 1, prereq: [], uses: ['game', 'algo'], icon: '🕐', minutes: 15, mode: 'text',
+{ id: 'M1_mod', ch: 1, n: 1, title: '나눠서 남는 것', subtitle: '나머지 연산 (%)', level: '고1', stars: 1, prereq: [], uses: ['game', 'algo'], icon: '🕐', mode: 'text',
   params: [{ id: 'n', label: 'n', min: 0, max: 60, step: 1, default: 23 }, { id: 'm', label: '나눔 수 m', min: 2, max: 12, step: 1, default: 12 }],
   terms: {},
   pages: [
@@ -48,7 +48,7 @@ const LESSONS = [
       example: { code: 'n = 17\nm = 5\nq = 0\nr = n\nwhile r >= m:\n    r -= m   # 한 바퀴(m)를 빼요\n    q += 1\n    print("빼기", q, "번째 → 남은 것", r)\nprint("몫", q, "나머지", r, "| 파이썬:", n // m, n % m)\ndays = ["월", "화", "수", "목", "금", "토", "일"]\ntoday = 2   # 수요일\nfor k in [1, 5, 10, 100]:\n    print(k, "일 뒤:", days[(today + k) % 7])', trace: true } },
   ],
   summary: ['n % m = 원형 칸에서 멈춘 자리 (0 ~ m-1)', 'n == m * (n // m) + n % m', '한 바퀴 돌아 처음으로 = 시계·요일·원형 배열·해시'] },
-{ id: 'M1_prime', ch: 1, n: 2, title: '더 나눌 수 없는 수', subtitle: '소수와 에라토스테네스의 체', level: '고1', stars: 2, prereq: ['M1_mod'], uses: ['algo'], icon: '🧱', minutes: 15, mode: 'text',
+{ id: 'M1_prime', ch: 1, n: 2, title: '더 나눌 수 없는 수', subtitle: '소수와 에라토스테네스의 체', level: '고1', stars: 2, prereq: ['M1_mod'], uses: ['algo'], icon: '🧱', mode: 'text',
   params: [{ id: 'N', label: '범위 N', min: 10, max: 120, step: 10, default: 50 }],
   terms: {},
   pages: [
@@ -62,7 +62,7 @@ const LESSONS = [
       example: { code: 'n = 91\nis_p = n >= 2\nfor d in range(2, int(n ** 0.5) + 1):\n    print(n, "%", d, "=", n % d)\n    if n % d == 0:\n        is_p = False\n        break\nprint(n, "→", "소수" if is_p else "소수 아님")\nprint(int(91 ** 0.5), list(range(2, int(91 ** 0.5) + 1)))\nprint(all(89 % d for d in range(2, int(89 ** 0.5) + 1)))', trace: true } },
   ],
   summary: ['소수 = 2 이상, 1과 자기 자신만 약수', '하나 확인은 √n 까지, 전부 찾기는 체', '체: 남은 가장 작은 수는 소수, 그 배수를 지운다'] },
-{ id: 'M1_gcd', ch: 1, n: 3, title: '공통으로 나누는 수', subtitle: '최대공약수와 유클리드 호제법', level: '고1', stars: 2, prereq: ['M1_prime'], uses: ['algo'], icon: '📐', minutes: 15, mode: 'text',
+{ id: 'M1_gcd', ch: 1, n: 3, title: '공통으로 나누는 수', subtitle: '최대공약수와 유클리드 호제법', level: '고1', stars: 2, prereq: ['M1_prime'], uses: ['algo'], icon: '📐', mode: 'text',
   params: [{ id: 'a', label: '가로 a', min: 1, max: 40, step: 1, default: 24 }, { id: 'b', label: '세로 b', min: 1, max: 30, step: 1, default: 18 }],
   terms: {},
   pages: [
@@ -76,7 +76,7 @@ const LESSONS = [
       example: { code: 'import math\na = 30\nb = 18\nx, y = a, b\nstep = 1\nwhile y:\n    print(step, "단계:", x, "%", y, "=", x % y, "→ 다음", y, x % y)\n    x, y = y, x % y\n    step += 1\nprint("gcd =", x, "| lcm =", a * b // x)\nprint("약분:", a, "/", b, "=", a // x, "/", b // x)\nprint("6분·8분 버스가 다시 같이:", 6 * 8 // math.gcd(6, 8), "분 뒤")', trace: true } },
   ],
   summary: ['gcd(a, b) = gcd(b, a % b), 나머지 0이면 끝', '직사각형을 정사각형으로 잘라 가면 마지막 한 변', 'lcm = a*b // gcd, 파이썬 math.gcd'] },
-{ id: 'M1_binary', ch: 1, n: 4, title: '0과 1로 세기', subtitle: '2진법·16진법과 비트', level: '고1', stars: 1, prereq: ['M1_mod'], uses: ['algo', 'game'], icon: '💡', minutes: 15, mode: 'text',
+{ id: 'M1_binary', ch: 1, n: 4, title: '0과 1로 세기', subtitle: '2진법·16진법과 비트', level: '고1', stars: 1, prereq: ['M1_mod'], uses: ['algo', 'game'], icon: '💡', mode: 'text',
   params: [{ id: 'v', label: '값 v', min: 0, max: 255, step: 1, default: 37 }],
   terms: {},
   pages: [
@@ -90,7 +90,7 @@ const LESSONS = [
       example: { code: 'v = 37\nx = v\ndigits = []\nwhile x > 0:\n    print(x, "÷ 2 = 몫", x // 2, "나머지", x % 2)\n    digits.append(str(x % 2))\n    x //= 2\nprint("모은 순서", digits)\nprint("거꾸로 읽기", "".join(reversed(digits)) or "0")\ns = "1101"\ntotal = 0\nfor i, ch in enumerate(reversed(s)):\n    if ch == "1":\n        total += 2 ** i\n        print("오른쪽", i, "번 자리 켜짐 → +", 2 ** i)\nprint(s, "=", total, int(s, 2))', trace: true } },
   ],
   summary: ['자리값 1, 2, 4, 8, … 켜진 자리를 더한다', '2로 나눈 나머지를 모으면 2진수 (bin, int(s, 2))', '<< 1 은 ×2, >> 1 은 //2'] },
-{ id: 'M1_float', ch: 1, n: 5, title: '컴퓨터가 소수를 못 담는 이유', subtitle: '부동소수점과 오차', level: '고1', stars: 2, prereq: ['M1_binary'], uses: ['data', 'game'], icon: '🫧', minutes: 15, mode: 'text',
+{ id: 'M1_float', ch: 1, n: 5, title: '컴퓨터가 소수를 못 담는 이유', subtitle: '부동소수점과 오차', level: '고1', stars: 2, prereq: ['M1_binary'], uses: ['data', 'game'], icon: '🫧', mode: 'text',
   params: [{ id: 'c', label: '보는 위치 c', min: 1, max: 1000, step: 1, default: 1 }, { id: 'bits', label: '가수 비트', min: 3, max: 8, step: 1, default: 4 }],
   terms: { '가수': '부동소수점에서 유효 숫자 부분. 비트가 많을수록 점이 촘촘' },
   pages: [
@@ -104,7 +104,7 @@ const LESSONS = [
       example: { code: 'total = 0.0\nfor k in range(1, 11):\n    total += 0.1\n    print(k, "번:", total, total == k / 10)\nimport math\nprint(math.isclose(total, 1.0), abs(total - 1.0) < 1e-9)\nbits = 3\nfor e in range(0, 4):\n    print("구간", 2 ** e, "~", 2 ** (e + 1), "간격", 2 ** (e - bits))', trace: true } },
   ],
   summary: ['float는 수직선의 점 몇 개 — 사이 값은 반올림', '큰 수일수록 간격이 넓다(2^(e-52))', '0.1은 2진 무한소수. 비교는 isclose, 돈은 정수·decimal'] },
-{ id: 'M1_power', ch: 1, n: 6, title: '곱하기를 반복하면', subtitle: '거듭제곱과 지수적 증가', level: '고2', stars: 1, prereq: [], uses: ['algo', 'data'], icon: '🚀', minutes: 15, mode: 'text',
+{ id: 'M1_power', ch: 1, n: 6, title: '곱하기를 반복하면', subtitle: '거듭제곱과 지수적 증가', level: '고2', stars: 1, prereq: [], uses: ['algo', 'data'], icon: '🚀', mode: 'text',
   params: [{ id: 'a', label: '밑 a', min: 1.1, max: 3, step: 0.1, default: 2 }, { id: 'xmax', label: 'x 범위', min: 5, max: 40, step: 5, default: 10 }],
   terms: {},
   pages: [
@@ -118,7 +118,7 @@ const LESSONS = [
       example: { code: 'count = 1\nday = 0\nwhile count <= 1000:\n    count *= 2\n    day += 1\n    print(day, "일째:", count, "명")\nprint("1000명 돌파:", day, "일")\nprint(2 ** 3 * 2 ** 4, "=", 2 ** 7, "|", (2 ** 3) ** 2, "=", 2 ** 6)', trace: true } },
   ],
   summary: ['a^x = 곱하기 반복, 결국 x²·x를 전부 추월', 'a^m · a^n = a^(m+n), (a^m)^n = a^(mn)', '2^10 ≈ 10^3: 10비트마다 1000배'] },
-{ id: 'M1_log', ch: 1, n: 7, title: '거꾸로 묻기', subtitle: '로그와 "몇 번 반으로 나누나"', level: '고2', stars: 2, prereq: ['M1_power'], uses: ['algo'], icon: '🔍', minutes: 15, mode: 'text',
+{ id: 'M1_log', ch: 1, n: 7, title: '거꾸로 묻기', subtitle: '로그와 "몇 번 반으로 나누나"', level: '고2', stars: 2, prereq: ['M1_power'], uses: ['algo'], icon: '🔍', mode: 'text',
   params: [{ id: 'b', label: '밑 b', min: 2, max: 10, step: 1, default: 2 }, { id: 'xp', label: 'x', min: 0.5, max: 16, step: 0.5, default: 8 }],
   terms: {},
   pages: [
@@ -132,7 +132,7 @@ const LESSONS = [
       example: { code: 'import math\nn = 200\ncount = 0\nwhile n > 1:\n    n //= 2\n    count += 1\n    print(count, "번째:", n)\nprint("반으로", count, "번 → 이진 탐색 최대", count + 1, "번 비교")\nprint("log2(200) =", round(math.log2(200), 2), "| 비트 수", (200).bit_length(), bin(200))', trace: true } },
   ],
   summary: ['log_b x = "b를 몇 번 곱해야 x"', 'b^x 와 log_b x 는 y = x 대칭(역함수)', 'log₂ n = 절반씩 나누는 횟수 = 이진 탐색·비트 수'] },
-{ id: 'M1_seq', ch: 1, n: 8, title: '앞 항으로 다음 항', subtitle: '수열과 점화식', level: '고2', stars: 2, prereq: [], uses: ['game', 'algo'], icon: '🪜', minutes: 15, mode: 'text',
+{ id: 'M1_seq', ch: 1, n: 8, title: '앞 항으로 다음 항', subtitle: '수열과 점화식', level: '고2', stars: 2, prereq: [], uses: ['game', 'algo'], icon: '🪜', mode: 'text',
   params: [{ id: 'a1', label: '초항 a₁', min: 1, max: 10, step: 1, default: 2 }, { id: 'd', label: '공차 d', min: 0, max: 5, step: 1, default: 3 }, { id: 'r', label: '공비 r', min: 1, max: 2, step: 0.1, default: 1.5 }],
   terms: { '점화식': '앞 항으로 다음 항을 정하는 규칙. a_{n+1} = a_n + d' },
   pages: [
@@ -146,7 +146,7 @@ const LESSONS = [
       example: { code: 'a, b = 1, 1   # F1, F2\nprint(1, "번째:", a)\nfor k in range(2, 9):\n    a, b = b, a + b\n    print(k, "번째:", a, "  (다음 준비:", b, ")")\nxp = [30 + 4 * L for L in range(1, 5)]\nprint("레벨 1→5 XP", xp, "합", sum(xp))\nprint("(첫 항 + 끝 항) × 개수 ÷ 2 =", (xp[0] + xp[-1]) * len(xp) // 2)', trace: true } },
   ],
   summary: ['점화식 = 앞 항으로 다음 항 = for 반복문', '등차(더하기)는 직선, 등비(곱하기)는 휘는 곡선', '일반항이 있으면 n번째를 바로 계산'] },
-{ id: 'M1_sigma', ch: 1, n: 9, title: '다 더하기', subtitle: 'Σ 기호와 반복문', level: '고2', stars: 1, prereq: ['M1_seq'], uses: ['data', 'algo'], icon: '🧮', minutes: 12, mode: 'text',
+{ id: 'M1_sigma', ch: 1, n: 9, title: '다 더하기', subtitle: 'Σ 기호와 반복문', level: '고2', stars: 1, prereq: ['M1_seq'], uses: ['data', 'algo'], icon: '🧮', mode: 'text',
   params: [{ id: 'n', label: 'n', min: 1, max: 20, step: 1, default: 8 }],
   terms: {},
   pages: [
@@ -160,7 +160,7 @@ const LESSONS = [
       example: { code: 'n = 4\ntotal = 0\nfor i in range(1, n + 1):\n    total += i * i\n    print("i =", i, "더할 것", i * i, "→ 합", total)\nprint("Σ i² =", total, "| 공식", n * (n + 1) * (2 * n + 1) // 6)\n# 가우스: 1~8 을 앞뒤로 짝지으면\npairs = [(i, 9 - i) for i in range(1, 5)]\nprint(pairs, "→", len(pairs), "쌍 × 9 =", len(pairs) * 9, "=", sum(range(1, 9)))', trace: true } },
   ],
   summary: ['Σ_{i=1}^{n} f(i) = for i in range(1, n+1): total += f(i)', '1+…+n = n(n+1)/2', '합은 나눠 더해도 같고, 상수는 밖으로'] },
-{ id: 'M1_divisor', ch: 1, n: 10, title: '나누어떨어지는 수 모으기', subtitle: '약수의 개수와 완전수', level: '고1', stars: 2, prereq: ['M1_prime', 'M1_sigma'], uses: ['algo'], icon: '🧩', minutes: 15, mode: 'text',
+{ id: 'M1_divisor', ch: 1, n: 10, title: '나누어떨어지는 수 모으기', subtitle: '약수의 개수와 완전수', level: '고1', stars: 2, prereq: ['M1_prime', 'M1_sigma'], uses: ['algo'], icon: '🧩', mode: 'text',
   params: [{ id: 'n', label: 'n', min: 1, max: 40, step: 1, default: 12 }],
   terms: { '완전수': '자기 자신을 뺀 약수를 전부 더하면 자기 자신이 되는 수. 6 = 1 + 2 + 3, 28 = 1 + 2 + 4 + 7 + 14' },
   pages: [
@@ -176,7 +176,7 @@ const LESSONS = [
   summary: ['약수: n % i == 0 인 i — 짝(i, n // i)으로 오니 √n 까지만', '약수 개수 = 소인수분해 지수에 1씩 더해 곱 · 제곱수만 홀수 개', '완전수: 자기 자신을 뺀 약수의 합 = n (6, 28, 496, 8128)'] },
 
 // =============== 영역 3 경우의 수·확률·통계 ===============
-{ id: 'M3_perm', ch: 3, n: 1, title: '줄 세우기와 고르기', subtitle: '순열과 조합', level: '고1', stars: 2, prereq: [], uses: ['algo', 'game'], icon: '🌳', minutes: 15, mode: 'text',
+{ id: 'M3_perm', ch: 3, n: 1, title: '줄 세우기와 고르기', subtitle: '순열과 조합', level: '고1', stars: 2, prereq: [], uses: ['algo', 'game'], icon: '🌳', mode: 'text',
   params: [{ id: 'n', label: 'n (전체)', min: 2, max: 6, step: 1, default: 4 }, { id: 'r', label: 'r (뽑는 수)', min: 1, max: 4, step: 1, default: 2 }, { id: 'ordered', label: '순서 있음(1)/없음(0)', min: 0, max: 1, step: 1, default: 1 }],
   terms: {},
   pages: [
@@ -190,7 +190,7 @@ const LESSONS = [
       example: { code: 'n = 4\nr = 2\nperm = 1\nfact_r = 1\nfor i in range(r):\n    perm *= n - i\n    fact_r *= i + 1\n    print("i =", i, "→ perm =", perm, "fact_r =", fact_r)\nprint("순열 nPr =", perm)\nprint("조합 nCr =", perm, "//", fact_r, "=", perm // fact_r)', trace: true } },
   ],
   summary: ['곱의 법칙: 단계마다 가짓수를 곱한다', 'nPr = n(n−1)…(n−r+1), nCr = nPr / r!', 'permutations / combinations, math.perm / comb'] },
-{ id: 'M3_prob', ch: 3, n: 2, title: '얼마나 자주', subtitle: '확률과 큰 수의 법칙', level: '고2', stars: 1, prereq: ['M3_perm'], uses: ['game', 'data'], icon: '🎲', minutes: 15, mode: 'text',
+{ id: 'M3_prob', ch: 3, n: 2, title: '얼마나 자주', subtitle: '확률과 큰 수의 법칙', level: '고2', stars: 1, prereq: ['M3_perm'], uses: ['game', 'data'], icon: '🎲', mode: 'text',
   params: [{ id: 'sides', label: '주사위 면 수', min: 2, max: 12, step: 1, default: 6 }],
   terms: { '큰 수의 법칙': '시행을 많이 할수록 실제 비율이 확률에 가까워진다' },
   pages: [
@@ -204,7 +204,7 @@ const LESSONS = [
       example: { code: 'count = 0\nfor a in range(1, 7):\n    for b in range(1, 7):\n        if a + b == 7:\n            count += 1\n            print("찾음", (a, b), "→ 지금까지", count, "개")\nprint("합이 7:", count, "/", 6 * 6, "=", round(count / 36, 4))\n# 10번 내내 1이 안 나올 확률: 매번 5/6, 독립이라 곱하기\nprint("10번 내내 1이 안 나옴:", round((5 / 6) ** 10, 3))\nimport random\nrandom.seed(1)\nprint("seed(1) 첫 번째:", [random.randint(1, 6) for _ in range(5)])\nrandom.seed(1)\nprint("seed(1) 두 번째:", [random.randint(1, 6) for _ in range(5)])', trace: true } },
   ],
   summary: ['확률 = 사건 경우 수 / 전체 경우 수 (0~1)', '많이 하면 실제 비율 → 확률 (큰 수의 법칙)', '"또는"은 더하고(겹침 빼기), 독립 "그리고"는 곱'] },
-{ id: 'M3_cond', ch: 3, n: 3, title: '이미 알고 나면', subtitle: '조건부 확률', level: '고2', stars: 2, prereq: ['M3_prob'], uses: ['data'], icon: '🔵', minutes: 15, mode: 'text',
+{ id: 'M3_cond', ch: 3, n: 3, title: '이미 알고 나면', subtitle: '조건부 확률', level: '고2', stars: 2, prereq: ['M3_prob'], uses: ['data'], icon: '🔵', mode: 'text',
   params: [{ id: 'pa', label: 'P(A) %', min: 5, max: 90, step: 5, default: 40 }, { id: 'pb', label: 'P(B) %', min: 5, max: 90, step: 5, default: 50 }, { id: 'pab', label: 'P(A∩B) %', min: 0, max: 60, step: 5, default: 30 }],
   terms: { '조건부 확률': 'B가 일어났다고 알고 난 뒤의 A의 확률 P(A|B) = P(A∩B) / P(B). 전체가 B로 줄어든다' },
   pages: [
@@ -218,7 +218,7 @@ const LESSONS = [
       example: { code: 'mails = [("spam", 1), ("spam", 1), ("spam", 1), ("spam", 0),\n         ("ok", 1), ("ok", 1), ("ok", 1), ("ok", 0), ("ok", 0), ("ok", 0)]\nfree = [m for m in mails if m[1] == 1]        # ① 무료 메일만 남기기\nspam = [m for m in mails if m[0] == "spam"]   # ② 스팸만 남기기\nk1 = sum(1 for m in free if m[0] == "spam")\nk2 = sum(1 for m in spam if m[1] == 1)\nprint("무료", len(free), "통 중 스팸", k1, "통 → P(스팸|무료) =", k1 / len(free))\nprint("스팸", len(spam), "통 중 무료", k2, "통 → P(무료|스팸) =", k2 / len(spam))\nprint("식으로:", (3 / 10), "/", (6 / 10), "=", round((3 / 10) / (6 / 10), 2))', trace: true } },
   ],
   summary: ['P(A|B) = P(A∩B) / P(B): 전체가 B로 줄어든다', 'P(A|B) ≠ P(B|A) (분모가 다름)', '독립 = 알아도 안 변함, P(A∩B) = P(A)P(B)'] },
-{ id: 'M3_expect', ch: 3, n: 4, title: '평균적으로 얼마', subtitle: '기댓값과 분산', level: '고2', stars: 2, prereq: ['M3_prob'], uses: ['game', 'data'], icon: '⚖️', minutes: 15, mode: 'text',
+{ id: 'M3_expect', ch: 3, n: 4, title: '평균적으로 얼마', subtitle: '기댓값과 분산', level: '고2', stars: 2, prereq: ['M3_prob'], uses: ['game', 'data'], icon: '⚖️', mode: 'text',
   params: [{ id: 'p1', label: '대박 확률 %', min: 1, max: 50, step: 1, default: 10 }, { id: 'big', label: '대박 보상', min: 10, max: 100, step: 5, default: 50 }],
   terms: {},
   pages: [
@@ -232,7 +232,7 @@ const LESSONS = [
       example: { code: 'p1 = 10\nbig = 50\nitems = [(1, 1 - p1 / 100), (big, p1 / 100)]   # (값, 확률)\nmu = 0\nfor x, p in items:\n    mu += x * p\n    print("값", x, "× 확률", p, "=", round(x * p, 2), "→ 누적", round(mu, 2))\nvar = 0\nfor x, p in items:\n    d = x - mu\n    var += d ** 2 * p\n    print("편차", round(d, 2), "제곱", round(d ** 2, 2), "× 확률", p, "→ 누적", round(var, 3))\nprint("기댓값", round(mu, 2), "분산", round(var, 2), "표준편차", round(var ** 0.5, 2))', trace: true } },
   ],
   summary: ['E[X] = Σ 값×확률 (무게 중심)', 'Var = Σ (값−μ)²×확률, σ = √Var (퍼짐)', '값 c배 → 평균 c배, σ c배, 분산 c²배'] },
-{ id: 'M3_normal', ch: 3, n: 5, title: '왜 가운데에 몰리나', subtitle: '이항분포와 정규분포', level: '고2', stars: 2, prereq: ['M3_expect'], uses: ['game', 'data'], icon: '🔔', minutes: 15, mode: 'text',
+{ id: 'M3_normal', ch: 3, n: 5, title: '왜 가운데에 몰리나', subtitle: '이항분포와 정규분포', level: '고2', stars: 2, prereq: ['M3_expect'], uses: ['game', 'data'], icon: '🔔', mode: 'text',
   params: [{ id: 'rows', label: '핀 줄 수 (동전 수)', min: 2, max: 30, step: 1, default: 10 }],
   terms: { '이항분포': '성공 확률 p인 시행을 n번 했을 때 성공 횟수의 분포. 동전 n개 중 앞면 개수', '정규분포': '종 모양 분포. 많은 작은 우연이 더해지면 뭐든 이 모양(중심극한정리)' },
   pages: [
@@ -246,7 +246,7 @@ const LESSONS = [
       example: { code: 'import math\nfrom itertools import product\npaths = list(product("HT", repeat=3))   # 동전 3개, H = 앞면\ncount = {}\nfor path in paths:\n    k = path.count("H")\n    count[k] = count.get(k, 0) + 1\n    print("".join(path), "→ 앞면", k, "개")\nfor k in range(4):\n    print(f"앞면 {k}개: {count[k]}가지 (3C{k} = {math.comb(3, k)}) → 확률 {count[k] / 8}")\np = 0.2   # 성공 확률이 반반이 아닐 때\nprint("p = 0.2, 3번 중 1번:", round(math.comb(3, 1) * p ** 1 * (1 - p) ** 2, 3))\nprint("평균", round(3 * p, 2), "표준편차", round((3 * p * (1 - p)) ** 0.5, 2))', trace: true } },
   ],
   summary: ['작은 우연이 더해지면 가운데에 몰린다 (종 모양)', 'P(k) = nCk p^k (1−p)^(n−k), μ = np, σ = √(np(1−p))', 'σ 안 68%, 2σ 안 95%'] },
-{ id: 'M3_monte', ch: 3, n: 6, title: '많이 돌려서 알아내기', subtitle: '몬테카를로 시뮬레이션', level: '고2', stars: 1, prereq: ['M3_prob'], uses: ['game', 'data'], icon: '🎯', minutes: 12, mode: 'text',
+{ id: 'M3_monte', ch: 3, n: 6, title: '많이 돌려서 알아내기', subtitle: '몬테카를로 시뮬레이션', level: '고2', stars: 1, prereq: ['M3_prob'], uses: ['game', 'data'], icon: '🎯', mode: 'text',
   params: [{ id: 'n', label: '점 수', min: 100, max: 50000, step: 100, default: 2000 }],
   terms: { '몬테카를로': '무작위 표본을 아주 많이 뽑아 비율로 값을 추정하는 방법. 식이 없어도 된다' },
   pages: [
@@ -260,7 +260,7 @@ const LESSONS = [
       example: { code: 'import random\nrandom.seed(42)\ninside = 0\nfor i in range(1, 6):\n    x = random.random()\n    y = random.random()\n    d = x * x + y * y\n    if d <= 1:\n        inside += 1\n    print(i, "번째", (round(x, 3), round(y, 3)), "x²+y² =", round(d, 4), "안" if d <= 1 else "밖", "→ π ≈", round(4 * inside / i, 3))\nfor N in [100, 1000, 10000, 100000]:\n    random.seed(7)\n    hit = 0\n    for _ in range(N):\n        x = random.random()\n        y = random.random()\n        if x * x + y * y <= 1:\n            hit += 1\n    print("N =", N, "π ≈", 4 * hit / N, "오차", round(abs(4 * hit / N - 3.14159), 4))', trace: true } },
   ],
   summary: ['무작위로 많이 뽑아 비율로 추정', '오차 ∝ 1/√N: 100배 → 1/10', 'random.seed 고정으로 재현'] },
-{ id: 'M3_bayes', ch: 3, n: 7, title: '증거를 보고 생각 바꾸기', subtitle: '베이즈 정리', level: '대학', stars: 3, star: true, prereq: ['M3_cond'], uses: ['data'], icon: '🧪', minutes: 18, mode: 'text',
+{ id: 'M3_bayes', ch: 3, n: 7, title: '증거를 보고 생각 바꾸기', subtitle: '베이즈 정리', level: '대학', stars: 3, star: true, prereq: ['M3_cond'], uses: ['data'], icon: '🧪', mode: 'text',
   params: [{ id: 'prev', label: '유병률 %', min: 0.5, max: 30, step: 0.5, default: 1 }, { id: 'acc', label: '검사 정확도 %', min: 80, max: 99.5, step: 0.5, default: 95 }],
   terms: { '베이즈 정리': '증거(검사 결과)를 본 뒤 가설(병)의 확률을 갱신하는 식. P(병|양성) = P(양성|병)P(병) / P(양성)' },
   pages: [
@@ -274,7 +274,7 @@ const LESSONS = [
       example: { code: 'prev = 1      # 유병률 %\nacc = 95      # 정확도 %\nsick = 1000 * prev / 100              # ① 병인 사람\nhealthy = 1000 - sick\ntp = sick * acc / 100                 # ② 병 + 양성 (진짜 양성)\nfp = healthy * (100 - acc) / 100      # ③ 건강 + 양성 (가짜 양성)\nprint("병", sick, "명 → 진짜 양성", tp, "명")\nprint("건강", healthy, "명 → 가짜 양성", round(fp, 1), "명")\nprint("양성 전체", round(tp + fp, 1), "명 중 진짜", tp, "명")\nprint("P(병|양성) =", round(100 * tp / (tp + fp), 1), "%")', trace: true } },
   ],
   summary: ['양성 = 진짜 양성 + 가짜 양성, 드문 병이면 가짜가 더 많다', 'P(H|E) = P(E|H)P(H) / P(E)', '사전 확률이 작으면 증거가 강해도 사후 확률은 작다'] },
-{ id: 'M3_corr', ch: 3, n: 8, title: '같이 움직이나', subtitle: '상관계수와 추세선', level: '대학', stars: 3, star: true, prereq: ['M3_expect'], uses: ['data'], icon: '📈', minutes: 15, mode: 'text',
+{ id: 'M3_corr', ch: 3, n: 8, title: '같이 움직이나', subtitle: '상관계수와 추세선', level: '대학', stars: 3, star: true, prereq: ['M3_expect'], uses: ['data'], icon: '📈', mode: 'text',
   params: [],
   terms: { '상관계수': '두 변수가 함께 움직이는 정도 r (−1 ~ 1). 1이면 완전히 같은 방향, 0이면 무관', '추세선': '점들을 가장 잘 지나는 직선(최소제곱). 잔차 제곱합이 최소' },
   pages: [
@@ -288,7 +288,7 @@ const LESSONS = [
       example: { code: 'xs = [1, 2, 3, 4]\nys = [1, 3, 2, 4]\nn = len(xs)\nmx, my = sum(xs) / n, sum(ys) / n\nprint("평균", mx, my)\nsxy = sxx = syy = 0\nfor x, y in zip(xs, ys):\n    dx, dy = x - mx, y - my\n    sxy += dx * dy\n    sxx += dx * dx\n    syy += dy * dy\n    print((x, y), "편차", (dx, dy), "곱", dx * dy)\nprint("sxy", sxy, "sxx", sxx, "syy", syy)\nr = sxy / (sxx * syy) ** 0.5\na = sxy / sxx\nb = my - a * mx\nprint("r =", round(r, 3), "a =", round(a, 3), "b =", round(b, 3))', trace: true } },
   ],
   summary: ['r: 1 같이 커짐, −1 반대, 0 무관', 'r = 공분산 / (σx σy), 이상값 하나에 크게 흔들린다', '추세선 = 잔차 제곱합 최소. 상관 ≠ 인과'] },
-{ id: 'M3_geom', ch: 3, n: 9, title: '몇 번 만에 성공하나', subtitle: '기하분포', level: '대학', stars: 2, star: true, prereq: ['M3_expect'], uses: ['game', 'data'], icon: '🎰', minutes: 15, mode: 'text',
+{ id: 'M3_geom', ch: 3, n: 9, title: '몇 번 만에 성공하나', subtitle: '기하분포', level: '대학', stars: 2, star: true, prereq: ['M3_expect'], uses: ['game', 'data'], icon: '🎰', mode: 'text',
   params: [{ id: 'pct', label: '성공 확률 p', min: 10, max: 90, step: 5, default: 20, unit: '%' }],
   terms: { '기하분포': '성공 확률 p인 시도를 성공할 때까지 반복할 때, 첫 성공까지 걸린 횟수의 분포. 평균 1/p 번' },
   pages: [
@@ -302,7 +302,7 @@ const LESSONS = [
       example: { code: 'pct = 20\nk = 3\np = pct / 100\nfail_all = 1\nfor i in range(1, k + 1):\n    exact = (1 - p) ** (i - 1) * p    # 앞에서 i-1번 실패, i번째 성공\n    fail_all *= 1 - p                 # i번 연속 실패\n    print(i, "번째 처음 성공", round(exact, 4), "| 연속 실패", round(fail_all, 4), "|", i, "번 안에", round(1 - fail_all, 4))\nprint("평균", 1 / p, "번")', trace: true } },
   ],
   summary: ['기하분포: 성공할 때까지 반복한 횟수 — P(X=k) = (1−p)^(k−1)·p', '가장 흔한 건 1번 만에, 평균은 1/p 번', 'k번 연속 실패 (1−p)^k — 평균은 보장이 아니다(천장이 필요한 이유)'] },
-{ id: 'M3_sample', ch: 3, n: 10, title: '조금만 보고 전체 맞히기', subtitle: '표본평균과 표준오차', level: '고2', stars: 2, prereq: ['M3_normal'], uses: ['data', 'game'], icon: '🥄', minutes: 15, mode: 'text',
+{ id: 'M3_sample', ch: 3, n: 10, title: '조금만 보고 전체 맞히기', subtitle: '표본평균과 표준오차', level: '고2', stars: 2, prereq: ['M3_normal'], uses: ['data', 'game'], icon: '🥄', mode: 'text',
   params: [{ id: 'n', label: '표본 크기 n', min: 1, max: 25, step: 1, default: 4 }],
   terms: { '표본': '전체(모집단)에서 일부만 뽑아 본 것. 국 한 냄비에서 뜬 한 숟가락', '표본평균': '표본의 평균 x̄. 뽑을 때마다 조금씩 달라지는 값', '표준오차': '표본평균이 뽑을 때마다 흔들리는 정도(표준편차). σ ÷ √n — 표본이 클수록 작아요' },
   pages: [
@@ -318,7 +318,7 @@ const LESSONS = [
   summary: ['표본평균은 뽑을 때마다 흔들리지만 평균적으로 모평균에 맞는다', '표준오차 = σ ÷ √n — 정확도 2배에 표본 4배', '95% 구간 = x̄ ± 1.96 × s ÷ √n (s 는 n − 1 로 나눔)'] },
 
 // =============== 영역 5 벡터·행렬 ===============
-{ id: 'M5_vec', ch: 5, n: 1, title: '크기와 방향', subtitle: '2D 벡터', level: '고2', stars: 1, prereq: [], uses: ['game'], icon: '➡️', minutes: 12, mode: 'text',
+{ id: 'M5_vec', ch: 5, n: 1, title: '크기와 방향', subtitle: '2D 벡터', level: '고2', stars: 1, prereq: [], uses: ['game'], icon: '➡️', mode: 'text',
   params: [{ id: 'ax', label: 'x 성분', min: -5, max: 5, step: 0.5, default: 3 }, { id: 'ay', label: 'y 성분', min: -5, max: 5, step: 0.5, default: 2 }],
   terms: { '벡터의 크기': '화살표 길이 = √(x² + y²) (피타고라스)' },
   pages: [
@@ -332,7 +332,7 @@ const LESSONS = [
       example: { code: 'import math\nax = 3\nay = 4\nprint("① x² + y² =", ax * ax, "+", ay * ay, "=", ax * ax + ay * ay)\nprint("② 길이 = √", ax * ax + ay * ay, "=", math.hypot(ax, ay))\nx, y = 0, 0\nfor frame in range(1, 4):\n    x, y = x + ax, y + ay\n    print(frame, "프레임 뒤 위치", (x, y))\nn = 60\nprint(n, "프레임 뒤", (ax * n, ay * n), "· 움직인 거리", math.hypot(ax, ay) * n)', trace: true } },
   ],
   summary: ['벡터 = (x, y): 얼마만큼 어느 쪽으로', '길이 = √(x² + y²) = math.hypot', '숫자배는 길이만 c배(음수면 반대)'] },
-{ id: 'M5_add', ch: 5, n: 2, title: '더하고 빼기', subtitle: '벡터의 합과 차', level: '고2', stars: 1, prereq: ['M5_vec'], uses: ['game'], icon: '➕', minutes: 12, mode: 'text',
+{ id: 'M5_add', ch: 5, n: 2, title: '더하고 빼기', subtitle: '벡터의 합과 차', level: '고2', stars: 1, prereq: ['M5_vec'], uses: ['game'], icon: '➕', mode: 'text',
   params: [{ id: 'ax', label: 'a.x', min: -5, max: 5, step: 0.5, default: 3 }, { id: 'ay', label: 'a.y', min: -5, max: 5, step: 0.5, default: 1 }, { id: 'bx', label: 'b.x', min: -5, max: 5, step: 0.5, default: 1 }],
   terms: { '벡터 합': '성분끼리 더한다. 그림으로는 꼬리에 머리를 잇기(평행사변형)', '벡터 차': 'b − a = a 끝에서 b 끝으로 가는 화살표. "a에서 b로"' },
   pages: [
@@ -346,7 +346,7 @@ const LESSONS = [
       example: { code: 'pos = [0, 10]\nvel = [2, 5]\ng = 1\nfor t in range(1, 5):\n    vel[1] -= g                                # ① 속도에 중력 더하기 (y만 −g)\n    pos = [pos[0] + vel[0], pos[1] + vel[1]]   # ② 위치에 속도 더하기\n    print(t, "초: 속도", vel, "→ 위치", pos)', trace: true } },
   ],
   summary: ['합: 성분끼리 더하기 = 꼬리에 머리 잇기', '차 b − a = a에서 b로 (끝 − 시작)', 'pos += vel, vel += gravity 가 물리의 뼈대'] },
-{ id: 'M5_norm', ch: 5, n: 3, title: '길이를 1로', subtitle: '정규화 (단위 벡터)', level: '고2', stars: 2, prereq: ['M5_add'], uses: ['game'], icon: '🎯', minutes: 12, mode: 'text',
+{ id: 'M5_norm', ch: 5, n: 3, title: '길이를 1로', subtitle: '정규화 (단위 벡터)', level: '고2', stars: 2, prereq: ['M5_add'], uses: ['game'], icon: '🎯', mode: 'text',
   params: [{ id: 'ax', label: 'x 성분', min: -5, max: 5, step: 0.5, default: 3 }, { id: 'ay', label: 'y 성분', min: -5, max: 5, step: 0.5, default: 4 }, { id: 'speed', label: '속력', min: 1, max: 5, step: 0.5, default: 2 }],
   terms: { '단위 벡터': '길이가 1인 벡터. 방향만 남긴 것' },
   pages: [
@@ -360,7 +360,7 @@ const LESSONS = [
       example: { code: 'import math\nax = 3\nay = 4\nspeed = 2\nL = math.hypot(ax, ay)\nprint("① 길이 L =", L)\nif L == 0:\n    print("길이 0 — 방향이 없으니 움직이지 않아요")\nelse:\n    ux, uy = ax / L, ay / L\n    print("② 길이로 나누기", (round(ux, 3), round(uy, 3)), "길이", round(math.hypot(ux, uy), 3))\n    print("③ 속력", speed, "곱하기", (round(ux * speed, 3), round(uy * speed, 3)))\n# 추적: (0, 0)에서 목표 (6, 8)로 한 걸음씩\npos, target = [0.0, 0.0], (6.0, 8.0)\nfor step in range(1, 4):\n    dx, dy = target[0] - pos[0], target[1] - pos[1]\n    d = math.hypot(dx, dy)\n    if d <= speed:\n        pos = list(target)\n        print(step, "걸음: 도착!", pos)\n        break\n    pos = [pos[0] + dx / d * speed, pos[1] + dy / d * speed]\n    print(step, "걸음 뒤", [round(v, 2) for v in pos], "남은 거리", round(d - speed, 2))', trace: true } },
   ],
   summary: ['정규화 = v / |v|: 방향만 남기고 길이 1', '길이 0이면 먼저 걸러야 한다', '이동 = 정규화한 방향 × 속력 (대각선 버그 해결)'] },
-{ id: 'M5_dot', ch: 5, n: 4, title: '같은 방향을 보고 있나', subtitle: '내적', level: '고2', stars: 2, prereq: ['M5_add'], uses: ['game', 'data'], icon: '👁', minutes: 15, mode: 'text',
+{ id: 'M5_dot', ch: 5, n: 4, title: '같은 방향을 보고 있나', subtitle: '내적', level: '고2', stars: 2, prereq: ['M5_add'], uses: ['game', 'data'], icon: '👁', mode: 'text',
   params: [{ id: 'ax', label: 'a.x', min: -5, max: 5, step: 0.5, default: 4 }, { id: 'ay', label: 'a.y', min: -5, max: 5, step: 0.5, default: 1 }, { id: 'bx', label: 'b.x', min: -5, max: 5, step: 0.5, default: 2 }],
   terms: {},
   pages: [
@@ -374,7 +374,7 @@ const LESSONS = [
       example: { code: 'import math\nax = 3\nay = 1\nbx = 1\nby = 2\ndot = ax * bx + ay * by\nprint("① 내적", ax, "×", bx, "+", ay, "×", by, "=", dot)\nla, lb = math.hypot(ax, ay), math.hypot(bx, by)\nprint("② 길이 |a| =", round(la, 3), "|b| =", round(lb, 3))\nif la * lb == 0:\n    print("길이 0인 벡터는 각도가 없어요")\nelse:\n    cos_t = dot / (la * lb)\n    print("③ cosθ =", dot, "/", round(la * lb, 3), "=", round(cos_t, 3))\n    rad = math.acos(cos_t)\n    print("④ acos →", round(rad, 3), "라디안 → degrees →", round(math.degrees(rad), 1), "도")\nprint("직각 확인: (3, 1)·(-1, 3) =", 3 * -1 + 1 * 3)', trace: true } },
   ],
   summary: ['a·b = axbx + ayby = |a||b|cosθ', '양수 같은 쪽 · 0 직각 · 음수 반대쪽', '시야 판정·밝기·코사인 유사도 전부 내적'] },
-{ id: 'M5_rotate', ch: 5, n: 5, title: '돌리기', subtitle: '회전 행렬', level: '고2', stars: 2, prereq: ['M5_vec'], uses: ['game'], icon: '🔄', minutes: 15, mode: 'text',
+{ id: 'M5_rotate', ch: 5, n: 5, title: '돌리기', subtitle: '회전 행렬', level: '고2', stars: 2, prereq: ['M5_vec'], uses: ['game'], icon: '🔄', mode: 'text',
   params: [{ id: 'deg', label: '각도', min: 0, max: 360, step: 5, default: 30, unit: '°' }],
   terms: { '회전 행렬': '점을 원점 기준 θ만큼 돌리는 2×2 행렬 [[cosθ, −sinθ], [sinθ, cosθ]]', '기저벡터': '(1,0)과 (0,1). 행렬의 열은 "기저벡터가 어디로 가나"' },
   pages: [
@@ -388,7 +388,7 @@ const LESSONS = [
       example: { code: 'import math\ndeg = 90\nt = math.radians(deg)\nc, s = math.cos(t), math.sin(t)\nprint("① 라디안", round(t, 4), " cos", round(c, 3), " sin", round(s, 3))\nx, y, cx, cy = 5, 3, 3, 3\nrx, ry = x - cx, y - cy\nprint("② 중심 빼기", (rx, ry))\nnx, ny = rx * c - ry * s, rx * s + ry * c\nprint("③ 돌리기", (nx, ny))\nprint("④ 중심 더하기", (round(nx + cx, 2) + 0, round(ny + cy, 2) + 0))\ntiny = -1e-17\nprint("-0.00 문제:", f"{tiny:.2f}", "→", f"{round(tiny, 2) + 0:.2f}")', trace: true } },
   ],
   summary: ['행렬의 열 = î, ĵ가 간 곳. 회전은 (cosθ, sinθ), (−sinθ, cosθ)', 'x\' = x cosθ − y sinθ, y\' = x sinθ + y cosθ', 'math.radians 필수, 중심 기준은 빼고 돌리고 더하기'] },
-{ id: 'M5_scale', ch: 5, n: 6, title: '늘리고 기울이기', subtitle: '크기·기울임 행렬', level: '고2', stars: 2, prereq: ['M5_rotate'], uses: ['game'], icon: '↔️', minutes: 15, mode: 'text',
+{ id: 'M5_scale', ch: 5, n: 6, title: '늘리고 기울이기', subtitle: '크기·기울임 행렬', level: '고2', stars: 2, prereq: ['M5_rotate'], uses: ['game'], icon: '↔️', mode: 'text',
   params: [{ id: 'a', label: 'a (î의 x)', min: -2, max: 3, step: 0.25, default: 1.5 }, { id: 'b', label: 'b (ĵ의 x, 기울임)', min: -2, max: 2, step: 0.25, default: 0 }, { id: 'd', label: 'd (ĵ의 y)', min: -2, max: 3, step: 0.25, default: 1 }],
   terms: { '선형 변환': '격자가 평행·등간격을 유지한 채 변하는 변환(원점 고정). 회전·크기·기울임' },
   pages: [
@@ -402,7 +402,7 @@ const LESSONS = [
       example: { code: 'a = 2\nb = 0.5\nc = 0\nd = 1.5\ndef apply(x, y):\n    return (a * x + b * y, c * x + d * y)\nprint("î (1, 0) →", apply(1, 0), "= 첫 열 (a, c)")\nprint("ĵ (0, 1) →", apply(0, 1), "= 둘째 열 (b, d)")\nprint("(1, 1) →", apply(1, 1), "= î 행선지 + ĵ 행선지")\nprint("(2, 0) →", apply(2, 0), " (y = 0인 점은 기울임 b의 영향 없음)")\nprint("넓이 배율 det =", a, "×", d, "-", b, "×", c, "=", a * d - b * c)', trace: true } },
   ],
   summary: ['대각선 = 크기, 나머지 = 기울임', 'M·(x,y) = (ax+by, cx+dy), 열 = î·ĵ 행선지', 'det = ad − bc = 넓이 배율'] },
-{ id: 'M5_compose', ch: 5, n: 7, title: '연달아 변형하기', subtitle: '행렬 곱과 순서', level: '대학', stars: 3, star: true, prereq: ['M5_scale'], uses: ['game'], icon: '🔁', minutes: 15, mode: 'text',
+{ id: 'M5_compose', ch: 5, n: 7, title: '연달아 변형하기', subtitle: '행렬 곱과 순서', level: '대학', stars: 3, star: true, prereq: ['M5_scale'], uses: ['game'], icon: '🔁', mode: 'text',
   params: [{ id: 'deg', label: '회전 각도', min: 0, max: 180, step: 15, default: 45, unit: '°' }, { id: 'sx', label: 'x 크기', min: 0.5, max: 3, step: 0.25, default: 2 }],
   terms: { '행렬 곱': '두 변환을 연달아 적용한 것을 하나의 행렬로. AB는 "B 먼저, 그다음 A"', '교환법칙': 'AB = BA 가 성립하는 성질. 행렬 곱은 일반적으로 성립하지 않는다' },
   pages: [
@@ -416,7 +416,7 @@ const LESSONS = [
       example: { code: 'import math\ndeg = 45\nsx = 2\nt = math.radians(deg)\nc, s = math.cos(t), math.sin(t)\ndef S(v):    # x만 sx배\n    return (round(sx * v[0], 3), round(v[1], 3))\ndef R(v):    # deg만큼 회전\n    return (round(v[0] * c - v[1] * s, 3), round(v[0] * s + v[1] * c, 3))\nv = (1, 0)\nprint("S 먼저:", v, "→ S →", S(v), "→ R →", R(S(v)))\nprint("R 먼저:", v, "→ R →", R(v), "→ S →", S(R(v)))\nA = [[1, 2], [0, 1]]   # 기울임\nB = [[3, 0], [0, 1]]   # x 3배\nAB = [[A[i][0] * B[0][j] + A[i][1] * B[1][j] for j in range(2)] for i in range(2)]\nBA = [[B[i][0] * A[0][j] + B[i][1] * A[1][j] for j in range(2)] for i in range(2)]\nprint("AB =", AB, "BA =", BA, "같은가?", AB == BA)', trace: true } },
   ],
   summary: ['AB = B 먼저, 그다음 A. 순서가 바뀌면 결과도 다름', '행렬 곱 원소 = 행 · 열 (내적)', '변환을 하나로 합쳐 두면 점이 많아도 한 번만'] },
-{ id: 'M5_homog', ch: 5, n: 8, title: '옮기기도 행렬로', subtitle: '동차좌표와 3×3 변환', level: '대학', stars: 3, star: true, prereq: ['M5_compose'], uses: ['game'], icon: '📦', minutes: 15, mode: 'text',
+{ id: 'M5_homog', ch: 5, n: 8, title: '옮기기도 행렬로', subtitle: '동차좌표와 3×3 변환', level: '대학', stars: 3, star: true, prereq: ['M5_compose'], uses: ['game'], icon: '📦', mode: 'text',
   params: [{ id: 'tx', label: '이동 tx', min: -3, max: 3, step: 0.5, default: 1.5 }, { id: 'ty', label: '이동 ty', min: -3, max: 3, step: 0.5, default: 1 }, { id: 'deg', label: '회전', min: 0, max: 360, step: 15, default: 30, unit: '°' }],
   terms: { '동차좌표': '(x, y)를 (x, y, 1)로 한 차원 올려 쓰는 좌표. 이동까지 행렬 곱 하나로 표현된다', '변환 행렬': '회전·크기·이동을 전부 담은 3×3 행렬. 게임 엔진의 Transform' },
   pages: [
@@ -430,7 +430,7 @@ const LESSONS = [
       example: { code: 'import math\ntx = 1\nty = 2\ndeg = 90\nt = math.radians(deg)\nc, s = round(math.cos(t), 3) + 0, round(math.sin(t), 3) + 0\nM = [[c, -s + 0, tx],\n     [s, c, ty],\n     [0, 0, 1]]\nv = (1, 0, 1)    # 점 (1, 0) 끝에 1을 붙인다\nfor i in range(3):\n    parts = " + ".join(f"{M[i][k]}×{v[k]}" for k in range(3))\n    print(i + 1, "행:", parts, "=", sum(M[i][k] * v[k] for k in range(3)))\n# 순서를 바꾸면? 먼저 옮기고, 그다음 돌리기\nx, y = 1 + tx, 0 + ty\nprint("이동 먼저:", (x, y), "→ 회전 →", (round(x * c - y * s, 3) + 0, round(x * s + y * c, 3) + 0))', trace: true } },
   ],
   summary: ['(x, y, 1)로 쓰면 이동도 행렬 곱', '3×3: 왼쪽 위 회전·크기, 마지막 열 이동', 'M = T·R·S (크기 → 회전 → 이동), 부모×자식'] },
-{ id: 'M5_dist', ch: 5, n: 9, title: '얼마나 떨어져 있나', subtitle: '두 점 사이 거리와 충돌 판정', level: '고1', stars: 1, prereq: ['M5_add'], uses: ['game'], icon: '💥', minutes: 15, mode: 'text',
+{ id: 'M5_dist', ch: 5, n: 9, title: '얼마나 떨어져 있나', subtitle: '두 점 사이 거리와 충돌 판정', level: '고1', stars: 1, prereq: ['M5_add'], uses: ['game'], icon: '💥', mode: 'text',
   params: [{ id: 'ax', label: 'A.x', min: -5, max: 5, step: 0.5, default: -3 }, { id: 'ay', label: 'A.y', min: -5, max: 5, step: 0.5, default: 1 }, { id: 'bx', label: 'B.x', min: -5, max: 5, step: 0.5, default: 1 }],
   terms: { '두 점 사이 거리': '(x₁, y₁)과 (x₂, y₂) 사이 거리 = √((x₂−x₁)² + (y₂−y₁)²). 차 벡터 B − A의 길이', '충돌 판정': '두 물체가 겹치는지 검사하는 것. 원끼리는 중심 사이 거리 ≤ 반지름의 합이면 충돌' },
   pages: [
@@ -444,7 +444,7 @@ const LESSONS = [
       example: { code: 'import math\nax = -3\nay = 1\nbx = 1\nby = 4\nr1, r2 = 2, 3\ndx, dy = bx - ax, by - ay\nprint("① 차 벡터 B - A =", (dx, dy))\nd2 = dx * dx + dy * dy\nprint(f"② 거리² = {dx * dx} + {dy * dy} = {d2} (거리 {math.hypot(dx, dy)})")\ns2 = (r1 + r2) ** 2\nprint(f"③ 반지름 합² = ({r1} + {r2})² = {s2}")\nprint("④ 판정:", "겹침" if d2 < s2 else "닿음" if d2 == s2 else "떨어짐")\nfor b in [(0, 3), (2, 5)]:                 # B를 옮겨 가며\n    ex, ey = b[0] - ax, b[1] - ay\n    e2 = ex * ex + ey * ey\n    print("B =", b, "거리²", e2, "vs", s2, "→", "겹침" if e2 < s2 else "닿음" if e2 == s2 else "떨어짐")', trace: true } },
   ],
   summary: ['거리 = |B − A| = √(dx² + dy²) = math.hypot(dx, dy)', '원 충돌: 중심 거리 ≤ r₁ + r₂', '게임에서는 제곱끼리 비교 — √ 없이 빠르고 정확'] },
-{ id: 'M5_cross', ch: 5, n: 10, title: '왼쪽인가 오른쪽인가', subtitle: '2D 외적과 행렬식(넓이)', level: '대학', stars: 2, star: true, prereq: ['M5_scale'], uses: ['game', 'algo'], icon: '🧭', minutes: 15, mode: 'text',
+{ id: 'M5_cross', ch: 5, n: 10, title: '왼쪽인가 오른쪽인가', subtitle: '2D 외적과 행렬식(넓이)', level: '대학', stars: 2, star: true, prereq: ['M5_scale'], uses: ['game', 'algo'], icon: '🧭', mode: 'text',
   params: [{ id: 'ax', label: 'a.x (a.y = 1)', min: -3, max: 3, step: 0.5, default: 3 }, { id: 'bx', label: 'b.x', min: -3, max: 3, step: 0.5, default: 1 }, { id: 'by', label: 'b.y', min: -3, max: 3, step: 0.5, default: 2 }],
   terms: { '외적': '2D 에서 a × b = a.x·b.y − a.y·b.x. 양수면 b 가 a 의 왼쪽(반시계), 음수면 오른쪽(시계), 0 이면 같은 줄. 크기 = 두 벡터가 만드는 평행사변형 넓이', '행렬식': '2×2 행렬 [[a, b], [c, d]] 의 ad − bc. 넓이 1 인 정사각형이 변환 뒤 몇 배 넓이가 되나(음수면 뒤집힘, 0 이면 납작)' },
   pages: [
@@ -458,7 +458,7 @@ const LESSONS = [
       example: { code: 'import math\nax = 3\nay = 1\nbx = 1\nby = 2\nprint("① ax × by =", ax * by, "· ay × bx =", ay * bx)\nc = ax * by - ay * bx\nprint("② a × b =", ax * by, "-", ay * bx, "=", c, "→", "양수: b는 a의 왼쪽(반시계)" if c > 0 else "음수: b는 a의 오른쪽(시계)" if c < 0 else "0: 같은 줄")\nprint("   b × a =", bx * ay - by * ax, "(순서를 바꾸면 부호만 반대)")\nla, lb = math.hypot(ax, ay), math.hypot(bx, by)\nang = math.degrees(math.atan2(by, bx) - math.atan2(ay, ax))\nprint(f"③ 확인: |a| × |b| × sin(사이각 {ang:.1f}°) = {la * lb * math.sin(math.radians(ang)):.4f}")\nP, Q, R = (1, 1), (5, 2), (2, 6)\nu = (Q[0] - P[0], Q[1] - P[1])\nv = (R[0] - P[0], R[1] - P[1])\ncr = u[0] * v[1] - u[1] * v[0]\nprint("삼각형 PQR: u =", u, "v =", v, "외적", cr, "→ 넓이", abs(cr) / 2)', trace: true } },
   ],
   summary: ['a × b = a.x·b.y − a.y·b.x — 양수 왼쪽, 음수 오른쪽, 0 같은 줄', '|a × b| = 평행사변형 넓이 = 2×2 행렬식', 'ccw(P, Q, R) = (Q − P) × (R − P), 삼각형 넓이 = 절댓값 ÷ 2'] },
-{ id: 'M5_system', ch: 5, n: 11, title: '두 직선이 만나는 곳', subtitle: '연립방정식과 역행렬', level: '대학', stars: 3, star: true, prereq: ['M5_cross', 'M4_linear'], uses: ['game', 'data'], icon: '✖️', minutes: 18, mode: 'text',
+{ id: 'M5_system', ch: 5, n: 11, title: '두 직선이 만나는 곳', subtitle: '연립방정식과 역행렬', level: '대학', stars: 3, star: true, prereq: ['M5_cross', 'M4_linear'], uses: ['game', 'data'], icon: '✖️', mode: 'text',
   params: [{ id: 'a', label: 'a (ax + y = c)', min: -3, max: 3, step: 0.5, default: 1 }, { id: 'c', label: 'c', min: -4, max: 6, step: 1, default: 5 }],
   terms: { '연립방정식': '여러 식을 동시에 만족하는 값을 찾는 것. 미지수 2개·식 2개면 두 직선이 만나는 점', '역행렬': '행렬 A 를 곱한 것을 되돌리는 행렬 A⁻¹. 2×2 는 행렬식 D = ad − bc 가 0 이 아닐 때만 있어요' },
   pages: [
@@ -472,7 +472,7 @@ const LESSONS = [
       example: { code: 'a, b, e = 2, 1, 7      # 2x + y = 7\nc, d, f = 1, -1, 2     # x - y = 2\nD = a * d - b * c\nprint("① D = ad - bc =", a * d, "-", b * c, "=", D)\nx = (e * d - b * f) / D\ny = (a * f - e * c) / D\nprint("② x = (ed - bf) ÷ D =", e * d - b * f, "÷", D, "=", x)\nprint("③ y = (af - ec) ÷ D =", a * f - e * c, "÷", D, "=", y)\ninv = [[d / D, -b / D], [-c / D, a / D]]           # 역행렬 (1/D)[[d, -b], [-c, a]]\nprint("④ 역행렬로:", round(inv[0][0] * e + inv[0][1] * f, 6), round(inv[1][0] * e + inv[1][1] * f, 6))\nprint("평행한 경우 2x + y = 7, 4x + 2y = 3 → D =", 2 * 2 - 1 * 4)\nprint("0 ÷ 음수 =", 0 / -2, "→ + 0 하면", 0 / -2 + 0)', trace: true } },
   ],
   summary: ['연립방정식의 해 = 두 직선이 만나는 점', 'D = ad − bc ≠ 0 이면 해 하나: x = (ed − bf) ÷ D, y = (af − ec) ÷ D', 'D = 0 이면 평행(해 없음)이나 같은 직선(무수히) — 나누기 전에 확인'] },
-{ id: 'M5_eigen', ch: 5, n: 12, title: '돌지 않고 늘어나기만', subtitle: '고유벡터와 고유값 맛보기', level: '대학', stars: 3, star: true, prereq: ['M5_cross'], uses: ['data', 'game'], icon: '🧲', minutes: 18, mode: 'text',
+{ id: 'M5_eigen', ch: 5, n: 12, title: '돌지 않고 늘어나기만', subtitle: '고유벡터와 고유값 맛보기', level: '대학', stars: 3, star: true, prereq: ['M5_cross'], uses: ['data', 'game'], icon: '🧲', mode: 'text',
   params: [{ id: 'a', label: '대각 a', min: -1, max: 3, step: 0.5, default: 2 }, { id: 'b', label: '나머지 b', min: -2, max: 2, step: 0.5, default: 1 }],
   terms: { '고유벡터': '행렬을 곱해도 방향이 바뀌지 않고(같은 줄 위) 길이만 바뀌는 벡터 v. Av = λv', '고유값': '고유벡터가 늘어나는 배수 λ. 음수면 반대쪽으로 뒤집혀 늘어나요' },
   pages: [
@@ -487,7 +487,7 @@ const LESSONS = [
   ],
   summary: ['고유벡터: 곱해도 방향 그대로 Av = λv, λ = 고유값', '판정: v × Av = 0, 배수 λ = (Av·v) ÷ (v·v)', '계속 곱하면 가장 큰 고유값의 방향으로 모인다(거듭제곱법)'] },
 // =============== 영역 4 함수·변화·미적분 (콘텐츠팀 C10 — 기존 그림 kind 만. Fable M2 가 새 그림 4종·나머지 노드를 얹는다) ===============
-{ id: 'M4_linear', ch: 4, n: 1, title: '얼마나 빨리 변하나', subtitle: '일차함수와 기울기', level: '고1', stars: 1, prereq: [], uses: ['game', 'data'], icon: '📏', minutes: 12, mode: 'text',
+{ id: 'M4_linear', ch: 4, n: 1, title: '얼마나 빨리 변하나', subtitle: '일차함수와 기울기', level: '고1', stars: 1, prereq: [], uses: ['game', 'data'], icon: '📏', mode: 'text',
   params: [{ id: 'a', label: '기울기 a', min: -3, max: 3, step: 0.5, default: 2 }, { id: 'b', label: 'y절편 b', min: -5, max: 5, step: 1, default: 1 }],
   terms: { '기울기': 'x가 1 늘 때 y가 늘어나는 양. (y의 변화량) ÷ (x의 변화량)', 'y절편': 'x = 0일 때의 y 값. 직선이 y축과 만나는 곳' },
   pages: [
@@ -501,7 +501,7 @@ const LESSONS = [
       example: { code: 'x1, y1 = 1, 3\nx2, y2 = 4, 9\na = (y2 - y1) / (x2 - x1)\nprint("기울기 a =", y2 - y1, "÷", x2 - x1, "=", a)\nb = y1 - a * x1\nprint("y절편 b =", y1, "-", a, "×", x1, "=", b)\nprint("확인: x2 를 넣으면", a * x2 + b, "(y2 =", y2, ")")\nprint((5 - 5) / (1 - 3), "→ + 0 하면", (5 - 5) / (1 - 3) + 0)', trace: true } },
   ],
   summary: ['y = ax + b: x가 1 늘 때 y는 a만큼', '기울기 = (y의 차) ÷ (x의 차)', 'b만 바꾸면 위아래로 평행 이동'] },
-{ id: 'M4_quad', ch: 4, n: 2, title: '던진 공은 왜 포물선인가', subtitle: '이차함수와 꼭짓점', level: '고1', stars: 1, prereq: ['M4_linear'], uses: ['game'], icon: '⚾', minutes: 15, mode: 'text',
+{ id: 'M4_quad', ch: 4, n: 2, title: '던진 공은 왜 포물선인가', subtitle: '이차함수와 꼭짓점', level: '고1', stars: 1, prereq: ['M4_linear'], uses: ['game'], icon: '⚾', mode: 'text',
   params: [{ id: 'a', label: 'a', min: -2, max: 2, step: 0.5, default: -1 }, { id: 'b', label: 'b', min: -4, max: 4, step: 1, default: 2 }, { id: 'c', label: 'c', min: -5, max: 5, step: 1, default: 3 }],
   terms: { '이차함수': 'y = ax² + bx + c 꼴(a ≠ 0). 그래프는 포물선', '꼭짓점': '포물선이 꺾여 돌아오는 점. x = −b ÷ (2a)' },
   pages: [
@@ -515,7 +515,7 @@ const LESSONS = [
       example: { code: 'a = -1\nb = 2\nc = 3\nvx = -b / (2 * a)\nprint("꼭짓점 x =", -b, "÷", 2 * a, "=", vx, "→ y =", a * vx * vx + b * vx + c)\nD = b * b - 4 * a * c\nprint("b² =", b * b, "· 4ac =", 4 * a * c, "→ 판별식 D =", D)\nif D >= 0:\n    r1 = (-b - D ** 0.5) / (2 * a)\n    r2 = (-b + D ** 0.5) / (2 * a)\n    print("근", r1, r2, "→ 작은 것부터", min(r1, r2), max(r1, r2))\nfor t in [0, 0.5, 1, 1.5, 2]:\n    print("t =", t, "초 높이", 10 * t - 5 * t * t)', trace: true } },
   ],
   summary: ['y = ax² + bx + c: a < 0 산, a > 0 골짜기', '꼭짓점 x = −b ÷ (2a)', '판별식 b² − 4ac 로 x축과 만나는 개수'] },
-{ id: 'M4_explog', ch: 4, n: 3, title: '두 배씩 vs 반씩', subtitle: '지수함수와 로그함수', level: '고2', stars: 2, prereq: ['M1_power'], uses: ['algo', 'data'], icon: '🪞', minutes: 15, mode: 'text',
+{ id: 'M4_explog', ch: 4, n: 3, title: '두 배씩 vs 반씩', subtitle: '지수함수와 로그함수', level: '고2', stars: 2, prereq: ['M1_power'], uses: ['algo', 'data'], icon: '🪞', mode: 'text',
   params: [{ id: 'b', label: '밑 b', min: 1.2, max: 4, step: 0.1, default: 2 }],
   terms: { '지수함수': 'y = bˣ. x가 1 늘 때마다 y가 b배', '로그함수': 'y = log_b x. 지수함수의 거꾸로 — "b를 몇 번 곱해야 x가 되나"', '역함수': '입력과 출력을 맞바꾼 함수. 그래프는 y = x 직선에 대해 대칭' },
   pages: [
@@ -529,7 +529,7 @@ const LESSONS = [
       example: { code: 'import math\nmoney = 1000\nyear = 0\nwhile money < 2000:\n    money *= 1.2\n    year += 1\n    print(year, "년 뒤:", round(money, 2))\nprint("반복:", year, "년")\nprint("로그:", round(math.log(2) / math.log(1.2), 3), "→ 올림", math.ceil(math.log(2, 1.2)))', trace: true } },
   ],
   summary: ['지수 bˣ: 1 늘 때마다 b배 / 로그 log_b x: 그 거꾸로', '서로 역함수 — y = x 에 대해 대칭', 'log_b x = ln x ÷ ln b'] },
-{ id: 'M4_trig', ch: 4, n: 4, title: '돌면서 오르내리기', subtitle: '삼각함수와 단위원', level: '고2', stars: 2, prereq: ['M5_vec'], uses: ['game'], icon: '🎡', minutes: 15, mode: 'text',
+{ id: 'M4_trig', ch: 4, n: 4, title: '돌면서 오르내리기', subtitle: '삼각함수와 단위원', level: '고2', stars: 2, prereq: ['M5_vec'], uses: ['game'], icon: '🎡', mode: 'text',
   params: [{ id: 'deg', label: '각도 θ', min: 0, max: 360, step: 5, default: 30, unit: '°' }],
   terms: { '사인': 'sin θ = 반지름 1인 원(단위원) 위 점의 높이(y)', '코사인': 'cos θ = 단위원 위 점의 가로 위치(x)', '라디안': '각도를 원호 길이로 재는 단위. 180° = π rad, 컴퓨터의 sin·cos 는 라디안을 받아요' },
   pages: [
@@ -543,7 +543,7 @@ const LESSONS = [
       example: { code: 'import math\ndeg = 30\nprint("도 그대로 넣으면 cos", round(math.cos(deg), 4), "← 30라디안으로 계산됨")\nt = math.radians(deg)\nprint(deg, "° =", round(t, 4), "라디안 → cos", round(math.cos(t), 4), "sin", round(math.sin(t), 4))\nr = 3\nfor k in range(4):\n    a = math.radians(360 * k / 4)\n    x, y = round(r * math.cos(a), 2), round(r * math.sin(a), 2)\n    print(360 * k // 4, "°:", x, y, "→ + 0:", x + 0, y + 0)', trace: true } },
   ],
   summary: ['단위원 위 점 = (cos θ, sin θ)', 'sin 은 높이, cos 은 가로 — 돌리면 파도', 'math.sin 은 라디안: math.radians(deg)'] },
-{ id: 'M4_limit', ch: 4, n: 5, title: '가까이 갈수록', subtitle: '극한의 수치 체험', level: '고2', stars: 2, prereq: ['M4_linear'], uses: ['data'], icon: '🔭', minutes: 15, mode: 'text',
+{ id: 'M4_limit', ch: 4, n: 5, title: '가까이 갈수록', subtitle: '극한의 수치 체험', level: '고2', stars: 2, prereq: ['M4_linear'], uses: ['data'], icon: '🔭', mode: 'text',
   params: [{ id: 'xp', label: 'x', min: -8, max: 8, step: 0.05, default: 1 }],
   terms: { '극한': 'x를 어떤 값에 한없이 가까이 할 때 식의 값이 가까워지는 값. 그 점에서의 값이 없어도 된다' },
   pages: [
@@ -557,7 +557,7 @@ const LESSONS = [
       example: { code: 'def f(x):\n    return (x * x - 1) / (x - 1)\nfor i in range(1, 5):\n    x = 1 + 10 ** -i\n    print(f"x = {x:g} → {f(x):.6f}")\nfor i in range(1, 5):\n    x = 1 - 10 ** -i\n    print(f"x = {x:g} → {f(x):.6f}")\nprint(1.1 * 1.1 - 1, "| 다듬으면", f"{1.1 * 1.1 - 1:.6f}")', trace: true } },
   ],
   summary: ['극한 = 다가갈 때의 목적지 (그 점의 값이 없어도 됨)', 'sin x ÷ x → 1 (x → 0)', '(1 + 1/n)ⁿ → e ≈ 2.718'] },
-{ id: 'M4_tangent', ch: 4, n: 6, title: '그 순간의 기울기', subtitle: '미분 = 접선의 기울기', level: '고2', stars: 2, prereq: ['M4_limit'], uses: ['game', 'data'], icon: '📐', minutes: 18, mode: 'text',
+{ id: 'M4_tangent', ch: 4, n: 6, title: '그 순간의 기울기', subtitle: '미분 = 접선의 기울기', level: '고2', stars: 2, prereq: ['M4_limit'], uses: ['game', 'data'], icon: '📐', mode: 'text',
   params: [{ id: 'a', label: '점 위치 a', min: -2, max: 2, step: 0.5, default: 1 }, { id: 'h', label: '간격 h', min: 0.05, max: 2, step: 0.05, default: 1.5 }],
   terms: { '할선': '곡선 위 두 점을 잇는 직선. 기울기 = 두 점 사이의 평균 변화율', '접선': '곡선의 한 점을 스치듯 지나는 직선. 기울기 = 그 순간의 변화율', '미분': '간격 h → 0 일 때 (f(a+h) − f(a)) ÷ h 의 극한 = 접선의 기울기. x² 의 미분은 2x' },
   pages: [
@@ -571,7 +571,7 @@ const LESSONS = [
       example: { code: 'a = 2\ndef f(x):\n    return x * x\nfor h in [1, 0.1, 0.01, 0.001]:\n    print(f"h = {h}: ({f(a + h):.6f} - {f(a):g}) ÷ {h} = {(f(a + h) - f(a)) / h:.4f}")\nprint("접선 기울기 2a =", 2 * a)\nprint("x³ 의 x = 1 기울기 ≈", round((1.0001 ** 3 - 1 ** 3) / 0.0001, 4), "(정답 3x² = 3)")', trace: true } },
   ],
   summary: ['할선 기울기 = (f(a+h) − f(a)) ÷ h', 'h → 0 이면 접선 기울기 = 미분', 'x² 의 미분은 2x — 코드는 작은 h 로 근사'] },
-{ id: 'M4_poly', ch: 4, n: 7, title: '어디서 꺾이나', subtitle: '다항함수와 극대·극소', level: '고2', stars: 2, prereq: ['M4_tangent'], uses: ['game', 'data'], icon: '🎢', minutes: 15, mode: 'text',
+{ id: 'M4_poly', ch: 4, n: 7, title: '어디서 꺾이나', subtitle: '다항함수와 극대·극소', level: '고2', stars: 2, prereq: ['M4_tangent'], uses: ['game', 'data'], icon: '🎢', mode: 'text',
   params: [{ id: 'a', label: 'a', min: -1, max: 3, step: 0.5, default: 1 }],
   terms: { '극대': '그 근처에서 가장 높은 점(봉우리). 기울기가 + 에서 − 로 바뀌는 곳', '극소': '그 근처에서 가장 낮은 점(골짜기). 기울기가 − 에서 + 로 바뀌는 곳', '도함수': '각 x 에서의 접선 기울기를 모은 함수 f′(x). xⁿ 의 도함수는 n·xⁿ⁻¹' },
   pages: [
@@ -585,7 +585,7 @@ const LESSONS = [
       example: { code: 'a = 1\ndef f(x):\n    return x ** 3 - 3 * a * x\ndef df(x):\n    return 3 * x * x - 3 * a\nprev = None\nx = -2.0\nwhile x <= 2.0:\n    s = df(x)\n    print(f"x = {x:4.1f}  f = {f(x):5.2f}  기울기 = {s:5.2f}")\n    if prev is not None and prev > 0 and s <= 0:\n        print("   ↑ 기울기가 + 에서 0 이하로 → 이 근처가 꼭대기(극대)")\n    if prev is not None and prev < 0 and s >= 0:\n        print("   ↑ 기울기가 - 에서 0 이상으로 → 이 근처가 골짜기(극소)")\n    prev = s\n    x += 0.5', trace: true } },
   ],
   summary: ['기울기(도함수)가 + → − 면 극대, − → + 면 극소', 'xⁿ 의 기울기는 n·xⁿ⁻¹ — x³ − 3ax 는 3x² − 3a', 'f′ = 0 을 풀고, 앞뒤 부호로 봉우리·골짜기 판정'] },
-{ id: 'M4_wave', ch: 4, n: 8, title: '얼마나 크게, 얼마나 자주', subtitle: '삼각함수의 그래프 — 진폭과 주기', level: '고2', stars: 2, prereq: ['M4_trig'], uses: ['game'], icon: '🌊', minutes: 14, mode: 'text',
+{ id: 'M4_wave', ch: 4, n: 8, title: '얼마나 크게, 얼마나 자주', subtitle: '삼각함수의 그래프 — 진폭과 주기', level: '고2', stars: 2, prereq: ['M4_trig'], uses: ['game'], icon: '🌊', mode: 'text',
   params: [{ id: 'A', label: '진폭 A', min: 0.5, max: 3, step: 0.5, default: 2 }, { id: 'T', label: '주기 T', min: 0.5, max: 4, step: 0.5, default: 2, unit: '초' }],
   terms: { '진폭': '출렁임의 크기. 가운데에서 꼭대기까지의 높이 A', '주기': '한 번 오르내리고 제자리로 오는 데 걸리는 시간 T', '진동수': '1초에 몇 번 오르내리나. 1 ÷ T, 단위 Hz(헤르츠)' },
   pages: [
@@ -599,7 +599,7 @@ const LESSONS = [
       example: { code: 'import math\nA = 2\nT = 2\nfor i in range(5):\n    t = T * i / 4\n    y = A * math.sin(2 * math.pi * t / T)\n    print(f"t = {t:.2f}: 그대로 {y:.2f} · round 뒤 + 0 → {round(y, 2) + 0:.2f}")\nprint("440Hz 소리 한 번 떨리는 시간", round(1 / 440, 5), "초")', trace: true } },
   ],
   summary: ['y = A·sin(2πt ÷ T): A 는 높이, T 는 한 번 오르내리는 시간', '진동수 = 1 ÷ T (Hz) — T 를 줄이면 촘촘해진다', '게임: y = y0 + A·sin(2πt/T), −0.00 은 round 뒤 + 0'] },
-{ id: 'M4_ease', ch: 4, n: 9, title: '부드럽게 출발, 부드럽게 도착', subtitle: '보간(lerp)과 이징 함수', level: '고1', stars: 2, prereq: ['M4_quad'], uses: ['game'], icon: '🛝', minutes: 14, mode: 'text',
+{ id: 'M4_ease', ch: 4, n: 9, title: '부드럽게 출발, 부드럽게 도착', subtitle: '보간(lerp)과 이징 함수', level: '고1', stars: 2, prereq: ['M4_quad'], uses: ['game'], icon: '🛝', mode: 'text',
   params: [{ id: 'k', label: '휘는 정도 k', min: 1, max: 4, step: 0.5, default: 2 }],
   terms: { '보간': '두 값 사이의 중간값을 진행률 t(0 ~ 1)로 만드는 것. lerp(a, b, t) = a + (b − a) × t', '이징': '진행률 t 대신 휜 곡선 e(t)를 넣어 출발·도착을 부드럽게 하는 것. ease-in 은 천천히 출발, ease-out 은 천천히 도착' },
   pages: [
@@ -614,7 +614,7 @@ const LESSONS = [
   ],
   summary: ['lerp: a + (b − a) × t — t 는 0 ~ 1 진행률', 'ease-in tᵏ 천천히 출발, ease-out 1 − (1 − t)ᵏ 천천히 도착', '곡선 기울기 = 속도, e(0) = 0·e(1) = 1 은 늘 같다'] },
 // ================= 영역 2 · 논리·집합·증명 (콘텐츠팀 C10 2부 — 기존 그림 kind 만: venn·bits·plot·cells) =================
-{ id: 'M2_set', ch: 2, n: 1, title: '겹치는 것, 합치는 것', subtitle: '집합 연산', level: '고1', stars: 1, prereq: [], uses: ['data', 'algo'], icon: '⭕', minutes: 12, mode: 'text',
+{ id: 'M2_set', ch: 2, n: 1, title: '겹치는 것, 합치는 것', subtitle: '집합 연산', level: '고1', stars: 1, prereq: [], uses: ['data', 'algo'], icon: '⭕', mode: 'text',
   params: [{ id: 'pa', label: 'A %', min: 10, max: 80, step: 5, default: 40 }, { id: 'pb', label: 'B %', min: 10, max: 80, step: 5, default: 50 }, { id: 'pab', label: 'A∩B %', min: 0, max: 60, step: 5, default: 20 }],
   terms: { '교집합': 'A와 B 둘 다에 있는 것 A∩B. 파이썬 a & b', '합집합': 'A나 B 중 하나라도에 있는 것 A∪B. 파이썬 a | b', '차집합': 'A에는 있고 B에는 없는 것 A − B. 파이썬 a - b' },
   pages: [
@@ -628,7 +628,7 @@ const LESSONS = [
       example: { code: 'names = "민지 준호 민지 서연".split()\na = set()\nfor w in names:\n    a.add(w)\n    print(w, "넣기 →", sorted(a), len(a), "명")\nb = {"서연", "하준"}\nprint("둘 다", sorted(a & b), "· 하나라도", sorted(a | b), "· a만", sorted(a - b))\nc = {"도윤"}\nprint("a만:", " ".join(sorted(a - b)) or "없음")\nprint("a와 c 둘 다:", " ".join(sorted(a & c)) or "없음")', trace: true } },
   ],
   summary: ['A∩B 둘 다, A∪B 하나라도, A − B A에만', '|A∪B| = |A| + |B| − |A∩B| (겹친 곳 한 번 빼기)', '파이썬 set: & | - , 중복 제거·빠른 in'] },
-{ id: 'M2_logic', ch: 2, n: 2, title: '참과 거짓의 조합', subtitle: '명제와 진리표', level: '고1', stars: 1, prereq: [], uses: ['algo'], icon: '🔀', minutes: 12, mode: 'text',
+{ id: 'M2_logic', ch: 2, n: 2, title: '참과 거짓의 조합', subtitle: '명제와 진리표', level: '고1', stars: 1, prereq: [], uses: ['algo'], icon: '🔀', mode: 'text',
   params: [{ id: 'v', label: '조합 번호 v', min: 0, max: 7, step: 1, default: 5 }],
   terms: { '명제': '참(True)이나 거짓(False)이 분명한 문장. 코드의 조건식', '진리표': '변수들의 참·거짓 조합을 전부 적고 결과를 채운 표. 변수 n개면 2ⁿ 줄', '드모르간 법칙': 'not (p and q) 는 (not p) or (not q), not (p or q) 는 (not p) and (not q)' },
   pages: [
@@ -642,7 +642,7 @@ const LESSONS = [
       example: { code: 'v = 5\nn = 3\nprint("v =", v, "→", bin(v))\nfor i in range(n):\n    s = n - 1 - i\n    print("왼쪽", i + 1, "번째: v >>", s, "=", v >> s, "→ & 1 =", (v >> s) & 1)\nbits = [(v >> (n - 1 - i)) & 1 for i in range(n)]\nprint(bits, "or:", any(bits), "and:", all(bits))\nfor p in [False, True]:\n    for q in [False, True]:\n        print(int(p), int(q), "| not(p and q):", int(not (p and q)), "· not p or not q:", int((not p) or (not q)))', trace: true } },
   ],
   summary: ['명제 n개 → 참·거짓 조합 2ⁿ (2진수와 짝)', 'and 전부 참, or 하나라도 참, not 뒤집기', '드모르간: not (p and q) = not p or not q'] },
-{ id: 'M2_func', ch: 2, n: 3, title: '짝이 하나씩', subtitle: '함수·일대일·역함수', level: '고1', stars: 2, prereq: ['M4_linear'], uses: ['data'], icon: '🔁', minutes: 14, mode: 'text',
+{ id: 'M2_func', ch: 2, n: 3, title: '짝이 하나씩', subtitle: '함수·일대일·역함수', level: '고1', stars: 2, prereq: ['M4_linear'], uses: ['data'], icon: '🔁', mode: 'text',
   params: [{ id: 'a', label: '기울기 a', min: 0.5, max: 3, step: 0.5, default: 2 }, { id: 'b', label: 'b', min: -3, max: 3, step: 1, default: 1 }],
   terms: { '일대일 함수': '서로 다른 입력이 늘 서로 다른 출력으로 가는 함수. 출력만 보고 입력을 되찾을 수 있다', '역함수': 'f 가 x → y 이면 y → x 로 되돌리는 함수 f⁻¹. 일대일 함수에만 있다' },
   pages: [
@@ -656,7 +656,7 @@ const LESSONS = [
       example: { code: 'a = 3\nb = 1\nx = 4\ny = a * x + b\nprint("f(", x, ") =", a, "×", x, "+", b, "=", y)\nprint("f⁻¹(", y, ") = (", y, "-", b, ") ÷", a, "=", (y - b) / a)\nd = {"가": 1, "나": 2, "다": 1}\nback = {}\nfor k, v in d.items():\n    if v in back:\n        print(v, "은 이미", back[v], "의 짝 → 일대일 아님")\n        break\n    back[v] = k\n    print(k, "→", v, "  뒤집은 표:", back)', trace: true } },
   ],
   summary: ['함수: 입력 하나 → 출력 하나', '일대일이어야 역함수(되돌리기)가 있다', '역함수 그래프 = y = x 에 대해 접은 모양'] },
-{ id: 'M2_pigeon', ch: 2, n: 4, title: '비둘기가 상자보다 많으면', subtitle: '비둘기집 원리', level: '대학', stars: 2, star: true, prereq: [], uses: ['algo'], icon: '🐦', minutes: 12, mode: 'text',
+{ id: 'M2_pigeon', ch: 2, n: 4, title: '비둘기가 상자보다 많으면', subtitle: '비둘기집 원리', level: '대학', stars: 2, star: true, prereq: [], uses: ['algo'], icon: '🐦', mode: 'text',
   params: [{ id: 'n', label: '사람 n', min: 1, max: 24, step: 1, default: 8 }, { id: 'k', label: '상자 k', min: 2, max: 10, step: 1, default: 7 }],
   terms: { '비둘기집 원리': 'n개를 k칸에 넣을 때 n > k 이면 어떤 칸에는 반드시 2개 이상. 일반형: 어떤 칸에는 ⌈n ÷ k⌉개 이상', '올림': '⌈x⌉ — x보다 작지 않은 가장 작은 정수. 파이썬 math.ceil(x), 정수끼리는 (n + k - 1) // k' },
   pages: [

@@ -63,7 +63,8 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('lesson',{lessonId:'L3',page:(Content.lesson('L3').pages||[]).length})"); pg.wait_for_timeout(300); dc=pg.locator('#startDrills').count()
     if dc: pg.click('#startDrills'); pg.wait_for_timeout(500)
     dr=pg.evaluate("({pid:UI.params.pid, drill:!!(UI.params.session&&UI.params.session.drill), ed:!!document.querySelector('#pvEd'), n:Content.drillsOf('L3').length, total:PROBLEMS.length, inProbs:PROBLEMS.some(p=>p.drill)})")
-    check(dc==1 and dr['drill'] and dr['pid'].startswith('L3D') and dr['ed'] and dr['n']==15 and not dr['inProbs'], '⌨ 타자 연습: 레슨 요약 버튼 → 드릴 세션(텍스트), 진도용 PROBLEMS 에는 안 섞임 (QA #96): '+str(dr))
+    # v2.5.0: L3 를 L3·L3B 로 나눠 L3 타자 연습은 7개
+    check(dc==1 and dr['drill'] and dr['pid'].startswith('L3D') and dr['ed'] and dr['n']==7 and not dr['inProbs'], '⌨ 타자 연습: 레슨 요약 버튼 → 드릴 세션(텍스트), 진도용 PROBLEMS 에는 안 섞임 (QA #96): '+str(dr))
     pg.evaluate("UI.go('typing')"); pg.wait_for_timeout(300); ty=pg.evaluate("({v:UI.view, note:!!document.querySelector('.ty-note') && document.querySelector('.ty-note').textContent.includes('PC'), lessons:document.querySelectorAll('[data-l]').length})")
     pg.evaluate("Sessions.drillMix(['L3'])"); pg.wait_for_timeout(400); ty2=pg.evaluate("({drill:!!(UI.params.session&&UI.params.session.drill), allL3:UI.params.session.pids.every(id=>id.startsWith('L3D')), coach:!!document.querySelector('#pvCoach .coach')})")
     check(ty['v']=='typing' and ty['note'] and ty['lessons']>=1 and ty2['drill'] and ty2['allL3'] and not ty2['coach'], '⌨ 백문이불여일타 화면: PC 권장 안내·레슨 체크 → 고른 범위 드릴, 따라하기 숨김 (QA #96): '+str(ty)+str(ty2))

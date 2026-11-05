@@ -115,6 +115,7 @@ dfn.term{font-style:normal;font-weight:800;font-size:1.12em;text-decoration:unde
 .coach-all{margin:4px 0 8px 46px;padding-left:1.2em;font-size:.92em;line-height:1.6;color:var(--muted)}.coach-all li.done{text-decoration:line-through;opacity:.6}.coach-all li.cur{color:var(--text);font-weight:700}
 .coach-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.coach-foot .sm{font-size:.85em}
 @keyframes coachflash{0%{box-shadow:0 0 0 0 rgba(43,182,115,.7)}100%{box-shadow:0 0 0 14px rgba(43,182,115,0)}}
+.lref{font-weight:700;border-bottom:1px dotted var(--muted);cursor:help}
 /* Parsons */
 .parsons{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pz-col{min-width:0}.pz-head{font-weight:700;font-size:.9em;margin-bottom:6px}.pz-head small{color:var(--muted);font-weight:normal}
 .pz-list{min-height:120px;border:1px dashed var(--border);border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:5px;background:var(--surface2)}.pz-empty{color:var(--muted);font-size:.85em;padding:8px}
