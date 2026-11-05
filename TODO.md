@@ -18,7 +18,7 @@
 | O6 | **C12 수학 「상」 #145~#147 → 수학 「중」** (D4 후순위, 그림 kind 가 새로 필요하면 Fable) | `specs/content-team.md` C12, `QA.md` | 열림 |
 | O7 | C6~C9 (힌트 품질 점검·알고 실전 연습 문제·수학 표기) | `specs/content-team.md` 3절 | 열림 |
 
-Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별 검증(`node tools/check_level.mjs --gate`, 터미널 `node tools/run_shell_solutions.mjs`, SQL `python3 tools/run_sql_solutions.py`, 웹 `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py` 가 통과해야 PR. 버전·stamp 는 올리지 않는다(릴리스 때 Fable). CHANGELOG 「미배포」에 항목 한 줄. 새 레슨·새 문제 type·그림 kind·core 수정은 Fable 에게(HANDOFF 에 메모).
+Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별 검증(`node tools/check_level.mjs --gate`, 터미널 `node tools/run_shell_solutions.mjs`, SQL `python3 tools/run_sql_solutions.py`, 웹 `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py` 가 통과해야 PR. 과제가 끝나면 **Opus 가 패치 릴리스 PR 을 직접 낸다**(`APP_VERSION` 2.7.z+1 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 항목을 `## v2.7.z — 날짜 (Opus·콘텐츠 릴리스)` 아래로 → HANDOFF 상태판 한 줄 → `release/v2.7.z` PR). 사용자가 머지하면 배포. Fable 은 core 가 바뀔 때 마이너(2.8.0)로. (11/6 개정 — 「버전은 Fable 만」 옛 규칙 폐기) 새 레슨·새 문제 type·그림 kind·core 수정은 Fable 에게(HANDOFF 에 메모).
 
 ## Fable 용 — core (위에서부터)
 

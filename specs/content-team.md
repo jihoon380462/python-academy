@@ -11,7 +11,7 @@
 
 ## 2. 검증·배포 (푸시 전 필수)
 
-`node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` → 통과하면 PROBLEMS.md 표 추가 → CHANGELOG 맨 위 `## 미배포` 절에 항목 추가(버전 머리글 없이) → `[content] C4: …` 커밋 → `git push -u origin content/C4-…` → `gh pr create --base main --fill`. **`APP_VERSION`·stamp·HANDOFF 상태판은 건드리지 않는다**(릴리스 때 Fable). 가능하면 `python3 tools/regress.py`. PR 의 `PR Check` 가 초록이어야 병합된다.
+`node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` → 통과하면 PROBLEMS.md 표 추가 → CHANGELOG 맨 위 `## 미배포` 절에 항목 추가(버전 머리글 없이) → `[content] C4: …` 커밋 → `git push -u origin content/C4-…` → `gh pr create --base main --fill`. **(11/6 개정) 과제가 끝나면 Opus 가 직접 패치 릴리스 PR 을 낸다**(`specs/workflow.md` 7절·`schedule-week.md` 4절 5번: `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG 머리글 → HANDOFF 상태판 → `release/vX.Y.Z` PR → 사용자 머지). ~~`APP_VERSION`·stamp·HANDOFF 상태판은 건드리지 않는다**(릴리스 때 Fable). 가능하면 `python3 tools/regress.py`. PR 의 `PR Check` 가 초록이어야 병합된다.
 
 ## 3. 과제 목록 (위에서부터, 하나씩 배포)
 

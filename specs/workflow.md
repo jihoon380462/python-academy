@@ -77,7 +77,11 @@ Fable 세션(엔진·설계·검토·릴리스) 외에 **Opus 채팅 네 개를 
 
 ## 8. 브랜치·PR 규칙 — "먼저 끝낸 쪽이 바로 배포" 금지 (2026-11-02)
 
-**배포 권한은 Fable 이상(Fable·사용자)에게만 있다. Opus(QA팀·콘텐츠팀·core 작업 포함)는 배포하지 않는다** — main 푸시, PR 병합, `APP_VERSION` 올림, `node tools/stamp.mjs`, HANDOFF 상태판 갱신 전부 Fable 의 릴리스 커밋에서만 한다. main 에 푸시되면 곧바로 GitHub Pages 에 배포되기 때문이다. 팀 작업은 전부 브랜치 → PR → (Fable) 검토 → 병합 → 릴리스 순서다.
+**(2026-11-06 사용자 지시로 개정) 배포 = main 에 PR 을 병합하는 것 = 사용자만 한다(main 보호: PR 필수 + `verify` 체크).** 릴리스 PR 은 **Opus 도 Fable 도 낸다**:
+- **Opus(콘텐츠) 릴리스 = 패치 버전** `APP_VERSION` x.y.**z+1**(예 2.7.1 → 2.7.2). 절차는 `specs/schedule-week.md` 4절 5번과 같다: 게이트 통과 → `core/config.js` `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 항목을 `## vX.Y.Z — 날짜 (Opus·콘텐츠 릴리스: 과제 이름)` 머리글 아래로 → HANDOFF 0절 상태판 「현재 버전」「마지막 작업」 한 줄 → 브랜치 `release/vX.Y.Z` 로 PR → 사용자에게 보고(버전·들어간 것·확인할 화면). 콘텐츠 과제 브랜치(`content/…`)를 그대로 릴리스 PR 로 올려도 된다(버전 커밋만 더 얹기).
+- **Fable(core) 릴리스 = 마이너 버전** x.**y+1**.0. core 가 바뀌는 PR 만.
+- 둘이 동시에 열려 있으면 나중에 머지되는 쪽이 `origin/main` 을 머지해 버전을 다시 매긴다(validate 가 `?v=` 불일치를 잡는다 → `node tools/stamp.mjs` 다시).
+- 옛 규칙(「APP_VERSION·stamp·HANDOFF 는 Fable 만」)은 폐기. 11/5 저녁 TODO·content-team 에 그 옛 규칙을 다시 적은 것은 Fable 의 실수였다.
 
 1. **브랜치 이름**: `content/<과제>` (예 `content/C4-glossary`), `qa/<날짜-주제>` (예 `qa/1102-round1`), Opus core 작업은 `core/<주제>`. 시작: `git fetch origin && git switch -c content/C4-glossary origin/main`.
 2. **커밋**: 평소대로(`[content]`·`[qa]`·`[core]` 접두). **`APP_VERSION`·`sw.js`·HTML `?v=`·HANDOFF 상태판은 손대지 않는다.** CHANGELOG 는 맨 위 `## 미배포` 절 아래에 항목만 추가한다(버전 머리글 없이). PROBLEMS.md 표 추가는 OK.
