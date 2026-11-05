@@ -146,7 +146,7 @@ with sync_playwright() as p:
     check(pg.locator('.blank').count()>=1, '빈칸 문제 렌더')
     # 버그·Parsons·텍스트 렌더
     pg.evaluate("UI.go('problem',{pid:'L2P4',lessonId:'L2'})"); pg.wait_for_timeout(300); check(pg.locator('.bugline').count()>0, '버그 문제 렌더')
-    pg.evaluate("UI.go('problem',{pid:'L6P2',lessonId:'L6'})"); pg.wait_for_timeout(300); check(pg.locator('.pz-tile.pz-ans').count()==1 and pg.locator('.pz-bank .pz-tile').count()>0, 'Parsons 렌더 + 저장된 배치 복원')
+    pg.evaluate("UI.go('problem',{pid:'L6P2',lessonId:'L6'})"); pg.wait_for_timeout(300); check(pg.locator('.pz-tile').count()==0 and pg.locator('#pvEd textarea').count()==1 and pg.evaluate("document.querySelector('#pvEd textarea').value.startsWith('while True:')"), 'v2.8.1: 옛 Parsons 문제(L6P2)가 타이핑 편집기 + 시작 코드로 열림')
     # v2.4.0 블록·Parsons→타자 전환: 옛 저장(mode parsons/block)이 남아 있어도 code 문제는 starter 로 열린다
     pg.evaluate("UI.go('problem',{pid:'L5P2',lessonId:'L5'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('.pz-tile').count()==0 and 'total = 0' in pg.evaluate("(document.querySelector('.ted textarea')||{}).value || ''"), '옛 Parsons 기록이 있는 문제 → 타자 편집기(starter)로')
     pg.evaluate("UI.go('problem',{pid:'L1P2',lessonId:'L1'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('.bed').count()==0 and pg.evaluate("(document.querySelector('.ted textarea')||{}).value || ''").startswith('print("나는")'), '옛 블록 기록이 있는 문제 → 타자 편집기(starter)로')

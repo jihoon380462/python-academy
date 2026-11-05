@@ -4,7 +4,11 @@ const Audio = {
   ctx: null, get on() { return Store.data.settings.sound; },
   wave() { const s = INVENTORY.sound.find(x => x.id === Store.data.settings.soundSet); return s ? s.wave : 'sine'; },
   _ctx() { if (!this.ctx) { try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (this.ctx.state === 'suspended') this.ctx.resume(); return this.ctx; },
-  tone(freq, dur = 0.12, type = null, vol = 0.18, delay = 0, slide = 0) { if (!this.on) return; const c = this._ctx(); if (!c) return; const o = c.createOscillator(), g = c.createGain(); o.type = type || this.wave(); const t = c.currentTime + delay; o.frequency.setValueAtTime(freq, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + slide), t + dur); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + 0.02); },
+  tone(freq, dur = 0.12, type = null, vol = 0.18, delay = 0, slide = 0) { if (!this.on) return; const c = this._ctx(); if (!c) return; const o = c.createOscillator(), g = c.createGain(); o.type = type || this.wave(); const t = c.currentTime + delay; o.frequency.setValueAtTime(freq, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + slide), t + dur); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(this._out(c)); o.start(t); o.stop(t + dur + 0.02); },
+  // 사용자 제보(11/6): 제출 때 테스트마다 소리가 겹쳐 커짐 → 모든 소리를 리미터(DynamicsCompressor) + 마스터 볼륨에 통과시켜 겹쳐도 상한
+  _out(c) { if (this._master && this._master.context === c) return this._comp; try { const comp = c.createDynamicsCompressor(); comp.threshold.value = -20; comp.knee.value = 6; comp.ratio.value = 12; comp.attack.value = 0.003; comp.release.value = 0.15; const m = c.createGain(); m.gain.value = 0.8; comp.connect(m); m.connect(c.destination); this._comp = comp; this._master = m; return comp; } catch (e) { return c.destination; } },
+  _gap(name, ms) { const now = performance.now(); this._last = this._last || {}; if (now - (this._last[name] || 0) < ms) return false; this._last[name] = now; return true; }, // 같은 소리를 ms 안에 또 내지 않음
+  tick() { if (this._gap('tick', 120)) this.tone(1320, 0.04, 'sine', 0.05); }, // 테스트 하나 통과: 아주 작은 틱 (예전엔 pass 2음)
   click() { this.tone(900, 0.05, 'square', 0.06); },
   pass() { this.tone(660, 0.08); this.tone(880, 0.1, null, 0.18, 0.08); },
   clear() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.15, null, 0.2, i * 0.09)); this.tone(1319, 0.35, null, 0.2, 0.36); },
@@ -13,7 +17,7 @@ const Audio = {
   badge() { this.tone(1200, 0.08, 'triangle', 0.15); this.tone(1800, 0.14, 'triangle', 0.15, 0.07); },
   boss() { [262, 330, 392, 523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.2, null, 0.22, i * 0.11)); this.tone(1319, 0.7, null, 0.22, 0.8); },
   wrong() { this.tone(180, 0.18, 'sawtooth', 0.12, 0, -60); },
-  hit() { this.tone(120, 0.12, 'square', 0.15, 0, -50); },
+  hit() { if (this._gap('hit', 120)) this.tone(120, 0.1, 'square', 0.08, 0, -50); },
   type() { this.tone(1500, 0.02, 'square', 0.02); },
 };
 const Haptic = { tap(ms = 20) { if (Store.data.settings.vibrate && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) {} } };
