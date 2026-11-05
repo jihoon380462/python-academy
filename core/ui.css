@@ -7,7 +7,9 @@
 :root{--on-primary:#fff}
 :root[data-theme=dark]{--primary-text:#7cb4ff;--bg:#0c111b;--surface:#161d2b;--surface2:#1e2738;--border:#344157;--text:#f4f7fb;--muted:#aab4c5;--primary:#1f6feb;--primary2:#1a5fd0;--accent:#1f6feb;--accent2:#1a5fd0;--success:#3fb950;--danger:#f2555a;--warn:#e3a92a;--gold:#e6c46a;--shadow:0 6px 24px rgba(0,0,0,.35)}
 :root[data-theme=light]{--primary-text:#0f4fa8;--bg:#eef1f6;--surface:#ffffff;--surface2:#f4f6fa;--border:#c6cfdb;--text:#0e1625;--muted:#4a5568;--primary:#1a73e8;--primary2:#1557b0;--accent:#1a73e8;--accent2:#1557b0;--success:#1e8e3e;--danger:#d93025;--warn:#b26a00;--gold:#a67c00;--shadow:0 6px 20px rgba(30,40,80,.10)}
-[data-font="0"]{--fs:14px;--code-size:13px}[data-font="1"]{--fs:16px;--code-size:14px}[data-font="2"]{--fs:18px;--code-size:16px}[data-font="3"]{--fs:20px;--code-size:18px}
+/* v2.8.4 넓은 화면(FHD·2K·4K): 사용자가 고른 글자 크기(설정 0~3)에 화면 폭 비율 --wide 를 곱한다 — 설정을 덮어쓰지 않음 */
+:root{--wide:1}
+[data-font="0"]{--fs:calc(14px * var(--wide));--code-size:calc(13px * var(--wide))}[data-font="1"]{--fs:calc(16px * var(--wide));--code-size:calc(14px * var(--wide))}[data-font="2"]{--fs:calc(18px * var(--wide));--code-size:calc(16px * var(--wide))}[data-font="3"]{--fs:calc(20px * var(--wide));--code-size:calc(18px * var(--wide))}
 :root[data-contrast="1"][data-theme=dark]{--on-primary:#0b0f17;--primary-text:#8fbcff;--bg:#000;--surface:#0d0d12;--surface2:#1a1a24;--border:#5a607a;--text:#ffffff;--muted:#c3c7d6;--primary:#5aa0ff;--accent:#5aa0ff;--success:#3ddb8c;--danger:#ff7a86;--gold:#ffe08a}:root[data-contrast="1"][data-theme=light]{--primary-text:#0b4fc2;--bg:#fff;--surface:#fff;--surface2:#f0f2f8;--border:#6b7187;--text:#000;--muted:#3a3f52;--primary:#0b4fc2;--accent:#0b4fc2;--success:#0f7a44;--danger:#c3203a}
 [data-contrast="1"] .btn{border-width:2px}[data-contrast="1"] .muted{color:var(--muted)}
 [data-anim="0"] *{animation:none!important;transition:none!important}
@@ -357,3 +359,9 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 
 /* v2.7.0 뼈대 코스: 준비 중 레슨 */
 .lc.draft,.tr-l.draft{opacity:.55}.lc-st.draft{color:var(--muted)}.lc.draft .lc-n{border-style:dashed}
+/* v2.8.4 넓은 화면 대응 (사용자 요청 11/6 「2K 화면까지 지원」): 1920px↑ 글자 ×1.125·내용 폭 1600, 2400px↑(2K·QHD) ×1.25·1840, 3400px↑(4K) ×1.5·2200. 1919px 이하는 그대로 */
+/* 상단바 아이콘(svg width=20)·높이도 같은 비율 */
+.ico{width:calc(20px * var(--wide));height:calc(20px * var(--wide))}#topbar{min-height:calc(52px * var(--wide))}
+@media (min-width:1920px){:root{--wide:1.125}#view{max-width:1600px}.page{max-width:1040px}.lesson.lp2{max-width:1600px}#view.view-problem{max-width:1880px}.ex3-cols{grid-template-columns:280px minmax(0,1fr) 340px}}
+@media (min-width:2400px){:root{--wide:1.25}#view{max-width:1840px}.page{max-width:1160px}.lesson.lp2{max-width:1840px}#view.view-problem{max-width:2160px}.ex3-cols{grid-template-columns:310px minmax(0,1fr) 380px}}
+@media (min-width:3400px){:root{--wide:1.5}#view{max-width:2200px}.page{max-width:1400px}.lesson.lp2{max-width:2200px}#view.view-problem{max-width:2600px}.ex3-cols{grid-template-columns:360px minmax(0,1fr) 440px}}
