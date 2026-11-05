@@ -13,7 +13,7 @@ const Store = {
   blank() {
     return { v: CONFIG.SCHEMA_VERSION, nick: '', mascotColor: 0, onboarded: false, xp: 0, badges: [], badgeDates: {}, stats: {}, problems: {}, lessons: {},
       streak: { cur: 0, best: 0, last: null }, days: {}, dailyGoal: 5, dailyGoalDates: {},
-      settings: { theme: 'dark', font: 1, sound: true, vibrate: true, anim: 2, apiKey: '', model: CONFIG.TUTOR.defaultModel, editorTheme: 'classic', confetti: 'rainbow', soundSet: 'bell', accessory: 'none', turtleSpeed: 6 },
+      settings: { theme: 'dark', font: 1, sound: true, vibrate: true, anim: 2, apiKey: '', model: CONFIG.TUTOR.defaultModel, editorTheme: 'classic', confetti: 'rainbow', soundSet: 'bell', accessory: 'none', turtleSpeed: 6, game: false },
       works: [], tutorChats: {}, myProblems: [], bestTimes: {}, dailyChallenge: null, checkups: {}, playgroundXp: { date: '', amount: 0 }, polished: {}, examplesEdited: {}, reviewToday: { date: '', count: 0 }, chapterPerfect: {}, last: null };
   },
   _get(k) { try { const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; } catch (e) { console.warn('저장 데이터 읽기 실패', k, e); return null; } },

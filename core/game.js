@@ -74,6 +74,7 @@ const Game = {
   lessonDone(l) { if (l.mock) return !!Store.data.stats['boss_' + l.id]; let ps = Content.problemsOf(l.id); if (l.practical) { const pj = ps.filter(p => p.project); if (pj.length) ps = pj; } /* QA #72: 실전 레슨은 프로젝트만 완료 조건(연습 문제는 선택) */ return ps.length > 0 && ps.every(p => Store.prob(p.id).status === 'clear'); },
   // 수학 노드 숙련도 링 0~3: ① 탐구(탐구 퀴즈 전부 클리어 또는 그림 페이지를 끝까지 봄) ② 풀이(문제 전부) ③ 유지(복습 2단계 이상) (v2.3.0)
   mastery(l) { const ps = Content.problemsOf(l.id); if (!ps.length) return 0; const ex = ps.filter(p => p.kind === 'explore'); const lp = Store.data.lessons[l.id] || {}; const m1 = ex.length ? ex.every(p => Store.prob(p.id).status === 'clear') : (lp.page || 0) >= (l.pages || []).length; const m2 = this.lessonDone(l); const m3 = m2 && ps.every(p => (Store.prob(p.id).review || {}).stage >= 2); return m3 ? 3 : m2 ? 2 : m1 ? 1 : 0; },
+  showGame() { return !!(Store.data.settings && Store.data.settings.game); }, // v2.6.0 ⑤: XP·레벨·스트릭·뱃지·콘페티·레벨업 팝업은 설정 「게임 요소 보기」를 켰을 때만 (성인·모던 디자인 기본값 끔)
   lessonStars(l) { const ps = Content.problemsOf(l.id); if (!ps.length) return 0; return Math.min(...ps.map(p => Store.prob(p.id).stars)); },
   currentLesson() { /* v2.5.0: 가장 멀리 간 레슨부터 찾고(뒤에 새로 끼운 문제 때문에 앞 레슨으로 되돌아가지 않게), 없으면 처음부터 */ const far = Math.max(0, this.furthestIdx()); for (let i = far; i < LESSONS.length; i++) { const l = LESSONS[i]; if (this.lessonOpen(l) && !this.lessonDone(l)) return l; } for (const l of LESSONS) { if (this.lessonOpen(l) && !this.lessonDone(l)) return l; } return LESSONS[LESSONS.length - 1]; },
 };

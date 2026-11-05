@@ -191,6 +191,30 @@ Create ONE PNG badge for a consistent educational game medal set. Flat vector st
 
 자리 없는 그림(노드 아이콘·레슨 머리)은 아래 4절, Fable 제안으로만.
 
+## 3-B. 8차 요청 — 디자인 개편(v2.6.0, 사용자 결정 D1·D3 11/5): 성인용 · 깔끔·모던 · **선 아이콘·단색·추상 도형** (요청 확정 — 아트 역할이 ChatGPT 에 맡기고 검수)
+
+**스타일이 바뀌었어요.** 1절의 「플랫 벡터풍·둥근 스티커·귀여운 악당」은 이 차수부터 **쓰지 않아요**. 새 기준(specs/ref/modern-ui-*.png):
+
+| 항목 | 새 규칙 |
+| --- | --- |
+| 톤 | 성인 개발자용 학습 도구. 캐릭터·얼굴·동물·마스코트 없음. 이모지 느낌 없음 |
+| 모양 | **선 아이콘(stroke 2px, 둥근 끝)** 또는 **단색 추상 도형**(원·사각·화살표·괄호·점선). 한 장에 소재 하나, 장식 없음 |
+| 색 | **단색**: 어두운 배경용은 `#e9edf3`(흰 계열) 선 + 포인트 1곳만 파랑 `#1a73e8`. 밝은 배경용 따로 만들지 않고 **투명 PNG 한 장**으로 — 선 색이 중간 회색 `#8e98a9` 이면 둘 다에서 보여요 |
+| 크기 | 512×512, 여백 12%, 배경 투명 |
+| 금지 | 그라데이션·그림자·입체·질감·글자 |
+
+| # | 파일 | 자리(코드) | 내용 (영어 프롬프트) | 상태 |
+| --- | --- | --- | --- | --- |
+| 8-1 | `course-python.png` | 허브 코스 카드 아이콘(지금은 글자 `Py`, `core/hub.js` `.hc-glyph` — 그림이 오면 교체) | Minimal line icon, a single pair of curly braces { } with a small blue dot inside, 2px stroke, rounded ends, monochrome light gray #8e98a9 with one blue #1a73e8 dot, transparent background, no text, no gradient | 요청 |
+| 8-2 | `course-algo.png` | 허브 코스 카드 | Minimal line icon of three vertical bars of increasing height with a small arrow across the top (sorting), 2px stroke, monochrome #8e98a9, one bar highlighted #1a73e8, transparent | 요청 |
+| 8-3 | `course-terminal-git.png` | 허브 코스 카드 | Minimal line icon of a terminal prompt chevron > and a short underscore cursor inside a rounded rectangle, 2px stroke, #8e98a9, cursor #1a73e8, transparent | 요청 |
+| 8-4 | `course-sql.png` | 허브 코스 카드 | Minimal line icon of a database cylinder (three stacked ellipses), 2px stroke, #8e98a9, top ellipse #1a73e8, transparent | 요청 |
+| 8-5 | `course-web.png` | 허브 코스 카드 | Minimal line icon of angle brackets < / > with a slash, 2px stroke, #8e98a9, slash #1a73e8, transparent | 요청 |
+| 8-6 | `course-math.png` | 허브 공간 카드 | Minimal line icon of a sigma Σ drawn as a single polyline, 2px stroke, #8e98a9, one corner dot #1a73e8, transparent | 요청 |
+| 8-7 | `boss-python-1.png` ~ `boss-python-7.png`, `boss-algo-1..5.png` | 지도 보스 카드 56px 자리(`.lc.boss .lc-n`), 보스 문제 화면 | **캐릭터 대신 추상 도형**: 챕터 번호만큼의 동심 육각형(1챕터 1겹 … 7챕터 7겹)을 가는 선으로, 중앙에 작은 파랑 점. Abstract geometric emblem: N concentric hexagon outlines (N = chapter number), 1.5px stroke #8e98a9, small filled blue #1a73e8 circle at the center, transparent background, no face, no character | 요청 (기존 보스 캐릭터 12장은 「게임 요소 보기」를 켰을 때만 쓰도록 바꿀 예정 — 지금은 자리에 그대로 들어가 있음) |
+
+**빠진 것·안 쓰게 된 그림(지우지는 말 것, 설정으로 되살릴 수 있게)**: `hero-hub.png`(허브 배너 — v2.6.0 에서 자리 삭제), `chapter-<course>-<n>.png`(지도 챕터 제목 옆 — 탐색기 트리에는 자리 없음), `course-*.png` 동물 아이콘(글자 아이콘으로 대체, 8-1~8-6 이 오면 그림으로), 지도 노드의 마스코트. 뱃지 그림 60여 장은 뱃지 화면에서만 쓰고 홈·상단바에는 안 나와요(「게임 요소 보기」 끔이 기본).
+
 ## 4. 그 뒤 (자리 없음 — 만들지 말 것)
 
 | 파일 | 크기 | 쓰이는 곳 | 메모 |
