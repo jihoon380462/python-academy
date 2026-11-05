@@ -149,7 +149,7 @@ const Coach = {
     const self = {
       check(step, code) {
         if (!step.c) return false; const cs = Array.isArray(step.c) ? step.c : [step.c]; const n = Coach.norm(code); const ed = getEd();
-        return cs.every(c => { if (typeof c !== 'string') return false; if (c.startsWith('@pz:')) { const k = c.slice(4); if (!ed || !ed.answer) return false; if (k === 'any') return ed.answer.length > 0; const sol = Grader.parsonsLines(p.parsons.solution)[+k]; const a = ed.answer[+k]; return !!(a && sol && a.text === sol.text && a.indent === sol.indent); } if (c.startsWith('~')) { try { return new RegExp(c.slice(1)).test(n); } catch (e) { return false; } } return n.includes(Coach.norm(c)); });
+        return cs.every(c => { if (typeof c !== 'string') return false; if (c.startsWith('@pz:')) { const k = c.slice(4); if (!ed || !ed.answer) return false; if (k === 'any') return ed.answer.length > 0; const sol = Grader.parsonsLines(p.parsons.solution)[+k]; const a = ed.answer[+k]; return !!(a && sol && a.text === sol.text && a.indent === sol.indent); } if (c.startsWith('~')) { try { return new RegExp(c.slice(1)).test(n); } catch (e) { return false; } } const nc = Coach.norm(c); if (!nc) return true; const need = 1 + steps.slice(0, Math.max(0, steps.indexOf(step))).filter(s2 => (Array.isArray(s2.c) ? s2.c : [s2.c]).includes(c)).length; return n.split(nc).length - 1 >= need; }); /* 사용자 제보(11/6): 같은 줄이 정답에 두 번 나오면(B3P1 item = parts[1]) 첫 번째 줄 때문에 두 번째 단계가 저절로 통과돼 건너뛰어짐 → 앞 단계에 같은 줄이 k개 있으면 코드에 k+1개 있어야 통과 */
       },
       update(code) {
         if (st.i >= steps.length - 1) { if (!el.firstChild) self.render(); return; }
