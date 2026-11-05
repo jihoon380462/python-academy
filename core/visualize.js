@@ -12,7 +12,7 @@
 //   Viz.runAndShow(host, { code, input, spec, editor }) : 코드를 추적 실행해 플레이어로 (내 코드 모드·데모 모드 공용)
 const Viz = {
   css(name, fb) { const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fb; },
-  theme() { return { bg: this.css('--surface', '#181b26'), fg: this.css('--text', '#e6e8f0'), muted: this.css('--muted', '#8b90a8'), border: this.css('--border', '#2d3247'), primary: this.css('--primary', '#6c8cff'), accent: this.css('--accent', '#2bb673'), warn: this.css('--warn', '#ffb347'), danger: this.css('--danger', '#ff5d6c'), gold: this.css('--gold', '#ffd166'), surface2: this.css('--surface2', '#222636') }; },
+  theme() { return { bg: this.css('--surface', '#181b26'), fg: this.css('--text', '#e6e8f0'), muted: this.css('--muted', '#8b90a8'), border: this.css('--border', '#2d3247'), primary: this.css('--primary', '#1a73e8'), accent: this.css('--accent', '#2ea043'), warn: this.css('--warn', '#ffb347'), danger: this.css('--danger', '#ff5d6c'), gold: this.css('--gold', '#ffd166'), surface2: this.css('--surface2', '#222636') }; },
   num(v) { return typeof v === 'number' ? v : (typeof v === 'string' && v.trim() !== '' && !isNaN(+v)) ? +v : null; },
   get(snap, name) { if (!name) return undefined; if (Array.isArray(name)) return name.map(n => snap[n]); return snap[name]; },
   // ---------- 개별 그림 ----------

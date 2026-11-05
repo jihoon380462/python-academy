@@ -4,9 +4,9 @@
 //   kind 목록 (M1): modring sieve euclid bits floatline plot bars tree hist venn montecarlo cells scatter vector transform unitcircle
 //   공통 규칙: 격자·축·단위 표시, 파라미터당 색 1개(팔레트 5색) + 모양 병행, 조작 요소는 한 화면에 3개 이하, 터치 손잡이 반경 22px.
 const Fig = {
-  palette: ['#6c8cff', '#ff5d6c', '#2bb673', '#ffb347', '#9c27b0'],
+  palette: ['#1a73e8', '#ff5d6c', '#2ea043', '#ffb347', '#9c27b0'],
   kinds: {},
-  theme() { const css = (n, fb) => { const v = getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v || fb; }; return { bg: css('--surface', '#181b26'), fg: css('--text', '#e6e8f0'), muted: css('--muted', '#8b90a8'), border: css('--border', '#2d3247'), primary: css('--primary', '#6c8cff'), accent: css('--accent', '#2bb673'), warn: css('--warn', '#ffb347'), danger: css('--danger', '#ff5d6c'), gold: css('--gold', '#ffd166'), surface2: css('--surface2', '#222636'), light: document.documentElement.dataset.theme === 'light' }; },
+  theme() { const css = (n, fb) => { const v = getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v || fb; }; return { bg: css('--surface', '#181b26'), fg: css('--text', '#e6e8f0'), muted: css('--muted', '#8b90a8'), border: css('--border', '#2d3247'), primary: css('--primary', '#1a73e8'), accent: css('--accent', '#2ea043'), warn: css('--warn', '#ffb347'), danger: css('--danger', '#ff5d6c'), gold: css('--gold', '#ffd166'), surface2: css('--surface2', '#222636'), light: document.documentElement.dataset.theme === 'light' }; },
   rng(seed) { let a = (seed >>> 0) || 1; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; },
   // 식 평가: x 와 파라미터 이름만 변수로. Math 함수는 이름 그대로 (sin, cos, exp, log, sqrt, abs, pow, floor, PI, E)
   fn(expr, p) { const keys = Object.keys(p); const math = ['sin', 'cos', 'tan', 'exp', 'log', 'log2', 'log10', 'sqrt', 'abs', 'pow', 'floor', 'ceil', 'round', 'min', 'max', 'PI', 'E', 'atan2', 'sign']; try { const f = new Function(...keys, ...math, 'x', 'i', 'return (' + expr + ')'); const mv = math.map(m => Math[m]); return (x, i) => { try { return f(...keys.map(k => p[k]), ...mv, x, i); } catch (e) { return NaN; } }; } catch (e) { return () => NaN; } },

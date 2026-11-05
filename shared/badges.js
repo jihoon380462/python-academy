@@ -64,7 +64,7 @@ const BADGES = [
 // 에러 사전
 const INVENTORY = {
   editorTheme: [
-    { id:'classic', name:'클래식', unlock:null, css:{bg:'#1e1e2e', fg:'#cdd6f4', kw:'#cba6f7', str:'#a6e3a1', num:'#fab387', com:'#6c7086'} },
+    { id:'classic', name:'클래식', unlock:null, css:{bg:'#0f141c', fg:'#d6dde8', kw:'#c678dd', str:'#e5c07b', num:'#d19a66', com:'#7d8799'} },
     { id:'paper', name:'종이', unlock:{level:5}, css:{bg:'#fdf6e3', fg:'#586e75', kw:'#859900', str:'#2aa198', num:'#d33682', com:'#93a1a1'} },
     { id:'ocean', name:'바다', unlock:{level:12}, css:{bg:'#0b2239', fg:'#d7e9ff', kw:'#7dd3fc', str:'#86efac', num:'#fde68a', com:'#64748b'} },
     { id:'forest', name:'숲', unlock:{badge:'turtle5'}, css:{bg:'#13261b', fg:'#d9f5e0', kw:'#8bd3a0', str:'#f5d67b', num:'#f7a072', com:'#5e7d68'} },
