@@ -3,7 +3,7 @@
 #   1) v1 저장 데이터 → v2 마이그레이션 수치 보존  2) 허브 렌더·이어서 하기  3) 코스 페이지 전 화면 + 문제 유형별 채점  4) 모바일 390px 가로 스크롤 없음  5) 콘솔 에러 0
 import json, os, sys, time
 from playwright.sync_api import sync_playwright
-ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); HUB='file://'+os.path.join(ROOT,'index.html'); COURSE='file://'+os.path.join(ROOT,'courses/python/index.html')
+ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); HUB='file://'+os.path.join(ROOT,'index.html'); COURSE='file://'+os.path.join(ROOT,'courses/python/index.html')+'?classic=1'; BOOKURL='file://'+os.path.join(ROOT,'courses/python/index.html')  # v2.9.0: 파이썬은 교과서 모드가 기본 — 예전 문제집 화면(엔진 회귀)은 ?classic=1
 SHOT=os.path.join(ROOT,'tools/.out/shots'); os.makedirs(SHOT,exist_ok=True)
 V1={"v":1,"nick":"테스터","mascotColor":1,"onboarded":True,"xp":385,"badges":["first_run","first_clear"],"badgeDates":{"first_run":"2026-10-20"},"stats":{"runs":12},
     "problems":{"L0P1":{"status":"clear","stars":3,"hints":0,"attempts":1,"fails":0,"code":None,"mode":None,"clearedAt":"2026-10-20"},"L3P2":{"status":"try","stars":0,"hints":1,"attempts":2,"fails":1,"code":"n = int(input())\n","mode":"text"},"L5P2":{"status":"none","stars":0,"hints":0,"attempts":0,"fails":0,"code":json.dumps({"answer":[{"text":"total = 0","indent":0}]}),"mode":"parsons"},"L6P2":{"status":"none","stars":0,"hints":0,"attempts":0,"fails":0,"code":json.dumps({"answer":[{"text":"while True:","indent":0}]}),"mode":"parsons"},"L1P2":{"status":"try","stars":0,"hints":0,"attempts":1,"fails":1,"code":json.dumps({"blocks":{"languageVersion":0,"blocks":[]}}),"mode":"block"}},
@@ -32,7 +32,7 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==6 and r['ready']==2, f"코스 카드 6개(코스 5 + 수학 공간), 열린 것 2개 (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==6 and r['ready']==3, f"코스 카드 6개(코스 5 + 수학 공간), 열린 것 3개(v2.9.0 파이썬 보스 잠금 없앰) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and '#' in r['cont'], '이어서 하기 링크: '+str(r['cont']))
     check('일일 목표 2/5' in (r['today'] or ''), '오늘의 할 일: '+(r['today'] or '').replace('\n',' '))
     pg.screenshot(path=SHOT+'/hub.png')
@@ -455,6 +455,20 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('problem',{pid:'S0P3',lessonId:'S0'})"); pg.wait_for_timeout(400); pg.fill('.blank[data-b="0"]','SELECT'); pg.fill('.blank[data-b="1"]','FROM'); pg.click('#btnGrade'); pg.wait_for_timeout(600); check(pg.evaluate("Store.prob('S0P3').status")=='clear', 'S0P3(fill 키워드 빈칸) 정답')
     pg.set_viewport_size({'width':390,'height':800}); pg.evaluate("UI.go('problem',{pid:'S0P1',lessonId:'S0'},false)"); pg.wait_for_timeout(400); pg.click('.pv-tabs button[data-t="work"]'); pg.wait_for_timeout(200); check(pg.evaluate('document.documentElement.scrollWidth')<=390, 'SQL 문제 화면 모바일 가로 스크롤 없음'); pg.set_viewport_size({'width':1280,'height':900})
     sqlerr=[e for e in errors[n0:] if 'sql-wasm' not in e and 'Py' not in e]; check(not sqlerr, 'SQL 코스 pageerror 0 (%s)' % (sqlerr[:2] or 'OK')); pg.evaluate("Store.data.settings.unlockAll=false; Store.save()")
+    print('[파이썬 교과서 모드 v2.9.0]'); n0=len(errors); pg.set_viewport_size({'width':1280,'height':900}); pg.goto(BOOKURL); pg.wait_for_timeout(1200)
+    check(pg.evaluate("document.documentElement.classList.contains('book-mode') && !!document.querySelector('.bk-setup') && document.querySelectorAll('.bk-step').length===4"), '교과서 홈: 「시작하기」 4단계(설치·VS Code·첫 실행·쓰는 법)')
+    check(pg.evaluate("document.querySelectorAll('.bk-l').length") >= 40 and pg.evaluate("!document.querySelector('.tb-xp') && !document.querySelector('.modal-ov')"), '교과서 홈: 레슨 목록, XP 없음, 첫 방문 질문 창 없음')
+    pg.click('.bk-step[data-sp="0"]'); pg.wait_for_timeout(300); check('Add python.exe to PATH' in pg.inner_text('.bk-art'), '시작하기 1: PATH 체크 안내')
+    pg.evaluate("UI.go('lesson',{lessonId:'L5',page:0})"); pg.wait_for_timeout(300); check(pg.evaluate("!!document.querySelector('.bk-code .bk-copy') && !document.querySelector('#exRun') && !document.querySelector('.ted')"), '교과서 레슨: 예제는 복사 버튼만(브라우저 실행·편집기 없음)')
+    pg.click('.bk-tab.make'); pg.wait_for_timeout(300); check(pg.locator('.bk-task').count() >= 3 and pg.locator('.bk-task .bk-need').count() >= 3 and pg.locator('.bk-ans').count() >= 3, '교과서 레슨: 「만들어 보기」 문장 문제 + 필요한 문법 + 접힌 예시 답')
+    pg.click('.bk-task .bk-need >> nth=0'); pg.wait_for_timeout(300); check(pg.evaluate("UI.view")=='lesson' and pg.evaluate("UI.params.lessonId") in ('L5','L3B','L1','L2','L3'), '필요한 문법 누르면 그 설명 쪽으로')
+    pg.goto(HUB); pg.wait_for_timeout(300); pg.goto(BOOKURL+'#problem/L4P2'); pg.wait_for_timeout(1200); bk=pg.evaluate("[UI.view, UI.params.lessonId, document.querySelectorAll('.bk-tab.make.on').length, location.hash]"); check(bk[:3]==['lesson','L4',1], '옛 문제 주소 #problem/L4P2 → 레슨 4 「만들어 보기」 %s' % bk)
+    pg.evaluate("UI.go('lesson',{lessonId:'B3',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-task').count()==2 and '가계부' in pg.inner_text('.bk-art'), '보스(B3) = 챕터 「만들어 보기」 큰 문제 2개')
+    pg.evaluate("UI.go('lesson',{lessonId:'X1',page:8})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prep').count()==1 and 'data.csv' in pg.inner_text('.bk-prep'), '실전 프로젝트: 준비 파일(data.csv) 내용 보여 주기')
+    pg.set_viewport_size({'width':390,'height':800}); pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.evaluate("document.documentElement.scrollWidth")<=390, '교과서 폰 390px: 가로 넘침 없음')
+    pg.evaluate("UI.go('lesson',{lessonId:'L12',page:4})"); pg.wait_for_timeout(300); check(pg.evaluate("document.documentElement.scrollWidth")<=390, '교과서 폰 390px: 만들어 보기 가로 넘침 없음')
+    pg.set_viewport_size({'width':1280,'height':900})
+    berr=[e for e in errors[n0:] if 'Py' not in e]; check(not berr, '교과서 모드 pageerror 0 (%s)' % (berr[:2] or 'OK'))
     b.close()
 cdn=[e for e in errors if 'importScripts' in e or 'pyodide' in e.lower()]
 real=[e for e in errors if e not in cdn]
