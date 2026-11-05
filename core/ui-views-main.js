@@ -224,12 +224,11 @@ Views.problem = (root, params) => {
         ${instant ? '' : `<div class="pv-brief"><div class="pv-brief-t">${esc(p.title)}</div><div class="pv-brief-p">${UI.terms(p.prompt)}</div><button class="lnk" id="briefDesc">설명 전체 보기 ▸</button></div>`}
         <div class="pv-focusbar"><button class="btn sm" id="btnFocus" title="문제 설명을 접고 작업판을 넓게 써요">${focus ? '⛶ 집중 모드 끄기' : '⛶ 집중 모드'}</button>${focus ? `<span class="pv-focus-title" title="${esc(p.title)}">${esc(p.title)}</span><button class="btn sm" id="fbDesc">📄 설명</button><button class="btn sm" id="fbHint">힌트</button><button class="btn sm tutor" id="fbTutor">💬 선생님</button>` : ''}</div>
         ${isBoss ? `<div class="bosshp"><div class="bosshp-h">${UI.img(`boss-${Store.course}-${l.ch}.png`, '👾', 'boss-img')} 보스 HP</div><div class="hpbar"><div class="hpfill" style="width:100%"></div></div><div class="bosshp-n">${tests.length}/${tests.length}</div></div>` : ''}
-        <div class="pv-mode" id="pvMode"></div>
-        <div class="pv-io" id="pvIo"></div>
-        <div class="pv-tests" id="pvTests"></div>
-        <div class="pv-trace" id="pvTrace"></div>
-        <div class="pv-result" id="pvResult"></div>
+        <div class="pv-cols"><div class="pv-main"><div class="pv-mode" id="pvMode"></div><div class="pv-io" id="pvIo"></div></div>
+        <div class="pv-side"><div id="pvIoSide"></div><div class="pv-tests" id="pvTests"></div><div class="pv-trace" id="pvTrace"></div><div class="pv-result" id="pvResult"></div></div></div>
       </div></div>`;
+    /* v2.8.7 넓은 화면 3단(사용자 요청 11/6): 입력값·출력 칸은 결과 쪽(.pv-side)으로 옮겨 둔다 — 좁은 화면에선 위아래로 쌓여 순서가 전과 같고, 1920px↑ 에선 「설명 | 코드 | 출력·테스트」. io.innerHTML 을 다시 쓰는 곳이 여러 군데라 감시로 처리 */
+    { const io0 = $('#pvIo', root), side0 = $('#pvIoSide', root); if (io0 && side0) { const moveIo = () => { const els = $$('#pvIo > .stdin-wrap, #pvIo > .out-wrap', root); if (!els.length) return; side0.innerHTML = ''; els.forEach(e => side0.appendChild(e)); }; new MutationObserver(moveIo).observe(io0, { childList: true }); } }
     UI.bindTerms(root);
     $$('.pv-tabs button', root).forEach(b => b.onclick = () => { $$('.pv-tabs button', root).forEach(x => x.classList.remove('on')); b.classList.add('on'); root.querySelector('.pv').dataset.tab = b.dataset.t; });
     if (instant && UI.isMobile()) { const w = $('.pv-work', root), pr = $('.pv-prompt', root); if (w && pr) pr.insertAdjacentElement('afterend', w); } // 즉시 채점형: 보기를 지문 바로 아래에

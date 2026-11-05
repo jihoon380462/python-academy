@@ -365,3 +365,11 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 @media (min-width:1920px){:root{--wide:1.125}#view{max-width:1600px}.page{max-width:1040px}.lesson.lp2{max-width:1600px}#view.view-problem{max-width:1880px}.ex3-cols{grid-template-columns:280px minmax(0,1fr) 340px}}
 @media (min-width:2400px){:root{--wide:1.25}#view{max-width:1840px}.page{max-width:1160px}.lesson.lp2{max-width:1840px}#view.view-problem{max-width:2160px}.ex3-cols{grid-template-columns:310px minmax(0,1fr) 380px}}
 @media (min-width:3400px){:root{--wide:1.5}#view{max-width:2200px}.page{max-width:1400px}.lesson.lp2{max-width:2200px}#view.view-problem{max-width:2600px}.ex3-cols{grid-template-columns:360px minmax(0,1fr) 440px}}
+/* v2.8.7 넓은 화면 문제 3단 (사용자 요청 11/6): 1920px↑ 에서 코드 쪽(.pv-main)과 결과 쪽(.pv-side)을 나란히 → 「설명 | 코드 | 출력·테스트」. 출력 칸이 있는 문제(코드·버그 등)만. 집중 모드면 설명이 접혀 코드 | 결과 2단 */
+.pv-cols{min-width:0}.pv-main,.pv-side{min-width:0}
+@media (min-width:1920px){
+  .pv:not(.instant){grid-template-columns:minmax(300px,23%) minmax(0,1fr)}
+  .pv-cols:has(#pvIoSide .out-wrap){display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
+  .pv-cols:has(#pvIoSide .out-wrap) .pv-side{position:sticky;top:calc(64px * var(--wide));max-height:calc(100vh - 80px * var(--wide));overflow:auto;padding-right:2px}
+  .pv-cols:has(#pvIoSide .out-wrap) .pv-side .out{max-height:none;min-height:120px}
+}
