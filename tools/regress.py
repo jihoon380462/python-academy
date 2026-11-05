@@ -191,7 +191,7 @@ with sync_playwright() as p:
     pg.evaluate("Store.data.works.push({id:'w_t', name:'테스트 작품', code:'print(1)\\nprint(2)', src:'X1P1', course:'python', date:Date.now(), mode:'text', steps:4, total:4}); Store.save(); UI.go('works')"); pg.wait_for_timeout(300)
     check(pg.locator('.work-card').count()>=1 and pg.locator('[data-review]').count()==0 and '단계 4/4' in pg.locator('#view').inner_text(), '내 작품 갤러리: 프로젝트 카드 (리뷰 버튼은 선생님 꺼짐으로 없음)')
     pg.evaluate("Store.data.settings.unlockAll=false")
-    for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','playground','works']:
+    for v in ['badges','profile','inventory','settings','glossary','errors','weakness','review','timeattack','works']:
         pg.evaluate(f"UI.go('{v}')"); pg.wait_for_timeout(300); check(len(pg.locator('#view').inner_text())>10, f'화면 {v}')
     pg.evaluate("Store.data.stats.badgesSeenAt=0; Store.data.badgeDates.first_clear=Date.now(); Store.data.stats.runs=12; Store.data.badges=Store.data.badges.filter(b=>b!=='secret_night'); /* 밤(0~5시)에 돌리면 시각 뱃지가 붙어 개수가 달라져요 */ UI.go('badges')"); pg.wait_for_timeout(300)
     check(pg.locator('.badge.got').count()==2 and pg.locator('.badge.new').count()>=1 and pg.locator('.b-prog').count()>=20 and pg.locator('.badge.secret .b-q').count()>=4 and pg.locator('[data-bf]').count()==4, '뱃지 화면: 획득 2·NEW·미획득 진행 막대·비밀 ❔·필터')
@@ -231,7 +231,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('problem',{pid:'AB4P1',lessonId:'AB4'})"); pg.wait_for_timeout(400); check('입력 형식' in pg.locator('.pv-prompt').inner_text() and '코딩테스트' in pg.locator('.pv-head').inner_text(), '코딩테스트 형식 문제')
     cm=pg.locator('#pvCoach').inner_html(); pg.evaluate("UI.go('problem',{pid:'AB4P1',lessonId:'AB4',session:{mock:true,pids:['AB4P1'],goto(){},startAt:Date.now()}})"); pg.wait_for_timeout(400)
     check(len(cm)>0 and pg.locator('#pvCoach').inner_html()=='' and pg.locator('#btnAnswer').count()==0 and pg.locator('#btnHint').count()==1, '모의고사 중에는 따라하기·정답 보기 없음, 힌트는 있음 (QA #3)')
-    pg.evaluate("UI.go('playground')"); pg.wait_for_timeout(300); check(pg.locator('[data-m="block"]').count()==0, '놀이터에 블록 탭 없음')
+    pg.evaluate("UI.go('playground')"); pg.wait_for_timeout(300); check(pg.evaluate('UI.view')=='home', '놀이터 삭제(v2.8.0): 옛 playground 링크는 홈으로')
     pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300); check(pg.locator('#sUnlock').count()==1, '설정: 전제 무시 스위치')
     vz = pg.evaluate(VIZ_JS)
     check(vz['ok1'] and vz['frames']==3 and vz['errs']==0, "시각화 플레이어·8종 그리기 (frames=%s, errs=%s)" % (vz['frames'], vz['errs']))

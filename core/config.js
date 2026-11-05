@@ -2,7 +2,7 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.7.2',
+  APP_VERSION: '2.8.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
@@ -57,7 +57,6 @@ const CONFIG = {
   REVIEW_BONUS: 20,                       // 복습 3개 완료 보너스
   REVIEW_INTERVALS: [1, 3, 7, 14, 30],    // 일
   REVIEW_SIZE: 5,                         // 복습 한 번에 고르는 문제 수 (Review.plan)
-  PLAYGROUND_XP: 5, PLAYGROUND_XP_DAILY_MAX: 50,
   BOSS_XP_RATIO: 0.5,
   DAILY_CHALLENGE_MULT: 2,
   CHECKUP_SIZE: 10, CHECKUP_PASS: 0.8, CHECKUP_BONUS: 40,
@@ -85,7 +84,7 @@ const T = {
   appName: '파이썬 아카데미',
   home: '홈', run: '실행', runAll: '제출하기', stepRun: '한 줄씩 보기', hint: '힌트', answer: '정답 보기',
   askTutor: '선생님에게 물어보기', next: '다음', prev: '이전', back: '뒤로', close: '닫기', save: '저장', load: '불러오기',
-  settings: '설정', badges: '뱃지', profile: '프로필', inventory: '보관함', playground: '놀이터', works: '내 작품',
+  settings: '설정', badges: '뱃지', profile: '프로필', inventory: '보관함', works: '내 작품',
   glossary: '용어집', errorDict: '에러 사전', weakness: '약점 분석', review: '복습', dailyChallenge: '오늘의 도전',
   timeAttack: '타임 어택', checkup: '종합 점검', level: '레벨', xp: 'XP', streak: '연속 학습', combo: '콤보',
   stdin: '입력값', output: '출력', tests: '테스트', passed: '통과', failed: '실패', clear: '클리어!', locked: '잠김',
@@ -98,7 +97,7 @@ const T = {
   keyBad: '키가 올바르지 않아요. 설정에서 다시 확인해 주세요.', rateLimit: '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.',
   netErr: '인터넷 연결을 확인해 주세요.', keyOk: '연결 성공! 선생님과 대화할 수 있어요.',
   chips: ['뭐가 틀렸어요?', '이 에러가 무슨 뜻이에요?', '다른 방법도 있어요?', '이 개념 다시 설명해 주세요'],
-  learned: '이번에 배운 것', example: '따라 하기', tryIt: '실행해 보기', toPlayground: '놀이터로 가져가기',
+  learned: '이번에 배운 것', example: '따라 하기', tryIt: '실행해 보기',
   confirmReset: '정말 모든 진행을 초기화할까요? 되돌릴 수 없어요.', confirmReset2: '정말요? 레벨·뱃지·코드가 모두 사라져요.',
   importConfirm: '불러오면 지금 진행이 덮어써져요. 계속할까요?', exported: '진행 파일을 내려받았어요.',
   dailyGoal: '일일 목표', goalDone: '오늘 목표 달성!', reviewDone: '기억 유지! 복습 완료',
@@ -113,5 +112,5 @@ const T = {
 4. 현재 레슨 범위를 벗어난 개념은 "그건 나중에 배워요"라고 미루고 지금 범위 안에서 설명해.
 5. 답은 300자 안팎, 코드 예시는 3줄 이내. 마크다운 코드 블록을 써도 돼.
 6. 사용자가 이미 "정답 보기"를 열었다면(맥락에 표시됨) 전체 코드 설명도 허용해.`,
-  tutorSystemFree: `너는 프로그래밍을 처음 배우는 한국어 사용자를 돕는 친절한 파이썬 선생님이야. 지금은 놀이터에서 자유롭게 코드를 만드는 중이라 완성 코드를 보여 줘도 돼. 쉬운 말, 짧은 문장, 비유를 먼저 쓰고 전문 용어는 한 문장으로 풀어 써. 답은 400자 안팎.`,
+  tutorSystemFree: `너는 프로그래밍을 처음 배우는 한국어 사용자를 돕는 친절한 파이썬 선생님이야. 지금은 자유 질문 중이라 완성 코드를 보여 줘도 돼. 쉬운 말, 짧은 문장, 비유를 먼저 쓰고 전문 용어는 한 문장으로 풀어 써. 답은 400자 안팎.`,
 };

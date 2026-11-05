@@ -41,7 +41,12 @@
 .sh-graph{margin-top:8px;overflow-x:auto}
 .sh-svg{display:block;max-width:none}
 .sh-ge{stroke:var(--muted);stroke-width:2;fill:none}
-.sh-gc circle{fill:var(--surface2);stroke:var(--primary);stroke-width:2.5;transition:r .3s}.sh-gc.head circle{fill:var(--primary)}
+.sh-gc circle{fill:var(--surface2);stroke:var(--primary);stroke-width:2.5;transition:r .3s}
+/* v2.8.0 커밋 그래프 애니메이션 (ui-views-shell.js animateGraph): 이동=transform 전환, 새 커밋=피어남, 새 선=그려짐, 이름표·바뀐 선=스며듦 */
+.sh-gc,.sh-gl{transition:transform .5s cubic-bezier(.2,.8,.2,1)}.sh-born circle{transform-box:fill-box;transform-origin:center;animation:shBorn .5s cubic-bezier(.2,1.4,.4,1)}.sh-born text{animation:shFade .5s}.sh-draw{transition:stroke-dashoffset .55s ease-out .1s}.sh-fade{animation:shFade .5s}
+@keyframes shBorn{from{transform:scale(0)}to{transform:scale(1)}}@keyframes shFade{from{opacity:0}to{opacity:1}}
+.sh-gnote{margin-top:6px;font-size:.85em;color:var(--primary-text);position:sticky;left:0}
+@media (prefers-reduced-motion:reduce){.sh-gc,.sh-gl,.sh-draw{transition:none}.sh-born circle,.sh-born text,.sh-fade{animation:none}}.sh-gc.head circle{fill:var(--primary)}
 .sh-gh{fill:var(--muted);font-family:var(--mono);font-size:9px}
 .sh-gl rect{fill:var(--surface2);stroke:var(--border);stroke-width:1}.sh-gl text{fill:var(--text);font-family:var(--mono);font-size:10px}
 .sh-gl.head rect{fill:var(--primary);stroke:var(--primary)}.sh-gl.head text{fill:#fff;font-weight:700}

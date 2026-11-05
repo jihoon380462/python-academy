@@ -108,7 +108,7 @@ const Sync = {
       this.set('syncing'); const changed = await this.pull();
       if (force || (Store.data.updatedAt || 0) > this.cfg.lastLocalUpdated || changed) await this.push();
       this.cfg.lastSyncAt = Date.now(); this.saveCfg(); this.set('ok');
-      if (changed) { if (!this._quiet && this.lastPullProgress && this.toastOk()) UI.toast('☁ 다른 기기의 진행 상황을 가져왔어요', 1500); if (UI.view && !['problem', 'lesson', 'playground'].includes(UI.view)) UI.go(UI.view, UI.params, false); else UI.renderTopbar(); }
+      if (changed) { if (!this._quiet && this.lastPullProgress && this.toastOk()) UI.toast('☁ 다른 기기의 진행 상황을 가져왔어요', 1500); if (UI.view && !['problem', 'lesson'].includes(UI.view)) UI.go(UI.view, UI.params, false); else UI.renderTopbar(); }
       return changed;
     } catch (e) { this.set('err', this.errMsg(e)); console.warn('sync', e); return false; }
     finally { this.busy = false; if (this.pending) { this.pending = false; this.schedulePush(); } }
