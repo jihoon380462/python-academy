@@ -26,9 +26,12 @@
 | C6 | **파이썬 L9~L18 힌트 품질 점검** — C5와 같은 기준(방향→구체→거의 정답, 3단계 = 정답 코드와 같은 변수명) | `courses/python/content.js` 기존 힌트 줄만 | QA.md에 C5 형식으로 표 추가 |
 | C7 | **알고리즘 A0~A15·AB1~AB3 힌트 품질 점검** — 같은 기준 + `kind:'ct'` 문제는 힌트 3이 입출력 형식까지 | `courses/algo/content.js` 기존 힌트 줄만 | QA.md 표 추가 |
 | C8 | **알고리즘 실전 E1~E6 연습 문제** — 실전 레슨마다 프로젝트 전에 푸는 작은 `code` 문제 1개(프로젝트의 한 단계만 떼어낸 것, 테스트 4개) | `courses/algo/content.js` 끝에 push, config algo total(값만) | validate·run_solutions 통과 |
+| **C10** (v2.7.0, 사용자 11/5 「콘텐츠는 Opus」) | **「풀 수 있나」 맞추기 — TODO ★4-2·★4-3·★4-4.** ① `node tools/check_level.mjs` 표(파이썬 30·알고 7)에 걸린 문제를 3-2절 규칙대로 고친다. 우선순위: B5P1·B5P2(`is None`·삼항 — 본문에 없음), B7P2(`not in`·`.endswith`), AB5P1(`chr/ord` — A16 본문에 한 쪽 추가), L17(5문제 중 4개가 새 기능 3~5개 — 쉬운 것부터 계단), L4(전 문제가 if/else/비교 3~4개 — 첫 문제는 if 하나만), L14, L15P1·L6P1·L9P1(첫 문제가 가장 무거움 — 순서 바꾸기), X1·X3·X5·X6 프로젝트(새 기능 3~4 — starter 에 더 적어 두기). `(지문○)` 표시는 지문에만 있는 것 — 본문에 한 줄 넣을지 판단. 고친 뒤 `node tools/check_level.mjs --update-baseline`. ② 긴 코드 줄 약 230개(74쪽, L17·X1~X4)를 줄 나눠 쓰기(상자 안 가로 스크롤 없애기). ③ QA-OPEN 파이썬 「중」 #128~#139·타자 연습 #139·#144. | `courses/python/content.js`·`courses/algo/content.js` 내용만 | check_level 걸린 수 감소(baseline 갱신)·validate·run_solutions·regress 통과·고친 레슨은 직접 풀어 보기 |
+| **C11** (v2.7.0) | **레슨 나누기 2차**(★2 규칙: 한 레슨 = 개념 하나~둘, 5~6쪽 이하, 문제 3~5개) — 파이썬 L1(7쪽)·L2(8)·L4(7)·L5(8, 종합 점검 1 위치 같이)·L9(8)·L13(7)·L17(8)·L19(7, L16B 와 겹침 → 줄이기)·L20(8)·L21(7)·L18B(개념 5 → map·filter / enumerate·zip·max); 알고리즘 6쪽 레슨 A6·A16·A18·A19. **v2.5.0 방식 그대로**: 문제 id 는 안 바꾸고 lesson 만 옮김, 새 레슨 id 는 알파벳 접미(L4B), n 다시 매김, 본문의 「레슨 N」은 `[[레슨:ID]]` 토큰, CHECKUPS after 갱신, config total/lessons 값. 실전 X1·X3·X4 의 새 문법 쪽은 앞 레슨으로. | `courses/python/content.js`·`courses/algo/content.js` | validate(레슨 토큰)·regress 통과, CHANGELOG 「미배포」에 항목 |
+| **C12** (v2.7.0) | **수학 「상」 #145~#147** — M5_eigen 절댓값·바늘 그림, M4_ease 문장(QA.md 고칠 내용대로) → 수학 「중」(11/4 검수: 그림 겹침·점선·숫자 답 안내·퀴즈 정답 첫 보기). 그림 kind 가 새로 필요하면 Fable 에게. | `courses/math/content.js` 값·문구만 | QA.md 닫힘 표시 |
 | C9 | **수학 난이도·범위 표기 재점검**(QA #33) — 28노드 `level`(고1/고2/대학)·`stars` 기준을 PROBLEMS.md 수학 절에 적고 맞추기 | `courses/math/content.js` level/stars 값만 — **Fable M2 작업 중이면 M2 배포 뒤에** | QA #33 닫힘 |
 
-C1~C5 완료(v2.3.6). **C6부터.** 한 과제 = 한 브랜치 = PR 하나(버전은 릴리스 때 Fable이). 수학 `content.js`는 Fable 이 M2 로 고치는 동안(HANDOFF 상태판 확인) 건드리지 않는다 — C9는 그 뒤. 과제를 끝내면 HANDOFF "다음 후보"의 콘텐츠 줄을 갱신하고 다음 과제로.
+C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(새 코스 채우기, 아래 절) → C11 → C12 → C6~C9 순.** 사용자 결정(11/5): 콘텐츠는 전부 Opus, core 는 Fable. 한 과제 = 한 브랜치 = PR 하나(버전은 릴리스 때 Fable이). 수학 `content.js`는 Fable 이 M2 로 고치는 동안(HANDOFF 상태판 확인) 건드리지 않는다 — C9는 그 뒤. 과제를 끝내면 HANDOFF "다음 후보"의 콘텐츠 줄을 갱신하고 다음 과제로.
 
 ## 3-2. 문제 난이도 규칙 (2026-11-05 추가, QA #160)
 
