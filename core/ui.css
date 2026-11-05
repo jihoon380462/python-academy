@@ -51,7 +51,8 @@ select{padding:8px 10px;border-radius:8px;border:1px solid var(--border);backgro
 .toast{background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(-10px);transition:.3s}.toast.show{opacity:1;transform:none}
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:flex;align-items:center;justify-content:center;padding:16px}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;box-shadow:var(--shadow);animation:pop .25s}.modal.wide{max-width:560px}
-.modal-title{font-weight:800;font-size:1.15em;padding:16px 18px 6px}.modal-body{padding:6px 18px}.modal-btns{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px 16px;flex-wrap:wrap}
+.modal{display:flex;flex-direction:column;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px)} /* QA #159: 가로 폰 「아주 크게」에서 창이 화면보다 커져 제목이 잘리던 것 — 창은 화면 안, 본문만 스크롤 */
+.modal-title{font-weight:800;font-size:1.15em;padding:16px 18px 6px;overflow-wrap:anywhere;flex:none}.modal-body{padding:6px 18px;overflow:auto;min-height:0}.modal-btns{flex:none}.modal-btns{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px 16px;flex-wrap:wrap}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
 /* 카드 */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}.card.hot{border-color:var(--gold)}.card-h{font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}.card-h small{color:var(--muted);font-weight:normal}
@@ -288,6 +289,8 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 /* QA #122(사용자 제보 11/4): 줄 앞 공백을 한 칸마다 점으로 — 4칸인지 3·5칸인지 바로 보이게. 4의 배수가 아니면 빨간 바탕 */
 .cm-lead{background-image:radial-gradient(circle at 50% 55%,rgba(128,128,128,.7) 0 1.3px,transparent 1.8px);background-size:1ch 100%;background-repeat:repeat-x}.cm-lead-odd{background-color:rgba(255,93,108,.22)}
 .ted-fb{position:relative}.ted-ind{position:absolute;right:8px;bottom:4px;font-size:.75em;color:var(--muted);pointer-events:none;background:var(--ed-bg);padding:0 4px;border-radius:4px}.ted-ind.odd{color:var(--danger)}
+/* QA #158: 「들여쓰기 n칸」 표시가 마지막 코드 줄을 가리던 것(폰) — 기본 편집기는 아래 여백을 표시 높이만큼(줄 번호 칸도 같이, 스크롤 길이를 맞추려고). 예제 편집기는 줄 수에 맞춘 높이에 그만큼 더함 */
+.ted-ta,.ted-gutter{padding-bottom:2em}.ted.ex-ed:has(.ted-fb){height:calc(var(--ex-lines,6) * var(--code-size) * 1.5 + 22px + 2em)}
 /* QA #120: 세션 중 레슨 설명 창 */
 .lpk-nav{display:flex;gap:6px;align-items:center;margin-bottom:8px}.lpk-nav select{flex:1;min-width:0;padding:6px;border-radius:8px;background:var(--surface2);color:var(--text);border:1px solid var(--border)}.lpk-page{max-height:60vh;overflow:auto}.lpk-page h3{margin:4px 0 8px}
 /* QA #123: 실행 중 멈추기 버튼 */
