@@ -1,0 +1,61 @@
+/* courses/sql/course.css — 데이터베이스(SQL) 코스 전용 화면 (core/ui.css 는 건드리지 않는다, DESIGN.md 16절). 토큰은 v2.6.0 것 그대로 */
+.sqlw{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:12px;align-items:start}
+.sqlw.compact{grid-template-columns:minmax(0,1fr) 200px}
+.sqlw-main{min-width:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--ed-bg)}
+.sqlw-head{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.sqlw-ds{white-space:nowrap}
+.sqlw-ed.ted{border:0;border-radius:0;height:180px;min-height:120px}
+.sqlw.compact .sqlw-ed.ted{height:120px;min-height:90px}
+.sqlw-engine:empty,.sqlw-warn:empty{display:none}
+.sqlw-out{background:var(--surface);border-top:1px solid var(--border);padding:8px 10px;min-height:48px}
+.sqlw-out:empty::before{content:'▶ 실행을 누르면 결과 표가 여기에 나와요';color:var(--muted);font-size:.9em}
+.sqlw-side{min-width:0}
+.sql-notice{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;background:var(--surface);border-top:1px solid var(--border);font-size:.92em;color:var(--text)}
+.sql-notice.err{border-left:4px solid var(--danger)}
+.sql-notice.warn{border-left:4px solid var(--warn)}
+.sql-notice b{font-weight:700}
+.sql-notice span{color:var(--muted)}
+.sql-spin{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:sqlspin .8s linear infinite;display:inline-block}
+@keyframes sqlspin{to{transform:rotate(360deg)}}
+/* 결과 표 */
+.sql-tbl-wrap{overflow:auto;max-height:360px;border:1px solid var(--border);border-radius:8px;background:var(--bg)}
+.sql-tbl{border-collapse:collapse;font-family:var(--mono);font-size:.88em;min-width:100%}
+.sql-tbl th,.sql-tbl td{padding:5px 10px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;color:var(--text)}
+.sql-tbl th{position:sticky;top:0;background:var(--surface2);cursor:pointer;user-select:none;font-weight:700}
+.sql-tbl th:hover{color:var(--primary-text)}
+.sql-tbl th.asc::after{content:' ▲';font-size:.75em}.sql-tbl th.desc::after{content:' ▼';font-size:.75em}
+.sql-tbl td.n{text-align:right}
+.sql-tbl td.diff{background:rgba(229,72,77,.22);outline:1px solid var(--danger)}
+.sql-tbl tbody tr:nth-child(even) td{background:rgba(128,128,128,.05)}
+.sql-null{color:var(--muted);font-style:italic}
+.sql-tbl-meta{margin-top:6px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sql-tbl-title{font-size:.8em;color:var(--muted);margin:6px 0 4px}
+.sql-pager{display:inline-flex;gap:6px;align-items:center}
+.sql-err{font-family:var(--mono);font-size:.9em}
+.sql-err-raw{color:var(--danger);white-space:pre-wrap}
+.sql-err-ko{margin-top:6px;color:var(--text);font-family:inherit}
+/* 스키마 패널 */
+.sqlw-schema{border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:8px 10px;max-height:460px;overflow:auto}
+.sql-sch-h{font-weight:700;font-size:.9em;margin-bottom:6px}
+.sql-sch-row{display:flex;align-items:center;gap:6px}
+.sql-sch-tog,.sql-sch-name,.sql-sch-col{background:none;border:0;color:var(--text);cursor:pointer;font-family:var(--mono);padding:3px 4px;border-radius:6px;text-align:left}
+.sql-sch-tog{color:var(--muted);width:20px;padding:3px 0}
+.sql-sch-name{font-weight:700}
+.sql-sch-name:hover,.sql-sch-col:hover{background:var(--surface2);color:var(--primary-text)}
+.sql-sch-cols{display:flex;flex-direction:column;padding-left:22px}
+.sql-sch-col{display:flex;justify-content:space-between;gap:8px;font-size:.86em;width:100%}
+.sql-sch-col small{color:var(--muted)}
+.sql-sch-smp{padding:2px 0 8px 22px}
+.sql-sch-smp .sql-tbl-wrap{max-height:140px}
+.sql-sch-smp .sql-tbl{font-size:.78em}
+.sql-sch-smp .sql-tbl-meta{display:none}
+/* 채점 결과 */
+.sql-ok{margin-bottom:8px}
+.sql-fail-why{margin-bottom:8px}
+.sql-diff{display:grid;grid-template-columns:1fr 1fr;gap:10px;color:var(--text)}
+.sql-diff-h{font-size:.85em;font-weight:700;margin-bottom:4px;color:var(--text)}
+.sql-diff .sql-tbl-wrap{max-height:260px}
+.result.bad .sql-diff,.result.bad .sql-err-ko,.result.bad .muted{color:var(--text)}
+.chip.type-sql{background:rgba(244,81,30,.15);border-color:rgba(244,81,30,.4)}
+@media (max-width:900px){.sqlw,.sqlw.compact{grid-template-columns:1fr}.sqlw-schema{max-height:240px}.sql-diff{grid-template-columns:1fr}}
+.ex2.sqlw{border:0;background:transparent;overflow:visible}

@@ -9,9 +9,16 @@ RUNNER = r'''
 import sys, json, io
 src = json.loads(sys.stdin.readline())
 stdin_text = src.get('stdin', '')
-real_out = sys.stdout
-cap = io.StringIO()
-sys.stdout = cap; sys.stdin = io.StringIO(stdin_text)
+real_out = sys.stdout; real_err = sys.stderr
+# QA #154: stdout·stderr 를 쓴 순서대로 조각([stream, text])으로 모아 가짜 Pyodide 가 같은 순서로 write 하게 (stderr 순서 검사용)
+chunks = []
+class _W(io.TextIOBase):
+    def __init__(s, k): s.k = k
+    def writable(s): return True
+    def write(s, t):
+        if t: chunks.append([s.k, t])
+        return len(t)
+sys.stdout = _W(0); sys.stderr = _W(1); sys.stdin = io.StringIO(stdin_text)
 g = {'__name__': '__pa__'}
 res = {}
 try:
@@ -25,8 +32,8 @@ try:
             exec(compile(code, '<x>', 'exec'), g); res['v'] = None
 except BaseException as e:
     res['error'] = type(e).__name__ + ': ' + str(e)
-sys.stdout = real_out
-res['out'] = cap.getvalue()
+sys.stdout = real_out; sys.stderr = real_err
+res['out'] = ''.join(t for k, t in chunks if k == 0); res['chunks'] = chunks
 if not isinstance(res.get('v'), (str, int, float, type(None))): res['v'] = str(res['v'])
 print(json.dumps(res))
 '''

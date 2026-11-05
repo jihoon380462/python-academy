@@ -50,8 +50,8 @@ select{padding:8px 10px;border-radius:8px;border:1px solid var(--border);backgro
 #toasts{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:6px;pointer-events:none}
 .toast{background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(-10px);transition:.3s}.toast.show{opacity:1;transform:none}
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:flex;align-items:center;justify-content:center;padding:16px}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;box-shadow:var(--shadow);animation:pop .25s}.modal.wide{max-width:560px}
-.modal-title{font-weight:800;font-size:1.15em;padding:16px 18px 6px}.modal-body{padding:6px 18px}.modal-btns{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px 16px;flex-wrap:wrap}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;box-shadow:var(--shadow);animation:pop .25s;display:flex;flex-direction:column;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px)}.modal.wide{max-width:560px}.modal-body{overflow-y:auto;min-height:0;flex:1 1 auto;overscroll-behavior:contain}.modal-title,.modal-btns{flex:none} /* QA #149: 창이 화면보다 길면(폰 「아주 크게」 복습 끝 요약) 본문만 스크롤하고 제목·버튼은 항상 보이게 */
+.modal-title{font-weight:800;font-size:1.15em;padding:16px 18px 6px;overflow-wrap:anywhere /* QA #159: 가로 폰 아주 크게 — 창 높이 제한·본문 스크롤은 위 .modal(#149 와 공유), 긴 제목은 접음 */}.modal-body{padding:6px 18px}.modal-btns{display:flex;gap:8px;justify-content:flex-end;padding:12px 18px 16px;flex-wrap:wrap}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
 /* 카드 */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}.card.hot{border-color:var(--gold)}.card-h{font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}.card-h small{color:var(--muted);font-weight:normal}
@@ -279,7 +279,7 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 /* 🧠 복습 미리보기·왜 나왔나·끝 요약 (사용자 요청 11/4) */
 .rv-plan .rv-head{font-size:1.05em;margin-bottom:4px}.rv-list{margin:10px 0;padding-left:1.4em;display:flex;flex-direction:column;gap:10px}.rv-list li{line-height:1.45}
 .rv-why{display:flex;flex-direction:column;gap:2px;font-size:.9em;color:var(--muted);margin-top:2px}.rv-why.rv-in{background:var(--surface);border:1px dashed var(--primary);border-radius:10px;padding:8px 12px;margin:0 0 8px;color:var(--text)}.rv-why.rv-in b{margin-bottom:2px}
-.rv-sum{display:flex;flex-direction:column;gap:6px;margin:10px 0}.rv-row{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.rv-row .ok{color:var(--success)}.rv-row .warn{color:var(--gold)}.rv-weak{margin-top:8px}.rv-weak .chip{margin:2px}
+.rv-sum{display:flex;flex-direction:column;gap:6px;margin:10px 0}.rv-row{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.rv-row .ok{color:var(--success)}.rv-row .warn{color:var(--muted);font-weight:600} /* QA #149: 「✓ N번 틀린 뒤 · 힌트」는 --gold(라이트 2.27:1 → v2.6.0 3.8:1) 대신 --muted(라이트 5.4:1·다크 5.5:1) — --gold 는 힌트·별에만 쓰는 토큰(v2.6.0 D1) */.rv-weak{margin-top:8px}.rv-weak .chip{margin:2px}
 /* QA #117(사용자 제보 11/4): 레슨 설명 안의 코드·출력 상자(<pre>)가 글과 구분이 안 되던 것 — 지문 상자와 같은 모양(세 코스 레슨 12곳) */
 .lp-html pre{background:var(--ed-bg);color:var(--ed-fg);padding:8px 12px;border-radius:8px;margin:6px 0;white-space:pre;overflow-wrap:normal;word-break:normal;overflow-x:auto;-webkit-overflow-scrolling:touch;font-family:var(--mono);font-size:var(--code-size);line-height:1.5}.lp-html pre code{white-space:inherit;overflow-wrap:normal}
 /* 사용자 제보 11/5(폰 「코드 가독성」): 레슨 코드 상자·편집기는 줄을 접지 않고 상자 안에서 옆으로 넘겨 봐요 — 낱말 중간에서 끊기고 줄 번호와 어긋나던 것 */
@@ -288,6 +288,8 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 /* QA #122(사용자 제보 11/4): 줄 앞 공백을 한 칸마다 점으로 — 4칸인지 3·5칸인지 바로 보이게. 4의 배수가 아니면 빨간 바탕 */
 .cm-lead{background-image:radial-gradient(circle at 50% 55%,rgba(128,128,128,.7) 0 1.3px,transparent 1.8px);background-size:1ch 100%;background-repeat:repeat-x}.cm-lead-odd{background-color:rgba(255,93,108,.22)}
 .ted-fb{position:relative}.ted-ind{position:absolute;right:8px;bottom:4px;font-size:.75em;color:var(--muted);pointer-events:none;background:var(--ed-bg);padding:0 4px;border-radius:4px}.ted-ind.odd{color:var(--danger)}
+/* QA #158: 「들여쓰기 n칸」 표시가 마지막 코드 줄을 가리던 것(폰) — 기본 편집기는 아래 여백을 표시 높이만큼(줄 번호 칸도 같이, 스크롤 길이를 맞추려고). 예제 편집기는 줄 수에 맞춘 높이에 그만큼 더함 */
+.ted-ta,.ted-gutter{padding-bottom:2em}.ted.ex-ed:has(.ted-fb){height:calc(var(--ex-lines,6) * var(--code-size) * 1.5 + 22px + 2em)}
 /* QA #120: 세션 중 레슨 설명 창 */
 .lpk-nav{display:flex;gap:6px;align-items:center;margin-bottom:8px}.lpk-nav select{flex:1;min-width:0;padding:6px;border-radius:8px;background:var(--surface2);color:var(--text);border:1px solid var(--border)}.lpk-page{max-height:60vh;overflow:auto}.lpk-page h3{margin:4px 0 8px}
 /* QA #123: 실행 중 멈추기 버튼 */
@@ -355,3 +357,6 @@ h1.lp-h{font-size:2em;font-weight:800;line-height:1.25;letter-spacing:-.01em;mar
 html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(--surface);border:1px solid var(--primary);color:var(--primary-text);font-family:var(--mono);font-size:1.1em}
 @media (max-width:767px){#pyload{right:8px;bottom:calc(8px + env(safe-area-inset-bottom));max-width:calc(100% - 16px)}}
 .lc-st.locked::before{content:'';display:inline-block;width:9px;height:7px;border:1.5px solid currentColor;border-radius:2px;box-shadow:0 -4px 0 -1.5px currentColor;margin-right:2px}
+
+/* v2.7.0 뼈대 코스: 준비 중 레슨 */
+.lc.draft,.tr-l.draft{opacity:.55}.lc-st.draft{color:var(--muted)}.lc.draft .lc-n{border-style:dashed}

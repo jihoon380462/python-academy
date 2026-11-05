@@ -49,8 +49,8 @@ def run(code, stdin='', call=None, turtle=False, files=None, out_files=None):
         return out, r.stderr if r.returncode else '', ret if not turtle else segs, outf
 fails=[]; computed={}; table=[]
 for p in P:
-    if p.get('runner') not in (None,'python'):
-        fails.append((p['id'],f"runner {p['runner']} 검증기는 아직 없음 (해당 Phase에서 추가)")); continue
+    if p.get('runner') not in (None,'python'):   # v2.7.0: shell/sql/web 은 코스 전용 검증기(run_shell_solutions.mjs·run_sql_solutions.py·run_web_solutions.py)가 맡음
+        table.append((p,0)); continue
     tests=p['tests'] or []
     if p['type'] in ('quiz','fill','match','pair'): table.append((p,len(tests))); continue
     if p['type']=='num':   # 수학 공간 숫자 답: 정답 코드가 print 한 마지막 숫자가 answer.value 와 tol 안에서 같아야 한다 (v2.3.0)

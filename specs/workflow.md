@@ -66,7 +66,8 @@ Fable 세션(엔진·설계·검토·릴리스) 외에 **Opus 채팅 네 개를 
 
 **Opus 채팅을 열 때 첫 메시지(복사용)**
 - QA팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/qa-team.md 순서로 읽은 뒤 qa-team.md 2절 체크리스트대로 1회전 QA를 시작해. 결과는 QA.md에 기록하고 콘텐츠 오류는 고쳐서 [qa] 커밋으로 올려.`
-- 콘텐츠팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/content-team.md 순서로 읽은 뒤 content-team.md 3절의 첫 과제부터 시작해. [content] 커밋으로 올려.`
+- 콘텐츠팀(**2026-11-05 저녁부터 이 한 줄**): `jihoon380462/python-academy 저장소 연결하고 HANDOFF.md 읽고 TODO 에서 Opus 용 확인해` → Opus 는 `TODO.md` 「Opus 용」 표를 위에서부터, 상세는 `specs/content-team.md` 3절. 한 과제 = 브랜치 `content/<과제>` = PR 하나, `[content]` 커밋. core(`core/`·`tools/`·`index.html`·`sw.js`)·버전·stamp 는 건드리지 않고 필요하면 HANDOFF 「Fable 요청」 줄에 적는다.
+  (옛 문구) `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/content-team.md 순서로 읽은 뒤 content-team.md 3절의 첫 과제부터 시작해. [content] 커밋으로 올려.`
 - 아트 검수·요청팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → IMAGES.md → specs/art-team.md 순서로 읽은 뒤 art-team.md 4절의 첫 과제(A0 전수 재검수)를 시작해. 결과는 IMAGES.md 검수 메모에 적고 art/ 브랜치로 PR을 내. main 직접 푸시 금지.`
 - 유지보수팀: `저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → QA.md → specs/maintenance-team.md 순서로 읽은 뒤 QA.md의 「열림」 항목을 심각도 순으로 고쳐 fix/ 브랜치로 PR을 내. 담당이 Fable인 항목은 건드리지 말고 재현 절차만 보강해. main 직접 푸시 금지.`
 

@@ -1,6 +1,7 @@
 // core/ui-views-more.js — 놀이터·뱃지·프로필·보관함·설정·용어집·약점·세션·점검·온보딩·코스 페이지 초기화
 // ---------- 놀이터 ----------
 Views.playground = (root, params = {}) => {
+  if (typeof Py === 'undefined') { root.innerHTML = `<div class="page"><h2>놀이터</h2><div class="card"><p class="muted">이 코스에는 파이썬 실행기가 없어요. 자유롭게 쳐 보려면 레슨 예제 창을 쓰거나, <a href="../python/#playground">파이썬 코스의 놀이터</a>로 가세요.</p></div></div>`; return; } /* v2.7.0: sql·web·terminal-git 코스 */
   const d = Store.data; let editor = null, stopTurtle = null; let currentWork = null;
   const render = () => {
     root.innerHTML = `<div class="pg"><div class="pg-main">
@@ -16,7 +17,7 @@ Views.playground = (root, params = {}) => {
     const run = async (trace) => {
       const code = getCode(); const out = $('#pgOut'); out.textContent = ''; out.className = 'out'; $('#pgTurtle').innerHTML = ''; editor && editor.setErrorLine(null); if (stopTurtle) { stopTurtle(); stopTurtle = null; }
       if (!Py.ready) { out.textContent = T.loadingPy + '…'; Py.start(); } Audio.click(); Game.stat('runs'); if (/print\(\s*["']안녕["']\s*\)/.test(code)) Game.stat('printHello');
-      let lines = 0; const r = await Py.run({ code, input: $('#pgIn').value, trace, onOut: (t, e) => { out.textContent += t; lines += (t.match(/\n/g) || []).length; if (lines > CONFIG.MAX_OUTPUT_LINES) out.textContent = out.textContent.split('\n').slice(0, CONFIG.MAX_OUTPUT_LINES).join('\n') + '\n' + T.tooLong; if (e) out.classList.add('haserr'); } });
+      let lines = 0; const stopUI = UI.stopButton(out); /* QA #154: 놀이터에도 ⏹ 멈추기 */ const r = await Py.run({ code, input: $('#pgIn').value, trace, onOut: (t, e) => { UI.outClear(out); out.textContent += t; lines += (t.match(/\n/g) || []).length; if (lines > CONFIG.MAX_OUTPUT_LINES) out.textContent = out.textContent.split('\n').slice(0, CONFIG.MAX_OUTPUT_LINES).join('\n') + '\n' + T.tooLong; if (e) out.classList.add('haserr'); } }); stopUI(); UI.outClear(out);
       if (trace && r.trace) { if (r.out != null) out.textContent = r.out; TracePanel.show($('#pgTrace'), r, editor); }
       if (!r.ok) { out.innerHTML += `<div class="errbox"><b>${esc(r.ename)}</b>: ${esc(r.emsg || '')}<br><span class="errko">💡 ${esc(Py.explain(r))}</span> <button class="btn xs" id="pgErrMore">자세히</button></div>`; if (r.line && editor) editor.setErrorLine(r.line); Audio.wrong(); Game.recordError(null); $('#pgErrMore').onclick = () => UI.go('errors', { name: r.ename }); }
       else if (!out.textContent.trim() && !r.turtleUsed) out.textContent = '(출력이 없어요)';
@@ -124,7 +125,10 @@ Views.weakness = (root) => {
     ${(() => { const cl = Game.confusedLessons().slice(0, 5); return cl.length ? `<h3>🤔 「모르겠어요」를 누른 레슨</h3><div class="card"><div class="muted small">누른 횟수가 많은 순. 다시 읽고 그 레슨의 문제를 풀어 보세요.</div>${cl.map(x => `<div class="wk-cl"><span>${esc(x.lesson.title)} <span class="chip">${x.count}회</span></span><span class="row"><button class="btn xs" data-cl-lesson="${x.lesson.id}" data-cl-page="${Math.min(...x.pages)}">다시 보기</button><button class="btn xs" data-cl-prob="${x.lesson.id}">✏ 문제 풀기</button></span></div>`).join('')}</div>` : ''; })()}
     <div class="row"><button class="btn primary" id="wkStart">가장 약한 개념 복습 시작</button>${CONFIG.TUTOR.enabled ? `<button class="btn tutor" id="wkAsk">💬 선생님에게 약점 요약 받기</button>` : ''}</div><div id="wkTutor"></div></div>`;
   $$('[data-cl-lesson]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.clLesson, page: +b.dataset.clPage })); $$('[data-cl-prob]', root).forEach(b => b.onclick = () => { const ps = Content.problemsOf(b.dataset.clProb); const first = ps.find(p => Store.prob(p.id).status !== 'clear') || ps[0]; if (first) UI.go('problem', { pid: first.id, lessonId: first.lesson }); });
-  $('#wkStart').onclick = () => { const w = Review.weakest(); const pool = PROBLEMS.filter(p => Store.prob(p.id).status === 'clear' && (!w || p.tags.includes(w))); if (!pool.length) return UI.toast('아직 복습할 문제가 없어요'); const pick = pool.sort(() => Math.random() - 0.5).slice(0, 3); Sessions.start(pick.map(p => p.id), { inReview: true, title: `#${w} 복습` }); };
+  $('#wkStart').onclick = () => { /* QA #149: 가장 약한 주제(정답률 낮은 순, 클리어한 문제가 있는 주제만 — 클리어가 0이면 복습할 게 없어 토스트만 뜨던 것)의 클리어 문제를 약점 점수 순으로 최대 3개 (예전엔 무작위 3개) + 「왜 나왔나」 */
+    const order = Object.entries(ts).filter(([, s]) => s.clear > 0 && s.attempts + s.clear > 0).map(([t, s]) => [t, s.clear / Math.max(1, s.clear + s.fails)]).sort((a, b) => a[1] - b[1]);
+    let w = null, pl = { items: [] }; for (const [t] of order) { const cand = Review.plan({ mode: 'weak', n: 3, only: (p) => (p.tags || []).includes(t) }); if (cand.items.length) { w = t; pl = cand; break; } }
+    if (!pl.items.length) return UI.toast('아직 복습할 문제가 없어요'); const reasons = {}; pl.items.forEach(x => reasons[x.id] = x.reasons); Sessions.start(pl.items.map(x => x.id), { inReview: true, title: `#${w} 복습`, reasons }); };
   const wkAsk = $('#wkAsk'); if (wkAsk) wkAsk.onclick = () => { const summary = tags.map(t => { const s = ts[t]; return `${t}: 정답률 ${s.clear + s.fails ? Math.round(100 * s.clear / Math.max(1, s.clear + s.fails)) : '미도전'}%, 클리어 ${s.clear}/${s.total}, 실패 ${s.fails}`; }).join('\n'); Tutor.ui.open({ free: true, key: 'weakness', preset: `아래는 제 개념별 정답률이에요. 무엇을 어떤 순서로 복습하면 좋을지 한 문단으로 알려 주세요.\n\n${summary}` }); };
 };
 
@@ -183,23 +187,24 @@ Views.typing = (root) => { const d = Store.data; const open = LESSONS.filter(l =
    오늘의 복습 = 다시 볼 날이 된 문제 먼저(약점으로 채움), 더 복습하기 = 범위 안 클리어 문제 중 약점·오래된 순. 둘 다 챕터를 고르게 나눔 */
 Views.reviewPlan = (root, mode) => { const d = Store.data; const extra = mode === 'extra'; const title = extra ? '🔁 더 복습하기' : '🧠 오늘의 복습';
   const open = LESSONS.filter(l => Review.candidates([l.id]).length); /* 클리어한 문제가 있는 레슨 = 복습할 수 있는 레슨 */ if (!open.length) { UI.toast('클리어한 문제가 아직 없어요'); UI.go('home', {}, false); return; }
-  const saved = Array.isArray(d.lessons.reviewSel) ? d.lessons.reviewSel.filter(id => open.some(l => l.id === id)) : null; const sel = new Set(saved && saved.length ? saved : open.map(l => l.id));
+  const selKey = extra ? 'reviewSelExtra' : 'reviewSel'; /* QA #149: 두 모드가 범위를 따로 기억 (예전엔 reviewSel 하나를 같이 써서 한쪽에서 바꾸면 다른 쪽도 바뀜) */
+  const saved = Array.isArray(d.lessons[selKey]) ? d.lessons[selKey].filter(id => open.some(l => l.id === id)) : null; const sel = new Set(saved ? saved : open.map(l => l.id)); /* QA #149: 저장된 범위가 빈 배열이면 「아무것도 안 고름」 그대로 (예전엔 빈 배열 = 전체라 「전체 해제」가 전체였음). 처음엔 전체 */
   const chs = [...new Set(open.map(l => l.ch))]; const chName = (ch) => { const c = (typeof CHAPTERS !== 'undefined' ? CHAPTERS : []).find(x => x.ch === ch); return c ? c.name : '챕터 ' + ch; };
   let plan = null; let showRange = false;
-  const render = (reroll) => { if (!plan || reroll) plan = Review.plan({ mode, lessonIds: [...sel] }); const items = plan.items; const nDue = items.filter(x => x.kind === 'due').length; const nWeak = items.length - nDue; const chList = [...new Set(items.map(x => x.ch))].sort((a, b) => a - b);
+  const render = (reroll, avoidPrev) => { if (!plan || reroll) { const prev = plan ? plan.items.map(x => x.id) : []; plan = Review.plan({ mode, lessonIds: [...sel], avoid: avoidPrev ? prev : null }); /* QA #149 「다시 고르기」: 직전 목록을 뒤로 보내 다른 문제가 나오게 — 예전엔 같은 점수로 다시 골라 목록이 그대로였음 */ if (avoidPrev && prev.length && plan.items.length === prev.length && plan.items.every(x => prev.includes(x.id))) UI.toast(extra ? '범위 안에서 고를 수 있는 문제가 이것뿐이에요 — 범위를 넓혀 보세요' : '오늘 다시 볼 문제가 딱 이만큼이라 목록이 그대로예요'); } const items = plan.items; const nDue = items.filter(x => x.kind === 'due').length; const nWeak = items.length - nDue; const chList = [...new Set(items.map(x => x.ch))].sort((a, b) => a - b);
     const allSel = sel.size === open.length;
     root.innerHTML = `<div class="page rvp"><h2>${title}</h2>
       <div class="card rv-plan"><div class="rv-head"><b>${items.length ? `${items.length}문제` : '고를 문제가 없어요'}</b>${items.length ? ` <span class="muted">· ${!extra ? `다시 볼 날 ${nDue}${nWeak ? ` · 약점 보강 ${nWeak}` : ''}` : '약점·오래된 것 위주'} · 챕터 ${chList.map(c => esc(String(c))).join('·')}</span>` : ''}</div>
-      <div class="muted small">${extra ? '고른 범위의 클리어한 문제 중에서 틀렸던 것·힌트 본 것·약한 주제·오래전에 푼 것을 먼저, 챕터를 고르게 골랐어요. 복습 일정은 바뀌지 않아요.' : `다시 볼 날이 된 문제(${plan.dueCount}개) 중 약한 것·오래 밀린 것부터, 한 챕터에 몰리지 않게 골랐어요. 한 번에 맞히면 간격이 늘고, 틀리면 내일 다시 나와요.`}</div>
-      ${items.length ? `<ol class="rv-list">${items.map(x => { const p = Content.problem(x.id); const l = Content.lesson(x.lesson) || {}; return `<li><div><b>${esc(p.title)}</b> <small class="muted">${esc(chName(x.ch))} · ${esc(l.title || '')}</small></div><div class="rv-why">${x.reasons.map(t => `<span>• ${esc(t)}</span>`).join('')}</div></li>`; }).join('')}</ol>` : `<div class="muted">${extra ? '범위를 넓혀 보세요.' : '오늘 다시 볼 문제가 없어요. 「🔁 더 복습하기」로 원하는 만큼 연습할 수 있어요.'}</div>`}
+      <div class="muted small">${extra ? '고른 범위의 클리어한 문제 중에서 틀렸던 것·힌트 본 것·약한 주제·오래전에 푼 것을 먼저, 챕터를 고르게 골랐어요. 오늘의 복습에 나올 문제는 뒤로 미루고, 복습 일정은 바뀌지 않아요.' : `다시 볼 날이 된 문제(${plan.dueCount}개)부터 — 약한 것·오래 밀린 것 먼저, 한 챕터에 몰리지 않게 골랐어요. 모자라면 약점 문제로 채워요. 한 번에 맞히면 간격이 늘고, 틀리면 내일 다시 나와요.`}</div>
+      ${items.length ? `<ol class="rv-list">${items.map(x => { const p = Content.problem(x.id); const l = Content.lesson(x.lesson) || {}; return `<li><div><b>${esc(p.title)}</b> <small class="muted">${esc(chName(x.ch))} · ${esc(l.title || '')}</small></div><div class="rv-why">${x.reasons.map(t => `<span>• ${esc(t)}</span>`).join('')}</div></li>`; }).join('')}</ol>` : `<div class="muted">${!sel.size ? '아래 「📚 범위 바꾸기」에서 레슨을 골라 주세요.' : extra ? '범위를 넓혀 보세요.' : '오늘 다시 볼 문제가 없어요. 「🔁 더 복습하기」로 원하는 만큼 연습할 수 있어요.'}</div>`}
       <div class="row"><button class="btn primary big" id="rvGo" ${items.length ? '' : 'disabled'}>▶ 복습 시작</button><button class="btn" id="rvRe">🔄 다시 고르기</button>${!extra ? `<button class="btn" data-go="reviewMore">🔁 더 복습하기</button>` : ''}</div></div>
-      <div class="card"><button class="btn sm" id="rvRange">📚 범위 ${showRange ? '접기' : '바꾸기'}</button> <span class="muted small">${allSel ? '배운 레슨 전체' : `레슨 ${sel.size}개 골랐어요`}</span>
+      <div class="card"><button class="btn sm" id="rvRange">📚 범위 ${showRange ? '접기' : '바꾸기'}</button> <span class="muted small">${allSel ? '배운 레슨 전체' : sel.size ? `레슨 ${sel.size}개 골랐어요` : '고른 레슨이 없어요'}</span>
       ${showRange ? `<div class="row"><button class="btn sm" id="rvAll">전체 선택</button><button class="btn sm" id="rvNone">전체 해제</button><button class="btn sm" id="rvRecent">최근 챕터만</button></div>${chs.map(ch => { const ls = open.filter(l => l.ch === ch); const on = ls.every(l => sel.has(l.id)); return `<div class="card ty-ch"><label class="ty-row ty-chrow"><input type="checkbox" data-ch="${ch}" ${on ? 'checked' : ''}><b>${esc(chName(ch))}</b></label>${ls.map(l => `<label class="ty-row"><input type="checkbox" data-l="${l.id}" ${sel.has(l.id) ? 'checked' : ''}><span>${esc(l.title)}</span><small class="muted">클리어 ${Review.candidates([l.id]).length}</small></label>`).join('')}</div>`; }).join('')}` : ''}</div></div>`;
-    const save = () => { d.lessons.reviewSel = [...sel]; Store.save({ silent: true }); render(true); };
+    const save = () => { d.lessons[selKey] = [...sel]; Store.save({ silent: true }); render(true); };
     $$('[data-l]', root).forEach(cb => cb.onchange = () => { cb.checked ? sel.add(cb.dataset.l) : sel.delete(cb.dataset.l); save(); });
     $$('[data-ch]', root).forEach(cb => cb.onchange = () => { open.filter(l => String(l.ch) === cb.dataset.ch).forEach(l => cb.checked ? sel.add(l.id) : sel.delete(l.id)); save(); });
     const ra = $('#rvAll', root); if (ra) { ra.onclick = () => { open.forEach(l => sel.add(l.id)); save(); }; $('#rvNone', root).onclick = () => { sel.clear(); save(); }; $('#rvRecent', root).onclick = () => { const mx = Math.max(...chs); sel.clear(); open.filter(l => l.ch === mx).forEach(l => sel.add(l.id)); save(); }; }
-    $('#rvRange', root).onclick = () => { showRange = !showRange; render(false); }; $('#rvRe', root).onclick = () => render(true);
+    $('#rvRange', root).onclick = () => { showRange = !showRange; render(false); }; $('#rvRe', root).onclick = () => render(true, true);
     $$('[data-go]', root).forEach(b => b.onclick = () => UI.go(b.dataset.go));
     $('#rvGo', root).onclick = () => { const reasons = {}; items.forEach(x => reasons[x.id] = x.reasons); Sessions.start(items.map(x => x.id), { inReview: true, extraReview: extra, title: extra ? '더 복습하기' : '오늘의 복습', reasons }); }; };
   render(true); };
@@ -256,7 +261,7 @@ window.addEventListener('DOMContentLoaded', () => {
   { const cc = CONFIG.COURSES.find(c => c.id === Store.course); if (cc && cc.requires && !Store.data.settings.unlockAll && !Store.data.stats['boss_' + cc.requires.boss]) { setTimeout(() => UI.toast(`🔒 ${cc.requires.label} — 레슨 0은 미리 볼 수 있어요`, 5000), 800); } } (Store.data.myProblems || []).forEach(np => { if (!Content.problemMap[np.id]) { Content.problemMap[np.id] = np; (Content.byLesson[np.lesson] = Content.byLesson[np.lesson] || []).push(np); PROBLEMS.push(np); } });
   UI.applyTheme(); Confetti.init(); Loader.init(); QuickKeys.init(); Tutor.ui.init(); Offline.register('../../sw.js');
   Sync.load();
-  Py.start(); // 홈 진입과 동시에 백그라운드 로딩
+  if (typeof Py !== 'undefined') Py.start(); // 홈 진입과 동시에 백그라운드 로딩 (QA #159: terminal-git 코스는 셸 러너뿐이라 Py 없음)
   Game.touchStreak(); Store.save();
   document.addEventListener('click', () => { Audio._ctx(); }, { once: true });
   if (!Store.data.onboarded) { UI.go('home', {}, false); Onboarding.start(); } else UI.go('home', {}, false);

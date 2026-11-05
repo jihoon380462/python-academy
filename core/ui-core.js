@@ -20,6 +20,11 @@ const UI = {
   go(view, params = {}, push = true) { if (push && this.view) this.history.push([this.view, this.params]); this.view = view; this.params = params; if (this.current && this.current.destroy) try { this.current.destroy(); } catch (e) {} this.current = null; Tutor.ui && Tutor.ui.close(); const root = $('#view'); root.className = 'view-' + view; root.scrollTop = 0; window.scrollTo(0, 0); if (['problem', 'lesson'].includes(view)) { Store.data.last = { course: Store.course, view, params: { pid: params.pid, lessonId: params.lessonId, page: params.page }, at: Date.now() }; Store.save({ silent: true }); } const V = Views[view]; const seq = ++this._seq; const res = V(root, params); if (seq !== this._seq) return; /* 뷰 안에서 다른 화면으로 넘어간 경우 */ this.current = res || null; this.renderTopbar(); },
   _seq: 0,
   back() { const h = this.history.pop(); if (h) this.go(h[0], h[1], false); else this.go('home', {}, false); },
+  // v2.7.0 코스 플러그인 등록부 — 코스 모듈(core/ui-views-<코스>.js)이 채운다. 계약은 DESIGN.md 16절.
+  //   UI.modes[type] = { label, instant?, mount(host, p, ctx) → { getCode(), submit?(), destroy?() } }  ctx = { pid, rec, fresh, inMock, lesson, submit(result) }  result = { ok, msg, detail }
+  //   UI.examples[kind] = { mount(host, example, ctx) → { destroy?() } }  — 레슨 pages[].example 이 { <kind>: … } 꼴일 때(파이썬 { code } 는 기존 경로)
+  modes: {}, examples: {},
+  exampleKind(ex) { return ex ? Object.keys(this.examples).find(k => ex[k] != null) || null : null; },
   icon(name) { const P = { hub: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>', home: '<path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-6h4v6"/>', settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>', keys: '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/>' }; return `<svg class="ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || ''}</svg>`; }, // v2.6.0: 상단바 선 아이콘
   renderTopbar() {
     const d = Store.data; const lv = Game.level(); const streak = Game.currentStreak();
@@ -66,9 +71,9 @@ const UI = {
 // ---------- 로딩 오버레이 (Pyodide) ----------
 const Loader = {
   el: null,
-  init() { this.el = $('#pyload'); Py.onState(() => this.render()); this.render(); },
+  init() { this.el = $('#pyload'); if (typeof Py === 'undefined') return; /* QA #159: terminal-git 코스(셸 러너만)에서 Py is not defined */ Py.onState(() => this.render()); this.render(); },
   render() {
-    const el = this.el; if (!el) return;
+    const el = this.el; if (!el || typeof Py === 'undefined') return;
     if (Py.ready && Py.main && !this.mainNoticeShown) { this.mainNoticeShown = true; UI.toast('⚠ 이 환경에서는 보조 실행기로 동작해요. 무한루프 자동 중단이 없으니 while 조건을 꼭 확인하세요.', 6000); }
     if (Py.ready || Py.phase === 'idle') { el.classList.add('hide'); return; }
     el.classList.remove('hide');
@@ -97,4 +102,4 @@ const Offline = {
 };
 // ---------- 키보드 단축키 안내 (v2.2.9, F6) — PC. ? 키 또는 상단바 ⌨ ----------
 UI.shortcuts = function () { const rows = [['Ctrl + Enter', '코드 실행 (문제·예제·놀이터)'], ['Ctrl + Shift + Enter', '제출 (채점)'], ['Ctrl + /', '힌트 한 단계'], ['Tab', '에디터에서 들여쓰기 4칸'], ['← / →', '레슨 페이지 넘기기 (입력칸 밖에서)'], ['Esc', '창 닫기'], ['?', '이 안내']]; return this.modal({ title: '⌨ 키보드 단축키', body: `<table class="kb"><tbody>${rows.map(([k, v]) => `<tr><td><kbd>${esc(k)}</kbd></td><td>${esc(v)}</td></tr>`).join('')}</tbody></table><div class="muted small" style="margin-top:8px">모바일에서는 코드 입력칸 위의 칩(Tab · ⇤ · 기호)을 쓰세요.</div>` }); };
-document.addEventListener('keydown', (e) => { const t = e.target; if (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable || t.closest && t.closest('.cm-editor')) return; if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey && !document.querySelector('.modal-ov')) { e.preventDefault(); UI.shortcuts(); } if (e.key === 'Escape') { const ov = document.querySelector('.modal-ov'); if (ov) { const b = ov.querySelector('.modal-btns button'); if (b) b.click(); } } });
+document.addEventListener('keydown', (e) => { const t = e.target; if (e.key === 'Escape') { /* QA #159: 쪽 목록(select)·입력칸에 포커스가 있어도 Esc 로 창 닫기 */ const ovs = document.querySelectorAll('.modal-ov'); const ov = ovs[ovs.length - 1]; if (ov) { const b = ov.querySelector('.modal-btns button'); if (b) b.click(); } return; } if (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable || t.closest && t.closest('.cm-editor')) return; if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey && !document.querySelector('.modal-ov')) { e.preventDefault(); UI.shortcuts(); } });

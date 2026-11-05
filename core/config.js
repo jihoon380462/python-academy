@@ -2,18 +2,18 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.6.0',
+  APP_VERSION: '2.7.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
-  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$' },
+  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
     { id: 'python', name: '파이썬', icon: '🐍', desc: '입문부터 실전까지, 브라우저에서 직접 쳐 보는 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 170, lessons: 45 },
     { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '코드가 돌아가는 모습을 눈으로 보며, 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 145, lessons: 32, requires: { course: 'python', boss: 'B3', label: '파이썬 챕터 3까지 끝내면 열려요' } },
-    { id: 'terminal-git', name: '터미널·Git', icon: '🎧', desc: '검은 창이 무섭지 않게. 가상 터미널과 Git 시뮬레이터', phase: 2 },
-    { id: 'sql', name: '데이터베이스(SQL)', icon: '🗄️', desc: '동네 카페 데이터로 배우는 진짜 SQLite', phase: 3 },
+    { id: 'terminal-git', name: '터미널·Git', icon: '🎧', desc: '검은 창이 무섭지 않게. 가상 터미널과 Git 시뮬레이터', path: 'courses/terminal-git/', color: '#607d8b', phase: 2, preview: true, total: 0, lessons: 0, requires: { course: 'python', boss: 'B2', label: '파이썬 챕터 2까지 끝내면 열려요' } },
+    { id: 'sql', name: '데이터베이스(SQL)', icon: '🗄️', desc: '동네 카페 데이터로 배우는 진짜 SQLite', path: 'courses/sql/', color: '#f4511e', phase: 3, preview: true, total: 0, lessons: 0, requires: { course: 'python', boss: 'B3', label: '파이썬 챕터 3까지 끝내면 열려요' } },
     { id: 'math', name: '수학 공간', icon: '📐', desc: '프로그래머 수학 — 그림을 만지며 배우고, 계산은 파이썬이', path: 'courses/math/', color: '#e91e63', ready: true, total: 180, lessons: 45, space: true, map: 'graph', hubLabel: '언제든 들어와도 돼요' },
-    { id: 'web', name: '웹·HTTP·API', icon: '🌐', desc: '내가 만든 걸 남에게 보여주려면', requires: { course: 'python', boss: 'B2', label: '파이썬 챕터 2까지 끝내면 열려요' }, phase: 4 },
+    { id: 'web', name: '웹·HTTP·API', icon: '🌐', desc: '내가 만든 걸 남에게 보여주려면', path: 'courses/web/', color: '#8e24aa', requires: { course: 'python', boss: 'B2', label: '파이썬 챕터 2까지 끝내면 열려요' }, phase: 4, preview: true, total: 0, lessons: 0 },
   ],
 
   // --- 외부 라이브러리 (버전 고정) ---
@@ -41,7 +41,7 @@ const CONFIG = {
   STORAGE_WARN_BYTES: 4 * 1024 * 1024,     // 저장 용량 경고 (설정에 정리 버튼)
 
   // --- XP / 레벨 ---
-  XP: { quiz: 10, fill: 15, bug: 20, parsons: 20, code: 30, num: 20, match: 20, pair: 20 }, // num·match·pair: 수학 공간 유형 (v2.3.0)
+  XP: { quiz: 10, fill: 15, bug: 20, parsons: 20, code: 30, num: 20, match: 20, pair: 20, mission: 25, sql: 25, web: 25 }, // num·match·pair: 수학 공간 유형 (v2.3.0) · mission·sql·web: 새 코스 유형 (v2.7.0)
   KATEX: { css: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css', js: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js' }, // 수학 공간 수식 (없어도 글자 수식으로 대체)
   HINT_XP_MULT: [1, 0.7, 0.4, 0],        // 힌트 0,1,2,3단계 사용 시 배율 (정답 보기 = 0)
   FIRST_TRY_BONUS: 0.5,                   // 첫 시도 클리어 +50%

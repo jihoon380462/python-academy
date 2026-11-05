@@ -1,0 +1,47 @@
+/* courses/web/course.css — 웹·HTTP·API 코스 전용 화면(core/ui-views-web.js 의 작업판). core/ui.css 토큰(--bg/--surface/--surface2/--primary/--success/--danger/--muted/--border)만 쓴다. */
+.web-ws{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;min-width:0}
+.web-ws.compact{gap:10px}
+.web-ed,.web-pv{min-width:0;border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden}
+.web-tabs,.web-pv-bar,.web-ptabs{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+.web-tab{min-height:30px;padding:3px 12px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);font-family:var(--mono);font-weight:700;font-size:.9em}
+.web-tab.on{background:var(--surface2);border-color:var(--border);color:var(--text)}
+.web-tab.on::after{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--primary);margin-left:8px;vertical-align:middle}
+.web-ed{display:flex;flex-direction:column}
+.web-pane{display:none}.web-pane.on{display:flex;flex-direction:column;flex:1}
+.web-pane .ted{border:0;border-radius:0;flex:1;height:auto;min-height:300px}
+.web-ws.compact .web-pane .ted{min-height:200px}
+.web-pv-title{font-weight:700;font-size:.9em;color:var(--muted)}
+.web-w.on{background:var(--primary);color:var(--on-primary);border-color:transparent}
+.web-auto{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.web-frame-wrap{background:#fff;overflow:auto;display:flex;justify-content:center;min-height:200px}
+.web-frame{display:block;width:100%;height:300px;border:0;background:#fff;transition:width .2s}
+.web-ws.compact .web-frame{height:200px}
+.web-ws.phone .web-frame{width:390px;max-width:100%;box-shadow:0 0 0 1px var(--border)}
+.web-ws.phone .web-frame-wrap{background:var(--surface2)}
+.web-panels{border-top:1px solid var(--border)}
+.web-ptab{min-height:28px;padding:3px 10px;border-radius:999px;border:1px solid transparent;background:transparent;color:var(--muted);font-size:.85em;font-weight:600}
+.web-ptab.on{color:var(--primary-text);border-color:var(--border);background:var(--surface2)}
+.web-cnt{font-weight:normal;color:var(--muted);font-size:.9em}
+.web-panels [data-panel]{display:none}.web-panels [data-panel].on{display:block}
+.web-console{border:0;border-radius:0;min-height:70px;max-height:200px;margin:0}
+.web-line{white-space:pre-wrap}.web-line.error{color:var(--danger)}.web-line.warn{color:var(--warn)}.web-line.alert{color:var(--primary-text)}.web-line.info,.web-line.debug{color:var(--muted)}
+.web-net{padding:8px 10px;max-height:240px;overflow:auto;font-size:.9em}
+.web-net-t{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.92em}
+.web-net-t th{text-align:left;color:var(--muted);font-weight:600;padding:4px 6px;border-bottom:1px solid var(--border)}
+.web-net-t td{padding:5px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+.web-net-t tbody tr:not(.web-net-detail){cursor:pointer}.web-net-t tbody tr:not(.web-net-detail):hover{background:var(--surface2)}
+.web-net-t tr.ok td:nth-child(3){color:var(--success);font-weight:700}.web-net-t tr.bad td:nth-child(3){color:var(--danger);font-weight:700}
+.web-net-url{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.web-net-detail td{background:var(--surface2)}.web-net-detail .lbl{margin:4px 0}.web-net-detail pre.code{max-height:140px;overflow:auto;white-space:pre-wrap;word-break:break-all;font-size:.92em}
+.web-check{padding:8px 10px;max-height:260px;overflow:auto}
+.web-chk{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.web-chk li{display:flex;align-items:baseline;gap:8px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+.web-chk li.ok{border-color:var(--success)}.web-chk li.bad{border-color:var(--danger);cursor:pointer}.web-chk li.bad:hover,.web-chk li.sel{background:var(--surface2)}
+.web-chk-m{font-weight:800;width:1.2em;text-align:center}.web-chk li.ok .web-chk-m{color:var(--success)}.web-chk li.bad .web-chk-m{color:var(--danger)}
+.web-chk-t{flex:1;min-width:0}.web-chk-g{flex-basis:100%;padding-left:1.9em;font-family:var(--mono)}
+.web-chk.done li{padding:4px 8px;border:0;background:transparent}.web-chk.done{gap:0}
+.web-actions{margin-top:10px}
+.pv-result .web-chk{margin-top:4px}
+.ex2.ex-plugin.web-example{border:0;background:transparent;overflow:visible}
+@media (max-width:1000px){.web-ws{grid-template-columns:1fr}.web-pane .ted{min-height:240px;height:240px;flex:none}}
+@media (max-width:767px){.web-frame{height:260px}.web-net-url{max-width:120px}.web-auto span{display:none}}
