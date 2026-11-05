@@ -50,7 +50,7 @@
     const l = isSetup ? { id: SETUP_ID, title: BOOK.setup.title, pages: BOOK.setup.pages, ch: null } : Content.lesson(lessonId);
     if (!l) { UI.go('home', {}, false); return; }
     UI.params.lessonTitle = l.title;
-    const pages = (l.pages || []).map((pg, i) => { const o = (BOOK.pages || {})[`${l.id}/${i}`]; if (!o) return pg; let html = o.html || pg.html; (o.rep || []).forEach(([a, b]) => { html = html.split(a).join(b); }); return { ...pg, title: o.title || pg.title, html }; }); const tasks = isSetup ? [] : tasksOf(l); const hasMake = tasks.length > 0;
+    const pages = (l.pages || []).map((pg, i) => { const key = `${l.id}/${i}`; const tt = (BOOK.titles || {})[key]; const o = (BOOK.pages || {})[key]; if (!o) return tt ? { ...pg, title: tt } : pg; let html = o.html || pg.html; (o.rep || []).forEach(([a, b]) => { html = html.split(a).join(b); }); return { ...pg, title: o.title || tt || pg.title, html }; }); const tasks = isSetup ? [] : tasksOf(l); const hasMake = tasks.length > 0;
     const total = pages.length + (hasMake ? 1 : 0);
     if (!total) { UI.go('home', {}, false); return; }
     let cur = clamp(page, 0, total - 1);
@@ -63,7 +63,7 @@
       const tabs = `<div class="bk-tabs">${pages.map((p, i) => `<button class="bk-tab ${i === cur ? 'on' : ''}" data-pg="${i}" title="${esc(p.title)}">${i + 1}</button>`).join('')}${hasMake ? `<button class="bk-tab make ${cur === pages.length ? 'on' : ''}" data-pg="${pages.length}">🛠 만들어 보기</button>` : ''}</div>`;
       let body;
       if (isMake) {
-        body = `<h1 class="lp-h">🛠 만들어 보기</h1><p class="muted">VS Code 에서 빈 파일(예: <code>${esc((l.id || '').toLowerCase())}_1.py</code>)을 만들고 직접 짜 보세요. 막히면 「필요한 문법」을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답을 펴 보세요. 예시 답과 달라도 같은 결과가 나오면 맞아요.</p>
+        body = `<h1 class="lp-h">🛠 만들어 보기</h1><p class="muted">VS Code 에서 빈 파일(예: <code>${esc(l.n != null ? 'l' + String(l.n).padStart(2, '0') : (l.id || '').toLowerCase())}_1.py</code>)을 만들고 직접 짜 보세요. 막히면 「필요한 문법」을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답을 펴 보세요. 예시 답과 달라도 같은 결과가 나오면 맞아요.</p>
           <ol class="bk-tasks">${tasks.map((t, i) => `<li class="card bk-task"><div class="bk-task-h"><span class="bk-task-n">${i + 1}</span><b>${esc(t.title)}</b></div><div class="bk-task-p lp-html">${UI.terms(t.text)}</div>
             ${t.given ? codeBox(t.given, '이 코드를 복사해서 고쳐 보세요') : ''}${t.prep ? `<div class="bk-prep"><div class="lbl">준비 파일 — .py 파일과 같은 폴더에 <code>${esc(t.prep.name)}</code> 을 만들고 아래 내용을 붙여 넣으세요</div>${codeBox(t.prep.text, t.prep.name)}</div>` : ''}${/sys\.stdin\.read/.test(t.answer || '') ? '<div class="muted small bk-tip">💡 「끝까지」 읽는 프로그램이에요. VS Code 터미널에 입력을 다 붙여 넣은 뒤 <b>Windows: <kbd>Ctrl</kbd>+<kbd>Z</kbd> → <kbd>Enter</kbd></b>, Mac: <kbd>Ctrl</kbd>+<kbd>D</kbd> 를 누르면 입력이 끝나요.</div>' : ''}
             ${t.io && t.io.length ? `<div class="bk-io">${t.io.map(c => `${c.input != null && String(c.input).length ? `<div><div class="lbl">입력 예 <span class="muted small">(터미널에 치는 값)</span></div><pre class="code">${esc(c.input)}</pre></div>` : ''}<div><div class="lbl">출력 예</div><pre class="code">${esc(c.output)}</pre></div>`).join('')}</div>` : ''}
