@@ -4,7 +4,7 @@ import fs from 'node:fs'; import path from 'node:path';
 import { ROOT, courses, loadCourse } from './load_content.mjs';
 const errors = [], warns = [];
 const err = (m) => errors.push(m), warn = (m) => warns.push(m);
-const EXEC = new Set(['code', 'block', 'parsons', 'bug']);
+const EXEC = new Set(['code', 'parsons', 'bug']);
 let totals = { lessons: 0, problems: 0 };
 for (const id of courses()) {
   const c = loadCourse(id); const lessonIds = new Set(); const pids = new Set();
@@ -19,6 +19,11 @@ for (const id of courses()) {
     if (p.quiz && typeof p.quiz.why === 'string' && /<[a-z][^>]*>/i.test(p.quiz.why)) err(`${where}: quiz.why 는 글자 그대로 보여요(이스케이프) — HTML 태그를 쓰지 마세요`);
     if (!lessonIds.has(p.lesson)) err(`${where}: 없는 레슨 참조 ${p.lesson}`);
     if (!p.title) err(`${where}: 제목 없음`); if (!p.type) err(`${where}: type 없음`);
+    // v2.4.0 (TODO ★1, 사용자 결정 D2): 블록(Blockly) 유형과 「Parsons/텍스트 고르기」(dual) 삭제 — 전부 타자. Parsons 는 줄 순서·들여쓰기 자체가 연습인 문제(정답 5줄 이상)만
+    if (p.type === 'block') err(`${where}: type 'block' 은 삭제됐어요 — 'code' 로 바꾸고 starter·지문에 쓸 줄을 적어 주세요 (TODO ★1)`);
+    if (p.dual) err(`${where}: dual 은 삭제됐어요 — 기본은 타자(code). 필드를 지워 주세요`);
+    if (p.type === 'parsons') { const n = String(p.parsons && p.parsons.solution || '').split('\n').filter(l => l.trim()).length; if (n <= 4) err(`${where}: Parsons 정답이 ${n}줄 — 4줄 이하는 타자(code)로 (D2)`); }
+    if (p.type === 'code' && p.parsons) err(`${where}: code 문제에 parsons 필드가 남아 있어요 (dual 잔재)`);
     if (!Array.isArray(p.hints) || p.hints.length < 3) err(`${where}: 힌트 3개 미만`);
     if (!Array.isArray(p.tags) || !p.tags.length) err(`${where}: 태그 없음`);
     if (EXEC.has(p.type)) { const tests = p.type === 'bug' ? (p.bug && p.bug.tests) : p.tests; if (!tests || !tests.length) err(`${where}: 실행형 문제인데 테스트 없음`); const sol = p.type === 'bug' ? (p.bug && p.bug.solution) : (p.solution || (p.parsons && p.parsons.solution)); if (!sol) err(`${where}: 정답 코드 없음`); }

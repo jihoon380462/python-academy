@@ -1,4 +1,4 @@
-// core/hub.js — 허브(index.html). "오늘 뭐 할까"에 3초 안에 답한다. 러너(Pyodide·Blockly·CodeMirror)는 받지 않는다.
+// core/hub.js — 허브(index.html). "오늘 뭐 할까"에 3초 안에 답한다. 러너(Pyodide·CodeMirror)는 받지 않는다.
 // 읽는 것: academy.profile + 각 코스 조각(진행률). 쓰는 것: 없음(설정·초기화는 코스 페이지의 설정 화면에서).
 const Hub = {
   courseUrl(c, hash = '') { return c.path + (hash ? '#' + hash : ''); },

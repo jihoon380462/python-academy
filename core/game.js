@@ -18,7 +18,6 @@ const Game = {
     let xp = p.xp || CONFIG.XP[p.type] || 10;
     if (p.boss) xp = this.bossXp(p);
     xp *= CONFIG.HINT_XP_MULT[Math.min(3, rec.answerSeen ? 3 : hints)];
-    if (p.dual && mode === 'text') xp *= CONFIG.TEXT_MODE_MULT;
     if (firstTry && !wasClear) xp *= 1 + CONFIG.FIRST_TRY_BONUS;
     if (inChallenge) xp *= CONFIG.DAILY_CHALLENGE_MULT;
     // 콤보

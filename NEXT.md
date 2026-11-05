@@ -13,7 +13,7 @@
    ```
    node tools/stamp.mjs && node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py && node tools/test_shell.mjs && python3 tools/regress.py
    ```
-   `regress.py`는 헤드리스 크롬(file://, CDN 없음 → Pyodide·Blockly·CodeMirror 폴백). 새 화면·요소를 추가하면 거기에 `check(...)` 한 줄을 보탠다.
+   `regress.py`는 헤드리스 크롬(file://, CDN 없음 → Pyodide·CodeMirror 폴백). 새 화면·요소를 추가하면 거기에 `check(...)` 한 줄을 보탠다.
 4. **버전**: `core/config.js`의 `APP_VERSION`을 올리고 `node tools/stamp.mjs`. WP-A(피드백·보강)는 패치(2.2.x), WP-B(터미널·Git)는 다음 마이너(2.4.0 — v2.3.0은 수학 공간 M1이 가져감), SQL 2.5.0, 웹 2.5.0, WP-C/WP-D(Phase 5)는 2.6.0 (EXPANSION.md 1절 표).
 5. **같은 커밋에 반드시**: `HANDOFF.md` 0절 상태판(현재 버전·마지막 작업·다음 후보), `CHANGELOG.md`(사용자가 보는 변화 → 내부 변화 순), 설계가 바뀌면 `DESIGN.md`(새 절: "임의로 정한 수치 / 지시서와 다르게 한 것과 이유 / 알려진 한계 / 파일별 용량"), 문제가 늘면 `PROBLEMS.md`.
 6. **커밋·배포**:

@@ -1,4 +1,4 @@
-// courses/python/content.js — 파이썬 코스 콘텐츠: 레슨(LESSONS)·문제(PROBLEMS)·챕터(CHAPTERS)·지도 장식·따라하기 가이드(GUIDES). 로직 없음
+// courses/python/content.js — 파이썬 코스 콘텐츠: 레슨(LESSONS)·문제(PROBLEMS)·챕터(CHAPTERS)·지도 장식·타자 연습(DRILLS). 로직 없음
 // =====================================================================
 // === CONTENT ===  (레슨·문제·힌트·뱃지·에러 사전·용어집. 전부 데이터)
 // =====================================================================
@@ -6,7 +6,7 @@
 문제 데이터 스키마 (PROBLEMS 배열의 원소)
   id        string  필수. 고유 id. 예: 'L1P1'  (레슨 L1의 1번 문제)
   lesson    string  필수. 소속 레슨 id ('L0'..'L18', 보스는 'B1'..'B5')
-  type      string  필수. 'quiz' | 'fill' | 'bug' | 'parsons' | 'block' | 'code'
+  type      string  필수. 'quiz' | 'fill' | 'bug' | 'parsons' | 'code'   (v2.4.0: 블록(Blockly) 유형 삭제 — 전부 타자)
   title     string  필수. 문제 제목
   prompt    string  필수. 지문 (HTML 허용, <code> 사용 가능)
   tags      string[] 필수. 개념 태그 1~3개 ('출력','변수','계산','조건','반복','리스트','함수','문자열','딕셔너리','클래스','예외','파일','모듈','오개념')
@@ -14,27 +14,25 @@
   xp        number  선택. 생략 시 CONFIG.XP[type]
   boss      bool    선택. 보스 문제(HP 바 연출, 테스트 5개 이상)
   project   {steps:string[]} 선택. 미니 프로젝트 체크리스트. 클리어 시 "내 작품"에 저장
-  dual      bool    선택. Parsons/텍스트 선택 가능 (텍스트로 풀면 XP 1.5배)
   vary      object  선택. 복습 변형 파라미터. 예: {n:[2,9]} (정수 범위) 또는 {w:['사과','배']} (목록)
                     prompt/starter/solution/tests 안의 {{n}} 이 치환되고 기대 출력은 정답 코드를 실행해 계산
   --- type별 필드 ---
   quiz:    quiz:{opts:string[4], ans:number(0~3), why:string}
   fill:    fill:{code:string('___1___' 자리), blanks:[{a:string[], opt?:string[]}], why:string}
   bug:     bug:{code:string, bugLine:number(1부터), solution:string, tests:TEST[]}
-  parsons: parsons:{solution:string, distractors?:string[]}
-  block:   starter?:string, solution:string, tests:TEST[], inputExample?:string
+  parsons: parsons:{solution:string, distractors?:string[]}   — 줄 순서·들여쓰기 자체가 연습인 문제만(정답 5줄 이상). 정답 4줄 이하는 code 로
   code:    starter?:string, solution:string, tests:TEST[], inputExample?:string, turtle?:bool, ignoreCase?:bool
   TEST = {input?:string(줄바꿈으로 여러 줄), output:string} | {call:string, ret:string(repr)}
   마지막 테스트 1개는 화면에 숨김(하드코딩 방지). 거북이 문제(turtle:true)는 정답 코드의 선분 목록과 비교.
 
 예시:
-  { id:'L1P1', lesson:'L1', type:'block', title:'첫 인사', prompt:'첫 번째 블록 문제예요. 화면에 <code>안녕, 파이썬!</code>을 출력하세요. 출력 블록을 끌어와 글자만 바꾸면 돼요.',
-    tags:['출력'], hints:['print를 쓰세요','print("안녕, 파이썬!")','print("안녕, 파이썬!")'],
+  { id:'L1P1', lesson:'L1', type:'code', title:'첫 인사', prompt:'화면에 <code>안녕, 파이썬!</code>을 출력하세요. 아래 한 줄을 그대로 치면 돼요.<pre>print("안녕, 파이썬!")</pre>',
+    tags:['출력'], hints:['print 뒤에 괄호를 열고 글자를 써요','글자는 따옴표로 감싸요','print("안녕, 파이썬!")'],
     solution:'print("안녕, 파이썬!")', tests:[{output:'안녕, 파이썬!'}] }
 
 레슨 데이터 스키마 (LESSONS 배열)
-  id, ch(챕터 번호), n(레슨 번호; 보스는 없음), title, minutes, mode('read'|'block'|'parsons'|'text'),
-  boss(bool), blocks(string[] 이 레슨에서 새로 열리는 블록; 누적됨), tutorSummary, terms(object 용어→설명),
+  id, ch(챕터 번호), n(레슨 번호; 보스는 없음), title, minutes, mode('read'|'text'),
+  boss(bool), tutorSummary, terms(object 용어→설명),
   pages:[{title, html, example?:{code, trace?:bool}}], summary:string[3]
 */
 
@@ -54,7 +52,7 @@ const LESSONS = [
   ],
   summary:['프로그래밍은 컴퓨터에게 할 일을 순서대로 적는 것','코드는 위에서 아래로 한 줄씩 실행된다','에러는 실패가 아니라 힌트'] },
 
-{ id:'L1', ch:1, n:1, title:'print로 말하기', minutes:10, mode:'block', blocks:['text_print','text','text_join'],
+{ id:'L1', ch:1, n:1, title:'print로 말하기', minutes:10, mode:'text',
   tutorSummary:'print()는 괄호 안의 내용을 화면에 보여 준다. 글자(문자열)는 따옴표로 감싼다. print를 여러 번 쓰면 여러 줄이 나온다.',
   pages:[
     { title:'print: 화면에 보여 주기', html:`<p>[[print]]는 괄호 <code>( )</code> 안의 내용을 <b>화면에 보여 줘요</b>.</p><pre>print("안녕")   # 안녕</pre><p>줄 끝 <code>#</code> 뒤는 [[주석]] — 컴퓨터가 읽지 않는 메모예요. 이 앱에서는 <b>결과를 적어 둘 때</b> 써요. 위 코드를 실행하면 <code>안녕</code>만 나와요.</p><p>컴퓨터가 한 일을 보려면 print로 보여 달라고 해야 해요.</p>`,
@@ -65,7 +63,7 @@ const LESSONS = [
       example:{ code:`print(7)\nprint("7")\nprint(42)`, trace:true } },
     { title:'따옴표를 빠뜨리면', html:`<p>글자에 따옴표를 빠뜨리면 컴퓨터는 그걸 글자가 아니라 <b>어떤 것의 이름</b>으로 생각해요.</p><pre>print(안녕)</pre><pre>NameError: name '안녕' is not defined</pre><p>「안녕이라는 이름은 정해진 적이 없어요」라는 에러예요. <code>print("안녕")</code>처럼 따옴표를 붙이면 고쳐져요.</p>`,
       example:{ code:`print("안녕")`, trace:true } },
-    { title:'여러 줄 출력하기', html:`<p>print를 여러 번 쓰면 <b>한 줄에 하나씩</b> 차례로 나와요.</p><pre>print("사과")   # 사과\nprint("배")     # 배</pre><p>print 하나가 한 줄이에요. 블록 화면에서는 <b>출력</b> 블록을 위아래로 쌓으면 돼요. 블록을 움직이면 오른쪽 코드도 같이 바뀌어요.</p>`,
+    { title:'여러 줄 출력하기', html:`<p>print를 여러 번 쓰면 <b>한 줄에 하나씩</b> 차례로 나와요.</p><pre>print("사과")   # 사과\nprint("배")     # 배</pre><p>print 하나가 한 줄이에요.</p>`,
       example:{ code:`print("사과")\nprint("배")\nprint("포도")`, trace:true } },
     { title:'쉼표로 여러 개', html:`<p>괄호 안에 <b>쉼표</b>로 여러 개를 넣으면 <b>한 칸씩 띄워</b> 한 줄에 나와요.</p><pre>print("사과", "배", "포도")   # 사과 배 포도\nprint("나이:", 12)           # 나이: 12</pre><p>글자와 숫자를 섞어도 돼요. 쉼표 자리마다 빈칸이 하나 생기니, 따옴표 안에 빈칸을 또 넣지 않아도 돼요.</p>`,
       example:{ code:`print("사과", "배", "포도")\nprint("나이:", 12)\nprint(3, 5, 7)`, trace:true } },
@@ -74,7 +72,7 @@ const LESSONS = [
   ],
   summary:['print(내용)은 화면에 내용을 보여 준다','글자는 따옴표로 감싼다 (문자열)','print를 쌓으면 줄이 바뀐다'] },
 
-{ id:'L2', ch:1, n:2, title:'변수: 이름표 붙이기', minutes:12, mode:'block', blocks:['variables_set','variables_get','math_number','math_arithmetic','py_change'],
+{ id:'L2', ch:1, n:2, title:'변수: 이름표 붙이기', minutes:12, mode:'text',
   tutorSummary:'변수는 값을 담는 이름표 붙은 상자. 이름 = 값 으로 만들고, 이름을 쓰면 안의 값이 나온다. 다시 대입하면 값이 바뀐다. 숫자와 문자열은 다른 종류다.',
   terms:{ '변수':'값을 담아 두고 이름으로 꺼내 쓰는 상자' },
   pages:[
@@ -97,7 +95,7 @@ const LESSONS = [
   ],
   summary:['변수는 값을 담는 이름표 상자','= 는 오른쪽 값을 왼쪽 이름에 넣는 것','다시 넣으면 값이 바뀐다 (x = x + 1)'] },
 
-{ id:'L3', ch:1, n:3, title:'계산하기와 input', minutes:15, mode:'block', blocks:['math_modulo','py_floordiv','py_input','py_int','py_str','py_float'],
+{ id:'L3', ch:1, n:3, title:'계산하기와 input', minutes:15, mode:'text',
   tutorSummary:'사칙연산 + - * /, 나머지 %, 몫 //, 거듭제곱 **. input()은 사용자가 입력한 글자(문자열)를 돌려준다. 숫자로 계산하려면 int()로 바꿔야 한다.',
   terms:{ '형 변환':'값의 종류를 바꾸는 것. int("3")은 글자 "3"을 숫자 3으로 바꾼다' },
   pages:[
@@ -122,7 +120,7 @@ const LESSONS = [
   ],
   summary:['+ - * / 와 나머지 %, 몫 //','input()은 항상 문자열을 돌려준다','숫자로 쓰려면 int()로 바꾼다'] },
 
-{ id:'L4', ch:1, n:4, title:'조건문: 만약에', minutes:15, mode:'block', blocks:['controls_if','logic_compare','logic_operation','logic_negate','logic_boolean'],
+{ id:'L4', ch:1, n:4, title:'조건문: 만약에', minutes:15, mode:'text',
   tutorSummary:'if 조건: 으로 조건이 참일 때만 실행. elif로 다른 조건, else로 나머지. 비교는 == != < > <= >=, 논리는 and or not. 콜론 뒤 줄은 들여쓰기.',
   terms:{ '조건문':'조건이 맞을 때만 어떤 코드를 실행하게 하는 문장 (if)', '들여쓰기':'줄 앞에 공백 4칸을 넣어 "이 줄은 위 문장에 속한다"고 표시하는 것' },
   pages:[
@@ -143,14 +141,14 @@ const LESSONS = [
   ],
   summary:['if 조건: 아래 들여쓴 줄이 참일 때 실행','elif / else 로 갈래를 나눈다','같다는 == (두 개), 넣기는 = (한 개)'] },
 
-{ id:'B1', ch:1, boss:true, title:'보스: 숫자 맞히기 1단계', minutes:10, mode:'block', pages:[], summary:[],
+{ id:'B1', ch:1, boss:true, title:'보스: 숫자 맞히기 1단계', minutes:10, mode:'text', pages:[], summary:[],
   tutorSummary:'input으로 받은 수를 int로 바꾸고, 비밀 숫자 7과 비교해 정답/더 커요/더 작아요를 출력하는 조건 분기 종합.' },
 
-{ id:'L5', ch:2, n:5, title:'for와 range: 반복하기', minutes:15, mode:'block', blocks:['py_for_range','controls_repeat_ext'],
+{ id:'L5', ch:2, n:5, title:'for와 range: 반복하기', minutes:15, mode:'text',
   tutorSummary:'for i in range(n): 은 n번 반복하며 i가 0부터 n-1까지 변한다. range(a,b)는 a부터 b-1, range(a,b,step)은 step씩. 반복 안의 코드는 들여쓴다.',
   terms:{ '반복문':'같은 일을 여러 번 되풀이하게 하는 문장 (for, while)', 'range':'연속된 숫자를 만들어 주는 것. range(5)는 0,1,2,3,4', '누적':'값을 조금씩 더해 모아 가는 것. total = total + i 처럼 쓴다' },
   pages:[
-    { title:'for: 같은 일을 여러 번', html:`<p>[[반복문]] <code>for</code>는 <b>같은 일을 정한 횟수만큼</b> 되풀이해요.</p><pre>for i in range(3):\n    print("안녕")</pre><p><code>range(3)</code>은 「3번」이라서 <code>안녕</code>이 세 번 나와요(range는 3쪽에서 자세히). 줄 끝 콜론과 들여쓰기는 if와 같은 규칙이고, <b>들여쓴 줄 전부</b>가 반복돼요. 블록 화면에서는 반복 블록 안에 끼워요.</p>`,
+    { title:'for: 같은 일을 여러 번', html:`<p>[[반복문]] <code>for</code>는 <b>같은 일을 정한 횟수만큼</b> 되풀이해요.</p><pre>for i in range(3):\n    print("안녕")</pre><p><code>range(3)</code>은 「3번」이라서 <code>안녕</code>이 세 번 나와요(range는 3쪽에서 자세히). 줄 끝 콜론과 들여쓰기는 if와 같은 규칙이고, <b>들여쓴 줄 전부</b>가 반복돼요.</p>`,
       example:{ code:`for i in range(3):\n    print("안녕")\n    print("반가워")\nprint("끝")`, trace:true } },
     { title:'i: 몇 번째인지 세기', html:`<p><code>i</code>는 반복할 때마다 바뀌는 변수예요. <code>range(3)</code>이면 0, 1, 2로 바뀌어요.</p><pre>for i in range(3):\n    print("안녕", i)</pre><ol><li>1회차: i = 0 → <code>안녕 0</code></li><li>2회차: i = 1 → <code>안녕 1</code></li><li>3회차: i = 2 → <code>안녕 2</code></li><li>꺼낼 숫자가 없으니 끝</li></ol>`,
       example:{ code:`for i in range(3):\n    print("안녕", i)`, trace:true } },
@@ -169,7 +167,7 @@ const LESSONS = [
   ],
   summary:['for i in range(n): 은 n번 반복','range(5)는 0~4, 5는 없다','range(시작, 끝, 간격)'] },
 
-{ id:'L6', ch:2, n:6, title:'while: 조건 반복', minutes:15, mode:'block', blocks:['controls_whileUntil','controls_flow_statements'],
+{ id:'L6', ch:2, n:6, title:'while: 조건 반복', minutes:15, mode:'text',
   tutorSummary:'while 조건: 은 조건이 참인 동안 반복. 안에서 조건이 바뀌지 않으면 무한루프. break로 즉시 탈출, continue로 다음 반복으로 건너뜀.',
   terms:{ '무한루프':'끝나는 조건이 없어서 영원히 도는 반복. 보통 조건을 바꾸는 줄을 깜빡해서 생긴다' },
   pages:[
@@ -186,7 +184,7 @@ const LESSONS = [
   ],
   summary:['while 조건: 은 조건이 참인 동안 반복','조건을 바꾸지 않으면 무한루프','break는 탈출, continue는 다음 회차로'] },
 
-{ id:'L7', ch:2, n:7, title:'리스트: 여러 개를 한 줄로', minutes:15, mode:'block', blocks:['lists_create_with','lists_length','py_index','py_append','py_pop','controls_forEach'],
+{ id:'L7', ch:2, n:7, title:'리스트: 여러 개를 한 줄로', minutes:15, mode:'text',
   tutorSummary:'리스트는 [a, b, c]처럼 여러 값을 순서대로 담는 상자. 인덱스는 0부터. append로 끝에 추가, pop으로 꺼내기, len으로 개수. for x in 리스트: 로 하나씩 꺼낸다.',
   terms:{ '리스트':'여러 값을 순서대로 담는 묶음. 대괄호 [ ]로 만든다', '인덱스':'리스트 안에서의 번호. 0부터 시작한다' },
   pages:[
@@ -211,7 +209,7 @@ const LESSONS = [
   ],
   summary:['리스트 = [값, 값, 값], 인덱스는 0부터','append로 추가, pop으로 꺼내기, len으로 개수','for x in 리스트: 로 하나씩'] },
 
-{ id:'L8', ch:2, n:8, title:'함수: 레시피 만들기', minutes:18, mode:'block', blocks:['procedures_defnoreturn','procedures_defreturn','procedures_callnoreturn','procedures_callreturn','procedures_ifreturn'],
+{ id:'L8', ch:2, n:8, title:'함수: 레시피 만들기', minutes:18, mode:'text',
   tutorSummary:'def 이름(매개변수): 로 함수를 정의하고 이름()으로 호출. return으로 값을 돌려준다. return 뒤의 코드는 실행되지 않는다. return이 없으면 None.',
   terms:{ '함수':'여러 줄의 코드에 이름을 붙여 묶어 둔 것. 이름만 부르면 그 코드가 실행된다', '매개변수':'함수를 부를 때 넘겨 주는 재료를 받는 변수 (parameter)', 'return':'함수가 계산한 결과를 부른 쪽에 돌려주는 것' },
   pages:[
@@ -228,13 +226,13 @@ const LESSONS = [
   ],
   summary:['def 이름(): 으로 정의, 이름()으로 호출','매개변수로 재료를 받는다','return은 결과를 돌려주고 함수를 끝낸다'] },
 
-{ id:'B2', ch:2, boss:true, title:'보스: 숫자 맞히기 게임 완성', minutes:15, mode:'parsons', pages:[], summary:[],
+{ id:'B2', ch:2, boss:true, title:'보스: 숫자 맞히기 게임 완성', minutes:15, mode:'text', pages:[], summary:[],
   tutorSummary:'미니 프로젝트 1. while 반복, 조건문, 시도 횟수 변수, 입력 형 변환을 합쳐 숫자 맞히기 게임을 완성한다.' },
 ];
 
 
 LESSONS.push(
-{ id:'L9', ch:3, n:9, title:'문자열 다루기', minutes:15, mode:'parsons',
+{ id:'L9', ch:3, n:9, title:'문자열 다루기', minutes:15, mode:'text',
   tutorSummary:'문자열 인덱스·슬라이싱 s[a:b], len, upper/lower/replace/split/strip 메서드, f-string f"{변수}"로 값 끼워 넣기.',
   terms:{ '슬라이싱':'문자열이나 리스트의 일부를 [시작:끝]으로 잘라내는 것', '메서드':'값에 점(.)을 찍고 부르는 함수. "abc".upper() 처럼', 'f-string':'앞에 f를 붙인 문자열. 중괄호 { } 안에 변수를 넣으면 값이 끼워진다' },
   pages:[
@@ -257,7 +255,7 @@ LESSONS.push(
   ],
   summary:['s[a:b]로 자르기, s[::-1]로 뒤집기','upper, replace, split, strip 메서드','f"{변수}" 로 값 끼워 넣기'] },
 
-{ id:'L10', ch:3, n:10, title:'딕셔너리: 이름으로 찾기', minutes:15, mode:'parsons',
+{ id:'L10', ch:3, n:10, title:'딕셔너리: 이름으로 찾기', minutes:15, mode:'text',
   tutorSummary:'딕셔너리 {키: 값}. d[키]로 꺼내고 d[키] = 값으로 추가·수정. 없는 키는 KeyError, d.get(키, 기본값)은 안전. for k, v in d.items(): 로 반복. in으로 키 존재 확인.',
   terms:{ '딕셔너리':'키(이름)로 값을 찾는 묶음. 중괄호 {키: 값}으로 만든다', '키':'딕셔너리에서 값을 찾을 때 쓰는 이름표' },
   pages:[
@@ -491,49 +489,49 @@ const PROBLEMS = [
 { id:'L0P4', lesson:'L0', type:'code', title:'첫 실행과 제출', prompt:'코드는 이미 적혀 있어요. <b>▶ 실행</b>을 눌러 출력 칸에 <code>안녕!</code>이 나오는지 보고, <b>✔ 제출하기</b>를 눌러 보세요. 이게 이 앱에서 문제를 푸는 기본 흐름이에요. (글자를 바꿔서 실행해 봐도 돼요 — 제출 전에만 되돌리면 돼요)', tags:['출력'], xp:10,
   starter:'print("안녕!")', solution:'print("안녕!")', tests:[{output:'안녕!'},{output:'안녕!'}],
   hints:['코드를 고칠 필요가 없어요. 실행 → 제출','출력 칸에 안녕! 이 보이면 제출하기','print("안녕!") 그대로 제출'] },
-{ id:'L1P1', lesson:'L1', type:'block', title:'첫 인사', prompt:'화면에 <code>안녕, 파이썬!</code>을 출력하세요.', tags:['출력'],
+{ id:'L1P1', lesson:'L1', type:'code', title:'첫 인사', prompt:'화면에 <code>안녕, 파이썬!</code>을 출력하세요. 아래 한 줄을 <b>그대로 치면</b> 돼요. 괄호와 따옴표까지 똑같이요.<pre>print("안녕, 파이썬!")</pre>', tags:['출력'],
   solution:'print("안녕, 파이썬!")', tests:[{output:'안녕, 파이썬!'}],
-  hints:['"출력" 블록을 꺼내세요','출력 블록 안의 글자 블록에 안녕, 파이썬! 을 적으세요','print("안녕, 파이썬!")'] },
-{ id:'L1P2', lesson:'L1', type:'block', title:'두 줄 말하기', prompt:'첫 줄에 <code>나는</code>, 둘째 줄에 <code>파이썬을 배워요</code>를 출력하세요.', tags:['출력'],
-  solution:'print("나는")\nprint("파이썬을 배워요")', tests:[{output:'나는\n파이썬을 배워요'}],
-  hints:['print를 두 번 쓰면 두 줄이 나와요','출력 블록 두 개를 위아래로 붙이세요','print("나는") 다음 줄에 print("파이썬을 배워요")'] },
+  hints:['print 뒤에 괄호 ( ) 를 열고, 그 안에 보여 줄 글자를 써요','글자는 따옴표 " " 로 감싸요. 괄호 안에 "안녕, 파이썬!" 을 넣어요','print("안녕, 파이썬!")'] },
+{ id:'L1P2', lesson:'L1', type:'code', title:'두 줄 말하기', prompt:'첫 줄에 <code>나는</code>, 둘째 줄에 <code>파이썬을 배워요</code>를 출력하세요. 첫 줄은 이미 적혀 있어요 — <b>둘째 줄에 print 한 줄</b>을 더 치세요.', tags:['출력'],
+  starter:'print("나는")\n', solution:'print("나는")\nprint("파이썬을 배워요")', tests:[{output:'나는\n파이썬을 배워요'}],
+  hints:['print 를 한 줄에 하나씩 쓰면 화면에도 한 줄씩 나와요','둘째 줄: print("파이썬을 배워요")','print("나는")\nprint("파이썬을 배워요")'] },
 { id:'L1P3', lesson:'L1', type:'quiz', title:'따옴표가 없다면', prompt:'따옴표 없이 <code>print(안녕)</code>이라고 쓰면 어떻게 될까요? (글자인지 이름인지가 핵심이에요)', tags:['출력','오개념'],
   quiz:{ opts:['안녕 이 출력된다','"안녕" 이 출력된다','NameError가 난다 (안녕이라는 이름이 없어서)','아무 일도 안 일어난다'], ans:2, why:'따옴표가 없으면 컴퓨터는 안녕을 「이름」(나중에 배울 변수)으로 생각해요. 그런 이름은 없으니 NameError가 나요.' },
   hints:['따옴표가 없는 글자는 문자열이 아니에요','컴퓨터는 안녕을 "어떤 이름"으로 찾으려 해요','없는 이름을 찾으면 생기는 에러 이름이 들어간 보기'] },
 { id:'L1P4', lesson:'L1', type:'fill', title:'빈칸 채우기: 따옴표', prompt:'<code>안녕</code>이 출력되도록 빈칸을 채우세요. 글자를 출력하려면 무엇으로 감싸야 했죠?', tags:['출력'],
   fill:{ code:'print(___1___)', blanks:[{ a:['"안녕"', "'안녕'"], opt:['안녕', '"안녕"', 'print', '안녕"'] }], why:'글자는 따옴표로 감싸야 문자열이 돼요. 양쪽 모두 같은 따옴표여야 해요.' },
   hints:['레슨 1에서 글자를 감쌌던 기호를 떠올려 보세요','양쪽에 따옴표가 모두 있는 보기를 고르세요','빈칸에 "안녕" (따옴표 포함) → print("안녕")']},
-{ id:'L1P5', lesson:'L1', type:'block', title:'자기소개', prompt:'세 줄로 출력하세요. 첫 줄 <code>이름: 김코딩</code>, 둘째 줄 <code>나이: 12</code>, 셋째 줄 <code>취미: 게임</code>', tags:['출력'],
-  solution:'print("이름: 김코딩")\nprint("나이: 12")\nprint("취미: 게임")', tests:[{output:'이름: 김코딩\n나이: 12\n취미: 게임'}],
-  hints:['출력 블록 세 개가 필요해요','콜론(:) 뒤에 띄어쓰기 한 칸이 있어요','print("이름: 김코딩") 처럼 한 줄씩 세 번'] },
+{ id:'L1P5', lesson:'L1', type:'code', title:'자기소개', prompt:'세 줄로 출력하세요. 첫 줄 <code>이름: 김코딩</code>, 둘째 줄 <code>나이: 29</code>, 셋째 줄 <code>취미: 게임</code>. 두 줄은 적혀 있어요 — <b>셋째 줄</b>에 print 한 줄을 더 치세요.', tags:['출력'],
+  starter:'print("이름: 김코딩")\nprint("나이: 29")\n', solution:'print("이름: 김코딩")\nprint("나이: 29")\nprint("취미: 게임")', tests:[{output:'이름: 김코딩\n나이: 29\n취미: 게임'}],
+  hints:['위 두 줄과 같은 모양으로 한 줄 더','콜론(:) 뒤에 띄어쓰기 한 칸이 있어요: "취미: 게임"','print("취미: 게임")'] },
 
 // ---------------- L2 ----------------
-{ id:'L2P1', lesson:'L2', type:'block', title:'변수에 담아 출력', prompt:'변수 <code>name</code>에 <code>파이썬</code>을 넣고, 그 변수를 출력하세요.', tags:['변수'],
-  solution:'name = "파이썬"\nprint(name)', tests:[{output:'파이썬'}],
-  hints:['"□ = □" 블록(변수 블록)으로 상자를 만드세요','= 오른쪽 칸에 글자 블록 "파이썬"을 넣고, 출력 블록 안에는 변수 블록을 넣으세요','name = "파이썬" 그리고 print(name)'] },
+{ id:'L2P1', lesson:'L2', type:'code', title:'변수에 담아 출력', prompt:'변수 <code>name</code>에 <code>파이썬</code>이 들어 있어요(첫 줄). <b>둘째 줄</b>에 그 변수를 출력하는 print 한 줄을 치세요. 변수를 출력할 때는 <b>따옴표 없이 이름만</b> 써요.', tags:['변수'],
+  starter:'name = "파이썬"\n', solution:'name = "파이썬"\nprint(name)', tests:[{output:'파이썬'}],
+  hints:['print 괄호 안에 변수 이름을 써요','따옴표를 붙이면 name 이라는 글자가 나와요. 따옴표 없이: print(name)','name = "파이썬"\nprint(name)'] },
 { id:'L2P2', lesson:'L2', type:'quiz', title:'값 바꾸기', prompt:'다음 코드의 출력은?<pre>x = 5\nx = x + 1\nprint(x)</pre>', tags:['변수'],
   quiz:{ opts:['5','6','x + 1','에러'], ans:1, why:'x = x + 1 은 "지금 x(5)에 1을 더한 6을 다시 x에 넣어라"예요. 그래서 6이 출력돼요.' },
   hints:['= 는 오른쪽 값을 왼쪽에 넣는 거예요','둘째 줄에서 x가 5에서 어떻게 바뀔까요?','x = x + 1 은 5 + 1 = 6을 x에 넣어요 → 6']},
-{ id:'L2P3', lesson:'L2', type:'block', title:'내년 나이', prompt:'변수 <code>age</code>에 <code>{{age}}</code>를 넣고, 첫 줄에 age를, 둘째 줄에 age에 1을 더한 값을 출력하세요.', tags:['변수','계산'],
-  vary:{ age:[8, 15] },
-  solution:'age = {{age}}\nprint(age)\nprint(age + 1)', tests:[{output:'{{age}}\n{{age+1}}'}],
-  hints:['숫자는 따옴표 없이 숫자 블록을 쓰세요','출력 블록 안에 "더하기" 계산 블록을 넣고 변수와 1을 넣으세요','age = {{age}}\nprint(age)\nprint(age + 1)'] },
+{ id:'L2P3', lesson:'L2', type:'code', title:'내년 나이', prompt:'변수 <code>age</code>에 <code>{{age}}</code>가 들어 있고, 둘째 줄 <code>print(age)</code>까지 적혀 있어요. <b>셋째 줄</b>에 age에 1을 더한 값을 출력하는 print 한 줄을 치세요.', tags:['변수','계산'],
+  vary:{ age:[25, 45] },
+  starter:'age = {{age}}\nprint(age)\n', solution:'age = {{age}}\nprint(age)\nprint(age + 1)', tests:[{output:'{{age}}\n{{age+1}}'}],
+  hints:['print 괄호 안에서 바로 계산할 수 있어요','age + 1 을 괄호 안에: print(age + 1)','age = {{age}}\nprint(age)\nprint(age + 1)'] },
 { id:'L2P4', lesson:'L2', type:'bug', title:'이름이 달라요', prompt:'<code>민수</code>를 출력하려 했는데 에러가 나요. 틀린 줄을 고르고 고치세요.', tags:['변수'],
   bug:{ code:'name = "민수"\nprint(nmae)', bugLine:2, solution:'name = "민수"\nprint(name)', tests:[{output:'민수'}] },
   hints:['변수 이름은 글자 하나만 달라도 다른 이름이에요','첫 줄에서 만든 이름과 둘째 줄에서 부르는 이름을 비교해 보세요','print(name)'] },
-{ id:'L2P5', lesson:'L2', type:'block', title:'곱하고 더하기', prompt:'변수 <code>a</code>에 <code>{{a}}</code>, <code>b</code>에 <code>{{b}}</code>를 넣고, 첫 줄에 a × b, 둘째 줄에 a + b를 출력하세요.', tags:['변수','계산'],
+{ id:'L2P5', lesson:'L2', type:'code', title:'곱하고 더하기', prompt:'변수 <code>a</code>에 <code>{{a}}</code>, <code>b</code>에 <code>{{b}}</code>가 들어 있고, a × b 출력까지 적혀 있어요. <b>마지막 줄</b>에 a + b를 출력하는 print 한 줄을 치세요.', tags:['변수','계산'],
   vary:{ a:[3, 9], b:[4, 9] },
-  solution:'a = {{a}}\nb = {{b}}\nprint(a * b)\nprint(a + b)', tests:[{output:'{{a*b}}\n{{a+b}}'}],
-  hints:['변수 설정 블록 두 개, 출력 블록 두 개','계산 블록의 연산자를 ×와 +로 각각 고르세요','print(a * b) 다음 print(a + b)'] },
+  starter:'a = {{a}}\nb = {{b}}\nprint(a * b)\n', solution:'a = {{a}}\nb = {{b}}\nprint(a * b)\nprint(a + b)', tests:[{output:'{{a*b}}\n{{a+b}}'}],
+  hints:['곱하기가 * 였듯 더하기는 + 예요','셋째 줄과 같은 모양으로 기호만 바꿔요: print(a + b)','a = {{a}}\nb = {{b}}\nprint(a * b)\nprint(a + b)'] },
 
 // ---------------- L3 ----------------
-{ id:'L3P1', lesson:'L3', type:'block', title:'곱셈 계산', prompt:'<code>{{a}} × {{b}}</code>의 결과를 출력하세요. (숫자를 직접 계산해서 적지 말고 계산 블록을 쓰세요)', tags:['계산'],
+{ id:'L3P1', lesson:'L3', type:'code', title:'곱셈 계산', prompt:'<code>{{a}} × {{b}}</code>의 결과를 출력하세요. 숫자를 직접 계산해서 적지 말고 <b>print 괄호 안에 곱셈식</b>을 치세요. 곱하기 기호는 <code>*</code> 예요. 한 줄이면 돼요.', tags:['계산'],
   vary:{ a:[3, 12], b:[4, 12] },
   solution:'print({{a}} * {{b}})', tests:[{output:'{{a*b}}'}],
-  hints:['곱하기는 * 예요','출력 블록 안에 계산 블록을 넣고 연산자를 ×로','print({{a}} * {{b}})'] },
-{ id:'L3P2', lesson:'L3', type:'block', title:'두 배로', prompt:'숫자 하나를 입력받아 2배한 값을 출력하세요.', tags:['계산','입력'], inputExample:'7',
-  solution:'n = int(input())\nprint(n * 2)', tests:[{input:'7', output:'14'},{input:'25', output:'50'},{input:'0', output:'0'}],
-  hints:['input으로 받은 건 글자예요. 숫자로 바꿔야 계산돼요','int(input()) 을 변수에 담고 그 변수에 2를 곱하세요','n = int(input()) 그리고 print(n * 2)'] },
+  hints:['곱하기는 * 예요','print 괄호 안에 {{a}} * {{b}} 를 그대로 써요','print({{a}} * {{b}})'] },
+{ id:'L3P2', lesson:'L3', type:'code', title:'두 배로', prompt:'숫자 하나를 입력받아 2배한 값을 출력하세요. 입력받아 숫자로 바꾸는 첫 줄은 적혀 있어요. <b>둘째 줄</b>에 n의 2배를 출력하는 print 한 줄을 치세요.', tags:['계산','입력'], inputExample:'7',
+  starter:'n = int(input())\n', solution:'n = int(input())\nprint(n * 2)', tests:[{input:'7', output:'14'},{input:'25', output:'50'},{input:'0', output:'0'}],
+  hints:['n 에 입력한 숫자가 들어 있어요','print(n * 2)','n = int(input())\nprint(n * 2)'] },
 { id:'L3P3', lesson:'L3', type:'quiz', title:'나누기 세 가지', prompt:'<code>print(7 // 2)</code>의 결과는? (<code>//</code>는 나눗셈의 몫만 남겨요)', tags:['계산','오개념'],
   quiz:{ opts:['3.5','3','4','1'], ans:1, why:'// 는 몫만 구해요. 7을 2로 나누면 몫 3, 나머지 1. / 를 썼다면 3.5가 나와요.' },
   hints:['// 는 / 와 달라요','//는 소수점을 버리고 몫만 남겨요','7 나누기 2의 몫'] },
@@ -543,51 +541,56 @@ const PROBLEMS = [
 { id:'L3P5', lesson:'L3', type:'fill', title:'빈칸 채우기: 형 변환', prompt:'입력한 숫자에 10을 곱해 출력하려고 해요. 빈칸에 알맞은 것은?', tags:['계산','입력'],
   fill:{ code:'n = ___1___(input())\nprint(n * 10)', blanks:[{ a:['int'], opt:['str','int','print','input'] }], why:'input()은 글자를 돌려주므로 int()로 숫자로 바꿔야 곱셈이 돼요.' },
   hints:['글자를 숫자로 바꾸는 함수예요','integer(정수)의 앞 세 글자','빈칸에 int → int(input()) 처럼 감싸요']},
-{ id:'L3P6', lesson:'L3', type:'block', title:'두 수의 합', prompt:'숫자 두 개를 한 줄씩 입력받아 합을 출력하세요.', tags:['계산','입력'], inputExample:'3\n4',
-  solution:'a = int(input())\nb = int(input())\nprint(a + b)', tests:[{input:'3\n4', output:'7'},{input:'10\n-5', output:'5'},{input:'100\n200', output:'300'}],
-  hints:['input을 두 번 써야 두 줄을 읽어요','각각 int()로 바꿔 변수 a, b에 담으세요','a = int(input())\nb = int(input())\nprint(a + b)'] },
+{ id:'L3P6', lesson:'L3', type:'code', title:'두 수의 합', prompt:'숫자 두 개를 한 줄씩 입력받아 합을 출력하세요. 두 줄을 입력받는 코드는 적혀 있어요. <b>셋째 줄</b>에 a + b를 출력하는 print 한 줄을 치세요.', tags:['계산','입력'], inputExample:'3\n4',
+  starter:'a = int(input())\nb = int(input())\n', solution:'a = int(input())\nb = int(input())\nprint(a + b)', tests:[{input:'3\n4', output:'7'},{input:'10\n-5', output:'5'},{input:'100\n200', output:'300'}],
+  hints:['a 와 b 에 각각 입력한 숫자가 들어 있어요','print(a + b)','a = int(input())\nb = int(input())\nprint(a + b)'] },
 
 // ---------------- L4 ----------------
-{ id:'L4P1', lesson:'L4', type:'block', title:'양수인가요', prompt:'숫자를 입력받아 0보다 크면 <code>양수</code>, 아니면 <code>양수가 아니에요</code>를 출력하세요.', tags:['조건','입력'], inputExample:'5',
+{ id:'L4P1', lesson:'L4', type:'code', title:'양수인가요', prompt:'숫자를 입력받아 0보다 크면 <code>양수</code>, 아니면 <code>양수가 아니에요</code>를 출력하세요. <code>if</code> 와 그 안쪽 <code>print("양수")</code> 까지 적혀 있어요. <b>넷째 줄부터 두 줄</b>을 치세요: <code>else:</code> 와 그 안쪽의 <code>print("양수가 아니에요")</code>. else 는 if 와 같은 위치(들여쓰기 없이), 그 안의 print 는 앞에 빈칸 4칸이에요.', tags:['조건','입력'], inputExample:'5',
+  starter:'n = int(input())\nif n > 0:\n    print("양수")\n',
   solution:'n = int(input())\nif n > 0:\n    print("양수")\nelse:\n    print("양수가 아니에요")', tests:[{input:'5', output:'양수'},{input:'-3', output:'양수가 아니에요'},{input:'0', output:'양수가 아니에요'}],
-  hints:['"만약" 블록과 비교 블록이 필요해요','만약 블록의 톱니바퀴를 눌러 "아니면" 조각을 추가하세요','n = int(input())\nif n > 0:\n    print("양수")\nelse:\n    print("양수가 아니에요")'] },
-{ id:'L4P2', lesson:'L4', type:'block', title:'짝수 홀수', prompt:'숫자를 입력받아 짝수면 <code>짝수</code>, 홀수면 <code>홀수</code>를 출력하세요.', tags:['조건','계산'], inputExample:'4',
+  hints:['else: 줄은 if 와 같은 위치에 쓰고 끝에 콜론(:)','else: 아래 줄은 빈칸 4칸 들여쓰고 print("양수가 아니에요")','n = int(input())\nif n > 0:\n    print("양수")\nelse:\n    print("양수가 아니에요")'] },
+{ id:'L4P2', lesson:'L4', type:'code', title:'짝수 홀수', prompt:'숫자를 입력받아 짝수면 <code>짝수</code>, 홀수면 <code>홀수</code>를 출력하세요. 입력 줄은 적혀 있어요. 아래에 <b>네 줄</b>을 치세요: <code>if n % 2 == 0:</code> → 안쪽 <code>print("짝수")</code> → <code>else:</code> → 안쪽 <code>print("홀수")</code>. 2로 나눈 나머지(<code>%</code>)가 0이면 짝수예요.', tags:['조건','계산','입력'], inputExample:'4',
+  starter:'n = int(input())\n',
   solution:'n = int(input())\nif n % 2 == 0:\n    print("짝수")\nelse:\n    print("홀수")', tests:[{input:'4', output:'짝수'},{input:'7', output:'홀수'},{input:'0', output:'짝수'},{input:'13', output:'홀수'}],
-  hints:['2로 나눈 나머지가 0이면 짝수예요','나머지 블록(%)과 비교 블록(=)을 함께 쓰세요','n = int(input())\nif n % 2 == 0:\n    print("짝수")\nelse:\n    print("홀수")'] },
+  hints:['2로 나눈 나머지가 0이면 짝수: n % 2 == 0 (같은지 비교는 = 두 개)','if n % 2 == 0: 아래 줄은 빈칸 4칸 들여쓰고 print("짝수"), else: 아래도 같게 print("홀수")','n = int(input())\nif n % 2 == 0:\n    print("짝수")\nelse:\n    print("홀수")'] },
 { id:'L4P3', lesson:'L4', type:'quiz', title:'= 와 ==', prompt:'<code>if x = 5:</code> 라고 쓰면 에러가 나요. 왜일까요?', tags:['조건','오개념'],
   quiz:{ opts:['x가 5가 아니라서','비교할 때는 == (등호 두 개)를 써야 해서','if 뒤에는 숫자를 쓸 수 없어서','콜론이 없어서'], ans:1, why:'= 는 변수에 값을 넣는 것, == 는 같은지 비교하는 것이에요. 조건에는 == 를 써요.' },
   hints:['= 하나는 "넣기"였어요','"같다"를 물어볼 땐 등호가 몇 개?','if x == 5: 처럼 등호 두 개(==)를 써야 해요']},
 { id:'L4P4', lesson:'L4', type:'fill', title:'빈칸 채우기: elif', prompt:'90점 이상 A, 80점 이상 B, 나머지 C를 출력하는 코드예요. 빈칸을 채우세요.', tags:['조건'],
   fill:{ code:'if score >= 90:\n    print("A")\n___1___ score >= 80:\n    print("B")\n___2___:\n    print("C")', blanks:[{ a:['elif'], opt:['if','elif','else','while'] },{ a:['else'], opt:['if','elif','else','end'] }], why:'두 번째 조건은 elif, 나머지 전부는 else예요.' },
   hints:['조건이 여러 개일 때 중간에 쓰는 말과, 나머지 전부를 뜻하는 말','첫 빈칸은 조건이 있고 둘째 빈칸은 조건이 없어요','elif, else'] },
-{ id:'L4P5', lesson:'L4', type:'block', title:'성적 등급', prompt:'점수를 입력받아 90 이상이면 <code>A</code>, 80 이상이면 <code>B</code>, 그 외에는 <code>C</code>를 출력하세요.', tags:['조건'], inputExample:'85',
+{ id:'L4P5', lesson:'L4', type:'code', title:'성적 등급', prompt:'점수를 입력받아 90 이상이면 <code>A</code>, 80 이상이면 <code>B</code>, 그 외에는 <code>C</code>를 출력하세요. <code>if</code> 와 그 안쪽 <code>print("A")</code> 까지 적혀 있어요. <b>넷째 줄부터 네 줄</b>을 치세요: <code>elif score >= 80:</code> → 안쪽 <code>print("B")</code> → <code>else:</code> → 안쪽 <code>print("C")</code>. elif·else 는 if 와 같은 위치에 써요.', tags:['조건'], inputExample:'85',
+  starter:'score = int(input())\nif score >= 90:\n    print("A")\n',
   solution:'score = int(input())\nif score >= 90:\n    print("A")\nelif score >= 80:\n    print("B")\nelse:\n    print("C")', tests:[{input:'95', output:'A'},{input:'85', output:'B'},{input:'40', output:'C'},{input:'90', output:'A'},{input:'80', output:'B'}],
-  hints:['조건이 세 갈래예요 — 큰 기준(90)부터 차례로 검사해요','만약 블록의 톱니바퀴로 "아니고 만약"과 "아니면" 조각을 추가하고, 비교는 ≥ 를 쓰세요','score = int(input())\nif score >= 90:\n    print("A")\nelif score >= 80:\n    print("B")\nelse:\n    print("C")'] },
+  hints:['큰 기준(90)부터 검사했으니 다음은 80: elif score >= 80:','elif·else 는 if 와 같은 위치(들여쓰기 없이), 그 안의 print 는 빈칸 4칸','score = int(input())\nif score >= 90:\n    print("A")\nelif score >= 80:\n    print("B")\nelse:\n    print("C")'] },
 { id:'L4P6', lesson:'L4', type:'bug', title:'빠진 기호', prompt:'10보다 크면 <code>크다</code>를 출력하려는데 문법 에러가 나요. 틀린 줄을 고르고 고치세요.', tags:['조건'],
   bug:{ code:'n = int(input())\nif n > 10\n    print("크다")\nelse:\n    print("작거나 같다")', bugLine:2, solution:'n = int(input())\nif n > 10:\n    print("크다")\nelse:\n    print("작거나 같다")', tests:[{input:'15', output:'크다'},{input:'3', output:'작거나 같다'},{input:'10', output:'작거나 같다'}] },
   hints:['if 줄 끝에 꼭 있어야 하는 기호가 있어요','else 줄과 if 줄을 비교해 보세요','if n > 10:'] },
 
 // ---------------- B1 ----------------
-{ id:'B1P1', lesson:'B1', type:'block', title:'숫자 맞히기 1단계', boss:true, tags:['조건','입력','계산'], inputExample:'3',
-  prompt:'비밀 숫자는 <b>7</b>이에요. 숫자를 하나 입력받아서, 7이면 <code>정답!</code>, 7보다 작으면 <code>더 커요</code>(비밀 숫자가 더 크다는 뜻), 7보다 크면 <code>더 작아요</code>를 출력하세요.',
+{ id:'B1P1', lesson:'B1', type:'code', title:'숫자 맞히기 1단계', boss:true, tags:['조건','입력','계산'], inputExample:'3',
+  prompt:'비밀 숫자는 <b>7</b>이에요. 숫자를 하나 입력받아서, 7이면 <code>정답!</code>, 7보다 작으면 <code>더 커요</code>(비밀 숫자가 더 크다는 뜻), 7보다 크면 <code>더 작아요</code>를 출력하세요. 준비 두 줄(secret·guess)은 적혀 있어요. 아래에 세 갈래를 치세요: <code>if guess == secret:</code> / <code>elif guess < secret:</code> / <code>else:</code>, 각 안쪽에 print 한 줄씩(모두 6줄).',
+  starter:'secret = 7\nguess = int(input())\n',
   solution:'secret = 7\nguess = int(input())\nif guess == secret:\n    print("정답!")\nelif guess < secret:\n    print("더 커요")\nelse:\n    print("더 작아요")',
   tests:[{input:'7', output:'정답!'},{input:'3', output:'더 커요'},{input:'10', output:'더 작아요'},{input:'6', output:'더 커요'},{input:'8', output:'더 작아요'}],
-  hints:['입력을 int로 바꾸고 7과 비교하세요','세 갈래가 필요해요: 같다(==), 작다(<), 나머지','guess = int(input())\nif guess == 7:\n    print("정답!")\nelif guess < 7:\n    print("더 커요")\nelse:\n    print("더 작아요")'] },
+  hints:['guess 와 secret 을 비교해요. 같다는 == (두 개), 작다는 <','세 갈래: if guess == secret: → elif guess < secret: → else: 각 아래에 빈칸 4칸 print','secret = 7\nguess = int(input())\nif guess == secret:\n    print("정답!")\nelif guess < secret:\n    print("더 커요")\nelse:\n    print("더 작아요")'] },
 
 // ---------------- L5 ----------------
-{ id:'B1P2', lesson:'B1', type:'block', title:'숫자 맞히기 1단계 + 범위 검사', boss:true, tags:['조건','입력'], inputExample:'12',
-  prompt:'비밀 숫자는 <b>7</b>이에요. 숫자를 하나 입력받아서, <b>1보다 작거나 10보다 크면</b> <code>1에서 10 사이로!</code>, 7이면 <code>정답!</code>, 그 외에는 <code>땡</code>을 출력하세요. 조건은 세 갈래예요 — 「만약」에서 범위를 검사하고, 「아니고 만약」에서 7인지 보고, 나머지는 「아니면」으로 보내요. 1보다 작은 것과 10보다 큰 것은 <b>또는(or)</b>으로 한 조건에 묶어요.',
+{ id:'B1P2', lesson:'B1', type:'code', title:'숫자 맞히기 1단계 + 범위 검사', boss:true, tags:['조건','입력'], inputExample:'12',
+  prompt:'비밀 숫자는 <b>7</b>이에요. 숫자를 하나 입력받아서, <b>1보다 작거나 10보다 크면</b> <code>1에서 10 사이로!</code>, 7이면 <code>정답!</code>, 그 외에는 <code>땡</code>을 출력하세요. 조건은 세 갈래예요 — <code>if</code> 에서 범위를 검사하고, <code>elif</code> 에서 7인지 보고, 나머지는 <code>else</code> 로 보내요. 1보다 작은 것과 10보다 큰 것은 <code>or</code> 로 한 조건에 묶어요: <code>if guess < 1 or guess > 10:</code>. 준비 두 줄은 적혀 있어요.',
+  starter:'secret = 7\nguess = int(input())\n',
   solution:'secret = 7\nguess = int(input())\nif guess < 1 or guess > 10:\n    print("1에서 10 사이로!")\nelif guess == secret:\n    print("정답!")\nelse:\n    print("땡")',
   tests:[{input:'12', output:'1에서 10 사이로!'},{input:'7', output:'정답!'},{input:'3', output:'땡'},{input:'0', output:'1에서 10 사이로!'},{input:'10', output:'땡'},{input:'1', output:'땡'}],
-  hints:['범위 검사가 맨 먼저: guess < 1 or guess > 10','그다음 == 7, 마지막은 아니면','guess = int(input())\nif guess < 1 or guess > 10:\n    print("1에서 10 사이로!")\nelif guess == 7:\n    print("정답!")\nelse:\n    print("땡")'] },
-{ id:'L5P1', lesson:'L5', type:'block', title:'1부터 5까지', prompt:'1, 2, 3, 4, 5를 한 줄에 하나씩 출력하세요.', tags:['반복'],
+  hints:['범위 검사가 맨 먼저: if guess < 1 or guess > 10:','그다음 elif guess == secret: 마지막은 else:','secret = 7\nguess = int(input())\nif guess < 1 or guess > 10:\n    print("1에서 10 사이로!")\nelif guess == secret:\n    print("정답!")\nelse:\n    print("땡")'] },
+{ id:'L5P1', lesson:'L5', type:'code', title:'1부터 5까지', prompt:'1, 2, 3, 4, 5를 한 줄에 하나씩 출력하세요. for 두 줄이면 돼요: <code>for i in range(1, 6):</code> 그리고 안쪽에 <code>print(i)</code>. range 의 끝 숫자는 포함되지 않아서 5까지 세려면 6을 써요.', tags:['반복'],
   solution:'for i in range(1, 6):\n    print(i)', tests:[{output:'1\n2\n3\n4\n5'}],
-  hints:['같은 일(출력)을 다섯 번 → 반복 블록을 쓰세요','"i를 1부터 5까지" 반복 블록 안에 i 출력 블록. range로 쓰면 끝은 포함 안 돼서 6','for i in range(1, 6): print(i)'] },
-{ id:'L5P2', lesson:'L5', type:'parsons', title:'1부터 10까지의 합', prompt:'1부터 10까지 더한 값(55)을 출력하는 코드를 순서대로 맞추세요. 함정 줄이 하나 섞여 있어요.', tags:['반복','변수'],
-  parsons:{ solution:'total = 0\nfor i in range(1, 11):\n    total = total + i\nprint(total)', distractors:['for i in range(1, 10):'] },
+  hints:['같은 일(출력)을 다섯 번 → for 반복','for i in range(1, 6): 아래 줄은 빈칸 4칸 들여쓰고 print(i)','for i in range(1, 6):\n    print(i)'] },
+{ id:'L5P2', lesson:'L5', type:'code', title:'1부터 10까지의 합', prompt:'1부터 10까지 더한 값(55)을 출력하세요. 합을 담을 변수 <code>total</code> 을 0으로 시작하는 첫 줄은 적혀 있어요. 아래에 <b>세 줄</b>을 치세요: <code>for i in range(1, 11):</code> → 안쪽 <code>total = total + i</code> → 반복 밖(들여쓰기 없이) <code>print(total)</code>.', tags:['반복','변수'],
+  starter:'total = 0\n', solution:'total = 0\nfor i in range(1, 11):\n    total = total + i\nprint(total)',
   tests:[{output:'55'}],
-  hints:['합을 담을 변수를 먼저 0으로 만들어요','10까지 포함하려면 range의 끝은 11','total = 0 → for i in range(1, 11): → (들여쓰기) total = total + i → print(total)'] },
-{ id:'L5P3', lesson:'L5', type:'code', title:'거북이 정사각형', prompt:'거북이로 한 변이 100인 정사각형을 그리세요. "앞으로 100, 왼쪽 90도"를 4번 반복하면 돼요.', tags:['반복'], turtle:true,
+  hints:['10까지 포함하려면 range 의 끝은 11','반복 안에서 total = total + i (빈칸 4칸). 다 돌고 나서 출력하는 print(total) 은 들여쓰기 없이','total = 0\nfor i in range(1, 11):\n    total = total + i\nprint(total)'] },
+{ id:'L5P3', lesson:'L5', type:'code', title:'거북이 정사각형', prompt:'거북이로 한 변이 100인 정사각형을 그리세요. "앞으로 100, 왼쪽 90도"를 4번 반복하면 돼요. <b>셋째 줄</b>에 <code>for i in range(4):</code>, 그 안쪽(빈칸 4칸)에 <code>turtle.forward(100)</code> 과 <code>turtle.left(90)</code> 을 치세요.', tags:['반복'], turtle:true,
   starter:'import turtle\n# 여기에 반복문을 쓰세요\n',
   solution:'import turtle\nfor i in range(4):\n    turtle.forward(100)\n    turtle.left(90)', tests:[{output:''}],
   hints:['"앞으로 가기 + 왼쪽으로 90도 돌기"를 4번 반복해요','for i in range(4): 안에 turtle.forward(100) 과 turtle.left(90) 을 들여써서 넣어요','for i in range(4):\n    turtle.forward(100)\n    turtle.left(90)'] },
@@ -597,15 +600,17 @@ const PROBLEMS = [
 { id:'L5P5', lesson:'L5', type:'fill', title:'빈칸 채우기: 홀수', prompt:'1, 3, 5, 7, 9를 출력하도록 빈칸을 채우세요.', tags:['반복'],
   fill:{ code:'for i in range(1, ___1___, 2):\n    print(i)', blanks:[{ a:['10','11'], opt:['9','10','2','1'] }], why:'1부터 2씩 뛰어 9까지 가려면 끝은 9보다 큰 10(또는 11)이어야 해요. 끝은 포함되지 않으니까요.' },
   hints:['세 번째 값 2는 "2씩 뛴다"예요','9가 나와야 하고 끝은 포함되지 않아요','range(1, 10, 2) → 끝 칸에 10 (또는 11)']},
-{ id:'L5P6', lesson:'L5', type:'block', title:'구구단 한 단', prompt:'숫자 n을 입력받아 <code>n x 1 = n</code>부터 <code>n x 9 = …</code>까지 아홉 줄을 출력하세요. (예: <code>2 x 1 = 2</code>)<br>블록으로 풀 때: 「출력」 블록은 칸이 4개라서, 마지막 칸에 <b>글자 이어 붙이기</b> 블록을 끼워 <code>"= "</code>와 <code>n * i</code>를 함께 넣어요.', tags:['반복','입력'], inputExample:'2',
+{ id:'L5P6', lesson:'L5', type:'code', title:'구구단 한 단', prompt:'숫자 n을 입력받아 <code>n x 1 = n</code>부터 <code>n x 9 = …</code>까지 아홉 줄을 출력하세요. (예: <code>2 x 1 = 2</code>) 입력과 for 줄은 적혀 있어요. <b>셋째 줄</b>에 앞에 빈칸 4칸(for 안쪽)을 두고 <b>print 한 줄</b>을 치세요 — print 에 쉼표로 여러 값을 넣으면 띄어쓰기 한 칸씩 이어서 나와요: <code>    print(n, "x", i, "=", n * i)</code>', tags:['반복','입력'], inputExample:'2',
+  starter:'n = int(input())\nfor i in range(1, 10):\n',
   solution:'n = int(input())\nfor i in range(1, 10):\n    print(n, "x", i, "=", n * i)',
   tests:[{input:'2', output:'2 x 1 = 2\n2 x 2 = 4\n2 x 3 = 6\n2 x 4 = 8\n2 x 5 = 10\n2 x 6 = 12\n2 x 7 = 14\n2 x 8 = 16\n2 x 9 = 18'},{input:'7', output:'7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63'}],
-  hints:['1부터 9까지 반복하면서 매번 한 줄을 출력해요','칸이 4개인 출력 블록에 n, "x", i 를 넣고, 마지막 칸에는 「출력」 메뉴의 글자 이어 붙이기 블록(칸 2개)으로 "= "(등호 뒤 한 칸 띄움)와 n×i 를 이어서 넣으세요','n = int(input())\nfor i in range(1, 10):\n    print(n, "x", i, "=", n * i)\n# 블록: 출력 칸 4개 → 마지막 칸에 글자 이어 붙이기로 "= "와 n * i'] },
+  hints:['1부터 9까지 반복하면서 매번 한 줄을 출력해요','for 안쪽이니 빈칸 4칸. 쉼표로 나누면 띄어쓰기 한 칸씩: n, "x", i, "=", n * i','n = int(input())\nfor i in range(1, 10):\n    print(n, "x", i, "=", n * i)'] },
 
 // ---------------- L6 ----------------
-{ id:'L6P1', lesson:'L6', type:'block', title:'while로 세기', prompt:'숫자 n을 입력받아 1부터 n까지 while 반복으로 한 줄에 하나씩 출력하세요.', tags:['반복','입력'], inputExample:'3',
+{ id:'L6P1', lesson:'L6', type:'code', title:'while로 세기', prompt:'숫자 n을 입력받아 1부터 n까지 while 반복으로 한 줄에 하나씩 출력하세요. 입력과 <code>i = 1</code> 은 적혀 있어요. 아래에 <b>세 줄</b>을 치세요: <code>while i <= n:</code> 과 안쪽 <code>print(i)</code>, <code>i += 1</code>. i 를 키우는 줄을 빼먹으면 끝나지 않는 반복이 돼요.', tags:['반복','입력'], inputExample:'3',
+  starter:'n = int(input())\ni = 1\n',
   solution:'n = int(input())\ni = 1\nwhile i <= n:\n    print(i)\n    i += 1', tests:[{input:'3', output:'1\n2\n3'},{input:'5', output:'1\n2\n3\n4\n5'},{input:'1', output:'1'}],
-  hints:['세는 변수 i를 1로 시작하세요','while i <= n: 안에서 출력하고 i를 1 키우세요','n = int(input())\ni = 1\nwhile i <= n:\n    print(i)\n    i += 1'] },
+  hints:['while i <= n: — i 가 n 이하인 동안 반복해요','안쪽 두 줄 모두 빈칸 4칸: print(i) 다음 i += 1','n = int(input())\ni = 1\nwhile i <= n:\n    print(i)\n    i += 1'] },
 { id:'L6P2', lesson:'L6', type:'parsons', title:'끝이라고 할 때까지', prompt:'<code>끝</code>이 입력될 때까지 계속 입력을 받아 <code>입력: 단어</code>로 출력하고, 끝나면 <code>종료</code>를 출력하는 코드를 맞추세요.', tags:['반복','조건'], inputExample:'사과\n배\n끝',
   parsons:{ solution:'while True:\n    word = input()\n    if word == "끝":\n        break\n    print("입력:", word)\nprint("종료")', distractors:['    continue'] },
   tests:[{input:'사과\n배\n끝', output:'입력: 사과\n입력: 배\n종료'},{input:'끝', output:'종료'}],
@@ -613,7 +618,7 @@ const PROBLEMS = [
 { id:'L6P3', lesson:'L6', type:'quiz', title:'무한루프 찾기', prompt:'다음 중 영원히 끝나지 않는(무한루프) 코드는? 반복 안에서 조건이 바뀌는지 보세요.', tags:['반복','오개념'],
   quiz:{ opts:['<code>i = 0<br>while i < 3:<br>&nbsp;&nbsp;&nbsp;&nbsp;i += 1</code>','<code>i = 0<br>while i < 3:<br>&nbsp;&nbsp;&nbsp;&nbsp;print(i)</code>','<code>for i in range(3):<br>&nbsp;&nbsp;&nbsp;&nbsp;print(i)</code>','<code>while False:<br>&nbsp;&nbsp;&nbsp;&nbsp;print("안녕")</code>'], ans:1, why:'두 번째 코드는 i가 영원히 0이라서 조건 i < 3 이 계속 참이에요. 반복 안에서 조건을 바꾸는 줄이 없어요.' },
   hints:['반복 안에서 조건이 바뀌는지 보세요','i가 커지지 않으면 i < 3 은 영원히 참이에요','i += 1 이 없는 while'] },
-{ id:'L6P4', lesson:'L6', type:'code', title:'거북이 별', prompt:'거북이로 별을 그리세요. "앞으로 100, 오른쪽 144도"를 5번 반복하면 별이 돼요. while 반복으로 해 보세요.', tags:['반복'], turtle:true,
+{ id:'L6P4', lesson:'L6', type:'code', title:'거북이 별', prompt:'거북이로 별을 그리세요. "앞으로 100, 오른쪽 144도"를 5번 반복하면 별이 돼요. while 반복으로 해 보세요. <b>넷째 줄</b>에 <code>while count < 5:</code>, 안쪽(빈칸 4칸) 세 줄 <code>turtle.forward(100)</code> / <code>turtle.right(144)</code> / <code>count += 1</code>.', tags:['반복'], turtle:true,
   starter:'import turtle\ncount = 0\n# while로 5번 반복\n',
   solution:'import turtle\ncount = 0\nwhile count < 5:\n    turtle.forward(100)\n    turtle.right(144)\n    count += 1', tests:[{output:''}],
   hints:['"앞으로 100 + 오른쪽 144도"를 5번 — while 은 몇 번 했는지 세는 변수가 필요해요','count = 0 으로 시작해 while count < 5: 안에서 forward·right 다음 count += 1','count = 0\nwhile count < 5:\n    turtle.forward(100)\n    turtle.right(144)\n    count += 1'] },
@@ -622,9 +627,10 @@ const PROBLEMS = [
   hints:['i가 커져야 i <= 3 이 언젠가 거짓이 돼요','마지막 줄에서 i가 어떻게 변하나요?','i = i + 1'] },
 
 // ---------------- L7 ----------------
-{ id:'L7P1', lesson:'L7', type:'block', title:'처음과 마지막', prompt:'리스트 <code>["사과", "배", "포도"]</code>를 변수 <code>fruits</code>에 넣고, 첫 번째와 마지막 과일을 한 줄씩 출력하세요.', tags:['리스트'],
+{ id:'L7P1', lesson:'L7', type:'code', title:'처음과 마지막', prompt:'리스트 <code>fruits</code> 가 적혀 있어요. 첫 번째와 마지막 과일을 한 줄씩 출력하는 <b>print 두 줄</b>을 치세요. 첫 번째는 <code>fruits[0]</code>, 마지막은 <code>fruits[-1]</code> 이에요.', tags:['리스트'],
+  starter:'fruits = ["사과", "배", "포도"]\n',
   solution:'fruits = ["사과", "배", "포도"]\nprint(fruits[0])\nprint(fruits[-1])', tests:[{output:'사과\n포도'}],
-  hints:['"리스트" 블록에 글자 세 개를 넣으세요','첫 번째는 0번, 마지막은 -1번(또는 2번)','print(fruits[0]) 그리고 print(fruits[-1])'] },
+  hints:['번호는 0부터 세요. 첫 번째는 0번','마지막은 -1번(또는 2번)','print(fruits[0])\nprint(fruits[-1])'] },
 { id:'L7P2', lesson:'L7', type:'parsons', title:'추가하고 꺼내기', prompt:'<code>[1, 2]</code>에 3을 추가해 출력하고, 마지막 값을 꺼내 출력한 뒤, 남은 개수를 출력하는 코드를 맞추세요. 결과는 아래처럼 세 줄이에요.<pre>[1, 2, 3]\n3\n2</pre>', tags:['리스트'],
   parsons:{ solution:'nums = [1, 2]\nnums.append(3)\nprint(nums)\nlast = nums.pop()\nprint(last)\nprint(len(nums))', distractors:['nums.append(2)'] },
   tests:[{output:'[1, 2, 3]\n3\n2'}],
@@ -635,22 +641,23 @@ const PROBLEMS = [
 { id:'L7P4', lesson:'L7', type:'fill', title:'빈칸 채우기: 개수', prompt:'리스트에 몇 개가 들어 있는지 출력하도록 빈칸을 채우세요.', tags:['리스트'],
   fill:{ code:'nums = [3, 1, 4, 1, 5]\nprint(___1___(nums))', blanks:[{ a:['len'], opt:['count','len','size','sum'] }], why:'len()은 길이(length), 즉 개수를 돌려줘요.' },
   hints:['길이를 영어로?','length의 앞 세 글자','빈칸에 len → len(리스트) 가 개수예요']},
-{ id:'L7P5', lesson:'L7', type:'block', title:'전부 두 배', prompt:'리스트 <code>[3, 1, 4]</code>의 각 값을 2배해서 한 줄에 하나씩 출력하세요.', tags:['리스트','반복'],
+{ id:'L7P5', lesson:'L7', type:'code', title:'전부 두 배', prompt:'리스트 <code>nums</code> 의 각 값을 2배해서 한 줄에 하나씩 출력하세요. 리스트는 적혀 있어요. 아래에 <b>두 줄</b>을 치세요: <code>for x in nums:</code> 와 안쪽 <code>print(x * 2)</code>.', tags:['리스트','반복'],
+  starter:'nums = [3, 1, 4]\n',
   solution:'nums = [3, 1, 4]\nfor x in nums:\n    print(x * 2)', tests:[{output:'6\n2\n8'}],
-  hints:['"각 항목에 대해" 반복 블록을 쓰세요','반복 안에서 항목 × 2 를 출력','for x in nums: print(x * 2)'] },
-{ id:'L7P6', lesson:'L7', type:'code', title:'가장 큰 수', prompt:'띄어쓰기로 구분된 숫자들을 한 줄로 입력받아 가장 큰 수를 출력하세요. 파이썬에 원래 있는 <code>max()</code> 함수는 쓰지 말고 반복문으로 찾아보세요.', tags:['리스트','반복','조건'], inputExample:'3 9 2 7',
-  starter:'nums = input().split()\n# 각 항목은 글자예요. int()로 바꿔서 비교하세요\n',
+  hints:['리스트의 항목을 하나씩 꺼내는 반복: for x in nums:','반복 안에서(빈칸 4칸) 항목 × 2 를 출력','nums = [3, 1, 4]\nfor x in nums:\n    print(x * 2)'] },
+{ id:'L7P6', lesson:'L7', type:'code', title:'가장 큰 수', prompt:'띄어쓰기로 구분된 숫자들을 한 줄로 입력받아 가장 큰 수를 출력하세요. 파이썬에 원래 있는 <code>max()</code> 함수는 쓰지 말고 반복문으로 찾아보세요. 틀은 적혀 있어요 — for 안쪽에 <code>if n > biggest:</code> 와 그 안쪽 <code>biggest = n</code>(지금까지 가장 큰 수 갱신) 두 줄, 그리고 맨 마지막 줄에 <code>print(biggest)</code> 를 치세요.', tags:['리스트','반복','조건'], inputExample:'3 9 2 7',
+  starter:'nums = input().split()\nbiggest = int(nums[0])\nfor s in nums:\n    n = int(s)\n    # 여기에 두 줄: n 이 biggest 보다 크면 biggest 를 n 으로\n',
   solution:'nums = input().split()\nbiggest = int(nums[0])\nfor s in nums:\n    n = int(s)\n    if n > biggest:\n        biggest = n\nprint(biggest)', tests:[{input:'3 9 2 7', output:'9'},{input:'1 2 3', output:'3'},{input:'-5 -2 -9', output:'-2'},{input:'42', output:'42'}],
   hints:['첫 번째 값을 "지금까지 가장 큰 수"로 시작하세요','반복하면서 더 큰 수를 만나면 바꿔요','biggest = int(nums[0])\nfor s in nums:\n    n = int(s)\n    if n > biggest:\n        biggest = n\nprint(biggest)'] },
 
 // ---------------- L8 ----------------
-{ id:'L8P1', lesson:'L8', type:'block', title:'인사 함수', prompt:'<code>안녕!</code>을 출력하는 함수 <code>hello</code>를 만들고 세 번 부르세요.', tags:['함수'],
+{ id:'L8P1', lesson:'L8', type:'code', title:'인사 함수', prompt:'<code>안녕!</code>을 출력하는 함수 <code>hello</code> 를 만들고 세 번 부르세요. <code>def hello():</code> → 안쪽 <code>print("안녕!")</code> → 그 아래(들여쓰기 없이) <code>hello()</code> 를 세 줄.', tags:['함수'],
   solution:'def hello():\n    print("안녕!")\n\nhello()\nhello()\nhello()', tests:[{output:'안녕!\n안녕!\n안녕!'}],
-  hints:['"함수" 블록으로 정의하고 이름을 hello로 바꾸세요','정의만 하면 안 나와요. 부르는 블록을 세 개 쌓으세요','def hello(): print("안녕!") 그리고 hello() 세 번'] },
-{ id:'L8P2', lesson:'L8', type:'parsons', title:'더하기 함수', prompt:'두 수를 더해 돌려주는 함수 <code>add</code>를 만들고 <code>add(3, 4)</code>의 결과를 출력하는 코드를 맞추세요.', tags:['함수'],
-  parsons:{ solution:'def add(a, b):\n    return a + b\n\nprint(add(3, 4))', distractors:['    print(a + b)'] },
+  hints:['def 로 함수를 만들어요. 이름 뒤에 괄호와 콜론: def hello():','만들기만 하면 아무것도 안 나와요. hello() 를 세 줄 써서 세 번 부르세요','def hello():\n    print("안녕!")\n\nhello()\nhello()\nhello()'] },
+{ id:'L8P2', lesson:'L8', type:'code', title:'더하기 함수', prompt:'두 수를 더해 돌려주는 함수 <code>add</code> 를 만들고 <code>add(3, 4)</code> 의 결과를 출력하세요. <b>세 줄</b>이에요: <code>def add(a, b):</code> → 안쪽 <code>return a + b</code> → 들여쓰기 없이 <code>print(add(3, 4))</code>.', tags:['함수'],
+  solution:'def add(a, b):\n    return a + b\n\nprint(add(3, 4))',
   tests:[{output:'7'}],
-  hints:['def 로 시작해요','결과를 돌려줄 땐 print가 아니라 return','def add(a, b):\n    return a + b\n\nprint(add(3, 4))'] },
+  hints:['def 로 시작해요: def add(a, b):','결과를 돌려줄 땐 print 가 아니라 return','def add(a, b):\n    return a + b\n\nprint(add(3, 4))'] },
 { id:'L8P3', lesson:'L8', type:'quiz', title:'return 뒤', prompt:'다음 코드의 출력은?<pre>def f():\n    return 1\n    print("안녕")\nprint(f())</pre>', tags:['함수','오개념'],
   quiz:{ opts:['안녕 그리고 1','1','안녕','에러'], ans:1, why:'return을 만나면 함수가 바로 끝나요. 그 아래 print("안녕")은 실행되지 않아요.' },
   hints:['return은 함수를 끝내요','return 아래 줄은 실행될까요?','print("안녕")은 실행되지 않고 f()는 1을 돌려줘요 → 1']},
@@ -677,18 +684,16 @@ const PROBLEMS = [
 
 PROBLEMS.push(
 // ---------------- L9 ----------------
-{ id:'B2P2', lesson:'B2', type:'parsons', dual:true, title:'숫자 맞히기: 기회는 3번', boss:true, tags:['반복','조건'], inputExample:'10\n50\n42',
+{ id:'B2P2', lesson:'B2', type:'parsons', title:'숫자 맞히기: 기회는 3번', boss:true, tags:['반복','조건'], inputExample:'10\n50\n42',
   prompt:'비밀 숫자 <b>42</b>를 <b>최대 3번</b> 안에 맞히는 게임이에요. 매번 입력받아 맞히면 <code>정답!</code>과 <code>시도 횟수: n</code>을 출력하고 끝나요. 틀렸을 때는 입력이 42보다 작으면 <code>더 커요</code>, 크면 <code>더 작아요</code>를 알려 주고, 3번 다 틀리면 <code>실패! 정답은 42</code>를 출력하세요. 함정 줄 2개가 섞여 있어요.',
   parsons:{ solution:'secret = 42\ntries = 0\nwhile tries < 3:\n    guess = int(input())\n    tries += 1\n    if guess == secret:\n        print("정답!")\n        print("시도 횟수:", tries)\n        break\n    elif guess < secret:\n        print("더 커요")\n    else:\n        print("더 작아요")\nif guess != secret:\n    print("실패! 정답은 42")', distractors:['while tries <= 3:', 'tries = 1'] },
-  solution:'secret = 42\ntries = 0\nwhile tries < 3:\n    guess = int(input())\n    tries += 1\n    if guess == secret:\n        print("정답!")\n        print("시도 횟수:", tries)\n        break\n    elif guess < secret:\n        print("더 커요")\n    else:\n        print("더 작아요")\nif guess != secret:\n    print("실패! 정답은 42")',
   tests:[{input:'10\n50\n42', output:'더 커요\n더 작아요\n정답!\n시도 횟수: 3'},{input:'42', output:'정답!\n시도 횟수: 1'},{input:'1\n2\n3', output:'더 커요\n더 커요\n더 커요\n실패! 정답은 42'},{input:'100\n42', output:'더 작아요\n정답!\n시도 횟수: 2'},{input:'41\n43\n40', output:'더 커요\n더 작아요\n더 커요\n실패! 정답은 42'}],
   hints:['while tries < 3: 로 최대 3번만 돌아요','맞히면 break, 반복이 끝난 뒤 guess != secret 이면 실패 출력','secret, tries=0 → while tries < 3: 입력·tries += 1·비교 → 끝나고 if guess != secret: 실패'] },
-{ id:'L9P1', lesson:'L9', type:'parsons', dual:true, title:'f-string 인사', prompt:'이름을 입력받아 <code>안녕, 이름님!</code>을 출력하는 코드를 맞추세요.', tags:['문자열','입력'], inputExample:'민수',
-  parsons:{ solution:'name = input()\nprint(f"안녕, {name}님!")', distractors:['print("안녕, {name}님!")'] },
+{ id:'L9P1', lesson:'L9', type:'code', title:'f-string 인사', prompt:'이름을 입력받아 <code>안녕, 이름님!</code>을 출력하세요. 첫 줄 <code>name = input()</code> 은 적혀 있어요. <b>둘째 줄</b>에 f-string 으로 print 한 줄을 치세요: 따옴표 앞에 <code>f</code> 를 붙이고, 변수 자리는 <code>{name}</code> 으로.', tags:['문자열','입력'], inputExample:'민수',
+  starter:'name = input()\n',
   solution:'name = input()\nprint(f"안녕, {name}님!")', tests:[{input:'민수', output:'안녕, 민수님!'},{input:'파이썬', output:'안녕, 파이썬님!'}],
-  hints:['input으로 받고 f-string으로 끼워 넣어요','따옴표 앞에 f가 있는 줄이 정답이에요','name = input()\nprint(f"안녕, {name}님!")'] },
-{ id:'L9P2', lesson:'L9', type:'code', dual:true, title:'거꾸로', prompt:'문자열을 입력받아 거꾸로 뒤집어 출력하세요.', tags:['문자열'], inputExample:'python',
-  parsons:{ solution:'s = input()\nprint(s[::-1])' },
+  hints:['f-string: 따옴표 앞에 f, 변수는 중괄호 {name}','print(f"안녕, {name}님!")','name = input()\nprint(f"안녕, {name}님!")'] },
+{ id:'L9P2', lesson:'L9', type:'code', title:'거꾸로', prompt:'문자열을 입력받아 거꾸로 뒤집어 출력하세요. 첫 줄 <code>s = input()</code> 은 적혀 있어요. <b>셋째 줄</b>에 거꾸로 뒤집은 s 를 출력하는 print 한 줄을 치세요 — 레슨의 간격 -1 슬라이싱 <code>s[::-1]</code> 이에요.', tags:['문자열'], inputExample:'python',
   solution:'s = input()\nprint(s[::-1])', tests:[{input:'python', output:'nohtyp'},{input:'안녕하세요', output:'요세하녕안'},{input:'a', output:'a'}],
   starter:'s = input()\n# s를 거꾸로 뒤집어 출력하세요 (슬라이싱)\n',
   hints:['문자열도 리스트처럼 잘라 쓸 수 있어요(슬라이싱) — 뒤에서부터 걷게 할 수 있어요','슬라이싱의 세 번째 값(간격)을 -1로: s[::-1]','s = input()\nprint(s[::-1])'] },
@@ -698,52 +703,47 @@ PROBLEMS.push(
 { id:'L9P4', lesson:'L9', type:'fill', title:'빈칸 채우기: 대문자', prompt:'<code>s = "hello"</code>일 때 <code>HELLO</code>가 출력되도록 빈칸을 채우세요. (대문자로 바꾸는 메서드)', tags:['문자열'],
   fill:{ code:'s = "hello"\nprint(s.___1___())', blanks:[{ a:['upper'], opt:['big','upper','capital','large'] }], why:'upper()는 모두 대문자로 바꾼 새 문자열을 돌려줘요.' },
   hints:['대문자를 영어로 uppercase','upper() 메서드를 점(.) 뒤에 붙여요','빈칸에 upper → s.upper()']},
-{ id:'L9P5', lesson:'L9', type:'code', dual:true, title:'단어 개수', prompt:'문장을 입력받아 단어가 몇 개인지 출력하세요. (띄어쓰기 기준)', tags:['문자열','리스트'], inputExample:'나는 파이썬을 배워요',
-  parsons:{ solution:'sentence = input()\nwords = sentence.split()\nprint(len(words))', distractors:['print(len(sentence))'] },
+{ id:'L9P5', lesson:'L9', type:'code', title:'단어 개수', prompt:'문장을 입력받아 단어가 몇 개인지 출력하세요. (띄어쓰기 기준) 첫 줄은 적혀 있어요. <b>셋째 줄</b>에 <code>words = sentence.split()</code>, 그 아래에 단어 수를 출력하는 <code>print(len(words))</code> 를 치세요.', tags:['문자열','리스트'], inputExample:'나는 파이썬을 배워요',
   solution:'sentence = input()\nwords = sentence.split()\nprint(len(words))', tests:[{input:'나는 파이썬을 배워요', output:'3'},{input:'hello', output:'1'},{input:'a b c d e', output:'5'}],
   starter:'sentence = input()\n# split()으로 단어 리스트를 만든 뒤 개수를 출력하세요\n',
   hints:['split()으로 잘라 리스트로 만드세요','리스트의 개수는 len()','sentence = input()\nwords = sentence.split()\nprint(len(words))'] },
 
 // ---------------- L10 ----------------
-{ id:'L10P1', lesson:'L10', type:'parsons', dual:true, title:'점수표 출력', prompt:'딕셔너리 <code>{"민수": 90, "영희": 85}</code>를 만들고 <code>민수 90</code>, <code>영희 85</code>처럼 한 줄씩 출력하는 코드를 맞추세요.', tags:['딕셔너리','반복'],
-  parsons:{ solution:'scores = {"민수": 90, "영희": 85}\nfor name, score in scores.items():\n    print(name, score)', distractors:['for name in scores.values():'] },
+{ id:'L10P1', lesson:'L10', type:'code', title:'점수표 출력', prompt:'딕셔너리 <code>scores</code> 가 적혀 있어요. <code>민수 90</code>, <code>영희 85</code>처럼 한 줄씩 출력하세요. 키와 값을 함께 꺼내는 <code>for name, score in scores.items():</code> 와 안쪽 <code>print(name, score)</code> <b>두 줄</b>을 치세요.', tags:['딕셔너리','반복'],
+  starter:'scores = {"민수": 90, "영희": 85}\n',
   solution:'scores = {"민수": 90, "영희": 85}\nfor name, score in scores.items():\n    print(name, score)', tests:[{output:'민수 90\n영희 85'}],
-  hints:['키와 값을 함께 돌려면 items()','for 키, 값 in 딕셔너리.items():','for name, score in scores.items(): print(name, score)'] },
+  hints:['키와 값을 함께 돌려면 items()','for name, score in scores.items(): 아래에 빈칸 4칸 print(name, score)','scores = {"민수": 90, "영희": 85}\nfor name, score in scores.items():\n    print(name, score)'] },
 { id:'L10P3', lesson:'L10', type:'quiz', title:'없는 키', prompt:'<code>d = {"a": 1}</code>일 때 <code>print(d["b"])</code>를 실행하면?', tags:['딕셔너리','오개념'],
   quiz:{ opts:['None','0','KeyError','b'], ans:2, why:'없는 키를 대괄호로 꺼내면 KeyError예요. d.get("b")를 쓰면 None, d.get("b", 0)이면 0이 나와요.' },
   hints:['딕셔너리에 "b"라는 키가 있나요?','없는 키를 [ ]로 꺼내면 생기는 에러','Key가 들어간 에러'] },
 { id:'L10P4', lesson:'L10', type:'fill', title:'빈칸 채우기: 안전하게 꺼내기', prompt:'없는 과일은 0이 출력되도록 빈칸을 채우세요.', tags:['딕셔너리'],
   fill:{ code:'price = {"사과": 1000}\nprint(price.___1___("포도", 0))', blanks:[{ a:['get'], opt:['find','get','take','read'] }], why:'get(키, 기본값)은 키가 없을 때 기본값을 돌려줘요.' },
   hints:['없을 때 기본값을 주는 메서드','get(키, 기본값) 형태예요','빈칸에 get → price.get("포도", 0)']},
-{ id:'L10P2', lesson:'L10', type:'code', dual:true, title:'단어 세기', prompt:'단어들을 한 줄로 입력받아 각 단어가 몇 번 나왔는지 <code>단어 횟수</code> 형식으로 한 줄씩 출력하세요. 처음 나온 순서대로요.<br>예: <code>a b a c b a</code>를 넣으면 아래처럼 나와요.<pre>a 3\nb 2\nc 1</pre>방법(레슨 9쪽 「개수 세기 패턴」): ① <code>count</code> 딕셔너리에 「단어: 횟수」를 모아요 ② 단어를 하나씩 보며 <code>count[w] = count.get(w, 0) + 1</code> ③ 다 세면 <code>items()</code>로 돌며 출력', tags:['딕셔너리','반복'], inputExample:'a b a c b a',
-  parsons:{ solution:'words = input().split()\ncount = {}\nfor w in words:\n    count[w] = count.get(w, 0) + 1\nfor w, n in count.items():\n    print(w, n)', distractors:['    count[w] = count[w] + 1'] },
+{ id:'L10P2', lesson:'L10', type:'code', title:'단어 세기', prompt:'단어들을 한 줄로 입력받아 각 단어가 몇 번 나왔는지 <code>단어 횟수</code> 형식으로 한 줄씩 출력하세요. 처음 나온 순서대로요.<br>예: <code>a b a c b a</code>를 넣으면 아래처럼 나와요.<pre>a 3\nb 2\nc 1</pre>방법(레슨 9쪽 「개수 세기 패턴」): ① <code>count</code> 딕셔너리에 「단어: 횟수」를 모아요 ② 단어를 하나씩 보며 <code>count[w] = count.get(w, 0) + 1</code> ③ 다 세면 <code>items()</code>로 돌며 출력<br>starter 의 <code>pass</code> 는 「아직 비어 있음」 자리표시예요. <b>넷째 줄</b>의 <code>pass</code> 를 지우고 그 자리에 ②를, <b>일곱째 줄</b>에 ③ 두 줄(<code>for w, n in count.items():</code> / 안쪽 <code>print(w, n)</code>)을 치세요.', tags:['딕셔너리','반복'], inputExample:'a b a c b a',
   solution:'words = input().split()\ncount = {}\nfor w in words:\n    count[w] = count.get(w, 0) + 1\nfor w, n in count.items():\n    print(w, n)', tests:[{input:'a b a c b a', output:'a 3\nb 2\nc 1'},{input:'사과 배 사과', output:'사과 2\n배 1'},{input:'x', output:'x 1'}],
   starter:'words = input().split()\ncount = {}\nfor w in words:\n    pass  # ② 이 줄을 지우고: 이 단어의 횟수를 1 늘려요 (처음 보는 단어면 0에서 시작)\n\n# ③ 단어와 횟수를 한 줄씩 출력해요\n',
   hints:['단어 하나를 볼 때마다 「지금까지 센 수 + 1」을 다시 적어요. 처음 보는 단어는 아직 키가 없으니 0에서 시작해야 해요','count.get(w, 0) 은 「w의 횟수, 없으면 0」이에요. 거기에 1을 더해 count[w]에 넣어요. 출력은 for w, n in count.items(): 로 돌아요','for w in words:\n    count[w] = count.get(w, 0) + 1\nfor w, n in count.items():\n    print(w, n)'] },
-{ id:'L10P5', lesson:'L10', type:'code', dual:true, title:'전화번호부', prompt:'첫 줄에 사람 수 n, 다음 n줄에 <code>이름 번호</code>가 오고, 마지막 줄에 찾을 이름이 와요. 그 사람의 번호를 출력하고, 없으면 <code>없음</code>을 출력하세요.', tags:['딕셔너리','입력'], inputExample:'2\n민수 010-1111\n영희 010-2222\n영희',
-  parsons:{ solution:'n = int(input())\nbook = {}\nfor i in range(n):\n    name, number = input().split()\n    book[name] = number\nwho = input()\nprint(book.get(who, "없음"))', distractors:['print(book[who])'] },
+{ id:'L10P5', lesson:'L10', type:'code', title:'전화번호부', prompt:'첫 줄에 사람 수 n, 다음 n줄에 <code>이름 번호</code>가 오고, 마지막 줄에 찾을 이름이 와요. 그 사람의 번호를 출력하고, 없으면 <code>없음</code>을 출력하세요. 틀은 적혀 있어요 — <b>다섯째 줄</b>에 <code>book[name] = number</code>(딕셔너리에 넣기), <b>마지막 줄</b>에 <code>print(book.get(who, "없음"))</code>(없으면 "없음") 두 줄만 치세요.', tags:['딕셔너리','입력'], inputExample:'2\n민수 010-1111\n영희 010-2222\n영희',
   solution:'n = int(input())\nbook = {}\nfor i in range(n):\n    name, number = input().split()\n    book[name] = number\nwho = input()\nprint(book.get(who, "없음"))', tests:[{input:'2\n민수 010-1111\n영희 010-2222\n영희', output:'010-2222'},{input:'1\n민수 010-1111\n철수', output:'없음'},{input:'3\na 1\nb 2\nc 3\na', output:'1'}],
-  starter:'n = int(input())\nbook = {}\n# n줄의 "이름 번호"를 book에 넣으세요\n\n# 마지막 줄의 이름을 찾아 번호 또는 "없음"을 출력\n',
+  starter:'n = int(input())\nbook = {}\nfor i in range(n):\n    name, number = input().split()\n    # 여기에 한 줄: book 에 name → number 넣기\nwho = input()\n# 여기에 한 줄: 번호 또는 "없음" 출력\n',
   hints:['n번 반복하며 "이름 번호"를 split해서 딕셔너리에 넣어요','name, number = input().split() 으로 두 개를 한 번에 받아요','마지막에 book.get(who, "없음") 출력'] },
 
 // ---------------- L11 ----------------
 { id:'L11P2', lesson:'L11', type:'quiz', title:'튜플 수정', prompt:'<code>t = (1, 2, 3)</code>일 때 <code>t[0] = 9</code>를 실행하면?', tags:['리스트','오개념'],
   quiz:{ opts:['t가 (9, 2, 3)이 된다','TypeError (튜플은 바꿀 수 없음)','t가 (9,)가 된다','아무 일도 없다'], ans:1, why:'튜플은 만든 뒤 바꿀 수 없어요. 바꾸려면 리스트를 쓰세요.' },
   hints:['튜플의 가장 큰 특징을 떠올리세요','못 바꾸는 것을 바꾸려 하면?','TypeError'] },
-{ id:'L11P3', lesson:'L11', type:'code', dual:true, title:'제곱 리스트', prompt:'숫자 n을 입력받아 1부터 n까지의 제곱을 담은 리스트를 컴프리헨션으로 만들어 출력하세요. 예: n=3 → <code>[1, 4, 9]</code><br>모양은 레슨 4쪽 그대로예요: <code>[x * x for x in range(1, n + 1)]</code> — n까지 넣으려면 끝을 <code>n + 1</code>로 써요.', tags:['리스트','반복'], inputExample:'3',
-  parsons:{ solution:'n = int(input())\nsquares = [x * x for x in range(1, n + 1)]\nprint(squares)', distractors:['squares = [x * x for x in range(1, n)]'] },
+{ id:'L11P3', lesson:'L11', type:'code', title:'제곱 리스트', prompt:'숫자 n을 입력받아 1부터 n까지의 제곱을 담은 리스트를 컴프리헨션으로 만들어 출력하세요. 예: n=3 → <code>[1, 4, 9]</code><br>모양은 레슨 4쪽 그대로예요: <code>[x * x for x in range(1, n + 1)]</code> — n까지 넣으려면 끝을 <code>n + 1</code>로 써요. <b>셋째 줄</b> <code>squares = </code> 뒤에 이어서 치세요.', tags:['리스트','반복'], inputExample:'3',
   solution:'n = int(input())\nsquares = [x * x for x in range(1, n + 1)]\nprint(squares)', tests:[{input:'3', output:'[1, 4, 9]'},{input:'5', output:'[1, 4, 9, 16, 25]'},{input:'1', output:'[1]'}],
-  starter:'n = int(input())\n# 컴프리헨션: squares = [식 for x in range(1, n + 1)]\nsquares = \nprint(squares)\n',
+  starter:'n = int(input())\n# 컴프리헨션: squares = [식 for x in range(1, n + 1)]\nsquares = \nprint(squares)',
   hints:['[식 for x in range(...)] — 식은 x * x','n까지 포함하려면 range(1, n + 1)','n = int(input())\nsquares = [x * x for x in range(1, n + 1)]\nprint(squares)'] },
 { id:'L11P4', lesson:'L11', type:'fill', title:'빈칸 채우기: 골라 담기', prompt:'0~19 중 <b>짝수만</b> 담는 컴프리헨션의 빈칸을 채우세요. (뒤에 조건을 붙이면 골라 담아요)', tags:['리스트'],
   fill:{ code:'evens = [x for x in range(20) ___1___ x % 2 == 0]\nprint(evens)', blanks:[{ a:['if'], opt:['if','when','where','and'] }], why:'컴프리헨션 끝에 if 조건을 붙이면 조건에 맞는 것만 담아요.' },
   hints:['조건을 붙이는 키워드','컴프리헨션 끝에 "조건이면"을 붙여요','빈칸에 if → [x for x in range(20) if x % 2 == 0]']},
-{ id:'L11P5', lesson:'L11', type:'parsons', title:'짝수 합', prompt:'1부터 10까지 중 짝수만 리스트에 담고 그 합을 출력하는 코드를 맞추세요. (결과 30)', tags:['리스트','반복'],
-  parsons:{ solution:'nums = range(1, 11)\nevens = [x for x in nums if x % 2 == 0]\nprint(sum(evens))', distractors:['evens = [x for x in nums if x % 2 == 1]'] },
-  tests:[{output:'30'}],
-  hints:['범위 만들기 → 골라 담기 → 합 출력','짝수는 x % 2 == 0','nums = range(1, 11) / evens = [...] / print(sum(evens))'] },
-{ id:'L11P1', lesson:'L11', type:'code', dual:true, title:'중복 제거', prompt:'숫자들을 한 줄로 입력받아 <b>중복을 없애고 작은 수부터</b> 띄어쓰기로 출력하세요.<br>세 단계예요: ① 입력을 숫자 리스트로(이미 적혀 있어요) ② <code>uniq = sorted(set(nums))</code> — set으로 중복을 없애고 sorted로 작은 수부터 ③ join으로 한 줄 출력(이미 적혀 있어요). <b>가운데 한 줄만</b> 채우면 돼요.', tags:['리스트','문자열'], inputExample:'3 1 3 2 1',
-  parsons:{ solution:'nums = [int(x) for x in input().split()]\nuniq = sorted(set(nums))\nwords = [str(x) for x in uniq]\nprint(" ".join(words))', distractors:['uniq = set(sorted(nums))'] },
+{ id:'L11P5', lesson:'L11', type:'code', title:'짝수 합', prompt:'1부터 10까지 중 짝수만 리스트에 담고 그 합을 출력하세요. (결과 30) 첫 줄 <code>nums = range(1, 11)</code> 은 적혀 있어요. <b>둘째 줄</b>에 조건 있는 컴프리헨션 <code>evens = [x for x in nums if x % 2 == 0]</code>, <b>셋째 줄</b>에 <code>print(sum(evens))</code> 를 치세요.', tags:['리스트','반복'],
+  starter:'nums = range(1, 11)\n',
+  solution:'nums = range(1, 11)\nevens = [x for x in nums if x % 2 == 0]\nprint(sum(evens))', tests:[{output:'30'}],
+  hints:['짝수는 x % 2 == 0 — 컴프리헨션 끝에 if 조건으로 붙여요','evens = [x for x in nums if x % 2 == 0]','nums = range(1, 11)\nevens = [x for x in nums if x % 2 == 0]\nprint(sum(evens))'] },
+{ id:'L11P1', lesson:'L11', type:'code', title:'중복 제거', prompt:'숫자들을 한 줄로 입력받아 <b>중복을 없애고 작은 수부터</b> 띄어쓰기로 출력하세요.<br>세 단계예요: ① 입력을 숫자 리스트로(이미 적혀 있어요) ② <code>uniq = sorted(set(nums))</code> — set으로 중복을 없애고 sorted로 작은 수부터 ③ join으로 한 줄 출력(이미 적혀 있어요). <b>가운데 한 줄만</b> 채우면 돼요.', tags:['리스트','문자열'], inputExample:'3 1 3 2 1',
   solution:'nums = [int(x) for x in input().split()]\nuniq = sorted(set(nums))\nwords = [str(x) for x in uniq]\nprint(" ".join(words))', tests:[{input:'3 1 3 2 1', output:'1 2 3'},{input:'5 5 5', output:'5'},{input:'10 2 33 2 10', output:'2 10 33'}],
   starter:'nums = [int(x) for x in input().split()]\n# 여기에 한 줄: set으로 중복을 없애고 sorted로 정렬해 uniq에 담기\n\nwords = [str(x) for x in uniq]\nprint(" ".join(words))\n',
   hints:['중복 없애기는 set(nums), 작은 수부터는 sorted(…) — 둘을 겹쳐 써요','uniq = sorted(set(nums))','nums = [int(x) for x in input().split()]\nuniq = sorted(set(nums))\nwords = [str(x) for x in uniq]\nprint(" ".join(words))'] },
@@ -760,10 +760,10 @@ PROBLEMS.push(
 { id:'L12P3', lesson:'L12', type:'quiz', title:'행과 열', prompt:'<code>grid = [[1, 2, 3], [4, 5, 6]]</code>일 때 <code>grid[1][0]</code>은?', tags:['리스트'],
   quiz:{ opts:['2','4','1','6'], ans:1, why:'grid[1]은 두 번째 행 [4, 5, 6]이고, 그중 [0]은 4예요.' },
   hints:['바깥 번호 먼저: grid[1]은 어떤 행?','그 행의 0번째','grid[1]은 [4, 5, 6], 그중 0번째 → 4']},
-{ id:'L12P4', lesson:'L12', type:'parsons', title:'1등은 누구', prompt:'학생 딕셔너리 리스트를 점수 높은 순으로 정렬해 이름만 한 줄씩 출력하는 코드를 맞추세요.<br><b>이렇게 나오면 돼요</b><pre>영희\n민수\n철수</pre>', tags:['리스트','딕셔너리'],
-  parsons:{ solution:'students = [{"name": "민수", "score": 85}, {"name": "영희", "score": 92}, {"name": "철수", "score": 70}]\nstudents.sort(key=lambda s: s["score"], reverse=True)\nfor s in students:\n    print(s["name"])', distractors:['students.sort(key=lambda s: s["name"])'] },
-  tests:[{output:'영희\n민수\n철수'}],
-  hints:['리스트 → 정렬 → 반복 출력 순서예요','sort에 key로 점수를, reverse=True로 높은 순','students.sort(key=lambda s: s["score"], reverse=True)\nfor s in students:\n    print(s["name"])'] },
+{ id:'L12P4', lesson:'L12', type:'code', title:'1등은 누구', prompt:'학생 딕셔너리 리스트 <code>students</code> 가 적혀 있어요. 점수 높은 순으로 정렬해 이름만 한 줄씩 출력하세요. <b>둘째 줄</b>에 <code>students.sort(key=lambda s: s["score"], reverse=True)</code>, 그 아래 <code>for s in students:</code> 와 안쪽 <code>print(s["name"])</code>.<br><b>이렇게 나오면 돼요</b><pre>영희\n민수\n철수</pre>', tags:['리스트','딕셔너리'],
+  starter:'students = [{"name": "민수", "score": 85}, {"name": "영희", "score": 92}, {"name": "철수", "score": 70}]\n',
+  solution:'students = [{"name": "민수", "score": 85}, {"name": "영희", "score": 92}, {"name": "철수", "score": 70}]\nstudents.sort(key=lambda s: s["score"], reverse=True)\nfor s in students:\n    print(s["name"])', tests:[{output:'영희\n민수\n철수'}],
+  hints:['정렬 → 반복 출력 순서예요','sort 에 key 로 점수를, reverse=True 로 높은 순','students.sort(key=lambda s: s["score"], reverse=True)\nfor s in students:\n    print(s["name"])'] },
 { id:'L12P5', lesson:'L12', type:'bug', title:'같이 바뀌어요', prompt:'<code>b</code>에만 4를 추가했는데 <code>a</code>도 바뀌어요. 출력이 <code>[1, 2, 3]</code>과 <code>[1, 2, 3, 4]</code>가 되도록 틀린 줄을 고르고 고치세요.', tags:['리스트','오개념'],
   bug:{ code:'a = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)\nprint(b)', bugLine:2, solution:'a = [1, 2, 3]\nb = a.copy()\nb.append(4)\nprint(a)\nprint(b)', tests:[{output:'[1, 2, 3]\n[1, 2, 3, 4]'}] },
   hints:['b = a 는 복사가 아니에요','같은 상자에 이름표만 하나 더 붙은 거예요','b = a.copy()'] },
@@ -915,10 +915,10 @@ PROBLEMS.push(
   solution:'nums = map(int, input().split())\nprint(sum(nums))', tests:[{input:'1 2 3 4', output:'10'},{input:'10 -10', output:'0'},{input:'100', output:'100'}],
   starter:'nums = map(int, input().split())\n# sum으로 합계 출력\n',
   hints:['map(int, 리스트)로 전부 정수로','sum()으로 합','nums = map(int, input().split())\nprint(sum(nums))'] },
-{ id:'L18P5', lesson:'L18', type:'parsons', title:'점수순 이름', prompt:'(이름, 점수) 튜플 리스트를 점수 높은 순으로 정렬해 이름만 한 줄씩 출력하는 코드를 맞추세요. (결과: 영희, 민수, 철수)', tags:['함수','리스트'],
-  parsons:{ solution:'pairs = [("민수", 85), ("영희", 92), ("철수", 70)]\npairs.sort(key=lambda p: p[1], reverse=True)\nfor name, score in pairs:\n    print(name)', distractors:['pairs.sort(key=lambda p: p[0])'] },
-  tests:[{output:'영희\n민수\n철수'}],
-  hints:['튜플의 두 번째 값이 점수: p[1]','reverse=True로 높은 순','pairs.sort(key=lambda p: p[1], reverse=True)\nfor name, score in pairs:\n    print(name)'] },
+{ id:'L18P5', lesson:'L18', type:'code', title:'점수순 이름', prompt:'(이름, 점수) 튜플 리스트 <code>pairs</code> 가 적혀 있어요. 점수 높은 순으로 정렬해 이름만 한 줄씩 출력하세요. (결과: 영희, 민수, 철수) <b>둘째 줄</b>에 <code>pairs.sort(key=lambda p: p[1], reverse=True)</code>, 그 아래 <code>for name, score in pairs:</code> 와 안쪽 <code>print(name)</code>.', tags:['함수','리스트'],
+  starter:'pairs = [("민수", 85), ("영희", 92), ("철수", 70)]\n',
+  solution:'pairs = [("민수", 85), ("영희", 92), ("철수", 70)]\npairs.sort(key=lambda p: p[1], reverse=True)\nfor name, score in pairs:\n    print(name)', tests:[{output:'영희\n민수\n철수'}],
+  hints:['튜플의 두 번째 값이 점수: p[1]','reverse=True 로 높은 순','pairs.sort(key=lambda p: p[1], reverse=True)\nfor name, score in pairs:\n    print(name)'] },
 
 // ---------------- B5 ----------------
 { id:'B5P1', lesson:'B5', type:'code', title:'텍스트 RPG 전투', boss:true, tags:['클래스','모듈','파일','반복'], inputExample:'1\n공격\n공격\n회복\n공격\n공격\n공격\n공격\n공격',
@@ -937,10 +937,9 @@ PROBLEMS.push(
 );
 
 
-// 코스별 설정: 종합 점검 위치(after: 레슨 id → 점검 번호, upto: 점검 번호 → 출제 범위 마지막 레슨), 약점 분석 태그 순서, 놀이터 블록 범위
+// 코스별 설정: 종합 점검 위치(after: 레슨 id → 점검 번호, upto: 점검 번호 → 출제 범위 마지막 레슨), 약점 분석 태그 순서
 const CHECKUPS = { after: { L5: 1, L10: 2, L15: 3 }, upto: { 1: 'L5', 2: 'L10', 3: 'L15' } };
 const WEAKNESS_TAGS = ['변수', '계산', '조건', '반복', '리스트', '함수', '문자열', '딕셔너리', '클래스', '예외', '파일', '모듈', '출력', '입력', '오개념'];
-const PLAYGROUND_BLOCKS_UPTO = 'L8';
 const CHAPTERS = [
   { ch:0, name:'시작', color:'#8b8fa8' },
   { ch:1, name:'첫걸음', color:'#4caf50' },
@@ -952,107 +951,6 @@ const CHAPTERS = [
 
 // 뱃지: cond = [통계키, 이상값] (STATS 참조). secret: 조건 비공개
 const MAP_DECOR = { 1:'🌳', 2:'🏰', 3:'🚩', 4:'⛩', 5:'🗼' };
-
-// ---------- 블록 문제 따라하기 가이드 (초반 문제는 손으로 씀; 나머지는 정답 코드에서 자동 생성) ----------
-// t: 단계 설명(HTML), c: 완료 조건(생성된 코드에 공백 무시하고 포함되어야 하는 문자열. 배열이면 전부), '@var:이름' = 그 이름의 변수가 만들어짐, '~정규식' = 공백 제거한 코드에 정규식 매치, cat: 강조할 메뉴 이름
-const GUIDES = {
-  L3P6: [
-    { t: '숫자를 <b>두 번</b> 입력받는 문제예요. <b>변수</b> 메뉴 → <b>변수 만들기…</b>로 <code>a</code> 를 만들고, 한 번 더 <code>b</code> 를 만드세요.', c: ['@var:a', '@var:b'], cat: '변수' },
-    { t: '<b>a = 0</b> 블록을 끌어오고, 0 자리에 <b>값·계산</b> 메뉴의 <b>숫자로 int( 입력 받기 )</b> 블록을 끼우세요.', c: 'a=int(input())', cat: '값·계산' },
-    { t: '그 아래에 <b>b = 0</b> 블록을 붙이고, 똑같이 <b>숫자로 int( 입력 받기 )</b> 를 끼우세요. (입력 칸의 첫 줄이 a, 둘째 줄이 b로 들어가요)', c: 'b=int(input())', cat: '변수' },
-    { t: '출력 블록을 아래에 붙이고 ❝안녕❞ 자리에 <b>1 + 1</b> 계산 블록을 끼운 뒤, 왼쪽 1에 <b>a</b> 변수 블록, 오른쪽 1에 <b>b</b> 변수 블록을 넣으세요.', c: 'print(a+b)', cat: '값·계산' },
-    { t: '아래 <b>입력</b> 칸에 두 줄(예: 3 과 4)을 적고 <b>▶ 실행</b> → 7이 나오면 <b>✔ 제출하기</b>.' },
-  ],
-  L4P2: [
-    { t: '<b>변수</b> 메뉴 → <b>변수 만들기…</b> → 이름 <code>n</code>. 그다음 <b>n = 0</b> 블록을 끌어와 0 자리에 <b>값·계산</b> 메뉴의 <b>숫자로 int( 입력 받기 )</b> 블록을 끼우세요.', c: 'n=int(input())', cat: '변수' },
-    { t: '<b>조건</b> 메뉴의 <b>만약</b> 블록을 아래에 붙이세요.', c: 'if', cat: '조건' },
-    { t: '만약 블록 왼쪽 위 <b>⚙ 톱니바퀴</b>를 누르고, 왼쪽의 <b>아니면</b> 조각을 오른쪽 <b>만약</b> 안으로 끌어 넣으세요. 블록 아래에 "아니면" 칸이 생겨요.', c: 'else:', cat: '조건' },
-    { t: '"짝수인가"는 <b>2로 나눈 나머지가 0인가</b>예요. <b>조건</b> 메뉴의 <b>1 = 1</b> 비교 블록을 "만약" 옆 빈칸에 끼우고, 왼쪽 1 자리에 <b>값·계산</b> 메뉴의 <b>7 ÷ 2 의 나머지</b> 블록을 끼운 뒤 7 자리에 <b>n</b> 변수 블록, 오른쪽은 <code>0</code>.', c: 'ifn%2==0:', cat: '값·계산' },
-    { t: '"만약" 안쪽에 출력 블록 <code>짝수</code>, "아니면" 안쪽에 출력 블록 <code>홀수</code> 를 넣으세요.', c: ['print("짝수")', 'print("홀수")'], cat: '출력' },
-    { t: '입력 칸에 <code>4</code> 넣고 실행, <code>7</code> 넣고 실행해서 둘 다 맞는지 보고 <b>✔ 제출하기</b>.' },
-  ],
-  L4P5: [
-    { t: '<b>변수</b> 메뉴 → <b>변수 만들기…</b> → 이름 <code>score</code>. <b>score = 0</b> 블록의 0 자리에 <b>값·계산</b> 메뉴의 <b>숫자로 int( 입력 받기 )</b> 를 끼우세요.', c: 'score=int(input())', cat: '변수' },
-    { t: '<b>조건</b> 메뉴의 <b>만약</b> 블록을 아래에 붙이세요.', c: 'if', cat: '조건' },
-    { t: '이번엔 칸이 <b>세 개</b> 필요해요. <b>⚙ 톱니바퀴</b>를 누르고 <b>아니고 만약</b> 조각을 먼저, 그다음 <b>아니면</b> 조각을 "만약" 안으로 끌어 넣으세요. (순서: 만약 → 아니고 만약 → 아니면)', c: ['elif', 'else:'], cat: '조건' },
-    { t: '첫 칸: 비교 블록 <b>score ≥ 90</b> (가운데를 <b>≥</b> 로). 둘째 칸(아니고 만약): <b>score ≥ 80</b>.', c: ['ifscore>=90:', 'elifscore>=80:'], cat: '조건' },
-    { t: '각 칸 안에 출력 블록: 첫 칸 <code>A</code>, 둘째 칸 <code>B</code>, 아니면 칸 <code>C</code>.', c: ['print("A")', 'print("B")', 'print("C")'], cat: '출력' },
-    { t: '입력 칸에 <code>95</code>, <code>85</code>, <code>50</code> 을 차례로 넣어 실행해 보고 A·B·C가 맞으면 <b>✔ 제출하기</b>.' },
-  ],
-  L1P1: [
-    { t: '왼쪽에 보이는 <b>출력 ❝안녕❞</b> 블록을 마우스로 <b>꾹 누른 채</b> 오른쪽 흰 바탕으로 끌어다 놓으세요.', c: 'print(' },
-    { t: '블록 안의 <b>안녕</b> 글자를 클릭하고 <code>안녕, 파이썬!</code> 으로 고쳐 쓰세요. (쉼표·띄어쓰기·느낌표까지 똑같이)', c: 'print("안녕,파이썬!")' },
-    { t: '아래 <b>▶ 실행</b>을 눌러 출력 칸에 글자가 나오는지 확인하고, 맞으면 <b>✔ 제출하기</b>!' },
-  ],
-  L1P2: [
-    { t: '<b>출력 ❝안녕❞</b> 블록을 끌어와 글자를 <code>나는</code> 으로 바꾸세요.', c: 'print("나는")' },
-    { t: '출력 블록을 <b>하나 더</b> 끌어와 첫 블록 <b>바로 아래에 붙이세요</b>. 가까이 가져가면 자석처럼 딱 붙어요. 글자는 <code>파이썬을 배워요</code>.', c: ['print("나는")', 'print("파이썬을배워요")'] },
-    { t: '오른쪽 코드 창에 두 줄이 보이면 성공! <b>▶ 실행</b> 후 <b>✔ 제출하기</b>.' },
-  ],
-  L1P5: [
-    { t: '출력 블록을 끌어와 글자를 <code>이름: 김코딩</code> 으로 바꾸세요. 콜론(:) 뒤에 띄어쓰기 한 칸!', c: 'print("이름:김코딩")' },
-    { t: '출력 블록을 아래에 하나 더 붙이고 <code>나이: 12</code>', c: 'print("나이:12")' },
-    { t: '출력 블록을 또 하나 붙이고 <code>취미: 게임</code>', c: 'print("취미:게임")' },
-    { t: '세 블록이 위아래로 한 덩어리로 붙어 있는지 확인하고 <b>▶ 실행</b> → <b>✔ 제출하기</b>.' },
-  ],
-  L2P1: [
-    { t: '왼쪽 <b>변수</b> 메뉴를 누르고, 맨 위 <b>변수 만들기…</b> 버튼을 누르세요. 이름은 <code>name</code> 이라고 쓰고 [만들기].', c: '@var:name', cat: '변수' },
-    { t: '<b>변수</b> 메뉴에 새로 생긴 <b>name = 0</b> 블록을 흰 바탕으로 끌어오세요.', c: 'name=', cat: '변수' },
-    { t: '<b>출력</b> 메뉴에서 <b>❝ ❞</b> 글자 블록(따옴표만 있는 것)을 끌어와 <b>0 자리에 끼우고</b>, 안에 <code>파이썬</code> 이라고 쓰세요.', c: 'name="파이썬"', cat: '출력' },
-    { t: '<b>출력 ❝안녕❞</b> 블록을 끌어와 <b>name = …</b> 블록 아래에 붙이세요.', c: ['name="파이썬"', 'print('], cat: '출력' },
-    { t: '<b>변수</b> 메뉴의 동그란 <b>name</b> 블록을 끌어와 출력 블록의 <b>❝안녕❞ 자리에 끼우세요</b>. (안녕이 가려지고 name이 들어가요)', c: 'print(name)', cat: '변수' },
-    { t: '오른쪽 코드가 <code>name = "파이썬"</code> / <code>print(name)</code> 두 줄이면 완성! <b>▶ 실행</b> → <b>✔ 제출하기</b>.' },
-  ],
-  L2P3: [
-    { t: '<b>변수</b> 메뉴 → <b>변수 만들기…</b> → 이름 <code>age</code>.', c: '@var:age', cat: '변수' },
-    { t: '<b>age = 0</b> 블록을 끌어오고, <b>0</b>을 눌러 <code>{{age}}</code> 로 바꾸세요. (숫자는 따옴표 없이)', c: 'age={{age}}', cat: '변수' },
-    { t: '<b>출력</b> 블록을 아래에 붙이고, ❝안녕❞ 자리에 <b>변수</b> 메뉴의 <b>age</b> 블록을 끼우세요.', c: 'print(age)', cat: '출력' },
-    { t: '출력 블록을 하나 더 붙이고, ❝안녕❞ 자리에 <b>값·계산</b> 메뉴의 <b>1 + 1</b> 계산 블록을 끼우세요. 그다음 <b>왼쪽 1 자리에 age</b> 블록을 끼우세요. (오른쪽 1은 그대로)', c: 'print(age+1)', cat: '값·계산' },
-    { t: '코드가 세 줄이면 완성! <b>▶ 실행</b> → <b>✔ 제출하기</b>.' },
-  ],
-  L2P5: [
-    { t: '<b>변수</b> 메뉴에서 변수 <code>a</code> 와 <code>b</code> 를 각각 만드세요. (변수 만들기… 두 번)', c: ['@var:a', '@var:b'], cat: '변수' },
-    { t: '<b>a = 0</b> 블록을 끌어와 0을 <code>{{a}}</code> 로, 그 아래 <b>b = 0</b> 블록을 붙여 <code>{{b}}</code> 로.', c: ['a={{a}}', 'b={{b}}'], cat: '변수' },
-    { t: '출력 블록을 붙이고 ❝안녕❞ 자리에 <b>값·계산</b> 메뉴의 <b>1 + 1</b> 블록을 끼운 뒤, 가운데 <b>+</b> 를 눌러 <b>×</b> 로 바꾸고 양쪽에 <b>a</b>, <b>b</b> 변수 블록을 끼우세요.', c: 'print(a*b)', cat: '값·계산' },
-    { t: '출력 블록을 하나 더 붙이고 같은 방법으로 <b>a + b</b> 를 만드세요.', c: 'print(a+b)', cat: '값·계산' },
-    { t: '<b>▶ 실행</b> → 두 줄이 나오면 <b>✔ 제출하기</b>.' },
-  ],
-  L3P1: [
-    { t: '<b>출력 ❝안녕❞</b> 블록을 끌어오세요.', c: 'print(', cat: '출력' },
-    { t: '<b>값·계산</b> 메뉴의 <b>1 + 1</b> 계산 블록을 끌어와 ❝안녕❞ 자리에 끼우세요.', c: '~print\\(-?\\d+[-+*/]-?\\d+\\)', cat: '값·계산' },
-    { t: '가운데 <b>+</b> 를 눌러 <b>×</b> 로 바꾸고, 왼쪽 숫자를 <code>{{a}}</code>, 오른쪽 숫자를 <code>{{b}}</code> 로 고치세요.', c: 'print({{a}}*{{b}})' },
-    { t: '<b>▶ 실행</b> → 계산 결과가 나오면 <b>✔ 제출하기</b>.' },
-  ],
-  L3P2: [
-    { t: '이 문제는 <b>실행할 때 숫자를 입력</b>받아요. 먼저 <b>변수</b> 메뉴 → <b>변수 만들기…</b> → 이름 <code>n</code>.', c: '@var:n', cat: '변수' },
-    { t: '<b>n = 0</b> 블록을 끌어오세요.', c: 'n=', cat: '변수' },
-    { t: '<b>값·계산</b> 메뉴의 <b>숫자로 int( 입력 받기 )</b> 블록을 끌어와 <b>0 자리</b>에 끼우세요. (입력받은 글자를 숫자로 바꿔 주는 블록이에요)', c: 'n=int(input())', cat: '값·계산' },
-    { t: '출력 블록을 아래에 붙이고 ❝안녕❞ 자리에 <b>1 + 1</b> 계산 블록을 끼운 뒤, <b>+</b> 를 <b>×</b> 로, 왼쪽에 <b>n</b> 변수 블록, 오른쪽은 <code>2</code>.', c: 'print(n*2)', cat: '값·계산' },
-    { t: '아래 <b>입력</b> 칸에 <code>7</code> 을 적고 <b>▶ 실행</b> → 14가 나오면 <b>✔ 제출하기</b>.' },
-  ],
-  L4P1: [
-    { t: '변수 <code>n</code> 을 만들고, <b>n = 0</b> 블록의 0 자리에 <b>값·계산</b> 메뉴의 <b>숫자로 int( 입력 받기 )</b> 블록을 끼우세요.', c: 'n=int(input())', cat: '변수' },
-    { t: '<b>조건</b> 메뉴의 <b>만약</b> 블록을 아래에 붙이세요.', c: 'if', cat: '조건' },
-    { t: '만약 블록 왼쪽 위 <b>⚙ 톱니바퀴</b>를 누르고, 작은 창에서 왼쪽의 <b>아니면</b> 조각을 오른쪽 <b>만약</b> 안으로 끌어 넣으세요. 그러면 블록 아래에 "아니면" 칸이 생겨요.', c: 'else:', cat: '조건' },
-    { t: '<b>조건</b> 메뉴의 <b>1 = 1</b> 비교 블록을 "만약" 옆 빈칸에 끼우고, 왼쪽 1 자리에 <b>n</b> 변수 블록, 가운데 <b>=</b> 를 <b>&gt;</b> 로, 오른쪽은 <code>0</code>.', c: 'ifn>0:', cat: '조건' },
-    { t: '"만약" 안쪽에 출력 블록 <code>양수</code>, "아니면" 안쪽에 출력 블록 <code>양수가 아니에요</code> 를 넣으세요.', c: ['print("양수")', 'print("양수가아니에요")'], cat: '출력' },
-    { t: '입력 칸에 <code>5</code> 넣고 실행, <code>-3</code> 넣고 실행해서 둘 다 맞는지 보고 <b>✔ 제출하기</b>.' },
-  ],
-  L5P1: [
-    { t: '<b>반복</b> 메뉴의 <b>i 를 1 부터 5 까지 반복</b> 블록을 끌어오세요. (이미 1과 5가 들어 있어요)', c: 'foriinrange(1,6):', cat: '반복' },
-    { t: '<b>출력</b> 블록을 반복 블록의 <b>안쪽(ㄷ자 안)</b>에 넣으세요.', c: ['foriinrange(1,6):', 'print('], cat: '출력' },
-    { t: '출력 블록의 ❝안녕❞ 자리에 <b>변수</b> 메뉴의 <b>i</b> 블록을 끼우세요.', c: 'print(i)', cat: '변수' },
-    { t: '<b>▶ 실행</b> → 1~5가 한 줄씩 나오면 <b>✔ 제출하기</b>.' },
-  ],
-  // L5P6: 정답 코드 print(n, "x", i, "=", n * i) 는 값이 5개라 칸 4개짜리 출력 블록으로는 못 만든다(QA #13) → 마지막 칸을 글자 이어 붙이기로
-  L5P6: [
-    { t: '<b>변수</b> 메뉴 → <b>변수 만들기…</b> → 이름 <code>n</code>. <b>n = 0</b> 블록의 0 자리에 <b>값·계산</b> 메뉴의 <b>숫자로 int( 입력 받기 )</b> 블록을 끼우세요.', c: 'n=int(input())', cat: '변수' },
-    { t: '<b>반복</b> 메뉴의 <b>i 를 1 부터 5 까지 반복</b> 블록을 아래에 붙이고 5를 <code>9</code> 로 바꾸세요.', c: 'foriinrange(1,10):', cat: '반복' },
-    { t: '반복 블록 안쪽에 <b>칸이 4개인 출력</b> 블록을 넣고, 앞 세 칸에 <b>n</b> 변수 · 글자 <code>x</code> · <b>i</b> 변수를 차례로 끼우세요. (칸 사이는 출력할 때 한 칸씩 띄워져요)', c: '~print\\(n,"x",i', cat: '출력' },
-    { t: '값이 하나 더 남았죠? 마지막 칸에 <b>출력</b> 메뉴의 <b>글자 이어 붙이기</b> 블록(칸 2개)을 끼우고, 첫 칸에 글자 <code>=&nbsp;</code>(등호 뒤 <b>한 칸 띄움</b>), 둘째 칸에 <b>값·계산</b>의 곱하기 블록으로 <code>n × i</code>.', c: '~print\\(n,"x",i,"="\\+str\\(n\\*i\\)\\)', cat: '출력' },
-    { t: '입력 칸에 <code>2</code> 를 넣고 <b>▶ 실행</b> → <code>2 x 1 = 2</code> … <code>2 x 9 = 18</code> 아홉 줄이면 <b>✔ 제출하기</b>.' },
-  ],
-};
 
 // =====================================================================
 // === 챕터 6 실전 (v2.2.0, EXPANSION.md 9절 ② 층) — B5 클리어 시 해금. 레슨 1개 = 프로젝트 1개, 단계별 체크리스트 채점(tests[].stage)

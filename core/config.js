@@ -2,13 +2,13 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.3.22',
+  APP_VERSION: '2.4.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
   COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+([PD]\\d+)?$', algo: '^(A|AB|E)\\d+([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
-    { id: 'python', name: '파이썬', icon: '🐍', desc: '블록에서 텍스트까지, 브라우저에서 진짜 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 148, lessons: 36 },
+    { id: 'python', name: '파이썬', icon: '🐍', desc: '입문부터 실전까지, 브라우저에서 직접 쳐 보는 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 148, lessons: 36 },
     { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '코드가 돌아가는 모습을 눈으로 보며, 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 145, lessons: 32, requires: { course: 'python', boss: 'B3', label: '파이썬 챕터 3까지 끝내면 열려요' } },
     { id: 'terminal-git', name: '터미널·Git', icon: '🎧', desc: '검은 창이 무섭지 않게. 가상 터미널과 Git 시뮬레이터', phase: 2 },
     { id: 'sql', name: '데이터베이스(SQL)', icon: '🗄️', desc: '동네 카페 데이터로 배우는 진짜 SQLite', phase: 3 },
@@ -21,11 +21,6 @@ const CONFIG = {
   PYODIDE_URL: 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js',
   PYODIDE_INDEX: 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/',
   PYODIDE_SIZE_MB: 10,
-  BLOCKLY: {
-    core: 'https://unpkg.com/blockly@11.2.2/blockly.min.js',
-    python: 'https://unpkg.com/blockly@11.2.2/python_compressed.js',
-    ko: 'https://unpkg.com/blockly@11.2.2/msg/ko.js',
-  },
   CM: {
     core: 'https://cdn.jsdelivr.net/npm/codemirror@6.0.1/+esm',
     python: 'https://cdn.jsdelivr.net/npm/@codemirror/lang-python@6.2.1/+esm',
@@ -47,10 +42,9 @@ const CONFIG = {
   HUB: { minutesPerProblem: 4 },           // 허브 '남은 시간' 추정치 (문제당 분)
 
   // --- XP / 레벨 ---
-  XP: { quiz: 10, fill: 15, bug: 20, parsons: 20, block: 25, code: 30, num: 20, match: 20, pair: 20 }, // num·match·pair: 수학 공간 유형 (v2.3.0)
+  XP: { quiz: 10, fill: 15, bug: 20, parsons: 20, code: 30, num: 20, match: 20, pair: 20 }, // num·match·pair: 수학 공간 유형 (v2.3.0)
   KATEX: { css: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css', js: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js' }, // 수학 공간 수식 (없어도 글자 수식으로 대체)
   HINT_XP_MULT: [1, 0.7, 0.4, 0],        // 힌트 0,1,2,3단계 사용 시 배율 (정답 보기 = 0)
-  TEXT_MODE_MULT: 1.5,                    // Parsons/텍스트 선택 가능 문제를 텍스트로 풀면
   FIRST_TRY_BONUS: 0.5,                   // 첫 시도 클리어 +50%
   COMBO_MULT: [[10, 2], [5, 1.5], [3, 1.2]],
   MAX_LEVEL: 50,
@@ -100,8 +94,6 @@ const T = {
   retry: '다시 시도', timeout: '코드가 끝나지 않고 계속 돌고 있어요. while 조건이나 반복 횟수를 확인해 보세요.',
   needInput: (n) => `입력값 칸에 ${n}번째 값이 필요해요.`,
   tooLong: '…(너무 많아 생략)',
-  toText: '텍스트로 직접 고치기', toTextConfirm: '텍스트로 바꾸면 이 문제는 다시 블록으로 돌아올 수 없어요. 바꿀까요?',
-  parsonsOrText: '어떤 방식으로 풀까요?', byParsons: 'Parsons로 풀기', byText: '텍스트로 풀기 (XP 1.5배)',
   firstTry: '첫 시도 클리어!', levelUp: '레벨 업!', newTitle: '새 칭호', badgeGet: '뱃지 획득',
   bossDefeated: '보스 격파!', chapterOpen: '다음 챕터가 열렸어요', noKey: '설정에서 API 키를 넣으면 선생님에게 물어볼 수 있어요.',
   keyBad: '키가 올바르지 않아요. 설정에서 다시 확인해 주세요.', rateLimit: '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.',
