@@ -38,7 +38,6 @@ const BADGES = [
   { id:'tutor10', name:'질문으로 돌파', desc:'선생님에게 물어본 뒤 스스로 클리어 10회', icon:'💬', cond:['tutorBreakthrough',10], secret: true }, // 선생님 기능 꺼짐(CONFIG.TUTOR.enabled)일 땐 비밀 뱃지로 보임
   { id:'review10', name:'기억 유지', desc:'복습 10개 완료', icon:'🧠', cond:['reviewsDone',10] },
   { id:'daily7', name:'목표 달성 7회', desc:'일일 목표 7번 달성', icon:'📅', cond:['dailyGoalsMet',7] },
-  { id:'playground', name:'자유 코딩', desc:'놀이터에서 10줄 이상 코드 실행', icon:'🛝', cond:['playgroundRuns',1] },
   { id:'checkup', name:'종합 점검 통과', desc:'종합 점검 80% 이상', icon:'📝', cond:['checkupsPassed',1] },
   { id:'all_clear', name:'완주', desc:'모든 문제 클리어', icon:'🏁', cond:['allClear',1] },
   { id:'perfect1', name:'퍼펙트 1', desc:'챕터 1을 힌트 없이 한 번에 통과', icon:'🥇', cond:['perfect_1',1] },

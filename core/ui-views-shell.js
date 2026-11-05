@@ -82,7 +82,24 @@ const ShellUI = {
     const col = (title, items, empty) => `<div class="sh-col"><div class="sh-ch">${title}<span class="sh-cn">${items.length}</span></div>${items.length ? items.map(([p, k, lab]) => `<div class="sh-f ${k}"><span class="sh-fn">${esc(p)}</span><span class="sh-fl">${lab}</span></div>`).join('') : `<div class="sh-empty">${empty}</div>`}</div>`;
     $('.sh-git-br', panel).textContent = g.head.branch ? `브랜치 ${g.head.branch}` : `HEAD 분리됨 ${g.head.detached}`;
     $('.sh-cols', panel).innerHTML = col('작업 폴더', work, snap.conflicts.length ? '충돌 해결 중' : '변경 없음') + `<div class="sh-arrow" title="git add">add →</div>` + col('스테이징', staged, '비어 있음') + `<div class="sh-arrow" title="git commit">commit →</div>` + `<div class="sh-col"><div class="sh-ch">저장소<span class="sh-cn">${snap.commits}</span></div>${hc ? `<div class="sh-f cm"><span class="sh-fn"><code>${esc(hc.hash)}</code> ${esc(hc.message)}</span><span class="sh-fl">${Object.keys(hc.snapshot).length}파일</span></div>` : '<div class="sh-empty">커밋 없음</div>'}${snap.merging ? '<div class="sh-f warn"><span class="sh-fn">병합 중 (충돌)</span></div>' : ''}${snap.stash ? `<div class="sh-f"><span class="sh-fn">stash ${snap.stash}개</span></div>` : ''}</div>`;
-    $('.sh-graph', panel).innerHTML = this.graphSvg(sh, g);
+    const gEl = $('.sh-graph', panel); const prev = this.graphState(gEl); gEl.innerHTML = this.graphSvg(sh, g); this.animateGraph(gEl, prev, g);
+  },
+  // 그래프 애니메이션 (v2.8.0): 다시 그리기 전 위치를 기억(graphState) → 새로 그린 뒤 이전 위치에서 새 위치로 옮김(animateGraph)
+  //   새 커밋 = 피어남 · 이름표(브랜치·HEAD·origin/·tag) = 미끄러짐 · 새 선(merge 포함) = 그려짐 · 움직인 커밋 = 이동. 「무엇이 바뀌었나」 한 줄도 아래에.
+  graphState(gEl) { if (!gEl || !gEl._drawn) return null; /* 첫 그리기(문제 열 때)는 애니메이션 없음 */ const at = (el) => ({ x: +el.dataset.x, y: +el.dataset.y }); const st = { c: {}, l: {}, e: new Set() }; gEl.querySelectorAll('[data-h]').forEach(el => st.c[el.dataset.h] = at(el)); gEl.querySelectorAll('[data-l]').forEach(el => st.l[el.dataset.l] = at(el)); gEl.querySelectorAll('[data-e]').forEach(el => st.e.add(el.dataset.e)); st.lab = gEl._labAt || {}; st.head = gEl._head; return st; },
+  animateGraph(gEl, prev, g) {
+    const labAt = {}; Object.entries(g.branches).forEach(([b, h]) => labAt[b] = h); Object.entries(g.tags || {}).forEach(([t, h]) => labAt['tag ' + t] = h); Object.entries(g.remoteTracking || {}).forEach(([b, h]) => labAt['origin/' + b] = h); if (g.head.detached) labAt.HEAD = g.head.detached; gEl._labAt = labAt; gEl._drawn = true; const headNow = g.head.branch || ('분리된 HEAD ' + String(g.head.detached || '').slice(0, 7)); gEl._head = headNow;
+    const note = []; const short = (h) => h ? String(h).slice(0, 7) : '';
+    if (prev) { const newC = Object.keys(g.commits).filter(h => !(h in prev.c) && gEl.querySelector(`[data-h="${h}"]`)); if (newC.length) note.push(`새 커밋 ${newC.map(short).join(', ')}`); for (const [n, h] of Object.entries(labAt)) { const was = prev.lab[n]; if (was && was !== h) note.push(`${n}: ${short(was)} → ${short(h)}`); else if (!was && Object.keys(prev.lab).length) note.push(`${n}: 새로 생김 (${short(h)})`); } for (const n of Object.keys(prev.lab)) if (!(n in labAt)) note.push(`${n}: 없어짐`); if (prev.head && prev.head !== headNow) note.unshift(`HEAD: ${prev.head} → ${headNow}`); }
+    let nEl = gEl.querySelector('.sh-gnote'); if (note.length) { if (!nEl) { nEl = document.createElement('div'); nEl.className = 'sh-gnote'; gEl.appendChild(nEl); } nEl.textContent = '방금 바뀐 것: ' + note.slice(0, 4).join(' · '); }
+    const svg = gEl.querySelector('svg'); if (!svg) return; if (prev && note.length) gEl.scrollLeft = gEl.scrollWidth; // 모바일: 가장 새 커밋이 보이게
+    if (!prev || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    const moved = []; const from = (el, p) => { const x = +el.dataset.x, y = +el.dataset.y; if (!p || (p.x === x && p.y === y)) return false; el.style.transition = 'none'; el.style.transform = `translate(${p.x}px,${p.y}px)`; moved.push([el, x, y]); return true; };
+    svg.querySelectorAll('[data-h]').forEach(el => { const p = prev.c[el.dataset.h]; if (!p) el.classList.add('sh-born'); else from(el, p); });
+    svg.querySelectorAll('[data-l]').forEach(el => { const p = prev.l[el.dataset.l]; if (!p) el.classList.add('sh-fade'); else from(el, p); });
+    svg.querySelectorAll('[data-e]').forEach(el => { if (!prev.e.has(el.dataset.e)) { let len = 0; try { len = el.getTotalLength(); } catch (e) {} if (len) { el.style.strokeDasharray = len; el.style.strokeDashoffset = len; el.classList.add('sh-draw'); } } else if (moved.length) el.classList.add('sh-fade'); });
+    if (!moved.length && !svg.querySelector('.sh-draw')) return; void svg.getBoundingClientRect();
+    requestAnimationFrame(() => { moved.forEach(([el, x, y]) => { el.style.transition = ''; el.style.transform = `translate(${x}px,${y}px)`; }); svg.querySelectorAll('.sh-draw').forEach(el => { el.style.strokeDashoffset = '0'; }); });
   },
   graphSvg(sh, g) {
     const all = Object.values(g.commits).sort((a, b) => a.n - b.n); if (!all.length) return '<div class="sh-empty">커밋이 생기면 여기 그래프가 그려져요</div>';
@@ -97,11 +114,13 @@ const ShellUI = {
     const X = (i) => 28 + i * 52, Y = (l) => top + 12 + l * 36; const H = Y(maxLane) + 28; let W = X(list.length - 1) + 60;
     const pos = {}; list.forEach((c, i) => pos[c.hash] = { x: X(i), y: Y(lane[c.hash]) });
     list.forEach((c) => { const ls = labels[c.hash] || []; if (lane[c.hash] !== 0) W = Math.max(W, pos[c.hash].x + 12 + ls.reduce((a, [t]) => a + lw(t) + 4, 0) + 10); else ls.forEach(([t]) => { W = Math.max(W, pos[c.hash].x - 8 + lw(t) + 10); }); });
+    // v2.8.0 (TODO F2, EXPANSION 6절): 커밋·이름표·선마다 키(data-h / data-l / data-e)를 달고 위치는 style transform 으로 둔다 → animateGraph 가 이전 위치에서 새 위치로 옮긴다
     let s = `<svg class="sh-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="커밋 그래프">`;
-    for (const c of list) for (const p of c.parents) if (shown.has(p)) { const a = pos[p], b = pos[c.hash]; s += a.y === b.y ? `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="sh-ge"/>` : `<path d="M${a.x},${a.y} C${(a.x + b.x) / 2},${a.y} ${(a.x + b.x) / 2},${b.y} ${b.x},${b.y}" class="sh-ge"/>`; }
-    list.forEach((c) => { const { x, y } = pos[c.hash]; const isHead = (g.head.branch && g.branches[g.head.branch] === c.hash) || g.head.detached === c.hash; s += `<g class="sh-gc ${isHead ? 'head' : ''}"><circle cx="${x}" cy="${y}" r="7"/><title>${esc(c.hash)} ${esc(c.message)}</title></g><text class="sh-gh" x="${x}" y="${y + 20}" text-anchor="middle">${esc(c.hash)}</text>`;
-      const ls = labels[c.hash] || []; if (lane[c.hash] === 0) ls.forEach(([t, cls], k) => { s += `<g class="sh-gl ${cls}" transform="translate(${x - 8},${y - 26 - k * 16})"><rect width="${lw(t)}" height="14" rx="4"/><text x="5" y="10.5">${esc(t)}</text></g>`; }); // 레인 0: 위로 쌓기
-      else { let lx = x + 12; ls.forEach(([t, cls]) => { s += `<g class="sh-gl ${cls}" transform="translate(${lx},${y - 7})"><rect width="${lw(t)}" height="14" rx="4"/><text x="5" y="10.5">${esc(t)}</text></g>`; lx += lw(t) + 4; }); } }); // 다른 레인: 오른쪽에 나란히
+    for (const c of list) for (const p of c.parents) if (shown.has(p)) { const a = pos[p], b = pos[c.hash]; const d = a.y === b.y ? `M${a.x},${a.y} L${b.x},${b.y}` : `M${a.x},${a.y} C${(a.x + b.x) / 2},${a.y} ${(a.x + b.x) / 2},${b.y} ${b.x},${b.y}`; s += `<path d="${d}" class="sh-ge" data-e="${p}>${c.hash}" data-g="${a.x},${a.y},${b.x},${b.y}"/>`; }
+    list.forEach((c) => { const { x, y } = pos[c.hash]; const isHead = (g.head.branch && g.branches[g.head.branch] === c.hash) || g.head.detached === c.hash; s += `<g class="sh-gc ${isHead ? 'head' : ''}" data-h="${esc(c.hash)}" data-x="${x}" data-y="${y}" style="transform:translate(${x}px,${y}px)"><circle r="7"/><text class="sh-gh" y="20" text-anchor="middle">${esc(c.hash)}</text><title>${esc(c.hash)} ${esc(c.message)}</title></g>`;
+      const ls = labels[c.hash] || []; const lab = (t, cls, lx, ly) => `<g class="sh-gl ${cls}" data-l="${esc(t.replace(/^HEAD → /, ''))}" data-x="${lx}" data-y="${ly}" style="transform:translate(${lx}px,${ly}px)"><rect width="${lw(t)}" height="14" rx="4"/><text x="5" y="10.5">${esc(t)}</text></g>`;
+      if (lane[c.hash] === 0) ls.forEach(([t, cls], k) => { s += lab(t, cls, x - 8, y - 26 - k * 16); }); // 레인 0: 위로 쌓기
+      else { let lx = x + 12; ls.forEach(([t, cls]) => { s += lab(t, cls, lx, y - 7); lx += lw(t) + 4; }); } }); // 다른 레인: 오른쪽에 나란히
     return s + '</svg>' + (all.length > list.length ? `<div class="muted small">앞 ${all.length - list.length}개 커밋은 생략</div>` : '');
   },
   // ---------- edit 파일명 → 편집창 (아래 ShellUI.editFile) — 저장은 _saveFrom: 파일에 쓰고, 히스토리의 `edit 파일` 줄을 `edit 파일 "내용"` 꼴로 바꿔 둔다(다시 열 때 재실행용)

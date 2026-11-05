@@ -1,42 +1,6 @@
-// core/ui-views-more.js — 놀이터·뱃지·프로필·보관함·설정·용어집·약점·세션·점검·온보딩·코스 페이지 초기화
-// ---------- 놀이터 ----------
-Views.playground = (root, params = {}) => {
-  if (typeof Py === 'undefined') { root.innerHTML = `<div class="page"><h2>놀이터</h2><div class="card"><p class="muted">이 코스에는 파이썬 실행기가 없어요. 자유롭게 쳐 보려면 레슨 예제 창을 쓰거나, <a href="../python/#playground">파이썬 코스의 놀이터</a>로 가세요.</p></div></div>`; return; } /* v2.7.0: sql·web·terminal-git 코스 */
-  const d = Store.data; let editor = null, stopTurtle = null; let currentWork = null;
-  const render = () => {
-    root.innerHTML = `<div class="pg"><div class="pg-main">
-      <div class="pg-top"><div class="lbl">⌨ 코드</div><div class="row"><button class="btn sm" id="pgSave">💾 ${T.save}</button><button class="btn sm" id="pgNew">✚ 새 코드</button>${CONFIG.TUTOR.enabled ? `<button class="btn sm tutor" id="pgAsk">💬 질문</button>` : ''}</div></div>
-      <div class="pg-ed" id="pgEd"></div>
-      <div class="pv-run"><button class="btn primary" id="pgRun">▶ ${T.run} <kbd>Ctrl+Enter</kbd></button><button class="btn" id="pgTrace">${T.stepRun}</button><label class="lbl inline">🐢 속도 <input type="range" id="pgSpeed" min="1" max="10" value="${d.settings.turtleSpeed}"></label></div>
-      <label class="lbl">${T.stdin}</label><textarea class="stdin" id="pgIn" rows="2"></textarea>
-      <div class="lbl">${T.output}</div><pre class="out" id="pgOut"></pre><div id="pgTurtle"></div><div id="pgTrace"></div>
-    </div><aside class="pg-side"><div class="card"><div class="card-h">${T.works} <small>${d.works.length}개</small></div><div class="works" id="pgWorks">${d.works.length ? d.works.slice().reverse().map(w => `<div class="work ${currentWork === w.id ? 'cur' : ''}" data-w="${w.id}">${w.png ? `<img src="${w.png}">` : '<div class="work-ic">📄</div>'}<div class="work-n">${esc(w.name)}</div><div class="work-d">${new Date(w.date).toLocaleDateString()}</div><button class="btn xs del" data-del="${w.id}">✕</button></div>`).join('') : '<div class="muted">아직 작품이 없어요. 코드를 쓰고 저장해 보세요.</div>'}</div>${Game.showGame() ? `<div class="muted small">10줄 이상 실행하면 +${CONFIG.PLAYGROUND_XP} XP (하루 최대 ${CONFIG.PLAYGROUND_XP_DAILY_MAX})</div>` : ''}</div></aside></div>`;
-    const initCode = params.code || '# 아무 코드나 써 보세요!\nprint("안녕, 놀이터!")\n';
-    editor = new TextEditor($('#pgEd'), { value: initCode }); // v2.4.0: 놀이터는 텍스트만(블록 탭 삭제)
-    const getCode = () => editor ? editor.getValue() : '';
-    const run = async (trace) => {
-      const code = getCode(); const out = $('#pgOut'); out.textContent = ''; out.className = 'out'; $('#pgTurtle').innerHTML = ''; editor && editor.setErrorLine(null); if (stopTurtle) { stopTurtle(); stopTurtle = null; }
-      if (!Py.ready) { out.textContent = T.loadingPy + '…'; Py.start(); } Audio.click(); Game.stat('runs'); if (/print\(\s*["']안녕["']\s*\)/.test(code)) Game.stat('printHello');
-      let lines = 0; const stopUI = UI.stopButton(out); /* QA #154: 놀이터에도 ⏹ 멈추기 */ const r = await Py.run({ code, input: $('#pgIn').value, trace, onOut: (t, e) => { UI.outClear(out); out.textContent += t; lines += (t.match(/\n/g) || []).length; if (lines > CONFIG.MAX_OUTPUT_LINES) out.textContent = out.textContent.split('\n').slice(0, CONFIG.MAX_OUTPUT_LINES).join('\n') + '\n' + T.tooLong; if (e) out.classList.add('haserr'); } }); stopUI(); UI.outClear(out);
-      if (trace && r.trace) { if (r.out != null) out.textContent = r.out; TracePanel.show($('#pgTrace'), r, editor); }
-      if (!r.ok) { out.innerHTML += `<div class="errbox"><b>${esc(r.ename)}</b>: ${esc(r.emsg || '')}<br><span class="errko">💡 ${esc(Py.explain(r))}</span> <button class="btn xs" id="pgErrMore">자세히</button></div>`; if (r.line && editor) editor.setErrorLine(r.line); Audio.wrong(); Game.recordError(null); $('#pgErrMore').onclick = () => UI.go('errors', { name: r.ename }); }
-      else if (!out.textContent.trim() && !r.turtleUsed) out.textContent = '(출력이 없어요)';
-      if (r.turtleUsed) { $('#pgTurtle').innerHTML = `<canvas class="turtle-c" width="480" height="360"></canvas><div class="row"><button class="btn sm" id="pgPng">🖼 PNG로 저장</button><button class="btn sm" id="pgSaveT">🐢 그림 작품으로 저장</button></div>`; stopTurtle = TurtleView.draw($('canvas', $('#pgTurtle')), r.cmds, { speed: d.settings.turtleSpeed }); if (r.nsegs >= 100) Game.stat('turtleLines100'); $('#pgPng').onclick = () => { stopTurtle && stopTurtle(); const a = document.createElement('a'); a.download = 'turtle.png'; a.href = $('canvas', $('#pgTurtle')).toDataURL(); a.click(); }; $('#pgSaveT').onclick = async () => { stopTurtle && stopTurtle(); const name = await UI.prompt(T.nameWork, '예: 별 그림'); if (!name) return; const c = $('canvas', $('#pgTurtle')); const small = document.createElement('canvas'); small.width = 160; small.height = 120; small.getContext('2d').drawImage(c, 0, 0, 160, 120); d.works.push({ id: uid(), name, code, date: Date.now(), mode: 'text', png: small.toDataURL('image/jpeg', 0.7) }); Game.stat('worksSaved'); Game.stat('turtleSaved'); Store.save(); UI.toast('🐢 ' + T.savedWork); Game.checkBadges().forEach(b => UI.badgeFly(b)); render(); }; }
-      if (r.ok && code.split('\n').filter(x => x.trim()).length >= 10) { const px = d.playgroundXp; if (px.date !== todayKey()) { px.date = todayKey(); px.amount = 0; } if (px.amount < CONFIG.PLAYGROUND_XP_DAILY_MAX) { px.amount += CONFIG.PLAYGROUND_XP; Game.addXp(CONFIG.PLAYGROUND_XP); Game.stat('playgroundRuns'); if (Game.showGame()) UI.toast(`🛝 +${CONFIG.PLAYGROUND_XP} XP`); } }
-      Game.checkBadges().forEach(b => UI.badgeFly(b)); Store.save(); UI.renderTopbar();
-    };
-    $('#pgRun').onclick = () => run(false); $('#pgTrace').onclick = () => run(true); $('#pgSpeed').oninput = (e) => { d.settings.turtleSpeed = +e.target.value; Store.save(); };
-    $('#pgSave').onclick = async () => { const code = getCode(); if (!code.trim()) return UI.toast('저장할 코드가 없어요'); const cur = currentWork && d.works.find(w => w.id === currentWork); const name = await UI.prompt(T.nameWork, '예: 구구단', cur ? cur.name : ''); if (!name) return; if (cur) { cur.name = name; cur.code = code; cur.mode = 'text'; cur.blockState = null; cur.date = Date.now(); } else { const w = { id: uid(), name, code, mode: 'text', date: Date.now() }; d.works.push(w); currentWork = w.id; Game.stat('worksSaved'); } Store.save(); UI.toast('💾 ' + T.savedWork); Game.checkBadges().forEach(b => UI.badgeFly(b)); render(); };
-    $('#pgNew').onclick = () => { currentWork = null; params = {}; rebuild(); };
-    const pgAsk = $('#pgAsk'); if (pgAsk) pgAsk.onclick = () => Tutor.ui.open({ free: true, getCode, getLastRun: () => $('#pgOut').textContent.slice(-1000), key: 'playground' });
-    $$('[data-w]', root).forEach(el => el.onclick = (e) => { if (e.target.dataset.del) return; const w = d.works.find(x => x.id === el.dataset.w); if (!w) return; currentWork = w.id; params = { code: w.code }; /* v2.4.0: 옛 블록 작품(mode 'block')도 저장된 파이썬 코드(w.code)로 열어요 */ rebuild(); });
-    $$('[data-del]', root).forEach(b => b.onclick = async (e) => { e.stopPropagation(); if (!await UI.confirm('이 작품을 지울까요?')) return; d.works = d.works.filter(w => w.id !== b.dataset.del); Store.save(); render(); });
-  };
-  const rebuild = () => { editor && editor.destroy(); render(); };
-  const keyHandler = (e) => { if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); $('#pgRun') && $('#pgRun').click(); } }; document.addEventListener('keydown', keyHandler);
-  render();
-  return { destroy() { document.removeEventListener('keydown', keyHandler); editor && editor.destroy(); } };
-};
+// core/ui-views-more.js — 뱃지·프로필·보관함·설정·용어집·약점·세션·점검·온보딩·코스 페이지 초기화
+// ---------- 놀이터 (v2.8.0 삭제, 사용자 결정 11/6) — 옛 링크·저장된 마지막 화면이 'playground' 면 홈으로 ----------
+Views.playground = (root) => { UI.go('home', {}, false); };
 
 // ---------- 뱃지 ----------
 Views.badges = (root) => {
@@ -273,7 +237,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ---------- 내 작품 갤러리 (v2.2.3, NEXT.md WP-G G3·G4) ----------
-// 실전 프로젝트 클리어 시 자동 저장된 작품(src=문제 id)과 놀이터에서 저장한 작품을 한 화면에. 코드 복사·.py 내려받기·놀이터에서 열기·문제로·선생님 리뷰(키 있을 때).
+// 실전 프로젝트 클리어 시 자동 저장된 작품(src=문제 id)과 (예전 놀이터에서) 저장한 코드를 한 화면에. 코드 복사·.py 내려받기·문제로·선생님 리뷰(키 있을 때).
 Views.works = (root) => {
   const d = Store.data; const works = d.works.slice().sort((a, b) => b.date - a.date); const projects = works.filter(w => w.src), free = works.filter(w => !w.src);
   const courseName = (id) => { const c = CONFIG.COURSES.find(x => x.id === id); return c ? c.icon + ' ' + c.name : ''; };
@@ -281,12 +245,11 @@ Views.works = (root) => {
       <div class="wc-head"><span class="wc-ic">${w.png ? `<img src="${w.png}">` : (w.src ? '🏆' : '📄')}</span><div class="wc-t"><div class="wc-n">${esc(w.name)}</div><div class="muted small">${new Date(w.date).toLocaleDateString()} · ${lines}줄${w.src ? ` · ${courseName(w.course || Store.course)}${w.total ? ` · 단계 ${w.steps || 0}/${w.total}` : ''}` : ''}</div></div></div>
       ${w.review ? `<div class="wc-review"><b>🎓 선생님 리뷰</b><div class="small">${Tutor.ui.md(w.review)}</div></div>` : ''}
       <pre class="code small wc-code">${esc((w.code || '').split('\n').slice(0, 6).join('\n'))}${lines > 6 ? '\n…' : ''}</pre>
-      <div class="row wrap"><button class="btn sm" data-open="${w.id}">🛝 놀이터에서 열기</button><button class="btn sm" data-copy="${w.id}">복사</button><button class="btn sm" data-py="${w.id}">📥 .py</button>${p ? `<button class="btn sm" data-prob="${w.src}">📘 문제로</button>` : ''}${p && !w.review && CONFIG.TUTOR.enabled ? `<button class="btn sm" data-review="${w.id}">🎓 선생님 리뷰</button>` : ''}<button class="btn sm danger" data-del="${w.id}">🗑</button></div></div>`; };
+      <div class="row wrap"><button class="btn sm" data-copy="${w.id}">복사</button><button class="btn sm" data-py="${w.id}">📥 .py</button>${p ? `<button class="btn sm" data-prob="${w.src}">📘 문제로</button>` : ''}${p && !w.review && CONFIG.TUTOR.enabled ? `<button class="btn sm" data-review="${w.id}">🎓 선생님 리뷰</button>` : ''}<button class="btn sm danger" data-del="${w.id}">🗑</button></div></div>`; };
   root.innerHTML = `<div class="page"><h2>${T.works} <small>${works.length}개</small></h2>
     <h3>🏆 실전 프로젝트 <small class="muted">${projects.length}개</small></h3>${projects.length ? projects.map(card).join('') : `<div class="card muted center">${UI.img('empty-works.png', '', 'empty-img')}<div>실전 챕터의 프로젝트를 클리어하면 여기에 자동으로 저장돼요.</div></div>`}
-    <h3>🛝 놀이터 작품 <small class="muted">${free.length}개</small></h3>${free.length ? free.map(card).join('') : '<div class="card muted">놀이터에서 「저장」한 코드가 여기 모여요.</div>'}</div>`;
+    ${free.length ? `<h3>📄 저장한 코드 <small class="muted">${free.length}개</small></h3>${free.map(card).join('')}` : ''}</div>`; /* v2.8.0: 놀이터 삭제 — 예전에 놀이터에서 저장한 코드는 지우지 않고 보여 줌 */
   const find = (id) => d.works.find(w => w.id === id);
-  $$('[data-open]', root).forEach(b => b.onclick = () => { const w = find(b.dataset.open); UI.go('playground', { code: w.code }); });
   $$('[data-copy]', root).forEach(b => b.onclick = async () => { const w = find(b.dataset.copy); try { await navigator.clipboard.writeText(w.code); UI.toast('📋 코드를 복사했어요'); } catch (e) { UI.modal({ title: '코드', body: `<pre class="code">${esc(w.code)}</pre>` }); } });
   $$('[data-py]', root).forEach(b => b.onclick = () => { const w = find(b.dataset.py); const a = document.createElement('a'); a.download = (w.name || 'work').replace(/[\\/:*?"<>|\s]+/g, '_') + '.py'; a.href = URL.createObjectURL(new Blob(['# ' + w.name + ' — ' + T.appName + '\n' + w.code], { type: 'text/x-python;charset=utf-8' })); a.click(); Game.stat('fileDownloads'); });
   $$('[data-prob]', root).forEach(b => b.onclick = () => { const p = Content.problemMap[b.dataset.prob]; if (p) UI.go('problem', { pid: p.id, lessonId: p.lesson }); });
