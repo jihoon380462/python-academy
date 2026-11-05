@@ -1,7 +1,8 @@
 // core/ui-editors.js — 텍스트/Parsons 에디터 (블록(Blockly) 에디터는 v2.4.0에서 삭제 — 전부 타자)
 // ---------- 텍스트 에디터 (CodeMirror 6, 실패 시 textarea 대체) ----------
 const CM = {
-  modsPromise: null, mods: null, failed: false,
+  modsPromise: null, mods: null, failed: false, langP: {},
+  lang(id) { /* v2.7.0: 파이썬 외 언어 모듈(sql·html·css·js)을 필요할 때만 CDN 에서 — 실패해도 편집기는 뜸 */ if (!id || id === 'python' || !this.mods) return Promise.resolve(); if (!this.langP[id]) { const u = { sql: '@codemirror/lang-sql@6', html: '@codemirror/lang-html@6', css: '@codemirror/lang-css@6', js: '@codemirror/lang-javascript@6' }[id]; this.langP[id] = u ? import(`https://cdn.jsdelivr.net/npm/${u}/+esm`).then(mod => { const ext = id === 'js' ? mod.javascript() : mod[id](); this.mods.langs = this.mods.langs || {}; this.mods.langs[id] = ext; }).catch(() => {}) : Promise.resolve(); } return this.langP[id]; },
   load() {
     if (this.mods) return Promise.resolve(this.mods); if (this.failed) return Promise.reject(new Error('cm failed'));
     if (!this.modsPromise) this.modsPromise = (async () => {
@@ -32,23 +33,23 @@ function dedentTarget(lines, idx) {
 /* QA #159: 줄마다 「이 줄이 시작될 때 열린 괄호 수」 — 괄호 안에서 이어 쓰는 줄은 들여쓰기 칸 수 경고에서 뺀다 (문자열·주석 속 괄호는 대충 걷어냄, 세 따옴표 문자열은 안 봄) */
 function bracketDepths(lines) { let d = 0; return lines.map(l => { const at = d; const t = l.replace(/(["'])(?:\\.|(?!\1).)*\1/g, '""').replace(/#.*$/, ''); for (const ch of t) { if ('([{'.includes(ch)) d++; else if (')]}'.includes(ch) && d > 0) d--; } return at; }); }
 class TextEditor {
-  constructor(parent, { value = '', onChange = null, readOnly = false } = {}) {
-    this.parent = parent; this.onChange = onChange; this.readOnly = readOnly; this.cm = null; this.ta = null; this.value = value; this.lines = []; this.destroyed = false;
+  constructor(parent, { value = '', onChange = null, readOnly = false, lang = 'python' } = {}) { /* v2.7.0: lang 'python'|'sql'|'html'|'css'|'js' — 파이썬이 아니면 들여쓰기 규칙·빠른 키·경고를 끄고 CodeMirror 언어 모듈을 따로 받음(없으면 하이라이트 없이) */
+    this.parent = parent; this.lang = lang; this.py = lang === 'python'; this.onChange = onChange; this.readOnly = readOnly; this.cm = null; this.ta = null; this.value = value; this.lines = []; this.destroyed = false;
     parent.classList.add('ted'); parent.innerHTML = '';
     this.buildFallback(value); // 즉시 쓸 수 있게 먼저 textarea, CM이 준비되면 교체
-    CM.load().then(m => { if (this.destroyed) return; this.buildCM(m, this.getValue()); }).catch(() => {});
+    CM.load().then(m => CM.lang(this.lang).then(() => m)).then(m => { if (this.destroyed) return; this.buildCM(m, this.getValue()); }).catch(() => {});
   }
   buildFallback(value) {
     const wrap = document.createElement('div'); wrap.className = 'ted-fb'; wrap.innerHTML = `<pre class="ted-gutter"></pre><textarea class="ted-ta" wrap="off" spellcheck="false" autocapitalize="off" autocorrect="off" ${this.readOnly ? 'readonly' : ''}></textarea>`;
-    this.parent.appendChild(wrap); this.fb = wrap; this.ta = $('textarea', wrap); this.gut = $('.ted-gutter', wrap); this.ta.value = value; this.updateGutter(); /* QA #122: 기본 편집기는 점을 못 그려서 커서 줄 들여쓰기 칸 수를 글자로. QA #159: 괄호 안 이어 쓰는 줄·공백뿐인 줄은 경고 없이 칸 수만 */ const ind = document.createElement('div'); ind.className = 'ted-ind'; wrap.appendChild(ind); const showInd = this._showInd = () => { const ta = this.ta; if (!ta) return; const pos = ta.selectionStart; const st = ta.value.lastIndexOf('\n', pos - 1) + 1; const lines = ta.value.slice(0, st).split('\n'); const cur = ta.value.slice(st).split('\n')[0]; const n = (cur.match(/^ */) || [''])[0].length; const inBr = n > 0 && bracketDepths(lines)[lines.length - 1] > 0; const blank = n > 0 && n === cur.length; const odd = n % 4 !== 0 && !inBr && !blank; ind.textContent = n ? `들여쓰기 ${n}칸${odd ? ' ⚠ 4의 배수가 아니에요' : inBr ? ' (괄호 안)' : ''}` : ''; ind.classList.toggle('odd', odd); }; ['input', 'keyup', 'click', 'focus'].forEach(ev => this.ta.addEventListener(ev, showInd));
-    this.ta.addEventListener('input', (e) => { if (e.data === ':') this.autoDedentTA(); this.updateGutter(); this.onChange && this.onChange(this.getValue()); });
+    this.parent.appendChild(wrap); this.fb = wrap; this.ta = $('textarea', wrap); this.gut = $('.ted-gutter', wrap); this.ta.value = value; this.updateGutter(); /* QA #122: 기본 편집기는 점을 못 그려서 커서 줄 들여쓰기 칸 수를 글자로. QA #159: 괄호 안 이어 쓰는 줄·공백뿐인 줄은 경고 없이 칸 수만 */ const ind = document.createElement('div'); ind.className = 'ted-ind'; wrap.appendChild(ind); const showInd = this._showInd = () => { const ta = this.ta; if (!ta) return; const pos = ta.selectionStart; const st = ta.value.lastIndexOf('\n', pos - 1) + 1; const lines = ta.value.slice(0, st).split('\n'); const cur = ta.value.slice(st).split('\n')[0]; const n = (cur.match(/^ */) || [''])[0].length; const inBr = n > 0 && bracketDepths(lines)[lines.length - 1] > 0; const blank = n > 0 && n === cur.length; const odd = n % 4 !== 0 && !inBr && !blank; ind.textContent = n && this.py ? `들여쓰기 ${n}칸${odd ? ' ⚠ 4의 배수가 아니에요' : inBr ? ' (괄호 안)' : ''}` : ''; ind.classList.toggle('odd', odd); }; ['input', 'keyup', 'click', 'focus'].forEach(ev => this.ta.addEventListener(ev, showInd));
+    this.ta.addEventListener('input', (e) => { if (e.data === ':' && this.py) this.autoDedentTA(); this.updateGutter(); this.onChange && this.onChange(this.getValue()); });
     this.ta.addEventListener('scroll', () => { this.gut.scrollTop = this.ta.scrollTop; });
-    this.ta.addEventListener('focus', () => QuickKeys.show(this)); this.ta.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== this.ta) QuickKeys.hide(); }, 150));
+    this.ta.addEventListener('focus', () => { if (this.py) QuickKeys.show(this); }); this.ta.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== this.ta) QuickKeys.hide(); }, 150));
     this.ta.addEventListener('keydown', (e) => {
       const ta = this.ta; if (e.isComposing || e.keyCode === 229) return; /* QA #159: 한글 조합 중엔 건드리지 않음 */
       if (e.key === 'Tab' && !e.ctrlKey && !e.altKey && !e.metaKey) { e.preventDefault(); this.insert('    ', 4); }
       else if (e.key === 'Backspace' && !e.ctrlKey && !e.altKey && !e.metaKey && ta.selectionStart === ta.selectionEnd) { /* QA #121(사용자 제보 11/4): 줄 앞 공백에서는 한 번에 들여쓰기 한 단계(4칸)를 지워요. QA #159: Ctrl/Alt/Cmd+⌫(낱말 지우기)는 브라우저 기본대로 */ const pos = ta.selectionStart; const before = ta.value.slice(ta.value.lastIndexOf('\n', pos - 1) + 1, pos); if (before.length && !/[^ ]/.test(before)) { e.preventDefault(); const n = before.length % 4 || 4; this.taEdit(pos - n, pos, '', pos - n); } }
-      else if (e.key === 'Enter' && !e.ctrlKey && !e.altKey && !e.metaKey) { e.preventDefault(); const pos = ta.selectionStart; const before = ta.value.slice(0, pos); const line = before.slice(before.lastIndexOf('\n') + 1); let ind = line.match(/^ */)[0]; if (/:\s*$/.test(line)) ind += '    '; this.insert('\n' + ind, 1 + ind.length); }
+      else if (e.key === 'Enter' && !e.ctrlKey && !e.altKey && !e.metaKey) { e.preventDefault(); const pos = ta.selectionStart; const before = ta.value.slice(0, pos); const line = before.slice(before.lastIndexOf('\n') + 1); let ind = line.match(/^ */)[0]; if (this.py ? /:\s*$/.test(line) : /[{(\[]\s*$/.test(line)) ind += '    '; this.insert('\n' + ind, 1 + ind.length); }
     });
   }
   /* QA #156: 값을 ta.value= 로 바꾸면 실행 취소(Ctrl+Z) 기록이 통째로 날아가요 — execCommand(insertText/delete)로 브라우저 편집 기록에 남기고, 안 되는 환경만 예전 방식(그때는 input 이벤트가 안 나므로 직접 갱신) */
@@ -58,7 +59,7 @@ class TextEditor {
   buildCM(m, value) {
     const { core, python, view, state, commands, language } = m; this.m = m;
     this.lineEffect = m.setLines; const host = document.createElement('div'); host.className = 'ted-cm';
-    this.cm = new view.EditorView({ doc: value, parent: host, extensions: [core.basicSetup, python.python(), ...(m.backKey || []), view.keymap.of([commands.indentWithTab]), ...(m.leads || []), language.indentUnit.of('    '), language.syntaxHighlighting(m.hs), m.theme, m.lineField, m.guides, view.EditorView.editable.of(!this.readOnly), view.EditorView.updateListener.of(u => { if (u.docChanged) { this.autoDedentCM(u); if (this.onChange) this.onChange(this.getValue()); } }), view.EditorView.domEventHandlers({ focus: () => QuickKeys.show(this), blur: () => setTimeout(() => { if (!this.cm || !this.cm.hasFocus) QuickKeys.hide(); }, 150) })] });
+    this.cm = new view.EditorView({ doc: value, parent: host, extensions: [core.basicSetup, ...(this.py ? [python.python()] : (m.langs && m.langs[this.lang] ? [m.langs[this.lang]] : [])), ...(m.backKey || []), view.keymap.of([commands.indentWithTab]), ...(this.py ? (m.leads || []) : []), language.indentUnit.of('    '), language.syntaxHighlighting(m.hs), m.theme, m.lineField, m.guides, view.EditorView.editable.of(!this.readOnly), view.EditorView.updateListener.of(u => { if (u.docChanged) { if (this.py) this.autoDedentCM(u); if (this.onChange) this.onChange(this.getValue()); } }), view.EditorView.domEventHandlers({ focus: () => QuickKeys.show(this), blur: () => setTimeout(() => { if (!this.cm || !this.cm.hasFocus) QuickKeys.hide(); }, 150) })] });
     if (this.fb) this.fb.remove(); this.fb = null; this.ta = null; this.parent.appendChild(host); if (this.lines.length) this.setLines(this.lines);
   }
   autoDedentCM(u) { try { let typedColon = false; u.changes.iterChanges((fa, ta, fb, tb, ins) => { if (ins.toString() === ':') typedColon = true; }); if (!typedColon || this._dedenting) return; const doc = this.cm.state.doc; const head = this.cm.state.selection.main.head; const ln = doc.lineAt(head); const lines = []; for (let k = 1; k <= ln.number; k++) lines.push(doc.line(k).text); const t = dedentTarget(lines, ln.number - 1); if (t == null) return; const ind = ln.text.match(/^ */)[0].length; if (t === ind) return; this._dedenting = true; this.cm.dispatch({ changes: { from: ln.from, to: ln.from + ind, insert: ' '.repeat(t) } }); this._dedenting = false; } catch (e) { this._dedenting = false; } }

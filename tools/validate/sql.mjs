@@ -1,5 +1,5 @@
 // tools/validate/sql.mjs — 데이터베이스(SQL) 코스 전용 필드 규칙. validate_content.mjs 가 코스 sql 을 검사할 때 부른다 (DESIGN.md 16절).
-//   sql 유형: p.sql.dataset 이 courses/sql/datasets.js 의 SQL_DATASETS 키에 있어야 함 · p.sql.expect.kind 는 'rows'|'state' · solution 은 문자열 · state 면 expect.table · xp 필수(CONFIG.XP 에 sql 이 없음)
+//   sql 유형: p.sql.dataset 이 courses/sql/datasets.js 의 SQL_DATASETS 키에 있어야 함 · p.sql.expect.kind 는 'rows'|'state' · solution 은 문자열 · state 면 expect.table · xp 는 선택(없으면 CONFIG.XP.sql)
 //   레슨 예제 { sql } 의 dataset 도 같은 규칙. 정답 쿼리 실행 검증은 tools/run_sql_solutions.py(Python sqlite3).
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -10,7 +10,6 @@ export function datasetIds() {
 }
 export default async (course, { err, warn }) => {
   const ids = datasetIds(); if (!ids.length) err('courses/sql/datasets.js 에서 SQL_DATASETS 키를 못 찾았어요');
-  const xpTypes = new Set(['sql']);
   for (const p of course.PROBLEMS) {
     const w = p.id;
     if (p.type === 'sql') {
@@ -28,7 +27,7 @@ export default async (course, { err, warn }) => {
     }
     if (p.type === 'bug') err(`${w}: 이 코스에서 bug 유형은 못 써요(파이썬 실행 전제). type:'sql' + starter(틀린 쿼리) + prompt 「틀린 곳을 고치세요」 로`);
     if (p.type === 'code') err(`${w}: 이 코스 페이지에는 파이썬 러너가 없어 code 유형을 못 써요(S13 은 quiz·fill 로, 실행형은 core 요청)`);
-    if (xpTypes.has(p.type) && !(typeof p.xp === 'number' && p.xp > 0)) err(`${w}: type '${p.type}' 은 xp 필수(CONFIG.XP 에 없음)`);
+    if (p.xp != null && !(typeof p.xp === 'number' && p.xp > 0)) err(`${w}: xp 는 양수`);
     if (p.type === 'quiz' && p.quiz && p.quiz.code && /\n\s*$/.test(p.quiz.code)) warn(`${w}: quiz.code 끝에 빈 줄`);
   }
   for (const l of course.LESSONS) for (const [i, pg] of (l.pages || []).entries()) {

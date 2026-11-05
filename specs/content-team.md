@@ -323,7 +323,7 @@ python3 tools/regress.py                 # 브라우저 회귀(terminal-git 절 
 - 외래 키 검사는 **켜져 있다**(`PRAGMA foreign_keys = ON`, 브라우저·CI 동일). order_items 가 가리키는 menu 행을 DELETE 하면 `FOREIGN KEY constraint failed` 가 난다 — S8 의 DELETE 문제는 참조되지 않는 행(예: 새로 INSERT 한 행, shifts)으로 내거나 그 에러 자체를 가르친다.
 - 실행 화면의 DB 는 실행 사이에 유지된다(INSERT 뒤 SELECT 로 확인 가능). WHERE 없는 DELETE/UPDATE 도 실행되며 「모든 행이 바뀌었어요!」 경고 + 데이터 초기화 버튼이 뜬다(S8 의 포인트). 채점은 늘 새 DB.
 - quiz·fill·parsons 는 기존 core 채점(SQL 을 실행하지 않음). **bug 유형과 code(파이썬) 유형은 이 코스에서 금지**(validate 가 막음) — 틀린 곳 고치기는 `sql` + starter, S13(파이썬 sqlite3)은 quiz·fill 로 내고 실행형은 HANDOFF 「Fable 작업」으로 적는다.
-- `xp` 는 sql 유형에 **필수**(CONFIG.XP 에 sql 이 없음). 기준: rows 20~30, state 30, JOIN·서브쿼리 35, 보스 40~50.
+- `xp` 는 선택(없으면 CONFIG.XP.sql = 25). 기준: rows 20~30, state 30, JOIN·서브쿼리 35, 보스 40~50.
 
 ### 레슨별 「무엇을 쓸지」
 
@@ -350,7 +350,7 @@ python3 tools/regress.py                 # 브라우저 회귀(terminal-git 절 
 
 ### 검증 명령 순서
 
-1. `node tools/validate_content.mjs` — sql 필드 규칙(tools/validate/sql.mjs: dataset 존재·expect.kind·solution 문자열·state 의 table·xp 필수·bug/code 금지)
+1. `node tools/validate_content.mjs` — sql 필드 규칙(tools/validate/sql.mjs: dataset 존재·expect.kind·solution 문자열·state 의 table·bug/code 금지)
 2. `python3 tools/run_sql_solutions.py` — 모든 sql 문제의 정답·레슨 예제를 Python sqlite3 로 실행: 에러 없음, rows 는 1행 이상, state 는 table 조회됨, starter 가 이미 정답과 같은 결과면 실패
 3. `node tools/check_level.mjs --gate` (3-2절) · `python3 tools/regress.py` 의 `[sql]` 절(가짜 엔진으로 채점 경로 검사 — 실제 sql.js 는 CDN 차단 환경에서 못 받으므로 로컬 브라우저에서 S0 를 직접 풀어 본다)
 4. 브라우저에서 레슨마다 처음부터 직접 풀기(3-2절). 특히 결과 표가 50행을 넘는 문제는 페이지 넘김을 눌러 본다.

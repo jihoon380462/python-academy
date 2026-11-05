@@ -38,7 +38,7 @@ const WebUI = {
     const clearPanels = () => { consoleN = 0; netN = 0; setCnt('console', 0); setCnt('net', 0); if (consoleEl) { consoleEl.innerHTML = '<span class="muted">console.log(…) 와 에러, alert 가 여기 나와요</span>'; consoleEl.classList.remove('haserr'); } if (netBody) { netBody.innerHTML = ''; netTable.classList.add('hide'); netEmpty.classList.remove('hide'); } };
     const render = () => { clearPanels(); return Web.render(iframe, getCode(), { onConsole: (m) => log(m.level, m.text), onError: (e) => log('error', `${e.text}${e.line ? ` (${e.line}번째 줄)` : ''}`), onFetch: (r) => netRow(r) }, { api: opts.api || {} }); };
     const schedule = () => { if (!$('.web-autochk', host).checked) return; clearTimeout(timer); timer = setTimeout(render, 500); };
-    tabs.forEach(t => { editors[t] = new TextEditor($(`#${uid}-${t}`, host), { value: code[t] || '', onChange: (v) => { opts.onChange && opts.onChange(getCode()); schedule(); } }); });
+    tabs.forEach(t => { editors[t] = new TextEditor($(`#${uid}-${t}`, host), { lang: t, value: code[t] || '', onChange: (v) => { opts.onChange && opts.onChange(getCode()); schedule(); } }); });
     $$('.web-tab', host).forEach(b => b.onclick = () => { $$('.web-tab', host).forEach(x => x.classList.toggle('on', x === b)); $$('.web-pane', host).forEach(p => p.classList.toggle('on', p.dataset.pane === b.dataset.tab)); });
     $$('.web-w', host).forEach(b => b.onclick = () => { $$('.web-w', host).forEach(x => x.classList.toggle('on', x === b)); host.classList.toggle('phone', b.dataset.w === 'phone'); });
     $('.web-refresh', host).onclick = () => { clearTimeout(timer); render(); };

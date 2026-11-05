@@ -3,7 +3,7 @@
 //
 // 레슨 (LESSONS)  { id:'S0'(보스 'SB1'), ch, n, title, mode:'text', tutorSummary, terms?, pages:[{ title, html, example?:{ sql, dataset?, schema?, autoRun? } }], summary[3], draft? }
 //   example.sql     레슨 예제 — 편집기 + ▶ 실행 + 결과 표(core/ui-views-sql.js UI.examples.sql). dataset 기본 'cafe'(courses/sql/datasets.js). autoRun:false 면 엔진이 준비돼도 자동 실행 안 함
-// 문제 (PROBLEMS)  공통: id 'S0P1' · lesson · type · title · prompt(html) · tags(WEAKNESS_TAGS 안에서 1~3) · hints[3] · xp(sql 유형은 **필수** — CONFIG.XP 에 sql 이 없다) · solution(문자열, 「정답 보기」가 그대로 보여 줌)
+// 문제 (PROBLEMS)  공통: id 'S0P1' · lesson · type · title · prompt(html) · tags(WEAKNESS_TAGS 안에서 1~3) · hints[3] · xp(선택, 없으면 CONFIG.XP[type] — sql 25) · solution(문자열, 「정답 보기」가 그대로 보여 줌)
 //   type:'sql'   쿼리 작성. starter?(처음 쿼리) · solution(정답 쿼리) · sql:{ dataset:'cafe', expect:{ kind:'rows'|'state', query?, ordered?, columns?, table? } }
 //                rows  = 내 쿼리 결과 집합 vs solution(또는 expect.query) 결과 집합. 기본 열·행 순서 무시, ordered:true 면 행 순서 검사(ORDER BY 문제), columns:true 면 열 이름 검사(AS 문제). 실수는 소수 2자리
 //                state = 내 쿼리(여러 문장 가능)를 실행한 뒤 expect.table 의 전체 행 vs solution 실행 뒤 (INSERT/UPDATE/DELETE/CREATE 문제)
