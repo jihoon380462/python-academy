@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); HUB='file://'+os.path.join(ROOT,'index.html'); COURSE='file://'+os.path.join(ROOT,'courses/python/index.html')
 SHOT=os.path.join(ROOT,'tools/.out/shots'); os.makedirs(SHOT,exist_ok=True)
 V1={"v":1,"nick":"테스터","mascotColor":1,"onboarded":True,"xp":385,"badges":["first_run","first_clear"],"badgeDates":{"first_run":"2026-10-20"},"stats":{"runs":12},
-    "problems":{"L0P1":{"status":"clear","stars":3,"hints":0,"attempts":1,"fails":0,"code":None,"mode":None,"clearedAt":"2026-10-20"},"L3P2":{"status":"try","stars":0,"hints":1,"attempts":2,"fails":1,"code":"n = int(input())\n","mode":"text"},"L5P2":{"status":"none","stars":0,"hints":0,"attempts":0,"fails":0,"code":json.dumps({"answer":[{"text":"total = 0","indent":0}]}),"mode":"parsons"}},
+    "problems":{"L0P1":{"status":"clear","stars":3,"hints":0,"attempts":1,"fails":0,"code":None,"mode":None,"clearedAt":"2026-10-20"},"L3P2":{"status":"try","stars":0,"hints":1,"attempts":2,"fails":1,"code":"n = int(input())\n","mode":"text"},"L5P2":{"status":"none","stars":0,"hints":0,"attempts":0,"fails":0,"code":json.dumps({"answer":[{"text":"total = 0","indent":0}]}),"mode":"parsons"},"L6P2":{"status":"none","stars":0,"hints":0,"attempts":0,"fails":0,"code":json.dumps({"answer":[{"text":"while True:","indent":0}]}),"mode":"parsons"},"L1P2":{"status":"try","stars":0,"hints":0,"attempts":1,"fails":1,"code":json.dumps({"blocks":{"languageVersion":0,"blocks":[]}}),"mode":"block"}},
     "lessons":{"L0":{"page":4},"terms":{"print":True}},"streak":{"cur":3,"best":5,"last":time.strftime('%Y-%m-%d')},"days":{time.strftime('%Y-%m-%d'):2},"dailyGoal":5,"dailyGoalDates":{},
     "settings":{"theme":"light","font":2,"sound":True,"vibrate":True,"anim":2,"apiKey":"sk-ant-test","model":"claude-haiku-5-5","editorTheme":"classic","confetti":"rainbow","soundSet":"bell","accessory":"none","turtleSpeed":6,"focus":True},
     "works":[{"id":"w1","name":"구구단","code":"print(1)","date":1}],"tutorChats":{"L3P2":[{"role":"user","content":"hi"}]},"myProblems":[],"bestTimes":{"L1":42},"dailyChallenge":None,"checkups":{"1":80},"playgroundXp":{"date":"","amount":0},"polished":{},"examplesEdited":{},"reviewToday":{"date":"","count":0},"chapterPerfect":{},"updatedAt":1700000000000}
@@ -99,9 +99,12 @@ with sync_playwright() as p:
     check(pg.locator('.blank').count()>=1, '빈칸 문제 렌더')
     # 버그·Parsons·텍스트 렌더
     pg.evaluate("UI.go('problem',{pid:'L2P4',lessonId:'L2'})"); pg.wait_for_timeout(300); check(pg.locator('.bugline').count()>0, '버그 문제 렌더')
-    pg.evaluate("UI.go('problem',{pid:'L5P2',lessonId:'L5'})"); pg.wait_for_timeout(300); check(pg.locator('.pz-tile.pz-ans').count()==1 and pg.locator('.pz-bank .pz-tile').count()>0, 'Parsons 렌더 + 저장된 배치 복원')
+    pg.evaluate("UI.go('problem',{pid:'L6P2',lessonId:'L6'})"); pg.wait_for_timeout(300); check(pg.locator('.pz-tile.pz-ans').count()==1 and pg.locator('.pz-bank .pz-tile').count()>0, 'Parsons 렌더 + 저장된 배치 복원')
+    # v2.4.0 블록·Parsons→타자 전환: 옛 저장(mode parsons/block)이 남아 있어도 code 문제는 starter 로 열린다
+    pg.evaluate("UI.go('problem',{pid:'L5P2',lessonId:'L5'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('.pz-tile').count()==0 and 'total = 0' in pg.evaluate("(document.querySelector('.ted textarea')||{}).value || ''"), '옛 Parsons 기록이 있는 문제 → 타자 편집기(starter)로')
+    pg.evaluate("UI.go('problem',{pid:'L1P2',lessonId:'L1'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('.bed').count()==0 and pg.evaluate("(document.querySelector('.ted textarea')||{}).value || ''").startswith('print("나는")'), '옛 블록 기록이 있는 문제 → 타자 편집기(starter)로')
     pg.evaluate("UI.go('problem',{pid:'L13P1',lessonId:'L13'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('#pvIn').count()==1, '텍스트 문제 에디터(폴백)+입력칸')
-    pg.evaluate("UI.go('problem',{pid:'L1P1',lessonId:'L1'})"); pg.wait_for_timeout(1200); check('블록' in pg.locator('.bed').inner_text(), '블록 문제 (CDN 없음 → 안내 문구)')
+    pg.evaluate("UI.go('problem',{pid:'L1P1',lessonId:'L1'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('.bed').count()==0 and pg.locator('#btnToText').count()==0, 'L1 첫 문제도 타자 편집기 (블록 화면 없음)')
     # 실전 챕터 6 (v2.2.0): 프로젝트 체크리스트·단계 칩·파일 업로드 UI·마스터 뱃지
     pg.evaluate("Store.data.settings.unlockAll=true; UI.go('problem',{pid:'X1P1',lessonId:'X1'})"); pg.wait_for_timeout(600)
     check(pg.locator('#btnUpload').count()==1 and pg.locator('#pvFile').count()==1, '실전: 📎 CSV 업로드 버튼')

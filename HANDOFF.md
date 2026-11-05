@@ -16,7 +16,7 @@
 - **파이썬 아카데미**: 완전 초보자용 학습 사이트. v2.0.0(Phase 0)부터 **허브 + 코스 페이지** 구조 (확장 계획은 `EXPANSION.md`; "Phase N을 진행해"가 의뢰 단위).
 - 라이브 주소: 허브 **https://jihoon380462.github.io/python-academy/** · 파이썬 코스 `/courses/python/` (GitHub Pages, `main`에 push → Actions가 **검증(validate+run_solutions) 통과 시** 1~2분 안에 자동 배포)
 - 저장소: `github.com/jihoon380462/python-academy` (public)
-- 기술: Pyodide 0.27.5(Web Worker, 메인스레드 폴백) · Blockly 11.2.2 · CodeMirror 6 · 모두 CDN. Claude API 선생님(API 키는 기기별 localStorage). 기기 연동은 GitHub 비공개 gist(`core/sync.js`).
+- 기술: Pyodide 0.27.5(Web Worker, 메인스레드 폴백) · CodeMirror 6 · 모두 CDN(블록(Blockly)은 v2.4.0 에서 삭제 — 전부 타자). Claude API 선생님(API 키는 기기별 localStorage). 기기 연동은 GitHub 비공개 gist(`core/sync.js`).
 - 현재 버전: **v2.3.7** (`core/config.js`의 `APP_VERSION`. 설정 맨 아래·허브 푸터에 표시. 수정할 때마다 올리고 `node tools/stamp.mjs`로 HTML의 `?v=`도 맞춘다 — 사용자가 이 숫자로 반영 여부를 확인한다)
 
 ## 2. 작업 방법 (반드시 이 순서)
@@ -24,7 +24,7 @@
 0. 그림(아트 리소스)이 필요하면 코드에서 직접 그리지 말고 `IMAGES.md` 2절에 요청을 추가하고 `UI.img()`로 자리만 만든다(이모지 폴백). 그림은 ChatGPT 등 다른 쪽이 만들어 `assets/img/`에 넣는다.
 1. 저장소를 클론/attach한다. **빌드 없음** — 파일을 고치면 그게 곧 배포물이다. 로드 순서는 `courses/python/index.html`의 `<script>` 순서(바꾸지 말 것).
    - `core/config.js` 버전·CDN·수치·문구(T)·허브 코스 목록(COURSES) · `core/util.js` 유틸 · `core/storage.js` 저장(스키마 v2) · `core/sync.js` 기기 연동 · `core/engine.js` Content(인덱스·변형·가이드 생성)·Grader · `core/runners/python.js` Pyodide 워커·거북이 · `core/game.js` Game·Review · `core/tutor.js` 선생님 API+패널 · `core/fx.js` 효과음·색종이·마스코트 · `core/ui-core.js` UI 공통(모달·토스트·상단바·용어 칩) · `core/ui-editors.js` 텍스트/블록/Parsons 에디터 · `core/ui-views-main.js` 홈·레슨·문제·Coach · `core/ui-views-more.js` 나머지 화면·설정·온보딩·코스 페이지 초기화(딥링크 `#problem/ID`, `#lesson/ID`, `#settings`) · `core/hub.js` 허브 · `core/ui.css`
-   - `courses/python/content.js` 레슨 36(실전 X1~X6, 챕터 7 L19~L23+B7 포함)·문제 143·CHAPTERS·MAP_DECOR·GUIDES(블록 코치)·CHECKUPS·WEAKNESS_TAGS·PLAYGROUND_BLOCKS_UPTO · `courses/algo/content.js` 코스 2(COURSE 메타·tutorPersona, 레슨 16+보스 4+실전 4, 문제 105; 머리말에 확장 필드 설명) · 각 `course.json` · `shared/errors.js`·`glossary.js`·`badges.js`(BADGES·INVENTORY)
+   - `courses/python/content.js` 레슨 36(실전 X1~X6, 챕터 7 L19~L23+B7 포함)·문제 143·CHAPTERS·MAP_DECOR·CHECKUPS·WEAKNESS_TAGS · `courses/algo/content.js` 코스 2(COURSE 메타·tutorPersona, 레슨 16+보스 4+실전 4, 문제 105; 머리말에 확장 필드 설명) · 각 `course.json` · `shared/errors.js`·`glossary.js`·`badges.js`(BADGES·INVENTORY)
    - `core/visualize.js` 시각화 엔진(Viz.player/runAndShow/frame, 8종) — 알고리즘 코스 페이지만 로드. 러너 `Py.run({vis, maxsteps, timeoutMs})`가 구조 스냅샷(step.vis)을 돌려줌
    - 허브 `index.html`은 러너 없이 config·util·badges·python content·storage·sync·engine·game·fx·ui-core·hub.js만 읽는다.
 2. `APP_VERSION` 올리기 → `node tools/stamp.mjs` → 검증: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` → 가능하면 `python3 tools/regress.py`(헤드리스 크롬 회귀: 마이그레이션·허브·전 화면·모바일).
@@ -38,7 +38,7 @@
 4. 배포 확인: `gh run list --workflow "Deploy to GitHub Pages" --limit 1` 이 `success`면 끝(verify 잡 실패 시 배포 안 됨 → `gh run view <id> --log-failed`). 사용자에게 "vX.Y.Z 배포 완료, Ctrl+F5" 라고 알린다.
 
 ## 3. 환경 제약 (작업 샌드박스)
-- CDN(unpkg, jsdelivr, pypi, npm)에 **접근 불가** → Pyodide/Blockly/CodeMirror는 헤드리스에서 실제 로드 못 함. 실제 블록/실행 화면은 **사용자가 브라우저에서 확인**한다. 로직은 스텁으로 검증(`tools/regress.py`는 textarea 폴백·"블록 도구를 불러오지 못했어요" 문구까지만 확인).
+- CDN(unpkg, jsdelivr, pypi, npm)에 **접근 불가** → Pyodide/CodeMirror는 헤드리스에서 실제 로드 못 함. 실제 실행 화면은 **사용자가 브라우저에서 확인**한다. 로직은 스텁으로 검증(`tools/regress.py`는 textarea 폴백·"블록 도구를 불러오지 못했어요" 문구까지만 확인).
 - GitHub API도 file://에서는 CORS로 막힘 → 기기 연동은 가짜 fetch로 단위 테스트(`Sync.merge`·connect/pull/push 흐름; v1.2.0 작업 scratchpad `sync_test.js` 패턴).
 - GitHub Pages REST API는 프록시가 막음 → Actions 워크플로로만 배포 제어.
 - 헤드리스 크롬: `tools/regress.py` 패턴 — playwright + `/usr/bin/google-chrome`, `--allow-file-access-from-files`, `add_init_script`로 localStorage에 **v1 키 `python_academy_save`를 넣으면 마이그레이션까지 같이 검증**된다. `UI.go('problem',{pid:'L1P1'})`로 화면 이동.
@@ -62,5 +62,3 @@
 - **수학 공간(v2.3.0)**: `courses/math/content.js` 맨 위 주석이 노드·문제 스키마. 노드 = 레슨 + `subtitle/level/stars/prereq/star/icon/params[]`, `pages[0].figure`(필수)·`observe`, `pages[1].formula[{latex,note}]`·`example`(슬라이더 동기화는 `id = 값` 줄). 문제 유형 `quiz kind:'explore' requireInteract` · `num answer:{value,tol,unit,why}`(+solution 계산 코드) · `match match:{params,tol}` · `pair pair:{left,right,answer}`. 그림 종류와 옵션은 `core/figure.js` 맨 위 주석. 잠금은 보스가 아니라 `prereq`.
 - 문제 스키마는 `courses/python/content.js` 맨 위 주석(+ EXPANSION.md 4절의 확장 필드 runner/grader/setup/limits/visualize). `vary:{a:[lo,hi]}`의 **기본값은 lo**(`Content.defaultParams`) — 기본값끼리 겹치는 출력이 안 나오게 주의.
 - 테스트는 최소 2개(1개면 복제), 마지막 1개 숨김.
-- 코치 가이드 `GUIDES[pid]`(content.js) `= [{t:'HTML 설명', c:'코드에 포함될 문자열' | ['여러개'] | '@var:이름' | '~정규식', cat:'강조할 메뉴'}]`, 마지막 단계는 c 없이 "실행 → 제출" 안내. 없는 문제는 정답 코드 줄에서 자동 생성.
-- Blockly 한글 라벨 오버라이드는 `core/ui-editors.js` `Blocks.setup()` (`출력 %1`, `%1 = %2`, `만약/아니고 만약/아니면`, `i 를 1 부터 5 까지 반복` 등). 안내 문구는 이 라벨과 일치시킬 것.

@@ -45,8 +45,8 @@ const UI = {
   levelUpOverlay(ev) { return new Promise(res => { Audio.levelUp(); Confetti.rain(220); const ov = document.createElement('div'); ov.className = 'levelup-ov'; ov.innerHTML = `<div class="levelup"><div class="lu-mascot">${myMascot({ size: 120, mood: 'happy' })}</div><div class="lu-title">${T.levelUp}</div><div class="lu-level">Lv.${ev.level}</div>${ev.titleChanged ? `<div class="lu-newtitle">${T.newTitle}: <b>${ev.title}</b></div>` : ''}${ev.stageChanged ? `<div class="lu-stage">마스코트가 진화했어요!</div>` : ''}<button class="btn primary" id="luOk">계속</button></div>`; document.body.appendChild(ov); $('#luOk').onclick = () => { ov.remove(); res(); }; }); },
   badgeFly(b) { Audio.badge(); const el = document.createElement('div'); el.className = 'badge-fly'; el.innerHTML = `<div class="bf-icon">${UI.img('badge-' + b.id + '.png', b.icon, 'badge-img bf-img')}</div><div><div class="bf-t">${T.badgeGet}</div><div class="bf-n">${esc(b.name)}</div></div>`; document.body.appendChild(el); setTimeout(() => el.classList.add('in'), 20); setTimeout(() => { el.classList.remove('in'); setTimeout(() => el.remove(), 400); }, 2600); },
   shake(el) { if (!el || Store.data.settings.anim === 0) return; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 500); },
-  // PC 기준 위치 표현을 모바일 배치에 맞게 (블록 메뉴·코드 창이 아래에 있음)
-  layoutWords(html) { if (!this.isMobile()) return html; return String(html).replace(/오른쪽 흰 바탕/g, '위쪽 흰 바탕').replace(/왼쪽에 보이는/g, '아래에 보이는').replace(/왼쪽 <b>변수<\/b> 메뉴/g, '아래 <b>변수</b> 메뉴').replace(/오른쪽 코드 창/g, '아래 코드 창').replace(/오른쪽 코드가/g, '아래 코드가').replace(/오른쪽에 파이썬 코드가/g, '아래에 파이썬 코드가'); },
+  // 코치 문구 위치 표현 보정 자리 (v2.4.0: 블록 메뉴 위치 치환은 블록 삭제로 불필요 — 그대로 돌려줌)
+  layoutWords(html) { return html; },
   // 그림 또는 이모지 (IMAGES.md): 파일이 없으면 onerror 로 이모지 span 으로 바뀐다
   img(name, fallback, cls = '') { return `<img class="aimg ${cls}" src="${assetUrl(name)}" alt="" onerror="this.outerHTML='<span class=&quot;${cls}&quot;>${esc(fallback).replace(/'/g, '&#39;')}</span>'">`; },
   // 여러 줄 코드를 인라인 <code>에 <br>로 넣으면 줄마다 네모칸이 생긴다 → 블록 코드로 바꿔 그린다 (v2.2.6 수정)

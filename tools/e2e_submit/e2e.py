@@ -1,4 +1,5 @@
 # tools/e2e_submit/e2e.py — 실제 화면에서 코드·버그 문제(타자 연습 포함)의 정답을 넣고 「✔ 제출하기」 → 클리어 되는지.
+# v2.4.0: vary(변형) 문제는 기본 파라미터로 치환한 정답을 넣는다 (블록→타자 전환으로 L2P3·L2P5·L3P1 이 e2e 범위에 들어옴)
 # 사용: (server.py 를 띄운 뒤) python3 tools/e2e_submit/e2e.py python [L1P1,X3P1]   결과는 tools/.out/e2e_<코스>.json
 import json, sys, time
 from playwright.sync_api import sync_playwright
@@ -16,7 +17,7 @@ with sync_playwright() as p:
         if pg.evaluate("Py.ready"): break
         pg.wait_for_timeout(200)
     print('Py.ready', pg.evaluate("Py.ready"), pg.evaluate("Py.main"), pg.evaluate("Py.error||''"))
-    probs = pg.evaluate("PROBLEMS.concat(Content.allDrills()).filter(p=>['code','bug'].includes(p.type) && !p.quizOnly).map(p=>({id:p.id,type:p.type,lesson:p.lesson,drill:!!p.drill,sol:p.solution||'',bug:p.bug||null,blockOnly:p.type==='code'&&!p.dual&&(p.mode==='block')}))")
+    probs = pg.evaluate("PROBLEMS.concat(Content.allDrills()).filter(p=>['code','bug'].includes(p.type) && !p.quizOnly).map(p=>({id:p.id,type:p.type,lesson:p.lesson,drill:!!p.drill,sol:(p.vary?Content.instantiate(p,Content.defaultParams(p)).solution:p.solution)||'',bug:p.bug||null,blockOnly:p.type==='code'&&!p.dual&&(p.mode==='block')}))")
     for q in probs:
         pid = q['id']
         if ONLY and pid not in ONLY: continue

@@ -11,7 +11,7 @@ const Content = {
     PROBLEMS.forEach(p => {
       if (seen.has(p.id)) warn(`id 중복: ${p.id}`); seen.add(p.id);
       if (!this.lessonMap[p.lesson]) warn(`없는 레슨 참조: ${p.id} → ${p.lesson}`);
-      if (['block','code'].includes(p.type) && !(p.tests && p.tests.length)) warn(`테스트 없는 실행형 문제: ${p.id}`);
+      if (p.type === 'code' && !(p.tests && p.tests.length)) warn(`테스트 없는 실행형 문제: ${p.id}`);
       if (p.type === 'bug' && !(p.bug && p.bug.tests && p.bug.tests.length)) warn(`테스트 없는 버그 문제: ${p.id}`);
       if (!(p.hints && p.hints.length >= 3)) warn(`힌트 3개 미만: ${p.id}`);
       if (!(p.tags && p.tags.length)) warn(`개념 태그 없음: ${p.id}`);
@@ -27,11 +27,6 @@ const Content = {
   tests(p) { return p.type === 'bug' ? (p.bug.tests || []) : (p.tests || []); },
   lessonsOfChapter(ch) { return LESSONS.filter(l => l.ch === ch); },
   orderedLessons() { return LESSONS.slice(); },
-  blocksUpTo(lid) { // 누적 툴박스
-    const out = ['text_print','py_print_many']; const idx = LESSONS.findIndex(l => l.id === lid);
-    for (let i = 0; i <= idx; i++) (LESSONS[i].blocks || []).forEach(b => { if (!out.includes(b)) out.push(b); });
-    return out;
-  },
   // {{식}} 치환. params 없으면 vary 기본값(첫 값)
   defaultParams(p) { const out = {}; if (p.vary) for (const k in p.vary) out[k] = p.vary[k][0]; return out; },
   randomParams(p) { const out = {}; if (p.vary) for (const k in p.vary) { const r = p.vary[k]; out[k] = (r.length === 2 && typeof r[0] === 'number' && typeof r[1] === 'number' && r[1] > r[0] + 1) ? r[0] + Math.floor(Math.random() * (r[1] - r[0] + 1)) : r[Math.floor(Math.random() * r.length)]; } return out; },
@@ -44,37 +39,10 @@ const Content = {
     const expr = () => { let v = term(); while (['+', '-'].includes(peek())) { const op = next(), r = term(); v = op === '+' ? v + r : v - r; } return v; };
     const v = expr(); if (i < toks.length) throw new Error('trailing'); return v;
   },
-  // 블록 문제 따라하기 가이드. 손으로 쓴 guide가 있으면 그것, 없으면 정답 코드 줄에서 자동 생성
-  guideFor(p, mode = 'block') {
-    if (mode === 'text') return this.textGuideFor(p);
+  // 따라하기 가이드: 텍스트(타자)·Parsons. (블록 가이드는 v2.4.0에서 삭제)
+  guideFor(p, mode = 'text') {
     if (mode === 'parsons') return this.parsonsGuideFor(p);
-    const hand = p.guide || (typeof GUIDES !== 'undefined' && GUIDES[p.id]);
-    if (hand) { const params = p.params || {}; const sub = (x) => typeof x !== 'string' ? x : x.replace(/\{\{([^}]+)\}\}/g, (m, e) => { try { return String(this.evalExpr(e, params)); } catch (err) { return m; } }); return hand.map(g => ({ ...g, t: sub(g.t), c: Array.isArray(g.c) ? g.c.map(sub) : sub(g.c) })); }
-    if (p.type !== 'block' || !p.solution) return null;
-    const steps = []; const lines = p.solution.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      const raw = lines[i]; const t = raw.trim(); if (!t) continue;
-      const ind = raw.length - raw.trimStart().length; const inside = ind > 0 ? '위 블록의 <b>안쪽(ㄷ자 안)</b>에 ' : '';
-      let txt = null, cat = null, m;
-      if ((m = t.match(/^print\((.*)\)$/))) { txt = `${inside}<b>출력</b> 블록을 붙이고, 안쪽이 <code>${esc(m[1])}</code> 가 되게 만드세요.`; cat = '출력'; }
-      else if ((m = t.match(/^(\w+) = int\(input\(\)\)$/))) { txt = `<b>변수</b> 메뉴에서 <b>변수 만들기…</b>로 <code>${m[1]}</code> 을 만들고, <b>${m[1]} = 0</b> 블록을 끌어온 뒤 0 자리에 <b>값·계산</b> 메뉴의 <b>숫자로 int( 입력 받기 )</b> 블록을 끼우세요.`; cat = '변수'; }
-      else if ((m = t.match(/^(\w+) = input\(\)$/))) { txt = `변수 <code>${m[1]}</code> 을 만들고 <b>${m[1]} = 0</b> 블록의 0 자리에 <b>출력</b> 메뉴의 <b>입력 받기 input()</b> 블록을 끼우세요.`; cat = '변수'; }
-      else if ((m = t.match(/^(\w+) \+= (.*)$/))) { txt = `${inside}<b>변수</b> 메뉴의 <b>${m[1]} += 1</b> 블록을 붙이세요 (값: <code>${esc(m[2])}</code>).`; cat = '변수'; }
-      else if ((m = t.match(/^(\w+) = (.*)$/))) { txt = `<b>변수</b> 메뉴에서 <b>변수 만들기…</b>로 <code>${m[1]}</code> 을 만들고, <b>${m[1]} = 0</b> 블록을 끌어와 값을 <code>${esc(m[2])}</code> 로 바꾸세요.`; cat = '변수'; }
-      else if ((m = t.match(/^for (\w+) in range\((.*)\):$/))) { txt = `${inside}<b>반복</b> 메뉴의 <b>i 를 1 부터 5 까지 반복</b> 블록을 붙이고 범위를 <code>range(${esc(m[2])})</code> 에 맞게 고치세요. (끝 숫자는 마지막으로 셀 숫자)`; cat = '반복'; }
-      else if ((m = t.match(/^for (\w+) in (\w+):$/))) { txt = `${inside}<b>반복</b> 메뉴의 <b>… 의 각 항목 … 에 대해</b> 블록을 붙이고, 항목 이름을 <code>${m[1]}</code>, 리스트 자리에 <code>${m[2]}</code> 변수 블록을 끼우세요.`; cat = '반복'; }
-      else if ((m = t.match(/^while (.*):$/))) { txt = `${inside}<b>반복</b> 메뉴의 <b>~인 동안 반복</b> 블록을 붙이고 조건을 <code>${esc(m[1])}</code> 로 만드세요.`; cat = '반복'; }
-      else if ((m = t.match(/^if (.*):$/))) { txt = `${inside}<b>조건</b> 메뉴의 <b>만약</b> 블록을 붙이고, 옆 빈칸에 비교 블록으로 <code>${esc(m[1])}</code> 을 만드세요.`; cat = '조건'; }
-      else if ((m = t.match(/^elif (.*):$/))) { txt = `만약 블록의 <b>⚙ 톱니바퀴</b>를 눌러 <b>아니고 만약</b>을 추가하고 조건을 <code>${esc(m[1])}</code> 로 만드세요.`; cat = '조건'; }
-      else if (t === 'else:') { txt = `만약 블록의 <b>⚙ 톱니바퀴</b>를 눌러 <b>아니면</b>을 추가하세요.`; cat = '조건'; }
-      else if ((m = t.match(/^def (\w+)\((.*)\):$/))) { txt = `<b>함수</b> 메뉴의 <b>함수 만들기</b> 블록을 끌어와 이름을 <code>${m[1]}</code> 로 바꾸세요.${m[2] ? ` (⚙로 매개변수 <code>${esc(m[2])}</code> 추가)` : ''}`; cat = '함수'; }
-      else if ((m = t.match(/^return (.*)$/))) { txt = `함수 안에 <b>돌려주기 (return)</b> 블록을 넣고 값을 <code>${esc(m[1])}</code> 로.`; cat = '함수'; }
-      else if ((m = t.match(/^(\w+)\((.*)\)$/))) { txt = `<b>함수</b> 메뉴에 생긴 <b>${m[1]}</b> 부르기 블록을 붙이세요.`; cat = '함수'; }
-      else txt = `${inside}다음 코드가 되도록 블록을 붙이세요: <code>${esc(t)}</code>`;
-      steps.push({ t: txt, c: t, cat, auto: true });
-    }
-    steps.push({ t: '다 만들었으면 <b>▶ 실행</b>으로 결과를 확인하고, <b>✔ 제출하기</b>를 누르세요!' });
-    return steps;
+    return this.textGuideFor(p);
   },
   // 텍스트(타자) 문제 따라하기 가이드: 정답 코드를 한 줄씩 "무슨 뜻인지 + 그대로 치면 되는 코드"로 풀어 준다. 초반 레슨(L0~L5)만.
   TEXT_GUIDE_LESSONS: null, // null = 모든 레슨 (v2.0.1부터). 특정 레슨만 켜려면 ['L0', ...]
@@ -274,7 +242,6 @@ Grader.explainDiff = function (r) {
   }
   if (/input\(["'][^"']+["']\)/.test(r.code || '') && al.length > el.length) tips.push('input("…") 안의 안내문은 출력으로 나가요. 채점에서는 input() 을 비워 두세요.');
   if (r.ptype === 'parsons') tips.push('순서 맞추기: 타일의 순서뿐 아니라 들여쓰기 칸(▸)도 채점돼요. 반복·조건 안에 들어갈 줄은 한 칸 안으로.');
-  else if (r.mode === 'block') tips.push('블록: 반복 안에 들어가야 할 블록이 밖에 있거나, 변수 이름이 다르거나, 출력 블록이 빠지지 않았는지 보세요.');
   return { rows, tips: [...new Set(tips)].slice(0, 3), firstBad };
 };
 
