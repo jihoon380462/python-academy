@@ -1,13 +1,40 @@
 # TODO — 지금 할 일 + 예정
 
-> **새 채팅은 「TODO대로 진행」 한마디로 시작해요.** 이 파일 맨 위 「★ 지금 할 일」을 위에서부터 하나씩 해요. 다 하면 그 칸에 ✅·버전·PR 번호를 적고 다음 칸으로.
-> 읽는 순서: 이 파일 ★절 → `HANDOFF.md` 상태판 → `specs/workflow.md`(모델 권한·PR 규칙) → 맡은 칸이 가리키는 문서.
+> **새 채팅 시작 말 (2026-11-05 저녁 이후)**
+> - **Opus(콘텐츠) 채팅**: 「HANDOFF.md 읽고 TODO 에서 Opus 용 확인해」 → 이 파일 **「Opus 용」 절**을 위에서부터. 한 과제 = 한 브랜치(`content/<과제>`) = PR 하나. core(`core/`·`tools/`·`index.html`·`sw.js`) 는 손대지 않는다.
+> - **Fable(core) 채팅**: 「TODO대로 진행」 → 이 파일 **「Fable 용」 절**을 위에서부터.
+> 다 하면 그 칸에 ✅·버전·PR 번호를 적고 다음 칸으로. 읽는 순서: 이 파일 → `HANDOFF.md` 상태판 → `specs/workflow.md`(모델 권한·PR 규칙) → 맡은 칸이 가리키는 문서.
+> 사용자 결정(11/5 19:00): **콘텐츠(본문·문제·레슨 나누기·수학 콘텐츠)는 Opus, core(엔진·화면·도구·새 코스 뼈대)는 Fable.**
+
+## Opus 용 — 콘텐츠 (위에서부터 하나씩, 상세는 `specs/content-team.md` 3절 표)
+
+| 순서 | 과제 | 상세 위치 | 상태 |
+| --- | --- | --- | --- |
+| O1 | **C10 「풀 수 있나」 맞추기** — `node tools/check_level.mjs` 표에 걸린 파이썬 30·알고 7 문제를 3-2절 규칙대로(본문에 없는 꼴 → 본문에 넣거나 문제 고치기, 합친 문제는 starter 로, 첫 문제는 가장 쉬운 것). 우선 B5P1·B5P2·B7P2·AB5P1·L17·L4·L14·L15P1. 긴 코드 줄 230개 나눠 쓰기, QA-OPEN 파이썬 중 #128~#139·타자 #139·#144 | `specs/content-team.md` C10, `DESIGN.md` 14-2 | 열림 |
+| O2 | **C-T 터미널·Git 채우기** — T0 는 Fable 이 본보기로 완성, T1~T16·TB1~TB3(`draft: true`)의 본문·문제(mission/quiz cmd/fill/parsons) | `specs/content-team.md` C-T 절, `EXPANSION.md` 6절 | 열림 (v2.7.0 뼈대 뒤) |
+| O3 | **C-S 데이터베이스(SQL) 채우기** — S0 본보기, S1~S13·SB1~SB3 본문·문제(sql rows/state, quiz, fill, parsons) + 카페 데이터셋 키우기 | `specs/content-team.md` C-S 절, `EXPANSION.md` 7절 | 열림 (v2.7.0 뼈대 뒤) |
+| O4 | **C-W 웹·HTTP·API 채우기** — W0 본보기, W1~W13·WB1~WB3 본문·문제(web checks, quiz, fill, parsons) | `specs/content-team.md` C-W 절, `EXPANSION.md` 8절 | 열림 (v2.7.0 뼈대 뒤) |
+| O5 | **C11 레슨 나누기 2차** — 파이썬 L1·L2·L4·L5·L9·L13·L17·L19·L20·L21·L18B, 알고 A6·A16·A18·A19 (v2.5.0 방식: 문제 id 유지, 접미 id, `[[레슨:ID]]` 토큰) | `specs/content-team.md` C11, `DESIGN.md` 14-2 v2.5.0 항목 | 열림 |
+| O6 | **C12 수학 「상」 #145~#147 → 수학 「중」** (D4 후순위, 그림 kind 가 새로 필요하면 Fable) | `specs/content-team.md` C12, `QA.md` | 열림 |
+| O7 | C6~C9 (힌트 품질 점검·알고 실전 연습 문제·수학 표기) | `specs/content-team.md` 3절 | 열림 |
+
+Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별 검증(`node tools/check_level.mjs --gate`, 터미널 `node tools/run_shell_solutions.mjs`, SQL `python3 tools/run_sql_solutions.py`, 웹 `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py` 가 통과해야 PR. 버전·stamp 는 올리지 않는다(릴리스 때 Fable). CHANGELOG 「미배포」에 항목 한 줄. 새 레슨·새 문제 type·그림 kind·core 수정은 Fable 에게(HANDOFF 에 메모).
+
+## Fable 용 — core (위에서부터)
+
+| 순서 | 과제 | 상태 |
+| --- | --- | --- |
+| F1 | v2.7.0 릴리스 PR(★4-1 check_level · ★5 core 중 · 코스 플러그인 훅 · 터미널·Git/SQL/웹 뼈대) — 사용자 Merge 대기 | 진행 중 |
+| F2 | Opus 가 새 코스를 채우는 동안 들어오는 core 요청(HANDOFF 「Fable 요청」 줄) 처리, 새 코스 `ready: true` 전환은 콘텐츠가 다 찬 뒤 | 대기 |
+| F3 | 8차 아트(선 아이콘) 납품 검수(IMAGES.md 3-B), 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지) | 대기 |
+| F4 | 수학 M2·M3(EXPANSION 14절) — D4 후순위 | 대기 |
+| F5 | 예정 코스 T1~T8 설계(아래 「예정 코스」 절, GitHub T8 가장 중요) | 대기 |
 
 ## ★ 지금 할 일 (2026-11-05 13:00 정리, 사용자 지시)
 
 ### 0. 지금 상태
 
-- **배포된 버전: v2.5.0** (main, ★2 레슨 나누기). 열린 PR: `release/v2.6.0`(★3 디자인 개편 — 사용자 Merge 대기). 11/5 에 v2.3.19(PR #55~#64 합침)·v2.3.20(L11 난이도)·v2.3.21(기기 연동 팝업)·v2.3.22(폰 코드 가독성)까지 배포.
+- **배포된 버전: v2.6.0** (main, ★3 디자인 개편). 열린 PR: `release/v2.7.0`(★4-1·★5 core 마무리 + 코스 플러그인 훅 + 터미널·Git/SQL/웹 뼈대 — 사용자 Merge 대기). 아래 ★1~★6 은 11/5 낮의 기록이고, **지금 할 일은 위 「Opus 용」·「Fable 용」 표**. 11/5 에 v2.3.19(PR #55~#64 합침)·v2.3.20(L11 난이도)·v2.3.21(기기 연동 팝업)·v2.3.22(폰 코드 가독성)까지 배포.
 - 남은 검수 항목 전체: `QA-OPEN.md`, 상세는 `QA.md` 「릴리스 검수 — 11/5」(#125~#162).
 - 사용자는 지금 **파이썬 L11~L12 를 공부 중**이고, L11(튜플·집합·컴프리헨션)에서 며칠 막혔어요. 아래 1~3이 그 원인을 푸는 일이에요.
 
@@ -59,18 +86,18 @@
 - **아트**: 지금 이미지 90종(보스·뱃지·장식)은 성인용 톤이 아님 → 쓰는 곳을 줄이고, 필요한 것만 IMAGES.md 에 「선 아이콘·단색·추상 도형」 요청서로 다시(ChatGPT 생성 → Claude 검수 흐름 그대로).
 - 순서: ① 색·글꼴·버튼 토큰(CSS 변수) → ② 레슨 화면 배치 → ③ 레슨 목록/지도 → ④ 허브 → ⑤ 게임 요소 정리 → ⑥ 아트 교체. 단계마다 PC·폰 스크린샷을 사용자에게 보여 주고 다음으로.
 
-### 4. 「풀 수 있나」 맞추기 — Opus(콘텐츠) + Fable(도구)
+### 4. 「풀 수 있나」 맞추기 — Opus(콘텐츠) + Fable(도구) — 4-1 ✅ v2.7.0 (`tools/check_level.mjs`), 4-2~4-4 → Opus O1(C10)
 
 1. `tools/check_level.mjs`: 문제마다 ① 정답·힌트 3이 그 시점까지 **본문**(접힌 「더 알아보기」 제외)에서 안 나온 꼴을 쓰나 ② 한 문제가 합치는 새 기능 수 ③ 레슨 첫 문제가 가장 무거운가 → 표로. validate 처럼 게이트에 넣기(DESIGN 14-2절).
 2. 표에서 걸린 문제를 L11 처럼 고치기(쉬운 순서·한 줄만 쓰게·지문에 쓸 줄 콕 집기).
 3. 긴 코드 줄 약 230개(74쪽, L17·X1~X4 많음)를 줄 나눠 쓰기(지금은 상자 안 가로 스크롤).
 4. QA-OPEN 의 파이썬 「중」(#128~#139)·타자 연습 「중」(#139·#144).
 
-### 5. 나머지 `[core]` 「중」 — Fable
+### 5. 나머지 `[core]` 「중」 — Fable — ✅ v2.7.0 (#149 11건·#153~#159·#154 하)
 
 QA #149(복습 고르기 11건) · #153~#159(실행기·편집기·레슨 창) · #154 하. 1~3 작업 중 같은 파일을 만지면 그때 같이.
 
-### 6. 수학 공간 (D4 — 후순위)
+### 6. 수학 공간 (D4 — 후순위) — 콘텐츠(#145~#147·중)는 Opus O6(C12), M2·M3 는 Fable F4
 
 수학 「상」 #145~#147(M5_eigen 절댓값·바늘 그림, M4_ease 문장) → 수학 「중」(11/4 검수: 그림 겹침·점선 잡기·숫자 답 안내·퀴즈 정답 첫 보기) → M2·M3(EXPANSION 14절).
 
