@@ -1,6 +1,6 @@
 # QA팀 지시서 (Opus) — 파이썬 아카데미
 
-읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **main 에 직접 푸시 금지 — 브랜치 `qa/<주제>` 에 올리고 PR(workflow 8절). 버전·stamp·HANDOFF 상태판은 Fable 이 릴리스 때 한다. 배포 권한은 Fable 이상에게만 있다(workflow 1절 권한표).** 권한은 workflow 1절 Opus 열. **core/ 설계는 고치지 않는다** — 발견만 기록하고 "Fable 작업"으로 표시.
+읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **main 은 보호 브랜치 — 브랜치에 올리고 PR, 머지는 사용자(workflow 8절). 권한 구분 없음(11/6, workflow 1절).** 권한은 workflow 1절 Opus 열. **core/ 설계는 고치지 않는다** — 발견만 기록하고 "Fable 작업"으로 표시.
 
 ## 1. 환경과 도구
 

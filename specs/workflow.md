@@ -2,19 +2,11 @@
 
 Claude 요금제의 주간 한도가 "모든 모델"과 "Fable 전용"으로 나뉘어 있다. Fable 한도가 먼저 바닥나지 않도록 **일감을 Opus에게도 나눈다.** 개발 세션은 시작할 때 이 파일을 HANDOFF.md 다음으로 읽는다.
 
-## 1. 모델별 권한 (고정 — 묻지 않는다)
+## 1. 모델별 권한 — **없음** (2026-11-06 사용자 결정: 「권한 전부 없애라」)
 
-개발 세션은 자기가 어떤 모델인지 안다(시스템 안내의 모델 이름). 그 모델의 권한대로 바로 작업한다. 사용자에게 모드를 묻지 않는다.
-
-| | Opus | Fable |
-| --- | --- | --- |
-| 콘텐츠: `courses/*/content.js` 레슨·문제·힌트·코치, `shared/` 문구, `IMAGES.md` | ✅ | ✅ |
-| 문서: `specs/`, HANDOFF·CHANGELOG·DESIGN·NEXT | ✅ | ✅ |
-| 피드백 패치 (스크린샷) | ✅ | ✅ |
-| `core/` 수정 — **과제에 필요하면 무엇이든**(화면·엔진·도구·CSS·새 문제 type·새 그림 kind 포함) | ✅ 커밋에 `[core]` 표시 + DESIGN.md 15절에 「무엇을 왜」 한 줄 + regress 통과 | ✅ |
-| **금지 3가지(둘 다)**: ① 저장 데이터 모양 바꾸기(`core/storage.js`·`core/sync.js` 의 키·구조 — 옛 저장이 깨짐) ② 기존 문제·레슨 **id** 바꾸거나 지우기(진행 기록이 id 로 저장됨) ③ main 직접 푸시 | ❌ | ❌(사용자 결정 뒤에만) |
-| Opus의 `[core]` 커밋 검토 | — | ✅ 4절 체크리스트 |
-| **배포(main 푸시·PR 병합·릴리스 커밋·버전 올림·stamp·HANDOFF 상태판)** | ❌ **없음** — 브랜치에 올리고 PR까지만 | ✅ **Fable 이상만** (Fable 또는 사용자 본인) |
+Opus 든 Fable 이든 **같다**. 콘텐츠·문서·`core/`·`tools/`·버전(`APP_VERSION`)·stamp·CHANGELOG 머리글·HANDOFF 상태판·릴리스 PR — 전부 누구나 한다. 「이건 core 라서」「이건 Fable 작업이라서」 같은 말로 미루지 않는다. 검토는 사용자가 원할 때만.
+유일한 제약은 GitHub 설정(규칙이 아니라 사실): main 은 보호 브랜치라 **PR + `verify` 체크 뒤 사용자가 머지**해야 배포된다.
+알아 둘 사실(금지가 아님): 기존 문제·레슨 id 를 바꾸면 학습자 진행 기록이 그 문제에서 끊기고, `core/storage.js`·`sync.js` 의 저장 모양을 바꾸면 옛 저장을 읽는 코드를 같이 손봐야 한다.
 
 어느 모델로 일을 맡길지는 사용자가 채팅의 모델을 골라서 정한다. 문서는 그 결정을 묻지 않는다.
 
@@ -77,13 +69,7 @@ Fable 세션(엔진·설계·검토·릴리스) 외에 **Opus 채팅 네 개를 
 
 ## 8. 브랜치·PR 규칙 — "먼저 끝낸 쪽이 바로 배포" 금지 (2026-11-02)
 
-**(2026-11-06 사용자 지시) 「core 라서 못 한다」는 말은 없앤다.** core 의 기준은 단 하나 — 위 표의 **금지 3가지**(저장 모양·id·main 직접 푸시)만 아니면 Opus 가 과제에 필요한 core 수정을 직접 한다(`[core]` 커밋 + DESIGN 15절 한 줄 + regress). 너무 커서 못 하겠으면 할 수 있는 데까지 하고 HANDOFF 「Fable 요청」에 남은 것을 적는다 — 멈추고 사용자에게 「Fable 작업」이라고 미루지 않는다.
-
-**(2026-11-06 사용자 지시로 개정) 배포 = main 에 PR 을 병합하는 것 = 사용자만 한다(main 보호: PR 필수 + `verify` 체크).** 릴리스 PR 은 **Opus 도 Fable 도 낸다**:
-- **Opus(콘텐츠) 릴리스 = 패치 버전** `APP_VERSION` x.y.**z+1**(예 2.7.1 → 2.7.2). 절차는 `specs/schedule-week.md` 4절 5번과 같다: 게이트 통과 → `core/config.js` `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 항목을 `## vX.Y.Z — 날짜 (Opus·콘텐츠 릴리스: 과제 이름)` 머리글 아래로 → HANDOFF 0절 상태판 「현재 버전」「마지막 작업」 한 줄 → 브랜치 `release/vX.Y.Z` 로 PR → 사용자에게 보고(버전·들어간 것·확인할 화면). 콘텐츠 과제 브랜치(`content/…`)를 그대로 릴리스 PR 로 올려도 된다(버전 커밋만 더 얹기).
-- **Fable(core) 릴리스 = 마이너 버전** x.**y+1**.0. core 가 바뀌는 PR 만.
-- 둘이 동시에 열려 있으면 나중에 머지되는 쪽이 `origin/main` 을 머지해 버전을 다시 매긴다(validate 가 `?v=` 불일치를 잡는다 → `node tools/stamp.mjs` 다시).
-- 옛 규칙(「APP_VERSION·stamp·HANDOFF 는 Fable 만」)은 폐기. 11/5 저녁 TODO·content-team 에 그 옛 규칙을 다시 적은 것은 Fable 의 실수였다.
+**(2026-11-06) 권한 구분 없음(1절).** 릴리스 PR 은 누구나 낸다: 게이트 통과 → `core/config.js` `APP_VERSION` 올림(콘텐츠만이면 패치 +1, core 가 바뀌면 마이너 +1 — 겹쳐도 상관없음, 나중에 머지되는 쪽이 `origin/main` 머지 뒤 다시 매김) → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 항목을 `## vX.Y.Z — 날짜 (누가·무엇)` 머리글 아래로 → HANDOFF 0절 상태판 한 줄 → `release/vX.Y.Z` PR → 사용자에게 보고. 머지(배포)는 사용자.
 
 1. **브랜치 이름**: `content/<과제>` (예 `content/C4-glossary`), `qa/<날짜-주제>` (예 `qa/1102-round1`), Opus core 작업은 `core/<주제>`. 시작: `git fetch origin && git switch -c content/C4-glossary origin/main`.
 2. **커밋**: 평소대로(`[content]`·`[qa]`·`[core]` 접두). 작업 중엔 CHANGELOG 맨 위 `## 미배포` 절 아래에 항목만 추가(버전 머리글 없이). PROBLEMS.md 표 추가는 OK. **릴리스 PR 을 낼 때**(7절 개정) `APP_VERSION`·stamp·CHANGELOG 머리글·HANDOFF 상태판을 올린다.

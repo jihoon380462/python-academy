@@ -1,6 +1,6 @@
 # 콘텐츠팀 지시서 (Opus) — 파이썬 아카데미
 
-읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **main 에 직접 푸시 금지 — 브랜치 `content/<주제>` 에 올리고 PR(workflow 8절). 과제가 끝나면 Opus 가 패치 릴리스 PR 을 낸다(workflow 7절, 11/6 개정).** 권한: 과제에 필요한 것은 전부 — `courses/*`, `shared/`, 문서, 그리고 **core(`core/`·`tools/`)도 필요하면 직접**(`[core]` 커밋 + DESIGN 15절 한 줄 + regress). **금지는 셋뿐**: 저장 데이터 모양(`core/storage.js`·`sync.js` 키·구조) 바꾸기, 기존 문제·레슨 id 바꾸기·지우기, main 직접 푸시. 너무 큰 core 작업은 할 수 있는 데까지 하고 HANDOFF 「Fable 요청」에 남은 것을 적는다 — 「core 라서 못 한다」고 멈추지 않는다.
+읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **권한 구분 없음(11/6)**: 과제에 필요한 것은 무엇이든(콘텐츠·core·tools·문서·버전·릴리스 PR) 직접 한다. main 은 보호 브랜치라 브랜치 `content/<주제>` 에 올리고 PR → 사용자가 머지. 과제가 끝나면 릴리스 PR 까지(workflow 7절). 알아 둘 사실: 기존 문제·레슨 id 를 바꾸면 그 문제의 진행 기록이 끊긴다.
 
 ## 1. 스키마 (고치지 말고 그대로 쓴다)
 
@@ -46,7 +46,7 @@ C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(�
 
 - 레슨·문제 id 변경, 기존 문제 삭제(진행 데이터가 id로 저장됨). 고칠 땐 내용만.
 - `vary` 범위 밖 값, 테스트에 현재 시각·난수(시드 없는) 의존, 5초 넘게 도는 정답 코드.
-- (11/6 개정) 그림 kind·문제 type 을 새로 만들어도 된다 — `[core]` 커밋, DESIGN 15절 한 줄, validate·regress 에 검사 추가. 기존 kind/type 의 동작을 바꾸면 세 코스 regress 전부 통과해야 한다.
+- (11/6) 그림 kind·문제 type 도 필요하면 새로 만든다(DESIGN 에 한 줄, validate·regress 검사 추가).
 
 ## C-W 웹·HTTP·API 채우기 (v2.7.0 뼈대 · Fable 2026-11-05)
 

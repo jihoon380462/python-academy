@@ -1,10 +1,10 @@
 # TODO — 지금 할 일 + 예정
 
 > **새 채팅 시작 말 (2026-11-05 저녁 이후)**
-> - **Opus(콘텐츠) 채팅**: 「HANDOFF.md 읽고 TODO 에서 Opus 용 확인해」 → 이 파일 **「Opus 용」 절**을 위에서부터. 한 과제 = 한 브랜치(`content/<과제>`) = PR 하나. **과제에 필요하면 core 도 직접 고친다**(`[core]` 커밋 + DESIGN 15절 한 줄 + regress) — 금지는 저장 데이터 모양·기존 id·main 직접 푸시 셋뿐(`specs/workflow.md` 1절 표).
+> - **Opus(콘텐츠) 채팅**: 「HANDOFF.md 읽고 TODO 에서 Opus 용 확인해」 → 이 파일 **「Opus 용」 절**을 위에서부터. 한 과제 = 한 브랜치(`content/<과제>`) = PR 하나. **권한 구분 없음(11/6)** — 과제에 필요한 것은 core 포함 무엇이든 직접(`specs/workflow.md` 1절).
 > - **Fable(core) 채팅**: 「TODO대로 진행」 → 이 파일 **「Fable 용」 절**을 위에서부터.
 > 다 하면 그 칸에 ✅·버전·PR 번호를 적고 다음 칸으로. 읽는 순서: 이 파일 → `HANDOFF.md` 상태판 → `specs/workflow.md`(모델 권한·PR 규칙) → 맡은 칸이 가리키는 문서.
-> 사용자 결정(11/5 19:00): **콘텐츠(본문·문제·레슨 나누기·수학 콘텐츠)는 Opus, core(엔진·화면·도구·새 코스 뼈대)는 Fable.**
+> 사용자 결정(11/5 19:00): 콘텐츠는 Opus 채팅이, core·새 코스 뼈대는 Fable 채팅이 **맡아서 진행**한다(일 나누기일 뿐, 권한 차이는 없음 — 11/6).
 
 ## Opus 용 — 콘텐츠 (위에서부터 하나씩, 상세는 `specs/content-team.md` 3절 표)
 
@@ -18,7 +18,7 @@
 | O6 | **C12 수학 「상」 #145~#147 → 수학 「중」** (D4 후순위, 그림 kind 가 새로 필요하면 Fable) | `specs/content-team.md` C12, `QA.md` | 열림 |
 | O7 | C6~C9 (힌트 품질 점검·알고 실전 연습 문제·수학 표기) | `specs/content-team.md` 3절 | 열림 |
 
-Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별 검증(`node tools/check_level.mjs --gate`, 터미널 `node tools/run_shell_solutions.mjs`, SQL `python3 tools/run_sql_solutions.py`, 웹 `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py` 가 통과해야 PR. 과제가 끝나면 **Opus 가 패치 릴리스 PR 을 직접 낸다**(`APP_VERSION` 2.7.z+1 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 항목을 `## v2.7.z — 날짜 (Opus·콘텐츠 릴리스)` 아래로 → HANDOFF 상태판 한 줄 → `release/v2.7.z` PR). 사용자가 머지하면 배포. Fable 은 core 가 바뀔 때 마이너(2.8.0)로. (11/6 개정 — 「버전은 Fable 만」 옛 규칙 폐기) core 수정도 필요하면 직접(금지 3가지만 빼고). 너무 크면 할 수 있는 데까지 하고 HANDOFF 「Fable 요청」에 남은 것을 적는다.
+Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별 검증(`node tools/check_level.mjs --gate`, 터미널 `node tools/run_shell_solutions.mjs`, SQL `python3 tools/run_sql_solutions.py`, 웹 `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py` 가 통과해야 PR. 과제가 끝나면 **Opus 가 패치 릴리스 PR 을 직접 낸다**(`APP_VERSION` 2.7.z+1 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 항목을 `## v2.7.z — 날짜 (Opus·콘텐츠 릴리스)` 아래로 → HANDOFF 상태판 한 줄 → `release/v2.7.z` PR). 사용자가 머지하면 배포. Fable 은 core 가 바뀔 때 마이너(2.8.0)로. (11/6 개정 — 「버전은 Fable 만」 옛 규칙 폐기) core 수정도 필요하면 직접. 너무 크면 할 수 있는 데까지 하고 HANDOFF 「Fable 요청」에 남은 것을 적는다.
 
 ## Fable 용 — core (위에서부터)
 
