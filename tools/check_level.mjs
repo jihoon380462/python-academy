@@ -157,8 +157,9 @@ export function analyzeCourse(c, seed) {
       const sol = solutionOf(p); const h3 = (p.hints || [])[2] || '';
       const own = new Map([...detect(htmlToText(p.prompt)), ...detect(p.starter || '')]);
       const used = new Map(); for (const [k, v] of detect(sol)) used.set(k, { ...v, src: '정답' }); for (const [k, v] of detect(h3)) if (!used.has(k)) used.set(k, { ...v, src: '힌트3' });
+      const inStarter = detect(p.starter || (p.fill && p.fill.code) || (p.bug && p.bug.code) || ''); /* 빈칸·버그 문제는 주어진 코드가 starter 역할 */ // v2.8.8: starter 에 이미 적힌 기능은 학습자가 치지 않으니 ② 「합친 새 기능」에서 뺀다 (3-2절 「starter 에 대부분을 적어 두고 칠 줄을 콕 집는다」)
       const outside = [], combo = [], where = {};
-      for (const [k, v] of used) { const t = taught.get(k); if (!t) outside.push({ feature: k, inPrompt: own.has(k), src: v.src, line: v.line, text: v.text }); else { where[k] = t; if (t.lesson === l.id && lessonNew.has(k) && !SUB.has(k)) combo.push(k); } }
+      for (const [k, v] of used) { const t = taught.get(k); if (!t) outside.push({ feature: k, inPrompt: own.has(k), src: v.src, line: v.line, text: v.text }); else { where[k] = t; if (t.lesson === l.id && lessonNew.has(k) && !SUB.has(k) && !inStarter.has(k)) combo.push(k); } }
       const row = { lesson: l.id, lessonTitle: l.title, boss: !!l.boss, id: p.id, type: p.type, title: p.title, order: pi, lines: lineCount(sol), features: [...used.keys()].filter(k => !SUB.has(k)).length, outside, combo, first: null, usedList: [...used.keys()], where };
       lessonRows.push(row); rows.push(row);
       // 이 문제의 지문·starter 를 뒤 문제의 「본문」에 더한다 (처음 가르친 곳으로 기록)
