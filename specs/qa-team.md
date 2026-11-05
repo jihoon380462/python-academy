@@ -1,6 +1,6 @@
 # QA팀 지시서 (Opus) — 파이썬 아카데미
 
-읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **main 에 직접 푸시 금지 — 브랜치 `qa/<주제>` 에 올리고 PR(workflow 8절). 버전·stamp·HANDOFF 상태판은 Fable 이 릴리스 때 한다. 배포 권한은 Fable 이상에게만 있다(workflow 1절 권한표).** 권한은 workflow 1절 Opus 열. **core/ 설계는 고치지 않는다** — 발견만 기록하고 "Fable 작업"으로 표시.
+읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **main 은 보호 브랜치 — 브랜치에 올리고 PR, 머지는 사용자(workflow 8절). 권한 구분 없음(11/6, workflow 1절).** 고칠 수 있는 것은 직접 고친다(core 포함) — 못 고치면 QA.md 에 적는다.
 
 ## 1. 환경과 도구
 
@@ -43,6 +43,6 @@
 
 ## 4. 하지 말 것
 
-- `core/*.js` 로직 변경, 새 유형·새 그림 추가, 저장 스키마 변경 → QA.md에 Fable 작업으로.
+- `core/*.js` 로직 변경·새 유형·새 그림도 직접 고쳐도 된다(11/6, 권한 구분 없음). 손이 안 닿으면 QA.md 에 「열림」으로 남긴다.
 - 정답·테스트를 "내 생각에 맞게" 바꾸기 — 반드시 `run_solutions.py`로 재검증하고, 지문·힌트·정답이 서로 맞는지 확인한 뒤 커밋.
 - 버전 올리기·stamp·HANDOFF 상태판: 하지 않는다 — PR 이 병합되면 Fable 이 릴리스 커밋에서 한 번에. QA 수정 커밋은 `qa/<날짜-주제>` 브랜치 → PR.

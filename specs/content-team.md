@@ -1,6 +1,6 @@
 # 콘텐츠팀 지시서 (Opus) — 파이썬 아카데미
 
-읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **main 에 직접 푸시 금지 — 브랜치 `content/<주제>` 에 올리고 PR(workflow 8절). 버전·stamp·HANDOFF 상태판은 Fable 이 릴리스 때 한다. 배포 권한은 Fable 이상에게만 있다(workflow 1절 권한표).** 권한: `courses/*/content.js`, `shared/glossary.js`, PROBLEMS.md·CHANGELOG·HANDOFF. **새 문제 type·새 그림 kind·core/ 수정은 금지**(필요하면 HANDOFF 다음 후보에 "Fable 작업"으로 적는다).
+읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **권한 구분 없음(11/6)**: 과제에 필요한 것은 무엇이든(콘텐츠·core·tools·문서·버전·릴리스 PR) 직접 한다. main 은 보호 브랜치라 브랜치 `content/<주제>` 에 올리고 PR → 사용자가 머지. 과제가 끝나면 릴리스 PR 까지(workflow 7절). 알아 둘 사실: 기존 문제·레슨 id 를 바꾸면 그 문제의 진행 기록이 끊긴다.
 
 ## 1. 스키마 (고치지 말고 그대로 쓴다)
 
@@ -11,7 +11,7 @@
 
 ## 2. 검증·배포 (푸시 전 필수)
 
-`node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` → 통과하면 PROBLEMS.md 표 추가 → CHANGELOG 맨 위 `## 미배포` 절에 항목 추가(버전 머리글 없이) → `[content] C4: …` 커밋 → `git push -u origin content/C4-…` → `gh pr create --base main --fill`. **`APP_VERSION`·stamp·HANDOFF 상태판은 건드리지 않는다**(릴리스 때 Fable). 가능하면 `python3 tools/regress.py`. PR 의 `PR Check` 가 초록이어야 병합된다.
+`node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` → 통과하면 PROBLEMS.md 표 추가 → CHANGELOG 맨 위 `## 미배포` 절에 항목 추가(버전 머리글 없이) → `[content] C4: …` 커밋 → `git push -u origin content/C4-…` → `gh pr create --base main --fill`. **(11/6 개정) 과제가 끝나면 Opus 가 직접 패치 릴리스 PR 을 낸다**(`specs/workflow.md` 7절·`schedule-week.md` 4절 5번: `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG 머리글 → HANDOFF 상태판 → `release/vX.Y.Z` PR → 사용자 머지). ~~`APP_VERSION`·stamp·HANDOFF 상태판은 건드리지 않는다**(릴리스 때 Fable). 가능하면 `python3 tools/regress.py`. PR 의 `PR Check` 가 초록이어야 병합된다.
 
 ## 3. 과제 목록 (위에서부터, 하나씩 배포)
 
@@ -46,7 +46,7 @@ C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(�
 
 - 레슨·문제 id 변경, 기존 문제 삭제(진행 데이터가 id로 저장됨). 고칠 땐 내용만.
 - `vary` 범위 밖 값, 테스트에 현재 시각·난수(시드 없는) 의존, 5초 넘게 도는 정답 코드.
-- 그림 kind 새로 쓰기 / 문제 type 새로 쓰기 — Fable 작업.
+- (11/6) 그림 kind·문제 type 도 필요하면 새로 만든다(DESIGN 에 한 줄, validate·regress 검사 추가).
 
 ## C-W 웹·HTTP·API 채우기 (v2.7.0 뼈대 · Fable 2026-11-05)
 
@@ -170,7 +170,7 @@ C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(�
 5. `CONFIG.COURSES` 의 web 항목: 다 차면 `preview:true` 를 지우고 `ready:true, total:문제수, lessons:레슨수` 로(값만).
 
 ### 하지 말 것
-- core(`core/*.js`, `core/ui.css`)·`tools/validate/web.mjs`·`tools/run_web_solutions.py`·`tools/regress.py` 수정 — 검사 키가 모자라면(예: `hover`, 스크롤) Fable 에게 core 요청.
+- 검사 키가 모자라면(예: `hover`, 스크롤) `core/runners/web.js` `Web.check` 에 직접 추가해도 된다(`[core]` 커밋 + `tools/validate/web.mjs` 키 목록 + `Web.CHECK_DOC` + regress 검사 1개).
 - id 규칙 밖 id(`W<n>`·`WB<n>`·`W<n>P<m>`·`WB<n>P<m>` 만), 기존 id 변경, W0 문제 삭제.
 - `draft: true` 를 지우기 전에 pages 가 비어 있거나 `TODO` 가 남은 채 두기. 보스는 `pages:[]` 가 정상.
 - checks 한 항목에 검사 키 두 개(첫 것만 적용되고 경고), `text` 를 글자 비교로 쓰기(`equals`), `api.failRate`(무작위) 로 채점.
@@ -267,7 +267,7 @@ python3 tools/regress.py                 # 브라우저 회귀(terminal-git 절 
 ```
 
 ### C-T.6 하지 말 것
-- `core/`·`tools/validate_content.mjs`·`tools/run_solutions.py` 수정 금지(명령이 부족하면 "이 연습 터미널에서는 지원하지 않아요" 로 돌려 쓰고, 꼭 필요하면 Fable 에게 요청).
+- 셸 명령이 부족하면 `core/runners/shell.js` 에 추가해도 된다(`[core]` 커밋 + `tools/test_shell.mjs` 에 케이스 + DESIGN 15절 한 줄). 급하면 "이 연습 터미널에서는 지원하지 않아요" 로 돌려 쓰고 HANDOFF 「Fable 요청」에 적는다.
 - 셸이 모르는 명령·옵션을 정답/예제에 쓰지 않기. `edit 파일` 만 적은 solution 은 Node 에서 안 돌아간다(`edit 파일 "내용"`).
 - 문제 데이터에 함수·정규식 넣지 않기. `vary` 없음. `tests` 는 parsons 에만.
 - 레슨·문제 id 변경 금지, T0·TB1P1 수정 금지, 채운 레슨은 `draft` 를 지우고 아직인 레슨은 두기. 레슨을 다 채우면 `core/config.js` 의 COURSES 항목(`preview` → `ready·total·lessons`)은 Fable 이 바꾼다.
@@ -357,7 +357,7 @@ python3 tools/regress.py                 # 브라우저 회귀(terminal-git 절 
 
 ### 하지 말 것
 
-- `core/`·`tools/validate/sql.mjs`·`tools/run_sql_solutions.py` 수정 금지(필요하면 HANDOFF 「Fable 작업」). 새 문제 type·새 example kind 금지.
+- core(`core/runners/sql.js`·`core/ui-views-sql.js`)·`tools/validate/sql.mjs`·`tools/run_sql_solutions.py` 도 필요하면 직접 고친다(`[core]` 커밋 + regress). 새 문제 type·example kind 도 같은 조건으로 가능.
 - id 규칙 `S0`·`SB1`·`S0P1`(CONFIG.COURSE_ID_PATTERNS). 기존 S0 문제 id 는 바꾸지 않는다.
 - 레슨을 채우면 `draft: true` 를 **지운다**(안 지우면 「준비 중」으로 잠긴 채 남는다). 다 채우면 `CONFIG.COURSES[].sql` 의 `preview` 를 지우고 `ready: true, total, lessons` 로(값만).
 - `[[용어]]` 는 레슨 `terms` 나 `shared/glossary.js` 에 있어야 한다. `quiz.why` 에 HTML 금지. 힌트 정확히 3개.
