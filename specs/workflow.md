@@ -5,7 +5,7 @@ Claude 요금제의 주간 한도가 "모든 모델"과 "Fable 전용"으로 나
 ## 1. 모델별 권한 — **없음** (2026-11-06 사용자 결정: 「권한 전부 없애라」)
 
 Opus 든 Fable 이든 **같다**. 콘텐츠·문서·`core/`·`tools/`·버전(`APP_VERSION`)·stamp·CHANGELOG 머리글·HANDOFF 상태판·릴리스 PR — 전부 누구나 한다. 「이건 core 라서」「이건 Fable 작업이라서」 같은 말로 미루지 않는다. 검토는 사용자가 원할 때만.
-유일한 제약은 GitHub 설정(규칙이 아니라 사실): main 은 보호 브랜치라 **PR + `verify` 체크 뒤 사용자가 머지**해야 배포된다.
+유일한 제약은 GitHub 설정(규칙이 아니라 사실): main 은 보호 브랜치라 **PR + `verify` 체크(초록) 뒤 머지**해야 배포된다. **(2026-11-06 사용자 지시) 머지도 채팅이 직접 한다** — `verify` 초록 + 로컬 QA 를 확인한 뒤 `gh api -X PUT repos/jihoon380462/python-academy/pulls/<번호>/merge -f merge_method=merge`. 화면이 바뀌는 PR 은 **버전(APP_VERSION + `node tools/stamp.mjs`)을 같이 올려야** 폰 캐시가 갱신된다(v2.7.1 교훈).
 알아 둘 사실(금지가 아님): 기존 문제·레슨 id 를 바꾸면 학습자 진행 기록이 그 문제에서 끊기고, `core/storage.js`·`sync.js` 의 저장 모양을 바꾸면 옛 저장을 읽는 코드를 같이 손봐야 한다.
 
 어느 모델로 일을 맡길지는 사용자가 채팅의 모델을 골라서 정한다. 문서는 그 결정을 묻지 않는다.
