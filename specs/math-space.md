@@ -162,7 +162,7 @@ M1은 이 25개 노드로 시작하고, 노드당 문제 3~5개(총 90개 안팎
 | 항목 | 지금 있는 것 | 수학 공간에서 |
 | --- | --- | --- |
 | 코스 등록 | `CONFIG.COURSES` 평면 목록, 허브 카드 | `courses/math/`를 같은 방식으로 추가하되 `space:true`로 표시해 허브에서 코스 카드와 구분된 구역에 그린다. 허브 탭 UI는 만들지 않는다 |
-| 노드 = 레슨 | 레슨 스키마 `{id, ch, n, title, minutes, mode, terms, pages[{title, html, example}], summary}` | **노드는 레슨 스키마를 그대로 쓴다**(`ch` = 영역 1~6). 추가 필드: `prereq:[]`, `stars`, `uses:[]`, `params:[]`, `figure:{}`, `formula:[]`, `level`. `pages[0]`에 `figure`가 있으면 첫 화면이 그림. 엔진의 레슨 렌더·요약·용어·모르겠어요가 그대로 동작한다 |
+| 노드 = 레슨 | 레슨 스키마 `{id, ch, n, title, mode, terms, pages[{title, html, example}], summary}` | **노드는 레슨 스키마를 그대로 쓴다**(`ch` = 영역 1~6). 추가 필드: `prereq:[]`, `stars`, `uses:[]`, `params:[]`, `figure:{}`, `formula:[]`, `level`. `pages[0]`에 `figure`가 있으면 첫 화면이 그림. 엔진의 레슨 렌더·요약·용어·모르겠어요가 그대로 동작한다 |
 | 지도 | 챕터별 세로 지도(`CHAPTERS`, `MAP_DECOR`) | `course.json`에 `"map":"graph"`를 두면 지식 지도 레이아웃(노드 + `prereq` 선, 영역별 색). 잠금 규칙은 챕터 보스 대신 `prereq` 완료 |
 | 시각화 | `core/visualize.js`는 **추적 스냅샷 기반**(`Viz.player`, `Viz.runAndShow`, kind 8종) | 수학 그림은 **파라미터 기반**: `Viz.figure(host, spec, params)`를 새로 두고 JS만으로 즉시 그린다(슬라이더 응답에 Pyodide 왕복 없음). `fn` 문자열은 JS 식으로 평가(`x`, 파라미터 id만 허용). 코드 탭의 재실행·문제 채점만 Pyodide. 추적 기반 그림(예: 갈턴 보드 단계)은 기존 `Viz.player` 재사용 |
 | 슬라이더 | `example.slider:{var,min,max,step}` 하나 | `params[]`의 각 항목이 같은 모양. 노드의 `params`가 있으면 `pages[].example`에 자동 연결(코드의 `var = 값` 줄 치환 → 재실행) |

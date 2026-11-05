@@ -4,7 +4,7 @@
 
 ## 1. 스키마 (고치지 말고 그대로 쓴다)
 
-- 파이썬·알고리즘: `courses/python/content.js` 맨 위 주석 + `courses/algo/content.js` 맨 위 주석. 레슨 `{id, ch, n, title, minutes, mode, terms, pages[{title, html, example}], summary}` · 문제 `type: quiz|fill|bug|parsons|block|code` (+ 알고 `kind`, `tests[{call,ret}|{input,output}]`, `visualize`, `limits`).
+- 파이썬·알고리즘: `courses/python/content.js` 맨 위 주석 + `courses/algo/content.js` 맨 위 주석. 레슨 `{id, ch, n, title, mode, terms, pages[{title, html, example}], summary}` · 문제 `type: quiz|fill|bug|parsons|block|code` (+ 알고 `kind`, `tests[{call,ret}|{input,output}]`, `visualize`, `limits`).
 - 수학: `courses/math/content.js` 맨 위 주석. 노드 = 레슨 + `subtitle/level/stars/prereq/star/icon/params[]`, `pages[0].figure`(필수, kind는 `core/figure.js` 주석의 16종만) · `observe` 2~3 · `pages[1].formula/example`. 문제 `quiz kind:'explore' requireInteract` · `num answer:{value,tol,unit,why}`+solution · `match` · `pair` · `code`.
 - 규칙: 문제마다 힌트 **정확히 3개**(방향 → 구체 → 거의 정답), 태그 1개 이상(코스의 `WEAKNESS_TAGS` 안에서), 실행형은 테스트 ≥ 4(경계값 포함, 마지막 1개는 숨김), 보스 ≥ 5. `[[용어]]`는 레슨 `terms` 나 `shared/glossary.js`에 있어야 한다. 정답 코드는 CPython으로 돌려 통과해야 한다(`run_solutions.py`). 말투 ~해요체, 초보 기준 비유 먼저.
 - 추가 위치: 파일 **끝에** `LESSONS.push(...)`, `PROBLEMS.push(...)`(파이썬·알고리즘) / 수학은 배열 안에 영역별로. `CONFIG.COURSES[].total/lessons`(core/config.js의 숫자 두 개)는 **콘텐츠 수와 같아야 validate가 통과** — 이 숫자 수정은 허용(값만).

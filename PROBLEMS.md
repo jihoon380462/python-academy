@@ -398,7 +398,7 @@
 
 난이도·범위(C9 기준): M3_sample 은 고교 확률과 통계의 「통계적 추정」이라 `고2`(EXPANSION 표의 ★ 대신), M4_ease 는 중학 수학만으로 되는 프로그래머 수학이라 `고1`, 외적·역행렬·고유값은 고교 밖이라 `대학 ★`.
 
-## v2.5.0 추가 — 레슨 나누기(TODO ★2, 사용자 결정 D6: 한 레슨 = 개념 하나~둘) — 새 문제 21개
+## v2.5.0 추가 — 레슨 나누기(TODO ★2, 사용자 결정 D6: 한 레슨 = 개념 하나~둘) — 새 문제 22개
 
 레슨 7개를 17개로: L3→L3·L3B, L7→L7·L7B, L10→L10·L10B, L11→L11·L11B·L11C, L12→L12·L12B·L12C, L16→L16·L16B, L18→L18·L18B. 기존 문제는 id 그대로 lesson 만 옮김(진행 기록 유지). 레슨 id 는 알파벳 접미(L3B)를 허용하고 그 레슨의 새 문제 id 는 L3BP1 처럼 씀.
 
@@ -425,6 +425,7 @@
 | L16BP1 | L16B 날짜: datetime 맛보기 | quiz | weekday 숫자 |
 | L16BP2 | L16B 날짜: datetime 맛보기 | code | 며칠 뒤 |
 | L18BP1 | L18B map·filter·enumerate·zip | code | 번호 붙여 출력 |
+| L18BP2 | L18B map·filter·enumerate·zip | code | 이름과 점수 짝짓기 |
 
 레슨별 문제(순서 = 쉬운 것 → 합친 것):
 
@@ -443,4 +444,4 @@
 - L16 모듈과 random (6쪽): L16P3(fill) → L16P2(quiz) → L16P1(code) → L16P4(code)
 - L16B 날짜: datetime 맛보기 (3쪽): L16BP1(quiz) → L16BP2(code) → L16P5(code)
 - L18 람다와 정렬 기준 (3쪽): L18P2(quiz) → L18P1(code) → L18P5(code)
-- L18B map·filter·enumerate·zip (5쪽): L18P3(fill) → L18P4(code) → L18BP1(code)
+- L18B map·filter·enumerate·zip (5쪽): L18P3(fill) → L18P4(code) → L18BP1(code) → L18BP2(code)
