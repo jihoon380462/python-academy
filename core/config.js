@@ -2,7 +2,7 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.6.0',
+  APP_VERSION: '2.7.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)

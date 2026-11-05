@@ -3,9 +3,16 @@
 배포한 버전마다 한 항목. 형식: `## vX.Y.Z — YYYY-MM-DD` + 바뀐 것(사용자가 보는 변화 → 내부 변화 순). 배포 커밋에 HANDOFF.md 상태판과 함께 포함한다.
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
+
+## v2.7.0 — 2026-11-05 (Fable: release/v2.7.0 — core 마무리 · 코스 플러그인 훅 · 터미널·Git/SQL/웹 뼈대)
 - 🧰 (TODO ★4-1, Fable) **`tools/check_level.mjs` 레슨 수준 검사 도구**: 문제마다 ① 정답·힌트 3이 그 레슨까지 본문(접힌 「더 알아보기」 제외)에 안 나온 꼴을 쓰는지 ② 한 문제가 합치는 새 기능 수 ③ 레슨 첫 문제가 가장 무거운지 → 표(`--course`·`--lesson L11` 근거·`--json`). 래칫 게이트(`--gate`, `tools/check_level.baseline.json` 보다 늘면 실패)로 CI 에 연결. 현재 파이썬 30·알고 7 걸림 → Opus 과제 C10(specs/content-team.md).
 - 🔁 (TODO ★5, QA #149 `[core]`) **복습 고르기 11건**: 날 된 문제가 약점에 밀리지 않게(묶음 순서: 날 된 것 전부 → 모자랄 때 약점) · 「더 복습하기」는 날 안 된 클리어 문제에서(모자라면 날 된 것) · 복습에서 연달아 한 번에 맞히면 약점 점수가 반씩 줄어듦(`rec.reviewOk`) · 「다시 고르기」가 실제로 바뀜 · 범위 「전체 해제」= 0개(안내문) · 두 모드 범위 분리 · 타임어택·도전의 별·XP 는 평생 힌트 기준(`max(이번, 누적)`) · 끝 요약 창은 폰 「아주 크게」에서도 버튼이 화면 안(모달 공통 높이 제한·본문 스크롤) · 라이트 대비 5.4:1 · 하루 보너스 날짜 바뀌면 다시 · 약점 분석 「가장 약한 개념 복습」은 정답률 낮은 주제부터.
 - ⌨ (TODO ★5, QA #155~#159·#154 `[core]`) **실행기·편집기·레슨 창**: 레슨 창이 열린 동안 뒤 문제 화면 단축키 차단 · 기본 편집기 Tab/Enter/⌫/⇤ 가 실행 취소(Ctrl+Z) 기록을 지키게(`execCommand`, 폴백 유지) · 수학 레슨 창에 상황 글·정적 그림·식 · 「들여쓰기 n칸」이 마지막 줄을 안 가림 · 칸 수 표시 갱신, 수정키+⌫ 는 브라우저 기본, 한글 조합 중 무시, 괄호 안 이어 쓰는 줄·공백 줄은 빨강 제외 · 가로 폰 창 제목 · 모달 Esc(맨 위 것)·닫으면 포커스 복원 · 메인 실행기 출력 상한을 글자 수로, 상한 예외 `EIO`, 「엔진 준비…」 뒤 출력 안 붙음, ⏹ 멈추기를 놀이터·레슨 예제·수학에도 · 가짜 Pyodide(e2e)가 stdout/stderr 순서 흉내 · terminal-git 코스 `Py is not defined` 가드.
+- 🧱 **새 코스 뼈대 3개 — 터미널·Git / 데이터베이스(SQL) / 웹·HTTP·API** (허브 카드 「준비 중 · 미리보기 열림」, 레슨 0만 완성본, 나머지 레슨은 「준비 중」). 본문·문제는 Opus 과제 C-T·C-S·C-W(specs/content-team.md).
+  - 터미널·Git: 문제 유형 `mission`(검은 터미널 창 + 파일 트리 + Git 이면 3칸 상태 뷰·커밋 그래프 + 목표 체크리스트 실시간 ✓ + 「처음부터」 + `edit` 모달), `quiz kind:'cmd'`·`fill`·`parsons`(명령 순서), 레슨 예제 `example.shell`(한 줄씩 실행). 검증 `tools/run_shell_solutions.mjs`(셸 시뮬레이터로 정답 명령 실행). T0 4쪽·문제 4, TB1 보스 미션.
+  - SQL: `core/runners/sql.js`(sql.js 1.13 CDN, 없으면 「엔진을 받지 못했어요」 안내), 문제 유형 `sql`(편집기·▶ 실행·결과 표 정렬/페이지·스키마 패널·데이터 초기화; 채점 rows/state, 실패 시 기대/내 결과 표 비교·행 수 힌트·에러 한국어 풀이), 카페 데이터셋(`courses/sql/datasets.js`, `tools/gen_sql_dataset.py --full` 로 키움). 검증 `tools/run_sql_solutions.py`(Python sqlite3). S0 4쪽·문제 4.
+  - 웹: `core/runners/web.js`(iframe srcdoc 샌드박스, console/alert 출력창, **가짜 API 서버** `https://api.academy.local` todos/menu/orders/weather/login, 네트워크 탭), 문제 유형 `web`(HTML/CSS/JS 탭 + 미리보기 폰/PC + 자동 갱신 + 체크리스트 채점·실패 항목 강조·free 문제). 검증 `tools/run_web_solutions.py`(Playwright). W0 4쪽·문제 4.
+  - 공통: `tools/validate/<코스>.mjs` 규칙, regress 절 3개(55검사), `TextEditor` `lang` 옵션(sql·html·css·js 는 파이썬 들여쓰기 규칙·빠른 키 끔, CodeMirror 언어 모듈 지연 로드), `CONFIG.XP` mission/sql/web 25, `run_solutions.py` 는 다른 러너를 건너뜀.
 - 🔌 (사용자 결정 11/5 「뼈대는 Fable, 살은 Opus」) **코스 플러그인 훅**(DESIGN 16절): `UI.modes[type]`(문제 유형 플러그인)·`UI.examples[kind]`(레슨 예제 플러그인)·레슨 `draft: true`(「준비 중」)·허브 `preview: true`(잠금 없이 열림)·`tools/validate/<코스>.mjs` 코스별 검증 훅·id 규칙 sql/web.
 
 ## v2.6.0 — 2026-11-05 (Fable: release/v2.6.0 — 디자인 개편 ①~⑥ · 게임 요소 기본 숨김 · TODO ★3)
