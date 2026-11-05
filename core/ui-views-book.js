@@ -40,7 +40,7 @@
       ${chs.map(ch => `<section class="bk-ch"><h2 class="bk-ch-h"><span class="bk-ch-n">${String(ch).padStart(2, '0')}</span>${esc(chName(ch))}</h2><div class="bk-list">${lessonsOf(ch).map(l => { const tk = tasksOf(l).length; return `<button class="bk-l ${l.boss ? 'boss' : ''}" data-l="${l.id}"><span class="bk-l-n">${l.boss ? '🛠' : esc(String(l.n ?? ''))}</span><span class="bk-l-t">${esc(l.boss ? l.title.replace(/^보스:\s*/, '만들어 보기: ') : l.title)}<span class="bk-l-sub muted">${l.boss ? '챕터를 묶는 큰 문제' : `설명 ${(l.pages || []).length}쪽${tk ? ` · 만들어 보기 ${tk}개` : ''}`}</span></span>${readOf(l.id) ? '<span class="bk-done">✓</span>' : ''}<span class="bk-go">›</span></button>`; }).join('')}</div></section>`).join('')}
     </div>`;
     $$('[data-sp]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: SETUP_ID, page: +b.dataset.sp }));
-    $$('[data-l]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.l, page: (d.lessons[b.dataset.l] || {}).page || 0 }));
+    $$('[data-l]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.l, page: 0 })); /* v2.9.1 사용자 「왜 1번부터가 아니라 이상한 곳부터」: 예전 문제집 화면이 남긴 쪽 번호(요약 쪽 = 마지막+1)로 열리던 것 — 목차에서는 늘 1쪽부터 */
   };
 
   // ---------- 레슨: 설명 쪽들 + 마지막 「만들어 보기」 ----------
