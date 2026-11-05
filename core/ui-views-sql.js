@@ -105,6 +105,7 @@ const SqlUI = {
     const okTitle = `✓ 기대한 결과와 같아요 · ${state ? `표 ${esc(ex.table)} 의 상태 일치 · ${M.length}행` : `${M.length}행${ordered ? ' · 순서까지 일치' : ''}`}`; return { ok: true, detail: `<div class="sql-ok"><b>${okTitle}</b></div>`, okTitle, mine: mineR, expected: expR };
   },
   markRows(Es, Ms) { const n = Math.max(Es.length, Ms.length); const e = [], m = []; for (let i = 0; i < n; i++) { const a = Es[i] ? Es[i].r : null, b = Ms[i] ? Ms[i].r : null; const w = Math.max(a ? a.length : 0, b ? b.length : 0); const er = [], mr = []; for (let j = 0; j < w; j++) { const diff = !a || !b || this.key(a[j]) !== this.key(b[j]); er.push(diff); mr.push(diff); } e.push(er); m.push(mr); } return { e, m }; },
+  // 「기대한 결과」 표는 결과(값)를 그대로 보여 준다 — 쿼리가 아니라 결과라 정답 노출이 아님, 사용자 결정 11/6 (TODO F2)
   fail(p, why, expView, mineView, mark, note) { const id = 'sqd' + uid(); const html = `<div class="sql-fail-why">${why}</div><div class="sql-diff" id="${id}"><div class="sql-diff-col"><div class="sql-diff-h">기대한 결과</div><div class="sql-diff-t" data-side="e"></div></div><div class="sql-diff-col"><div class="sql-diff-h">내 결과</div><div class="sql-diff-t" data-side="m"></div></div></div><div class="muted small">${mark ? (note || '(행 순서를 무시하는 문제라 양쪽을 정렬해서 비교했어요. 빨간 칸이 다른 곳이에요.)') : ''}</div>`; setTimeout(() => { const box = document.getElementById(id); if (!box) return; this.table($('[data-side=e]', box), expView, { mark: mark && mark.e }); this.table($('[data-side=m]', box), mineView, { mark: mark && mark.m }); }, 0); return { ok: false, msg: html }; },
 };
 
