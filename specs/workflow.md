@@ -11,8 +11,8 @@ Claude 요금제의 주간 한도가 "모든 모델"과 "Fable 전용"으로 나
 | 콘텐츠: `courses/*/content.js` 레슨·문제·힌트·코치, `shared/` 문구, `IMAGES.md` | ✅ | ✅ |
 | 문서: `specs/`, HANDOFF·CHANGELOG·DESIGN·NEXT | ✅ | ✅ |
 | 피드백 패치 (스크린샷) | ✅ | ✅ |
-| `core/` 수정 — 지시서(NEXT.md·EXPANSION.md·specs/)에 **파일과 단계가 적힌 것** | ✅ 커밋에 `[core]` 표시 | ✅ |
-| `core/` 수정 — 지시서에 없는 새 설계 (새 러너·새 시각화 엔진·새 문제 type·저장 스키마 변경) | ❌ 멈추고 사용자에게 "Fable 작업"이라고 알림 | ✅ |
+| `core/` 수정 — **과제에 필요하면 무엇이든**(화면·엔진·도구·CSS·새 문제 type·새 그림 kind 포함) | ✅ 커밋에 `[core]` 표시 + DESIGN.md 15절에 「무엇을 왜」 한 줄 + regress 통과 | ✅ |
+| **금지 3가지(둘 다)**: ① 저장 데이터 모양 바꾸기(`core/storage.js`·`core/sync.js` 의 키·구조 — 옛 저장이 깨짐) ② 기존 문제·레슨 **id** 바꾸거나 지우기(진행 기록이 id 로 저장됨) ③ main 직접 푸시 | ❌ | ❌(사용자 결정 뒤에만) |
 | Opus의 `[core]` 커밋 검토 | — | ✅ 4절 체크리스트 |
 | **배포(main 푸시·PR 병합·릴리스 커밋·버전 올림·stamp·HANDOFF 상태판)** | ❌ **없음** — 브랜치에 올리고 PR까지만 | ✅ **Fable 이상만** (Fable 또는 사용자 본인) |
 
@@ -77,6 +77,8 @@ Fable 세션(엔진·설계·검토·릴리스) 외에 **Opus 채팅 네 개를 
 
 ## 8. 브랜치·PR 규칙 — "먼저 끝낸 쪽이 바로 배포" 금지 (2026-11-02)
 
+**(2026-11-06 사용자 지시) 「core 라서 못 한다」는 말은 없앤다.** core 의 기준은 단 하나 — 위 표의 **금지 3가지**(저장 모양·id·main 직접 푸시)만 아니면 Opus 가 과제에 필요한 core 수정을 직접 한다(`[core]` 커밋 + DESIGN 15절 한 줄 + regress). 너무 커서 못 하겠으면 할 수 있는 데까지 하고 HANDOFF 「Fable 요청」에 남은 것을 적는다 — 멈추고 사용자에게 「Fable 작업」이라고 미루지 않는다.
+
 **(2026-11-06 사용자 지시로 개정) 배포 = main 에 PR 을 병합하는 것 = 사용자만 한다(main 보호: PR 필수 + `verify` 체크).** 릴리스 PR 은 **Opus 도 Fable 도 낸다**:
 - **Opus(콘텐츠) 릴리스 = 패치 버전** `APP_VERSION` x.y.**z+1**(예 2.7.1 → 2.7.2). 절차는 `specs/schedule-week.md` 4절 5번과 같다: 게이트 통과 → `core/config.js` `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 항목을 `## vX.Y.Z — 날짜 (Opus·콘텐츠 릴리스: 과제 이름)` 머리글 아래로 → HANDOFF 0절 상태판 「현재 버전」「마지막 작업」 한 줄 → 브랜치 `release/vX.Y.Z` 로 PR → 사용자에게 보고(버전·들어간 것·확인할 화면). 콘텐츠 과제 브랜치(`content/…`)를 그대로 릴리스 PR 로 올려도 된다(버전 커밋만 더 얹기).
 - **Fable(core) 릴리스 = 마이너 버전** x.**y+1**.0. core 가 바뀌는 PR 만.
@@ -84,10 +86,10 @@ Fable 세션(엔진·설계·검토·릴리스) 외에 **Opus 채팅 네 개를 
 - 옛 규칙(「APP_VERSION·stamp·HANDOFF 는 Fable 만」)은 폐기. 11/5 저녁 TODO·content-team 에 그 옛 규칙을 다시 적은 것은 Fable 의 실수였다.
 
 1. **브랜치 이름**: `content/<과제>` (예 `content/C4-glossary`), `qa/<날짜-주제>` (예 `qa/1102-round1`), Opus core 작업은 `core/<주제>`. 시작: `git fetch origin && git switch -c content/C4-glossary origin/main`.
-2. **커밋**: 평소대로(`[content]`·`[qa]`·`[core]` 접두). **`APP_VERSION`·`sw.js`·HTML `?v=`·HANDOFF 상태판은 손대지 않는다.** CHANGELOG 는 맨 위 `## 미배포` 절 아래에 항목만 추가한다(버전 머리글 없이). PROBLEMS.md 표 추가는 OK.
+2. **커밋**: 평소대로(`[content]`·`[qa]`·`[core]` 접두). 작업 중엔 CHANGELOG 맨 위 `## 미배포` 절 아래에 항목만 추가(버전 머리글 없이). PROBLEMS.md 표 추가는 OK. **릴리스 PR 을 낼 때**(7절 개정) `APP_VERSION`·stamp·CHANGELOG 머리글·HANDOFF 상태판을 올린다.
 3. **PR 열기**: `git push -u origin <브랜치>` → `gh pr create --base main --fill` (제목 = 커밋 요약, 본문에 바뀐 것·확인한 화면·검증 결과). 열면 `PR Check`(`.github/workflows/ci.yml`: validate·run_solutions·test_shell·regress)가 자동으로 돈다. 빨간 PR 은 고쳐서 다시 푸시한다(같은 브랜치에 푸시하면 PR 이 갱신됨).
 4. **main 이 앞서 나갔으면** `git fetch origin && git rebase origin/main` 뒤 `git push --force-with-lease`. 충돌은 자기 브랜치에서 푼다. 같은 `courses/<id>/content.js` 끝에 두 팀이 `push`를 추가했으면 둘 다 남기는 쪽으로 합친다.
-5. **병합·릴리스(Fable)**: `gh pr list` → 4절 체크리스트로 검토 → `gh pr merge <번호> --squash --delete-branch` → main 에서 **릴리스 커밋 한 번**: `APP_VERSION` 패치/마이너 올림 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 를 `## vX.Y.Z — 날짜` 로 바꿈 → HANDOFF 상태판 → 푸시 → 배포 확인. 여러 PR 을 한 릴리스로 묶어도 된다.
+5. **병합(사용자)·릴리스 PR(Opus 패치 / Fable 마이너, 7절)**. (옛 절차) `gh pr list` → 4절 체크리스트로 검토 → `gh pr merge <번호> --squash --delete-branch` → main 에서 **릴리스 커밋 한 번**: `APP_VERSION` 패치/마이너 올림 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 를 `## vX.Y.Z — 날짜` 로 바꿈 → HANDOFF 상태판 → 푸시 → 배포 확인. 여러 PR 을 한 릴리스로 묶어도 된다.
 6. **브랜치 보호(사용자가 GitHub 에서 한 번 설정)**: 저장소 페이지 → **Settings** 탭 → 왼쪽 **Branches** → **Add branch ruleset**(또는 Add classic branch protection rule) → Branch name pattern `main` → 체크: **Require a pull request before merging**(승인 수 0 이어도 됨), **Require status checks to pass before merging** → 검색창에 `verify` 입력해 선택, **Do not allow bypassing the above settings** 는 끈 채로 → Create. 이렇게 하면 팀 채팅이 실수로 `git push origin main` 해도 거부된다. (이 설정은 API 로 못 하고 소유자가 UI 에서 해야 한다.)
 7. **예외**: 아트 납품(ChatGPT) 커밋은 `assets/img/`·IMAGES.md·버전만 바꾸므로 지금처럼 main 직접 푸시 허용 — 단 다른 PR 과 `APP_VERSION` 이 겹치지 않게 **아트 납품도 PR 로 올리는 걸 권장**(`art/<차수>` 브랜치).
 
