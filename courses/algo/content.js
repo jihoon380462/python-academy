@@ -11,7 +11,6 @@ const COURSE = { id: 'algo', name: '알고리즘·자료구조', runner: 'python
   tutorPersona: '이 코스는 알고리즘·자료구조다. 정답 코드 대신 더 나은 자료구조나 접근을 가리킨다. 시간 초과가 났으면 현재 코드의 시간복잡도를 학생과 같이 계산해 본다(반복문이 몇 겹인지, 안에서 리스트를 뒤지는지). 작은 입력(예: 5개짜리 리스트)으로 손으로 한 단계씩 따라가 보기를 권한다. 시각화 버튼(👀)을 써 보라고 권한다.' };
 const CHECKUPS = { after: {}, upto: {} };
 const WEAKNESS_TAGS = ['복잡도', '스택', '큐', '재귀', '정렬', '이진탐색', '해시', '연결리스트', '트리', '힙', '그래프', 'BFS', 'DFS', '최단경로', 'DP', '그리디', '투포인터', '누적합', '구현'];
-const PLAYGROUND_BLOCKS_UPTO = null;
 const CHAPTERS = [
   { ch: 1, name: '들어가기', color: '#4caf50' },
   { ch: 2, name: '찾고 정렬하기', color: '#2196f3' },

@@ -4,7 +4,7 @@ Views.playground = (root, params = {}) => {
   const d = Store.data; let editor = null, stopTurtle = null; let currentWork = null;
   const render = () => {
     root.innerHTML = `<div class="pg"><div class="pg-main">
-      <div class="pg-top"><div class="seg"><button class="on" data-m="text">⌨ 텍스트</button></div><div class="row"><button class="btn sm" id="pgSave">💾 ${T.save}</button><button class="btn sm" id="pgNew">✚ 새 코드</button>${CONFIG.TUTOR.enabled ? `<button class="btn sm tutor" id="pgAsk">💬 질문</button>` : ''}</div></div>
+      <div class="pg-top"><div class="lbl">⌨ 코드</div><div class="row"><button class="btn sm" id="pgSave">💾 ${T.save}</button><button class="btn sm" id="pgNew">✚ 새 코드</button>${CONFIG.TUTOR.enabled ? `<button class="btn sm tutor" id="pgAsk">💬 질문</button>` : ''}</div></div>
       <div class="pg-ed" id="pgEd"></div>
       <div class="pv-run"><button class="btn primary" id="pgRun">▶ ${T.run} <kbd>Ctrl+Enter</kbd></button><button class="btn" id="pgTrace">👣 ${T.stepRun}</button><label class="lbl inline">🐢 속도 <input type="range" id="pgSpeed" min="1" max="10" value="${d.settings.turtleSpeed}"></label></div>
       <label class="lbl">${T.stdin}</label><textarea class="stdin" id="pgIn" rows="2"></textarea>

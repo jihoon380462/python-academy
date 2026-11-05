@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# tools/regress.py — 헤드리스 크롬 회귀 (로컬 전용: Playwright + /usr/bin/google-chrome, 샌드박스는 CDN 접근 불가라 Pyodide/Blockly/CodeMirror는 폴백 동작만 확인)
+# tools/regress.py — 헤드리스 크롬 회귀 (로컬 전용: Playwright + /usr/bin/google-chrome, 샌드박스는 CDN 접근 불가라 Pyodide/CodeMirror는 폴백 동작만 확인)
 #   1) v1 저장 데이터 → v2 마이그레이션 수치 보존  2) 허브 렌더·이어서 하기  3) 코스 페이지 전 화면 + 문제 유형별 채점  4) 모바일 390px 가로 스크롤 없음  5) 콘솔 에러 0
 import json, os, sys, time
 from playwright.sync_api import sync_playwright
@@ -105,6 +105,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('problem',{pid:'L1P2',lessonId:'L1'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('.bed').count()==0 and pg.evaluate("(document.querySelector('.ted textarea')||{}).value || ''").startswith('print("나는")'), '옛 블록 기록이 있는 문제 → 타자 편집기(starter)로')
     pg.evaluate("UI.go('problem',{pid:'L13P1',lessonId:'L13'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('#pvIn').count()==1, '텍스트 문제 에디터(폴백)+입력칸')
     pg.evaluate("UI.go('problem',{pid:'L1P1',lessonId:'L1'})"); pg.wait_for_timeout(600); check(pg.locator('.ted').count()==1 and pg.locator('.bed').count()==0 and pg.locator('#btnToText').count()==0, 'L1 첫 문제도 타자 편집기 (블록 화면 없음)')
+    pg.evaluate("Store.data.settings.focus=false; Store.save({silent:true}); UI.go('problem',{pid:'L4P1',lessonId:'L4'})"); pg.wait_for_timeout(600); pg.evaluate("(document.querySelector('#coachOpen')||{click(){}}).click()"); pg.wait_for_timeout(200); check(pg.evaluate("(()=>{const e=document.querySelector('.coach-code'); return e? getComputedStyle(e).display : 'none'})()")=='flex', '따라하기 코치 코드 줄 flex 배치 (v2.4.0 CSS 잘림 회귀 방지)')
     # 실전 챕터 6 (v2.2.0): 프로젝트 체크리스트·단계 칩·파일 업로드 UI·마스터 뱃지
     pg.evaluate("Store.data.settings.unlockAll=true; UI.go('problem',{pid:'X1P1',lessonId:'X1'})"); pg.wait_for_timeout(600)
     check(pg.locator('#btnUpload').count()==1 and pg.locator('#pvFile').count()==1, '실전: 📎 CSV 업로드 버튼')

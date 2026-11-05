@@ -17,7 +17,7 @@ with sync_playwright() as p:
         if pg.evaluate("Py.ready"): break
         pg.wait_for_timeout(200)
     print('Py.ready', pg.evaluate("Py.ready"), pg.evaluate("Py.main"), pg.evaluate("Py.error||''"))
-    probs = pg.evaluate("PROBLEMS.concat(Content.allDrills()).filter(p=>['code','bug'].includes(p.type) && !p.quizOnly).map(p=>({id:p.id,type:p.type,lesson:p.lesson,drill:!!p.drill,sol:(p.vary?Content.instantiate(p,Content.defaultParams(p)).solution:p.solution)||'',bug:p.bug||null,blockOnly:p.type==='code'&&!p.dual&&(p.mode==='block')}))")
+    probs = pg.evaluate("PROBLEMS.concat(Content.allDrills()).filter(p=>['code','bug'].includes(p.type) && !p.quizOnly).map(p=>({id:p.id,type:p.type,lesson:p.lesson,drill:!!p.drill,sol:(p.vary?Content.instantiate(p,Content.defaultParams(p)).solution:p.solution)||'',bug:p.bug||null}))")
     for q in probs:
         pid = q['id']
         if ONLY and pid not in ONLY: continue

@@ -12,7 +12,6 @@ const COURSE = { id: 'terminal-git', name: '터미널·Git', runner: 'shell', be
   tutorPersona: '너는 터미널과 Git을 처음 보는 학생을 가르치는 선생님이다. 명령어는 "무엇을 하는지 → 어떻게 치는지 → 잘못 치면 어떻게 되는지" 순서로 설명한다. 실제 bash/Git 에러 문구(영문)를 그대로 보여 주고 한국어로 풀어 준다. 정답 명령을 바로 주지 말고 어느 명령 계열인지부터 짚는다.' };
 const CHECKUPS = { after: {}, upto: {} };
 const WEAKNESS_TAGS = ['경로', '파일조작', '찾기', '파이프', '커밋', '되돌리기', '브랜치', '병합', '원격', '충돌'];
-const PLAYGROUND_BLOCKS_UPTO = null;
 const CHAPTERS = [
   { ch: 1, name: '터미널', color: '#607d8b' },
   { ch: 2, name: 'Git 기초', color: '#f05033' },

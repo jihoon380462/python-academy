@@ -139,7 +139,7 @@ const TracePanel = {
 const Coach = {
   norm(code) { return String(code || '').replace(/\s+/g, '').replace(/'/g, '"'); },
   mount(el, p, rec, getEd, mode = 'text') {
-    const steps = Content.guideFor(p, mode); if (!steps || !steps.length || !el) return null; const isText = mode === 'text'; const isPz = mode === 'parsons';
+    const steps = Content.guideFor(p, mode); if (!steps || !steps.length || !el) return null; const isPz = mode === 'parsons';
     const key = 'coach_' + p.id; const st = { i: 0, open: isPz && rec.status !== 'clear', all: false, done: new Set() }; // 텍스트는 기본 접힘(사용자 요청), Parsons는 처음엔 펼침
     const self = {
       check(step, code) {

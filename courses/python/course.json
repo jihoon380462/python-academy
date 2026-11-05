@@ -1,1 +1,1 @@
-{ "id": "python", "name": "파이썬", "icon": "🐍", "desc": "블록에서 텍스트까지, 브라우저에서 진짜 파이썬", "runner": "python", "mapColor": "#2bb673", "mascotGear": null, "requires": null }
+{ "id": "python", "name": "파이썬", "icon": "🐍", "desc": "직접 타자로, 브라우저에서 진짜 파이썬", "runner": "python", "mapColor": "#2bb673", "mascotGear": null, "requires": null }
