@@ -24,7 +24,8 @@ Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs t
 
 | 순서 | 과제 | 상태 |
 | --- | --- | --- |
-| F1 | v2.7.0 릴리스 PR(★4-1 check_level · ★5 core 중 · 코스 플러그인 훅 · 터미널·Git/SQL/웹 뼈대) — 사용자 Merge 대기 | 진행 중 |
+| F0 | **CI `verify` 속도 고정**(HANDOFF 마지막 작업 ②): 공식 Playwright 컨테이너 이미지로 잡 실행(또는 브라우저 캐시 + 글꼴 apt 제거) · regress 외부 fetch 차단 · `concurrency: cancel-in-progress`. 고친 뒤 run 로그로 단계별 시간 보고 | 열림 |
+| F1 | v2.7.0 릴리스 PR — ✅ 머지됨(PR #73). 뒤이어 Opus 가 v2.7.1(PR #74·#75) | 완료 |
 | F2 | Opus 가 새 코스를 채우는 동안 들어오는 core 요청(HANDOFF 「Fable 요청」 줄) 처리, 새 코스 `ready: true` 전환은 콘텐츠가 다 찬 뒤. 뼈대 QA 에서 남긴 설계 판단: SQL 오답 「기대한 결과」 표가 정답을 그대로 보여 줌(열·행 수만 보일지), 온보딩 모달이 새 코스에서도 「파이썬 아카데미」 문구·마스코트, EXPANSION 6~8절의 미구현 UI(가짜 GitHub 탭·커밋 그래프 애니메이션·ERD/JOIN 애니메이션·요소 검사 모드), 실제 브라우저에서 sql.js·CodeMirror 언어 모듈(lang-sql/html/css/js) 로드 확인 | 대기 |
 | F3 | 8차 아트(선 아이콘) 납품 검수(IMAGES.md 3-B), 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지) | 대기 |
 | F4 | 수학 M2·M3(EXPANSION 14절) — D4 후순위 | 대기 |
@@ -34,7 +35,7 @@ Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs t
 
 ### 0. 지금 상태
 
-- **배포된 버전: v2.6.0** (main, ★3 디자인 개편). 열린 PR: `release/v2.7.0`(★4-1·★5 core 마무리 + 코스 플러그인 훅 + 터미널·Git/SQL/웹 뼈대 — 사용자 Merge 대기). 아래 ★1~★6 은 11/5 낮의 기록이고, **지금 할 일은 위 「Opus 용」·「Fable 용」 표**. 11/5 에 v2.3.19(PR #55~#64 합침)·v2.3.20(L11 난이도)·v2.3.21(기기 연동 팝업)·v2.3.22(폰 코드 가독성)까지 배포.
+- **배포된 버전: v2.7.1** (main). 열린 PR: #76(권한 삭제 문서)·#77(인수인계 갱신) — 사용자 머지 대기. 아래 ★1~★6 은 11/5 낮의 기록이고, **지금 할 일은 위 「Opus 용」·「Fable 용」 표**. 11/5 에 v2.3.19(PR #55~#64 합침)·v2.3.20(L11 난이도)·v2.3.21(기기 연동 팝업)·v2.3.22(폰 코드 가독성)까지 배포.
 - 남은 검수 항목 전체: `QA-OPEN.md`, 상세는 `QA.md` 「릴리스 검수 — 11/5」(#125~#162).
 - 사용자는 지금 **파이썬 L11~L12 를 공부 중**이고, L11(튜플·집합·컴프리헨션)에서 며칠 막혔어요. 아래 1~3이 그 원인을 푸는 일이에요.
 
