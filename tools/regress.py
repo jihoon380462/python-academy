@@ -164,7 +164,7 @@ with sync_playwright() as p:
     pg.click('#pvEd textarea'); pg.keyboard.press('Control+a'); pg.keyboard.type('if x:'); pg.keyboard.press('Enter'); v1=pg.evaluate("document.querySelector('#pvEd textarea').value"); pg.keyboard.press('Backspace'); v2=pg.evaluate("document.querySelector('#pvEd textarea').value"); pg.keyboard.press('Control+z'); pg.wait_for_timeout(100); v3=pg.evaluate("document.querySelector('#pvEd textarea').value"); i3=pg.locator('#pvEd .ted-ind').inner_text()
     check(v1=='if x:\n    ' and v2=='if x:\n' and v3=='if x:\n    ' and '4칸' in i3, '기본 편집기: Enter 자동 들여쓰기 → ⌫ 4칸 → Ctrl+Z 로 되돌아옴 + 칸 수 표시 (QA #156): %r %r %r %r' % (v1, v2, v3, i3))
     ind=lambda: pg.locator('#pvEd .ted-ind').inner_text()
-    pg.evaluate("(()=>{ const ta=document.querySelector('#pvEd textarea'); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); })()"); pg.keyboard.press('Tab'); t1=ind()
+    pg.evaluate("(()=>{ const ta=document.querySelector('#pvEd textarea'); ta.value='if x:\\n'; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); })()"); pg.keyboard.press('Tab'); t1=ind()
     pg.evaluate("(()=>{ const ta=document.querySelector('#pvEd textarea'); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); QuickKeys.press('⇤'); })()"); t2=ind()
     pg.evaluate("(()=>{ const ta=document.querySelector('#pvEd textarea'); ta.value='x = [\\n   1,\\n   2]\\n   \\n  y'; ta.setSelectionRange(10, 10); ta.dispatchEvent(new Event('click')); })()"); t3=ind()
     pg.evaluate("(()=>{ const ta=document.querySelector('#pvEd textarea'); ta.setSelectionRange(ta.value.indexOf('\\n   \\n')+2, ta.value.indexOf('\\n   \\n')+2); ta.dispatchEvent(new Event('click')); })()"); t4=ind()
