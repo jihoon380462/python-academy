@@ -15,6 +15,7 @@
   const SETUP_ID = 'SETUP';
   const chName = (ch) => ((CHAPTERS || []).find(c => c.ch === ch) || {}).name || '';
   const lessonsOf = (ch) => LESSONS.filter(l => l.ch === ch && !l.mock);
+  // 「필요한 문법」 = [실제 문법(코드), '레슨/쪽', 설명] — v2.9.2 사용자 「분명히 필요 문법을 넣으라고 했다」(별명 대신 실제 코드)
   const pageLink = (ref) => { const [lid, pg] = String(ref).split('/'); return { lid, pg: +pg || 0 }; };
   const tasksOf = (l) => {
     const own = (BOOK.tasks || {})[l.id] || [];
@@ -66,7 +67,7 @@
           <ol class="bk-tasks">${tasks.map((t, i) => `<li class="card bk-task"><div class="bk-task-h"><span class="bk-task-n">${i + 1}</span><b>${esc(t.title)}</b></div><div class="bk-task-p lp-html">${UI.terms(t.text)}</div>
             ${t.given ? codeBox(t.given, '이 코드를 복사해서 고쳐 보세요') : ''}${t.prep ? `<div class="bk-prep"><div class="lbl">준비 파일 — .py 파일과 같은 폴더에 <code>${esc(t.prep.name)}</code> 을 만들고 아래 내용을 붙여 넣으세요</div>${codeBox(t.prep.text, t.prep.name)}</div>` : ''}${/sys\.stdin\.read/.test(t.answer || '') ? '<div class="muted small bk-tip">💡 「끝까지」 읽는 프로그램이에요. VS Code 터미널에 입력을 다 붙여 넣은 뒤 <b>Windows: <kbd>Ctrl</kbd>+<kbd>Z</kbd> → <kbd>Enter</kbd></b>, Mac: <kbd>Ctrl</kbd>+<kbd>D</kbd> 를 누르면 입력이 끝나요.</div>' : ''}
             ${t.io && t.io.length ? `<div class="bk-io">${t.io.map(c => `${c.input != null && String(c.input).length ? `<div><div class="lbl">입력 예 <span class="muted small">(터미널에 치는 값)</span></div><pre class="code">${esc(c.input)}</pre></div>` : ''}<div><div class="lbl">출력 예</div><pre class="code">${esc(c.output)}</pre></div>`).join('')}</div>` : ''}
-            ${t.needs && t.needs.length ? `<div class="bk-needs"><span class="lbl">필요한 문법</span>${t.needs.map(([name, ref]) => { const { lid, pg: pn } = pageLink(ref); const ll = lid === SETUP_ID ? { n: '', title: BOOK.setup.title } : Content.lesson(lid); const where = lid === SETUP_ID ? '시작하기' : ll ? `레슨 ${ll.n ?? ''}` : ''; return `<button class="chip bk-need" data-nl="${esc(lid)}" data-np="${pn}" title="${ll ? esc(`${where} ${ll.title}`) : ''}">${UI.terms(name)}<span class="muted small"> · ${esc(where)}</span></button>`; }).join('')}</div>` : ''}
+            ${t.needs && t.needs.length ? `<div class="bk-needs"><span class="lbl">필요한 문법</span>${t.needs.map(([syn, ref, desc]) => { const { lid, pg: pn } = pageLink(ref); const ll = lid === SETUP_ID ? { n: '', title: BOOK.setup.title } : Content.lesson(lid); const where = lid === SETUP_ID ? '시작하기' : ll ? `레슨 ${ll.n ?? ''}` : ''; return `<button class="bk-need" data-nl="${esc(lid)}" data-np="${pn}" title="${ll ? esc(`${where} ${ll.title}`) : ''}"><code class="bk-syn">${esc(syn)}</code><span class="bk-need-d">${esc(desc || '')}</span><span class="bk-need-w muted small">${esc(where)} ›</span></button>`; }).join('')}</div>` : ''}
             ${t.answer ? `<details class="bk-ans"><summary>예시 답 보기</summary>${codeBox(t.answer, '예시 답')}</details>` : ''}</li>`).join('')}</ol>`;
       } else {
         body = `<h1 class="lp-h">${esc(pg.title)}</h1><div class="lp-body lp-html">${UI.terms(bookText(pg.html))}</div>${pg.example && pg.example.code ? codeBox(pg.example.code, '예제 코드 — 복사해서 VS Code 에서 실행해 보세요') : ''}`;

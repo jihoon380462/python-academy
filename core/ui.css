@@ -415,3 +415,7 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .bk-warn{border-left:3px solid var(--gold);padding:6px 0 6px 14px;margin:12px 0}
 .bk-art kbd{font-family:var(--mono);font-size:.88em;padding:1px 6px;border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;background:var(--surface2)}
 .bk-copy{white-space:nowrap;flex:none}.bk-code-h span{min-width:0}.bk-step-box pre,.bk-warn pre{margin:8px 0}
+.bk-needs{flex-direction:column;align-items:stretch;gap:6px}.bk-needs .lbl{margin:0 0 2px}
+.bk-need{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font:inherit;text-align:left;cursor:pointer}.bk-need:hover{border-color:var(--primary)}
+.bk-syn{font-family:var(--mono);font-size:.95em;font-weight:700;color:var(--code-fg,var(--text));background:var(--code-bg,transparent);border:1px solid var(--code-bd,var(--border));border-radius:6px;padding:2px 8px;white-space:pre-wrap;word-break:normal;overflow-wrap:break-word}
+.bk-need-d{flex:1;min-width:8em;font-size:.92em}.bk-need-w{flex:none;margin-left:auto}
