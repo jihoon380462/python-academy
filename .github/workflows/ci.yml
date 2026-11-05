@@ -30,6 +30,7 @@ jobs:
       - name: regress (Playwright)
         run: |
           pip install --quiet playwright pillow
-          python3 -m playwright install --with-deps chromium
+          # 브라우저는 러너에 깔린 /usr/bin/google-chrome 을 쓴다(regress.py·run_web_solutions.py 의 executable_path) — playwright install --with-deps 는 쓰지 않는 브라우저+apt 글꼴을 받느라 1.5~14분 걸려서 뺌 (TODO F0)
+          test -x /usr/bin/google-chrome
           python3 tools/regress.py
           python3 tools/run_web_solutions.py # web 코스: 모든 web 문제의 solution 을 미리보기 iframe 에 넣고 checks 전부 ✓ 인지 (Playwright)
