@@ -35,7 +35,7 @@ const UI = {
   async celebrate(events, anchorEl) {
     for (const ev of events) {
       if (ev.type === 'xp' && ev.rerun) { Audio.click && Audio.click(); continue; }
-      if (!Game.showGame()) { /* v2.6.0 ⑤: 게임 요소 끔 — 소리만, 팝업·콘페티 없음 */ if (ev.type === 'xp') { Audio.clear(); Haptic.tap(20); } else if (ev.type === 'badge') { this.toast(`🏅 ${esc(ev.badge.name)}`); } continue; }
+      if (!Game.showGame()) { /* v2.6.0 ⑤: 게임 요소 끔 — 소리만, 팝업·콘페티 없음 */ if (ev.type === 'xp') { Audio.clear(); Haptic.tap(20); } else if (ev.type === 'badge') { this.toast(`🏅 ${esc(ev.badge.name)}`); } else if (ev.type === 'dailyGoal') { this.toast(`🎯 ${T.goalDone}`); } continue; }
       if (ev.type === 'xp') { Confetti.burst(140); Audio.clear(); Haptic.tap(40); this.flyXp(ev.amount, ev.stars, anchorEl); if (ev.combo >= 3) { Audio.combo(ev.combo); } await sleep(500); }
       else if (ev.type === 'levelUp') { await this.levelUpOverlay(ev); }
       else if (ev.type === 'badge') { this.badgeFly(ev.badge); await sleep(400); }
@@ -45,7 +45,7 @@ const UI = {
   },
   flyXp(amount, stars, anchor) { const el = document.createElement('div'); el.className = 'xp-fly'; el.innerHTML = `<div class="xp-num">+${amount} XP</div><div class="xp-stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>`; document.body.appendChild(el); const r = anchor ? anchor.getBoundingClientRect() : { left: innerWidth / 2 - 60, top: innerHeight / 2 }; el.style.left = Math.max(10, Math.min(innerWidth - 150, r.left)) + 'px'; el.style.top = (r.top - 20) + 'px'; setTimeout(() => el.remove(), 1600); },
   levelUpOverlay(ev) { return new Promise(res => { Audio.levelUp(); Confetti.rain(220); const ov = document.createElement('div'); ov.className = 'levelup-ov'; ov.innerHTML = `<div class="levelup"><div class="lu-mascot">${myMascot({ size: 120, mood: 'happy' })}</div><div class="lu-title">${T.levelUp}</div><div class="lu-level">Lv.${ev.level}</div>${ev.titleChanged ? `<div class="lu-newtitle">${T.newTitle}: <b>${ev.title}</b></div>` : ''}${ev.stageChanged ? `<div class="lu-stage">마스코트가 진화했어요!</div>` : ''}<button class="btn primary" id="luOk">계속</button></div>`; document.body.appendChild(ov); $('#luOk').onclick = () => { ov.remove(); res(); }; }); },
-  badgeFly(b) { Audio.badge(); const el = document.createElement('div'); el.className = 'badge-fly'; el.innerHTML = `<div class="bf-icon">${UI.img('badge-' + b.id + '.png', b.icon, 'badge-img bf-img')}</div><div><div class="bf-t">${T.badgeGet}</div><div class="bf-n">${esc(b.name)}</div></div>`; document.body.appendChild(el); setTimeout(() => el.classList.add('in'), 20); setTimeout(() => { el.classList.remove('in'); setTimeout(() => el.remove(), 400); }, 2600); },
+  badgeFly(b) { if (!Game.showGame()) return this.toast(`🏅 ${esc(b.name)}`); Audio.badge(); const el = document.createElement('div'); el.className = 'badge-fly'; el.innerHTML = `<div class="bf-icon">${UI.img('badge-' + b.id + '.png', b.icon, 'badge-img bf-img')}</div><div><div class="bf-t">${T.badgeGet}</div><div class="bf-n">${esc(b.name)}</div></div>`; document.body.appendChild(el); setTimeout(() => el.classList.add('in'), 20); setTimeout(() => { el.classList.remove('in'); setTimeout(() => el.remove(), 400); }, 2600); },
   shake(el) { if (!el || Store.data.settings.anim === 0) return; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 500); },
   // 코치 문구 위치 표현 보정 자리 (v2.4.0: 블록 메뉴 위치 치환은 블록 삭제로 불필요 — 그대로 돌려줌)
   layoutWords(html) { return html; },
