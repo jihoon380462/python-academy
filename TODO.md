@@ -10,7 +10,7 @@
 
 | 순서 | 과제 | 상세 위치 | 상태 |
 | --- | --- | --- | --- |
-| O1 | **C10 「풀 수 있나」 맞추기** — `node tools/check_level.mjs` 표에 걸린 파이썬 30·알고 7 문제를 3-2절 규칙대로(본문에 없는 꼴 → 본문에 넣거나 문제 고치기, 합친 문제는 starter 로, 첫 문제는 가장 쉬운 것). 우선 B5P1·B5P2·B7P2·AB5P1·L17·L4·L14·L15P1. 긴 코드 줄 230개 나눠 쓰기, QA-OPEN 파이썬 중 #128~#139·타자 #139·#144 | `specs/content-team.md` C10, `DESIGN.md` 14-2 | 열림 |
+| O1 | **C10 「풀 수 있나」 맞추기** — `node tools/check_level.mjs` 표에 걸린 파이썬 30·알고 7 문제를 3-2절 규칙대로(본문에 없는 꼴 → 본문에 넣거나 문제 고치기, 합친 문제는 starter 로, 첫 문제는 가장 쉬운 것). 우선 B5P1·B5P2·B7P2·AB5P1·L17·L4·L14·L15P1. 긴 코드 줄 230개 나눠 쓰기, QA-OPEN 파이썬 중 #128~#139·타자 #139·#144 | `specs/content-team.md` C10, `DESIGN.md` 14-2 | 진행 중 — ① 괄호 지옥(호출 3겹+) 풀어 쓰기 ✅ v2.8.2 (파이썬 48·알고 63줄 → 0). 남은 것: check_level 표의 파이썬 31·알고 7, 긴 줄 나눠 쓰기, QA-OPEN #128~#139·#144 |
 | O2 | **C-T 터미널·Git 채우기** — T0 는 Fable 이 본보기로 완성, T1~T16·TB1~TB3(`draft: true`)의 본문·문제(mission/quiz cmd/fill/parsons) | `specs/content-team.md` C-T 절, `EXPANSION.md` 6절 | 열림 (v2.7.0 뼈대 뒤) |
 | O3 | **C-S 데이터베이스(SQL) 채우기** — S0 본보기, S1~S13·SB1~SB3 본문·문제(sql rows/state, quiz, fill, parsons) + 카페 데이터셋 키우기 | `specs/content-team.md` C-S 절, `EXPANSION.md` 7절 | 열림 (v2.7.0 뼈대 뒤) |
 | O4 | **C-W 웹·HTTP·API 채우기** — W0 본보기, W1~W13·WB1~WB3 본문·문제(web checks, quiz, fill, parsons) | `specs/content-team.md` C-W 절, `EXPANSION.md` 8절 | 열림 (v2.7.0 뼈대 뒤) |
@@ -18,7 +18,7 @@
 | O6 | **C12 수학 「상」 #145~#147 → 수학 「중」** (D4 후순위, 그림 kind 가 새로 필요하면 Fable) | `specs/content-team.md` C12, `QA.md` | 열림 |
 | O7 | C6~C9 (힌트 품질 점검·알고 실전 연습 문제·수학 표기) | `specs/content-team.md` 3절 | 열림 |
 
-Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별 검증(`node tools/check_level.mjs --gate`, 터미널 `node tools/run_shell_solutions.mjs`, SQL `python3 tools/run_sql_solutions.py`, 웹 `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py` 가 통과해야 PR. 과제가 끝나면 **Opus 가 패치 릴리스 PR 을 직접 낸다**(`APP_VERSION` 2.7.z+1 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 항목을 `## v2.7.z — 날짜 (Opus·콘텐츠 릴리스)` 아래로 → HANDOFF 상태판 한 줄 → `release/v2.7.z` PR). 사용자가 머지하면 배포. Fable 은 core 가 바뀔 때 마이너(2.8.0)로. (11/6 개정 — 「버전은 Fable 만」 옛 규칙 폐기) core 수정도 필요하면 직접. 너무 크면 할 수 있는 데까지 하고 HANDOFF 「Fable 요청」에 남은 것을 적는다.
+Opus 공통 규칙: `node tools/validate_content.mjs && node tools/check_nesting.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별 검증(`node tools/check_level.mjs --gate`, 터미널 `node tools/run_shell_solutions.mjs`, SQL `python3 tools/run_sql_solutions.py`, 웹 `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py` 가 통과해야 PR. 과제가 끝나면 **Opus 가 패치 릴리스 PR 을 직접 낸다**(`APP_VERSION` 2.7.z+1 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 항목을 `## v2.7.z — 날짜 (Opus·콘텐츠 릴리스)` 아래로 → HANDOFF 상태판 한 줄 → `release/v2.7.z` PR). 사용자가 머지하면 배포. Fable 은 core 가 바뀔 때 마이너(2.8.0)로. (11/6 개정 — 「버전은 Fable 만」 옛 규칙 폐기) core 수정도 필요하면 직접. 너무 크면 할 수 있는 데까지 하고 HANDOFF 「Fable 요청」에 남은 것을 적는다.
 
 ## Fable 용 — core (위에서부터)
 
@@ -35,7 +35,7 @@ Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs t
 
 ### 0. 지금 상태
 
-- **배포된 버전: v2.8.1** (main). 파이썬·알고의 순서 맞추기 문제는 v2.8.1 에서 전부 타이핑으로. 놀이터는 v2.8.0 에서 삭제(사용자 결정 11/6). 열린 PR: #76(권한 삭제 문서)·#77(인수인계 갱신) — 사용자 머지 대기. 아래 ★1~★6 은 11/5 낮의 기록이고, **지금 할 일은 위 「Opus 용」·「Fable 용」 표**. 11/5 에 v2.3.19(PR #55~#64 합침)·v2.3.20(L11 난이도)·v2.3.21(기기 연동 팝업)·v2.3.22(폰 코드 가독성)까지 배포.
+- **배포된 버전: v2.8.2** (main). 파이썬·알고의 순서 맞추기 문제는 v2.8.1 에서 전부 타이핑으로. 놀이터는 v2.8.0 에서 삭제(사용자 결정 11/6). 열린 PR: #76(권한 삭제 문서)·#77(인수인계 갱신) — 사용자 머지 대기. 아래 ★1~★6 은 11/5 낮의 기록이고, **지금 할 일은 위 「Opus 용」·「Fable 용」 표**. 11/5 에 v2.3.19(PR #55~#64 합침)·v2.3.20(L11 난이도)·v2.3.21(기기 연동 팝업)·v2.3.22(폰 코드 가독성)까지 배포.
 - 남은 검수 항목 전체: `QA-OPEN.md`, 상세는 `QA.md` 「릴리스 검수 — 11/5」(#125~#162).
 - 사용자는 지금 **파이썬 L11~L12 를 공부 중**이고, L11(튜플·집합·컴프리헨션)에서 며칠 막혔어요. 아래 1~3이 그 원인을 푸는 일이에요.
 
