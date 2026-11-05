@@ -357,3 +357,6 @@ h1.lp-h{font-size:2em;font-weight:800;line-height:1.25;letter-spacing:-.01em;mar
 html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(--surface);border:1px solid var(--primary);color:var(--primary-text);font-family:var(--mono);font-size:1.1em}
 @media (max-width:767px){#pyload{right:8px;bottom:calc(8px + env(safe-area-inset-bottom));max-width:calc(100% - 16px)}}
 .lc-st.locked::before{content:'';display:inline-block;width:9px;height:7px;border:1.5px solid currentColor;border-radius:2px;box-shadow:0 -4px 0 -1.5px currentColor;margin-right:2px}
+
+/* v2.7.0 뼈대 코스: 준비 중 레슨 */
+.lc.draft,.tr-l.draft{opacity:.55}.lc-st.draft{color:var(--muted)}.lc.draft .lc-n{border-style:dashed}

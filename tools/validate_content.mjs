@@ -9,7 +9,8 @@ let totals = { lessons: 0, problems: 0 };
 for (const id of courses()) {
   const c = loadCourse(id); const lessonIds = new Set(); const pids = new Set();
   if (!c.meta.id || c.meta.id !== id) err(`${id}: course.json의 id가 폴더 이름과 달라요`);
-  for (const l of c.LESSONS) { if (lessonIds.has(l.id)) err(`${id}: 레슨 id 중복 ${l.id}`); lessonIds.add(l.id); if (!l.title) err(`${id}: 레슨 ${l.id} 제목 없음`); if (!l.boss && !(l.pages && l.pages.length)) err(`${id}: 레슨 ${l.id} 페이지 없음`); }
+  for (const l of c.LESSONS) { if (lessonIds.has(l.id)) err(`${id}: 레슨 id 중복 ${l.id}`); lessonIds.add(l.id); if (!l.title) err(`${id}: 레슨 ${l.id} 제목 없음`); if (!l.boss && !l.draft && !(l.pages && l.pages.length)) err(`${id}: 레슨 ${l.id} 페이지 없음`); /* v2.7.0: draft 레슨(뼈대)은 본문 없어도 됨 */ }
+  if (c.LESSONS.some(l => l.draft)) warn(`${id}: 준비 중(draft) 레슨 ${c.LESSONS.filter(l => l.draft).length}개 — 본문·문제 채우면 draft 를 지우세요`);
   for (const p of [...c.PROBLEMS, ...(c.DRILLS || [])]) {
     const where = `${id}/${p.id}`;
     if ((c.DRILLS || []).includes(p)) { if (p.type !== 'code') err(`${where}: 타자 연습(DRILLS)은 type 'code' 만`); if (!(p.tests && p.tests.length >= 2)) err(`${where}: 타자 연습 테스트 2개 이상`); if (p.boss || p.project) err(`${where}: 타자 연습에 boss/project 불가`); }
@@ -53,6 +54,8 @@ for (const id of courses()) {
   for (const p of c.PROBLEMS) for (const m of String(p.prompt || '').matchAll(/\[\[레슨:([^\]]+)\]\]/g)) if (!lessonIds.has(m[1])) err(`${id}/${p.id}: 지문의 레슨 참조 [[레슨:${m[1]}]] 가 없는 레슨`);
   { const pat = (c.CONFIG.COURSE_ID_PATTERNS || {})[id]; if (!pat) err(`${id}: CONFIG.COURSE_ID_PATTERNS 에 이 코스의 id 규칙이 없어요 (기기 연동이 코스를 구분하는 데 씀, QA #67)`); else { const re = new RegExp(pat); const bad = [...c.LESSONS, ...c.PROBLEMS, ...(c.DRILLS || [])].map(x => x.id).filter(x => !re.test(x)); if (bad.length) err(`${id}: id 규칙(${pat})에 안 맞는 id ${bad.slice(0, 5).join(', ')}`); for (const [o, op] of Object.entries(c.CONFIG.COURSE_ID_PATTERNS)) if (o !== id) { const clash = [...c.LESSONS, ...c.PROBLEMS, ...(c.DRILLS || [])].map(x => x.id).filter(x => new RegExp(op).test(x)); if (clash.length) err(`${id}: id ${clash.slice(0, 3).join(', ')} 가 ${o} 코스 규칙에도 맞아요 — 기기 연동이 헷갈려요`); } } }
   const cfgCourse = (c.CONFIG.COURSES || []).find(x => x.id === id); if (cfgCourse && cfgCourse.ready) { if (cfgCourse.total !== c.PROBLEMS.length) err(`${id}: CONFIG.COURSES total ${cfgCourse.total} ≠ 실제 문제 수 ${c.PROBLEMS.length} (core/config.js 갱신)`); if (cfgCourse.lessons !== c.LESSONS.length) err(`${id}: CONFIG.COURSES lessons ${cfgCourse.lessons} ≠ 실제 레슨 수 ${c.LESSONS.length}`); }
+  // v2.7.0 코스별 추가 규칙(tools/validate/<코스>.mjs 가 있으면 그 파일의 default(c, { err, warn }) 를 부름)
+  { const extra = path.join(ROOT, 'tools/validate', id + '.mjs'); if (fs.existsSync(extra)) { const m = await import('file://' + extra); await m.default(c, { err: (x) => err(`${id}: ${x}`), warn: (x) => warn(`${id}: ${x}`) }); } }
   for (const l of c.LESSONS) if (l.practical && !c.PROBLEMS.some(p => p.lesson === l.id && p.project)) err(`${id}: 실전 레슨 ${l.id} 에 project 문제가 없음`);
   for (const p of c.PROBLEMS) if (p.boss) { const tests = p.type === 'bug' ? p.bug.tests : p.tests; if (tests && tests.length < 5) err(`${id}/${p.id}: 보스 테스트 5개 미만`); }
   totals.lessons += c.LESSONS.length; totals.problems += c.PROBLEMS.length;
