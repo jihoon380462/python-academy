@@ -291,3 +291,27 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 .lpk-nav{display:flex;gap:6px;align-items:center;margin-bottom:8px}.lpk-nav select{flex:1;min-width:0;padding:6px;border-radius:8px;background:var(--surface2);color:var(--text);border:1px solid var(--border)}.lpk-page{max-height:60vh;overflow:auto}.lpk-page h3{margin:4px 0 8px}
 /* QA #123: 실행 중 멈추기 버튼 */
 .pv-stop{margin:4px 0;border-color:var(--danger);color:var(--danger)}
+
+/* ===== 레슨 화면 v2 (★3 ②, specs/ref/modern-ui-lesson.png): 브레드크럼 · 왼쪽 설명 / 오른쪽 편집기+터미널 · 아래 챕터 스텝퍼. 폰은 설명 → 편집기 세로 ===== */
+.lesson.lp2{max-width:1600px}
+.lp-crumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 0 14px;border-bottom:1px solid var(--border);margin-bottom:18px;font-size:.95em}.lp-crumb .lp-sep{color:var(--muted)}.lp-crumb b{font-weight:700}
+.lp-cols{display:grid;grid-template-columns:1fr;gap:22px;align-items:start}.lp-cols.has-ex{grid-template-columns:minmax(300px,40%) 1fr}
+.lp-left{min-width:0}.lp-right{min-width:0;position:sticky;top:70px}
+.lp-kicker{color:var(--primary);font-weight:800;letter-spacing:.08em;font-size:.82em;text-transform:uppercase;margin-bottom:6px}.lp-kicker .muted{letter-spacing:0;text-transform:none;font-weight:600}
+h1.lp-h{font-size:2em;font-weight:800;line-height:1.25;letter-spacing:-.01em;margin:0 0 14px;word-break:keep-all}
+.lp2 .lp-html{font-size:1.02em;line-height:1.7}.lp2 .lp-html p{margin:.6em 0}
+.lp2 .lp-check{margin:18px 0 0;gap:4px}.lp2 .lp-check .lnk{color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:.85em;min-height:0}.lp2 .lp-check .lnk:hover{color:var(--text);border-color:var(--muted)}
+.lp2 .lp-nav{margin-top:18px}.lp2 .lp-nav .btn.primary.big{flex:1;max-width:420px;font-size:1.05em}
+.lp2 .summary{font-size:1.05em;line-height:1.8}
+.ex2{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--ed-bg)}
+.ex2-head{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}.ex2-tab{font-family:var(--mono);font-size:.9em;font-weight:700;padding:6px 12px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);white-space:nowrap}.ex2-tab::after{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--primary);margin-left:8px;vertical-align:middle}
+.ex2 .ex-ed{border:0;border-radius:0}.ex2 .ted{border:0;border-radius:0}.ex2 .stdin,.ex2 .lbl{margin:8px 10px}.ex2 .ex-slider{padding:0 10px 8px}
+.ex2-term{border-top:1px solid var(--border);background:var(--surface)}.ex2-tabs{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border)}.ex2-tabon{font-weight:700;color:var(--primary);border-bottom:2px solid var(--primary);padding:4px 2px}
+.ex2 .out{border:0;border-radius:0;min-height:90px;margin:0}
+.lp-stepper{margin-top:26px;padding:14px 0 6px;border-top:1px solid var(--border);display:flex;align-items:center;gap:16px}.lp-stp-ch{font-weight:700;white-space:nowrap;color:var(--muted)}
+.lp-stps{display:flex;align-items:flex-start;flex:1;min-width:0;overflow-x:auto;padding:4px 2px 8px;position:relative}.lp-stps::before{content:'';position:absolute;left:24px;right:24px;top:17px;height:2px;background:var(--border);z-index:0}
+.stp{position:relative;z-index:1;flex:1 0 96px;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:var(--muted);padding:0;cursor:pointer;min-height:0}.stp-dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--bg);border:2px solid var(--border);font-weight:700;font-size:.8em;color:var(--muted)}
+.stp.done .stp-dot{background:var(--primary);border-color:var(--primary);color:#fff}.stp.cur .stp-dot{border-color:var(--primary);color:var(--primary);box-shadow:0 0 0 4px rgba(26,115,232,.2)}.stp.cur{color:var(--text)}.stp.cur .stp-t{font-weight:700;color:var(--primary)}.stp.locked{opacity:.5;cursor:default}
+.stp-t{font-size:.78em;line-height:1.25;text-align:center;max-width:110px;word-break:keep-all}
+@media (max-width:900px){.lp-cols.has-ex{grid-template-columns:1fr}.lp-right{position:static}}
+@media (max-width:767px){.ex2-head .btn.sm{padding:6px 10px}.lesson.lp2 .lp-crumb{padding-bottom:8px;margin-bottom:12px}.lp-crumb .dots{display:none}h1.lp-h{font-size:1.55em}.lp-stepper{flex-direction:column;align-items:stretch;gap:6px}.stp{flex:0 0 84px}.lp2 .lp-nav .btn.primary.big{max-width:none}}
