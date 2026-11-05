@@ -43,12 +43,12 @@ const SqlUI = {
     $$('.sql-sch-t.on', host).forEach(el => { const smp = Sql.sample(db, el.dataset.t, 3); this.table($('.sql-sch-smp', el), { columns: smp.columns, rows: smp.rows }, { title: '샘플 3행' }); });
   },
   // ---------- 작업판 ----------
-  // host 에 편집기 + 실행 + 결과 + (스키마) 를 그린다. opt = { value, dataset, schema(bool), extra(html: 머리줄 오른쪽 버튼들), onChange, compact }
+  // host 에 편집기 + 실행 + 결과 + (스키마) 를 그린다. opt = { value, dataset, schema(bool), extra(html: 실행 버튼 앞), after(html: 실행 버튼 뒤), onChange, onRun, onReady, compact, runId }
   // 돌려주는 것: { editor, db, run(), resetDb(), getQuery(), setQuery(), destroy(), out(결과 host) }
   workbench(host, opt = {}) {
     const dataset = opt.dataset || 'cafe'; const w = { db: null, destroyed: false };
     host.classList.add('sqlw'); if (opt.compact) host.classList.add('compact');
-    host.innerHTML = `<div class="sqlw-main"><div class="sqlw-head"><span class="ex2-tab">query.sql</span><span class="muted small sqlw-ds">데이터셋: ${esc(dataset)}</span><span class="grow"></span>${opt.extra || ''}<button class="btn sm" data-dbreset title="표를 처음 상태로 되돌려요">데이터 초기화</button><button class="btn primary" id="${opt.runId || 'sqlRun'}">▶ 실행 <kbd>Ctrl+Enter</kbd></button></div><div class="sqlw-ed"></div><div class="sqlw-engine"></div><div class="sqlw-warn"></div><div class="sqlw-out"></div></div>${opt.schema === false ? '' : `<aside class="sqlw-side"><div class="sqlw-schema"></div></aside>`}`;
+    host.innerHTML = `<div class="sqlw-main"><div class="sqlw-head"><span class="ex2-tab">query.sql</span><span class="muted small sqlw-ds">데이터셋: ${esc(dataset)}</span><span class="grow"></span>${opt.extra || ''}<button class="btn sm" data-dbreset title="표를 처음 상태로 되돌려요">데이터 초기화</button><button class="btn primary" id="${opt.runId || 'sqlRun'}">▶ 실행 <kbd>Ctrl+Enter</kbd></button>${opt.after || ''}</div><div class="sqlw-ed"></div><div class="sqlw-engine"></div><div class="sqlw-warn"></div><div class="sqlw-out"></div></div>${opt.schema === false ? '' : `<aside class="sqlw-side"><div class="sqlw-schema"></div></aside>`}`;
     const edHost = $('.sqlw-ed', host); const out = $('.sqlw-out', host); const eng = $('.sqlw-engine', host); const warn = $('.sqlw-warn', host); const sch = $('.sqlw-schema', host);
     w.out = out; w.editor = new TextEditor(edHost, { value: opt.value || '', onChange: opt.onChange || null, lang: 'sql' });
     w.getQuery = () => w.editor.getValue(); w.setQuery = (v) => w.editor.setValue(v);
@@ -99,13 +99,13 @@ const SqlUI = {
     const sortRows = (rs) => rs.map((r, i) => ({ r, i })).sort((a, b) => this.key(a.r).localeCompare(this.key(b.r)));
     const Es = ordered ? E.map((r, i) => ({ r, i })) : sortRows(E), Ms = ordered ? M.map((r, i) => ({ r, i })) : sortRows(M);
     const expView = { columns: expR.columns, rows: Es.map(x => x.r), ms: null }; const mineView = { columns: sameNames ? expR.columns : mineR.columns, rows: Ms.map(x => x.r), ms: null };
-    if (E.length !== M.length) { const d = M.length - E.length; const hint = state ? `표에 행이 ${Math.abs(d)}개 ${d > 0 ? '더 많아요' : '적어요'}. INSERT/DELETE 횟수나 WHERE 조건을 보세요.` : d > 0 ? `${d}행이 더 나왔어요. WHERE 조건이 빠졌거나 느슨하지 않은지 보세요.` : `${-d}행이 덜 나왔어요. WHERE 조건이 너무 좁거나 LIMIT 이 작지 않은지 보세요.`; return this.fail(p, `행 수가 달라요(기대 ${E.length}행, 내 결과 ${M.length}행). ${hint}`, expView, mineView, this.markRows(Es, Ms)); }
+    if (E.length !== M.length) { const d = M.length - E.length; const hint = state ? `표에 행이 ${Math.abs(d)}개 ${d > 0 ? '더 많아요' : '적어요'}. INSERT/DELETE 횟수나 WHERE 조건을 보세요.` : d > 0 ? `${d}행이 더 나왔어요. WHERE 조건이 빠졌거나 느슨하지 않은지 보세요.` : `${-d}행이 덜 나왔어요. WHERE 조건이 너무 좁거나 LIMIT 이 작지 않은지 보세요.`; return this.fail(p, `행 수가 달라요(기대 ${E.length}행, 내 결과 ${M.length}행). ${hint}`, expView, mineView, this.markRows(Es, Ms), ordered ? '(빨간 칸이 다른 곳이에요.)' : null); }
     const mark = this.markRows(Es, Ms); const nDiff = mark.m.reduce((n, r) => n + r.filter(Boolean).length, 0);
-    if (nDiff) { let why = ordered && this.key(E.slice().sort((a, b) => this.key(a).localeCompare(this.key(b)))) === this.key(M.slice().sort((a, b) => this.key(a).localeCompare(this.key(b)))) ? '행의 내용은 같은데 순서가 달라요. ORDER BY 의 열이나 ASC/DESC 를 보세요.' : `${nDiff}개 셀이 달라요. 빨간 칸을 비교해 보세요.`; return this.fail(p, why, expView, mineView, mark); }
+    if (nDiff) { let why = ordered && this.key(E.slice().sort((a, b) => this.key(a).localeCompare(this.key(b)))) === this.key(M.slice().sort((a, b) => this.key(a).localeCompare(this.key(b)))) ? '행의 내용은 같은데 순서가 달라요. ORDER BY 의 열이나 ASC/DESC 를 보세요.' : `${nDiff}개 셀이 달라요. 빨간 칸을 비교해 보세요.`; return this.fail(p, why, expView, mineView, mark, ordered ? '(빨간 칸이 다른 곳이에요.)' : null); }
     const okTitle = `✓ 기대한 결과와 같아요 · ${state ? `표 ${esc(ex.table)} 의 상태 일치 · ${M.length}행` : `${M.length}행${ordered ? ' · 순서까지 일치' : ''}`}`; return { ok: true, detail: `<div class="sql-ok"><b>${okTitle}</b></div>`, okTitle, mine: mineR, expected: expR };
   },
   markRows(Es, Ms) { const n = Math.max(Es.length, Ms.length); const e = [], m = []; for (let i = 0; i < n; i++) { const a = Es[i] ? Es[i].r : null, b = Ms[i] ? Ms[i].r : null; const w = Math.max(a ? a.length : 0, b ? b.length : 0); const er = [], mr = []; for (let j = 0; j < w; j++) { const diff = !a || !b || this.key(a[j]) !== this.key(b[j]); er.push(diff); mr.push(diff); } e.push(er); m.push(mr); } return { e, m }; },
-  fail(p, why, expView, mineView, mark) { const id = 'sqd' + uid(); const html = `<div class="sql-fail-why">${why}</div><div class="sql-diff" id="${id}"><div class="sql-diff-col"><div class="sql-diff-h">기대한 결과</div><div class="sql-diff-t" data-side="e"></div></div><div class="sql-diff-col"><div class="sql-diff-h">내 결과</div><div class="sql-diff-t" data-side="m"></div></div></div><div class="muted small">${mark ? '(행 순서를 무시하는 문제는 양쪽을 정렬해서 비교했어요. 빨간 칸이 다른 곳이에요.)' : ''}</div>`; setTimeout(() => { const box = document.getElementById(id); if (!box) return; this.table($('[data-side=e]', box), expView, { mark: mark && mark.e }); this.table($('[data-side=m]', box), mineView, { mark: mark && mark.m }); }, 0); return { ok: false, msg: html }; },
+  fail(p, why, expView, mineView, mark, note) { const id = 'sqd' + uid(); const html = `<div class="sql-fail-why">${why}</div><div class="sql-diff" id="${id}"><div class="sql-diff-col"><div class="sql-diff-h">기대한 결과</div><div class="sql-diff-t" data-side="e"></div></div><div class="sql-diff-col"><div class="sql-diff-h">내 결과</div><div class="sql-diff-t" data-side="m"></div></div></div><div class="muted small">${mark ? (note || '(행 순서를 무시하는 문제라 양쪽을 정렬해서 비교했어요. 빨간 칸이 다른 곳이에요.)') : ''}</div>`; setTimeout(() => { const box = document.getElementById(id); if (!box) return; this.table($('[data-side=e]', box), expView, { mark: mark && mark.e }); this.table($('[data-side=m]', box), mineView, { mark: mark && mark.m }); }, 0); return { ok: false, msg: html }; },
 };
 
 // ---------- 문제 유형 'sql' ----------
@@ -113,7 +113,7 @@ UI.modes.sql = {
   label: '쿼리 작성',
   mount(host, p, ctx) {
     const spec = p.sql || {}; const saved = ctx.rec && ctx.rec.code != null && ctx.rec.mode === 'sql' ? ctx.rec.code : null; const start = saved != null ? saved : (p.starter || '');
-    const w = SqlUI.workbench(host, { value: start, dataset: spec.dataset || 'cafe', extra: `<button class="btn sm" data-qreset title="처음 쿼리로">↺ 처음 쿼리로</button><button class="btn accent" id="btnGrade">✔ 제출하기</button>`, onRun: () => {} });
+    const w = SqlUI.workbench(host, { value: start, dataset: spec.dataset || 'cafe', extra: `<button class="btn sm" data-qreset title="처음 쿼리로">↺ 처음 쿼리로</button>`, after: `<button class="btn accent" id="btnGrade">✔ 제출하기</button>` });
     $$('[data-qreset]', host).forEach(b => b.onclick = () => { w.setQuery(p.starter || ''); });
     let grading = false;
     const submit = () => { if (grading) return; grading = true; const q = w.getQuery(); const r = SqlUI.grade(p, q); grading = false; if (r.ok) { Game.stat('sqlClears'); if (r.mine) SqlUI.table(w.out, { ...r.mine, ms: null }, { title: r.okTitle || '✓ 기대한 결과와 같아요' }); /* core 의 onClear 가 #pvResult 를 자기 상자로 덮으므로 결과 표는 작업판 출력 칸에 */ } ctx.submit(r); };

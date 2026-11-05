@@ -28,7 +28,7 @@ const Sql = {
       if (typeof initSqlJs === 'function') return go();
       const old = document.querySelector('script[data-sqljs]'); if (old) old.remove();
       const s = document.createElement('script'); s.src = this.URL; s.async = true; s.dataset.sqljs = '1';
-      s.onload = go; s.onerror = () => { clearTimeout(timer); fail('스크립트를 받지 못했어요(인터넷 연결 필요)'); };
+      s.onload = go; s.onerror = () => { clearTimeout(timer); fail('스크립트를 받지 못했어요'); };
       document.head.appendChild(s);
     });
     return this.loading;
@@ -37,7 +37,7 @@ const Sql = {
     if (!this.ready) throw new Error('SQLite 엔진이 아직 준비되지 않았어요');
     const sets = typeof SQL_DATASETS !== 'undefined' ? SQL_DATASETS : {}; const sql = sets[datasetId || 'cafe'];
     if (!sql) throw new Error('데이터셋이 없어요: ' + datasetId);
-    const db = new this.SQL.Database(); db.exec(sql); return db;
+    const db = new this.SQL.Database(); db.exec('PRAGMA foreign_keys = ON'); db.exec(sql); return db; /* 외래 키 검사 켬(sql.js 기본은 꺼짐) — tools/run_sql_solutions.py 와 같은 설정 */
   },
   // 문자열·주석을 걷어낸 쿼리(키워드 검사용)
   _strip(q) { return String(q || '').replace(/'(?:[^']|'')*'/g, "''").replace(/"(?:[^"]|"")*"/g, '""').replace(/--[^\n]*/g, ' ').replace(/\/\*[\s\S]*?\*\//g, ' '); },
@@ -72,9 +72,9 @@ const Sql = {
   explain(msg, db) {
     const m = String(msg || ''); let x;
     const tbls = db ? this.tables(db) : []; const cols = db ? [...new Set(tbls.flatMap(t => this.columns(db, t).map(c => c.name)))] : [];
-    if ((x = m.match(/no such table:\s*([\w.]+)/i))) { const near = this._near(x[1].split('.').pop(), tbls); return `「${x[1]}」라는 표가 없어요. 표 이름을 확인해 보세요.${near.length ? ' 비슷한 표: ' + near.join(', ') : tbls.length ? ' 있는 표: ' + tbls.join(', ') : ''}`; }
-    if ((x = m.match(/no such column:\s*([\w.]+)/i))) { const near = this._near(x[1].split('.').pop(), cols); return `「${x[1]}」라는 열이 없어요. 열 이름을 확인해 보세요(글자를 비교하려면 작은따옴표 ' ' 로 감싸야 해요).${near.length ? ' 비슷한 열: ' + near.join(', ') : ''}`; }
-    if ((x = m.match(/ambiguous column name:\s*([\w.]+)/i))) return `「${x[1]}」열이 여러 표에 있어요. 어느 표의 열인지 표이름.열이름 으로 적어 주세요(예: menu.id).`;
+    if ((x = m.match(/no such table:\s*(\S+)/i))) { const near = this._near(x[1].split('.').pop(), tbls); return `「${x[1]}」라는 표가 없어요. 표 이름을 확인해 보세요.${near.length ? ' 비슷한 표: ' + near.join(', ') : tbls.length ? ' 있는 표: ' + tbls.join(', ') : ''}`; }
+    if ((x = m.match(/no such column:\s*(\S+)/i))) { const near = this._near(x[1].split('.').pop(), cols); return `「${x[1]}」라는 열이 없어요. 열 이름을 확인해 보세요(글자를 비교하려면 작은따옴표 ' ' 로 감싸야 해요).${near.length ? ' 비슷한 열: ' + near.join(', ') : ''}`; }
+    if ((x = m.match(/ambiguous column name:\s*(\S+)/i))) return `「${x[1]}」열이 여러 표에 있어요. 어느 표의 열인지 표이름.열이름 으로 적어 주세요(예: menu.id).`;
     if ((x = m.match(/no such function:\s*(\w+)/i))) return `「${x[1]}」이라는 함수는 없어요. 철자를 확인해 보세요(COUNT, SUM, AVG, MIN, MAX, LENGTH, UPPER…).`;
     if (/incomplete input/i.test(m)) return '문장이 끝나지 않았어요. 괄호 ( ) 나 따옴표가 닫혔는지, 뒤에 빠진 말은 없는지 보세요.';
     if ((x = m.match(/near "([^"]*)":\s*syntax error/i))) return `문법이 틀렸어요. 「${x[1]}」근처를 보세요 — 쉼표가 빠졌거나 많지 않은지, 키워드 철자(SELECT·FROM·WHERE)와 순서가 맞는지 확인해 보세요.`;

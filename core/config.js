@@ -41,7 +41,7 @@ const CONFIG = {
   STORAGE_WARN_BYTES: 4 * 1024 * 1024,     // 저장 용량 경고 (설정에 정리 버튼)
 
   // --- XP / 레벨 ---
-  XP: { quiz: 10, fill: 15, bug: 20, parsons: 20, code: 30, num: 20, match: 20, pair: 20 }, // num·match·pair: 수학 공간 유형 (v2.3.0)
+  XP: { quiz: 10, fill: 15, bug: 20, parsons: 20, code: 30, num: 20, match: 20, pair: 20, mission: 25, sql: 25, web: 25 }, // num·match·pair: 수학 공간 유형 (v2.3.0) · mission·sql·web: 새 코스 유형 (v2.7.0)
   KATEX: { css: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css', js: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js' }, // 수학 공간 수식 (없어도 글자 수식으로 대체)
   HINT_XP_MULT: [1, 0.7, 0.4, 0],        // 힌트 0,1,2,3단계 사용 시 배율 (정답 보기 = 0)
   FIRST_TRY_BONUS: 0.5,                   // 첫 시도 클리어 +50%

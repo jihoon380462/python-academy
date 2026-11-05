@@ -105,7 +105,7 @@ const ShellUI = {
     return s + '</svg>' + (all.length > list.length ? `<div class="muted small">앞 ${all.length - list.length}개 커밋은 생략</div>` : '');
   },
   // ---------- edit 파일명 → 편집창 (아래 ShellUI.editFile) — 저장은 _saveFrom: 파일에 쓰고, 히스토리의 `edit 파일` 줄을 `edit 파일 "내용"` 꼴로 바꿔 둔다(다시 열 때 재실행용)
-  _saveFrom(sh, abs, text) { if (!text.endsWith('\n') && text !== '') text += '\n'; sh.writeFile(abs, text); const q = ShellUI.quote(text.replace(/\n/g, '\\n')); const last = sh.history.length - 1; if (q && last >= 0 && /^edit\s/.test(sh.history[last])) sh.history[last] = `edit ${abs.split('/').pop()} ${q}`; },
+  _saveFrom(sh, abs, text) { if (!text.endsWith('\n') && text !== '') text += '\n'; sh.writeFile(abs, text); const q = ShellUI.quote(text.replace(/\n/g, '\\n')); const last = sh.history.length - 1; if (q && last >= 0 && /^edit\s/.test(sh.history[last])) sh.history[last] = `edit ${abs} ${q}`; }, // 절대 경로로 적어 두어야 다른 폴더에서 다시 열어도 같은 파일에 써진다
 };
 // 편집창: UI.modal 은 버튼 value 만 돌려주므로 저장은 버튼 onClick 에서 _saveFrom 을 부른다. 충돌 파일이면 「내 것 유지/상대 것 유지/둘 다」 버튼.
 ShellUI.editFile = function (sh, abs) {

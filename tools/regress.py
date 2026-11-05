@@ -331,15 +331,115 @@ with sync_playwright() as p:
     pg.fill('.web-pane[data-pane=css] textarea','p { color: blue; }'); pg.wait_for_timeout(800); pg.click('#btnGrade'); pg.wait_for_timeout(1500)
     for _ in range(3):
         if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
-    check(pg.locator('.result.ok').count()==1 and pg.locator('.pv-result .web-chk li.ok').count()==3 and pg.evaluate("Store.prob('W0P4').status")=='clear', 'W0P4 정답 → 클리어, 결과 상자에 체크리스트 ✓ 3')
+    check(pg.locator('.result.ok').count()==1 and pg.locator('.web-check .web-chk li.ok').count()==3 and pg.evaluate("Store.prob('W0P4').status")=='clear', 'W0P4 정답 → 클리어, 「검사 결과」 탭에 체크리스트 ✓ 3')
     pg.evaluate("UI.go('problem',{pid:'W0P2',lessonId:'W0'})"); pg.wait_for_timeout(500); pg.click('.qopt[data-i="0"]'); pg.wait_for_timeout(1200)
     for _ in range(3):
         if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
     check(pg.evaluate("Store.prob('W0P2').status")=='clear', 'W0P2 퀴즈(기존 유형) 정답 → 클리어')
-    pg.evaluate("UI.go('home')"); pg.wait_for_timeout(400); pg.evaluate("document.querySelector('.lc.draft').disabled=false; document.querySelector('.lc.draft').click()"); pg.wait_for_timeout(300)
+    pg.evaluate("UI.go('home')"); pg.wait_for_timeout(400); pg.evaluate("(()=>{ for (let k=0;k<2;k++){ const c=document.querySelector('.lc.draft'); c.disabled=false; c.click(); } })()"); pg.wait_for_timeout(300) # PC 홈은 첫 클릭 = 미리보기 선택, 둘째 클릭 = 열기
     check(pg.evaluate("UI.view")=='home' and '준비 중' in pg.locator('#toasts').inner_text(), 'draft 레슨 카드 → 「준비 중」 토스트, 열리지 않음')
     pg.set_viewport_size({'width':390,'height':800}); pg.evaluate("UI.go('problem',{pid:'W0P4',lessonId:'W0'},false)"); pg.wait_for_timeout(700); pg.click('.pv-tabs button[data-t="work"]'); pg.wait_for_timeout(300)
     check(pg.evaluate('document.documentElement.scrollWidth')<=390 and pg.locator('.web-frame').count()==1, '웹 문제 화면 모바일(390px) 가로 스크롤 없음'); pg.set_viewport_size({'width':1280,'height':900})
+    pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); errors[:]=[e for e in errors if 'allow-same-origin' not in e] # 미리보기 iframe 은 sandbox(allow-same-origin 없음)라 regress 의 add_init_script(localStorage 시드)가 iframe 안에서 던지는 에러 — 앱 코드가 아니므로 이 절 끝에서 뺀다(다른 코스 절이 웹 미리보기를 열면 거기서도 필요)
+    # ===== [코스 terminal-git] ===== (v2.7.0 뼈대) 허브 카드 → 코스 열기 → T0 레슨 쪽·예제(한 줄씩 실행) → 미션 정답/오답·명령 퀴즈·빈칸 → 이어서 하기(재실행)·처음부터 → Git 패널·편집창·명령 순서 → draft 「준비 중」 → 폰 390px
+    print('[terminal-git 코스]'); TG='file://'+os.path.join(ROOT,'courses/terminal-git/index.html'); tg0=len(errors)
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(500)
+    tgc=pg.evaluate("(()=>{ const c=[...document.querySelectorAll('a.hc')].find(x=>(x.getAttribute('href')||'').includes('terminal-git')); return c? {href:c.getAttribute('href'), txt:c.innerText.replace(/\\n/g,' ')} : null; })()")
+    check(bool(tgc) and '준비 중' in tgc['txt'] and '미리보기' in tgc['txt'], '허브: 터미널·Git 카드가 「준비 중 · 미리보기 열림」 링크 (%s)' % (tgc and tgc['txt'][:40]))
+    pg.goto(TG); pg.wait_for_timeout(800); pg.evaluate("Store.data.onboarded=true; Store.save({silent:true}); document.querySelectorAll('.modal-ov').forEach(e=>e.remove()); UI.go('home')"); pg.wait_for_timeout(400)
+    tgh=pg.evaluate("({view:UI.view, cards:document.querySelectorAll('.lc').length, draft:document.querySelectorAll('.lc.draft').length, modes:Object.keys(UI.modes).sort().join(','), ex:Object.keys(UI.examples).join(','), css:!![...document.styleSheets].find(s=>(s.href||'').includes('terminal-git/course.css'))})")
+    check(tgh['view']=='home' and tgh['cards']>=5 and tgh['draft']>=4 and tgh['modes']=='mission,parsons' and tgh['ex']=='shell' and tgh['css'], 'terminal-git 홈: 레슨 카드 + draft 카드 「준비 중」, UI.modes mission·parsons, UI.examples shell, course.css (%s)' % tgh)
+    pg.evaluate("UI._home.sel='T1'; UI.go('home')"); pg.wait_for_timeout(200); dr=pg.evaluate("(()=>{ const c=document.querySelector('.lc[data-l=\"T1\"], .lc.draft'); return c ? {cls:c.className, txt:c.innerText.includes('준비 중')} : null; })()")
+    check(bool(dr) and 'draft' in dr['cls'] and dr['txt'], 'draft 레슨 카드에 「준비 중」 (%s)' % dr)
+    pg.evaluate("UI.go('lesson',{lessonId:'T0',page:2})"); pg.wait_for_timeout(500)
+    tge={'term':pg.locator('#exPlugin .sh-term').count(), 'lines':pg.locator('.ex-sh-lines li').count(), 'pages':pg.evaluate("Content.lesson('T0').pages.length")}
+    for _ in range(4): pg.click('#exShNext'); pg.wait_for_timeout(60)
+    tge['out']=pg.locator('#exPlugin .sh-out').inner_text(); tge['cur']=pg.locator('#exPlugin .sh-tr.cur').inner_text(); tge['done']=pg.locator('.ex-sh-lines li.done').count()
+    check(tge['term']==1 and tge['lines']>=5 and tge['pages']==4 and '/home/me' in tge['out'] and 'projects/' in tge['out'] and 'projects/' in tge['cur'] and tge['done']==4, 'T0 레슨 4쪽 + 예제 플러그인: 한 줄씩 실행 4번 → 출력·트리의 현재 폴더가 projects (%s)' % {k:tge[k] for k in ('term','lines','pages','cur','done')})
+    pg.fill('#exPlugin .sh-in', 'cd ..'); pg.keyboard.press('Enter'); pg.wait_for_timeout(100); check('me/' in pg.locator('#exPlugin .sh-tr.cur').inner_text(), '예제 터미널에 직접 친 명령(cd ..)도 트리에 반영')
+    # 미션: 목표 체크리스트 실시간 ✓ → 제출 클리어, 저장 코드 = 명령 히스토리
+    pg.evaluate("UI.go('problem',{pid:'T0P1',lessonId:'T0'})"); pg.wait_for_timeout(500)
+    tgm={'term':pg.locator('#msTerm .sh-term').count(), 'goals':pg.locator('.ms-g').count(), 'dis0':pg.evaluate("document.querySelector('#btnGrade').disabled"), 'label':pg.locator('.pv-head .chip').first.inner_text()}
+    pg.fill('#msTerm .sh-in', 'pwd'); pg.keyboard.press('Enter'); pg.fill('#msTerm .sh-in', 'ls'); pg.keyboard.press('Enter'); pg.wait_for_timeout(80); tgm['mid']=pg.locator('.ms-g.done').count(); tgm['dis1']=pg.evaluate("document.querySelector('#btnGrade').disabled")
+    pg.fill('#msTerm .sh-in', 'cd pro'); pg.keyboard.press('Tab'); tgm['tab']=pg.evaluate("document.querySelector('#msTerm .sh-in').value"); pg.keyboard.press('Enter'); pg.wait_for_timeout(80); tgm['done']=pg.locator('.ms-g.done').count(); tgm['dis2']=pg.evaluate("document.querySelector('#btnGrade').disabled"); tgm['ps1']=pg.locator('#msTerm .sh-line .sh-ps1').inner_text()
+    check(tgm['term']==1 and tgm['goals']==3 and tgm['dis0'] and tgm['mid']==2 and tgm['dis1'] and tgm['tab']=='cd projects/' and tgm['done']==3 and not tgm['dis2'] and '~/projects' in tgm['ps1'] and tgm['label']=='미션', '미션: 명령마다 목표 ✓(2/3 → 3/3), Tab 자동완성, 프롬프트 경로, 전부 달성해야 제출 활성 (%s)' % tgm)
+    pg.click('#btnGrade'); pg.wait_for_timeout(1500)
+    for _ in range(3):
+        if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
+    check(pg.locator('.result.ok').count()==1 and pg.evaluate("Store.prob('T0P1').status")=='clear' and pg.evaluate("Store.prob('T0P1').code")=='pwd\nls\ncd projects/', '미션 제출 → 클리어, 저장된 답 = 명령 히스토리')
+    # 오답 제출(Ctrl+Shift+Enter 로 plugin.submit) → 남은 목표 안내, 다시 열면 이어서(재실행), 처음부터
+    pg.evaluate("UI.go('problem',{pid:'T0P4',lessonId:'T0'})"); pg.wait_for_timeout(400); pg.fill('#msTerm .sh-in', 'cd notes'); pg.keyboard.press('Enter'); pg.wait_for_timeout(80); pg.keyboard.press('Control+Shift+Enter'); pg.wait_for_timeout(400)
+    tgf=pg.locator('#pvResult').inner_text(); check('남은 목표' in tgf and 'cat welcome.txt' in tgf and pg.evaluate("Store.prob('T0P4').fails")>=1, '미션 오답 제출 → 남은 목표 안내 + 실패 기록 (%s)' % tgf[:60].replace('\n',' '))
+    pg.evaluate("UI.go('home')"); pg.wait_for_timeout(200); pg.evaluate("UI.go('problem',{pid:'T0P4',lessonId:'T0'})"); pg.wait_for_timeout(400)
+    check('~/notes' in pg.locator('#msTerm .sh-line .sh-ps1').inner_text() and pg.locator('.sh-note').count()==1, '미션 다시 열기 → 저장된 명령을 재실행해 이어서(프롬프트 ~/notes)')
+    pg.click('#msReset'); pg.wait_for_timeout(200); pg.evaluate("(()=>{ const bs=[...document.querySelectorAll('.modal-btns button')]; (bs[1]||bs[0]).click(); })()"); pg.wait_for_timeout(200)
+    check(pg.locator('#msTerm .sh-line .sh-ps1').inner_text().startswith('me@academy:~$') and pg.evaluate("Store.prob('T0P4').code")=='', '「처음부터」 → 초기 상태·저장 명령 비움')
+    # 명령 퀴즈(kind cmd) · 빈칸
+    pg.evaluate("UI.go('problem',{pid:'T0P2',lessonId:'T0'})"); pg.wait_for_timeout(300); tq=pg.locator('.qopt').count(); pg.click('.qopt[data-i="%d"]' % pg.evaluate("Content.problem('T0P2').quiz.ans")); pg.wait_for_timeout(1200)
+    for _ in range(3):
+        if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
+    check(tq==4 and pg.locator('.result.ok').count()==1, '명령 맞히기 퀴즈(kind cmd) 보기 4개 → 클리어')
+    pg.evaluate("UI.go('problem',{pid:'T0P3',lessonId:'T0'})"); pg.wait_for_timeout(300); fb=pg.locator('.blank').count(); pg.evaluate("[...document.querySelectorAll('.blank')].forEach((el,i)=>{ el.value=Content.problem('T0P3').fill.blanks[i].a[0]; })"); pg.click('#btnGrade'); pg.wait_for_timeout(1200)
+    for _ in range(3):
+        if pg.locator('#luOk').count(): pg.click('#luOk'); pg.wait_for_timeout(200)
+    check(fb==3 and pg.locator('.result.ok').count()==1, '빈칸(터미널 장면) 3칸 → 클리어')
+    # 보스 미션: Git 패널(3칸·그래프)·edit 편집창·forbid 규칙
+    pg.evaluate("Store.data.settings.unlockAll=true; UI.go('problem',{pid:'TB1P1',lessonId:'TB1'})"); pg.wait_for_timeout(400)
+    for c in ['git init','git add .','git commit -m "first"','git switch -c dev','echo more >> util.py','git commit -am "second"','git switch main','echo x >> main.py','git commit -am "third"','git merge dev']:
+        pg.fill('#msTerm .sh-in', c); pg.keyboard.press('Enter'); pg.wait_for_timeout(40)
+    tgg=pg.evaluate("({panel:document.querySelectorAll('.sh-git:not(.hide)').length, cols:document.querySelectorAll('.sh-col').length, circles:document.querySelectorAll('.sh-svg circle').length, labels:[...document.querySelectorAll('.sh-gl text')].map(t=>t.textContent).sort().join(','), ps1:document.querySelector('#msTerm .sh-line .sh-ps1').textContent, repo:document.querySelector('.sh-cols').innerText.includes('Merge branch')})")
+    check(tgg['panel']==1 and tgg['cols']==3 and tgg['circles']==4 and tgg['labels']=='HEAD → main,dev' and '(main)' in tgg['ps1'] and tgg['repo'], 'Git 패널: 3칸 상태 뷰 + 커밋 그래프(커밋 4·라벨 HEAD → main/dev) + 프롬프트 브랜치 (%s)' % tgg)
+    pg.fill('#msTerm .sh-in', 'edit notes.txt'); pg.keyboard.press('Enter'); pg.wait_for_timeout(300); tgd=pg.locator('#shEdTa').count(); pg.fill('#shEdTa', 'TODO 가 들어 있는 파일:\nutil.py\n'); pg.click('.modal-btns button:has-text("저장")'); pg.wait_for_timeout(200)
+    tgd2=pg.evaluate("({hist:Store.prob('TB1P1')&&1, work:document.querySelector('.sh-cols').innerText.includes('notes.txt'), modal:document.querySelectorAll('.modal-ov').length})"); pg.fill('#msTerm .sh-in', 'cat notes.txt'); pg.keyboard.press('Enter'); pg.wait_for_timeout(80)
+    check(tgd==1 and tgd2['modal']==0 and tgd2['work'] and 'util.py' in pg.locator('#msTerm .sh-out').inner_text()[-120:], 'edit 파일 → 편집창(textarea) 저장 → 파일에 반영(작업 폴더 칸에 고침 표시)')
+    pg.fill('#msTerm .sh-in', 'rm -r src'); pg.keyboard.press('Enter'); pg.wait_for_timeout(80); check(pg.locator('.ms-g.broken').count()==1 and pg.evaluate("document.querySelector('#btnGrade').disabled"), 'forbid 규칙(rm -r) 어기면 체크리스트에 ✕ + 제출 비활성')
+    tgp=pg.evaluate("""(()=>{ const sol='git init\\ngit add .\\ngit commit -m "a"\\ngit switch -c dev\\ngit log'; const p={id:'TX',type:'parsons',title:'t',prompt:'',hints:['a','b','c'],tags:['커밋'],solution:sol,parsons:{solution:sol}}; const host=document.createElement('div'); document.body.appendChild(host); const got=[]; const pl=UI.modes.parsons.mount(host,p,{pid:'TX',rec:{},fresh:true,submit:(r)=>got.push(r.ok)}); const pick=(t)=>[...host.querySelectorAll('.pz-bank .pz-tile')].find(x=>x.textContent===t).click(); ['git add .','git init'].forEach(pick); pl.submit(); while(host.querySelector('.pz-ans .pz-x')) host.querySelector('.pz-ans .pz-x').click(); sol.split('\\n').forEach(pick); pl.submit(); const code=pl.getCode(); host.remove(); return {got, saved:code.includes('git log'), hiddenIndent:getComputedStyle(document.body).display!=null}; })()""")
+    check(tgp['got']==[False, True] and tgp['saved'], '명령 순서(parsons 플러그인): 틀린 순서 → 실패, 맞는 순서 → 통과, 저장은 배치 JSON (%s)' % tgp['got'])
+    tgv=pg.evaluate("(()=>{ const p=Content.problem('T0P1'); const sh=Shell.create(JSON.parse(JSON.stringify(p.setup))); const r=Grader.matchState(sh.state(), p.expect); return {okBefore:r.ok, fails:r.fails.length}; })()")
+    check(tgv['okBefore'] is False and tgv['fails']>=1, '브라우저에서도 Grader.matchState 로 시작 상태는 미달성 (%s)' % tgv)
+    pg.set_viewport_size({'width':390,'height':800}); pg.evaluate("UI.go('problem',{pid:'T0P1',lessonId:'T0'})"); pg.wait_for_timeout(400); pg.click('.pv-tabs button[data-t="work"]'); pg.wait_for_timeout(200)
+    tgmo=pg.evaluate("({sw:document.documentElement.scrollWidth, chips:getComputedStyle(document.querySelector('.sh-chips')).display, treeFirst:document.querySelector('.sh-wrap').getBoundingClientRect().top < 1e9 && document.querySelector('.sh-side').getBoundingClientRect().top < document.querySelector('.sh-term').getBoundingClientRect().top})")
+    check(tgmo['sw']<=390 and tgmo['chips']=='flex' and tgmo['treeFirst'], '폰 390px: 미션 화면 가로 넘침 없음, 명령 칩 표시, 파일 트리가 터미널 위 (%s)' % tgmo)
+    pg.evaluate("UI.go('lesson',{lessonId:'T0',page:2})"); pg.wait_for_timeout(400); check(pg.evaluate('document.documentElement.scrollWidth')<=390, '폰 390px: T0 예제 쪽 가로 넘침 없음'); pg.set_viewport_size({'width':1280,'height':900})
+    check(not [e for e in errors[tg0:]], 'terminal-git 코스 페이지 에러 0 (%s)' % errors[tg0:][:2])
+    # ===== [코스 sql] ===== 데이터베이스(SQL) 코스 뼈대 (v2.7.0): 허브 카드 → 코스 열기 → S0 레슨 쪽·예제(CDN 차단 → Sql.unavailable 안내) → 문제 4개(가짜 엔진으로 채점 ok/실패) → draft 「준비 중」
+    print('[sql]'); SQLC='file://'+os.path.join(ROOT,'courses/sql/index.html'); n0=len(errors)
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600)
+    check(pg.locator('a.hc[href*="courses/sql/"]').count()==1 and '미리보기' in pg.locator('a.hc[href*="courses/sql/"]').inner_text(), '허브: SQL 카드가 미리보기로 열림')
+    pg.goto(SQLC); pg.wait_for_timeout(900); pg.evaluate("Store.data.onboarded=true; Store.data.settings.unlockAll=true; Store.save(); document.querySelectorAll('.modal-ov').forEach(m=>m.remove()); UI.go('home')"); pg.wait_for_timeout(400)
+    check(pg.evaluate("UI.view")=='home' and pg.evaluate("typeof Sql==='object' && typeof UI.modes.sql==='object' && typeof UI.examples.sql==='object'"), 'SQL 코스 홈 렌더 + Sql 러너·UI.modes.sql·UI.examples.sql 등록')
+    check(pg.locator('.lc.draft').count()>=4 and pg.locator('.lc.draft').first.is_disabled(), '준비 중(draft) 레슨 카드가 비활성 (%d개)' % pg.locator('.lc.draft').count())
+    pg.evaluate("UI.go('lesson',{lessonId:'S0',page:0})"); pg.wait_for_timeout(2500)
+    check(pg.locator('#exPlugin.sqlw').count()==1 and pg.locator('#exPlugin #exSqlRun').count()==1, 'S0 1쪽: { sql } 예제가 플러그인 작업판으로 그려짐')
+    sqlst=pg.evaluate("({un:Sql.unavailable, ready:Sql.ready, reason:Sql.reason})")
+    if sqlst['un']: check(pg.locator('#exPlugin .sql-notice.err').count()==1 and '받지 못했어요' in pg.locator('#exPlugin .sql-notice.err').inner_text() and pg.locator('#exPlugin [data-sqlretry]').count()==1, 'CDN 차단: 「SQLite 엔진을 받지 못했어요」 안내 + 재시도 버튼 (%s)' % sqlst['reason'])
+    else: check(pg.locator('#exPlugin .sql-tbl').count()==1, '엔진 있음: 예제 자동 실행 결과 표 (%s)' % sqlst)
+    pg.evaluate("UI.go('lesson',{lessonId:'S0',page:2})"); pg.wait_for_timeout(500); check(pg.locator('#exPlugin.sqlw').count()==1 and pg.evaluate("document.querySelector('#exPlugin textarea, #exPlugin .cm-content') ? (document.querySelector('#exPlugin textarea')||{}).value||document.querySelector('#exPlugin .cm-content').innerText : ''").strip().startswith('SELECT name, price'), 'S0 3쪽 예제 쿼리가 편집기에 들어감')
+    # 가짜 엔진: Sql.exec 를 고정 결과로 바꿔 채점 경로(rows 비교·기대/내 결과 표·행 수 힌트)를 검사
+    pg.evaluate("""()=>{ window.__stubRows={ 'SELECT * FROM menu':{columns:['id','name','category','price','is_hot'],rows:[[1,'아메리카노','커피',4000,1],[2,'카페라테','커피',4500,1]]}, "SELECT name, price FROM menu WHERE category = '커피'":{columns:['name','price'],rows:[['아메리카노',4000],['카페라테',4500]]}, 'SELECT name FROM menu':{columns:['name'],rows:[['아메리카노'],['카페라테']]}, 'SELECT * FROM menu LIMIT 1':{columns:['id','name','category','price','is_hot'],rows:[[1,'아메리카노','커피',4000,1]]}, "SELECT price, name FROM menu WHERE category = '커피'":{columns:['price','name'],rows:[[4500,'카페라테'],[4000,'아메리카노']]}, "SELECT name, price FROM menu WHERE category = '음료'":{columns:['name','price'],rows:[['녹차라테',5000],['유자차',4500]]} };
+      Sql.ready=true; Sql.unavailable=false; Sql.SQL={ Database: function(){ this.exec=()=>[]; this.close=()=>{}; this.getRowsModified=()=>0; } };
+      Sql.exec=(db,q)=>{ q=String(q).trim().replace(/\\s+/g,' '); const r=window.__stubRows[q]; if(!r) return { error:{ msg:'no such column: '+q.split(' ')[1], ko:'(가짜 엔진) 모르는 쿼리' } }; return { columns:r.columns.slice(), rows:r.rows.map(x=>x.slice()), ms:1, changes:0 }; };
+      Sql.tables=()=>['menu']; Sql.columns=()=>[{name:'id',type:'INTEGER',pk:true},{name:'name',type:'TEXT'}]; Sql.count=()=>2; Sql.sample=()=>({columns:['id','name'],rows:[[1,'아메리카노']]}); Sql._emit(); }""")
+    pg.evaluate("UI.go('problem',{pid:'S0P1',lessonId:'S0'})"); pg.wait_for_timeout(500)
+    check(pg.locator('#pvMode.sqlw').count()==1 and pg.locator('#sqlRun').count()==1 and pg.locator('#btnGrade').count()==1 and pg.locator('#pvMode .sqlw-schema .sql-sch-name').count()>=1, 'S0P1(sql): 작업판(실행·제출·스키마 패널)')
+    setq="(q)=>{ const t=document.querySelector('#pvMode textarea, #pvMode .cm-content'); if(t.value!==undefined){ t.value=q; t.dispatchEvent(new Event('input')); } else { t.innerText=q; } }"
+    pg.evaluate(setq, 'SELECT name FROM menu'); pg.click('#sqlRun'); pg.wait_for_timeout(300)
+    check(pg.locator('#pvMode .sqlw-out .sql-tbl').count()==1 and '2행' in pg.locator('#pvMode .sql-tbl-meta').inner_text(), '▶ 실행: 결과 표 + 행 수·ms')
+    pg.click('#pvMode .sql-tbl th[data-col="0"]'); pg.wait_for_timeout(100); check(pg.locator('#pvMode .sql-tbl th.asc').count()==1, '결과 표 열 머리 클릭 정렬')
+    pg.click('#btnGrade'); pg.wait_for_timeout(500)
+    r1=pg.locator('#pvResult').inner_text(); check('열 개수가 달라요' in r1 and pg.locator('#pvResult .sql-diff .sql-tbl').count()==2, '오답(열 수 다름): 기대/내 결과 표 두 개 나란히: %s' % r1[:40].replace('\n',' '))
+    pg.evaluate(setq, 'SELECT * FROM menu LIMIT 1'); pg.click('#btnGrade'); pg.wait_for_timeout(500)
+    r2=pg.locator('#pvResult').inner_text(); check('행 수가 달라요' in r2 and '덜 나왔어요' in r2 and pg.locator('#pvResult td.diff').count()>=1, '오답(행 수 다름): 자동 힌트 + 다른 셀 강조: %s' % r2[:50].replace('\n',' '))
+    pg.evaluate(setq, 'SELECT * FROM mneu'); pg.click('#btnGrade'); pg.wait_for_timeout(500); check('실행되지 않았어요' in pg.locator('#pvResult').inner_text() and pg.locator('#pvResult .sql-err-ko').count()==1, '오답(에러): 원문 + 한국어 풀이')
+    pg.evaluate(setq, 'SELECT * FROM menu'); pg.click('#btnGrade'); pg.wait_for_timeout(900)
+    check(pg.evaluate("Store.prob('S0P1').status")=='clear' and '기대한 결과와 같아요' in pg.locator('#pvMode .sqlw-out').inner_text() and pg.locator('#pvMode .sqlw-out .sql-tbl').count()==1 and pg.evaluate("Store.prob('S0P1').code")=='SELECT * FROM menu', '정답: clear + 결과 표 + 쿼리 저장')
+    pg.evaluate("UI.go('problem',{pid:'S0P4',lessonId:'S0'})"); pg.wait_for_timeout(500)
+    pg.evaluate(setq, "SELECT price, name FROM menu WHERE category = '커피'"); pg.click('#btnGrade'); pg.wait_for_timeout(900); check(pg.evaluate("Store.prob('S0P4').status")=='clear', 'S0P4: 열 순서가 달라도(이름으로 맞춤) 정답')
+    pg.evaluate("Store.prob('S0P4').status='none'"); pg.evaluate(setq, "SELECT name, price FROM menu WHERE category = '음료'"); pg.click('#btnGrade'); pg.wait_for_timeout(500); check(pg.locator('#pvResult td.diff').count()>=2 and '셀이 달라요' in pg.locator('#pvResult').inner_text(), 'S0P4: 같은 행 수·다른 값 → 다른 셀 강조')
+    pg.evaluate("UI.go('problem',{pid:'S0P2',lessonId:'S0'})"); pg.wait_for_timeout(400); pg.click('.qopt[data-i="1"]'); pg.wait_for_timeout(600); check(pg.evaluate("Store.prob('S0P2').status")=='clear', 'S0P2(quiz 결과 예측) 정답')
+    pg.evaluate("UI.go('problem',{pid:'S0P3',lessonId:'S0'})"); pg.wait_for_timeout(400); pg.fill('.blank[data-b="0"]','SELECT'); pg.fill('.blank[data-b="1"]','FROM'); pg.click('#btnGrade'); pg.wait_for_timeout(600); check(pg.evaluate("Store.prob('S0P3').status")=='clear', 'S0P3(fill 키워드 빈칸) 정답')
+    pg.set_viewport_size({'width':390,'height':800}); pg.evaluate("UI.go('problem',{pid:'S0P1',lessonId:'S0'},false)"); pg.wait_for_timeout(400); pg.click('.pv-tabs button[data-t="work"]'); pg.wait_for_timeout(200); check(pg.evaluate('document.documentElement.scrollWidth')<=390, 'SQL 문제 화면 모바일 가로 스크롤 없음'); pg.set_viewport_size({'width':1280,'height':900})
+    sqlerr=[e for e in errors[n0:] if 'sql-wasm' not in e and 'Py' not in e]; check(not sqlerr, 'SQL 코스 pageerror 0 (%s)' % (sqlerr[:2] or 'OK')); pg.evaluate("Store.data.settings.unlockAll=false; Store.save()")
     b.close()
 cdn=[e for e in errors if 'importScripts' in e or 'pyodide' in e.lower()]
 real=[e for e in errors if e not in cdn]

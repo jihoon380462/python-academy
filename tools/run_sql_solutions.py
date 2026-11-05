@@ -18,7 +18,7 @@ def load_course():
     if r.returncode: print(r.stderr); sys.exit(1)
     return json.loads(r.stdout)
 def fresh(sql):
-    db = sqlite3.connect(':memory:'); db.executescript(sql); return db
+    db = sqlite3.connect(':memory:'); db.execute('PRAGMA foreign_keys = ON'); db.executescript(sql); return db  # 브라우저(Sql.fresh)와 같은 설정: 외래 키 검사 켬
 def run(db, q):
     cur = db.cursor()
     # executescript 는 결과를 안 돌려주므로 문장을 나눠 마지막 결과 집합을 가져온다(sql.js 의 db.exec 와 같은 규칙)

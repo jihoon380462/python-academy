@@ -78,7 +78,7 @@ UI.modes.web = {
         ws.showChecks(results, (r) => { if (r.sel) Web.highlight(ws.iframe, r.sel); });
         const bad = results.filter(r => !r.ok);
         if (!bad.length) ctx.submit({ ok: true, detail: WebUI.checklistHtml(results) });
-        else ctx.submit({ ok: false, msg: `${results.length}개 중 ${bad.length}개 항목이 아직이에요: ${bad.map(r => esc(r.text)).join(' · ')} — 아래 「검사 결과」의 빨간 항목을 눌러 보세요.` });
+        else ctx.submit({ ok: false, msg: `${results.length}개 중 ${bad.length}개 항목이 아직이에요: ${bad.map(r => esc(r.text)).join(' · ')} — 미리보기 아래 「검사 결과」 탭의 빨간 항목을 누르면 그 요소가 표시돼요.` });
       } finally { busy = false; if (btn) btn.disabled = false; }
     };
     $('#btnGrade', host).onclick = submit;
