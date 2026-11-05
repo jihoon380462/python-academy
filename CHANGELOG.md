@@ -4,6 +4,10 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.8.3 — 2026-11-06 (Opus 릴리스: 에러 「자세히」 팝업)
+
+- 🩺 (사용자 제보 11/6) **출력 에러의 「자세히」가 에러 사전 화면으로 넘어가 돌아올 길이 없던 것**: 이제 문제·예제 화면에 그대로 머문 채 그 에러의 「왜 나나요 / 자주 하는 실수 / 고치는 법」을 팝업으로(`UI.errorPeek`). 팝업의 「에러 사전 전체 보기」로 가면 사전 화면 위에 「← 돌아가기」가 있어 원래 문제로 돌아옴. 사전에 없는 에러면 안내 문구.
+
 ## v2.8.2 — 2026-11-06 (Opus 릴리스: TODO O1-1 괄호 지옥 풀어 쓰기)
 
 - 📖 (사용자 지시 11/6, TODO O1 「긴 코드 줄 나눠 쓰기」 1차) **함수 호출이 3겹 이상 겹친 줄을 한 줄에 한 단계로**: 예) <code>print(sorted(set(nums)))</code> → <code>nums = set(nums)</code> / <code>nums = sorted(nums)</code> / <code>print(nums)</code>, 알고의 <code>a = list(map(int, input().split()))</code> → <code>line = input().split()</code> / <code>a = list(map(int, line))</code>. 파이썬 48줄(28곳)·알고 63줄(31곳) — 정답·시작 코드·힌트·빈칸·틀린 줄 찾기·레슨 예제·본문 <pre> 전부. 문제 설명 2곳(L11BP3·L11BP4)과 힌트 4곳·레슨 문장 1곳은 손으로 고쳐 씀, 틀린 줄 찾기 A5P3·A20P3 는 줄 번호도 옮김. 출력은 그대로(run_solutions 0). 남은 3겹 줄 0개. 새 검사 도구 `tools/check_nesting.mjs` 를 PR 검사(CI)에 연결해 다시 생기면 실패.
