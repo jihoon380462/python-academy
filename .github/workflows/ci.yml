@@ -28,6 +28,8 @@ jobs:
         run: node tools/validate_content.mjs
       - name: check_level (난이도 래칫 게이트, DESIGN 14-2절)
         run: node tools/check_level.mjs --gate
+      - name: check_nesting (괄호 지옥 — 함수 호출 3겹 이상 줄 0개, v2.8.2)
+        run: node tools/check_nesting.mjs
       - name: run_solutions
         run: node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
       - name: test_shell
