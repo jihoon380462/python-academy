@@ -137,7 +137,7 @@ with sync_playwright() as p:
     pg.fill('#homeQ', '반복'); pg.wait_for_timeout(200); check(pg.locator('#homeResults .pitem').count()>=3 and pg.locator('#homeMap.hide').count()==1, '홈 검색(F4): 반복 → 결과 %d개'%pg.locator('#homeResults .pitem').count())
     pg.fill('#homeQ', ''); pg.click('[data-hf="todo"]'); pg.wait_for_timeout(200); n1=pg.locator('#homeResults .pitem').count(); pg.click('[data-hf="all"]'); pg.wait_for_timeout(200); check(n1>=1 and pg.locator('#homeMap.hide').count()==0, '홈 필터 칩: 안 푼 것 %d개 → 전체는 지도'%n1)
     pg.keyboard.press('?'); pg.wait_for_timeout(200); check(pg.locator('.kb').count()==1, '단축키 안내(F6): ? 키'); pg.keyboard.press('Escape'); pg.wait_for_timeout(200); check(pg.locator('.modal-ov').count()==0, 'Esc로 닫기')
-    pg.evaluate("Store.data.settings.contrast=true; Store.data.settings.font=3; UI.applyTheme()"); check(pg.evaluate("document.documentElement.dataset.contrast")=='1' and pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--fs').trim()")=='20px', '접근성(F9): 고대비·아주 크게'); pg.evaluate("Store.data.settings.contrast=false; Store.data.settings.font=1; UI.applyTheme()")
+    pg.evaluate("Store.data.settings.contrast=true; Store.data.settings.font=3; UI.applyTheme()"); check(pg.evaluate("document.documentElement.dataset.contrast")=='1' and pg.evaluate("getComputedStyle(document.body).fontSize")=='20px', '접근성(F9): 고대비·아주 크게'); pg.evaluate("Store.data.settings.contrast=false; Store.data.settings.font=1; UI.applyTheme()")
     pg.evaluate("UI.go('settings')"); pg.wait_for_timeout(300); check(pg.locator('#sOffline').count()==1 and '완전 무료' in pg.locator('#view').inner_text(), '설정: 오프라인 캐시 줄 + 무료 안내')
     # 빈칸
     pg.evaluate("UI.go('problem',{pid:'L1P4',lessonId:'L1'})"); pg.wait_for_timeout(300)
