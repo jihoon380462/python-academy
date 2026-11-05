@@ -1,0 +1,1 @@
+{ "id": "sql", "name": "데이터베이스(SQL)", "icon": "🗄️", "desc": "동네 카페 데이터로 배우는 진짜 SQLite", "runner": "sql", "mapColor": "#f4511e", "mascotGear": null, "requires": { "course": "python", "boss": "B3" } }

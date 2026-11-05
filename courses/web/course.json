@@ -1,0 +1,1 @@
+{ "id": "web", "name": "웹·HTTP·API", "icon": "🌐", "desc": "내가 만든 걸 남에게 보여주려면", "runner": "web", "mapColor": "#8e24aa", "mascotGear": null, "requires": { "course": "python", "boss": "B2" } }

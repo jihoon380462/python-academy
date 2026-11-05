@@ -25,8 +25,11 @@ jobs:
         run: node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
       - name: test_shell
         run: node tools/test_shell.mjs
+      - run: node tools/run_shell_solutions.mjs # terminal-git 미션·명령 순서 정답을 셸 시뮬레이터로 실행해 goals/expect 통과 확인
+      - run: python3 tools/run_sql_solutions.py # sql 코스 정답 쿼리·예제를 Python sqlite3 로 실행해 에러 없음·1행 이상 확인
       - name: regress (Playwright)
         run: |
           pip install --quiet playwright pillow
           python3 -m playwright install --with-deps chromium
           python3 tools/regress.py
+          python3 tools/run_web_solutions.py # web 코스: 모든 web 문제의 solution 을 미리보기 iframe 에 넣고 checks 전부 ✓ 인지 (Playwright)

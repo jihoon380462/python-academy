@@ -1,0 +1,87 @@
+/* courses/terminal-git/course.css — 터미널·Git 코스 전용 화면 (core/ui-views-shell.js). core/ui.css 의 토큰(--bg --surface --surface2 --primary --success --muted --border)만 쓴다. */
+/* ---------- 터미널 위젯 ---------- */
+.sh-wrap{display:grid;grid-template-columns:minmax(0,1fr) 250px;grid-template-areas:"term tree" "git git";gap:10px;align-items:start}
+.sh-wrap.compact{grid-template-columns:1fr;grid-template-areas:"term" "tree" "git"}
+.sh-term{grid-area:term}.sh-side{grid-area:tree}.sh-git{grid-area:git}.sh-panel.hide{display:none}
+.sh-term{background:#0b0f17;color:#d6dde8;border:1px solid var(--border);border-radius:12px;overflow:hidden;font-family:var(--mono);font-size:var(--code-size);min-width:0}
+[data-theme=light] .sh-term{background:#111827;color:#e5e7eb}
+.sh-bar{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.08);font-family:var(--sans);font-size:.85em;color:#aab3c2}
+.sh-dots{display:inline-flex;gap:5px}.sh-dots i{width:10px;height:10px;border-radius:50%;background:#3b4454;display:inline-block}
+.sh-out{min-height:150px;max-height:340px;overflow:auto;padding:10px 12px 4px;line-height:1.5;white-space:pre-wrap;word-break:break-all}
+.sh-o{margin:0;font:inherit;white-space:pre-wrap;color:#d6dde8}.sh-o.err{color:#ff8a93}
+.sh-echo{color:#d6dde8}.sh-echo.dim{opacity:.55}.sh-ps1{color:#7ee787;font-weight:700}.sh-echo .sh-cmd{color:#fff}
+.sh-ko{margin:2px 0 8px;padding:6px 10px;border-left:3px solid #d9a21b;background:rgba(217,162,27,.12);color:#f3d58a;font-family:var(--sans);font-size:.9em;line-height:1.5;white-space:normal}.sh-ko .sh-fix{color:#c9d1dd}
+.sh-note{color:#8e98a9;font-family:var(--sans);font-size:.85em;margin:4px 0 8px}
+.sh-line{display:flex;align-items:center;gap:6px;padding:4px 12px 10px}
+.sh-in{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#fff;font:inherit;caret-color:#7ee787;padding:4px 0}
+.sh-in::placeholder{color:#55607a}
+.sh-chips{display:none;gap:4px;padding:6px 8px 8px;overflow-x:auto;border-top:1px solid rgba(255,255,255,.08)}
+.sh-chips button{flex-shrink:0;min-width:40px;min-height:36px;border-radius:8px;border:1px solid #3b4454;background:#1b2230;color:#e9edf3;font-family:var(--mono);font-size:.9em}
+/* ---------- 오른쪽 패널 ---------- */
+.sh-side{display:flex;flex-direction:column;gap:10px;min-width:0}
+.sh-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px 10px}
+.sh-ph{font-weight:700;font-size:.92em;margin-bottom:6px;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.sh-tree-body{max-height:300px;overflow:auto;font-family:var(--mono);font-size:.88em}
+.sh-tr{display:flex;align-items:center;gap:4px;padding:2px 6px 2px calc(6px + var(--d,0)*14px);border-radius:6px;white-space:nowrap;transition:background .25s}
+.sh-tr.dir .sh-tn{color:var(--primary-text)}.sh-tr.file .sh-tn{color:var(--text)}.sh-tr.dot{opacity:.55}
+.sh-tr.cur{background:var(--primary);color:#fff}.sh-tr.cur .sh-tn{color:#fff;font-weight:700}
+.sh-ti{width:12px;color:var(--muted);text-align:center;font-size:.8em}.sh-tr.cur .sh-ti{color:#fff}
+.sh-here{margin-left:auto;font-family:var(--sans);font-size:.75em;background:rgba(255,255,255,.22);padding:0 6px;border-radius:999px}
+/* 3칸 상태 뷰 */
+.sh-cols{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:6px;align-items:start;font-size:.85em}
+.sh-col{background:var(--surface2);border-radius:8px;padding:6px;min-width:0;min-height:56px}
+.sh-ch{font-weight:700;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-family:var(--sans)}
+.sh-cn{background:var(--primary);color:#fff;border-radius:999px;padding:0 6px;font-size:.85em;min-width:18px;text-align:center}
+.sh-arrow{align-self:center;color:var(--muted);font-size:.78em;font-family:var(--mono);white-space:nowrap;padding:0 1px}
+.sh-f{display:flex;justify-content:space-between;gap:4px;padding:2px 4px;border-radius:4px;font-family:var(--mono);min-width:0}
+.sh-fn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.sh-fl{color:var(--muted);font-family:var(--sans);flex-shrink:0;font-size:.9em}
+.sh-f.new .sh-fl{color:var(--success)}.sh-f.mod .sh-fl{color:var(--warn)}.sh-f.del .sh-fl{color:var(--danger)}.sh-f.warn .sh-fn{color:var(--danger)}.sh-f.cm .sh-fn{white-space:normal}
+.sh-empty{color:var(--muted);font-family:var(--sans);font-size:.9em;padding:2px 4px}
+/* 커밋 그래프 */
+.sh-graph{margin-top:8px;overflow-x:auto}
+.sh-svg{display:block;max-width:none}
+.sh-ge{stroke:var(--muted);stroke-width:2;fill:none}
+.sh-gc circle{fill:var(--surface2);stroke:var(--primary);stroke-width:2.5;transition:r .3s}.sh-gc.head circle{fill:var(--primary)}
+.sh-gh{fill:var(--muted);font-family:var(--mono);font-size:9px}
+.sh-gl rect{fill:var(--surface2);stroke:var(--border);stroke-width:1}.sh-gl text{fill:var(--text);font-family:var(--mono);font-size:10px}
+.sh-gl.head rect{fill:var(--primary);stroke:var(--primary)}.sh-gl.head text{fill:#fff;font-weight:700}
+.sh-gl.remote rect{stroke-dasharray:3 2;stroke:var(--muted)}.sh-gl.remote text{fill:var(--muted)}
+.sh-gl.tag rect{stroke:var(--gold)}.sh-gl.tag text{fill:var(--gold)}
+/* 편집창 */
+.sh-ta{width:100%;min-height:140px;font-family:var(--mono);font-size:var(--code-size);line-height:1.5;background:var(--ed-bg);color:var(--ed-fg);border:1px solid var(--border);border-radius:8px;padding:8px;resize:vertical;tab-size:4}
+.sh-conf{margin-bottom:8px;padding:8px 10px;border-left:3px solid var(--warn);background:rgba(217,162,27,.12);border-radius:6px;font-size:.92em;line-height:1.5}
+/* ---------- 미션 문제 ---------- */
+.ms-goals{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.ms-gh{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:6px}.ms-gn{background:var(--surface2);border-radius:999px;padding:0 8px;font-family:var(--mono);font-size:.9em}
+.ms-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.ms-g{display:flex;align-items:flex-start;gap:8px;padding:4px 6px;border-radius:8px;line-height:1.5}
+.ms-chk{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);margin-top:2px;display:inline-flex;align-items:center;justify-content:center;font-size:.8em;color:#fff;transition:background .25s,border-color .25s}
+.ms-g.done .ms-chk{background:var(--success);border-color:var(--success)}.ms-g.done .ms-chk::after{content:'✓'}
+.ms-g.done .ms-gt{color:var(--muted);text-decoration:line-through}
+.ms-g.rule .ms-chk{border-style:dashed}.ms-g.rule.done .ms-gt{text-decoration:none;color:var(--text)}.ms-g.broken{background:rgba(229,72,77,.12)}.ms-g.broken .ms-chk{border-color:var(--danger);background:var(--danger)}.ms-g.broken .ms-chk::after{content:'✕'}
+.ms-g.pop .ms-chk{animation:msPop .45s ease-out}
+@keyframes msPop{0%{transform:scale(.6)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+.ms-actions{margin-top:10px;align-items:center;flex-wrap:wrap}
+.ms-left{margin:6px 0 0;padding-left:1.2em}
+.ms-pzhint{margin-bottom:6px}
+.ms-pz .pz-b[data-a=l],.ms-pz .pz-b[data-a=r],.ms-pz .pz-ind{display:none}
+/* 레슨 본문의 명령 표 */
+.lp-html .kb td:first-child{white-space:nowrap}
+/* ---------- 레슨 예제 (한 줄씩 실행) ---------- */
+.ex2.ex-plugin{background:var(--surface);border-color:var(--border)}
+.ex-sh-head{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ex-sh-lines{list-style:none;margin:0;padding:8px 10px;display:flex;flex-direction:column;gap:3px;font-family:var(--mono);font-size:.92em;background:var(--surface2)}
+.ex-sh-lines li{padding:3px 8px;border-radius:6px;border-left:3px solid transparent;color:var(--muted)}
+.ex-sh-lines li.next{border-left-color:var(--primary);color:var(--text);background:var(--surface)}
+.ex-sh-lines li.done{color:var(--text)}.ex-sh-lines li.done::before{content:'✓ ';color:var(--success)}
+.ex-sh-lines li code{background:transparent;border:0;padding:0;font-weight:400;color:inherit;white-space:pre-wrap}
+.ex-sh-term{padding:8px}.ex-sh-term .sh-term{border-radius:10px}
+.ex-sh-note{padding:0 10px 8px}
+/* ---------- 폰 ---------- */
+@media (max-width:767px){
+  .sh-wrap{grid-template-columns:1fr;grid-template-areas:"tree" "term" "git"}
+  .sh-tree-body{max-height:160px}
+  .sh-out{min-height:120px;max-height:240px}
+  .sh-chips{display:flex}
+  .sh-cols{grid-template-columns:1fr;gap:4px}.sh-arrow{transform:rotate(90deg);justify-self:center;padding:2px 0}
+}

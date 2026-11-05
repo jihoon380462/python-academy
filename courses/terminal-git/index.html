@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>파이썬 아카데미 — 터미널·Git 코스</title>
 <link rel="stylesheet" href="../../core/ui.css?v=2.6.0">
+<link rel="stylesheet" href="course.css?v=2.6.0"><!-- 코스 전용 화면(터미널 창·파일 트리·커밋 그래프·미션) -->
 </head>
 <body data-course="terminal-git">
 <div id="topbar"></div>
@@ -24,14 +25,14 @@
 <script src="../../core/storage.js?v=2.6.0"></script>
 <script src="../../core/sync.js?v=2.6.0"></script>
 <script src="../../core/engine.js?v=2.6.0"></script>
-<script src="../../core/runners/shell.js?v=2.6.0"></script><!-- WP-B: python.js 대신 셸 러너. Py.* 를 호출하는 화면(놀이터·예제 실행)은 러너 디스패치(NEXT.md WP-B 4단계) 뒤에 동작 -->
+<script src="../../core/runners/shell.js?v=2.6.0"></script><!-- python.js 대신 셸 러너(Py 없음 — core 는 typeof Py 가드) -->
 <script src="../../core/game.js?v=2.6.0"></script>
 <script src="../../core/tutor.js?v=2.6.0"></script>
 <script src="../../core/fx.js?v=2.6.0"></script>
 <script src="../../core/ui-core.js?v=2.6.0"></script>
 <script src="../../core/ui-editors.js?v=2.6.0"></script>
 <script src="../../core/ui-views-main.js?v=2.6.0"></script>
-<!-- WP-B 5단계: core/ui-views-terminal.js (터미널 창·파일 트리·커밋 그래프·3칸 상태 뷰) 를 여기 추가 -->
+<script src="../../core/ui-views-shell.js?v=2.6.0"></script><!-- 코스 플러그인: UI.modes.mission·parsons, UI.examples.shell (DESIGN.md 16절) -->
 <script src="../../core/ui-views-more.js?v=2.6.0"></script>
 </body>
 </html>
