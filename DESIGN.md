@@ -128,7 +128,7 @@
 | lesson3star | 완벽한 레슨 | 한 레슨의 모든 문제를 별 3개로 | `lessonsAll3` ≥ 1 |
 | lesson3star5 | 별 수집가 | 별 3개 레슨 5개 | `lessonsAll3` ≥ 5 |
 | grad_block | 첫 타자 (옛 이름 「블록 졸업」) | 코드 문제를 직접 타자로 처음 클리어 | `textClears` ≥ 1 |
-| grad_parsons | Parsons 졸업 | Parsons 문제 5개 클리어 | `parsonsClears` ≥ 5 |
+| grad_parsons | 순서 맞추기 졸업 (옛 이름 「Parsons 졸업」) | 순서 맞추기 문제 5개 클리어 | `parsonsClears` ≥ 5 |
 | boss1 | 보스 1 | 챕터 1 보스 클리어 | `boss_B1` ≥ 1 |
 | boss2 | 보스 2 | 챕터 2 보스 클리어 | `boss_B2` ≥ 1 |
 | boss3 | 보스 3 | 챕터 3 보스 클리어 | `boss_B3` ≥ 1 |

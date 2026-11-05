@@ -2,13 +2,13 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.3.22',
+  APP_VERSION: '2.4.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
   COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+([PD]\\d+)?$', algo: '^(A|AB|E)\\d+([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
-    { id: 'python', name: '파이썬', icon: '🐍', desc: '직접 타자로, 브라우저에서 진짜 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 148, lessons: 36 },
+    { id: 'python', name: '파이썬', icon: '🐍', desc: '입문부터 실전까지, 브라우저에서 직접 쳐 보는 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 148, lessons: 36 },
     { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '코드가 돌아가는 모습을 눈으로 보며, 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 145, lessons: 32, requires: { course: 'python', boss: 'B3', label: '파이썬 챕터 3까지 끝내면 열려요' } },
     { id: 'terminal-git', name: '터미널·Git', icon: '🎧', desc: '검은 창이 무섭지 않게. 가상 터미널과 Git 시뮬레이터', phase: 2 },
     { id: 'sql', name: '데이터베이스(SQL)', icon: '🗄️', desc: '동네 카페 데이터로 배우는 진짜 SQLite', phase: 3 },

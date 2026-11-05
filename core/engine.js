@@ -103,7 +103,7 @@ const Content = {
       else if (prevColon) indTxt = '';
       else if (i > 0 && steps.length && steps[steps.length - 1].lvl > 0) indTxt = ` <span class="coach-ind">들여쓰기 <b>없이</b> 맨 앞에서 시작해요 (반복/조건에서 나왔다는 뜻).</span>`;
       const code = '    '.repeat(lvl) + t;
-      steps.push({ t: `${why}${indTxt}<div class="coach-code"><span class="muted small">이렇게 치세요 (${steps.length + 1}번째 줄)</span><pre class="code"><code>${esc(code)}</code></pre><button class="btn xs coach-copy" data-code="${esc(code)}">📋 복사</button></div>`, c: t, lvl, auto: true });
+      steps.push({ t: `${why}${indTxt}<div class="coach-code"><span class="muted small">이렇게 치세요 (${i + 1}번째 줄)</span><pre class="code"><code>${esc(code)}</code></pre><button class="btn xs coach-copy" data-code="${esc(code)}">📋 복사</button></div>`, c: t, lvl, auto: true });
       prevColon = t.endsWith(':');
     }
     if (!steps.length) return null;

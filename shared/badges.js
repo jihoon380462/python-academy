@@ -22,7 +22,7 @@ const BADGES = [
   { id:'lesson3star', name:'완벽한 레슨', desc:'한 레슨의 모든 문제를 별 3개로', icon:'⭐', cond:['lessonsAll3',1] },
   { id:'lesson3star5', name:'별 수집가', desc:'별 3개 레슨 5개', icon:'🌟', cond:['lessonsAll3',5] },
   { id:'grad_block', name:'첫 타자', desc:'코드 문제를 직접 타자로 처음 클리어', icon:'⌨', cond:['textClears',1] },
-  { id:'grad_parsons', name:'Parsons 졸업', desc:'Parsons 문제 5개 클리어', icon:'🧩', cond:['parsonsClears',5] },
+  { id:'grad_parsons', name:'순서 맞추기 졸업', desc:'순서 맞추기 문제 5개 클리어', icon:'🧩', cond:['parsonsClears',5] },
   { id:'boss1', name:'보스 1', desc:'챕터 1 보스 클리어', icon:'👾', cond:['boss_B1',1] },
   { id:'boss2', name:'보스 2', desc:'챕터 2 보스 클리어', icon:'🐉', cond:['boss_B2',1] },
   { id:'boss3', name:'보스 3', desc:'챕터 3 보스 클리어', icon:'🦑', cond:['boss_B3',1] },
