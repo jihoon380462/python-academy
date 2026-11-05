@@ -18,7 +18,7 @@ def check(cond, msg):
 with sync_playwright() as p:
     b=p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox','--allow-file-access-from-files'])
     ctx=b.new_context(viewport={'width':1280,'height':900}); errors=[]; logs=[]
-    # TODO F0 ②: 위 가짜 기기 연동(gist 'g1')이 CI 에선 실제 api.github.com 요청이 돼 「화면 settings」 검사가 78초 기다렸다. 로컬(오프라인)과 같게 바로 실패시킨다
+    # 위 가짜 기기 연동(gist 'g1')이 인터넷 되는 CI 에서 진짜 api.github.com 으로 나가지 않게 바로 실패시킨다(로컬 오프라인과 같은 조건). ※ CI 로그의 「화면 settings 78초」는 출력 버퍼링 착시였음 — ci.yml PYTHONUNBUFFERED
     ctx.route('https://api.github.com/**', lambda r: r.abort())
     pg=ctx.new_page(); pg.on('console', lambda m: logs.append((m.type, m.text[:300]))); pg.on('pageerror', lambda e: errors.append(str(e)[:500]))
     pg.add_init_script("if(!localStorage.getItem('academy.profile')&&!localStorage.getItem('__seeded')){localStorage.setItem('python_academy_save', "+json.dumps(json.dumps(V1,ensure_ascii=False),ensure_ascii=False)+"); localStorage.setItem('python_academy_sync', JSON.stringify({token:'ghp_x',gistId:'g1',lastSyncAt:1,lastRemoteUpdated:1,lastLocalUpdated:1})); localStorage.setItem('__seeded','1');}")
