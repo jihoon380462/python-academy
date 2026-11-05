@@ -18,6 +18,8 @@ def check(cond, msg):
 with sync_playwright() as p:
     b=p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox','--allow-file-access-from-files'])
     ctx=b.new_context(viewport={'width':1280,'height':900}); errors=[]; logs=[]
+    # 위 가짜 기기 연동(gist 'g1')이 인터넷 되는 CI 에서 진짜 api.github.com 으로 나가지 않게 바로 실패시킨다(로컬 오프라인과 같은 조건). ※ CI 로그의 「화면 settings 78초」는 출력 버퍼링 착시였음 — ci.yml PYTHONUNBUFFERED
+    ctx.route('https://api.github.com/**', lambda r: r.abort())
     pg=ctx.new_page(); pg.on('console', lambda m: logs.append((m.type, m.text[:300]))); pg.on('pageerror', lambda e: errors.append(str(e)[:500]))
     pg.add_init_script("if(!localStorage.getItem('academy.profile')&&!localStorage.getItem('__seeded')){localStorage.setItem('python_academy_save', "+json.dumps(json.dumps(V1,ensure_ascii=False),ensure_ascii=False)+"); localStorage.setItem('python_academy_sync', JSON.stringify({token:'ghp_x',gistId:'g1',lastSyncAt:1,lastRemoteUpdated:1,lastLocalUpdated:1})); localStorage.setItem('__seeded','1');}")
     # ---- 1. 허브: 마이그레이션 + 렌더
@@ -299,7 +301,7 @@ with sync_playwright() as p:
     check(not tg and pg.evaluate("UI.view")=='home', 'terminal-git 코스: Py is not defined 없이 홈 렌더 (%s)' % (tg or 'OK'))
     # ---- 4. 예전 주소
     pg.goto('file://'+os.path.join(ROOT,'python_academy.html')); pg.wait_for_timeout(800); check(pg.url.endswith('courses/python/index.html') or '/courses/python/' in pg.url, '예전 주소 → 코스 페이지 리다이렉트 ('+pg.url[-40:]+')')
-    print('[기기 연동 코스 구분 (QA #67)]'); sx=b.new_context(); sp=sx.new_page(); sp.on('pageerror', lambda e: errors.append(str(e)[:500]))
+    print('[기기 연동 코스 구분 (QA #67)]'); sx=b.new_context(); sx.route('https://api.github.com/**', lambda r: r.abort()); sp=sx.new_page(); sp.on('pageerror', lambda e: errors.append(str(e)[:500]))
     sp.goto('file://'+os.path.join(ROOT,'courses/math/index.html')); sp.wait_for_timeout(900)
     sr=sp.evaluate("""()=>{ Store.data.onboarded=true; const r0=Store.prob('M1_mod_q1'); r0.status='clear'; r0.stars=3; Store.save(); Sync.cfg={lastSyncAt:1}; Sync.apply({updatedAt:Date.now()+5000, xp:9, settings:{}, problems:{L0P1:{status:'clear',stars:3}, M1_mod_q2:{status:'clear',stars:2}}}); const g=c=>{ const m=JSON.parse(localStorage.getItem('academy.course.'+c)||'{}'); return Object.keys(m.problems||{}).filter(k=>m.problems[k].status==='clear').sort().join(','); }; const p=Sync.payload(); return {math:g('math'), py:g('python'), fmt:p.format, keys:Object.keys(p.courses).sort().join(',')}; }""")
     check(sr['math']=='M1_mod_q1,M1_mod_q2' and sr['py']=='L0P1' and sr['fmt']=='academy-sync-2' and 'math' in sr['keys'] and 'python' in sr['keys'], '옛 형식 payload 를 수학 화면에서 받아도 코스별로 나뉨 + 새 payload 는 코스 묶음 (%s)' % sr)
@@ -414,6 +416,10 @@ with sync_playwright() as p:
     sqlst=pg.evaluate("({un:Sql.unavailable, ready:Sql.ready, reason:Sql.reason})")
     if sqlst['un']: check(pg.locator('#exPlugin .sql-notice.err').count()==1 and '받지 못했어요' in pg.locator('#exPlugin .sql-notice.err').inner_text() and pg.locator('#exPlugin [data-sqlretry]').count()==1, 'CDN 차단: 「SQLite 엔진을 받지 못했어요」 안내 + 재시도 버튼 (%s)' % sqlst['reason'])
     else: check(pg.locator('#exPlugin .sql-tbl').count()==1, '엔진 있음: 예제 자동 실행 결과 표 (%s)' % sqlst)
+    # TODO F2: CodeMirror 언어 모듈(sql·html·css·js)이 실제 CDN 에서 받아지는지 — 인터넷 되는 CI 에서만 의미 있음(샌드박스는 CodeMirror 자체가 폴백)
+    cml=pg.evaluate("""async()=>{ try { await CM.load(); } catch(e) { return {cm:false} } const o={cm:true}; for (const id of ['sql','html','css','js']) { await CM.lang(id); o[id]=!!(CM.mods.langs&&CM.mods.langs[id]); } return o; }""")
+    if cml.get('cm'): check(all(cml.get(k) for k in ['sql','html','css','js']), 'CodeMirror 언어 모듈 sql·html·css·js 로드 %s' % cml)
+    else: print('  · CodeMirror CDN 없음(폴백 환경) — 언어 모듈 확인 건너뜀')
     pg.evaluate("UI.go('lesson',{lessonId:'S0',page:2})"); pg.wait_for_timeout(500); check(pg.locator('#exPlugin.sqlw').count()==1 and pg.evaluate("document.querySelector('#exPlugin textarea, #exPlugin .cm-content') ? (document.querySelector('#exPlugin textarea')||{}).value||document.querySelector('#exPlugin .cm-content').innerText : ''").strip().startswith('SELECT name, price'), 'S0 3쪽 예제 쿼리가 편집기에 들어감')
     # 가짜 엔진: Sql.exec 를 고정 결과로 바꿔 채점 경로(rows 비교·기대/내 결과 표·행 수 힌트)를 검사
     pg.evaluate("""()=>{ window.__stubRows={ 'SELECT * FROM menu':{columns:['id','name','category','price','is_hot'],rows:[[1,'아메리카노','커피',4000,1],[2,'카페라테','커피',4500,1]]}, "SELECT name, price FROM menu WHERE category = '커피'":{columns:['name','price'],rows:[['아메리카노',4000],['카페라테',4500]]}, 'SELECT name FROM menu':{columns:['name'],rows:[['아메리카노'],['카페라테']]}, 'SELECT * FROM menu LIMIT 1':{columns:['id','name','category','price','is_hot'],rows:[[1,'아메리카노','커피',4000,1]]}, "SELECT price, name FROM menu WHERE category = '커피'":{columns:['price','name'],rows:[[4500,'카페라테'],[4000,'아메리카노']]}, "SELECT name, price FROM menu WHERE category = '음료'":{columns:['name','price'],rows:[['녹차라테',5000],['유자차',4500]]} };

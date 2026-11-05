@@ -5,6 +5,13 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+# TODO F0 ③: 같은 PR 에 연달아 푸시하면 이전 검사는 취소하고 마지막 것만 돈다
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+# 파이썬 출력을 줄마다 바로 내보내 run 로그의 시각이 실제 검사 시각과 맞게(버퍼링 때문에 「78초 걸린 검사」로 잘못 보였음)
+env:
+  PYTHONUNBUFFERED: '1'
 jobs:
   verify:
     runs-on: ubuntu-latest

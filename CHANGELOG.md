@@ -4,6 +4,8 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+- ⚙ (CI, TODO F0 ②③) PR 검사에 `concurrency: cancel-in-progress`(연달아 푸시하면 이전 검사 취소), `PYTHONUNBUFFERED=1`(run 로그 시각을 실제 검사 시각과 맞춤 — 「화면 settings 78초」는 출력 버퍼링 착시였고 실제론 0.3초), regress 의 가짜 기기 연동이 진짜 api.github.com 으로 나가지 않게 차단. 사이트 변화 없음.
+
 - ⚙ (CI, TODO F0 ①) PR 검사에서 `playwright install --with-deps chromium` 제거 — regress·run_web_solutions 는 러너에 깔린 `/usr/bin/google-chrome` 을 쓰므로 필요 없었음. 우분투 미러 상태에 따라 1.5~14분 걸리던 단계가 사라짐. 사이트 변화 없음.
 
 ## v2.7.1 — 2026-11-06 (Opus 릴리스: PR #74 — 모바일 홈 챕터 줄 스크롤 유지 · 색 대비 올림)
