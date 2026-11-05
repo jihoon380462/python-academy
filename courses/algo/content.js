@@ -21,7 +21,7 @@ const MAP_DECOR = { 1: '🧭', 2: '🔍', 3: '🌳', 4: '🏁' };
 
 const LESSONS = [
 // ================= 챕터 A 들어가기 =================
-{ id: 'A0', ch: 1, n: 0, title: '알고리즘이란', minutes: 10, mode: 'text',
+{ id: 'A0', ch: 1, n: 0, title: '알고리즘이란', mode: 'text',
   tutorSummary: '알고리즘 = 문제를 푸는 정해진 절차. 같은 문제도 여러 풀이가 있고, 입력이 커질수록 풀이 간 속도 차이가 벌어진다. time.perf_counter()로 실행 시간을 잴 수 있다.',
   terms: { '알고리즘': '문제를 푸는 정해진 순서와 방법. 레시피 같은 것', '입력 크기': '다룰 데이터의 개수. 보통 n으로 쓴다' },
   pages: [
@@ -38,7 +38,7 @@ const LESSONS = [
   ],
   summary: ['알고리즘 = 문제 푸는 정해진 절차. 같은 문제도 풀이가 여럿', '"빠르다"는 n이 커질 때 시간이 어떻게 변하나로 본다', '👀 시각화로 변수가 바뀌는 과정을 눈으로 본다'] },
 
-{ id: 'A1', ch: 1, n: 1, title: '시간복잡도 Big-O', minutes: 15, mode: 'text',
+{ id: 'A1', ch: 1, n: 1, title: '시간복잡도 Big-O', mode: 'text',
   tutorSummary: 'Big-O는 입력 n이 커질 때 실행 횟수가 어떻게 늘어나는지를 나타내는 표기. O(1) 상수, O(log n) 절반씩, O(n) 비례, O(n log n), O(n²) 이중 반복. 반복문 겹수를 세고 가장 큰 항만 남긴다.',
   terms: { 'Big-O': '입력이 커질 때 걸리는 시간이 어떻게 늘어나는지 나타내는 표기. O(n), O(n²) 처럼 쓴다', '시간복잡도': '알고리즘이 입력 크기에 따라 몇 번 일하는지를 식으로 나타낸 것' },
   pages: [
@@ -55,7 +55,7 @@ const LESSONS = [
   ],
   summary: ['Big-O = n이 커질 때 일하는 횟수가 늘어나는 모양', '한 겹 O(n), 두 겹 O(n²), 절반씩 O(log n), 반복 없음 O(1)', 'x in 리스트, pop(0)는 숨은 반복. 집합·딕셔너리 in은 O(1)'] },
 
-{ id: 'A2', ch: 1, n: 2, title: '스택: 쌓고 꺼내기', minutes: 15, mode: 'text',
+{ id: 'A2', ch: 1, n: 2, title: '스택: 쌓고 꺼내기', mode: 'text',
   tutorSummary: '스택은 마지막에 넣은 것을 먼저 꺼내는 구조(LIFO). 파이썬 리스트의 append/pop으로 구현. 괄호 짝 맞추기: 여는 괄호는 push, 닫는 괄호를 만나면 pop해서 짝 확인. 비어 있을 때 pop하면 에러.',
   terms: { '스택': '마지막에 넣은 것을 먼저 꺼내는 구조. 쌓아 둔 접시 더미', 'LIFO': 'Last In, First Out. 나중에 들어간 게 먼저 나온다' },
   pages: [
@@ -70,7 +70,7 @@ const LESSONS = [
   ],
   summary: ['스택 = 나중에 넣은 것 먼저(LIFO). 리스트 append/pop', '괄호 검사: 여는 건 push, 닫는 건 pop해서 짝 확인', '빈 스택 pop은 IndexError → if stack: 으로 확인'] },
 
-{ id: 'A3', ch: 1, n: 3, title: '큐와 덱: 줄 서기', minutes: 15, mode: 'text',
+{ id: 'A3', ch: 1, n: 3, title: '큐와 덱: 줄 서기', mode: 'text',
   tutorSummary: '큐는 먼저 넣은 것을 먼저 꺼내는 구조(FIFO). 리스트 pop(0)는 O(n)이라 느리므로 collections.deque의 popleft()를 쓴다. 덱은 양쪽 끝 모두 O(1). 프린터 대기열·BFS에 쓴다.',
   terms: { '큐': '먼저 넣은 것을 먼저 꺼내는 구조. 가게 앞 줄', 'FIFO': 'First In, First Out. 먼저 들어간 게 먼저 나온다', '덱': '양쪽 끝에서 넣고 뺄 수 있는 큐 (deque)' },
   pages: [
@@ -87,11 +87,11 @@ const LESSONS = [
   ],
   summary: ['큐 = 먼저 넣은 것 먼저(FIFO). 뒤에 넣고 앞에서 꺼낸다', '리스트 pop(0)는 O(n). 큐는 deque의 popleft()로', '덱은 양쪽 끝 모두 O(1): append/popleft/appendleft/pop'] },
 
-{ id: 'AB1', ch: 1, boss: true, title: '보스: 괄호 검사기 + 프린터 대기열', minutes: 20, mode: 'text', pages: [], summary: [],
+{ id: 'AB1', ch: 1, boss: true, title: '보스: 괄호 검사기 + 프린터 대기열', mode: 'text', pages: [], summary: [],
   tutorSummary: '챕터 A 보스. 스택으로 괄호 검사(종류 3가지), 큐(deque)로 프린터 대기열 시뮬레이션(우선 문서 끼어들기).' },
 
 // ================= 챕터 B 찾고 정렬하기 =================
-{ id: 'A4', ch: 2, n: 4, title: '재귀: 함수가 자신을 부르면', minutes: 20, mode: 'text',
+{ id: 'A4', ch: 2, n: 4, title: '재귀: 함수가 자신을 부르면', mode: 'text',
   tutorSummary: '재귀 = 함수 안에서 자기 자신을 부르는 것. 반드시 멈추는 조건(기저 조건)이 먼저 와야 한다. 호출마다 스택에 쌓였다가 돌아오며 풀린다. 팩토리얼, 피보나치(중복 호출로 느림), 하노이 탑.',
   terms: { '재귀': '함수가 자기 자신을 부르는 것', '기저 조건': '재귀가 멈추는 조건. 더 이상 자신을 부르지 않고 바로 답하는 경우', '호출 스택': '함수가 불릴 때마다 쌓이고, 끝나면 빠지는 스택' },
   pages: [
@@ -108,7 +108,7 @@ const LESSONS = [
   ],
   summary: ['재귀 = 자기 자신을 부르기. 기저 조건이 먼저!', '호출마다 스택에 쌓이고, 바닥에서 답이 나오면 위로 풀린다', '순진한 피보나치 재귀는 중복 계산이 많아 느리다'] },
 
-{ id: 'A5', ch: 2, n: 5, title: '정렬 1: 버블·선택·삽입', minutes: 20, mode: 'text',
+{ id: 'A5', ch: 2, n: 5, title: '정렬 1: 버블·선택·삽입', mode: 'text',
   tutorSummary: '세 정렬 모두 O(n²). 버블: 이웃끼리 비교해 큰 것을 뒤로 밀기. 선택: 남은 것 중 최소를 찾아 앞에 놓기. 삽입: 앞의 정렬된 부분에 끼워 넣기(거의 정렬된 입력에 빠름). 비교·교환 횟수를 세어 보기.',
   terms: { '정렬': '순서대로 줄 세우기', '버블 정렬': '옆끼리 비교해 큰 값을 뒤로 밀어내는 정렬', '선택 정렬': '남은 것 중 가장 작은 값을 골라 앞에 놓는 정렬', '삽입 정렬': '앞쪽 정렬된 부분에 새 값을 끼워 넣는 정렬' },
   pages: [
@@ -125,7 +125,7 @@ const LESSONS = [
   ],
   summary: ['버블: 옆끼리 비교해 큰 값을 뒤로 — O(n²)', '선택: 남은 것 중 최소를 찾아 앞에 — 교환 n번', '삽입: 앞의 정렬된 부분에 끼워 넣기 — 거의 정렬된 입력에 빠름'] },
 
-{ id: 'A6', ch: 2, n: 6, title: '정렬 2: 병합·퀵과 sorted', minutes: 20, mode: 'text',
+{ id: 'A6', ch: 2, n: 6, title: '정렬 2: 병합·퀵과 sorted', mode: 'text',
   tutorSummary: '병합 정렬: 반으로 나눠 각각 정렬한 뒤 합치기(O(n log n), 안정). 퀵 정렬: 기준값(pivot)보다 작은 것/큰 것으로 나누고 재귀. 실전은 sorted(key=..., reverse=...)를 쓴다. key는 "무엇을 기준으로"를 정하는 함수.',
   terms: { '병합 정렬': '반으로 나눠 정렬하고 둘을 합치는 정렬. O(n log n)', '퀵 정렬': '기준값보다 작은 것과 큰 것으로 나누고 각각 정렬하는 정렬', '피벗': '퀵 정렬에서 나누는 기준이 되는 값' },
   pages: [
@@ -144,7 +144,7 @@ const LESSONS = [
   ],
   summary: ['병합 정렬: 반으로 나눠 정렬하고 합치기, O(n log n)', '퀵 정렬: 피벗 기준으로 작은/같은/큰 묶음 나누고 재귀', '실전은 sorted(key=…, reverse=…). key = 줄 세울 기준'] },
 
-{ id: 'A7', ch: 2, n: 7, title: '이진 탐색: 반씩 줄이기', minutes: 15, mode: 'text',
+{ id: 'A7', ch: 2, n: 7, title: '이진 탐색: 반씩 줄이기', mode: 'text',
   tutorSummary: '정렬된 리스트에서 가운데와 비교해 범위를 절반씩 줄이는 탐색. lo, hi, mid 세 변수. O(log n). 조건: 반드시 정렬되어 있어야 한다. bisect 모듈. 업다운 게임이 같은 원리.',
   terms: { '이진 탐색': '정렬된 목록에서 가운데를 보고 범위를 절반씩 줄여 가며 찾는 방법', '선형 탐색': '처음부터 하나씩 차례로 보며 찾는 방법' },
   pages: [
@@ -159,7 +159,7 @@ const LESSONS = [
   ],
   summary: ['이진 탐색: 정렬된 목록에서 가운데 비교 → 절반씩, O(log n)', 'lo <= hi, lo = mid+1, hi = mid-1 — 등호와 ±1 주의', 'bisect_left = 들어갈 자리 = 작은 값의 개수'] },
 
-{ id: 'A8', ch: 2, n: 8, title: '해시: 딕셔너리가 빠른 이유', minutes: 15, mode: 'text',
+{ id: 'A8', ch: 2, n: 8, title: '해시: 딕셔너리가 빠른 이유', mode: 'text',
   tutorSummary: '해시 함수가 키를 번호(버킷)로 바꿔 바로 그 칸을 보므로 딕셔너리·집합의 in/조회/추가는 평균 O(1). 리스트 in은 O(n). 중복 제거 set, 빈도 세기 dict.get(k,0)+1 또는 collections.Counter. 두 수의 합 문제.',
   terms: { '해시': '값을 정해진 규칙으로 숫자(칸 번호)로 바꾸는 것. 그 칸으로 바로 간다', '버킷': '해시 값으로 정해지는 보관 칸' },
   pages: [
@@ -174,11 +174,11 @@ const LESSONS = [
   ],
   summary: ['딕셔너리·집합의 in/조회/추가는 평균 O(1) (해시로 칸을 바로 찾음)', '중복 제거 set, 빈도 세기 dict.get(k, 0) + 1 / Counter', '두 수의 합: 본 값을 집합에 넣고 target - x 를 찾는다'] },
 
-{ id: 'AB2', ch: 2, boss: true, title: '보스: 성적표 정렬·검색 프로그램', minutes: 25, mode: 'text', pages: [], summary: [],
+{ id: 'AB2', ch: 2, boss: true, title: '보스: 성적표 정렬·검색 프로그램', mode: 'text', pages: [], summary: [],
   tutorSummary: '챕터 B 보스. 학생 명단을 점수 내림차순·이름 오름차순으로 정렬하고, 정렬된 점수에서 이진 탐색으로 등수/조건 개수를 구한다. 빈도 세기로 최다 점수.' },
 
 // ================= 챕터 C 연결된 구조 =================
-{ id: 'A9', ch: 3, n: 9, title: '연결 리스트: 노드와 참조', minutes: 20, mode: 'text',
+{ id: 'A9', ch: 3, n: 9, title: '연결 리스트: 노드와 참조', mode: 'text',
   tutorSummary: '노드(값 + 다음 노드 참조)가 사슬처럼 이어진 구조. head부터 next를 따라간다. 맨 앞 삽입/삭제는 O(1), 중간 접근은 O(n). 순회 while cur: … cur = cur.next. 리스트와의 차이.',
   terms: { '연결 리스트': '값과 다음 노드를 가리키는 참조로 이어진 자료구조', '노드': '값 하나와 연결 정보를 담은 상자', '참조': '다른 객체를 가리키는 것. 화살표' },
   pages: [
@@ -193,7 +193,7 @@ const LESSONS = [
   ],
   summary: ['연결 리스트 = 노드(값 + next 참조)의 사슬. head부터 따라간다', '중간 삽입·삭제는 화살표만 바꿔 O(1), k번째 접근은 O(n)', '순회: cur = head; while cur: … cur = cur.next'] },
 
-{ id: 'A10', ch: 3, n: 10, title: '트리와 이진 탐색 트리', minutes: 20, mode: 'text',
+{ id: 'A10', ch: 3, n: 10, title: '트리와 이진 탐색 트리', mode: 'text',
   tutorSummary: '트리: 루트에서 가지가 뻗는 구조, 노드는 left/right 자식. 이진 탐색 트리(BST): 왼쪽 < 자신 < 오른쪽. 삽입·탐색은 재귀로 방향을 고른다. 순회 3종: 전위(자신-왼-오), 중위(왼-자신-오 = 정렬 순), 후위(왼-오-자신).',
   terms: { '트리': '루트에서 가지가 갈라져 내려가는 구조', '이진 탐색 트리': '왼쪽 자식은 작고 오른쪽 자식은 큰 규칙을 지키는 트리', '순회': '트리의 모든 노드를 정해진 순서로 한 번씩 방문하기' },
   pages: [
@@ -210,7 +210,7 @@ const LESSONS = [
   ],
   summary: ['트리: 루트 → 자식(left/right). BST는 왼쪽 < 자신 < 오른쪽', '삽입·탐색: 작으면 왼쪽, 크면 오른쪽 (균형이면 O(log n))', '순회: 전위(자신-왼-오) 중위(왼-자신-오=정렬순) 후위(왼-오-자신)'] },
 
-{ id: 'A11', ch: 3, n: 11, title: '힙과 우선순위 큐', minutes: 15, mode: 'text',
+{ id: 'A11', ch: 3, n: 11, title: '힙과 우선순위 큐', mode: 'text',
   tutorSummary: '힙: 가장 작은(또는 큰) 값이 항상 맨 위에 오는 완전 이진 트리, 배열로 저장(자식은 2i+1, 2i+2). heapq.heappush/heappop 모두 O(log n). 최대 힙은 음수로. 응급실 우선순위, k번째 작은 값, 다익스트라.',
   terms: { '힙': '가장 작은 값이 항상 맨 위에 있도록 유지되는 트리. 배열로 저장한다', '우선순위 큐': '들어온 순서가 아니라 우선순위가 높은 것부터 꺼내는 큐' },
   pages: [
@@ -227,7 +227,7 @@ const LESSONS = [
   ],
   summary: ['힙 = 최소값이 항상 루트. 넣기·꺼내기 O(log n)', 'heapq.heappush / heappop / heapify / nsmallest·nlargest', '최대 힙은 음수로 넣고 꺼낼 때 되돌리기'] },
 
-{ id: 'A12', ch: 3, n: 12, title: '그래프: BFS와 DFS', minutes: 25, mode: 'text',
+{ id: 'A12', ch: 3, n: 12, title: '그래프: BFS와 DFS', mode: 'text',
   tutorSummary: '그래프 = 정점과 간선. 인접 리스트 dict{정점: [이웃들]}. BFS는 큐로 가까운 곳부터(최단 거리, 칸 수), DFS는 스택/재귀로 깊이 먼저(연결 여부, 경로 존재). visited 집합 필수. 격자 미로는 (r,c)가 정점, 상하좌우가 간선.',
   terms: { '그래프': '점(정점)과 그 사이를 잇는 선(간선)의 모음', '정점': '그래프의 점. 노드라고도 한다', '인접 리스트': '각 정점마다 이웃 정점 목록을 적어 둔 표현', 'BFS': '너비 우선 탐색. 가까운 정점부터 큐로 퍼져 나간다', 'DFS': '깊이 우선 탐색. 한 길로 끝까지 갔다가 돌아온다' },
   pages: [
@@ -244,11 +244,11 @@ const LESSONS = [
   ],
   summary: ['그래프 = 정점 + 간선. 인접 리스트 dict{정점: 이웃 목록}', 'BFS: 큐, 가까운 곳부터 → 최단 칸 수. visited 필수', 'DFS: 재귀/스택, 한 길로 끝까지 → 연결·경로 존재. 격자는 (r,c)+상하좌우'] },
 
-{ id: 'AB3', ch: 3, boss: true, title: '보스: 미로 최단 경로 + 친구 추천', minutes: 25, mode: 'text', pages: [], summary: [],
+{ id: 'AB3', ch: 3, boss: true, title: '보스: 미로 최단 경로 + 친구 추천', mode: 'text', pages: [], summary: [],
   tutorSummary: '챕터 C 보스. 격자 미로에서 BFS로 최단 칸 수(없으면 -1), 친구 관계 그래프에서 "친구의 친구" 중 아직 친구가 아닌 사람을 추천(공통 친구 수로 정렬).' },
 
 // ================= 챕터 D 패턴 =================
-{ id: 'A13', ch: 4, n: 13, title: '최단 경로: 다익스트라 입문', minutes: 20, mode: 'text',
+{ id: 'A13', ch: 4, n: 13, title: '최단 경로: 다익스트라 입문', mode: 'text',
   tutorSummary: '간선에 가중치가 있을 때 BFS는 안 된다. 다익스트라: dist를 무한대로 두고 시작점 0, 힙에서 가장 가까운 정점을 꺼내 이웃의 거리를 갱신(dist[u]+w < dist[v]). 음수 가중치 불가. O((V+E) log V).',
   terms: { '가중치': '간선마다 붙은 비용(거리·시간·요금)', '다익스트라': '가중치 그래프에서 한 점에서 모든 점까지 최단 거리를 구하는 알고리즘. 힙으로 가장 가까운 정점부터 확정' },
   pages: [
@@ -263,7 +263,7 @@ const LESSONS = [
   ],
   summary: ['가중치가 있으면 BFS 대신 다익스트라', '힙에 (거리, 정점). 꺼낸 정점의 이웃을 d + w 로 갱신', '음수 가중치는 불가. prev로 경로 복원'] },
 
-{ id: 'A14', ch: 4, n: 14, title: '동적 계획법 입문', minutes: 25, mode: 'text',
+{ id: 'A14', ch: 4, n: 14, title: '동적 계획법 입문', mode: 'text',
   tutorSummary: 'DP = 같은 작은 문제를 다시 풀지 않고 표에 적어 두기. 메모이제이션(재귀 + dict)과 테이블(반복문으로 작은 것부터 채우기). 피보나치, 계단 오르기(dp[i]=dp[i-1]+dp[i-2]), 동전 거스름돈(dp[x]=min(dp[x-c]+1)). 점화식 세우기가 핵심.',
   terms: { '동적 계획법': '작은 문제의 답을 표에 적어 두고 재사용해 큰 문제를 푸는 방법 (DP)', '메모이제이션': '한 번 계산한 결과를 기억해 두고 다시 쓰기', '점화식': 'dp[i]를 더 작은 dp 값들로 나타낸 식' },
   pages: [
@@ -278,7 +278,7 @@ const LESSONS = [
   ],
   summary: ['DP = 작은 문제의 답을 표에 적어 두고 재사용', '메모이제이션(재귀+dict) 또는 테이블(작은 것부터 채우기)', '핵심은 점화식: dp[i]의 뜻을 정하고 작은 dp로 나타내기'] },
 
-{ id: 'A15', ch: 4, n: 15, title: '자주 나오는 기법', minutes: 25, mode: 'text',
+{ id: 'A15', ch: 4, n: 15, title: '자주 나오는 기법', mode: 'text',
   tutorSummary: '그리디: 매 순간 최선을 고르기(회의실 배정은 끝나는 시간 순). 투 포인터: 정렬된 배열에서 양끝/두 포인터로 O(n). 슬라이딩 윈도우: 창을 밀며 합 유지. 누적 합: prefix[i]로 구간 합 O(1). 각 기법이 언제 되는지와 안 되는지.',
   terms: { '그리디': '매 순간 가장 좋아 보이는 선택을 하는 방법. 항상 정답은 아니다', '투 포인터': '두 개의 위치 변수를 움직이며 배열을 한 번에 훑는 기법', '누적 합': 'prefix[i] = 앞 i개(a[0]~a[i-1])의 합. 구간 합을 빼기 한 번으로 구한다' },
   pages: [
@@ -295,7 +295,7 @@ const LESSONS = [
   ],
   summary: ['그리디: 매 순간 최선. 되는 문제인지 의심(끝나는 시간 순 회의)', '투 포인터: 양끝 포인터로 O(n). 슬라이딩 윈도우: 들어온 값 +, 나간 값 -', '누적 합: prefix[r+1] - prefix[l] 로 구간 합 O(1)'] },
 
-{ id: 'AB4', ch: 4, boss: true, mock: true, title: '보스: 코딩테스트 모의고사', minutes: 60, mode: 'text', pages: [], summary: [],
+{ id: 'AB4', ch: 4, boss: true, mock: true, title: '보스: 코딩테스트 모의고사', mode: 'text', pages: [], summary: [],
   tutorSummary: '챕터 D 보스 = 모의고사. 15문제 풀에서 랜덤 3문제, 60분, 시간 제한 채점. 2문제 이상 통과 시 클리어. 정답 코드는 주지 않고 복잡도와 자료구조 방향만 짚는다.' },
 ];
 
@@ -792,7 +792,7 @@ const GUIDES = {};
 CHAPTERS.push({ ch: 5, name: '실전', color: '#ffd166' });
 MAP_DECOR[5] = '🏆';
 LESSONS.push(
-{ id: 'E1', ch: 5, n: 16, practical: true, title: '실전 1: 미로 게임', minutes: 40, mode: 'text',
+{ id: 'E1', ch: 5, n: 16, practical: true, title: '실전 1: 미로 게임', mode: 'text',
   tutorSummary: '실전 프로젝트 1. 사용자가 입력한 미로(#벽 .길 S시작 G도착)를 2차원 리스트로 읽고 BFS로 최단 거리를 구한 뒤 부모 기록으로 경로를 복원해 *로 표시한다. 변수 grid/visited/path 를 쓰면 격자 시각화가 된다. 이웃은 위·아래·왼쪽·오른쪽 순.',
   terms: { '경로 복원': '목적지에서 부모(어디서 왔나)를 거꾸로 따라가 경로를 되살리는 것', '간선': '그래프에서 두 정점을 잇는 선. 격자에서는 옆 칸으로 가는 길' },
   pages: [
@@ -806,7 +806,7 @@ LESSONS.push(
       example: { code: 'parent = {(0, 1): (0, 0), (1, 1): (0, 1), (2, 1): (1, 1), (2, 2): (2, 1)}\nstart, goal = (0, 0), (2, 2)\npath = []\ncur = goal\nwhile cur != start:\n    path.append(cur)\n    print("지금", cur, "← 온 곳", parent[cur])\n    cur = parent[cur]\npath.append(start)\npath.reverse()\nprint(path, "거리", len(path) - 1)', trace: true } },
   ],
   summary: ['격자 BFS: 이웃은 (dr, dc) 네 방향으로 바로 만든다', 'parent[다음칸] = 지금칸 → 도착에서 거꾸로 따라가 경로 복원', '큐가 비도록 G를 못 만나면 길이 없다'] },
-{ id: 'E2', ch: 5, n: 17, practical: true, title: '실전 2: 지하철 최단 경로', minutes: 40, mode: 'text',
+{ id: 'E2', ch: 5, n: 17, practical: true, title: '실전 2: 지하철 최단 경로', mode: 'text',
   tutorSummary: '실전 프로젝트 2. 역-역-소요분 줄들을 가중 그래프(dict: 역 → [(이웃, 분)])로 만들고 heapq 다익스트라로 최단 시간과 경로(prev 기록)를 구한다. 변수 graph/dist/done/node 를 쓰면 그래프 시각화. 명령: 이웃, 최단 A B, 경로 A B, 전체 A.',
   terms: {},
   pages: [
@@ -885,7 +885,7 @@ PROBLEMS.push(
 );
 // --- v2.2.3 (NEXT.md WP-G): 실전 3·4 ---
 LESSONS.push(
-{ id: 'E3', ch: 5, n: 18, practical: true, title: '실전 3: 시험 시간표 짜기', minutes: 40, mode: 'text',
+{ id: 'E3', ch: 5, n: 18, practical: true, title: '실전 3: 시험 시간표 짜기', mode: 'text',
   tutorSummary: '실전 프로젝트 3. 시험(과목 시작 끝) 목록으로 ① 최소 교실 수(시작순 정렬 + 끝나는 시각 최소 힙) ② 교실 배정(가장 번호 낮은 빈 교실) ③ 겹치지 않게 최대 시험 수(끝시간 그리디) ④ 최대 동시 진행 시각(스위프). 변수 rooms(힙)로 시각화.',
   terms: { '스위프': '시각 순서대로 훑으며 시작이면 +1, 끝이면 -1 하는 기법' },
   pages: [
@@ -897,7 +897,7 @@ LESSONS.push(
       example: { code: 'exams = [(9, 11, "수학"), (10, 12, "국어"), (11, 13, "영어")]\nends = []\nfor s, e, name in exams:\n    for i in range(len(ends)):\n        if ends[i] <= s:\n            ends[i] = e\n            print(name, "→ 교실", i + 1)\n            break\n    else:\n        ends.append(e)\n        print(name, "→ 새 교실", len(ends))\n\nevents = []\nfor s, e, name in exams:\n    events.append((s, 1))\n    events.append((e, -1))\nevents.sort()\nprint(events)\ncur = 0\nfor t, x in events:\n    cur += x\n    print("시각", t, "→ 진행 중", cur)', trace: true } },
   ],
   summary: ['시작순 정렬 + 끝나는 시각 최소 힙 → 최소 교실 수', '배정표는 번호 낮은 빈 교실부터', '겹침 최대는 (시각, ±1) 스위프'] },
-{ id: 'E4', ch: 5, n: 19, practical: true, title: '실전 4: 친구 네트워크 분석', minutes: 40, mode: 'text',
+{ id: 'E4', ch: 5, n: 19, practical: true, title: '실전 4: 친구 네트워크 분석', mode: 'text',
   tutorSummary: '실전 프로젝트 4. 친구 관계(A B 줄)를 그래프로 만들어 ① 그룹(연결 요소) ② 두 사람 사이 다리 수(BFS) ③ 허브(친구 많은 순 3명) ④ 영향(2단계 안 도달 인원)을 출력. 변수 graph/visited/queue/node로 그래프 시각화.',
   terms: {},
   pages: [
@@ -980,7 +980,7 @@ CHAPTERS.push({ ch: 6, name: '한 걸음 더', color: '#00acc1' });
 MAP_DECOR[6] = '🔭';
 WEAKNESS_TAGS.push('문자열', '비트', '완전탐색', '시뮬레이션');
 LESSONS.push(
-{ id: 'A16', ch: 6, n: 20, title: '문자열 알고리즘', minutes: 25, mode: 'text',
+{ id: 'A16', ch: 6, n: 20, title: '문자열 알고리즘', mode: 'text',
   tutorSummary: '문자열은 글자 리스트처럼 다룬다: 회문은 양끝 투 포인터 또는 s == s[::-1], 아나그램은 정렬 또는 글자 개수 딕셔너리, 부분 문자열 찾기는 s.find/in(O(n·m)), 빈도는 Counter 패턴, 가장 긴 공통 접두사는 열 단위 비교. 문자열은 불변이라 += 반복은 리스트에 모아 join.',
   terms: { '회문': '앞에서 읽으나 뒤에서 읽으나 같은 글자열 (level, 토마토)', '아나그램': '글자 구성이 같고 순서만 다른 두 단어 (listen ↔ silent)' },
   pages: [
@@ -998,7 +998,7 @@ LESSONS.push(
       example: { code: 'n = 5\ncopied = 0\nresult = ""\nfor i in range(n):\n    copied += len(result) + 1   # 새 문자열을 만들며 복사하는 글자 수\n    result += "a"\n    print(i + 1, "번째:", result, "복사 누적", copied)\nprint("1 + 2 + … +", n, "=", n * (n + 1) // 2)\n\nparts = []\nfor i in range(n):\n    parts.append("a")\nprint("join:", "".join(parts))', slider: { var: 'n', min: 1, max: 30, step: 1 } } },
   ],
   summary: ['회문 = 양끝 투 포인터 (또는 s[::-1])', '아나그램 = sorted 비교 또는 글자 개수 dict 비교', '긴 문자열은 리스트에 모아 join (+= 반복은 O(n²))'] },
-{ id: 'A17', ch: 6, n: 21, title: '비트 연산', minutes: 25, mode: 'text',
+{ id: 'A17', ch: 6, n: 21, title: '비트 연산', mode: 'text',
   tutorSummary: '정수를 2진수 비트 묶음으로 본다. & | ^ ~ << >>, bin(n), n & 1 홀짝, n >> 1 절반, 1 << k. 비트마스크 = 집합: i번째 원소 포함 = mask & (1 << i), 넣기 |=, 빼기 & ~, 부분집합 전부 = range(1 << n). 비트 개수 bin(n).count("1").',
   terms: { '비트마스크': '정수의 각 비트를 "원소 i가 들어 있나"로 쓰는 집합 표현', '시프트': '비트를 왼쪽/오른쪽으로 미는 연산. << k 는 ×2ᵏ, >> k 는 ÷2ᵏ' },
   pages: [
@@ -1014,7 +1014,7 @@ LESSONS.push(
       example: { code: 'nums = [3, 5, 8]\nn = len(nums)\nfor mask in range(1 << n):\n    chosen = [nums[i] for i in range(n) if mask & (1 << i)]\n    print(bin(mask), chosen, sum(chosen))', trace: true } },
   ],
   summary: ['& | ^ << >> 는 자리별 계산, bin(n)으로 확인', '비트마스크: 포함 mask & (1<<i), 넣기 |=, 빼기 &= ~', '부분집합 전부 = for mask in range(1 << n)'] },
-{ id: 'A18', ch: 6, n: 22, title: '구현과 시뮬레이션', minutes: 25, mode: 'text',
+{ id: 'A18', ch: 6, n: 22, title: '구현과 시뮬레이션', mode: 'text',
   tutorSummary: '문제가 시키는 대로 정확히 따라 하는 유형. 격자 이동은 방향 배열 dr/dc와 방향 번호(회전 = (d+1)%4), 범위 검사 함수, 명령 해석은 딕셔너리로 분기. 시각화 변수 grid/visited/pos 를 쓰면 격자가 보인다. 함정: 행/열 순서, 0-based, 경계.',
   terms: { '시뮬레이션': '문제가 설명한 규칙을 그대로 코드로 옮겨 단계별로 따라 하는 것', '방향 배열': '상·우·하·좌 이동량을 순서대로 담은 리스트. 회전은 번호만 바꾼다' },
   pages: [
@@ -1032,7 +1032,7 @@ LESSONS.push(
       example: { code: 'grid = [[0, 1, 0], [1, 1, 0], [0, 0, 0]]\nR, C = 3, 3\nfor t in range(2):\n    new = [row[:] for row in grid]\n    for r in range(R):\n        for c in range(C):\n            n = sum(grid[nr][nc] for nr in (r-1, r, r+1) for nc in (c-1, c, c+1) if (nr, nc) != (r, c) and 0 <= nr < R and 0 <= nc < C)\n            new[r][c] = 1 if n >= 2 else 0\n    grid = new\n    print(t + 1, "초:", grid)', visualize: { kind: 'grid', var: 'grid' }, trace: true } },
   ],
   summary: ['방향 배열 dr/dc + 방향 번호, 회전은 (d±1) % 4', 'inside(r, c) 로 항상 범위 검사, 명령은 dict로 분기', '동시에 바뀌는 규칙은 복사본에 쓰고 마지막에 교체'] },
-{ id: 'A19', ch: 6, n: 23, title: '완전탐색과 백트래킹', minutes: 25, mode: 'text',
+{ id: 'A19', ch: 6, n: 23, title: '완전탐색과 백트래킹', mode: 'text',
   tutorSummary: '경우의 수가 작으면(≤ 수백만) 전부 시도한다. itertools.permutations/combinations/product, 재귀로 "고르고 → 다음 → 되돌리기"(백트래킹). 가지치기: 이미 답보다 나쁘면 return. 비트마스크 부분집합과 같은 일. N-Queen·부분합·순열 생성이 대표.',
   terms: { '완전탐색': '가능한 모든 경우를 하나씩 전부 확인하는 방법', '백트래킹': '한 단계 고르고 들어갔다가, 안 되면 그 선택을 되돌리고 다른 걸 고르는 재귀', '가지치기': '더 가 봐야 답이 될 수 없는 길을 미리 끊는 것' },
   pages: [
@@ -1050,7 +1050,7 @@ LESSONS.push(
       example: { code: 'calls = 0\n\ndef go(nums, target, i, cur, prune):\n    global calls\n    calls += 1\n    if cur == target:\n        return True\n    if prune and cur > target:\n        return False\n    if i == len(nums):\n        return False\n    return go(nums, target, i + 1, cur + nums[i], prune) or go(nums, target, i + 1, cur, prune)\n\nnums = [32, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2]\nfor prune in [False, True]:\n    calls = 0\n    found = go(nums, 51, 0, 0, prune)\n    print("가지치기", "있음:" if prune else "없음:", found, calls, "번")' } },
   ],
   summary: ['작으면 전부: permutations / combinations / product', '백트래킹 = append → 재귀 → pop (되돌리기)', '가지치기 한 줄이 수백 배를 줄인다'] },
-{ id: 'A20', ch: 6, n: 24, title: '코딩테스트 체크리스트', minutes: 20, mode: 'text',
+{ id: 'A20', ch: 6, n: 24, title: '코딩테스트 체크리스트', mode: 'text',
   tutorSummary: '시험장 절차: ① 입력 크기 → 허용 복잡도(n≤20 완전탐색, ≤10⁴ O(n²), ≤10⁶ O(n log n)) ② 빠른 입력 sys.stdin.readline ③ 출력은 모아서 한 번 ④ 경계: n=1, 빈 입력, 같은 값, 최대값 ⑤ 재귀 깊이 setrecursionlimit 또는 반복으로 ⑥ 제출 전 작은 입력 손계산. 흔한 실수 목록.',
   terms: { '허용 복잡도': '입력 크기와 시간 제한(보통 1초 ≈ 1억 번 연산)을 보고 "이 정도 복잡도까지는 통과"를 가늠한 것' },
   pages: [
@@ -1066,7 +1066,7 @@ LESSONS.push(
       example: { code: 'def solve(nums):\n    if not nums:\n        return 0\n    return max(nums) - min(nums)\n\nassert solve([]) == 0\nassert solve([5]) == 0\nassert solve([1, 9, 3]) == 8\nassert solve([7, 7, 7]) == 0\nprint("체크리스트 통과")', trace: true } },
   ],
   summary: ['n 최대값 → 허용 복잡도 표 → 풀이 선택', 'sys.stdin.readline / 출력은 join 한 번 / 재귀 한계', '제출 전: n=1·빈 입력·같은 값·최대값, 0-based, <vs<=, 출력 형식'] },
-{ id: 'AB5', ch: 6, boss: true, title: '보스: 암호 해독 사령부', minutes: 40, mode: 'text', pages: [], summary: [],
+{ id: 'AB5', ch: 6, boss: true, title: '보스: 암호 해독 사령부', mode: 'text', pages: [], summary: [],
   tutorSummary: '챕터 F 보스. 문제 1: 암호문 해독 — 시저 암호 전수조사(26가지 시프트) 중 사전 단어가 가장 많이 나오는 것 고르기(완전탐색+문자열 빈도). 문제 2: 금고 격자 — 명령 시뮬레이션으로 로봇이 지나간 칸의 비트마스크 상태를 추적(구현+비트).' },
 );
 PROBLEMS.push(
@@ -1205,7 +1205,7 @@ PROBLEMS.push(
 // === 실전 5·6 (v2.2.23) — 챕터 6 주제(문자열·시뮬레이션·비트)를 쓰는 프로젝트. 실전 챕터 5에 추가
 // =====================================================================
 LESSONS.push(
-{ id: 'E5', ch: 5, n: 25, practical: true, title: '실전 5: 텍스트 검색 엔진', minutes: 40, mode: 'text',
+{ id: 'E5', ch: 5, n: 25, practical: true, title: '실전 5: 텍스트 검색 엔진', mode: 'text',
   tutorSummary: '실전 프로젝트 5. 문서 여러 줄을 받아 ① 역색인(단어 → 문서 번호 집합) ② AND 검색(집합 교집합) ③ 아나그램 단어 찾기(정렬 키) ④ 자동완성(접두사, 문서 수 많은 순 5개). 변수 index 로 표 시각화. 단어 정리: lower + strip(".,!?").',
   terms: { '역색인': '단어마다 "그 단어가 나오는 문서 번호들"을 적어 둔 표. 검색 엔진의 심장' },
   pages: [
@@ -1217,7 +1217,7 @@ LESSONS.push(
       example: { code: 'def words_of(text):\n    out = []\n    for w in text.lower().split():\n        w = w.strip(".,!?\\"\'()")\n        if w:\n            out.append(w)\n    return out\n\nprint(words_of(\'"Hello," said the (Cat) ... !\'))\nindex = {"the": {1, 2, 3}, "cat": {1, 3}, "dog": {2}}\nhit = None\nfor w in ["the", "cat"]:\n    s = index.get(w, set())\n    hit = s if hit is None else hit & s\n    print(w, "→", sorted(hit))\nprint("문서 " + ", ".join(str(n) for n in sorted(hit)) if hit else "없음")', visualize: { kind: 'table', var: 'index' }, trace: true } },
   ],
   summary: ['단어 정리(lower·strip) → 역색인 {단어: 문서 집합}', '검색 = 집합 교집합, 아나그램 = 정렬 키, 자동완성 = startswith', '출력 순서(사전순·오름차순·없음)를 먼저 정한다'] },
-{ id: 'E6', ch: 5, n: 26, practical: true, title: '실전 6: 로봇 청소기 시뮬레이션', minutes: 45, mode: 'text',
+{ id: 'E6', ch: 5, n: 26, practical: true, title: '실전 6: 로봇 청소기 시뮬레이션', mode: 'text',
   tutorSummary: '실전 프로젝트 6. 격자(S 시작, # 벽, * 먼지)에서 ① 명령(F/R/L) 따라가며 먼지 청소 ② BFS로 도달 가능 칸·먼지 ③ 가장 가까운 먼지부터 반복 청소(자동: 매번 BFS, 거리 같으면 작은 (r, c)) ④ 청소 뒤 지도. 변수 grid/visited/pos 로 격자 시각화.',
   terms: {},
   pages: [

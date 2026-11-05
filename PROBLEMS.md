@@ -397,3 +397,51 @@
 | 돌지 않고 늘어나기만 — 고유벡터와 고유값 맛보기 ★ (M5_eigen) | 5-12 | M5_cross | transform [[a, b], [b, a]] + (1, 1)·(1, −1) 바늘 | 바늘 두 개만 방향 그대로 · b = 0 → 모든 방향 (잠금 조건) | [[4, 1], [2, 3]]·(1, 1) → 5배 | Av·외적 0 판정·λ (6) |
 
 난이도·범위(C9 기준): M3_sample 은 고교 확률과 통계의 「통계적 추정」이라 `고2`(EXPANSION 표의 ★ 대신), M4_ease 는 중학 수학만으로 되는 프로그래머 수학이라 `고1`, 외적·역행렬·고유값은 고교 밖이라 `대학 ★`.
+
+## v2.5.0 추가 — 레슨 나누기(TODO ★2, 사용자 결정 D6: 한 레슨 = 개념 하나~둘) — 새 문제 22개
+
+레슨 7개를 17개로: L3→L3·L3B, L7→L7·L7B, L10→L10·L10B, L11→L11·L11B·L11C, L12→L12·L12B·L12C, L16→L16·L16B, L18→L18·L18B. 기존 문제는 id 그대로 lesson 만 옮김(진행 기록 유지). 레슨 id 는 알파벳 접미(L3B)를 허용하고 그 레슨의 새 문제 id 는 L3BP1 처럼 씀.
+
+| id | 레슨 | 유형 | 제목 |
+|---|---|---|---|
+| L3P8 | L3 계산하기 | quiz | 계산 순서 |
+| L3P7 | L3 계산하기 | code | 몫과 나머지 |
+| L7P7 | L7 리스트: 만들고 꺼내기 | code | 값 바꾸기 |
+| L7BP1 | L7B 리스트에 넣고 빼고 돌기 | fill | 빈칸 채우기: 끝에 붙이기 |
+| L10BP1 | L10B 딕셔너리 돌기와 세기 | fill | 빈칸 채우기: 값만 더하기 |
+| L10P6 | L10 딕셔너리: 이름으로 찾기 | quiz | 키가 있나요 |
+| L10P7 | L10 딕셔너리: 이름으로 찾기 | code | 추가하고 출력 |
+| L11P6 | L11 튜플: 못 바꾸는 리스트 | fill | 빈칸 채우기: 나눠 담기 |
+| L11P8 | L11 튜플: 못 바꾸는 리스트 | code | 좌표 더하기 |
+| L11P7 | L11 튜플: 못 바꾸는 리스트 | code | 맞바꾸기 |
+| L11BP1 | L11B 집합: 중복 제거 | quiz | 몇 개 남나 |
+| L11BP2 | L11B 집합: 중복 제거 | fill | 빈칸 채우기: 몇 종류 |
+| L11BP3 | L11B 집합: 중복 제거 | code | 몇 종류 |
+| L11BP4 | L11B 집합: 중복 제거 | code | 작은 수부터, 중복 없이 |
+| L12P6 | L12 리스트 안의 딕셔너리 | quiz | 명단에서 꺼내기 |
+| L12P7 | L12 리스트 안의 딕셔너리 | fill | 빈칸 채우기: 명단에 추가 |
+| L12BP1 | L12B 2차원 리스트 | code | 표 출력 |
+| L12CP1 | L12C 정렬과 복사 | fill | 빈칸 채우기: 큰 것부터 |
+| L16BP1 | L16B 날짜: datetime 맛보기 | quiz | weekday 숫자 |
+| L16BP2 | L16B 날짜: datetime 맛보기 | code | 며칠 뒤 |
+| L18BP1 | L18B map·filter·enumerate·zip | code | 번호 붙여 출력 |
+| L18BP2 | L18B map·filter·enumerate·zip | code | 이름과 점수 짝짓기 |
+
+레슨별 문제(순서 = 쉬운 것 → 합친 것):
+
+- L3 계산하기 (5쪽): L3P8(quiz) → L3P1(code) → L3P3(quiz) → L3P7(code)
+- L3B input: 입력받기 (4쪽): L3P5(fill) → L3P2(code) → L3P4(quiz) → L3P6(code)
+- L7 리스트: 만들고 꺼내기 (4쪽): L7P3(quiz) → L7P4(fill) → L7P1(code) → L7P7(code)
+- L7B 리스트에 넣고 빼고 돌기 (5쪽): L7BP1(fill) → L7P2(parsons) → L7P5(code) → L7P6(code)
+- L10 딕셔너리: 이름으로 찾기 (5쪽): L10P3(quiz) → L10P6(quiz) → L10P4(fill) → L10P7(code)
+- L10B 딕셔너리 돌기와 세기 (5쪽): L10BP1(fill) → L10P1(code) → L10P5(code) → L10P2(code)
+- L11 튜플: 못 바꾸는 리스트 (3쪽): L11P2(quiz) → L11P6(fill) → L11P8(code) → L11P7(code)
+- L11B 집합: 중복 제거 (3쪽): L11BP1(quiz) → L11BP2(fill) → L11BP3(code) → L11BP4(code)
+- L11C 컴프리헨션: 한 줄로 리스트 만들기 (4쪽): L11P4(fill) → L11P3(code) → L11P5(code) → L11P1(code)
+- L12 리스트 안의 딕셔너리 (4쪽): L12P6(quiz) → L12P7(fill) → L12P1(code)
+- L12B 2차원 리스트 (5쪽): L12P3(quiz) → L12BP1(code) → L12P2(code)
+- L12C 정렬과 복사 (3쪽): L12CP1(fill) → L12P4(code) → L12P5(bug)
+- L16 모듈과 random (6쪽): L16P3(fill) → L16P2(quiz) → L16P1(code) → L16P4(code)
+- L16B 날짜: datetime 맛보기 (3쪽): L16BP1(quiz) → L16BP2(code) → L16P5(code)
+- L18 람다와 정렬 기준 (3쪽): L18P2(quiz) → L18P1(code) → L18P5(code)
+- L18B map·filter·enumerate·zip (5쪽): L18P3(fill) → L18P4(code) → L18BP1(code) → L18BP2(code)

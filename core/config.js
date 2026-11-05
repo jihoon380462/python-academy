@@ -2,13 +2,13 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.4.0',
+  APP_VERSION: '2.5.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
-  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+([PD]\\d+)?$', algo: '^(A|AB|E)\\d+([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$' },
+  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
-    { id: 'python', name: '파이썬', icon: '🐍', desc: '입문부터 실전까지, 브라우저에서 직접 쳐 보는 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 148, lessons: 36 },
+    { id: 'python', name: '파이썬', icon: '🐍', desc: '입문부터 실전까지, 브라우저에서 직접 쳐 보는 파이썬', path: 'courses/python/', color: '#2bb673', ready: true, total: 170, lessons: 45 },
     { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '코드가 돌아가는 모습을 눈으로 보며, 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 145, lessons: 32, requires: { course: 'python', boss: 'B3', label: '파이썬 챕터 3까지 끝내면 열려요' } },
     { id: 'terminal-git', name: '터미널·Git', icon: '🎧', desc: '검은 창이 무섭지 않게. 가상 터미널과 Git 시뮬레이터', phase: 2 },
     { id: 'sql', name: '데이터베이스(SQL)', icon: '🗄️', desc: '동네 카페 데이터로 배우는 진짜 SQLite', phase: 3 },
@@ -39,7 +39,6 @@ const CONFIG = {
   ALGO: { traceMaxSteps: 5000, slowdown: 3, benchBaselineMs: 350, mockMinutes: 60, mockCount: 3, mockBonusXp: 150 }, // 알고리즘 코스: 시각화 추적 단계, Pyodide/CPython 배율, 기기 벤치 기준(ms), 모의고사
   MAX_CODE_SAVE_BYTES: 10240,
   STORAGE_WARN_BYTES: 4 * 1024 * 1024,     // 저장 용량 경고 (설정에 정리 버튼)
-  HUB: { minutesPerProblem: 4 },           // 허브 '남은 시간' 추정치 (문제당 분)
 
   // --- XP / 레벨 ---
   XP: { quiz: 10, fill: 15, bug: 20, parsons: 20, code: 30, num: 20, match: 20, pair: 20 }, // num·match·pair: 수학 공간 유형 (v2.3.0)
@@ -99,7 +98,7 @@ const T = {
   keyBad: '키가 올바르지 않아요. 설정에서 다시 확인해 주세요.', rateLimit: '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.',
   netErr: '인터넷 연결을 확인해 주세요.', keyOk: '연결 성공! 선생님과 대화할 수 있어요.',
   chips: ['뭐가 틀렸어요?', '이 에러가 무슨 뜻이에요?', '다른 방법도 있어요?', '이 개념 다시 설명해 주세요'],
-  minutes: (m) => `약 ${m}분`, learned: '이번에 배운 것', example: '따라 하기', tryIt: '실행해 보기', toPlayground: '놀이터로 가져가기',
+  learned: '이번에 배운 것', example: '따라 하기', tryIt: '실행해 보기', toPlayground: '놀이터로 가져가기',
   confirmReset: '정말 모든 진행을 초기화할까요? 되돌릴 수 없어요.', confirmReset2: '정말요? 레벨·뱃지·코드가 모두 사라져요.',
   importConfirm: '불러오면 지금 진행이 덮어써져요. 계속할까요?', exported: '진행 파일을 내려받았어요.',
   dailyGoal: '일일 목표', goalDone: '오늘 목표 달성!', reviewDone: '기억 유지! 복습 완료',
