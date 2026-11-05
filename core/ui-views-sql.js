@@ -116,7 +116,7 @@ UI.modes.sql = {
     const w = SqlUI.workbench(host, { value: start, dataset: spec.dataset || 'cafe', extra: `<button class="btn sm" data-qreset title="처음 쿼리로">↺ 처음 쿼리로</button>`, after: `<button class="btn accent" id="btnGrade">✔ 제출하기</button>` });
     $$('[data-qreset]', host).forEach(b => b.onclick = () => { w.setQuery(p.starter || ''); });
     let grading = false;
-    const submit = () => { if (grading) return; grading = true; const q = w.getQuery(); const r = SqlUI.grade(p, q); grading = false; if (r.ok) { Game.stat('sqlClears'); if (r.mine) SqlUI.table(w.out, { ...r.mine, ms: null }, { title: r.okTitle || '✓ 기대한 결과와 같아요' }); /* core 의 onClear 가 #pvResult 를 자기 상자로 덮으므로 결과 표는 작업판 출력 칸에 */ } ctx.submit(r); };
+    const submit = () => { if (grading) return; if (!Sql.ready) return UI.toast(Sql.unavailable ? 'SQLite 엔진을 받지 못했어요 — 인터넷 연결을 확인하고 「다시 시도」를 눌러 주세요' : 'SQLite 엔진을 준비하는 중이에요. 잠시 뒤 다시 제출해 주세요'); /* QA(v2.7.0): 엔진 없을 때는 실패로 기록하지 않음 */ grading = true; const q = w.getQuery(); const r = SqlUI.grade(p, q); grading = false; if (r.ok) { Game.stat('sqlClears'); if (r.mine) SqlUI.table(w.out, { ...r.mine, ms: null }, { title: r.okTitle || '✓ 기대한 결과와 같아요' }); /* core 의 onClear 가 #pvResult 를 자기 상자로 덮으므로 결과 표는 작업판 출력 칸에 */ } ctx.submit(r); };
     $('#btnGrade', host).onclick = submit;
     return { getCode: () => w.getQuery(), submit, destroy: () => w.destroy() };
   },

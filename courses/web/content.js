@@ -8,7 +8,7 @@
 //       exists:true|false · count:n|{min,max} · equals:'글자가 정확히'(공백 정리 후 비교) · contains:'글자 포함' · value:'입력값' · attr:{name,value?} · css:{prop,value}(색은 rgb 정규화, px ±2) · js:'식'
 //       동작 뒤: { text, click:'#btn', times?:n, then:{ sel, … } } · { text, input:{sel,value}, then:{…} } · { text, key:{sel,key:'Enter'}, then:{…} } · { text, submit:'form', then:{…} } · wait:ms · viewport:390
 //     solution: 정답을 html 한 문자열로(css 는 <style>, js 는 <script> 로 합침 — 「정답 보기」가 그대로 보여 주고, tools/run_web_solutions.py 가 이걸 미리보기에 넣어 checks 전부 ✓ 인지 검사)
-//     xp: 필수(CONFIG.XP 에 web 이 없음). 보통 30, 자유 과제(free) 10.
+//     xp: 선택(없으면 CONFIG.XP.web = 25). 보통 30, 자유 과제(free) 10.
 //     free:true 「예쁘게 꾸미세요」 — checks 없이 「완료로 표시」 버튼이 완료 처리.
 //   type:'quiz' | 'fill' | 'parsons'  기존 유형 그대로(parsons 는 태그 중첩 순서 — 들여쓰기 2칸, 정답 5줄 이상).
 //   레슨 pages[].example = { web:{ html, css?, js? }, api?:{…} }  → 편집기 + 미리보기 + 「원래대로」(UI.examples.web)

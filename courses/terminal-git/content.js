@@ -3,7 +3,7 @@
 //
 // 이 코스의 문제 유형과 필드 (화면: core/ui-views-shell.js · 셸: core/runners/shell.js · 채점 키: core/engine.js 끝 Grader.matchState · 검사: tools/validate/terminal-git.mjs · 정답 실행: tools/run_shell_solutions.mjs)
 //   type:'mission'  미션형. setup:{cwd?, tree, git?, remote?}(shell.js 머리말) · goals:[{text, expect:{...}}](실시간 체크리스트, 명령마다 Shell.state()와 대조)
-//                   · expect?:{...}(최종 비교; 없으면 goals 의 expect 를 합침) · forbid?:['rm -rf /'](명령 히스토리 검사) · solution:'명령\n명령'(정답 보기·검증 도구가 실행) · xp 필수(CONFIG.XP 에 mission 없음)
+//                   · expect?:{...}(최종 비교; 없으면 goals 의 expect 를 합침) · forbid?:['rm -rf /'](명령 히스토리 검사) · solution:'명령\n명령'(정답 보기·검증 도구가 실행) · xp 선택(없으면 CONFIG.XP.mission = 25)
 //                   expect 키: cwd cwdStartsWith files dirs noFiles git commits branchCommits branches noBranches head staged stagedEmpty clean noConflictMarkers tags messages lastMessage remoteBranches pushed stash forbid historyIncludes
 //                   — expect 에 적힌 항목만 비교(EXPANSION 6절 "채점"). 함수·정규식은 쓰지 않는다(전부 선언형: Node 검증 도구가 같은 데이터로 돌린다). grader 는 'state' 로 적는다.
 //   type:'quiz'     그대로. 명령 맞히기는 kind:'cmd' — "이 상태에서 ○○ 하려면?" 보기 4개가 명령어(<code>…</code>)
@@ -116,4 +116,5 @@ const PROBLEMS = [
   solution: 'mkdir src docs data\nmv main.py util.py src/\nmv README.md docs/\nmv data.csv data/\ngrep -r TODO src\necho util.py >> notes.txt',
   hints: ['순서: 폴더 먼저 만들고(mkdir 는 한 번에 여러 개 가능), mv 로 옮기고, grep 으로 찾고, echo >> 로 적어요', 'mv 는 여러 파일을 한꺼번에 폴더로: mv main.py util.py src/ · 내용 찾기는 grep -r TODO . (결과 앞에 파일 이름이 나와요)', 'mkdir src docs data → mv main.py util.py src/ → mv README.md docs/ → mv data.csv data/ → grep -r TODO src → echo util.py >> notes.txt'] },
 ];
+const DRILLS = []; // 타자 연습 없음(공통 전역 const 구조 유지)
 const GUIDES = {};

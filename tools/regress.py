@@ -369,7 +369,7 @@ with sync_playwright() as p:
     check(pg.locator('.result.ok').count()==1 and pg.evaluate("Store.prob('T0P1').status")=='clear' and pg.evaluate("Store.prob('T0P1').code")=='pwd\nls\ncd projects/', '미션 제출 → 클리어, 저장된 답 = 명령 히스토리')
     # 오답 제출(Ctrl+Shift+Enter 로 plugin.submit) → 남은 목표 안내, 다시 열면 이어서(재실행), 처음부터
     pg.evaluate("UI.go('problem',{pid:'T0P4',lessonId:'T0'})"); pg.wait_for_timeout(400); pg.fill('#msTerm .sh-in', 'cd notes'); pg.keyboard.press('Enter'); pg.wait_for_timeout(80); pg.keyboard.press('Control+Shift+Enter'); pg.wait_for_timeout(400)
-    tgf=pg.locator('#pvResult').inner_text(); check('남은 목표' in tgf and 'cat welcome.txt' in tgf and pg.evaluate("Store.prob('T0P4').fails")>=1, '미션 오답 제출 → 남은 목표 안내 + 실패 기록 (%s)' % tgf[:60].replace('\n',' '))
+    tgf=pg.locator('#pvResult').inner_text(); check(tgf.strip()=='' and pg.evaluate("Store.prob('T0P4').fails")==0 and pg.evaluate("document.querySelector('#btnGrade').disabled"), '미션 목표 미달성: 제출 버튼 disabled, Ctrl+Shift+Enter 도 무시(실패 기록 없음) — QA v2.7.0 중6 (%s)' % tgf[:60].replace('\n',' '))
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(200); pg.evaluate("UI.go('problem',{pid:'T0P4',lessonId:'T0'})"); pg.wait_for_timeout(400)
     check('~/notes' in pg.locator('#msTerm .sh-line .sh-ps1').inner_text() and pg.locator('.sh-note').count()==1, '미션 다시 열기 → 저장된 명령을 재실행해 이어서(프롬프트 ~/notes)')
     pg.click('#msReset'); pg.wait_for_timeout(200); pg.evaluate("(()=>{ const bs=[...document.querySelectorAll('.modal-btns button')]; (bs[1]||bs[0]).click(); })()"); pg.wait_for_timeout(200)

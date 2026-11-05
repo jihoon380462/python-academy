@@ -1,6 +1,7 @@
 // core/ui-views-more.js — 놀이터·뱃지·프로필·보관함·설정·용어집·약점·세션·점검·온보딩·코스 페이지 초기화
 // ---------- 놀이터 ----------
 Views.playground = (root, params = {}) => {
+  if (typeof Py === 'undefined') { root.innerHTML = `<div class="page"><h2>놀이터</h2><div class="card"><p class="muted">이 코스에는 파이썬 실행기가 없어요. 자유롭게 쳐 보려면 레슨 예제 창을 쓰거나, <a href="../python/#playground">파이썬 코스의 놀이터</a>로 가세요.</p></div></div>`; return; } /* v2.7.0: sql·web·terminal-git 코스 */
   const d = Store.data; let editor = null, stopTurtle = null; let currentWork = null;
   const render = () => {
     root.innerHTML = `<div class="pg"><div class="pg-main">

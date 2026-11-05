@@ -188,7 +188,7 @@ C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(�
 ### C-T.2 문제 유형 4개와 채점
 | type | 어디서 채점 | 필드 |
 | --- | --- | --- |
-| `mission` (미션, 메인 유형·문제의 절반 이상) | 명령마다 `Shell.state()` 를 `goals[].expect` 와 `Grader.matchState` 로 대조 → 체크리스트 ✓. 전부 달성해야 제출 버튼이 켜지고, 제출 시 `expect`(없으면 goals 합집합) + `forbid` 로 최종 판정 | `setup` `goals` `expect?` `forbid?` `solution` `xp`(필수) `grader:'state'` |
+| `mission` (미션, 메인 유형·문제의 절반 이상) | 명령마다 `Shell.state()` 를 `goals[].expect` 와 `Grader.matchState` 로 대조 → 체크리스트 ✓. 전부 달성해야 제출 버튼이 켜지고, 제출 시 `expect`(없으면 goals 합집합) + `forbid` 로 최종 판정 | `setup` `goals` `expect?` `forbid?` `solution` `xp`(선택, 기본 25) `grader:'state'` |
 | `quiz` + `kind:'cmd'` (명령 맞히기) | 기존 퀴즈 그대로(즉시 채점) | `quiz:{opts:[<code>명령</code>×4], ans, why}` |
 | `fill` (명령 빈칸) | 기존 빈칸 그대로 | `fill:{code:'터미널 장면', blanks:[{a:['pwd']}], why}` |
 | `parsons` (명령 순서) | 줄 순서만(들여쓰기 없음). 셸 실행 채점은 화면에서 하지 않는다 | `parsons:{solution}`(5줄 이상) = `solution`, `setup`, `tests:[{expect}]`(Node 검증 도구가 명령을 차례로 실행해 확인) |

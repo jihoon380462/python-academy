@@ -12,6 +12,7 @@
   - 터미널·Git: 문제 유형 `mission`(검은 터미널 창 + 파일 트리 + Git 이면 3칸 상태 뷰·커밋 그래프 + 목표 체크리스트 실시간 ✓ + 「처음부터」 + `edit` 모달), `quiz kind:'cmd'`·`fill`·`parsons`(명령 순서), 레슨 예제 `example.shell`(한 줄씩 실행). 검증 `tools/run_shell_solutions.mjs`(셸 시뮬레이터로 정답 명령 실행). T0 4쪽·문제 4, TB1 보스 미션.
   - SQL: `core/runners/sql.js`(sql.js 1.13 CDN, 없으면 「엔진을 받지 못했어요」 안내), 문제 유형 `sql`(편집기·▶ 실행·결과 표 정렬/페이지·스키마 패널·데이터 초기화; 채점 rows/state, 실패 시 기대/내 결과 표 비교·행 수 힌트·에러 한국어 풀이), 카페 데이터셋(`courses/sql/datasets.js`, `tools/gen_sql_dataset.py --full` 로 키움). 검증 `tools/run_sql_solutions.py`(Python sqlite3). S0 4쪽·문제 4.
   - 웹: `core/runners/web.js`(iframe srcdoc 샌드박스, console/alert 출력창, **가짜 API 서버** `https://api.academy.local` todos/menu/orders/weather/login, 네트워크 탭), 문제 유형 `web`(HTML/CSS/JS 탭 + 미리보기 폰/PC + 자동 갱신 + 체크리스트 채점·실패 항목 강조·free 문제). 검증 `tools/run_web_solutions.py`(Playwright). W0 4쪽·문제 4.
+  - 독립 QA(상 2·중 5·하 7) 반영: 파이썬 실행기 없는 코스의 parsons 실행 버튼·놀이터 안내, 「다음 레슨」·「이어서 하기」·학습 진행이 준비 중 레슨을 건너뜀, 준비 중 레슨 뒤의 보스가 잠기지 않음, SQL 엔진 없을 때 제출은 실패로 기록하지 않음, 미션 목표 미달성이면 Ctrl+Shift+Enter 도 무시, 레슨 창·「모르겠어요」 문구, xp 선택.
   - 공통: `tools/validate/<코스>.mjs` 규칙, regress 절 3개(55검사), `TextEditor` `lang` 옵션(sql·html·css·js 는 파이썬 들여쓰기 규칙·빠른 키 끔, CodeMirror 언어 모듈 지연 로드), `CONFIG.XP` mission/sql/web 25, `run_solutions.py` 는 다른 러너를 건너뜀.
 - 🔌 (사용자 결정 11/5 「뼈대는 Fable, 살은 Opus」) **코스 플러그인 훅**(DESIGN 16절): `UI.modes[type]`(문제 유형 플러그인)·`UI.examples[kind]`(레슨 예제 플러그인)·레슨 `draft: true`(「준비 중」)·허브 `preview: true`(잠금 없이 열림)·`tools/validate/<코스>.mjs` 코스별 검증 훅·id 규칙 sql/web.
 

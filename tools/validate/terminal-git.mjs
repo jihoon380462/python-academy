@@ -22,7 +22,6 @@ export default async (course, { err, warn }) => {
       if (p.grader != null && p.grader !== 'state') err(`${where}: mission 의 grader 는 'state'`);
       if (p.forbid != null && !(Array.isArray(p.forbid) && p.forbid.every(f => typeof f === 'string' && f.trim()))) err(`${where}: forbid 는 문자열 배열`);
       if (!(typeof p.solution === 'string' && p.solution.trim())) err(`${where}: solution(정답 명령, 줄바꿈으로 여러 줄) 필요`); else if (p.solution.split('\n').some(l => /^\s*edit\s+\S+\s*$/.test(l))) err(`${where}: solution 의 edit 는 내용을 함께 적어야 Node 에서 돌아가요: edit 파일 "내용"`);
-      if (typeof p.xp !== 'number') err(`${where}: mission 은 xp 필수 (CONFIG.XP 에 mission 기본값이 없음)`);
       if (p.tests) err(`${where}: mission 에는 tests 를 쓰지 않아요 (goals·expect 로)`);
       if (p.boss && !(p.goals && p.goals.length >= 3)) err(`${where}: 보스 미션은 goals 3개 이상`);
     }

@@ -131,7 +131,7 @@ UI.modes.mission = {
       if (!term) return; const st = term.sh.state(); let done = 0;
       goals.forEach((g, i) => { const ok = Grader.matchState(st, g.expect || {}).ok; const li = $(`.ms-g[data-g="${i}"]`, host); if (li) { const was = li.classList.contains('done'); li.classList.toggle('done', ok); if (ok && !was && term.history().length) li.classList.add('pop'); } if (ok) done++; });
       let ruleOk = true; if (p.forbid && p.forbid.length) { ruleOk = Grader.matchState(st, { forbid: p.forbid }).ok; const li = $('.ms-g[data-g="forbid"]', host); if (li) { li.classList.toggle('done', ruleOk); li.classList.toggle('broken', !ruleOk); } }
-      allDone = done === goals.length && ruleOk; $('#msGoalN', host).textContent = `${done}/${goals.length}`; const b = $('#btnGrade', host); if (b) b.disabled = !allDone; const note = $('#msNote', host); if (note) note.textContent = allDone ? '목표를 모두 달성했어요 — 제출하세요' : (!ruleOk ? '금지된 명령을 썼어요 — 「처음부터」로 되돌리세요' : '');
+      allDone = done === goals.length && ruleOk; $('#msGoalN', host).textContent = `${done}/${goals.length}`; const b = $('#btnGrade', host); if (b) { if (b.disabled && allDone) { const pr = document.querySelector('#pvResult'); if (pr && pr.querySelector('.result.bad')) pr.innerHTML = ''; } b.disabled = !allDone; } const note = $('#msNote', host); if (note) note.textContent = allDone ? '목표를 모두 달성했어요 — 제출하세요' : (!ruleOk ? '금지된 명령을 썼어요 — 「처음부터」로 되돌리세요' : '');
     };
     const replay = (!ctx.fresh && ctx.rec && ctx.rec.mode === 'mission' && typeof ctx.rec.code === 'string' && ctx.rec.code.trim()) ? ctx.rec.code.split('\n') : null;
     term = ShellUI.term($('#msTerm', host), { setup: p.setup || {}, replay, onChange: () => check() });

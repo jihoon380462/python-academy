@@ -25,7 +25,7 @@ Opus 공통 규칙: `node tools/validate_content.mjs && node tools/extract.mjs t
 | 순서 | 과제 | 상태 |
 | --- | --- | --- |
 | F1 | v2.7.0 릴리스 PR(★4-1 check_level · ★5 core 중 · 코스 플러그인 훅 · 터미널·Git/SQL/웹 뼈대) — 사용자 Merge 대기 | 진행 중 |
-| F2 | Opus 가 새 코스를 채우는 동안 들어오는 core 요청(HANDOFF 「Fable 요청」 줄) 처리, 새 코스 `ready: true` 전환은 콘텐츠가 다 찬 뒤 | 대기 |
+| F2 | Opus 가 새 코스를 채우는 동안 들어오는 core 요청(HANDOFF 「Fable 요청」 줄) 처리, 새 코스 `ready: true` 전환은 콘텐츠가 다 찬 뒤. 뼈대 QA 에서 남긴 설계 판단: SQL 오답 「기대한 결과」 표가 정답을 그대로 보여 줌(열·행 수만 보일지), 온보딩 모달이 새 코스에서도 「파이썬 아카데미」 문구·마스코트, EXPANSION 6~8절의 미구현 UI(가짜 GitHub 탭·커밋 그래프 애니메이션·ERD/JOIN 애니메이션·요소 검사 모드), 실제 브라우저에서 sql.js·CodeMirror 언어 모듈(lang-sql/html/css/js) 로드 확인 | 대기 |
 | F3 | 8차 아트(선 아이콘) 납품 검수(IMAGES.md 3-B), 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지) | 대기 |
 | F4 | 수학 M2·M3(EXPANSION 14절) — D4 후순위 | 대기 |
 | F5 | 예정 코스 T1~T8 설계(아래 「예정 코스」 절, GitHub T8 가장 중요) | 대기 |

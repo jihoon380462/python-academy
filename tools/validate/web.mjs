@@ -12,7 +12,6 @@ export default async (course, { err, warn }) => {
       if (w.tabs != null) { if (!Array.isArray(w.tabs) || !w.tabs.length || w.tabs.some(t => !TABS.includes(t))) err(`${where}: web.tabs 는 ['html','css','js'] 중에서 1개 이상`); if (Array.isArray(w.tabs) && new Set(w.tabs).size !== w.tabs.length) err(`${where}: web.tabs 중복`); }
       if (!w.starter || typeof w.starter !== 'object') err(`${where}: web.starter 는 { html, css?, js? } 객체`);
       else { for (const k of Object.keys(w.starter)) { if (!TABS.includes(k)) err(`${where}: web.starter.${k} — html/css/js 만`); else if (typeof w.starter[k] !== 'string') err(`${where}: web.starter.${k} 는 문자열`); } const tabs = w.tabs || TABS; for (const k of Object.keys(w.starter)) if (w.starter[k] && !tabs.includes(k)) err(`${where}: starter.${k} 가 있는데 tabs 에 '${k}' 가 없어요(편집기에 안 보임)`); }
-      if (p.xp == null) err(`${where}: web 문제는 xp 필수 (CONFIG.XP 에 web 이 없음 — 보통 30, free 는 10)`);
       if (w.free) { if (Array.isArray(w.checks) && w.checks.length) warn(`${where}: free 문제의 checks 는 쓰이지 않아요(채점 없음)`); if ((p.xp || 0) > 15) warn(`${where}: free(자유 과제) XP 는 고정 소액(10 안팎)으로`); }
       else {
         if (!Array.isArray(w.checks) || !w.checks.length) err(`${where}: web.checks 가 비어 있어요 (자유 과제면 web.free:true)`);
