@@ -39,7 +39,7 @@ Views.home = (root) => {
         $$('[data-hp]', res).forEach(b => b.onclick = () => { const p = Content.problemMap[b.dataset.hp]; if (!openP(p)) return UI.toast('🔒 앞 챕터의 보스를 깨면 열려요 (설정에서 "전제 무시" 가능)'); UI.go('problem', { pid: p.id, lessonId: p.lesson }); }); };
       if (q) { q.value = st.q || ''; q.oninput = () => { st.q = q.value; run(); }; $$('[data-hf]', root).forEach(b => b.onclick = () => { filter = st.filter = b.dataset.hf; $$('[data-hf]', root).forEach(x => x.classList.toggle('on', x === b)); run(); }); $$('[data-hf]', root).forEach(x => x.classList.toggle('on', x.dataset.hf === filter)); if (st.q || filter !== 'all') run(); } }
     const hc = $('#homeCont', root); if (hc) hc.onclick = () => UI.go(contTarget.go, contTarget.params); const hcf = $('#homeConf', root); if (hcf) hcf.onclick = () => { const cl = Game.confusedLessons()[0]; UI.go('lesson', { lessonId: cl.lesson.id, page: Math.min(...cl.pages) }); };
-    $$('[data-tch]', root).forEach(b => b.onclick = () => { st.ch = +b.dataset.tch; const first = LESSONS.find(l => l.ch === st.ch && Game.lessonOpen(l) && !Game.lessonDone(l)) || LESSONS.find(l => l.ch === st.ch); st.sel = first ? first.id : null; render(); });
+    $$('[data-tch]', root).forEach(b => b.onclick = () => { const tl0 = $('.tr-list', root); const sx = tl0 ? tl0.scrollLeft : 0; st.ch = +b.dataset.tch; const first = LESSONS.find(l => l.ch === st.ch && Game.lessonOpen(l) && !Game.lessonDone(l)) || LESSONS.find(l => l.ch === st.ch); st.sel = first ? first.id : null; render(); centerChip(sx, true); }); /* 모바일 챕터 줄: 다시 그려도 가로 스크롤 위치 유지 → 고른 칩을 부드럽게 가운데로 */
     const openLesson = (id) => { const l = Content.lessonMap[id]; if (!l) return; if (l.draft) return UI.toast('이 레슨은 아직 준비 중이에요'); if (!Game.lessonOpen(l)) return UI.toast('🔒 앞 레슨을 먼저 끝내면 열려요 (설정에서 "전제 무시" 가능)'); UI.go('lesson', { lessonId: id, page: (d.lessons[id] || {}).page || 0 }); };
     const pick = (id) => { const l = Content.lessonMap[id]; if (!l) return; if (UI.isMobile() || window.innerWidth < 1100 || st.sel === id) return openLesson(id); st.sel = id; st.ch = l.ch; render(); };
     $$('[data-tl]', root).forEach(b => b.onclick = () => pick(b.dataset.tl)); $$('[data-l]', root).forEach(b => b.onclick = () => pick(b.dataset.l));
@@ -47,8 +47,10 @@ Views.home = (root) => {
     $$('[data-go]', root).forEach(b => b.onclick = () => UI.go(b.dataset.go));
     $$('[data-check]', root).forEach(b => b.onclick = () => UI.go('checkup', { n: +b.dataset.check }));
   };
+  // 모바일 가로 챕터 줄(.tr-list)에서 고른 칩을 가운데로. scrollIntoView 는 페이지 세로 스크롤까지 건드리므로 줄 안에서만 scrollTo
+  function centerChip(from, smooth) { const tl = $('.tr-list', root), on = $('.tr-sec.on', root); if (!tl || !on || tl.scrollWidth <= tl.clientWidth) return; if (from != null) tl.scrollLeft = from; const x = on.offsetLeft - tl.offsetLeft - (tl.clientWidth - on.offsetWidth) / 2; tl.scrollTo({ left: Math.max(0, x), behavior: smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' }); }
   render();
-  const chipOn = $('.tr-sec.on', root); if (chipOn && UI.isMobile()) chipOn.scrollIntoView({ inline: 'center', block: 'nearest' });
+  centerChip(null, false);
   const selNode = $('.lc.sel', root) || $('.lc.cur', root); if (selNode && !UI._homeScrolled) { setTimeout(() => selNode.scrollIntoView({ block: 'nearest' }), 100); UI._homeScrolled = true; }
 };
 
