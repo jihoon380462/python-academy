@@ -11,6 +11,7 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
   tasks.forEach((t, i) => {
     n++; const id = `${lid}#${i + 1} ${t.title}`; const p = t.pid ? P[t.pid] : null;
     if (t.pid && !p) return bad(`${id}: 없는 문제 ${t.pid}`);
+    for (const nd of t.needs || []) if (nd.length !== 3 || !nd[2] || !/[A-Za-z0-9=+*\/%\[\](){}"<>.:▷-]/.test(nd[0])) bad(`${id}: 필요한 문법은 [실제 문법(코드), '레슨/쪽', 설명] 이어야 해요 (v2.9.2) → ${JSON.stringify(nd)}`);
     for (const [name, ref] of t.needs || []) { const [nl, np] = String(ref).split('/'); const pages = nl === 'SETUP' ? BOOK.setup.pages : (L[nl] || {}).pages; if (!pages || !(+np >= 0 && +np < pages.length)) bad(`${id}: 필요한 문법 「${name}」 → ${ref} 가 없는 쪽`); }
     if (t.text === '@prompt' && !p) bad(`${id}: @prompt 인데 pid 없음`);
     const tests = (p && p.tests) || []; const io = t.io || (p && p.project ? tests.filter(c => !c.files && !c.inputGen && c.output !== '__COMPUTED__').filter((c, i, ok) => ok.findIndex(d => d.stage === c.stage) === i).slice(0, 4) : tests[0] ? [tests[0]] : []); const answer = t.answer || (p && p.solution) || '';
