@@ -12,7 +12,7 @@ if (fs.existsSync(swPath)) {
   const assets = []; const add = (rel) => assets.push(rel.replace(/\\/g, '/'));
   add('index.html'); for (const f of fs.readdirSync(path.join(ROOT, 'core'))) if (f.endsWith('.js') || f.endsWith('.css')) add('core/' + f); for (const f of fs.readdirSync(path.join(ROOT, 'core/runners'))) add('core/runners/' + f);
   for (const f of fs.readdirSync(path.join(ROOT, 'shared'))) if (f.endsWith('.js')) add('shared/' + f);
-  for (const d of fs.readdirSync(path.join(ROOT, 'courses'))) { const cd = path.join(ROOT, 'courses', d); if (!fs.statSync(cd).isDirectory()) continue; for (const f of ['index.html', 'content.js', 'course.json']) if (fs.existsSync(path.join(cd, f))) add(`courses/${d}/${f}`); }
+  for (const d of fs.readdirSync(path.join(ROOT, 'courses'))) { const cd = path.join(ROOT, 'courses', d); if (!fs.statSync(cd).isDirectory()) continue; for (const f of ['index.html', 'content.js', 'course.json', 'book.js']) if (fs.existsSync(path.join(cd, f))) add(`courses/${d}/${f}`); }
   if (fs.existsSync(path.join(ROOT, 'assets/img'))) for (const f of fs.readdirSync(path.join(ROOT, 'assets/img'))) if (/\.(png|webp|svg)$/.test(f)) add('assets/img/' + f);
   const list = assets.map(a => a.endsWith('.html') || a.endsWith('.json') ? a : a + '?v=' + ver);
   let sw = fs.readFileSync(swPath, 'utf8'); const t = sw.replace(/const VERSION = '[^']*';/, `const VERSION = '${ver}';`).replace(/const ASSETS = \[[\s\S]*?\];/, 'const ASSETS = ' + JSON.stringify(list) + ';');
