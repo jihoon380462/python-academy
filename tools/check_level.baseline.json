@@ -3,14 +3,14 @@
   "updated": "2026-11-05",
   "courses": {
     "algo": {
-      "outside": 4,
+      "outside": 3,
       "combo": 3,
       "first": 0
     },
     "python": {
-      "outside": 8,
-      "combo": 22,
-      "first": 4
+      "outside": 0,
+      "combo": 21,
+      "first": 1
     }
   }
 }

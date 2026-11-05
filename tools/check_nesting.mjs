@@ -8,7 +8,8 @@ const courses = process.argv[2] ? [process.argv[2]] : ['python', 'algo']; let to
 for (const course of courses) {
   const ctx = { window: {}, console }; vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(`courses/${course}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var '), ctx);
-const dec = (s) => s.replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+// HTML(문제 설명·레슨 본문)에서만 태그를 벗긴다 — 태그는 글자로 시작하는 것만(코드의 a <= b 비교를 지우지 않게, v2.8.5 수정)
+const dec = (s) => s.replace(/<br\s*\/?>/g, '\n').replace(/<\/?[a-zA-Z][^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
 // 호출 깊이: 이름( 로 여는 괄호만 호출로 셈(문자열 안은 건너뜀)
 function depth(line) {
   let max = 0, stack = [], q = null;
@@ -23,15 +24,15 @@ function depth(line) {
   return max;
 }
 const out = [];
-const scan = (where, text) => { if (!text) return; for (const raw of dec(String(text)).split('\n')) { const l = raw.trim(); if (!l) continue; const d = depth(l); if (d >= 3) out.push({ where, d, line: l }); } };
+const scan = (where, text, html = false) => { if (!text) return; for (const raw of (html ? dec(String(text)) : String(text)).split('\n')) { const l = raw.trim(); if (!l) continue; const d = depth(l); if (d >= 3) out.push({ where, d, line: l }); } };
 for (const p of ctx.PROBLEMS) {
-  const codes = (p.prompt || '').match(/<(code|pre)>[\s\S]*?<\/\1>/g) || []; codes.forEach(c => scan(p.id + ' prompt', c));
+  const codes = (p.prompt || '').match(/<(code|pre)>[\s\S]*?<\/\1>/g) || []; codes.forEach(c => scan(p.id + ' prompt', c, true));
   scan(p.id + ' solution', p.solution); scan(p.id + ' starter', p.starter);
   (p.hints || []).forEach((h, i) => scan(p.id + ' hint' + (i + 1), h));
   if (p.fill) scan(p.id + ' fill', p.fill.code); if (p.quiz && p.quiz.code) scan(p.id + ' quizcode', p.quiz.code);
   if (p.bug) scan(p.id + ' bug', p.bug.code || '');
 }
-for (const l of ctx.LESSONS) (l.pages || []).forEach((pg, i) => { if (pg.example) scan(`${l.id} p${i + 1} example`, pg.example.code); ((pg.html || '').match(/<(code|pre)>[\s\S]*?<\/\1>/g) || []).forEach(c => scan(`${l.id} p${i + 1} html`, c)); });
+for (const l of ctx.LESSONS) (l.pages || []).forEach((pg, i) => { if (pg.example) scan(`${l.id} p${i + 1} example`, pg.example.code); ((pg.html || '').match(/<(code|pre)>[\s\S]*?<\/\1>/g) || []).forEach(c => scan(`${l.id} p${i + 1} html`, c, true)); });
 const byP = {}; out.forEach(o => { const k = o.where.split(' ')[0]; byP[k] = (byP[k] || 0) + 1; });
 console.log((out.length ? '✗' : '✓') + ' check_nesting ' + course + ': 호출 3겹 이상 줄 ' + out.length + '개' + (out.length ? ' (' + Object.keys(byP).join(', ') + ')' : ''));
 if (process.argv[3] === 'list' || (out.length && !process.argv[3])) out.forEach(o => console.log(`  ${o.d}겹 ${o.where}: ${o.line}`));
