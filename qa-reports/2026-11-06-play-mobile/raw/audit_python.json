@@ -1,0 +1,2298 @@
+{
+ "results": {
+  "mobile-dark/home": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     ".lnk \"오늘의 도전\"",
+     72,
+     24
+    ],
+    [
+     ".lnk \"타임 어택\"",
+     60,
+     24
+    ],
+    [
+     ".lnk \"내 작품\"",
+     48,
+     24
+    ],
+    [
+     ".lnk \"통계\"",
+     32,
+     24
+    ],
+    [
+     ".lnk \"약점 분석\"",
+     60,
+     24
+    ],
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"안 푼 것\"",
+     66,
+     32
+    ],
+    [
+     ".chip-btn \"틀린 것\"",
+     62,
+     32
+    ],
+    [
+     ".chip-btn \"별 3 아님\"",
+     74,
+     32
+    ],
+    [
+     ".chip-btn \"프로젝트·보스\"",
+     98,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     ".tr-sec.locked \"03 데이터 다루기\"",
+     494
+    ],
+    [
+     ".tr-ch \"03 데이터 다루기\"",
+     494
+    ],
+    [
+     ".tr-name \"데이터 다루기\"",
+     481
+    ],
+    [
+     ".tr-sec.locked \"04 더 큰 프로그램\"",
+     651
+    ],
+    [
+     ".tr-ch \"04 더 큰 프로그램\"",
+     651
+    ],
+    [
+     ".tr-num \"04\"",
+     537
+    ],
+    [
+     ".tr-name \"더 큰 프로그램\"",
+     638
+    ],
+    [
+     ".tr-sec.locked \"05 마무리\"",
+     756
+    ],
+    [
+     ".tr-ch \"05 마무리\"",
+     756
+    ],
+    [
+     ".tr-num \"05\"",
+     694
+    ],
+    [
+     ".tr-name \"마무리\"",
+     743
+    ],
+    [
+     ".tr-sec.locked \"06 실전\"",
+     848
+    ],
+    [
+     ".tr-ch \"06 실전\"",
+     848
+    ],
+    [
+     ".tr-num \"06\"",
+     799
+    ],
+    [
+     ".tr-name \"실전\"",
+     835
+    ]
+   ]
+  },
+  "mobile-dark/lesson_L1": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     "#lpGot.lnk \"이해했어요\"",
+     85,
+     29
+    ],
+    [
+     "#lpLost.lnk \"모르겠어요\"",
+     85,
+     29
+    ],
+    [
+     "#exTrace.btn.xs \"한 줄씩 보기\"",
+     83,
+     28
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     ".stp.locked \"5 조건문: 만약에\"",
+     432
+    ],
+    [
+     ".stp-dot \"5\"",
+     403
+    ],
+    [
+     ".stp-t \"조건문: 만약에\"",
+     428
+    ],
+    [
+     ".stp.locked \"👾 보스\"",
+     516
+    ],
+    [
+     ".stp-dot \"👾\"",
+     487
+    ],
+    [
+     ".stp-t \"보스\"",
+     485
+    ]
+   ]
+  },
+  "mobile-dark/problem_L1P1": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-dark/problem_L4P2": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-dark/settings": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     "#sSound. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sVib. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sGame. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sUnlock. \"on\"",
+     22,
+     22
+    ],
+    [
+     ". \"이 링크\"",
+     41,
+     16
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [
+    [
+     ". \"이 링크\"",
+     3.64,
+     13.6
+    ],
+    [
+     "#sReset.btn.danger \"전체 초기화\"",
+     3.37,
+     16
+    ]
+   ],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-dark/stats": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [
+    [
+     ".st-dow \"토\"",
+     11.2
+    ],
+    [
+     ".st-dow.sun \"일\"",
+     11.2
+    ],
+    [
+     ".st-dow \"월\"",
+     11.2
+    ],
+    [
+     ".st-dow \"화\"",
+     11.2
+    ],
+    [
+     ".st-dow \"수\"",
+     11.2
+    ],
+    [
+     ".st-dow \"목\"",
+     11.2
+    ],
+    [
+     ".st-dow \"금\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-dark/badges": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [
+    [
+     ".b-pct \"0/1\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/10\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/4\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/20\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/5\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/7\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/7\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"획득\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"거의 다 됨\"",
+     78,
+     32
+    ],
+    [
+     ".chip-btn \"미획득\"",
+     58,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-light/home": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     ".lnk \"오늘의 도전\"",
+     72,
+     24
+    ],
+    [
+     ".lnk \"타임 어택\"",
+     60,
+     24
+    ],
+    [
+     ".lnk \"내 작품\"",
+     48,
+     24
+    ],
+    [
+     ".lnk \"통계\"",
+     32,
+     24
+    ],
+    [
+     ".lnk \"약점 분석\"",
+     60,
+     24
+    ],
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"안 푼 것\"",
+     66,
+     32
+    ],
+    [
+     ".chip-btn \"틀린 것\"",
+     62,
+     32
+    ],
+    [
+     ".chip-btn \"별 3 아님\"",
+     74,
+     32
+    ],
+    [
+     ".chip-btn \"프로젝트·보스\"",
+     98,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     ".tr-sec.locked \"03 데이터 다루기\"",
+     494
+    ],
+    [
+     ".tr-ch \"03 데이터 다루기\"",
+     494
+    ],
+    [
+     ".tr-name \"데이터 다루기\"",
+     481
+    ],
+    [
+     ".tr-sec.locked \"04 더 큰 프로그램\"",
+     651
+    ],
+    [
+     ".tr-ch \"04 더 큰 프로그램\"",
+     651
+    ],
+    [
+     ".tr-num \"04\"",
+     537
+    ],
+    [
+     ".tr-name \"더 큰 프로그램\"",
+     638
+    ],
+    [
+     ".tr-sec.locked \"05 마무리\"",
+     756
+    ],
+    [
+     ".tr-ch \"05 마무리\"",
+     756
+    ],
+    [
+     ".tr-num \"05\"",
+     694
+    ],
+    [
+     ".tr-name \"마무리\"",
+     743
+    ],
+    [
+     ".tr-sec.locked \"06 실전\"",
+     848
+    ],
+    [
+     ".tr-ch \"06 실전\"",
+     848
+    ],
+    [
+     ".tr-num \"06\"",
+     799
+    ],
+    [
+     ".tr-name \"실전\"",
+     835
+    ]
+   ]
+  },
+  "mobile-light/lesson_L1": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     "#lpGot.lnk \"이해했어요\"",
+     85,
+     29
+    ],
+    [
+     "#lpLost.lnk \"모르겠어요\"",
+     85,
+     29
+    ],
+    [
+     "#exTrace.btn.xs \"한 줄씩 보기\"",
+     83,
+     28
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     ".stp.locked \"5 조건문: 만약에\"",
+     432
+    ],
+    [
+     ".stp-dot \"5\"",
+     403
+    ],
+    [
+     ".stp-t \"조건문: 만약에\"",
+     428
+    ],
+    [
+     ".stp.locked \"👾 보스\"",
+     516
+    ],
+    [
+     ".stp-dot \"👾\"",
+     487
+    ],
+    [
+     ".stp-t \"보스\"",
+     485
+    ]
+   ]
+  },
+  "mobile-light/problem_L1P1": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-light/problem_L4P2": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-light/settings": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     "#sSound. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sVib. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sGame. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sUnlock. \"on\"",
+     22,
+     22
+    ],
+    [
+     ". \"이 링크\"",
+     41,
+     16
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-light/stats": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [
+    [
+     ".st-dow \"토\"",
+     11.2
+    ],
+    [
+     ".st-dow.sun \"일\"",
+     11.2
+    ],
+    [
+     ".st-dow \"월\"",
+     11.2
+    ],
+    [
+     ".st-dow \"화\"",
+     11.2
+    ],
+    [
+     ".st-dow \"수\"",
+     11.2
+    ],
+    [
+     ".st-dow \"목\"",
+     11.2
+    ],
+    [
+     ".st-dow \"금\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-light/badges": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [
+    [
+     ".b-pct \"0/1\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/10\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/4\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/20\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/5\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/7\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/7\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"획득\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"거의 다 됨\"",
+     78,
+     32
+    ],
+    [
+     ".chip-btn \"미획득\"",
+     58,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-dark-hc/home": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     ".lnk \"오늘의 도전\"",
+     72,
+     24
+    ],
+    [
+     ".lnk \"타임 어택\"",
+     60,
+     24
+    ],
+    [
+     ".lnk \"내 작품\"",
+     48,
+     24
+    ],
+    [
+     ".lnk \"통계\"",
+     32,
+     24
+    ],
+    [
+     ".lnk \"약점 분석\"",
+     60,
+     24
+    ],
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"안 푼 것\"",
+     66,
+     32
+    ],
+    [
+     ".chip-btn \"틀린 것\"",
+     62,
+     32
+    ],
+    [
+     ".chip-btn \"별 3 아님\"",
+     74,
+     32
+    ],
+    [
+     ".chip-btn \"프로젝트·보스\"",
+     98,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     ".tr-sec.locked \"03 데이터 다루기\"",
+     494
+    ],
+    [
+     ".tr-ch \"03 데이터 다루기\"",
+     494
+    ],
+    [
+     ".tr-name \"데이터 다루기\"",
+     481
+    ],
+    [
+     ".tr-sec.locked \"04 더 큰 프로그램\"",
+     651
+    ],
+    [
+     ".tr-ch \"04 더 큰 프로그램\"",
+     651
+    ],
+    [
+     ".tr-num \"04\"",
+     537
+    ],
+    [
+     ".tr-name \"더 큰 프로그램\"",
+     638
+    ],
+    [
+     ".tr-sec.locked \"05 마무리\"",
+     756
+    ],
+    [
+     ".tr-ch \"05 마무리\"",
+     756
+    ],
+    [
+     ".tr-num \"05\"",
+     694
+    ],
+    [
+     ".tr-name \"마무리\"",
+     743
+    ],
+    [
+     ".tr-sec.locked \"06 실전\"",
+     848
+    ],
+    [
+     ".tr-ch \"06 실전\"",
+     848
+    ],
+    [
+     ".tr-num \"06\"",
+     799
+    ],
+    [
+     ".tr-name \"실전\"",
+     835
+    ]
+   ]
+  },
+  "mobile-dark-hc/lesson_L1": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     "#lpGot.lnk \"이해했어요\"",
+     85,
+     29
+    ],
+    [
+     "#lpLost.lnk \"모르겠어요\"",
+     85,
+     29
+    ],
+    [
+     "#exTrace.btn.xs \"한 줄씩 보기\"",
+     85,
+     28
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     ".stp.locked \"5 조건문: 만약에\"",
+     432
+    ],
+    [
+     ".stp-dot \"5\"",
+     403
+    ],
+    [
+     ".stp-t \"조건문: 만약에\"",
+     428
+    ],
+    [
+     ".stp.locked \"👾 보스\"",
+     516
+    ],
+    [
+     ".stp-dot \"👾\"",
+     487
+    ],
+    [
+     ".stp-t \"보스\"",
+     485
+    ]
+   ]
+  },
+  "mobile-dark-hc/problem_L1P1": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [
+    [
+     ".on \"설명\"",
+     2.66,
+     16
+    ]
+   ],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-dark-hc/problem_L4P2": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [
+    [
+     ".on \"설명\"",
+     2.66,
+     16
+    ]
+   ],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-dark-hc/settings": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [],
+   "tap": [
+    [
+     "#sSound. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sVib. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sGame. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sUnlock. \"on\"",
+     22,
+     22
+    ],
+    [
+     ". \"이 링크\"",
+     41,
+     16
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [
+    [
+     ".on \"다크\"",
+     2.66,
+     16
+    ],
+    [
+     ".on \"보통\"",
+     2.66,
+     16
+    ],
+    [
+     ".on \"높게\"",
+     2.66,
+     16
+    ],
+    [
+     ".on \"5문제\"",
+     2.66,
+     16
+    ]
+   ],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-dark-hc/stats": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [
+    [
+     ".st-dow \"토\"",
+     11.2
+    ],
+    [
+     ".st-dow.sun \"일\"",
+     11.2
+    ],
+    [
+     ".st-dow \"월\"",
+     11.2
+    ],
+    [
+     ".st-dow \"화\"",
+     11.2
+    ],
+    [
+     ".st-dow \"수\"",
+     11.2
+    ],
+    [
+     ".st-dow \"목\"",
+     11.2
+    ],
+    [
+     ".st-dow \"금\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "mobile-dark-hc/badges": {
+   "overflowX": false,
+   "vw": 390,
+   "small": [
+    [
+     ".b-pct \"0/1\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/10\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/4\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/20\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/5\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/7\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/7\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"획득\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"거의 다 됨\"",
+     78,
+     32
+    ],
+    [
+     ".chip-btn \"미획득\"",
+     58,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": []
+  },
+  "desktop-dark/home": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ".lc-st.cur \"학습 중\"",
+     11.696
+    ]
+   ],
+   "tap": [
+    [
+     ".tr-l.cur \"프로그래밍이란\"",
+     210,
+     34
+    ],
+    [
+     ".lnk \"오늘의 도전\"",
+     72,
+     24
+    ],
+    [
+     ".lnk \"타임 어택\"",
+     60,
+     24
+    ],
+    [
+     ".lnk \"내 작품\"",
+     48,
+     24
+    ],
+    [
+     ".lnk \"통계\"",
+     32,
+     24
+    ],
+    [
+     ".lnk \"약점 분석\"",
+     60,
+     24
+    ],
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"안 푼 것\"",
+     66,
+     32
+    ],
+    [
+     ".chip-btn \"틀린 것\"",
+     62,
+     32
+    ],
+    [
+     ".chip-btn \"별 3 아님\"",
+     74,
+     32
+    ],
+    [
+     ".chip-btn \"프로젝트·보스\"",
+     98,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark/lesson_L1": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [],
+   "tap": [
+    [
+     "#lpGot.lnk \"이해했어요\"",
+     85,
+     29
+    ],
+    [
+     "#lpLost.lnk \"모르겠어요\"",
+     85,
+     29
+    ],
+    [
+     "#exTrace.btn.xs \"한 줄씩 보기\"",
+     83,
+     28
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark/problem_L1P1": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ". \"Ctrl+Enter\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark/problem_L4P2": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ". \"Ctrl+Enter\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark/settings": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [],
+   "tap": [
+    [
+     "#sSound. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sVib. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sGame. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sUnlock. \"on\"",
+     22,
+     22
+    ],
+    [
+     ". \"이 링크\"",
+     41,
+     16
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [
+    [
+     ". \"이 링크\"",
+     3.64,
+     13.6
+    ],
+    [
+     "#sReset.btn.danger \"전체 초기화\"",
+     3.37,
+     16
+    ]
+   ],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark/stats": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ".st-dow \"토\"",
+     11.2
+    ],
+    [
+     ".st-dow.sun \"일\"",
+     11.2
+    ],
+    [
+     ".st-dow \"월\"",
+     11.2
+    ],
+    [
+     ".st-dow \"화\"",
+     11.2
+    ],
+    [
+     ".st-dow \"수\"",
+     11.2
+    ],
+    [
+     ".st-dow \"목\"",
+     11.2
+    ],
+    [
+     ".st-dow \"금\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark/badges": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ".b-pct \"0/1\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/10\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/4\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/20\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/5\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/7\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/7\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"획득\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"거의 다 됨\"",
+     78,
+     32
+    ],
+    [
+     ".chip-btn \"미획득\"",
+     58,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-light/home": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ".lc-st.cur \"학습 중\"",
+     11.696
+    ]
+   ],
+   "tap": [
+    [
+     ".tr-l.cur \"프로그래밍이란\"",
+     210,
+     34
+    ],
+    [
+     ".lnk \"오늘의 도전\"",
+     72,
+     24
+    ],
+    [
+     ".lnk \"타임 어택\"",
+     60,
+     24
+    ],
+    [
+     ".lnk \"내 작품\"",
+     48,
+     24
+    ],
+    [
+     ".lnk \"통계\"",
+     32,
+     24
+    ],
+    [
+     ".lnk \"약점 분석\"",
+     60,
+     24
+    ],
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"안 푼 것\"",
+     66,
+     32
+    ],
+    [
+     ".chip-btn \"틀린 것\"",
+     62,
+     32
+    ],
+    [
+     ".chip-btn \"별 3 아님\"",
+     74,
+     32
+    ],
+    [
+     ".chip-btn \"프로젝트·보스\"",
+     98,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-light/lesson_L1": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [],
+   "tap": [
+    [
+     "#lpGot.lnk \"이해했어요\"",
+     85,
+     29
+    ],
+    [
+     "#lpLost.lnk \"모르겠어요\"",
+     85,
+     29
+    ],
+    [
+     "#exTrace.btn.xs \"한 줄씩 보기\"",
+     83,
+     28
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-light/problem_L1P1": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ". \"Ctrl+Enter\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-light/problem_L4P2": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ". \"Ctrl+Enter\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-light/settings": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [],
+   "tap": [
+    [
+     "#sSound. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sVib. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sGame. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sUnlock. \"on\"",
+     22,
+     22
+    ],
+    [
+     ". \"이 링크\"",
+     41,
+     16
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-light/stats": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ".st-dow \"토\"",
+     11.2
+    ],
+    [
+     ".st-dow.sun \"일\"",
+     11.2
+    ],
+    [
+     ".st-dow \"월\"",
+     11.2
+    ],
+    [
+     ".st-dow \"화\"",
+     11.2
+    ],
+    [
+     ".st-dow \"수\"",
+     11.2
+    ],
+    [
+     ".st-dow \"목\"",
+     11.2
+    ],
+    [
+     ".st-dow \"금\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-light/badges": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ".b-pct \"0/1\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/10\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/4\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/20\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/5\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/7\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/7\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"획득\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"거의 다 됨\"",
+     78,
+     32
+    ],
+    [
+     ".chip-btn \"미획득\"",
+     58,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark-hc/home": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ".lc-st.cur \"학습 중\"",
+     11.696
+    ]
+   ],
+   "tap": [
+    [
+     ".tr-l.cur \"프로그래밍이란\"",
+     210,
+     34
+    ],
+    [
+     ".lnk \"오늘의 도전\"",
+     72,
+     24
+    ],
+    [
+     ".lnk \"타임 어택\"",
+     60,
+     24
+    ],
+    [
+     ".lnk \"내 작품\"",
+     48,
+     24
+    ],
+    [
+     ".lnk \"통계\"",
+     32,
+     24
+    ],
+    [
+     ".lnk \"약점 분석\"",
+     60,
+     24
+    ],
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"안 푼 것\"",
+     66,
+     32
+    ],
+    [
+     ".chip-btn \"틀린 것\"",
+     62,
+     32
+    ],
+    [
+     ".chip-btn \"별 3 아님\"",
+     74,
+     32
+    ],
+    [
+     ".chip-btn \"프로젝트·보스\"",
+     98,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark-hc/lesson_L1": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [],
+   "tap": [
+    [
+     "#lpGot.lnk \"이해했어요\"",
+     85,
+     29
+    ],
+    [
+     "#lpLost.lnk \"모르겠어요\"",
+     85,
+     29
+    ],
+    [
+     "#exTrace.btn.xs \"한 줄씩 보기\"",
+     85,
+     28
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark-hc/problem_L1P1": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ". \"Ctrl+Enter\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark-hc/problem_L4P2": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ". \"Ctrl+Enter\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip.type-code \"코드 작성\"",
+     86,
+     34
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark-hc/settings": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [],
+   "tap": [
+    [
+     "#sSound. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sVib. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sGame. \"on\"",
+     22,
+     22
+    ],
+    [
+     "#sUnlock. \"on\"",
+     22,
+     22
+    ],
+    [
+     ". \"이 링크\"",
+     41,
+     16
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [
+    [
+     ".on \"다크\"",
+     2.66,
+     16
+    ],
+    [
+     ".on \"보통\"",
+     2.66,
+     16
+    ],
+    [
+     ".on \"높게\"",
+     2.66,
+     16
+    ],
+    [
+     ".on \"5문제\"",
+     2.66,
+     16
+    ]
+   ],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark-hc/stats": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ".st-dow \"토\"",
+     11.2
+    ],
+    [
+     ".st-dow.sun \"일\"",
+     11.2
+    ],
+    [
+     ".st-dow \"월\"",
+     11.2
+    ],
+    [
+     ".st-dow \"화\"",
+     11.2
+    ],
+    [
+     ".st-dow \"수\"",
+     11.2
+    ],
+    [
+     ".st-dow \"목\"",
+     11.2
+    ],
+    [
+     ".st-dow \"금\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  },
+  "desktop-dark-hc/badges": {
+   "overflowX": false,
+   "vw": 1280,
+   "small": [
+    [
+     ".b-pct \"0/1\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/10\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/4\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/20\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/5\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/3\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/7\"",
+     11.2
+    ],
+    [
+     ".b-pct \"1/30\"",
+     11.2
+    ],
+    [
+     ".b-pct \"0/7\"",
+     11.2
+    ]
+   ],
+   "tap": [
+    [
+     ".chip-btn.on \"전체\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"획득\"",
+     46,
+     32
+    ],
+    [
+     ".chip-btn \"거의 다 됨\"",
+     78,
+     32
+    ],
+    [
+     ".chip-btn \"미획득\"",
+     58,
+     32
+    ],
+    [
+     "#plHide.pl-x \"✕\"",
+     28,
+     28
+    ]
+   ],
+   "contrast": [],
+   "clipped": [],
+   "offscreen": [
+    [
+     "#tutorPanel. \"\"",
+     1700
+    ]
+   ]
+  }
+ },
+ "errs": []
+}

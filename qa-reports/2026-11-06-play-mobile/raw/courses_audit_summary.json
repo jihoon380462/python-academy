@@ -1,0 +1,265 @@
+{
+ "algo": {
+  "info": {
+   "lessons": 32,
+   "probs": 145,
+   "draft": 0,
+   "types": [
+    [
+     "quiz",
+     45
+    ],
+    [
+     "code",
+     88
+    ],
+    [
+     "fill",
+     5
+    ],
+    [
+     "bug",
+     7
+    ]
+   ],
+   "first": "A0P1",
+   "firstLesson": "A0"
+  },
+  "pageerrors": [],
+  "home": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 11,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 15
+  },
+  "lesson": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 4,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 3
+  },
+  "problem": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 2,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 0
+  }
+ },
+ "math": {
+  "info": {
+   "lessons": 45,
+   "probs": 180,
+   "draft": 0,
+   "types": [
+    [
+     "quiz",
+     90
+    ],
+    [
+     "num",
+     45
+    ],
+    [
+     "code",
+     44
+    ],
+    [
+     "pair",
+     1
+    ]
+   ],
+   "first": "M1_mod_q1",
+   "firstLesson": "M1_mod"
+  },
+  "pageerrors": [],
+  "home": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 4,
+   "tap": 5,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 0
+  },
+  "lesson": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 5,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 0
+  },
+  "problem": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 4,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 0
+  }
+ },
+ "terminal-git": {
+  "info": {
+   "lessons": 20,
+   "probs": 5,
+   "draft": 18,
+   "types": [
+    [
+     "mission",
+     3
+    ],
+    [
+     "quiz",
+     1
+    ],
+    [
+     "fill",
+     1
+    ]
+   ],
+   "first": "T0P1",
+   "firstLesson": "T0"
+  },
+  "pageerrors": [],
+  "home": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 10,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 0
+  },
+  "lesson": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 2,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 9
+  },
+  "problem": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 1,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 0
+  }
+ },
+ "sql": {
+  "info": {
+   "lessons": 17,
+   "probs": 4,
+   "draft": 16,
+   "types": [
+    [
+     "sql",
+     2
+    ],
+    [
+     "quiz",
+     1
+    ],
+    [
+     "fill",
+     1
+    ]
+   ],
+   "first": "S0P1",
+   "firstLesson": "S0"
+  },
+  "pageerrors": [],
+  "home": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 10,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 0
+  },
+  "lesson": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 1,
+   "tap": 2,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 3
+  },
+  "problem": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 1,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 0
+  }
+ },
+ "web": {
+  "info": {
+   "lessons": 17,
+   "probs": 4,
+   "draft": 16,
+   "types": [
+    [
+     "web",
+     2
+    ],
+    [
+     "quiz",
+     1
+    ],
+    [
+     "fill",
+     1
+    ]
+   ],
+   "first": "W0P1",
+   "firstLesson": "W0"
+  },
+  "pageerrors": [],
+  "home": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 10,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 2
+  },
+  "lesson": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 2,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 12
+  },
+  "problem": {
+   "overflowX": false,
+   "vw": 390,
+   "small": 0,
+   "tap": 1,
+   "contrast": 0,
+   "clipped": 0,
+   "offscreen": 0
+  }
+ }
+}

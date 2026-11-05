@@ -1,0 +1,580 @@
+{
+ "res": [
+  {
+   "case": "syntax_colon",
+   "btn": "#btnRun",
+   "secs": 0.6,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "syntax_colon",
+   "btn": "#btnGrade",
+   "secs": 1.2,
+   "result": "0/2 통과. 문법이 이상해요. 괄호·따옴표 짝이나 줄 끝 콜론(:)을 확인하세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "syntax_quote",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "syntax_quote",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 문법이 이상해요. 괄호·따옴표 짝이나 줄 끝 콜론(:)을 확인하세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "fullwidth",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "fullwidth",
+   "btn": "#btnGrade",
+   "secs": 1.1,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "tab_mix",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "tab_mix",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 3번 줄은 위 줄과 같은 칸에서 시작해야 해요. 앞의 공백을 지우세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "nameerror",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "nameerror",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 그런 이름이 없어요. 오타이거나 따옴표를 빠뜨린 글자일 수 있어요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "zero_div",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "zero_div",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 0으로 나눴어요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "infinite",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "infinite",
+   "btn": "#btnGrade",
+   "secs": 10.2,
+   "result": "0/2 통과. 코드가 끝나지 않고 계속 돌고 있어요. while 조건이나 반복 횟수를 확인해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "infinite_print",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "infinite_print",
+   "btn": "#btnGrade",
+   "secs": 10.2,
+   "result": "0/2 통과. 코드가 끝나지 않고 계속 돌고 있어요. while 조건이나 반복 횟수를 확인해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "huge_out",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "huge_out",
+   "btn": "#btnGrade",
+   "secs": 1.5,
+   "result": "0/2 통과. 출력이 너무 많아서 멈췄어요. 반복이 끝나지 않고 계속 print 하는 건 아닌지(while 조건, 반복 안에서 값을 바꾸는지) 확인해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "many_lines",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "many_lines",
+   "btn": "#btnGrade",
+   "secs": 6.6,
+   "result": "0/2 통과. 출력이 너무 많아서 멈췄어요. 반복이 끝나지 않고 계속 print 하는 건 아닌지(while 조건, 반복 안에서 값을 바꾸는지) 확인해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "recursion",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "recursion",
+   "btn": "#btnGrade",
+   "secs": 1.1,
+   "result": "0/2 통과. 함수가 자기 자신을 끝없이 불렀어요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "input_no_stdin",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "input_no_stdin",
+   "btn": "#btnGrade",
+   "secs": 1.1,
+   "result": "0/2 통과. 입력값 칸에 1번째 값이 필요해요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "input_loop",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "input_loop",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 입력값 칸에 1번째 값이 필요해요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "import_os",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "import_os",
+   "btn": "#btnGrade",
+   "secs": 1.1,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "open_file",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "open_file",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "exit",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "exit",
+   "btn": "#btnGrade",
+   "secs": 1.1,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "exit_builtin",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "exit_builtin",
+   "btn": "#btnGrade",
+   "secs": 1.1,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "memory",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "memory",
+   "btn": "#btnGrade",
+   "secs": 10.7,
+   "result": "0/2 통과. 코드가 끝나지 않고 계속 돌고 있어요. while 조건이나 반복 횟수를 확인해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "unicode_emoji",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "unicode_emoji",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "null_char",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "null_char",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "very_long_line",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "very_long_line",
+   "btn": "#btnGrade",
+   "secs": 1.1,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "deep_nesting",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "deep_nesting",
+   "btn": "#btnGrade",
+   "secs": 1.1,
+   "result": "0/2 통과. 문법이 이상해요. 괄호·따옴표 짝이나 줄 끝 콜론(:)을 확인하세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "eval_exec",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "eval_exec",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "class_dunder",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "class_dunder",
+   "btn": "#btnGrade",
+   "secs": 1.0,
+   "result": "0/2 통과. 기대한 출력과 달라요. 실패한 테스트를 비교해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  },
+  {
+   "case": "time_sleep",
+   "btn": "#btnRun",
+   "secs": 0.5,
+   "result": "",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ]
+  },
+  {
+   "case": "time_sleep",
+   "btn": "#btnGrade",
+   "secs": 10.2,
+   "result": "0/2 통과. 코드가 끝나지 않고 계속 돌고 있어요. while 조건이나 반복 횟수를 확인해 보세요.",
+   "io": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기",
+   "alive": [
+    true,
+    true
+   ],
+   "recover": "▶ 실행 Ctrl+Enter✔ 제출하기한 줄씩 보기"
+  }
+ ],
+ "errs": []
+}
