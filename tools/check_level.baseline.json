@@ -1,0 +1,16 @@
+{
+  "note": "check_level.mjs 래칫 기준. 걸린 수가 이보다 늘면 --gate 가 exit 1. 줄였으면 --update-baseline 으로 갱신.",
+  "updated": "2026-11-05",
+  "courses": {
+    "algo": {
+      "outside": 4,
+      "combo": 3,
+      "first": 0
+    },
+    "python": {
+      "outside": 8,
+      "combo": 22,
+      "first": 3
+    }
+  }
+}

@@ -202,7 +202,8 @@ async function init(){
     await prefetch(['pyodide.asm.js','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json']);
     postMessage({type:'progress',pct:95,phase:'init'});
     pyodide=await loadPyodide({indexURL:INDEX});
-    pyodide.setStdout({write:(b)=>{ if(outCut) throw new Error('PA_OUTPUT_LIMIT'); const t=dec.decode(b,{stream:true}); outN+=t.length; if(outMax && outN>outMax){ outCut=true; flushOut(); throw new Error('PA_OUTPUT_LIMIT'); } outBuf+=t; outW++; if(outW<=200 || outBuf.length>=8192 || Date.now()-lastFlush>50) flushOut(); return b.length; }});
+    const limitErr=()=>{ const e=new Error('PA_OUTPUT_LIMIT'); e.code='EIO'; return e; }; /* QA #154: errno 코드가 있어야 Pyodide 가 조용히 OSError 로 바꿔요(없으면 write 마다 console.error 도배) */
+    pyodide.setStdout({write:(b)=>{ if(outCut) throw limitErr(); const t=dec.decode(b,{stream:true}); outN+=t.length; if(outMax && outN>outMax){ outCut=true; flushOut(); throw limitErr(); } outBuf+=t; outW++; if(outW<=200 || outBuf.length>=8192 || Date.now()-lastFlush>50) flushOut(); return b.length; }});
     pyodide.setStderr({write:(b)=>{ flushOut(); /* QA #153: stdout 먼저 보내 순서 유지 */ postMessage({type:'err',id:curId,text:dec.decode(b,{stream:true})}); return b.length; }});
     pyodide.setStdin({stdin:()=>{ if(inputIdx<inputLines.length) return inputLines[inputIdx++]+'\\n'; return null; }, autoEOF:false, isatty:false});
     pyodide.runPython(PRELUDE);
@@ -276,7 +277,8 @@ const Py = {
       await loadScript(CONFIG.PYODIDE_URL); this.progress = 20; this._emit();
       const py = await loadPyodide({ indexURL: CONFIG.PYODIDE_INDEX }); this.progress = 95; this.phase = 'init'; this._emit();
       const dec = new TextDecoder();
-      py.setStdout({ write: (b) => { const c = this.cur; if (c) { if (c._cut) throw new Error('PA_OUTPUT_LIMIT'); c._n = (c._n || 0) + b.length; const mx = c.maxOut == null ? (CONFIG.MAX_OUTPUT_CHARS || 1000000) : c.maxOut; if (mx && c._n > mx) { c._cut = true; throw new Error('PA_OUTPUT_LIMIT'); } if (c.onOut) c.onOut(dec.decode(b, { stream: true }), false); } return b.length; } });
+      const limitErr = () => { const e = new Error('PA_OUTPUT_LIMIT'); e.code = 'EIO'; return e; }; /* QA #154: 워커와 같게 — 글자 수로 세고(바이트로 세면 한글 상한이 1/3), EIO 코드 */
+      py.setStdout({ write: (b) => { const c = this.cur; if (c) { if (c._cut) throw limitErr(); const t = dec.decode(b, { stream: true }); c._n = (c._n || 0) + t.length; const mx = c.maxOut == null ? (CONFIG.MAX_OUTPUT_CHARS || 1000000) : c.maxOut; if (mx && c._n > mx) { c._cut = true; throw limitErr(); } if (c.onOut) c.onOut(t, false); } return b.length; } });
       py.setStderr({ write: (b) => { if (this.cur && this.cur.onOut) this.cur.onOut(dec.decode(b, { stream: true }), true); return b.length; } });
       py.setStdin({ stdin: () => this.inputIdx < this.inputLines.length ? this.inputLines[this.inputIdx++] + '\n' : null, autoEOF: false, isatty: false });
       py.runPython(PY_PRELUDE); try { py.runPython('import sys\ntry:\n    sys.stdout.reconfigure(line_buffering=True); sys.stderr.reconfigure(line_buffering=True)\nexcept Exception: pass'); } catch (e) {} this.py = py; this.ready = true; this.phase = 'ready'; this.progress = 100; this._emit(); this._next();

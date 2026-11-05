@@ -119,7 +119,7 @@ const Review = {
       else if (r.stars && r.stars < 3) { weak += (3 - r.stars) * 5; reasons.push(`별 ${'★'.repeat(r.stars)}${'☆'.repeat(3 - r.stars)} — 더 깔끔하게 풀어 봐요`); }
       const wt = (p.tags || []).filter(t => rates[t] != null && rates[t] < 0.75).sort((a, b) => rates[a] - rates[b])[0];
       if (wt) { weak += (0.75 - rates[wt]) * 40; reasons.push(`#${wt} 주제 정답률 ${Math.round(rates[wt] * 100)}% — 약한 주제예요`); }
-      const ok = r.reviewOk || 0; if (ok > 0 && weak > 0) { weak *= Math.pow(0.5, ok); reasons.push(`복습에서 ${ok}번 연달아 한 번에 맞혔어요 — 약점 점수를 낮췄어요`); }
+      const ok = r.reviewOk || 0; if (ok > 0 && weak > 0) { weak *= Math.pow(0.5, ok); reasons.splice(due ? 1 : 0, 0, `복습에서 ${ok}번 연달아 한 번에 맞혔어요 — 약점 점수를 낮췄어요`); }
       const age = r.clearedAt ? Math.min(30, (Date.now() - r.clearedAt) / 864e5) : 30; if (mode === 'extra') s += age * 0.5;
       const ch = chOf(p); if (mode !== 'weak') { if (ch === maxCh) s += 6; else if (ch === maxCh - 1) s += 3; }
       return { p, id: p.id, ch, lesson: p.lesson, due, weak, score: s + weak + Math.random() * 2, kind: due ? 'due' : 'weak', reasons }; });

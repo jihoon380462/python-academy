@@ -19,6 +19,8 @@ jobs:
           python-version: '3.12'
       - name: validate_content
         run: node tools/validate_content.mjs
+      - name: check_level (난이도 래칫 게이트, DESIGN 14-2절)
+        run: node tools/check_level.mjs --gate
       - name: run_solutions
         run: node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
       - name: test_shell

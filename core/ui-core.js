@@ -66,9 +66,9 @@ const UI = {
 // ---------- 로딩 오버레이 (Pyodide) ----------
 const Loader = {
   el: null,
-  init() { this.el = $('#pyload'); Py.onState(() => this.render()); this.render(); },
+  init() { this.el = $('#pyload'); if (typeof Py === 'undefined') return; /* QA #159: terminal-git 코스(셸 러너만)에서 Py is not defined */ Py.onState(() => this.render()); this.render(); },
   render() {
-    const el = this.el; if (!el) return;
+    const el = this.el; if (!el || typeof Py === 'undefined') return;
     if (Py.ready && Py.main && !this.mainNoticeShown) { this.mainNoticeShown = true; UI.toast('⚠ 이 환경에서는 보조 실행기로 동작해요. 무한루프 자동 중단이 없으니 while 조건을 꼭 확인하세요.', 6000); }
     if (Py.ready || Py.phase === 'idle') { el.classList.add('hide'); return; }
     el.classList.remove('hide');
