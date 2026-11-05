@@ -18,6 +18,8 @@ def check(cond, msg):
 with sync_playwright() as p:
     b=p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox','--allow-file-access-from-files'])
     ctx=b.new_context(viewport={'width':1280,'height':900}); errors=[]; logs=[]
+    # TODO F0 ②: 위 가짜 기기 연동(gist 'g1')이 CI 에선 실제 api.github.com 요청이 돼 「화면 settings」 검사가 78초 기다렸다. 로컬(오프라인)과 같게 바로 실패시킨다
+    ctx.route('https://api.github.com/**', lambda r: r.abort())
     pg=ctx.new_page(); pg.on('console', lambda m: logs.append((m.type, m.text[:300]))); pg.on('pageerror', lambda e: errors.append(str(e)[:500]))
     pg.add_init_script("if(!localStorage.getItem('academy.profile')&&!localStorage.getItem('__seeded')){localStorage.setItem('python_academy_save', "+json.dumps(json.dumps(V1,ensure_ascii=False),ensure_ascii=False)+"); localStorage.setItem('python_academy_sync', JSON.stringify({token:'ghp_x',gistId:'g1',lastSyncAt:1,lastRemoteUpdated:1,lastLocalUpdated:1})); localStorage.setItem('__seeded','1');}")
     # ---- 1. 허브: 마이그레이션 + 렌더
@@ -299,7 +301,7 @@ with sync_playwright() as p:
     check(not tg and pg.evaluate("UI.view")=='home', 'terminal-git 코스: Py is not defined 없이 홈 렌더 (%s)' % (tg or 'OK'))
     # ---- 4. 예전 주소
     pg.goto('file://'+os.path.join(ROOT,'python_academy.html')); pg.wait_for_timeout(800); check(pg.url.endswith('courses/python/index.html') or '/courses/python/' in pg.url, '예전 주소 → 코스 페이지 리다이렉트 ('+pg.url[-40:]+')')
-    print('[기기 연동 코스 구분 (QA #67)]'); sx=b.new_context(); sp=sx.new_page(); sp.on('pageerror', lambda e: errors.append(str(e)[:500]))
+    print('[기기 연동 코스 구분 (QA #67)]'); sx=b.new_context(); sx.route('https://api.github.com/**', lambda r: r.abort()); sp=sx.new_page(); sp.on('pageerror', lambda e: errors.append(str(e)[:500]))
     sp.goto('file://'+os.path.join(ROOT,'courses/math/index.html')); sp.wait_for_timeout(900)
     sr=sp.evaluate("""()=>{ Store.data.onboarded=true; const r0=Store.prob('M1_mod_q1'); r0.status='clear'; r0.stars=3; Store.save(); Sync.cfg={lastSyncAt:1}; Sync.apply({updatedAt:Date.now()+5000, xp:9, settings:{}, problems:{L0P1:{status:'clear',stars:3}, M1_mod_q2:{status:'clear',stars:2}}}); const g=c=>{ const m=JSON.parse(localStorage.getItem('academy.course.'+c)||'{}'); return Object.keys(m.problems||{}).filter(k=>m.problems[k].status==='clear').sort().join(','); }; const p=Sync.payload(); return {math:g('math'), py:g('python'), fmt:p.format, keys:Object.keys(p.courses).sort().join(',')}; }""")
     check(sr['math']=='M1_mod_q1,M1_mod_q2' and sr['py']=='L0P1' and sr['fmt']=='academy-sync-2' and 'math' in sr['keys'] and 'python' in sr['keys'], '옛 형식 payload 를 수학 화면에서 받아도 코스별로 나뉨 + 새 payload 는 코스 묶음 (%s)' % sr)
