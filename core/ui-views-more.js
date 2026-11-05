@@ -213,7 +213,7 @@ const Onboarding = {
     await UI.modal({ title: '🎯 하루에 몇 문제?', body: `<p>작게 시작해도 괜찮아요. 매일 하는 게 중요해요.</p><div class="seg big" id="obGoal">${CONFIG.DAILY_GOAL_OPTIONS.map(n => `<button class="${n === goal ? 'on' : ''}" data-g="${n}">${n}문제</button>`).join('')}</div>`, buttons: [{ label: '다음', cls: 'primary', block: true }], onOpen: (ov) => { $$('#obGoal button', ov).forEach(b => b.onclick = () => { $$('#obGoal button', ov).forEach(x => x.classList.remove('on')); b.classList.add('on'); goal = +b.dataset.g; }); } });
     d.dailyGoal = goal; d.onboarded = true; Store.save(); UI.renderTopbar();
     UI.go('home', {}, false); await sleep(300);
-    const steps = Game.isGraph && Game.isGraph() ? [['.node.cur', '지도에서 레슨을 골라요. 반짝이는 곳이 지금 할 레슨이에요.'], ['.tb-xp', '문제를 풀면 XP가 쌓이고 레벨이 올라요.'], ['.card.prof', '프로필·뱃지·보관함은 여기서 봐요.'], ['#tbSettings', '설정에서 테마와 선생님(API 키)을 설정해요.']] : [['.ex3-tree', '왼쪽에서 챕터를 고르면 그 챕터의 레슨이 가운데에 나와요.'], ['.lc.sel', '레슨 카드를 누르면 오른쪽에 미리보기가 떠요. 지금 할 레슨은 여기예요.'], ['.pv3-go', '「이 레슨 시작」으로 설명을 읽고, 바로 문제를 풀어요.'], ['.tb-xp', '문제를 풀면 XP가 쌓이고 레벨이 올라요.'], ['#tbSettings', '설정에서 테마·게임 요소·선생님(API 키)을 설정해요.']];
+    const steps = Game.isGraph && Game.isGraph() ? [['.node.cur', '지도에서 레슨을 골라요. 반짝이는 곳이 지금 할 레슨이에요.'], ['.tb-xp', '문제를 풀면 XP가 쌓이고 레벨이 올라요.'], ['.card.prof', '프로필·뱃지·보관함은 여기서 봐요.'], ['#tbSettings', '설정에서 테마와 선생님(API 키)을 설정해요.']] : [['.ex3-tree', UI.isMobile() ? '위쪽 줄에서 챕터를 고르면 그 챕터의 레슨이 아래에 나와요.' : '왼쪽에서 챕터를 고르면 그 챕터의 레슨이 가운데에 나와요.'], ['.lc.sel', UI.isMobile() ? '레슨 카드를 누르면 미리보기가 떠요. 지금 할 레슨은 여기예요.' : '레슨 카드를 누르면 오른쪽에 미리보기가 떠요. 지금 할 레슨은 여기예요.'], ['.pv3-go', '「이 레슨 시작」으로 설명을 읽고, 바로 문제를 풀어요.'], ['.tb-xp', '문제를 풀면 XP가 쌓이고 레벨이 올라요.'], ['#tbSettings', '설정에서 테마·게임 요소·선생님(API 키)을 설정해요.']];
     for (const [sel, text] of steps) { const el = $(sel); if (!el || !el.getClientRects().length) continue; const skip = await this.point(el, text); if (skip) break; }
     UI.go('lesson', { lessonId: LESSONS[0].id, page: 0, autoRun: true });
   },
@@ -229,9 +229,10 @@ window.addEventListener('DOMContentLoaded', () => {
   if (typeof Py !== 'undefined') Py.start(); // 홈 진입과 동시에 백그라운드 로딩 (QA #159: terminal-git 코스는 셸 러너뿐이라 Py 없음)
   Game.touchStreak(); Store.save();
   document.addEventListener('click', () => { Audio._ctx(); }, { once: true });
+  UI._bootHash = location.hash; UI.initHistory(); /* PR#94 P1-02: 첫 화면이 주소를 덮기 전에 딥링크를 잡아 둔다 */
   if (!Store.data.onboarded) { UI.go('home', {}, false); Onboarding.start(); } else UI.go('home', {}, false);
   // 허브에서 온 딥링크: #problem/L3P2 · #lesson/L1 · #settings · #review 등
-  const goHash = () => { const h = location.hash.slice(1); if (!h) return; const [v, id] = h.split('/'); try { if (v === 'problem' && Content.problemMap[id]) UI.go('problem', { pid: id, lessonId: Content.problemMap[id].lesson }); else if (v === 'lesson' && Content.lessonMap[id]) UI.go('lesson', { lessonId: id, page: Math.max(0, Math.min(((Store.data.lessons || {})[id] || {}).page || 0, ((Content.lessonMap[id].pages || []).length || 1) - 1)) }) /* QA #5: 저장된 진행 쪽에서 */; else if (Views[v] && !id) UI.go(v); } catch (e) { console.warn('deep link', e); } history.replaceState(null, '', location.pathname + location.search); };
+  const goHash = () => { const h = (UI._bootHash || '').slice(1); if (!h) return; const [v, id] = h.split('/'); try { if (v === 'problem' && Content.problemMap[id]) UI.go('problem', { pid: id, lessonId: Content.problemMap[id].lesson }); else if (v === 'lesson' && Content.lessonMap[id]) UI.go('lesson', { lessonId: id, page: Math.max(0, Math.min(((Store.data.lessons || {})[id] || {}).page || 0, ((Content.lessonMap[id].pages || []).length || 1) - 1)) }) /* QA #5: 저장된 진행 쪽에서 */; else if (Views[v] && !id) UI.go(v); } catch (e) { console.warn('deep link', e); } /* PR#94 P1-02: 주소는 이제 UI.go 가 화면에 맞춰 쓴다(지우지 않음) */ };
   if (Store.data.onboarded) goHash();
   Sync.init(); // 연동돼 있으면 다른 기기 진행 상황을 내려받아 합친다
 });

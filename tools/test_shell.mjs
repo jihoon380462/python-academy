@@ -9,6 +9,17 @@ console.log('[셸]');
 { const sh = Shell.create({ tree: { home: { me: { 'memo.txt': 'hello\nworld\n', src: { 'main.py': 'print(1)\n', 'util.py': 'x = 1\n' }, 'notes.md': '# a\n' } } } });
   eq(sh.exec('pwd').out, '/home/me\n', 'pwd');
   eq(sh.exec('ls').out, 'memo.txt  notes.md  src/\n', 'ls (폴더는 /)');
+  // PR#94 P1-08·P1-19: 파이프·> 로 나가면 한 줄에 하나(진짜 셸처럼), -1, 2> · 2>&1 · /dev/null
+  eq(sh.exec('ls | wc -l').out.trim(), '3', 'ls | wc -l = 항목 수');
+  eq(sh.exec('ls | head -n 1').out, 'memo.txt\n', 'ls | head -n 1');
+  eq(sh.exec('ls -1').out, 'memo.txt\nnotes.md\nsrc/\n', 'ls -1');
+  eq(sh.exec('ls > list.txt && cat list.txt').out, 'memo.txt\nnotes.md\nsrc\n', 'ls > 파일 은 한 줄에 하나');
+  sh.exec('rm list.txt');
+  eq(sh.exec('cat nope.txt 2>/dev/null').err, '', '2>/dev/null 은 에러를 버림');
+  eq(sh.exec('ls > /dev/null').out, '', '> /dev/null 은 출력을 버림');
+  eq(sh.exec('cat nope.txt 2>&1 | wc -l').out.trim(), '1', '2>&1 은 에러를 출력으로');
+  eq(sh.exec('cat nope.txt 2> err.txt && cat err.txt').out, '', '2> 파일: 실패라 && 뒤는 안 감');
+  ok((sh.exec('cat err.txt').out || '').includes('No such file'), '2> 파일 에 에러가 적힘'); sh.exec('rm err.txt');
   eq(sh.exec('cd src && pwd').out, '/home/me/src\n', 'cd && pwd');
   eq(sh.exec('cd ..; mkdir -p a/b/c && ls a/b').out, 'c/\n', 'mkdir -p');
   eq(sh.exec('cat memo.txt').out, 'hello\nworld\n', 'cat');
