@@ -61,6 +61,12 @@ with sync_playwright() as p:
     pg.evaluate("UI.shortcuts(), 0"); pg.wait_for_timeout(200); sc=pg.inner_text('.modal-ov'); pg.keyboard.press('Escape'); check('쪽' in sc and '채점' not in sc and 'Ctrl + Enter' not in sc and '힌트' not in sc, '⌨ 단축키 안내: ← → 쪽 넘기기만(실행·제출·힌트 키 없음)')
     tb=pg.inner_text('#topbar'); check('Lv.' not in tb and '🔥' not in tb, '상단바: 레벨·연속 기록 없음')
     sw=open(os.path.join(ROOT,'sw.js'),encoding='utf8').read(); check('.png' not in sw and 'archive/' not in sw and 'game.js' not in sw, 'sw.js 미리 캐시: 그림·archive·옛 스크립트 없음')
+    pg.set_viewport_size({'width':390,'height':800}); big=[]
+    for cid, lid, pn in [('python','L23',3),('python','L19',5),('sql','SETUP',2),('web','SETUP',2),('web','W10',2)]:
+        pg.goto('file://'+os.path.join(ROOT,'courses/%s/index.html' % cid)); pg.wait_for_timeout(500); pg.evaluate("Store.data.settings.font=3; UI.applyTheme(); UI.go('lesson',{lessonId:'%s',page:%d})" % (lid, pn)); pg.wait_for_timeout(200)
+        if pg.evaluate("document.documentElement.scrollWidth")>390: big.append('%s %s/%d' % (cid, lid, pn))
+        pg.evaluate("Store.data.settings.font=1; UI.applyTheme()")
+    check(not big, '글자 「아주 크게」 + 폰 390: 긴 코드 제목·긴 주소·표가 가로로 안 넘침 (%s)' % (big or 'OK')); pg.set_viewport_size({'width':1280,'height':900})
     check(not errors[n13:], 'N13 pageerror 0 (%s)' % (errors[n13:][:2] or 'OK'))
     # ===== [수학 교과서 v2.18.0] N12 — 그림은 사이트에서 만지고, 계산은 VS Code(사용자 11/7: VS Code 과제 · 옛 문제 숨기기 · 목록 목차)
     print('[수학 교과서 v2.18.0]'); m0=len(errors); pg.set_viewport_size({'width':390,'height':800}); pg.goto(MATH); pg.wait_for_timeout(1200); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
