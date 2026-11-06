@@ -17,7 +17,6 @@ const CHAPTERS = [
   { ch: 3, name: '연결된 구조', color: '#ff9800' },
   { ch: 4, name: '패턴', color: '#9c27b0' },
 ];
-const MAP_DECOR = { 1: '🧭', 2: '🔍', 3: '🌳', 4: '🏁' };
 
 const LESSONS = [
 // ================= 챕터 A 들어가기 =================
@@ -790,7 +789,6 @@ const GUIDES = {};
 // === 챕터 E 실전 (v2.2.0, EXPANSION.md 9절 ② 층) — AB4 모의고사 통과 시 해금. 단계별 체크리스트 채점 + 격자/그래프 시각화
 // =====================================================================
 CHAPTERS.push({ ch: 5, name: '실전', color: '#ffd166' });
-MAP_DECOR[5] = '🏆';
 LESSONS.push(
 { id: 'E1', ch: 5, n: 16, practical: true, title: '실전 1: 미로 게임', mode: 'text',
   tutorSummary: '실전 프로젝트 1. 사용자가 입력한 미로(#벽 .길 S시작 G도착)를 2차원 리스트로 읽고 BFS로 최단 거리를 구한 뒤 부모 기록으로 경로를 복원해 *로 표시한다. 변수 grid/visited/path 를 쓰면 격자 시각화가 된다. 이웃은 위·아래·왼쪽·오른쪽 순.',
@@ -814,7 +812,7 @@ LESSONS.push(
       example: { code: 'lines = ["강남 역삼 2", "역삼 선릉 2", "강남 교대 3"]\ngraph = {}\nfor line in lines:\n    a, b, w = line.split()\n    w = int(w)\n    graph.setdefault(a, []).append((b, w))\n    graph.setdefault(b, []).append((a, w))\nfor s in graph:\n    print(s, graph[s])', visualize: { kind: 'graph', var: 'graph' }, autoViz: true } },
     { title: '설계: 다익스트라 + 경로', html: '<p><code>graph[역] = [(이웃, 분), …]</code>, <code>dist</code>는 역 → 최단 분(처음엔 출발역만 0), <code>heapq</code>에 <code>(분, 역)</code>을 넣고 가장 작은 것부터 꺼내요. 꺼낸 역이 이미 <code>done</code>이면 건너뛰고, 아니면 이웃을 완화(더 짧으면 갱신 + <code>prev[이웃] = 역</code>)해요.</p><p>예제를 따라가 보면: (0, 강남) 꺼냄 → 역삼 2, 교대 3 · (2, 역삼) 꺼냄 → 선릉 2 + 2 = 4 · (3, 교대) 꺼냄 → 선릉 3 + 6 = 9는 4보다 길어서 그대로 · (4, 선릉) 꺼냄 → 더 줄어드는 곳 없음. 실행하면 <code>{\'강남\': 0, \'역삼\': 2, \'교대\': 3, \'선릉\': 4}</code>가 나와요.</p><p>경로는 미로와 똑같이 <code>prev</code>를 도착역부터 거꾸로 따라가요. 출발역에서 갈 수 없는 역은 <code>dist</code>에 없어요 → <code>갈 수 없어요</code> / <code>도달 불가</code>.</p><p>시각화 변수: <code>graph</code>, <code>dist</code>, <code>done</code>(끝난 역 집합), <code>node</code>(지금 꺼낸 역).</p>',
       example: { code: 'import heapq\ngraph = {"강남": [("역삼", 2), ("교대", 3)], "역삼": [("강남", 2), ("선릉", 2)], "선릉": [("역삼", 2), ("교대", 6)], "교대": [("강남", 3), ("선릉", 6)]}\ndist = {"강남": 0}\nprev = {}\ndone = set()\npq = [(0, "강남")]\nwhile pq:\n    d, node = heapq.heappop(pq)\n    if node in done:\n        continue\n    done.add(node)\n    for nb, w in graph[node]:\n        if nb not in dist or d + w < dist[nb]:\n            dist[nb] = d + w\n            prev[nb] = node\n            heapq.heappush(pq, (d + w, nb))\nprint(dist)', visualize: { kind: 'graph', var: 'graph', dist: 'dist', visited: 'done', cur: 'node' }, autoViz: true } },
-    { title: '경로와 시간표 출력하기', html: '<p>다익스트라가 <code>dist</code>와 <code>prev</code>를 만들어 주면, 남은 명령은 <b>출력 모양 맞추기</b>예요.</p><ul><li><b>경로</b>: 도착역에서 <code>prev</code>를 따라 출발역까지 모으고 뒤집어요. <code>" → ".join(route)</code>는 리스트 사이사이에 화살표를 끼워 한 문자열로 만들어요. 실행하면 <code>강남 → 역삼 → 선릉 (4분)</code>.</li><li><b>전체</b>: <code>(시간, 역)</code> 튜플로 만들어 <code>sorted</code> 하면 시간 순, 같은 시간이면 이름 순이 돼요(튜플은 앞 칸부터 비교). 출발역 자신은 빼요. 실행하면 <code>역삼 2분</code>, <code>교대 3분</code>, <code>선릉 4분</code>.</li><li><b>못 가는 역</b>: 노선에는 있는데 <code>dist</code>에 없는 역이에요. 시간표 뒤에 이름 순으로 <code>김포 도달 불가</code>.</li></ul><p>단계 순서: ① 그래프와 <code>이웃</code> → ② 다익스트라와 <code>최단</code> → ③ <code>prev</code>로 <code>경로</code> → ④ <code>전체</code>와 도달 불가. 입력 예시의 김포·공항처럼 따로 떨어진 노선으로 ④를 꼭 확인하세요.</p>',
+    { title: '경로와 시간표 출력하기', html: '<p>다익스트라가 <code>dist</code>와 <code>prev</code>를 만들어 주면, 남은 명령은 <b>출력 모양 맞추기</b>예요.</p><ul><li><b>경로</b>: 도착역에서 <code>prev</code>를 따라 출발역까지 모으고 뒤집어요. <code>" → ".join(route)</code>는 리스트 사이사이에 화살표를 끼워 한 문자열로 만들어요. 실행하면 <code>강남 -&gt; 역삼 -&gt; 선릉 (4분)</code>.</li><li><b>전체</b>: <code>(시간, 역)</code> 튜플로 만들어 <code>sorted</code> 하면 시간 순, 같은 시간이면 이름 순이 돼요(튜플은 앞 칸부터 비교). 출발역 자신은 빼요. 실행하면 <code>역삼 2분</code>, <code>교대 3분</code>, <code>선릉 4분</code>.</li><li><b>못 가는 역</b>: 노선에는 있는데 <code>dist</code>에 없는 역이에요. 시간표 뒤에 이름 순으로 <code>김포 도달 불가</code>.</li></ul><p>단계 순서: ① 그래프와 <code>이웃</code> → ② 다익스트라와 <code>최단</code> → ③ <code>prev</code>로 <code>경로</code> → ④ <code>전체</code>와 도달 불가. 입력 예시의 김포·공항처럼 따로 떨어진 노선으로 ④를 꼭 확인하세요.</p>',
       example: { code: 'dist = {"강남": 0, "역삼": 2, "교대": 3, "선릉": 4}\nprev = {"역삼": "강남", "교대": "강남", "선릉": "역삼"}\nstations = ["강남", "역삼", "선릉", "교대", "김포"]\ncur = "선릉"\nroute = [cur]\nwhile cur != "강남":\n    cur = prev[cur]\n    route.append(cur)\nroute.reverse()\nprint(" -> ".join(route), f"({dist[\'선릉\']}분)")\nfor d, s in sorted((dist[s], s) for s in dist if s != "강남"):\n    print(s, f"{d}분")\nfor s in sorted(s for s in stations if s not in dist):\n    print(s, "도달 불가")', trace: true } },
   ],
   summary: ['graph[a].append((b, w)) 양쪽 다 → 양방향', 'heapq에 (거리, 역) → 작은 것부터, done이면 건너뛰기', 'prev로 경로 복원, dist에 없으면 갈 수 없는 역'] },
@@ -977,7 +975,6 @@ PROBLEMS.push(
 // === 챕터 F 한 걸음 더 (v2.2.22) - AB4 모의고사 통과 시 해금(실전 챕터와 나란히). 문자열·비트·구현·완전탐색·코딩테스트 체크리스트 + 보스 AB5
 // =====================================================================
 CHAPTERS.push({ ch: 6, name: '한 걸음 더', color: '#00acc1' });
-MAP_DECOR[6] = '🔭';
 WEAKNESS_TAGS.push('문자열', '비트', '완전탐색', '시뮬레이션');
 LESSONS.push(
 { id: 'A16', ch: 6, n: 20, title: '문자열 알고리즘', mode: 'text',

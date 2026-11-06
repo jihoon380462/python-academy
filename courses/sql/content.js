@@ -21,7 +21,6 @@ const CHAPTERS = [
   { ch: 2, name: '합치기', color: '#ef6c00' },
   { ch: 3, name: '바꾸기와 만들기', color: '#c62828' },
 ];
-const MAP_DECOR = { 1: '🗄️', 2: '🔗', 3: '🧱' };
 // draft 레슨 뼈대(본문·문제는 C-S 에서 채움). 채우면 draft 를 지우고 pages·문제를 넣는다.
 const TODO = (t) => [{ title: '준비 중', html: `<p>TODO(C-S): ${t}</p>` }];
 const LESSONS = [

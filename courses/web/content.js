@@ -22,7 +22,6 @@ const CHAPTERS = [
   { ch: 2, name: '움직이게', color: '#f9a825' },
   { ch: 3, name: '서버와 대화', color: '#00897b' },
 ];
-const MAP_DECOR = { 1: '🧱', 2: '⚡', 3: '📡' };
 const TODO = (t) => [{ title: '준비 중', html: `<p>TODO: ${t}</p>` }];
 
 const LESSONS = [

@@ -24,7 +24,7 @@
 | N7 | 알고 시각화 core 버그 QA #50·#51·#52(deque·set·dict 그림, 함수 정의형 문제 그림), 편집기·레슨 창 #155~#159, 복습 #149 — 알고 코스(예전 화면 `?classic=1`)에 남은 것. **v2.15.0 부터 교과서에선 레슨 예제 그림(#50~#52 의 deque·set·dict 그림은 해당)만 보임** | `QA.md`·`QA-OPEN.md` 1절 | 대기 |
 | N8 | 알고 C6~C9 (힌트 품질·실전 연습 문제), 알고 레슨 나누기 A6·A16·A18·A19 | `specs/content-team.md` 3절, C11 | 대기 |
 | N9 | 수학 「상」 #145~#147 → 수학 「중」 → M2·M3 (D4 후순위) | `QA.md`, `EXPANSION.md` 14절 | 후순위 |
-| N10 | 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지), 8차 아트 납품되면 검수(IMAGES.md 3-B) | — | 대기(아트는 납품 전) |
+| N10 | 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지), 8차 아트 납품되면 검수(IMAGES.md 3-B) | — | ✅ CSS·MAP_DECOR 정리 v2.15.1(17종, 전후 캡처 픽셀 동일) · 아트 검수는 납품 뒤 |
 
 검증 묶음: `node tools/validate_content.mjs && node tools/check_nesting.mjs && node tools/check_book.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별(`node tools/check_level.mjs --gate`, `node tools/test_shell.mjs`, `node tools/run_shell_solutions.mjs`, `python3 tools/run_sql_solutions.py`, `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py`. 화면을 바꾸면 APP_VERSION + `node tools/stamp.mjs`.
 
