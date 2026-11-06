@@ -4,6 +4,16 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.11.0 — 2026-11-06 (Opus: 공용 Vim 에디터 교과서 · 허브 「공간」 → 「공용」)
+
+- ⌨ 사용자 「공용에 windows 버전 vim 에디터 설치 및 사용법 그리고 단축키 교과서 만들어 그리고 파이썬과 연결하고 자동 띄어쓰기 및 자동완성 기능까지」 — **Vim 에디터 교과서**(`courses/vim/`, 처음부터 교과서 모드).
+  - 시작하기 3쪽: Windows gVim 9.2 받기(vim.org · GitHub vim-win32-installer · winget) · 설치 화면별 칸(Choose Components 의 Create .bat files 등, Choose _vimrc settings 는 **Do not remap keys (Default)** 그대로 — 이유 포함) · 연습 파일과 「준비 명령」 넣는 법(📋 → `:` → Ctrl+R + → Enter) · 쓰는 법.
+  - 챕터 1 기본기 6레슨: 모드와 빠져나오기(:w :q :wq :q!, gVim/터미널 Vim/Git Bash Vim 차이, 한글 입력) · 이동 · 입력 · 지우기·바꾸기·되돌리기(연산자+이동 문법, ciw ci", .) · 복사·붙여넣기·비주얼(Ctrl+v 여러 줄 주석, Windows 클립보드 "+) · 찾기·바꾸기(:%s, gc, \<단어\>).
+  - 챕터 2 파이썬과 연결 6레슨: `_vimrc`(C:\Users\이름\_vimrc, :source %) · **자동 들여쓰기**(filetype plugin indent on · autoindent · expandtab · tabstop/shiftwidth/softtabstop=4 · >> · :retab) · 파이썬 실행(**F5** = 저장+`:!python %`, **F6** = `:terminal` 로 input 프로그램) · 자동완성 1(Ctrl+n · Ctrl+x Ctrl+f/l) · **자동완성 2(LSP)**: vim-plug 설치(PowerShell·Git Bash) → vim-lsp · vim-lsp-settings · asyncomplete · asyncomplete-lsp → `:PlugInstall` → `:LspInstallServer pylsp-all`, Tab/Enter 고르기 · K · gd · F2 · ]g · 창·탭·탐색기.
+  - 만들어 보기 44문제(보스 2 + 🏠 생활형 4) · 📚 **단축키 도감**(레슨 37쪽 + 자주 쓰는 단축키 35개, 「복사」「저장」 한국어 검색).
+- 🏠 사용자 「공간을 공용으로 변경」 — 허브 구역 이름과 카드 표시 「공간」 → **「공용」**(수학 공간 + Vim 에디터). 교과서 코스 카드 「📖 읽은 레슨 n/14」.
+- 🧪 check_book: Vim 교과서 예시 답 33개를 **진짜 vim**(교과서 기본 _vimrc)에 키로 넣어 결과 파일 비교 + 파이썬 실행 결과 비교(실행 50), 기본 _vimrc 가 에러 없이 읽히고 .py 에서 들여쓰기·F5 가 켜지는지. 화면 `ui-views-book.js`: 「F5 로 실행하면」 상자, 결과 없는 도감 항목. regress +16.
+
 ## v2.10.1 — 2026-11-06 (Opus: 메인화면을 교과서에 맞게 · QA 용 사이트 의도 문서)
 
 - 🏠 사용자 「메인화면은 수정 안 했는데 원인 설명」 — 허브 카드는 코스와 따로 `core/config.js` 에 적혀 있어 교과서 전환이 반영되지 않았음(허브 정리를 N4 로 미룬 것 + QA 가 코스 안쪽만 본 것). 고침:

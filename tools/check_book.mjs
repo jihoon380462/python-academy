@@ -11,7 +11,7 @@ function checkCourse(cid) {
 const ctx = { window: {}, console }; vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(`${R}/courses/${cid}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var ') + '\n' + fs.readFileSync(`${R}/courses/${cid}/book.js`, 'utf8').replace(/^const /gm, 'var '), ctx);
 const { LESSONS, PROBLEMS, BOOK, COURSE } = ctx; const L = Object.fromEntries(LESSONS.map(l => [l.id, l])); const P = Object.fromEntries(PROBLEMS.map(p => [p.id, p]));
-const SHELL = COURSE && COURSE.runner === 'shell';
+const SHELL = COURSE && COURSE.runner === 'shell'; const VIM = BOOK.check === 'vim'; // v2.11.0 Vim 교과서: 진짜 vim 으로 키 넣기
 const pagesOf = (lid) => lid === 'SETUP' ? BOOK.setup.pages : (BOOK.lessonPages || {})[lid] || (L[lid] || {}).pages;
 for (const lid of Object.keys(BOOK.lessonPages || {})) if (!L[lid]) bad(`lessonPages ${lid}: 없는 레슨`);
 let fails = 0, ran = 0, n = 0;
@@ -20,13 +20,14 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
   tasks.forEach((t, i) => {
     n++; const id = `${lid}#${i + 1} ${t.title}`; const p = t.pid ? P[t.pid] : null;
     if (t.pid && !p) return bad(`${id}: 없는 문제 ${t.pid}`);
-    for (const nd of t.needs || []) if (nd.length !== 3 || !nd[2] || !/[A-Za-z0-9=+*\/%\[\](){}"<>.:▷|~$&-]/.test(nd[0])) bad(`${id}: 필요한 문법은 [실제 문법(코드), '레슨/쪽', 설명] 이어야 해요 (v2.9.2) → ${JSON.stringify(nd)}`);
+    for (const nd of t.needs || []) if (nd.length !== 3 || !nd[2] || !/[A-Za-z0-9=+*\/%\[\](){}"<>.:▷|~$&^-]/.test(nd[0])) bad(`${id}: 필요한 문법은 [실제 문법(코드), '레슨/쪽', 설명] 이어야 해요 (v2.9.2) → ${JSON.stringify(nd)}`);
     for (const [name, ref] of t.needs || []) { const [nl, np] = String(ref).split('/'); const pages = pagesOf(nl); if (!pages || !(+np >= 0 && +np < pages.length)) bad(`${id}: 필요한 문법 「${name}」 → ${ref} 가 없는 쪽`); }
     if (t.text === '@prompt' && !p) bad(`${id}: @prompt 인데 pid 없음`);
     const tests = (p && p.tests) || []; const io = t.io || (p && p.project ? tests.filter(c => !c.files && !c.inputGen && c.output !== '__COMPUTED__').filter((c, i, ok) => ok.findIndex(d => d.stage === c.stage) === i).slice(0, 4) : tests[0] ? [tests[0]] : []); const answer = t.answer || (p && p.solution) || '';
     if (!answer) bad(`${id}: 예시 답 없음`);
     if (JSON.stringify(io).includes('{{') || answer.includes('{{')) bad(`${id}: {{바꿔 끼우기}} 자리표시가 남음 — io·answer 를 직접 적으세요`);
     if (t.noRun) return;
+    if (VIM) { if (!t.setup) bad(`${id}: 준비 명령(setup) 없음`); for (const c of io) runVim(id, t, answer, c); return; }
     if (SHELL) { if (!t.setup) bad(`${id}: 준비 명령(setup) 없음`); for (const c of io) runShell(id, t, answer, c); return; }
     for (const c of io) {
       if (c.output == null) { bad(`${id}: 출력 예 없음`); continue; }
@@ -38,9 +39,16 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
     }
   });
 }
+if (VIM) { // 교과서가 권하는 _vimrc 를 진짜 vim 이 에러 없이 읽는지 + .py 에서 들여쓰기 설정이 실제로 켜지는지
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'vimrc-')); fs.writeFileSync(path.join(home, 'vimrc'), ctx.VIMRC_BASE_TEXT); fs.writeFileSync(path.join(home, 't.py'), 'x = 1\n');
+  try { execFileSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-c', 'redir! > out.txt', '-c', 'echo "ERR[" . v:errmsg . "]"', '-c', 'set ft? et? sw? sts? ai?', '-c', 'nmap <F5>', '-c', 'redir END', '-c', 'qa!', 't.py'], { cwd: home, env: { PATH: process.env.PATH, HOME: home }, timeout: 10000, stdio: 'ignore' }); } catch (e) {}
+  const o = fs.existsSync(path.join(home, 'out.txt')) ? fs.readFileSync(path.join(home, 'out.txt'), 'utf8') : ''; ran++;
+  if (!/ERR\[\]/.test(o) || !/filetype=python/.test(o) || !/\bexpandtab/.test(o) || !/shiftwidth=4/.test(o) || !/softtabstop=4/.test(o) || !/\bautoindent/.test(o) || !/:!python %/.test(o)) bad(`기본 _vimrc 가 vim 에서 제대로 안 읽힘:\n${o.trim()}`);
+}
 for (const [k, o2] of Object.entries(BOOK.pages || {})) { const [pl, pi] = k.split('/'); const pg = (pagesOf(pl) || [])[+pi]; if (!pg) { bad(`pages ${k}: 없는 쪽`); continue; } for (const [a] of o2.rep || []) if (!pg.html.includes(a)) bad(`pages ${k}: 바꿀 글을 못 찾음 「${a.slice(0, 40)}」`); }
 for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/'); if (!(pagesOf(tl) || [])[+ti]) bad(`titles ${k}: 없는 쪽`); }
 (BOOK.builtins || []).forEach((bi, i) => { n++; const id = `내장 함수 ${bi.name}`; if (bi.ref) { const [bl, bp] = bi.ref.split('/'); if (!(pagesOf(bl) || [])[+bp]) bad(`${id}: ref ${bi.ref} 가 없는 쪽`); }
+  if (VIM || SHELL) return; // 단축키·명령 모음은 실행 결과가 없음
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
   ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
 // 허브 카드(v2.10.1 사용자 「메인화면은 수정 안 했는데」): config.js 의 이 코스가 book:true 이고 lessons 가 열린 레슨 수와 같은지 — 허브는 book.js 를 안 읽어서 손으로 맞춰야 함
@@ -62,6 +70,20 @@ function runShell(id, t, answer, c) {
   if (norm(out) !== norm(c.output)) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(out))}`);
   // 로케일 함정: sort 결과를 보여 주는 문제는 Git Bash(보통 한국어·영어 로케일)에서도 같은 순서여야 — 문장부호를 빼고 비교한 순서와 C 순서가 같은지
   if (/\bsort\b(?! -r?n)/.test(t.check || '') && !t.anyOrder) { const ls = String(c.output).split('\n'); const k = (x) => x.replace(/[^\p{L}\p{N}]/gu, '').toLowerCase(); const a = [...ls].sort((x, y) => (k(x) < k(y) ? -1 : k(x) > k(y) ? 1 : 0)); if (a.join('\n') !== ls.join('\n')) bad(`${id}: 정렬 순서가 로케일에 따라 달라질 수 있어요 — 파일 이름을 바꾸세요`); }
+}
+// Vim: 빈 HOME 에 기본 _vimrc(VIMRC_BASE_TEXT) → vim -es 로 setup(준비 명령) → normal! 로 answer 키 → wall → 파일 비교 (+ python3 실행 비교)
+function vimKeys(k) { return String(k).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/<(Esc|Enter|BS|Tab|C-[a-z\[\]^])>/g, (m, x) => '\\<' + (x === 'Enter' ? 'CR' : x) + '>'); }
+function runVim(id, t, answer, c) {
+  if (c.output == null) return bad(`${id}: 결과 예 없음`);
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'vim-')); fs.writeFileSync(path.join(home, 'vimrc'), ctx.VIMRC_BASE_TEXT);
+  const fname = t.file || (String(t.setup).match(/edit! ~\/vim-study\/(\S+)/) || [])[1]; if (!fname) return bad(`${id}: setup 에서 연 파일 이름을 못 찾음`);
+  fs.writeFileSync(path.join(home, 's.vim'), `${t.setup}\nexe "normal! " . "${vimKeys(answer)}"\nsilent! wall\nqa!\n`);
+  try { execFileSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-S', path.join(home, 's.vim')], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8' }, encoding: 'utf8', timeout: 10000, stdio: ['ignore', 'pipe', 'pipe'] }); } catch (e) { if (e.code === 'ETIMEDOUT' || e.signal) return bad(`${id}: vim 이 끝나지 않음(키가 입력 모드에 갇힘?)`); }
+  ran++; let got; try { got = fs.readFileSync(path.join(home, 'vim-study', fname), 'utf8'); } catch (e) { return bad(`${id}: 결과 파일 ${fname} 없음`); }
+  const norm = (s) => String(s).replace(/\r/g, '').replace(/\n+$/, '');
+  if (norm(got) !== norm(c.output)) return bad(`${id}: 파일이 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(got))}`);
+  if (t.py) { let out; try { out = execFileSync('python3', [fname], { cwd: path.join(home, 'vim-study'), input: t.py.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { return bad(`${id}: 파이썬 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
+    ran++; if (norm(out) !== norm(t.py.output)) bad(`${id}: 실행 결과가 달라요\n      기대: ${JSON.stringify(norm(t.py.output))}\n      실제: ${JSON.stringify(norm(out))}`); }
 }
 function bad(m) { fails++; console.log('  ✗', `[${cid}]`, m); }
 }

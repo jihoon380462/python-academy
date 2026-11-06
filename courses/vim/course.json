@@ -1,0 +1,1 @@
+{ "id": "vim", "name": "Vim 에디터", "icon": "⌨", "desc": "Windows Vim 설치·단축키부터 파이썬 자동 들여쓰기·F5 실행·자동완성까지 — 공용 교과서", "runner": "none", "mapColor": "#019833", "mascotGear": "headset", "space": true }

@@ -22,7 +22,7 @@ const Hub = {
     const lastCourse = last && last.course && last.course !== 'python' ? CONFIG.COURSES.find(c => c.id === last.course) : null;
     const contCourse = lastCourse || py;
     const contHash = lastCourse ? (last.params.pid ? `problem/${last.params.pid}` : last.params.lessonId ? `lesson/${last.params.lessonId}` : '') : last ? (last.view === 'problem' && lastP ? `problem/${lastP.id}` : lastL ? `lesson/${lastL.id}` : '') : (cur ? `lesson/${cur.id}` : '');
-    const contLabel = lastCourse ? (lastCourse.space ? `${esc(lastCourse.name)} 이어서 하기` : lastCourse.book ? `${esc(lastCourse.name)} 교과서 이어서 읽기` : `${esc(lastCourse.name)} 코스 이어서 하기`) : last && lastP && py.book ? `레슨 "${esc(lessonOfP ? lessonOfP.title : lastP.title)}" 만들어 보기 이어서` : last && lastP ? `${esc(lastP.title)} 이어서 풀기` : last && lastL ? `레슨 "${esc(lastL.title)}" 이어서 보기` : cur ? `레슨 "${esc(cur.title)}" ${py.book ? '읽기' : '시작하기'}` : '파이썬 코스 열기';
+    const contLabel = lastCourse ? (lastCourse.book ? `${esc(lastCourse.name)} 교과서 이어서 읽기` : lastCourse.space ? `${esc(lastCourse.name)} 이어서 하기` : lastCourse.book ? `${esc(lastCourse.name)} 교과서 이어서 읽기` : `${esc(lastCourse.name)} 코스 이어서 하기`) : last && lastP && py.book ? `레슨 "${esc(lessonOfP ? lessonOfP.title : lastP.title)}" 만들어 보기 이어서` : last && lastP ? `${esc(lastP.title)} 이어서 풀기` : last && lastL ? `레슨 "${esc(lastL.title)}" 이어서 보기` : cur ? `레슨 "${esc(cur.title)}" ${py.book ? '읽기' : '시작하기'}` : '파이썬 코스 열기';
     const game = Game.showGame(); /* v2.6.0 ④·⑤: 허브는 마스코트·레벨·스트릭 없이 깔끔하게(설정 「게임 요소 보기」를 켜면 표시) */
     $('#topbar').innerHTML = `<div class="tb-title"><span class="tb-brand">${esc(T.appName)}</span>${game ? ` <span class="muted small">${esc(d.nick || '학습자')} · Lv.${lv.level} ${esc(Game.title(lv.level))}</span>` : ''}</div>
       ${game ? `<div class="tb-xp" title="레벨 ${lv.level}"><span class="tb-lv">Lv.${lv.level}</span><div class="xpbar"><div class="xpfill" style="width:${lv.need ? Math.round(100 * lv.into / lv.need) : 100}%"></div></div><span class="tb-xpn">${lv.into}/${lv.need || '최대'}</span></div>
@@ -36,7 +36,7 @@ const Hub = {
       </div>
       <h2 class="hub-h">코스</h2>
       <div class="hub-courses">${CONFIG.COURSES.filter(c => !c.space).map(c => this.courseCard(c)).join('')}</div>
-      ${CONFIG.COURSES.some(c => c.space) ? `<h2 class="hub-h">공간 <small class="muted">코스 순서와 무관 — 언제든</small></h2><div class="hub-courses hub-spaces">${CONFIG.COURSES.filter(c => c.space).map(c => this.courseCard(c)).join('')}</div>` : ''}
+      ${CONFIG.COURSES.some(c => c.space) ? `<h2 class="hub-h">공용 <small class="muted">코스 순서와 무관 — 언제든</small></h2><div class="hub-courses hub-spaces">${CONFIG.COURSES.filter(c => c.space).map(c => this.courseCard(c)).join('')}</div>` : ''}
       <div class="muted small center hub-foot">${T.appName} v${CONFIG.APP_VERSION} · <b>완전 무료</b> · 계정 없음 · 진행은 내 기기에만 저장(설정에서 백업·기기 연동) · 한 번 연 뒤엔 오프라인도 OK</div>
     </div>`;
   },
@@ -48,7 +48,7 @@ const Hub = {
       ? `<div class="hc-body">${this.ring(pr.pct, 'var(--primary)')}<div class="hc-txt"><div class="hc-sub">${pr.cleared}/${pr.total} 문제${Game.showGame() ? ` · ★ ${pr.stars}/${pr.maxStars}` : ''}</div><div class="hc-sub muted">${pr.cleared >= pr.total ? '완주! 🎉' : `남은 문제 ${pr.total - pr.cleared}개`}</div></div></div>`
       : `<div class="hc-body"><div class="hc-soon">준비 중 <small>${c.preview ? '· 미리보기 열림' : `(Phase ${c.phase})`}</small></div>${c.requires && !c.preview ? `<div class="hc-sub muted">🔒 ${esc(c.requires.label)}</div>` : ''}</div>`;
     const lockNote = locked ? `<div class="hc-sub muted">🔒 ${esc(c.requires.label)} <span class="small">(설정에서 "전제 무시" 가능)</span></div>` : '';
-    const glyph = { python: 'Py', algo: 'Al', 'terminal-git': '>_', sql: 'SQL', web: '</>', math: '∑' }[c.id] || (c.name || '?').slice(0, 1); const inner = `<div class="hc-head"><span class="hc-glyph" aria-hidden="true">${esc(glyph)}</span><span class="hc-name">${esc(c.name)}</span>${locked ? '<span class="chip">🔒</span>' : ''}${c.space ? '<span class="chip">공간</span>' : ''}</div><div class="hc-desc muted small">${esc(c.desc)}${c.hubLabel ? ` · ${esc(c.hubLabel)}` : ''}</div>${body}${lockNote}`;
+    const glyph = { python: 'Py', algo: 'Al', 'terminal-git': '>_', sql: 'SQL', web: '</>', math: '∑', vim: 'Vi' }[c.id] || (c.name || '?').slice(0, 1); const inner = `<div class="hc-head"><span class="hc-glyph" aria-hidden="true">${esc(glyph)}</span><span class="hc-name">${esc(c.name)}</span>${locked ? '<span class="chip">🔒</span>' : ''}${c.space ? '<span class="chip">공용</span>' : ''}</div><div class="hc-desc muted small">${esc(c.desc)}${c.hubLabel ? ` · ${esc(c.hubLabel)}` : ''}</div>${body}${lockNote}`;
     /* v2.7.0: preview 코스(뼈대 단계)는 잠금 없이 열림 — 허브 카드는 「준비 중 · 미리보기」 */
     return (ready && !locked) || c.preview ? `<a class="card hc ${ready ? 'ready' : 'soon preview'}" href="${this.courseUrl(c)}" style="--hc:var(--primary)">${inner}</a>` : `<div class="card hc ${ready ? 'locked' : 'soon'}">${inner}</div>`;
   },
