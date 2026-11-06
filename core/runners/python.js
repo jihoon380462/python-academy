@@ -82,7 +82,9 @@ def _pa_vis(v, depth=0, seen=None):
     if v is None or isinstance(v,(bool,int,float)): return v if not isinstance(v,float) or math.isfinite(v) else str(v)
     if isinstance(v,str): return v if len(v)<=60 else v[:57]+'...'
     if depth>8: return '...'
-    if isinstance(v,(list,tuple)):
+    if isinstance(v,(list,tuple)) or type(v).__name__=='deque':
+        # QA #50: deque 도 리스트처럼 (앞=왼쪽)
+        v=list(v)
         return [_pa_vis(x,depth+1,seen) for x in v[:300]]+(['...'] if len(v)>300 else [])
     if isinstance(v,(set,frozenset)):
         try: items=sorted(v)

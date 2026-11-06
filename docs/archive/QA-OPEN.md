@@ -22,9 +22,9 @@
 
 | # | 무엇 | 심각도 | 고칠 곳(추정) |
 | --- | --- | --- | --- |
-| 50 | 알고 시각화: deque·set 이 안 그려짐(「그리기 오류」) — BFS·큐 레슨 4곳·문제 9개 👀 | 중 | core/runners/python.js deque → list, core/visualize.js boxes·queue 에 `__set` |
-| 51 | 알고 시각화: dict 를 table 로 못 그림(항상 「비어 있어요」) — 메모이제이션·역색인 5곳 | 중 | core/visualize.js `drawTable` 에 dict(키 = 열 제목) |
-| 52 | 알고 함수 정의형 문제 27개 👀 에 그림이 없음(지문은 「시각화돼요」) | 중 | core/ui-views-main.js 시각화 실행 코드 뒤에 `tests[0].call` |
+| ~~50~~ ✅ v2.19.1 | 알고 시각화: deque·set 이 안 그려짐(「그리기 오류」) — BFS·큐 레슨 4곳·문제 9개 👀 | 중 | core/runners/python.js deque → list, core/visualize.js boxes·queue 에 `__set` |
+| ~~51~~ ✅ v2.19.1 | 알고 시각화: dict 를 table 로 못 그림(항상 「비어 있어요」) — 메모이제이션·역색인 5곳 | 중 | core/visualize.js `drawTable` 에 dict(키 = 열 제목) |
+| ~~52~~ 끝(v2.19.0 보관) | 알고 함수 정의형 문제 27개 👀 에 그림이 없음(지문은 「시각화돼요」) | 중 | core/ui-views-main.js 시각화 실행 코드 뒤에 `tests[0].call` |
 | 66 | 깬 보스(Parsons 등)를 **일반 화면에서** 다시 열면 맞춘 답이 채워진 채(복습·도전·타임어택은 #89·#90 으로 빈 상태) — 「자동 완성」처럼 보임 | 하 | 설계 결정: 클리어한 문제는 빈 상태 + 「이전 답 불러오기」? (저장·복원 동작) |
 | 115 | 폰 타자 연습: 시작 토스트가 2.5초 동안 「설명 / 작업」 탭 글자를 가림(누르기는 됨) · 5문제째에 레벨업 화면이 「5문제 더?」 확인 위에 겹침 | 하 | 공통 UI 판단: core/ui-core.js `toast` 위치(폰은 아래?)·레벨업과 확인 창 순서 |
 
