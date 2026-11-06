@@ -1,4 +1,4 @@
-// core/visualize.js — 알고리즘 시각화 엔진 (EXPANSION.md 5절). 파이썬 러너의 구조 스냅샷(step.vis)을 캔버스에 그린다.
+// core/visualize.js — 알고리즘 시각화 엔진 (docs/EXPANSION.md 5절). 파이썬 러너의 구조 스냅샷(step.vis)을 캔버스에 그린다.
 //   spec(문제·예제의 visualize 필드): { kind, var, ...옵션 }
 //     bars      { var:'a', hl:['i','j'], range?:[lo,hi] }           숫자 리스트 → 막대. hl 변수가 가리키는 인덱스 강조
 //     boxes     { var:'stack', orient:'v'|'h', top?:'top' }           스택·큐 → 상자 줄

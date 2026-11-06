@@ -23,7 +23,7 @@ const UI = {
   _seq: 0,
   back() { const h = this.history.pop(); if (h) this.go(h[0], h[1], false); else this.go('home', {}, false); },
   initHistory() { /* PR#94 P1-02: 폰·브라우저 뒤로가기가 앱 밖으로 나가지 않게 — 앱 안 기록이 남아 있으면 이전 화면으로 */ window.addEventListener('popstate', () => { const ovs = document.querySelectorAll('.modal-ov'); if (ovs.length) { /* 창이 떠 있으면 뒤로가기 = 창 닫기 */ const ov = ovs[ovs.length - 1]; ov.dispatchEvent(new MouseEvent('click', { bubbles: true })); try { history.pushState({ pa: 1 }, '', location.href); } catch (e) {} return; } if (!this.history.length) return; this.back(); }); },
-  // v2.7.0 코스 플러그인 등록부 — 코스 모듈(core/ui-views-<코스>.js)이 채운다. 계약은 DESIGN.md 16절.
+  // v2.7.0 코스 플러그인 등록부 — 코스 모듈(core/ui-views-<코스>.js)이 채운다. 계약은 docs/DESIGN.md 16절.
   //   UI.modes[type] = { label, instant?, mount(host, p, ctx) → { getCode(), submit?(), destroy?() } }  ctx = { pid, rec, fresh, inMock, lesson, submit(result) }  result = { ok, msg, detail }
   //   UI.examples[kind] = { mount(host, example, ctx) → { destroy?() } }  — 레슨 pages[].example 이 { <kind>: … } 꼴일 때(파이썬 { code } 는 기존 경로)
   modes: {}, examples: {},
@@ -57,7 +57,7 @@ const UI = {
   shake(el) { if (!el || Store.data.settings.anim === 0) return; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 500); },
   // 코치 문구 위치 표현 보정 자리 (v2.4.0: 블록 메뉴 위치 치환은 블록 삭제로 불필요 — 그대로 돌려줌)
   layoutWords(html) { return html; },
-  // 그림 또는 이모지 (IMAGES.md): 파일이 없으면 onerror 로 이모지 span 으로 바뀐다
+  // 그림 또는 이모지 (docs/IMAGES.md): 파일이 없으면 onerror 로 이모지 span 으로 바뀐다
   img(name, fallback, cls = '') { return `<img class="aimg ${cls}" src="${assetUrl(name)}" alt="" onerror="this.outerHTML='<span class=&quot;${cls}&quot;>${esc(fallback).replace(/'/g, '&#39;')}</span>'">`; },
   // 여러 줄 코드를 인라인 <code>에 <br>로 넣으면 줄마다 네모칸이 생긴다 → 블록 코드로 바꿔 그린다 (v2.2.6 수정)
   multiCode(html) { return String(html == null ? '' : html).replace(/<code>((?:(?!<\/code>)[\s\S])*?<br\s*\/?>(?:(?!<\/code>)[\s\S])*?)<\/code>/g, (m, c) => `<pre class="code qcode">${c.replace(/<br\s*\/?>/g, '\n').replace(/&nbsp;/g, ' ')}</pre>`); },

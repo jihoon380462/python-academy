@@ -1,7 +1,7 @@
 # NEXT — 남은 작업 뼈대 (다음 모델/세션용 작업 지시서)
 
 > v2.2.0까지는 Fable 5.1이 만들었다. 이 문서는 **그 다음 작업을 다른 모델(Opus 등)이 이어서 할 수 있게** 큰 뼈대를 적어 둔 것이다.
-> 읽는 순서: `HANDOFF.md`(상태판·작업 방법·사용자 성향) → 이 문서 → 해당 WP가 가리키는 `EXPANSION.md` 절 → 코드.
+> 읽는 순서: `HANDOFF.md`(상태판·작업 방법·사용자 성향) → 이 문서 → 해당 WP가 가리키는 `docs/EXPANSION.md` 절 → 코드.
 > 한 작업 패키지(WP) = 한 버전 = 한 배포. WP 안의 단계는 적힌 순서대로, 단계마다 검증을 돌린 뒤 다음으로.
 
 ## 0. 공통 규칙 (모든 WP)
@@ -14,8 +14,8 @@
    node tools/stamp.mjs && node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py && node tools/test_shell.mjs && python3 tools/regress.py
    ```
    `regress.py`는 헤드리스 크롬(file://, CDN 없음 → Pyodide·CodeMirror 폴백). 새 화면·요소를 추가하면 거기에 `check(...)` 한 줄을 보탠다.
-4. **버전**: `core/config.js`의 `APP_VERSION`을 올리고 `node tools/stamp.mjs`. WP-A(피드백·보강)는 패치(2.2.x), WP-B(터미널·Git)는 다음 마이너(2.4.0 — v2.3.0은 수학 공간 M1이 가져감), SQL 2.5.0, 웹 2.5.0, WP-C/WP-D(Phase 5)는 2.6.0 (EXPANSION.md 1절 표).
-5. **같은 커밋에 반드시**: `HANDOFF.md` 0절 상태판(현재 버전·마지막 작업·다음 후보), `CHANGELOG.md`(사용자가 보는 변화 → 내부 변화 순), 설계가 바뀌면 `DESIGN.md`(새 절: "임의로 정한 수치 / 지시서와 다르게 한 것과 이유 / 알려진 한계 / 파일별 용량"), 문제가 늘면 `PROBLEMS.md`.
+4. **버전**: `core/config.js`의 `APP_VERSION`을 올리고 `node tools/stamp.mjs`. WP-A(피드백·보강)는 패치(2.2.x), WP-B(터미널·Git)는 다음 마이너(2.4.0 — v2.3.0은 수학 공간 M1이 가져감), SQL 2.5.0, 웹 2.5.0, WP-C/WP-D(Phase 5)는 2.6.0 (docs/EXPANSION.md 1절 표).
+5. **같은 커밋에 반드시**: `HANDOFF.md` 0절 상태판(현재 버전·마지막 작업·다음 후보), `CHANGELOG.md`(사용자가 보는 변화 → 내부 변화 순), 설계가 바뀌면 `docs/DESIGN.md`(새 절: "임의로 정한 수치 / 지시서와 다르게 한 것과 이유 / 알려진 한계 / 파일별 용량"), 문제가 늘면 `docs/archive/PROBLEMS.md`.
 6. **커밋·배포**:
    ```
    git -c user.name="jihoon380462" -c user.email="jihoon380462@users.noreply.github.com" commit -m "vX.Y.Z: 한 줄 요약" && git push origin main
@@ -96,7 +96,7 @@
 
 ---
 
-## WP-B. Phase 2 터미널·Git 코스 (다음 마이너, 2.4.0 예정) — 설계 EXPANSION.md 6절
+## WP-B. Phase 2 터미널·Git 코스 (다음 마이너, 2.4.0 예정) — 설계 docs/EXPANSION.md 6절
 
 **진행 상태 (v2.2.15)**: 1단계 셸 명령 ✅ · 2단계 에러 사전 ✅(`ERRORS_SHELL`, `Shell.explain`) · 3단계 Git 시뮬레이터 ✅(init status add commit(-m -am --amend) log(--oneline --graph --all) diff(--staged) restore(--staged) reset(soft/mixed/hard HEAD~n) branch(-d/-D) switch(-c) checkout(-b) merge(ff·3-way·충돌 마커·--abort) rebase(--abort) stash(push/pop/list) tag remote(add -v) push(-u, 거부) pull(ff·병합·충돌) clone, .gitignore, 동료 푸시 시뮬 = 원격 store에 커밋 심기) · 4단계 중 `Grader.matchState` ✅ — `tools/test_shell.mjs` 111건 통과. **남은 것**: 4단계 나머지(엔진 디스패치: `Grader.runTests` mission 분기, 문제 화면 터미널 뷰, 레슨 `example.shell`, 놀이터, `tools/run_mission.mjs`, validate), 5단계 UI, 6단계 콘텐츠, 7·8단계.
 
@@ -127,13 +127,13 @@
    - regress: 미션 문제 열기 → 명령 입력 → 트리 갱신 → 체크리스트 체크 → 제출 클리어 흐름 + 모바일 390px 가로 스크롤 없음.
 6. **콘텐츠 (25%)** — `courses/terminal-git/content.js`: 레슨 17개 페이지 3개씩(개념 → 명령 → 실수와 에러, `example.shell`), 문제 70+ (미션 40: 레슨당 2 + 보스 3×2 / 퀴즈·명령 맞히기·빈칸·Parsons 30). 보스 3개는 `tests`(미션은 expect) 5개 이상 규칙 대신 `goals` 5개 이상(validate에 분기). 용어는 레슨 `terms`로(validate가 `[[용어]]` 검사). `WEAKNESS_TAGS` 사용. 문제 id는 `T<레슨>P<n>`, 보스 `TB<n>P<n>`.
 7. **실전 챕터 D + 보너스 TG (7%)** — 9절 ②: `TX1` "내 프로젝트를 GitHub에 올리기(시뮬)" 4단계(init → .gitignore → 커밋 3개 → push), `TX2` "동료와 2주 협업(시뮬)" 4단계(브랜치 → PR 흉내(merge) → 충돌 해소 → 깨끗한 로그). `practical:true` + `project.steps` + `tests[].stage`(미션은 `stages[]`로 단계별 expect — `autoCheck`가 stage 결과로 체크). 마스터 뱃지 `master_terminal-git`(🎧👑) `shared/badges.js`. 보너스 레슨 `TG` "컴퓨터에서 이어가기"(개발 환경 가이드, 실행 없는 체크리스트 12항목: 파이썬 설치·VS Code·터미널 열기·가상환경·pip·Git 설치·git config·GitHub 계정·토큰·첫 push·.gitignore·README; 체크 상태 `Store.data.lessons['guide_TG']`) — WP-D의 전제.
-8. **마무리 (5%)** — `core/config.js` COURSES terminal-git을 `ready:true, path:'courses/terminal-git/', total:N, lessons:N, requires:{course:'python', boss:'B2', label:'파이썬 챕터 2 보스 클리어'}`(validate가 수와 대조), 허브 카드 색 `#607d8b`. 튜터 페르소나는 `COURSE.tutorPersona`(이미 있음). `DESIGN.md` 14절(지원 명령 표 = `Shell.COMMANDS`에서 생성, 임의 수치: 해시 규칙·XP·미션 수, 지시서와 다른 점, 한계), `PROBLEMS.md` 코스 3 표, CHANGELOG v2.3.0, HANDOFF 상태판(Phase 3 → v2.4.0).
+8. **마무리 (5%)** — `core/config.js` COURSES terminal-git을 `ready:true, path:'courses/terminal-git/', total:N, lessons:N, requires:{course:'python', boss:'B2', label:'파이썬 챕터 2 보스 클리어'}`(validate가 수와 대조), 허브 카드 색 `#607d8b`. 튜터 페르소나는 `COURSE.tutorPersona`(이미 있음). `docs/DESIGN.md` 14절(지원 명령 표 = `Shell.COMMANDS`에서 생성, 임의 수치: 해시 규칙·XP·미션 수, 지시서와 다른 점, 한계), `docs/archive/PROBLEMS.md` 코스 3 표, CHANGELOG v2.3.0, HANDOFF 상태판(Phase 3 → v2.4.0).
 
 **지시서와 달라도 되는 것(미리 결정)**: `nano/vim` 대신 `edit` 가상 편집기 1개. `rebase -i`·`cherry-pick`·`bisect`는 범위 밖(레슨 15 시나리오는 branch+reset으로 푼다). 권한(chmod)·사용자·프로세스 명령 없음.
 
 ---
 
-## WP-C. 9절 ③ 허브 통합 프로젝트(캡스톤) — Phase 5(v2.6.0), 설계 EXPANSION.md 9절 ③
+## WP-C. 9절 ③ 허브 통합 프로젝트(캡스톤) — Phase 5(v2.6.0), 설계 docs/EXPANSION.md 9절 ③
 
 **구조 결정(권장)**: 캡스톤은 "코스"가 아니라 **허브의 구역**이지만 콘텐츠·채점은 코스 엔진을 그대로 쓰는 게 싸다 → `courses/capstone/`을 숨은 코스로 둔다(`CONFIG.COURSES`에 `hidden:true`, 허브 코스 목록엔 안 나오고 "통합 프로젝트" 구역이 카드로 링크). 문제마다 `runner`가 다르다(`p.runner:'python'|'sql'|'shell'|'web'`) → WP-B 4단계의 러너 디스패치를 **문제 단위**로(`p.runner || COURSE.runner`). `index.html`은 필요한 러너를 전부 로드.
 
@@ -146,7 +146,7 @@
 
 ---
 
-## WP-D. 9절 ④ PC형 실전 — Phase 5(v2.6.0), 설계 EXPANSION.md 9절 ④ (전제: WP-B 7단계 TG 레슨)
+## WP-D. 9절 ④ PC형 실전 — Phase 5(v2.6.0), 설계 docs/EXPANSION.md 9절 ④ (전제: WP-B 7단계 TG 레슨)
 
 1. **허브 구역** "💻 컴퓨터에서 하기": `Store.data.lessons['guide_TG']` 체크리스트가 전부 체크되면 열림(또는 전제 무시). 프로젝트 카드 3개: 폴더 정리 스크립트(실제 파일 이동, 확장자별 폴더) · 날씨 API 호출(`requests`, 무료 API 키 없이 되는 Open-Meteo) · 내 PC의 CSV 집계(X1P1의 PC판). 카드 → `Views.pcProject(id)`(새 화면, `core/ui-views-more.js`).
 2. **콘텐츠** `courses/pc/content.js`(숨은 코스, runner `'none'`): 프로젝트 = 레슨(설명 2페이지) + 문제 `type:'pc'`(★ 새 유형: 채점은 토큰 대조), `steps[]`(체크리스트, 스크립트가 단계마다 출력하는 문구와 1:1), `script`(파이썬 코드 템플릿, `{{NICK}}` `{{PID}}` 자리표시), `summaryKeys:['moved']`(토큰에 섞는 결과 요약 키).

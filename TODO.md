@@ -15,16 +15,16 @@
 
 | 순서 | 과제 | 상세 | 상태 |
 | --- | --- | --- | --- |
-| N1 | **터미널·Git 코스를 교과서로 채우기** — T1~T16·TB1~TB3 빈 레슨 19개: 설명 쪽 + 만들어 보기 + 필요한 문법 + 도감 + 시작하기(Git for Windows·Git Bash 설치). **연습은 내 컴퓨터의 Git Bash**(사용자 11/6) | `EXPANSION.md` 6절(범위), 파이썬 교과서 구조 재사용 | ✅ **완료** — 1차 명령어 편 T0~T5·TB1 (v2.10.0) · 2차 Git 편 T6~T16·TB2·TB3 (v2.12.0: 진짜 git, 원격은 bare 저장소 「가짜 GitHub」, T16 실제 GitHub·PR) |
-| N2 | **SQL 코스를 교과서로 채우기** — S1~S13·SB1~SB3 16개, **연습은 DB Browser for SQLite**(+ 파이썬 sqlite3) | `EXPANSION.md` 7절 | ✅ **완료** v2.13.0 — DB Browser + cafe.db, 레슨 14·보스 3·만들어 보기 50(실제 SQLite 로 검사) |
-| N3 | **웹·HTTP·API 코스를 교과서로 채우기** — W1~W13·WB1~WB3 16개, **연습은 VS Code + 브라우저** | `EXPANSION.md` 8절 | ✅ **완료** v2.14.0 — VS Code + Live Server, 레슨 14·보스 3·만들어 보기 28(예시 답을 미리보기로 검사), GitHub Pages 배포까지 |
-| N4 | ✅ **완료**(v2.10.1~v2.14.0) — 허브 카드 7개 전부 열림: 교과서 5(파이썬·터미널·Vim·SQL·웹) 「읽은 레슨 n/m」, 문제집 2(알고리즘·수학). 앞으로 교과서를 고칠 때는 같은 PR 에서 `config.js` 의 `lessons`·`bookNote`·`desc`(check_book 이 레슨 수·옛 문구 검사) | `core/config.js` COURSES, `specs/site-intent.md` 6절 | — |
+| N1 | **터미널·Git 코스를 교과서로 채우기** — T1~T16·TB1~TB3 빈 레슨 19개: 설명 쪽 + 만들어 보기 + 필요한 문법 + 도감 + 시작하기(Git for Windows·Git Bash 설치). **연습은 내 컴퓨터의 Git Bash**(사용자 11/6) | `docs/EXPANSION.md` 6절(범위), 파이썬 교과서 구조 재사용 | ✅ **완료** — 1차 명령어 편 T0~T5·TB1 (v2.10.0) · 2차 Git 편 T6~T16·TB2·TB3 (v2.12.0: 진짜 git, 원격은 bare 저장소 「가짜 GitHub」, T16 실제 GitHub·PR) |
+| N2 | **SQL 코스를 교과서로 채우기** — S1~S13·SB1~SB3 16개, **연습은 DB Browser for SQLite**(+ 파이썬 sqlite3) | `docs/EXPANSION.md` 7절 | ✅ **완료** v2.13.0 — DB Browser + cafe.db, 레슨 14·보스 3·만들어 보기 50(실제 SQLite 로 검사) |
+| N3 | **웹·HTTP·API 코스를 교과서로 채우기** — W1~W13·WB1~WB3 16개, **연습은 VS Code + 브라우저** | `docs/EXPANSION.md` 8절 | ✅ **완료** v2.14.0 — VS Code + Live Server, 레슨 14·보스 3·만들어 보기 28(예시 답을 미리보기로 검사), GitHub Pages 배포까지 |
+| N4 | ✅ **완료**(v2.10.1~v2.14.0 · v2.17.1 안내 문구·「이어서 하기」·푸터 정리) — 허브 카드 7개 전부 열림: 교과서 5(파이썬·터미널·Vim·SQL·웹) 「읽은 레슨 n/m」, 문제집 2(알고리즘·수학). 앞으로 교과서를 고칠 때는 같은 PR 에서 `config.js` 의 `lessons`·`bookNote`·`desc`(check_book 이 레슨 수·옛 문구 검사) | `core/config.js` COURSES, `specs/site-intent.md` 6절 | — |
 | N5 | **알고리즘 코스를 교과서로** — 사용자 「1」(11/6) | — | ✅ **완료** v2.15.0 — VS Code 에서 풀기 + 레슨 예제 👀 그림으로 보기·👣 한 줄씩 보기(누를 때만 엔진), 시작하기 4 · 만들어 보기 100(모의고사 15·실전 6 포함, 함수 문제는 「확인 코드」) · 도구 상자 15. 문제 모양은 `core/book-derive.js`(화면·check_book 공용) |
 | N6 | 예정 코스 설계 — **T8 GitHub 가장 중요**(사용자 11/3). N1 터미널·Git 과 겹침(원격·PR·Pages)을 정리해서 설계 | **`specs/github-course.md`** | ✅ 설계 v2.15.4 · **v2.16.0 챕터 1 · v2.16.1 챕터 2 · v2.16.2 챕터 3 · v2.17.0 챕터 4 + G17 — 완성**(레슨 22 · 만들어 보기 63) |
-| N7 | 알고 시각화 core 버그 QA #50·#51·#52(deque·set·dict 그림, 함수 정의형 문제 그림), 편집기·레슨 창 #155~#159, 복습 #149 — 알고 코스(예전 화면 `?classic=1`)에 남은 것. **v2.15.0 부터 교과서에선 레슨 예제 그림(#50~#52 의 deque·set·dict 그림은 해당)만 보임** | `QA.md`·`QA-OPEN.md` 1절 | 대기 |
+| N7 | 알고 시각화 core 버그 QA #50·#51·#52(deque·set·dict 그림, 함수 정의형 문제 그림), 편집기·레슨 창 #155~#159, 복습 #149 — 알고 코스(예전 화면 `?classic=1`)에 남은 것. **v2.15.0 부터 교과서에선 레슨 예제 그림(#50~#52 의 deque·set·dict 그림은 해당)만 보임** | `docs/QA.md`·`docs/archive/QA-OPEN.md` 1절 | 대기 |
 | N8 | 알고 C6~C9 (힌트 품질·실전 연습 문제), 알고 레슨 나누기 A6·A16·A18·A19 | `specs/content-team.md` 3절, C11 | 대기 |
-| N9 | 수학 「상」 #145~#147 → 수학 「중」 → M2·M3 (D4 후순위) | `QA.md`, `EXPANSION.md` 14절 | 후순위 |
-| N10 | 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지), 8차 아트 납품되면 검수(IMAGES.md 3-B) | — | ✅ CSS·MAP_DECOR 정리 v2.15.1(17종, 전후 캡처 픽셀 동일) · 아트 검수는 납품 뒤 |
+| N9 | 수학 「상」 #145~#147 → 수학 「중」 → M2·M3 (D4 후순위) | `docs/QA.md`, `docs/EXPANSION.md` 14절 | 후순위 |
+| N10 | 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지), 8차 아트 납품되면 검수(docs/IMAGES.md 3-B) | — | ✅ CSS·MAP_DECOR 정리 v2.15.1(17종, 전후 캡처 픽셀 동일) · 아트 검수는 납품 뒤 |
 
 검증 묶음: `node tools/validate_content.mjs && node tools/check_nesting.mjs && node tools/check_book.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별(`node tools/check_level.mjs --gate`, `node tools/test_shell.mjs`, `node tools/run_shell_solutions.mjs`, `python3 tools/run_sql_solutions.py`, `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py`. 화면을 바꾸면 APP_VERSION + `node tools/stamp.mjs`.
 
@@ -62,7 +62,7 @@
 # 예정 코스 (설계 전)
 
 > 사용자가 정한 **앞으로 만들 코스 목록**이에요(2026-11-03). 아직 설계 전이라 **Fable 이 이 파일을 보고 설계**합니다.
-> - 설계가 끝난 코스는 `EXPANSION.md` 에 새 절(지시서)로 옮기고, 여기서는 「→ EXPANSION n절」로 바꿔 적어요.
+> - 설계가 끝난 코스는 `docs/EXPANSION.md` 에 새 절(지시서)로 옮기고, 여기서는 「→ EXPANSION n절」로 바꿔 적어요.
 > - 설계와 구현은 Fable 이 해요. Opus 세션은 이 파일에 메모(겹침·아이디어)만 보탤 수 있어요(workflow 1절: 새 러너·새 문제 type·새 그림 kind 는 Fable).
 > - 아래 「범위 후보」「실행 방법 후보」는 설계를 돕기 위한 출발점일 뿐이에요. 확정이 아니에요.
 
@@ -73,7 +73,7 @@
 - 레벨·보스·뱃지 구조를 지켜요. 허브 카드는 `CONFIG.COURSES` 에 들어가요.
 - **기존 코스·수학 공간과 겹치는 부분**은 각 코스 칸에 적어 뒀어요. 새로 만들지, 기존 레슨으로 연결할지는 Fable 이 정해요.
 - 순서·우선순위는 아직 정하지 않았어요 → 사용자에게 물어보거나, 설계 때 제안해 주세요.
-- 기존 계획(`EXPANSION.md` 1절)의 터미널·Git, SQL, 웹·HTTP·API 코스와 수학 M2·M3 은 그대로 살아 있어요. 이 목록은 그 계획에 **더하는** 거예요.
+- 기존 계획(`docs/EXPANSION.md` 1절)의 터미널·Git, SQL, 웹·HTTP·API 코스와 수학 M2·M3 은 그대로 살아 있어요. 이 목록은 그 계획에 **더하는** 거예요.
 
 ## 1. 예정 코스 8개
 
@@ -117,7 +117,7 @@
 - **범위 후보**: 에러 메시지·트레이스백 읽기, print·로그 디버깅, 이분 탐색식 범위 좁히기, 디버거 흉내(중단점·한 줄씩 실행·변수 보기), 재현 가능한 버그 보고서 쓰기, `assert`·단위 테스트·경계값·테스트 먼저 쓰기(TDD), 회귀 테스트, 테스트 커버리지 개념.
 - **겹침 — 꼭 정리해야 해요**:
   - 파이썬 코스 `L21` 테스트 작성 · `L22` 디버깅 사고법 · `L23` 코드 설계·리팩터링
-  - `EXPANSION.md` 9절 「삽입 주제」(테스트·디버깅을 레슨 사이에 끼워 넣는 계획)
+  - `docs/EXPANSION.md` 9절 「삽입 주제」(테스트·디버깅을 레슨 사이에 끼워 넣는 계획)
   - 원래 계획은 「별도 코스로 만들면 아무도 안 들어간다」여서 끼워 넣기였어요. **11/3 사용자 결정으로 별도 코스가 됐어요.** 기존 L21·L22를 입문으로 두고 이 코스를 심화로 둘지 정해야 해요.
 - **실행 방법 후보**: Pyodide 러너를 써요. 9절에 있던 「테스트 먼저 쓰기」 문제 유형(숨은 틀린 구현을 몇 개 잡아내나)이 여기 잘 맞아요. 기존 `bug` 유형 확장, 한 줄씩 실행 시각화(`Viz` 추적 재사용)도 후보예요.
 
@@ -137,7 +137,7 @@
 - **범위 후보**: 클래스·객체 복습, 캡슐화, 상속과 합성(언제 무엇을), 다형성·덕 타이핑, 인터페이스·추상 클래스(`abc`), SOLID 원칙 맛보기, 자주 쓰는 디자인 패턴 몇 개(전략·옵저버·팩토리), UML 클래스 다이어그램 읽기, 리팩터링.
 - **겹침**:
   - 파이썬 `L14`·`L15` 클래스 1·2, 보스 `B4`(클래스 가위바위보), `L23` 코드 설계·리팩터링
-  - `EXPANSION.md` 9절의 「리팩터링 문제 유형」 아이디어
+  - `docs/EXPANSION.md` 9절의 「리팩터링 문제 유형」 아이디어
   - 미뤄 둔 C# 코스(EXPANSION 끝, 별도 저장소) — 객체지향을 C#에서 다룰지, 파이썬으로 먼저 할지 정해야 해요.
 - **실행 방법 후보**: Pyodide를 써요. 클래스 관계를 그림(다이어그램)으로 보여 주는 시각화와, 리팩터링 채점(테스트는 그대로 통과 + 구조 조건)이 핵심 신기술이 될 거예요.
 
@@ -217,8 +217,8 @@
 - [ ] 허브 배치: 코스 카드(`CONFIG.COURSES`)인지, 수학 공간처럼 별도 구역인지(예: CS·운영체제를 한 「컴퓨터 공간」으로)
 - [ ] 무거운 패키지(pandas·scikit-learn) 로딩 시간·용량 대책(폰 기준)
 - [ ] 브라우저 밖 도구(설치·외부 AI 서비스·Colab 등)를 어느 코스에서 어디까지 쓸지
-- [ ] 아트: 코스 아이콘·보스·뱃지 요청서는 그림 자리가 생긴 뒤 아트 역할이 IMAGES.md에 써요.
-- [ ] 설계를 마치면 `EXPANSION.md` 새 절로 옮기고, 이 파일의 상태 칸을 「→ EXPANSION n절」로 바꾸기
+- [ ] 아트: 코스 아이콘·보스·뱃지 요청서는 그림 자리가 생긴 뒤 아트 역할이 docs/IMAGES.md에 써요.
+- [ ] 설계를 마치면 `docs/EXPANSION.md` 새 절로 옮기고, 이 파일의 상태 칸을 「→ EXPANSION n절」로 바꾸기
 
 ## 3. 메모 (아이디어가 생기면 여기에 한 줄씩)
 

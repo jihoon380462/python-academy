@@ -238,7 +238,7 @@ button,input,select,textarea{-webkit-text-size-adjust:100%;text-size-adjust:100%
 @media (max-width:767px){.only-pc{display:none}}
 .chip-btn.on{background:var(--primary);color:var(--on-primary);border-color:transparent}
 .pitem.locked{opacity:.6}
-/* ===== 아트 리소스 (IMAGES.md) ===== */
+/* ===== 아트 리소스 (docs/IMAGES.md) ===== */
 img.aimg{display:inline-block;vertical-align:middle;object-fit:contain}img.aimg.boss-img{width:56px;height:56px;margin:0}.bosshp.dead img.aimg{filter:grayscale(1) opacity(.5)}
 
 img.aimg.badge-img{width:56px;height:56px}.badge.no img.aimg.badge-img{filter:none}img.aimg.bf-img{width:44px;height:44px;vertical-align:middle}img.aimg.empty-img{width:140px;height:140px;display:block;margin:0 auto 8px}

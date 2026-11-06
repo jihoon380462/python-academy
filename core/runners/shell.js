@@ -1,5 +1,5 @@
-// core/runners/shell.js — 터미널·Git 코스(Phase 2)의 가상 파일시스템 + 셸 + Git 시뮬레이터 (NEXT.md WP-B 1~3단계, v2.2.15)
-// 설계(EXPANSION.md 6절): 실제 셸·isomorphic-git 없이 메모리 트리 위에 직접 구현 → 결과가 결정적이라 채점(grader:'state')이 쉽다.
+// core/runners/shell.js — 터미널·Git 코스(Phase 2)의 가상 파일시스템 + 셸 + Git 시뮬레이터 (docs/archive/NEXT.md WP-B 1~3단계, v2.2.15)
+// 설계(docs/EXPANSION.md 6절): 실제 셸·isomorphic-git 없이 메모리 트리 위에 직접 구현 → 결과가 결정적이라 채점(grader:'state')이 쉽다.
 //   사용:  const sh = Shell.create(setup);  sh.exec('mkdir -p a/b && ls a')  →  { out:'b\n', err:'', code:0 }
 //          sh.state()  → { cwd, tree, history, git:{...} }  (Grader.state 가 expect 와 비교)
 //   setup: { cwd?: '/home/me', tree?: { home: { me: { 'memo.txt': 'hello', src: {} } } },   객체=폴더, 문자열=파일 내용

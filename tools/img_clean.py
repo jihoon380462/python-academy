@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# tools/img_clean.py — IMAGES.md 납품 검수·정리. `python3 tools/img_clean.py [--check] [파일...]`  (Pillow 필요: pip install pillow)
+# tools/img_clean.py — docs/IMAGES.md 납품 검수·정리. `python3 tools/img_clean.py [--check] [파일...]`  (Pillow 필요: pip install pillow)
 #   검사: 크기(512/256/1200×400), RGBA 투명 배경, 모서리 알파 0, 여백 ≥ 6%, 흰 테두리(스티커 후광) 유무
 #   정리(--check 없을 때): 투명 배경에 맞닿은 흰색~회색(무채색) 테두리 픽셀을 지운다(최대 14겹)(다크 테마에서 흰 띠가 생기는 문제). 내부의 흰색(눈·종이)은 윤곽선에 막혀 그대로.
 #            hero-hub.png 처럼 아래가 비어 있는 가로 배너는 내용 bbox + 8% 여백으로 잘라 세로를 줄인다.

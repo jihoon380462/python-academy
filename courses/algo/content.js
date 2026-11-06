@@ -1,4 +1,4 @@
-// courses/algo/content.js — 코스 2 알고리즘·자료구조 콘텐츠 (EXPANSION.md 5절). 로직 없음.
+// courses/algo/content.js — 코스 2 알고리즘·자료구조 콘텐츠 (docs/EXPANSION.md 5절). 로직 없음.
 // 스키마는 courses/python/content.js 머리말과 같고, 이 코스는 아래 필드를 더 쓴다:
 //   문제  kind:'trace'|'bigo'|'choose'|'ct'  표시용 유형 이름 (type은 quiz/code)
 //         quiz.code, quiz.input  추적·복잡도 퀴즈에서 보여줄 코드와 입력 · quiz.q 질문 · quiz.then:{q,opts,ans,why} 2단계(이유 고르기)
@@ -786,7 +786,7 @@ const PROBLEMS = [
 const GUIDES = {};
 
 // =====================================================================
-// === 챕터 E 실전 (v2.2.0, EXPANSION.md 9절 ② 층) — AB4 모의고사 통과 시 해금. 단계별 체크리스트 채점 + 격자/그래프 시각화
+// === 챕터 E 실전 (v2.2.0, docs/EXPANSION.md 9절 ② 층) — AB4 모의고사 통과 시 해금. 단계별 체크리스트 채점 + 격자/그래프 시각화
 // =====================================================================
 CHAPTERS.push({ ch: 5, name: '실전', color: '#ffd166' });
 LESSONS.push(
@@ -881,7 +881,7 @@ PROBLEMS.push(
   ],
   hints: ['graph.setdefault(a, []).append((b, w)) 와 반대 방향도. 이웃 출력: ", ".join(f"{nb}({w})" ...)', '다익스트라: pq에서 (d, node) 꺼내 done이면 continue, 아니면 done.add 후 이웃 완화(d + w < dist.get(nb, 무한)) -> dist 갱신, prev[nb] = node, push', '경로: prev를 b에서 a까지 거꾸로 -> reverse -> " -> ".join. 전체: sorted((dist[s], s) ...)로 (시간, 이름) 정렬, dist에 없는 역은 "도달 불가"'] },
 );
-// --- v2.2.3 (NEXT.md WP-G): 실전 3·4 ---
+// --- v2.2.3 (docs/archive/NEXT.md WP-G): 실전 3·4 ---
 LESSONS.push(
 { id: 'E3', ch: 5, n: 18, practical: true, title: '실전 3: 시험 시간표 짜기', mode: 'text',
   tutorSummary: '실전 프로젝트 3. 시험(과목 시작 끝) 목록으로 ① 최소 교실 수(시작순 정렬 + 끝나는 시각 최소 힙) ② 교실 배정(가장 번호 낮은 빈 교실) ③ 겹치지 않게 최대 시험 수(끝시간 그리디) ④ 최대 동시 진행 시각(스위프). 변수 rooms(힙)로 시각화.',

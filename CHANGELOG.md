@@ -4,6 +4,18 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.17.1 — 2026-11-06 (Opus: 허브 정리 + 저장소 파일·폴더 정리)
+
+- 🏠 허브(메인 화면)를 교과서 기준으로:
+  - 맨 위 안내 문구에 빠져 있던 **GitHub** 추가. 교과서 코스 이름은 `COURSES` 의 새 칸 `short` 로 만들어서, 코스가 늘어도 저절로 들어가요.
+  - 「계정은 필요 없어요」·푸터 「계정 없음」 → **「사이트 가입은 필요 없어요」·「사이트 가입 없음」**(GitHub 교과서는 내 GitHub 계정을 쓰므로).
+  - 상자 이름 「오늘의 할 일」 → **「이어서 하기」**. 「문제 코스(수학) 오늘 0/5 · 복습 큐 0개」 줄은 수학 공간을 시작했을 때만 보여요(교과서만 쓰면 의미 없는 0 이 늘 떠 있었음).
+- 🧹 저장소 정리:
+  - 지움: 맨 위의 연습 파일 7개(`a.txt` `b.txt` `data.csv` `fruits.txt` `memo.txt` `result.csv` `words.csv` — 사이트가 읽지 않음), `tools/__pycache__`(이제 `.gitignore`), `legacy/python_academy_v1.html`(v1 단일 파일, git 기록에 남음).
+  - 옮김: 맨 위 문서 → `docs/`(DESIGN · EXPANSION · IMAGES · QA), 끝난 기록 → `docs/archive/`(NEXT · PROBLEMS · QA-OPEN) · `specs/archive/`(11/2~11/5 시간표 · 팀 메모 3개). 이 파일들을 가리키던 문서·코드 주석 53곳의 경로를 같이 고침(CHANGELOG 의 옛 항목은 그대로).
+  - 맨 위에 남은 것: README · CHANGELOG · HANDOFF · TODO · index.html · sw.js · python_academy.html(예전 주소 넘겨 주기).
+- README 다시 씀: 코스 표(모드·레슨 수·연습 도구) · 폴더 표 · 검사 명령.
+
 ## v2.17.0 — 2026-11-06 (Opus: GitHub 교과서 완성 — 챕터 4 자동화와 안전 + 한 걸음 더 gh)
 
 - 🐙 GitHub 교과서 레슨 22개 전부 열림(준비 중 0 · 만들어 보기 63 — 명령 문제 14개 bash 검사). N6 완료.

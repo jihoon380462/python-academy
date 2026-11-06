@@ -1,4 +1,4 @@
-// core/ui-views-sql.js — 데이터베이스(SQL) 코스 화면 (v2.7.0 뼈대, EXPANSION.md 7절 · DESIGN.md 16절 플러그인 계약). SQL 코스 페이지에서만 로드된다.
+// core/ui-views-sql.js — 데이터베이스(SQL) 코스 화면 (v2.7.0 뼈대, docs/EXPANSION.md 7절 · docs/DESIGN.md 16절 플러그인 계약). SQL 코스 페이지에서만 로드된다.
 //   UI.modes.sql      문제 유형 'sql': 왼쪽 쿼리 편집기(TextEditor) + ▶ 실행 + 오른쪽 결과 표(열 정렬·50행 페이지·행 수·ms) + 스키마 패널 + 데이터 초기화 + ✔ 제출(btnGrade → ctx.submit)
 //   UI.examples.sql   레슨 예제 { sql: '쿼리', dataset?: 'cafe', schema?: false, autoRun?: false }: 편집기 + 실행 + 결과 표
 //   SqlUI.grade(p, query)   채점 — p.sql = { dataset, expect: { kind: 'rows' | 'state', query?, ordered?, columns?, table? } } (아래 grade 주석)

@@ -280,7 +280,7 @@ Grader.matchState = function (st, ex) {
   return { ok: !fails.length, fails };
 };
 
-// ---------- 수학 공간 채점 (v2.3.0, EXPANSION.md 14절) ----------
+// ---------- 수학 공간 채점 (v2.3.0, docs/EXPANSION.md 14절) ----------
 // num: p.answer = { value, tol(절대 오차, 기본 상대 1%), unit?:'rad'|'deg'|... }  → Grader.checkNum(p, 입력값) = { ok, tips:[규칙 설명] }
 Grader.checkNum = function (p, raw) {
   const a = p.answer || {}; const v = typeof raw === 'number' ? raw : parseFloat(String(raw).replace(/,/g, '').trim()); const tips = [];

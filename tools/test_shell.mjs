@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// tools/test_shell.mjs — 셸·Git 시뮬레이터 자가 테스트 (Node). `node tools/test_shell.mjs`. 검증 명령 묶음에 포함(NEXT.md 0절).
+// tools/test_shell.mjs — 셸·Git 시뮬레이터 자가 테스트 (Node). `node tools/test_shell.mjs`. 검증 명령 묶음에 포함(docs/archive/NEXT.md 0절).
 import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);
 const Shell = require('../core/runners/shell.js');
 let fails = 0, n = 0; const eq = (a, b, msg) => { n++; if (a !== b) { fails++; console.log('  ✗', msg, '\n      got:', JSON.stringify(a), '\n      want:', JSON.stringify(b)); } else console.log('  ✓', msg); };

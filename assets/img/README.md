@@ -1,6 +1,6 @@
 # 아트 리소스 제작 기록
 
-`IMAGES.md`의 요청에 따라 만든 생성 이미지다. 2차 A~D 16장은 내장 `image_gen`으로 생성했고, 최초 승인된 뱀·보스 이미지를 스타일 참조로 사용했다. 이미지 변형본이 아닌 최종 선택본만 납품했다.
+`docs/IMAGES.md`의 요청에 따라 만든 생성 이미지다. 2차 A~D 16장은 내장 `image_gen`으로 생성했고, 최초 승인된 뱀·보스 이미지를 스타일 참조로 사용했다. 이미지 변형본이 아닌 최종 선택본만 납품했다.
 
 PNG 출력 크기와 캔버스 여백을 맞춰 원본의 투명 알파를 유지했다. 512×512(13장), 256×256(2장), 1200×400(배너 1장). 다크/라이트 배경에서 40px·48px·56px 축소 표시, 배너 하단 1/3 투명을 확인했다.
 
@@ -704,7 +704,7 @@ Create ONE educational game asset, a flat vector-style sticker illustration matc
 
 ## 6차 E — 2026-11-02
 
-요청 원본: `art/6-request` (2b0efad0b61acb3828e58c33091845494748409e)의 IMAGES.md 3절. E1-4 → E1-2 → E2-4 → E2-2 순서. 영어 프롬프트·참조 파일은 원문 그대로 사용했다. 영역 512×512, 뱃지 256×256 PNG RGBA로 정규화(여백 47/23px). img_clean 검사·다크/라이트 실사용 크기 축소본 확인. 약한 색조 변화와 실제 앱 렌더는 아트팀 최종 검수 대상.
+요청 원본: `art/6-request` (2b0efad0b61acb3828e58c33091845494748409e)의 docs/IMAGES.md 3절. E1-4 → E1-2 → E2-4 → E2-2 순서. 영어 프롬프트·참조 파일은 원문 그대로 사용했다. 영역 512×512, 뱃지 256×256 PNG RGBA로 정규화(여백 47/23px). img_clean 검사·다크/라이트 실사용 크기 축소본 확인. 약한 색조 변화와 실제 앱 렌더는 아트팀 최종 검수 대상.
 
 ### E1-4 `area-math-4.png`
 
@@ -741,7 +741,7 @@ Create ONE PNG badge for a consistent educational game medal set. Flat vector st
 
 ## 6차 E — 재요청(2차), 2026-11-02
 
-출처: `art/6차-검수` (0b13c17dc3b992e9d7430b25d9abbf51cffebe13) IMAGES.md 3절. E1-4 → E2-4 수정 프롬프트로 재생성. 영역 512×512, 뱃지 256×256 RGBA, 여백 47/23px. img_clean 및 다크/라이트 32·48/56px 축소본 확인.
+출처: `art/6차-검수` (0b13c17dc3b992e9d7430b25d9abbf51cffebe13) docs/IMAGES.md 3절. E1-4 → E2-4 수정 프롬프트로 재생성. 영역 512×512, 뱃지 256×256 RGBA, 여백 47/23px. img_clean 및 다크/라이트 32·48/56px 축소본 확인.
 
 ### E1-4 `area-math-4.png`
 
@@ -766,7 +766,7 @@ Edit the FIRST reference medal. Keep its purple circular medal and rim unchanged
 
 ## 6차 E — E1-4 재요청(3차), 2026-11-02
 
-출처: `art/6차-검수` (`9a1f7a423c4f32f5a7a1ecdcee28657fa29773ee`) IMAGES.md 3절. `main` (`486e272a18ba25c86f1e1d0985cea319415ef772`)에서 분기한 `art/6차-3`에 납품. 변경 그림은 `area-math-4.png` 한 장이다. 내장 이미지 생성 도구 사용.
+출처: `art/6차-검수` (`9a1f7a423c4f32f5a7a1ecdcee28657fa29773ee`) docs/IMAGES.md 3절. `main` (`486e272a18ba25c86f1e1d0985cea319415ef772`)에서 분기한 `art/6차-3`에 납품. 변경 그림은 `area-math-4.png` 한 장이다. 내장 이미지 생성 도구 사용.
 
 참조: 검수 브랜치의 `badge-math_area_4.png`(2차 통과본, 구도; blob `ca8b3228f1ae049ed47142a91e465c738587fa6b`), `area-math-2.png`·`area-math-1.png`(굵기·스타일). 참조 파일 자체는 수정하지 않는다.
 

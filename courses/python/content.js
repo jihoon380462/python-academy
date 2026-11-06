@@ -1092,7 +1092,7 @@ const CHAPTERS = [
 // 뱃지: cond = [통계키, 이상값] (STATS 참조). secret: 조건 비공개
 
 // =====================================================================
-// === 챕터 6 실전 (v2.2.0, EXPANSION.md 9절 ② 층) — B5 클리어 시 해금. 레슨 1개 = 프로젝트 1개, 단계별 체크리스트 채점(tests[].stage)
+// === 챕터 6 실전 (v2.2.0, docs/EXPANSION.md 9절 ② 층) — B5 클리어 시 해금. 레슨 1개 = 프로젝트 1개, 단계별 체크리스트 채점(tests[].stage)
 // =====================================================================
 CHAPTERS.push({ ch: 6, name: '실전', color: '#ffd166' });
 LESSONS.push(
@@ -1171,7 +1171,7 @@ PROBLEMS.push(
   ],
   hints: ['load: csv.reader(f)로 줄마다 [eng, kor] → Card(eng, kor)', '퀴즈: random.seed(int(cmd[1])); cards = list(deck); random.shuffle(cards) → 섞은 복사본으로 quiz()', '복습: load("wrong.csv")가 비면 "틀린 단어가 없어요", 아니면 quiz() 후 save_wrong(틀린 것). wrong.csv 가 아직 없을 수 있어요 → load 안을 try: … except FileNotFoundError: return [] 로 감싸요(「파일 입출력」 레슨의 「파일이 없을 때」 쪽)'] },
 );
-// --- v2.2.3 (NEXT.md WP-G): 실전 3·4 ---
+// --- v2.2.3 (docs/archive/NEXT.md WP-G): 실전 3·4 ---
 LESSONS.push(
 { id: 'X3', ch: 6, n: 30, practical: true, title: '실전 3: 할 일 관리 앱', mode: 'text',
   tutorSummary: "실전 프로젝트 3. todo.json(리스트[{title, prio, due, done}])을 json.load로 읽고 명령 루프(목록/추가/완료/급한 날짜/저장/끝)로 다룬다. 한 줄 조건식 A if 조건 else B, f-string 안 따옴표는 바깥과 다르게. 목록은 (done, due, prio) 튜플 key 로 정렬. 못 찾으면 for … else. 저장은 json.dump(ensure_ascii=False, indent=2).",
