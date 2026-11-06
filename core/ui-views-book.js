@@ -95,6 +95,12 @@
   };
   const backBar = (back) => back ? `<button class="btn bk-back" id="bkBack">← ${esc(back.label)}</button>` : '';
   const bindBack = (back) => { const b = $('#bkBack'); if (b && back) b.onclick = () => UI.go(back.view, back.params || {}); };
+  // v2.15.3 사용자 「방향키 ← 누르면 이전, → 누르면 다음 · 만들어 보기에서 목차로 가는 건 키를 넣지 말고」: 레슨·시작하기 쪽에서 ← → 로 쪽 넘기기
+  //   입력칸·그림 플레이어의 슬라이더(input)·창(modal)·Ctrl/Alt/⌘ 조합일 때는 그대로 둠. 리스너는 하나만(화면이 바뀌면 bkKeys.root 가 화면에서 빠져 아무것도 안 함)
+  let bkKeys = null;
+  document.addEventListener('keydown', (e) => { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; if (!bkKeys || UI.view !== 'lesson' || !bkKeys.root.isConnected || !bkKeys.root.querySelector('.bk-lesson')) return;
+    const t = e.target || {}; if (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName || '') || t.isContentEditable || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || document.querySelector('.modal-ov')) return;
+    e.preventDefault(); (e.key === 'ArrowLeft' ? bkKeys.prev : bkKeys.next)(); });
   Views.lesson = (root, { lessonId, page = 0, back = null, task = null }) => {
     const isSetup = lessonId === SETUP_ID;
     const l = isSetup ? { id: SETUP_ID, title: BOOK.setup.title, pages: BOOK.setup.pages, ch: null } : Content.lesson(lessonId);
@@ -125,12 +131,13 @@
       }
       root.innerHTML = `<div class="page bk-lesson">${backBar(back)}<div class="bk-crumb"><button class="lnk" id="bkHome">☰ 목차</button><span class="muted">/</span><span>${kicker}</span><span class="grow"></span><button class="lnk" id="bkDexL">📚 ${M.dexShort}</button></div>
         <div class="lp-kicker">${isSetup ? '' : esc(l.boss ? '' : l.title)}</div>${tabs}<article class="bk-art">${body}</article>
-        <div class="bk-nav"><button class="btn" id="bkPrev" ${cur === 0 ? 'disabled' : ''}>← 이전</button><button class="btn accent" id="bkNext">${cur < total - 1 ? (hasMake && cur === pages.length - 1 ? '🛠 만들어 보기 →' : '다음 →') : '☰ 목차로'}</button></div></div>`;
+        <div class="bk-nav"><button class="btn" id="bkPrev" title="이전 쪽 (키보드 ←)" ${cur === 0 ? 'disabled' : ''}>← 이전</button><button class="btn accent" id="bkNext" ${cur < total - 1 ? 'title="다음 쪽 (키보드 →)"' : ''}>${cur < total - 1 ? (hasMake && cur === pages.length - 1 ? '🛠 만들어 보기 →' : '다음 →') : '☰ 목차로'}</button></div></div>`;
       UI.bindTerms(root); bindCopy(root); if (!isMake) bindViz(root, pg);
       bindBack(back); bindPre(root, { label: isMake ? `「${l.title}」 만들어 보기로 돌아가기` : `레슨 ${l.n ?? ''} 「${l.title}」로 돌아가기`, view: 'lesson', params: { lessonId: l.id, page: cur, back } }); $('#bkHome').onclick = () => UI.go('home'); $('#bkDexL').onclick = () => UI.go('dogam', { back: { label: isSetup ? '시작하기로 돌아가기' : `레슨 ${l.n ?? ''} 「${l.title}」로 돌아가기`, view: 'lesson', params: { lessonId: l.id, page: cur, back } } });
       $$('.bk-tab', root).forEach(b => b.onclick = () => { cur = +b.dataset.pg; render(); window.scrollTo(0, 0); });
       $('#bkPrev').onclick = () => { if (cur > 0) { cur--; render(); window.scrollTo(0, 0); } };
       $('#bkNext').onclick = () => { if (cur < total - 1) { cur++; render(); window.scrollTo(0, 0); } else UI.go('home'); };
+      bkKeys = { root, prev: () => { if (cur > 0) { cur--; render(); window.scrollTo(0, 0); } }, next: () => { if (cur < total - 1) { cur++; render(); window.scrollTo(0, 0); } } }; // ← → 키(아래 전역 처리) — 마지막 쪽(만들어 보기)에서 → 는 목차로 가지 않음
       $$('.bk-need', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.nl, page: +b.dataset.np, back: { label: `만들어 보기 ${+b.dataset.ti + 1}번 문제로 돌아가기`, view: 'lesson', params: { lessonId: l.id, page: pages.length, task: +b.dataset.ti, back } } }));
       if (isMake && task != null) { const el = $(`.bk-task[data-ti="${task}"]`, root); if (el) setTimeout(() => { el.scrollIntoView({ block: 'start' }); el.classList.add('bk-flash'); }, 30); task = null; }
     };
