@@ -337,12 +337,106 @@ git push origin v1.0.0</pre>
   ],
   summary: ['git tag -a v1.0.0 -m … → git push origin v1.0.0 (따로 push)', '버전 = 큰.중간.작은', 'Releases → Draft a new release → Choose a tag → Generate release notes → Publish release'] },
 { id: 'GB3', ch: 3, boss: true, title: '보스: 포트폴리오 공개', mode: 'text', pages: [], summary: [], tutorSummary: '저장소 2개 README, Pages, v1.0.0 릴리스, 프로필 README(아이디/아이디 저장소).' },
-// ================= 챕터 4 자동화와 안전 (다음 업데이트) =================
-{ id: 'G14', ch: 4, n: 14, title: 'GitHub Actions 첫 워크플로', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '.github/workflows/test.yml, on, jobs, runs-on, checkout, setup-python, pytest, Actions 탭 로그.' },
-{ id: 'G15', ch: 4, n: 15, title: 'PR 에 초록 체크 + 보호 규칙', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'Checks, Rulesets: Require a pull request before merging, Require status checks to pass before merging, Block force pushes.' },
-{ id: 'G16', ch: 4, n: 16, title: '비밀 지키기', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '.gitignore .env, Secrets and variables → Actions, secrets.X, Push protection, 토큰 폐기 먼저.' },
-{ id: 'GB4', ch: 4, boss: true, title: '보스: 이 사이트처럼 운영하기', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '보호 규칙 + verify 워크플로 + PR → 초록 체크 → squash → Pages 자동 배포.' },
-{ id: 'G17', ch: 5, n: 17, title: '터미널에서 GitHub: gh', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'gh auth login, gh repo create, gh pr create --fill, gh pr checks, gh pr merge --squash.' },
+// ================= 챕터 4 자동화와 안전 (v2.16.3) =================
+{ id: 'G14', ch: 4, n: 14, title: 'GitHub Actions 첫 워크플로', mode: 'text', tutorSummary: '.github/workflows/test.yml: name, on: [push, pull_request], jobs.test.runs-on ubuntu-latest, steps: actions/checkout@v6, actions/setup-python@v5(python-version 3.13), run: python test_todo.py. 종료 코드 0 = 초록 ✓, 아니면 빨간 ✗. Actions 탭 → 실행 → job → 단계 펼쳐 로그 맨 아래. 공개 저장소 무료.',
+  pages: [
+    { title: '워크플로 = push 할 때마다 도는 로봇', html: `<p><b>GitHub Actions</b> 는 「저장소에 무슨 일이 생기면(push · PR) GitHub 의 컴퓨터가 내가 정한 명령을 실행」 하게 하는 기능이에요. 제일 흔한 쓰임은 <b>테스트 자동 실행</b>이에요 — 사람이 깜빡해도 로봇은 매번 돌려요.</p>
+<pre class="code">git push
+   │
+   ▼
+GitHub 이 .github/workflows/*.yml 을 읽음
+   │
+   ▼
+GitHub 의 컴퓨터(runner, ubuntu)를 하나 빌려
+  ① 저장소 받기  ② 파이썬 준비  ③ python test_todo.py
+   │
+   ▼
+끝 코드 0 → 초록 ✓   ·   에러(0 아님) → 빨간 ✗</pre>
+<table class="kb"><tbody><tr><td><b>workflow</b>(워크플로)</td><td>자동 실행 하나의 설명 파일. <code>.github/workflows/</code> 폴더의 <code>.yml</code></td></tr><tr><td><b>job</b></td><td>한 컴퓨터에서 차례로 하는 일 묶음</td></tr><tr><td><b>step</b></td><td>job 안의 한 단계 — 남이 만든 동작(<code>uses:</code>) 또는 명령(<code>run:</code>)</td></tr><tr><td><b>runner</b></td><td>그 일을 해 주는 GitHub 의 컴퓨터</td></tr></tbody></table>
+<div class="bk-warn"><b>공개 저장소는 무료</b>예요. 비공개 저장소는 한 달 무료 시간이 정해져 있어요 — 연습은 공개 저장소로.</div>` },
+    { title: 'test.yml 한 줄씩', html: `<p>파이썬 교과서 레슨 21 처럼 <code>assert</code> 로 쓴 <code>test_todo.py</code> 가 있다고 해요(실패하면 에러로 끝나는 파일). 저장소에 <code>.github/workflows/test.yml</code> 을 만들어요 — 폴더 이름의 점(<code>.github</code>)과 철자가 정확해야 GitHub 이 찾아요.</p>
+<pre>name: test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python test_todo.py</pre>
+<table class="kb"><tbody><tr><td><code>name: test</code></td><td>Actions 탭에 보일 이름</td></tr><tr><td><code>on: [push, pull_request]</code></td><td>언제 — push 할 때, PR 이 열리거나 바뀔 때</td></tr><tr><td><code>jobs:</code> → <code>test:</code></td><td>job 이름(챕터 4 의 보호 규칙에서 이 이름을 골라요)</td></tr><tr><td><code>runs-on: ubuntu-latest</code></td><td>GitHub 이 빌려줄 컴퓨터 종류(리눅스)</td></tr><tr><td><code>uses: actions/checkout@v6</code></td><td>저장소 파일 받기 — 거의 모든 워크플로의 첫 단계</td></tr><tr><td><code>uses: actions/setup-python@v5</code> + <code>with:</code></td><td>파이썬 3.13 준비</td></tr><tr><td><code>run: python test_todo.py</code></td><td>내 테스트 실행. pytest 를 쓰면 <code>run: pip install pytest</code> 다음 <code>run: python -m pytest</code></td></tr></tbody></table>
+<div class="bk-warn"><b>YAML 은 들여쓰기가 문법이에요</b> — 빈칸 두 칸씩, <kbd>Tab</kbd> 은 안 돼요(VS Code 는 .yml 에서 Tab 을 빈칸으로 바꿔 줘요). <code>-</code> 뒤에 빈칸 하나. 틀리면 Actions 탭에 「Invalid workflow file」 이 떠요.</div>` + GH_DATE },
+    { title: 'Actions 탭에서 결과 읽기: 빨간 ✗ 를 만나면', html: `<p>push 하고 저장소 <b>Actions</b> 탭을 열면 실행 목록이 있어요. 노란 ● = 도는 중, 초록 ✓ = 성공, 빨간 ✗ = 실패. 커밋 목록·PR 에도 같은 표시가 붙어요.</p>
+<div class="bk-step-box"><b>실패 원인 찾기</b><br>빨간 실행을 누름 → 왼쪽 job 이름(<code>test</code>) → 빨간 ✗ 가 붙은 단계(<code>Run python test_todo.py</code>)를 펼침 → <b>맨 아래 줄부터</b> 읽어요. 파이썬 교과서 레슨 22 의 트레이스백 읽기와 똑같아요:<pre class="code">  File "test_todo.py", line 7, in test_add
+    assert add([], "우유") == ["우유"]
+AssertionError
+Error: Process completed with exit code 1.</pre></div>
+<ul><li>내 컴퓨터에서 같은 테스트를 돌려 재현 → 고치기 → commit · push → 새 실행이 저절로 시작돼요.</li><li>코드는 그대로인데 다시 돌려 보고 싶으면 실행 화면 오른쪽 위 <b>Re-run jobs</b>.</li><li>「내 컴퓨터에선 되는데 Actions 에서만 실패」 는 보통 ① push 안 한 파일 ② 내 컴퓨터에만 깔린 패키지(<code>pip install</code> 단계 빠짐) ③ Windows 경로(<code>C:\\</code>)를 코드에 적은 것이에요.</li></ul>
+<p>예제는 내 컴퓨터에서 「끝 코드」 를 직접 보는 거예요. <code>$?</code> 는 바로 앞 명령의 끝 코드 — 0 이면 Actions 가 초록이에요.</p>` + GH_DATE, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g14 && mkdir g14 && cd g14\nprintf \'%s\\n\' \'def add(items, x):\' \'    return items + [x]\' > todo.py\nprintf \'%s\\n\' \'from todo import add\' \'assert add([], "우유") == ["우유"]\' \'print("테스트 통과")\' > test_todo.py\npython test_todo.py\necho "끝 코드: $?"\nprintf \'%s\\n\' \'def add(items, x):\' \'    return items\' > todo.py\npython test_todo.py\necho "끝 코드: $?"', label: '예제 명령 — 두 번째는 일부러 실패(끝 코드 1 = 빨간 ✗)' } },
+  ],
+  summary: ['.github/workflows/test.yml: on · jobs · runs-on · steps', 'checkout@v6 → setup-python@v5 → run: python test_todo.py', '끝 코드 0 = 초록 ✓, Actions 탭 → 단계 펼쳐 맨 아래 줄'] },
+{ id: 'G15', ch: 4, n: 15, title: 'PR 에 초록 체크 + 보호 규칙', mode: 'text', tutorSummary: 'PR 아래 All checks have passed / Some checks were not successful, Details. Settings → Code, planning, and automation → Rulesets → New ruleset → New branch ruleset: Ruleset name, Disabled → Active, Target branches → Add target → Include default branch, ☑ Require a pull request before merging(승인 0), ☑ Require status checks to pass before merging → Add checks(test), Block force pushes → Create. main 에 바로 push → 거절.',
+  pages: [
+    { title: 'PR 의 Checks: 초록 ✓ 를 보고 합치기', html: `<p>워크플로가 <code>pull_request</code> 에도 돌게 해 두면(레슨 14), PR 아래에 검사 결과 상자가 생겨요.</p>
+<table class="kb"><tbody><tr><td>✓ <b>All checks have passed</b></td><td>테스트 통과 — 합쳐도 돼요</td></tr><tr><td>✗ <b>Some checks were not successful</b></td><td>실패 — 옆 <b>Details</b> 로 로그를 보고, 같은 브랜치에 고친 커밋을 push 하면 다시 돌아요</td></tr><tr><td>● 노란 점</td><td>도는 중 — 기다려요</td></tr></tbody></table>
+<p>PR 의 <b>Checks</b> 탭에서도 같은 결과와 로그를 볼 수 있어요. 이 사이트의 모든 PR 도 <code>verify</code> 라는 검사가 초록이어야 합쳐져요 — 그런데 지금은 <b>빨간 ✗ 여도 합치기 단추를 누를 수는 있어요</b>. 「초록이 아니면 못 합치게」 하려면 다음 쪽의 보호 규칙이 필요해요.</p>` + GH_DATE },
+    { title: 'Rulesets: main 을 지키는 규칙 만들기', html: `<div class="bk-step-box"><b>① 들어가기</b><br>저장소 <b>Settings</b> → 왼쪽 「Code, planning, and automation」 묶음의 <b>Rulesets</b>(펼쳐지면 그 아래 <b>Rulesets</b> 를 한 번 더) → <b>New ruleset</b> → <b>New branch ruleset</b>.</div>
+<div class="bk-step-box"><b>② 이름과 켜기</b><br>「Ruleset name」 칸에 <code>main 보호</code>. 처음엔 <b>Disabled</b> 로 되어 있는 단추를 눌러 <b>Active</b> 로 — Disabled 면 만들어도 아무것도 막지 않아요.</div>
+<div class="bk-step-box"><b>③ 어느 브랜치에</b><br>「Target branches」 → <b>Add target</b> → <b>Include default branch</b>(= main).</div>
+<div class="bk-step-box"><b>④ 규칙 고르기</b><ul><li>☑ <b>Restrict deletions</b> · ☑ <b>Block force pushes</b> — 처음부터 켜져 있어요. 그대로.</li><li>☑ <b>Require a pull request before merging</b> — main 에 바로 push 금지, PR 로만. 펼쳐지는 추가 설정의 <b>승인 수(Required approvals)는 0</b> — 혼자라서(내 PR 은 내가 Approve 못 해요, 레슨 6).</li><li>☑ <b>Require status checks to pass before merging</b> → <b>Add checks</b> → 검색 칸에 <code>test</code>(레슨 14 의 job 이름) → 고르기. 목록에 안 보이면 워크플로를 한 번 이상 돌린 뒤에 다시.</li></ul></div>
+<div class="bk-step-box"><b>⑤ 저장</b><br>맨 아래 <b>Create</b>.</div>
+<p class="muted small">「Bypass list」 에 나를 넣으면 나는 규칙을 건너뛸 수 있어요. 연습할 때는 비워 둬야 규칙이 나한테도 걸려요.</p>` + GH_DATE },
+    { title: '이제 main 에 바로 push 하면', html: `<p>규칙이 켜진 뒤 main 에서 커밋하고 <code>git push</code> 하면 거절돼요. 글은 이런 모양이에요(조금 다를 수 있어요):</p>
+<pre class="code">remote: error: GH013: Repository rule violations found for refs/heads/main.
+remote: - Changes must be made through a pull request.
+ ! [remote rejected] main -&gt; main (push declined due to repository rule violations)</pre>
+<p>고장이 아니라 <b>규칙이 일하는 것</b>이에요. 그 커밋을 브랜치로 옮겨서 PR 로 보내요(터미널·Git 교과서 레슨 15 ②):</p>
+<pre>git switch -c fix-typo
+git push -u origin fix-typo
+git switch main
+git reset --hard origin/main</pre>
+<p>PR 에서는 테스트가 초록이 될 때까지 합치기 단추가 회색이에요 — 「Merging is blocked」. 이게 이 사이트가 운영되는 방식이에요: <b>검사를 통과한 것만 main 에 들어가고, main 에 들어간 것만 배포돼요</b>.</p>
+<p>예제는 내 컴퓨터 원격(<code>remote.git</code>)에 GitHub 의 규칙과 비슷한 「main 에 바로 push 금지」 훅을 걸어 거절을 직접 보는 거예요.</p>`, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g15 && mkdir g15 && cd g15\ngit init -q --bare remote.git && git clone -q remote.git work && cd work && echo "# todo" > README.md && git add . && git commit -qm "시작" && git push -q origin main && cd ..\nprintf \'%s\\n\' \'#!/bin/sh\' \'while read old new ref; do [ "$ref" = refs/heads/main ] && { echo "규칙: main 에 바로 push 금지 — PR 로 보내세요"; exit 1; }; done; exit 0\' > remote.git/hooks/pre-receive && chmod +x remote.git/hooks/pre-receive\ncd work && echo "오타 고침" >> README.md && git commit -qam "오타 고침"\ngit push\ngit switch -c fix-typo\ngit push -u origin fix-typo\ngit switch main\ngit reset --hard origin/main\ngit log --oneline --all', label: '예제 명령 — main 으로의 push 는 일부러 거절돼요(진짜 GitHub 규칙은 Settings 에서)' } },
+  ],
+  summary: ['PR: All checks have passed / Some checks were not successful → Details', 'Settings → Rulesets → New branch ruleset → Active · default branch', 'Require a pull request(승인 0) + Require status checks(test) → main 바로 push 거절'] },
+{ id: 'G16', ch: 4, n: 16, title: '비밀 지키기', mode: 'text', tutorSummary: '.env 에 비밀, .gitignore 에 .env, git check-ignore. Settings → Security → Secrets and variables → Actions → New repository secret(Name·Secret → Add secret), 워크플로 env: X: ${{ secrets.X }}, 로그엔 ***. Push protection(공개 저장소 기본 켜짐). 올렸으면 폐기가 먼저.',
+  pages: [
+    { title: '비밀은 .env 에, .env 는 .gitignore 에', html: `<p>API 키·비밀번호·토큰을 코드에 그대로 쓰면, 공개 저장소에 올리는 순간 <b>전 세계가 봐요</b>. 그리고 지운 다음 커밋에도 <b>예전 커밋에 그대로 남아요</b>. 그래서 처음부터 코드 밖에 둬요.</p>
+<pre># .env  (저장소에 안 올리는 파일)
+API_KEY=abc123진짜키
+
+# app.py
+import os
+key = os.environ.get("API_KEY")</pre>
+<p><code>.env</code> 를 <code>.gitignore</code> 에 한 줄 넣으면 Git 이 못 본 척해요(터미널·Git 교과서 레슨 10). 확인은:</p>
+<pre>git check-ignore -v .env</pre>
+<p><code>.gitignore:1:.env	.env</code> 처럼 「몇 번째 줄 규칙에 걸렸다」 가 나오면 무시되고 있는 거예요. 아무것도 안 나오면 <b>올라갈 수 있는 상태</b>예요.</p>
+<p class="muted small"><code>.env</code> 를 읽어 <code>os.environ</code> 에 넣으려면 보통 <code>python-dotenv</code> 패키지를 써요(<code>pip install python-dotenv</code> → <code>from dotenv import load_dotenv; load_dotenv()</code>). 대신 저장소에는 값 없이 이름만 적은 <code>.env.example</code> 을 올려 두면 다른 사람이 무엇이 필요한지 알아요.</p>`, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g16 && mkdir g16 && cd g16\ngit init -q -b main\necho "API_KEY=abc123" > .env && echo "print(1)" > app.py\ngit status --short\necho ".env" > .gitignore\ngit status --short\ngit check-ignore -v .env', label: '예제 명령 — .gitignore 전후로 git status 가 어떻게 바뀌나' } },
+    { title: 'Actions 의 비밀값: secrets', html: `<p>워크플로가 비밀(배포 토큰 등)을 써야 하면 파일에 쓰지 않고 <b>저장소 설정에 숨겨 두고 이름으로 불러요</b>.</p>
+<div class="bk-step-box"><b>① 넣기</b><br>저장소 <b>Settings</b> → 왼쪽 「Security」 묶음의 <b>Secrets and variables</b> → <b>Actions</b> → <b>Secrets</b> 탭 → <b>New repository secret</b> → 「Name」 칸 <code>API_KEY</code> · 「Secret」 칸에 값 → <b>Add secret</b>. 넣은 뒤엔 나도 값을 다시 볼 수 없어요(바꾸기만).</div>
+<div class="bk-step-box"><b>② 워크플로에서 쓰기</b><pre>      - run: python app.py
+        env:
+          API_KEY: \${{ secrets.API_KEY }}</pre>코드에서는 <code>os.environ["API_KEY"]</code>. 실행 로그에 그 값이 찍히면 GitHub 이 <code>***</code> 로 가려요.</div>
+<ul><li>fork 에서 온 PR 의 워크플로에는 secrets 가 안 넘어가요(남이 훔쳐 가지 못하게).</li><li><code>GITHUB_TOKEN</code> 은 GitHub 이 실행마다 자동으로 주는 임시 열쇠라 따로 안 넣어도 돼요.</li></ul>` + GH_DATE },
+    { title: '실수로 올렸으면: 지우기보다 폐기가 먼저', html: `<div class="bk-step-box"><b>Push protection — GitHub 이 먼저 막아 줘요</b><br>공개 저장소에 토큰처럼 생긴 글자(GitHub 토큰·클라우드 키 등)가 든 커밋을 push 하면, 내 계정의 <b>Push protection</b>(기본으로 켜져 있음)이 push 를 거절하고 어느 커밋 · 어느 파일 · 몇째 줄인지 알려 줘요:<pre class="code">remote:    locations:
+remote:      - commit: 8728dbe67
+remote:        path: README.md:4</pre>→ 그 줄을 지우고, 마지막 커밋이면 <code>git commit --amend --all</code> → 다시 push.</div>
+<div class="bk-warn"><b>이미 올라갔으면 순서가 중요해요</b><ol><li><b>그 비밀을 폐기(revoke)</b> — 키를 준 곳에서 지우고 새로 발급. GitHub 토큰이면 내 사진 → Settings → <b>Developer settings</b> → <b>Personal access tokens</b> 에서 삭제. 공개된 순간 이미 누가 복사했을 수 있어서, 기록을 지우는 것보다 이게 먼저예요.</li><li>새 비밀은 <code>.env</code> · secrets 에.</li><li>기록에서 지우기는 그다음 — push 전이면 터미널·Git 교과서 레슨 15 ⑤, push 뒤에는 기록 다시 쓰기라 어려워요. 그래서 1 번이 핵심이에요.</li></ol></div>
+<p class="muted small">Settings → 「Security」 의 <b>Advanced Security</b>(또는 Code security) 화면에서 <b>Dependabot alerts</b> 를 켜면, 내가 쓰는 패키지에 알려진 보안 문제가 생겼을 때 알려 줘요.</p>` + GH_DATE },
+  ],
+  summary: ['.env 에 비밀 + .gitignore, git check-ignore -v .env', 'Settings → Secrets and variables → Actions → New repository secret → ${{ secrets.X }}', 'Push protection 이 막아 줌 · 올렸으면 폐기 먼저'] },
+{ id: 'GB4', ch: 4, boss: true, title: '보스: 이 사이트처럼 운영하기', mode: 'text', pages: [], summary: [], tutorSummary: '보호 규칙 + 테스트 워크플로 + PR → 초록 체크 → squash → Pages 자동 배포. 이 사이트의 ci.yml·pages.yml 읽기.' },
+{ id: 'G17', ch: 5, n: 17, title: '터미널에서 GitHub: gh', mode: 'text', tutorSummary: 'winget install --id GitHub.cli, gh auth login(GitHub.com · HTTPS · Login with a web browser), gh repo create 이름 --public --source=. --push, gh pr create --fill, gh pr checks, gh pr merge --squash --delete-branch, gh issue create.',
+  pages: [
+    { title: 'gh 설치와 로그인', html: `<p><b>gh</b>(GitHub CLI)는 GitHub 화면에서 하던 일을 Git Bash 명령으로 하는 공식 도구예요. 챕터 2~4 를 손에 익힌 뒤에 쓰면 빨라져요 — 화면을 먼저 알아야 명령이 무슨 뜻인지 보여요.</p>
+<div class="bk-step-box"><b>① 설치</b><br>Windows 의 명령 프롬프트나 PowerShell 에서 <code>winget install --id GitHub.cli</code>(또는 <a href="https://cli.github.com/" target="_blank" rel="noopener">cli.github.com</a> 에서 설치 파일). <b>Git Bash 를 껐다 다시 열고</b> <code>gh --version</code>.</div>
+<div class="bk-step-box"><b>② 로그인</b><pre>gh auth login</pre>질문에 화살표 키 + Enter 로: <b>GitHub.com</b> → 방식 <b>HTTPS</b> → Git 도 이 계정으로 로그인할지 <b>Yes</b> → <b>Login with a web browser</b> → 화면에 나온 8자리 코드를 복사하고 Enter → 브라우저에 코드 붙여 넣기 → <b>Authorize</b>. <code>gh auth status</code> 로 확인.</div>` },
+    { title: '자주 쓰는 gh 명령', html: `<table class="kb"><tbody><tr><td><code>gh repo create todo-cli --public --source=. --push</code></td><td>지금 폴더로 새 공개 저장소 만들고 올리기(레슨 2 를 한 줄로)</td></tr><tr><td><code>gh repo clone 아이디/저장소</code></td><td>clone</td></tr><tr><td><code>gh pr create --fill</code></td><td>지금 브랜치로 PR — 제목·설명을 커밋 메시지로 채움(레슨 5)</td></tr><tr><td><code>gh pr list</code> · <code>gh pr view 3 --web</code></td><td>PR 목록 · 3번 PR 을 브라우저로</td></tr><tr><td><code>gh pr checks</code></td><td>지금 브랜치 PR 의 자동 검사 결과(레슨 15)</td></tr><tr><td><code>gh pr merge --squash --delete-branch</code></td><td>squash 로 합치고 브랜치 지우기(레슨 7)</td></tr><tr><td><code>gh issue create</code> · <code>gh issue list</code></td><td>이슈 만들기 · 목록(레슨 9)</td></tr><tr><td><code>gh release create v1.0.0 --generate-notes</code></td><td>릴리스(레슨 13)</td></tr></tbody></table>
+<p>이 사이트는 이 명령들과 같은 일을 하는 GitHub API 로 PR 을 만들고 검사를 기다렸다 합쳐요. 화면 · 명령 · API 모두 같은 일을 하는 다른 손잡이예요.</p>`, example: { shell: 'gh auth status\ngit switch -c readme-gh\necho "gh 로 만든 PR" >> README.md\ngit commit -am "README: gh 연습"\ngit push -u origin readme-gh\ngh pr create --fill\ngh pr checks\ngh pr merge --squash --delete-branch', label: '예제 명령 — 연습 저장소 github-study 폴더에서(진짜 GitHub 에 PR 이 생겨요)' } },
+  ],
+  summary: ['winget install --id GitHub.cli → gh auth login', 'gh pr create --fill · gh pr checks · gh pr merge --squash --delete-branch', 'gh repo create · gh issue create · gh release create'] },
 ];
 const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)
 const DRILLS = [];

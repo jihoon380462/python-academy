@@ -4,6 +4,17 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.17.0 — 2026-11-06 (Opus: GitHub 교과서 완성 — 챕터 4 자동화와 안전 + 한 걸음 더 gh)
+
+- 🐙 GitHub 교과서 레슨 22개 전부 열림(준비 중 0 · 만들어 보기 63 — 명령 문제 14개 bash 검사). N6 완료.
+  - G14 GitHub Actions 첫 워크플로(`.github/workflows/test.yml` · on: [push, pull_request] · actions/checkout@v6 · setup-python@v5 · python-version "3.13" · Actions 탭 로그 읽기 · 초록 ✓ → 빨간 ✗ → 다시 초록)
+  - G15 초록 체크와 보호 규칙(Settings → Code, planning, and automation → Rulesets → Rulesets · New ruleset → New branch ruleset · Disabled → Active · Include default branch · PR 필수(승인 0) · status check 필수 · 바로 push 거절 GH013 → 브랜치로 옮기기)
+  - G16 비밀 지키기(.env + .gitignore · git check-ignore -v · Settings → Security → Secrets and variables → Actions → New repository secret · `${{ secrets.X }}` · 로그엔 *** · Push protection · 올렸으면 폐기 먼저)
+  - 보스 GB4 「이 사이트처럼 운영하기」(테스트 워크플로 + main 보호 + Actions 로 Pages + 이슈→PR→squash → 자동 배포 + v1.1.0 릴리스 · 이 사이트의 ci.yml · pages.yml 읽기)
+  - 한 걸음 더 G17 gh 명령(gh auth login · gh pr create --fill · gh pr checks · gh pr merge --squash --delete-branch)
+- 도감 4개(test.yml · secrets · check-ignore · gh pr), 허브 카드 「읽은 레슨 n/22」.
+- check_book: `${{ … }}`(Actions 문법)은 {{자리표시}} 검사에서 제외.
+
 ## v2.16.2 — 2026-11-06 (Opus: GitHub 교과서 챕터 3 + 파이썬 거북이 예제 turtle.done())
 
 - 🐢 사용자 「이 turtle 있으면 안 되는 거 아니야?」 — 파이썬 레슨 5 「turtle: 거북이에게 명령하기」 의 두 코드에 `turtle.done()` 이 없었어요. 예전 화면은 브라우저 캔버스라 필요 없었지만 VS Code 에서는 없으면 그림 창이 깜빡 뜨고 바로 닫혀요(같은 레슨의 만들어 보기 문제에는 있었음). 두 코드에 넣고 「창 ✕ 를 눌러야 끝나요」 · tkinter 가 없을 때(설치 Modify → ☑ tcl/tk and IDLE) 안내. turtle 자체는 Windows 파이썬 기본 설치에 들어 있어 VS Code 에서 돼요. check_book ⑪: 거북이 코드(예제·본문·예시 답)에 turtle.done() 이 없으면 실패.
