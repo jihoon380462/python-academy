@@ -588,6 +588,17 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','flex'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=2 and pg.inner_text('.tb-title')=='웹 문법 도감', '웹 문법 도감: flex 검색')
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '웹 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',1),('W2',2),('W4',2),('W7',1),('W11',2),('WB3',0)] ]
     pg.set_viewport_size({'width':1280,'height':900}); werr=errors[w0:]; check(not werr, '웹 교과서 pageerror 0 (%s)' % (werr[:2] or 'OK'))
+    # v2.15.3 사용자 「방향키 ← 이전 · → 다음 · 만들어 보기에서 목차로 가는 건 키 없이」
+    print('[교과서 ← → 키 v2.15.3]'); PYB='file://'+os.path.join(ROOT,'courses/python/index.html'); pg.goto(PYB); pg.wait_for_timeout(800); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
+    pg.evaluate("UI.go('lesson',{lessonId:'L2',page:4})"); pg.wait_for_timeout(250); pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(150); k1=pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")
+    pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(150); k2=pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")
+    check(k1=='5' and k2=='4', '레슨 2: → 다음 쪽(5→6) · ← 이전 쪽 (%s, %s)' % (k1, k2))
+    nlast=pg.evaluate("document.querySelectorAll('.bk-tab').length-1"); pg.evaluate("UI.go('lesson',{lessonId:'L2',page:%d})" % nlast); pg.wait_for_timeout(250); pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(300)
+    check(pg.evaluate("UI.view")=='lesson' and pg.locator('.bk-tab.make.on').count()==1, '만들어 보기(마지막 쪽)에서 → 는 목차로 안 감')
+    pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(150); check(pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")==str(nlast-1), '만들어 보기에서 ← 는 앞 쪽으로')
+    pg.evaluate("UI.go('lesson',{lessonId:'L2',page:0})"); pg.wait_for_timeout(200); pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(150); check(pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")=='0', '첫 쪽에서 ← 는 그대로')
+    pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(250); pg.click('#dexQ'); pg.keyboard.type('split'); pg.keyboard.press('ArrowLeft'); pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(200); check(pg.evaluate("UI.view")=='dogam', '도감 검색칸에서 ← → 는 글자 커서만(쪽 넘기기 아님)')
+    pg.evaluate("UI.go('lesson',{lessonId:'SETUP',page:0})"); pg.wait_for_timeout(200); pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(150); check(pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")=='1', '시작하기에서도 → 다음 쪽')
     # ===== [알고리즘 교과서 v2.15.0] N5 — VS Code 에서 풀기 + 레슨 예제의 👀 그림으로 보기(누를 때만 엔진)
     #   CI 에는 파이썬 엔진(Pyodide CDN)이 없어서, 그림 버튼 확인은 core/runners/python.js 의 프렐류드(__pa_run)를 이 python3 에서 돌려 Py.run 대신 씀 — 추적 형식은 진짜와 같음
     print('[알고리즘 교과서 v2.15.0]'); a0=len(errors); ALB='file://'+os.path.join(ROOT,'courses/algo/index.html')
