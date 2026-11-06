@@ -4,6 +4,19 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.16.1 — 2026-11-06 (Opus: GitHub 교과서 챕터 2 — Pull Request 로 협업)
+
+- 🐙 챕터 2 열림(레슨 6 + 보스 1, 만들어 보기 12 — 명령 문제 4개는 bash 검사):
+  - G5 브랜치에서 PR 열기(왜 main 에 바로 안 올리나 · Compare & pull request · base ← compare · 무엇/왜/확인 방법 설명 · Draft · 같은 브랜치 push 는 PR 에 붙음)
+  - G6 코드 리뷰(Files changed 의 + · Start a review / Add single comment · Insert a suggestion → Commit suggestion · **Submit review**: Comment / Approve / Request changes — 내 PR 은 Comment 만)
+  - G7 병합 세 가지와 뒷정리(merge commit · Squash and merge · Rebase and merge 그림 비교 · Confirm … · Delete branch · 내 컴퓨터: switch main → pull → **fetch --prune → branch -d**, squash 면 not fully merged → -D)
+  - G8 PR 충돌(Resolve conflicts → Mark as resolved → Commit merge · 내 컴퓨터에서 git pull origin main)
+  - G9 Issues(재현·기대·실제 · Labels·Assignees·Milestone · **Closes #3** 은 기본 브랜치에 합쳐질 때 닫힘 · Settings → Features → Set up templates)
+  - G10 Projects 보드(프로필 → Projects → New project → Board · + Add item · 기본 Workflows 로 자동 Done)
+  - 보스 GB2 「혼자 하는 협업 한 바퀴」
+- 화면 이름은 docs.github.com 원문(github/docs 저장소)으로 대조. 예제 명령을 실제 git 으로 돌려 보다가 찾은 것: 「git pull 만 하고 git branch -d」 는 원격 흔적(origin/브랜치)이 남아 있으면 squash 뒤에도 **경고만 내고 지워져요** → 순서를 fetch --prune 먼저로(regress 가 순서 확인).
+- 도감 도구 상자에 PR 5개(push -u → Compare & pull request · suggestion · Closes #3 · fetch --prune/branch -D · pull origin main). 허브 카드 「읽은 레슨 n/13」.
+
 ## v2.16.0 — 2026-11-06 (Opus: GitHub 교과서 — N6 챕터 1)
 
 - 🐙 사용자 「1」(= GitHub 교과서 만들기, 설계 `specs/github-course.md` 의 Q1~Q4 는 제안대로) — **새 코스 「GitHub」**(허브 「코스」 칸 터미널·Git 다음, 처음부터 교과서). 연습은 **내 진짜 GitHub 계정** + Git Bash.
