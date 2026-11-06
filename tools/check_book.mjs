@@ -20,7 +20,7 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
     if (t.noRun) return;
     for (const c of io) {
       if (c.output == null) { bad(`${id}: 출력 예 없음`); continue; }
-      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'book-')); const up = p && p.files && p.files.upload; if (up && up.sample) fs.writeFileSync(path.join(dir, up.name), up.sample);
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'book-')); const up = p && p.files && p.files.upload; if (up && up.sample) fs.writeFileSync(path.join(dir, up.name), up.sample); if (t.prep) fs.writeFileSync(path.join(dir, t.prep.name), t.prep.text);
       fs.writeFileSync(path.join(dir, 'main.py'), answer);
       let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: c.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); continue; }
       ran++; const norm = (s) => String(s).replace(/\r/g, '').split('\n').map(x => x.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
@@ -30,5 +30,8 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
 }
 for (const [k, o2] of Object.entries(BOOK.pages || {})) { const [pl, pi] = k.split('/'); const pg = ((L[pl] || {}).pages || [])[+pi]; if (!pg) { bad(`pages ${k}: 없는 쪽`); continue; } for (const [a] of o2.rep || []) if (!pg.html.includes(a)) bad(`pages ${k}: 바꿀 글을 못 찾음 「${a.slice(0, 40)}」`); }
 for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/'); if (!((L[tl] || {}).pages || [])[+ti]) bad(`titles ${k}: 없는 쪽`); }
+(BOOK.builtins || []).forEach((bi, i) => { n++; const id = `내장 함수 ${bi.name}`; if (bi.ref) { const [bl, bp] = bi.ref.split('/'); if (!((L[bl] || {}).pages || [])[+bp]) bad(`${id}: ref ${bi.ref} 가 없는 쪽`); }
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
+  ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
 const noTasks = LESSONS.filter(l => !l.mock && !(BOOK.tasks[l.id] || []).length).map(l => l.id); if (noTasks.length) console.log('  · 만들어 보기가 없는 레슨:', noTasks.join(', '));
 console.log(fails ? `✗ check_book 실패 ${fails} (문제 ${n}, 실행 ${ran})` : `✓ check_book OK (문제 ${n}, 예시 답 실행 ${ran})`); process.exit(fails ? 1 : 0);
