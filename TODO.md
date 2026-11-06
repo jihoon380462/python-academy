@@ -18,7 +18,7 @@
 | N1 | **터미널·Git 코스를 교과서로 채우기** — T1~T16·TB1~TB3 빈 레슨 19개: 설명 쪽 + 만들어 보기 + 필요한 문법 + 도감 + 시작하기(Git for Windows·Git Bash 설치). **연습은 내 컴퓨터의 Git Bash**(사용자 11/6) | `EXPANSION.md` 6절(범위), 파이썬 교과서 구조 재사용 | ✅ **완료** — 1차 명령어 편 T0~T5·TB1 (v2.10.0) · 2차 Git 편 T6~T16·TB2·TB3 (v2.12.0: 진짜 git, 원격은 bare 저장소 「가짜 GitHub」, T16 실제 GitHub·PR) |
 | N2 | **SQL 코스를 교과서로 채우기** — S1~S13·SB1~SB3 16개, **연습은 DB Browser for SQLite**(+ 파이썬 sqlite3) | `EXPANSION.md` 7절 | ✅ **완료** v2.13.0 — DB Browser + cafe.db, 레슨 14·보스 3·만들어 보기 50(실제 SQLite 로 검사) |
 | N3 | **웹·HTTP·API 코스를 교과서로 채우기** — W1~W13·WB1~WB3 16개, **연습은 VS Code + 브라우저** | `EXPANSION.md` 8절 | ✅ **완료** v2.14.0 — VS Code + Live Server, 레슨 14·보스 3·만들어 보기 28(예시 답을 미리보기로 검사), GitHub Pages 배포까지 |
-| N4 | 허브 카드: ✅ 파이썬·터미널 v2.10.1(`book:true` · 읽은 레슨 · 문구). **남은 것: 교과서를 채울 때마다 같은 PR 에서** `config.js` 의 그 코스 `lessons`·`bookNote`·`desc` 를 바꾸기(check_book 이 레슨 수·옛 문구 검사) — SQL·웹은 N2·N3 때 | `core/config.js` COURSES, `specs/site-intent.md` 6절 | 코스마다 같이 |
+| N4 | ✅ **완료**(v2.10.1~v2.14.0) — 허브 카드 7개 전부 열림: 교과서 5(파이썬·터미널·Vim·SQL·웹) 「읽은 레슨 n/m」, 문제집 2(알고리즘·수학). 앞으로 교과서를 고칠 때는 같은 PR 에서 `config.js` 의 `lessons`·`bookNote`·`desc`(check_book 이 레슨 수·옛 문구 검사) | `core/config.js` COURSES, `specs/site-intent.md` 6절 | — |
 | N5 | (사용자 결정 전) 알고리즘 코스도 교과서로 바꿀지 | — | 제안만 함(11/6) |
 | N6 | 예정 코스 설계 — **T8 GitHub 가장 중요**(사용자 11/3). N1 터미널·Git 과 겹침(원격·PR·Pages)을 정리해서 설계 | 아래 「예정 코스」 | 대기 |
 | N7 | 알고 시각화 core 버그 QA #50·#51·#52(deque·set·dict 그림, 함수 정의형 문제 그림), 편집기·레슨 창 #155~#159, 복습 #149 — 알고 코스(예전 화면)에 남은 것 | `QA.md`·`QA-OPEN.md` 1절 | 대기 |
