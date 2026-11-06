@@ -6,6 +6,12 @@
 //   io·answer 를 직접 적으면 그걸 씀. given: true 면 그 문제의 starter 를 「고칠 코드」로 보여 줌. noRun: 거북이·무작위처럼 출력 비교가 안 되는 것.
 //   검증: node tools/check_book.mjs (모든 예시 답을 실제 파이썬으로 돌려 출력 예와 같은지)
 const BOOK = {
+  // v2.12.2 사용자 「필수 사항은 강조하고」 — 먼저 해야 하는 것(core/ui-views-book.js 가 목차·레슨 1쪽·만들어 보기 위에 경고 상자로)
+  meta: { prereq: [
+    { lessons: ['L0', 'L1'], chapters: [0], ref: 'SETUP/0', btn: '시작하기 1 · 파이썬 설치 보기',
+      title: '먼저 꼭! 「🛠 시작하기」 1~3 — 파이썬 설치 · VS Code 연결 · 첫 파일 실행',
+      html: '이 교과서의 예제와 「만들어 보기」 는 전부 <b>내 컴퓨터의 VS Code</b> 에서 돌려요. 파이썬 설치 때 <b>「Add python.exe to PATH」</b> 를 체크하지 않았거나 VS Code 의 <b>Python 확장</b>이 없으면 아무것도 실행되지 않아요. 확인: 터미널에서 <code>python --version</code> 이 버전을 보여 주고, VS Code 오른쪽 위 ▶ 로 <code>hello.py</code> 가 돌면 준비 끝.' },
+  ] },
   setup: {
     title: '시작하기: 파이썬 설치하고 VS Code 에서 실행하기',
     pages: [
