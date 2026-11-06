@@ -36,10 +36,11 @@ with sync_playwright() as p:
     check(r['cont'] and '#' in r['cont'], '이어서 하기 링크: '+str(r['cont']))
     check('오늘 2/5' in (r['today'] or '') and '오늘의 도전' not in (r['today'] or ''), '오늘의 할 일(문제 코스만 세기, 교과서엔 없는 「오늘의 도전」 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
-    hb=pg.evaluate("(()=>{ const t=(id)=>{ const a=document.querySelector(`a.hc[href*=\"courses/${id}/\"]`); return a? a.innerText.replace(/\\n/g,' ') : ''; }; return {py:t('python'), tg:t('terminal-git'), lead:(document.querySelector('.hub-lead')||{}).textContent||''}; })()")
+    hb=pg.evaluate("(()=>{ const t=(id)=>{ const a=document.querySelector(`a.hc[href*=\"courses/${id}/\"]`); return a? a.innerText.replace(/\\n/g,' ') : ''; }; return {py:t('python'), tg:t('terminal-git'), al:t('algo'), lead:(document.querySelector('.hub-lead')||{}).textContent||''}; })()")
     check('읽은 레슨' in hb['py'] and '남은 문제' not in hb['py'] and '/45' in hb['py'], '허브 파이썬 카드: 교과서 · 읽은 레슨 n/45 (문제 수 없음) (%s)' % hb['py'][:80])
     check('Git Bash' in hb['tg'] and '읽은 레슨' in hb['tg'] and '/20' in hb['tg'] and 'Git 편' in hb['tg'] and '시뮬레이터' not in hb['tg'] and '준비 중 ·' not in hb['tg'], '허브 터미널 카드: Git Bash 교과서 · 읽은 레슨 n/20 · 명령어 편 + Git 편 (%s)' % hb['tg'][:90])
     check('교과서' in hb['lead'] and 'Git Bash' in hb['lead'], '허브 안내 문구: 교과서 코스는 내 컴퓨터에서')
+    check('읽은 레슨' in hb['al'] and '/32' in hb['al'] and '남은 문제' not in hb['al'] and '알고리즘' in hb['lead'] and '알고리즘·수학' not in pg.inner_text('.hub-stats'), '허브 알고리즘 카드: 교과서 · 읽은 레슨 n/32 · 안내 문구에 알고리즘 (v2.15.0) (%s)' % hb['al'][:80])
     pg.screenshot(path=SHOT+'/hub.png')
     # ---- 2. 코스 페이지
     print('[코스 페이지]'); pg.goto(COURSE+'#problem/L3P2'); pg.wait_for_timeout(1500); pg.evaluate("Loader.minimized=true;Loader.render()")
@@ -218,7 +219,7 @@ with sync_playwright() as p:
     ex=pg.evaluate("JSON.parse(Store.exportJSON())"); check(ex['xp']>=385 and 'problems' in ex and 'works' in ex and 'tutorChats' in ex, '내보내기 JSON은 v1과 같은 모양')
     pg.evaluate("UI.go('checkup',{n:1})"); pg.wait_for_timeout(300); check(pg.locator('.qopt,.blank').count()>0, '종합 점검')
     # ---- 2b. 알고리즘 코스 페이지
-    print('[알고리즘 코스]'); ALGO='file://'+os.path.join(ROOT,'courses/algo/index.html')
+    print('[알고리즘 코스]'); ALGO='file://'+os.path.join(ROOT,'courses/algo/index.html')+'?classic=1'  # v2.15.0: 교과서가 기본 — 문제집·시각화 플레이어(예전) 회귀는 ?classic=1
     pg.goto(ALGO+'#lesson/A2'); pg.wait_for_timeout(1500); pg.evaluate("Loader.minimized=true;Loader.render()")
     check(pg.evaluate("Store.course")=='algo' and pg.evaluate("UI.view")=='lesson', '코스 id=algo, 레슨 딥링크')
     check(pg.locator('#exViz').count()==1, '레슨 예제에 👀 시각화 재생 버튼')
@@ -254,8 +255,8 @@ with sync_playwright() as p:
     pg.goto(HUB); pg.wait_for_timeout(600); hc = pg.evaluate("()=>[...document.querySelectorAll('.hc')].map(e=>e.className+'|'+e.innerText.replace(/\\n/g,' ').slice(0,60))")
     check('완전 무료' in pg.locator('.hub-foot').inner_text(), '허브 푸터: 완전 무료·계정 없음·오프라인')
     check(any('알고리즘' in x and ('ready' in x or 'locked' in x) for x in hc), '허브에 알고리즘 코스 카드: '+([x for x in hc if '알고리즘' in x]+['?'])[0][:70])
-    pg.evaluate("(()=>{const k='academy.course.algo'; const c=JSON.parse(localStorage.getItem(k)||'{}'); c.problems=c.problems||{}; c.problems['A0P3']={status:'clear',stars:3,hints:0,attempts:1,review:{stage:0,due:'2000-01-01'}}; localStorage.setItem(k,JSON.stringify(c)); Hub.render();})()"); pg.wait_for_timeout(200)
-    check('알고리즘·자료구조 1' in pg.locator('.hub-stats').inner_text(), '허브 복습 큐 코스 공통(F1): '+pg.locator('.hub-stats').inner_text().replace('\n',' ')[:80])
+    pg.evaluate("(()=>{const k='academy.course.algo'; const c=JSON.parse(localStorage.getItem(k)||'{}'); c.problems=c.problems||{}; c.problems['A0P3']={status:'clear',stars:3,hints:0,attempts:1,review:{stage:0,due:'2000-01-01'}}; localStorage.setItem(k,JSON.stringify(c)); const m='academy.course.math'; const d=JSON.parse(localStorage.getItem(m)||'{}'); d.problems=d.problems||{}; d.problems['M1_mod']={status:'clear',stars:3,hints:0,attempts:1,review:{stage:0,due:'2000-01-01'}}; localStorage.setItem(m,JSON.stringify(d)); Hub.render();})()"); pg.wait_for_timeout(200)
+    hs=pg.locator('.hub-stats').inner_text(); check('수학 공간 1' in hs and '알고리즘' not in hs, '허브 복습 큐 코스 공통(F1): 문제 코스(수학)만 · 교과서가 된 알고리즘(v2.15.0)은 안 셈: '+hs.replace('\n',' ')[:80])
     # ---- 3. 모바일
     print('[수학 공간]'); MATH='file://'+os.path.join(ROOT,'courses/math/index.html'); pg.set_viewport_size({'width':1100,'height':800})
     pg.goto(MATH); pg.wait_for_timeout(1500); pg.evaluate("Loader.minimized=true;Loader.render(); document.querySelectorAll('.modal-ov').forEach(e=>e.remove()); Store.data.onboarded=true; UI.go('home',{},false)"); pg.wait_for_timeout(500)
@@ -587,6 +588,35 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','flex'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=2 and pg.inner_text('.tb-title')=='웹 문법 도감', '웹 문법 도감: flex 검색')
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '웹 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',1),('W2',2),('W4',2),('W7',1),('W11',2),('WB3',0)] ]
     pg.set_viewport_size({'width':1280,'height':900}); werr=errors[w0:]; check(not werr, '웹 교과서 pageerror 0 (%s)' % (werr[:2] or 'OK'))
+    # ===== [알고리즘 교과서 v2.15.0] N5 — VS Code 에서 풀기 + 레슨 예제의 👀 그림으로 보기(누를 때만 엔진)
+    #   CI 에는 파이썬 엔진(Pyodide CDN)이 없어서, 그림 버튼 확인은 core/runners/python.js 의 프렐류드(__pa_run)를 이 python3 에서 돌려 Py.run 대신 씀 — 추적 형식은 진짜와 같음
+    print('[알고리즘 교과서 v2.15.0]'); a0=len(errors); ALB='file://'+os.path.join(ROOT,'courses/algo/index.html')
+    import io as _io
+    _src=open(os.path.join(ROOT,'core/runners/python.js'),encoding='utf8').read(); _G={}; exec(_src.split('const PY_PRELUDE = String.raw`',1)[1].split('`;',1)[0], _G)
+    def _pyrun(payload):
+        o=json.loads(payload); old=sys.stdin; sys.stdin=_io.StringIO(o.get('input') or '')
+        try: return _G['__pa_run'](o['code'], o.get('call'), bool(o.get('trace')), o.get('maxsteps') or 500, json.dumps(o['vis']) if o.get('vis') else None)
+        finally: sys.stdin=old
+    try: pg.expose_function('pyRunLocal', _pyrun)
+    except Exception: pass
+    pg.goto(ALB); pg.wait_for_timeout(1000); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
+    ah=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length, mock:!!document.querySelector('button.bk-l[data-l=\"AB4\"]'), phase:Py.phase, worker:!!Py.worker})")
+    check(ah['book'] and ah['steps']==4 and ah['ls']==32 and ah['soon']==0 and ah['pre']==2 and ah['mock'], '알고리즘 교과서 홈: 시작하기 4 · 레슨 32(모의고사 포함) · 준비 중 0 · 「먼저 꼭」 경고 2 (%s)' % ah)
+    check(ah['phase']=='idle' and not ah['worker'], '알고리즘 교과서: 그림 버튼을 누르기 전엔 파이썬 엔진을 안 받음 (%s/%s)' % (ah['phase'], ah['worker']))
+    pg.evaluate("UI.go('lesson',{lessonId:'A5',page:0})"); pg.wait_for_timeout(300)
+    check(pg.locator('#bkViz').count()==1 and pg.locator('.bk-ln').count()>=6 and 'VS Code' in pg.inner_text('.bk-code-h'), 'A5 1쪽: 예제 코드(줄 나눔) + 👀 그림으로 보기')
+    pg.evaluate("""(() => { Py.worker = {}; Py.ready = true; Py.phase = 'ready'; Py._emit(); Py.run = async (o) => { const r = JSON.parse(await window.pyRunLocal(JSON.stringify({code:o.code,input:o.input,trace:o.trace,vis:o.vis,maxsteps:o.maxsteps}))); r.ms = 1; return r; }; })()""")
+    pg.click('#bkViz'); pg.wait_for_timeout(1500); av=pg.evaluate("({c:document.querySelectorAll('#bkVizHost canvas').length, t:(document.querySelector('#bkVizHost')||{}).innerText||'', on:document.querySelectorAll('.bk-ln.on').length})")
+    check(av['c']>=1 and '버블 정렬' in av['t'] and av['on']==1, 'A5 👀 그림으로 보기: 막대 그림 + 지금 줄 칠하기 (%s)' % {k:(v[:40] if isinstance(v,str) else v) for k,v in av.items()})
+    pg.evaluate("UI.go('lesson',{lessonId:'A1',page:0})"); pg.wait_for_timeout(300); check(pg.locator('#bkViz').count()==0 and pg.locator('#bkTrace').count()==1 and '슬라이더' not in pg.inner_text('.bk-art'), 'A1 1쪽: 👣 한 줄씩 보기 · 「슬라이더」 안내 없음(VS Code 에서 n 바꾸기)')
+    pg.click('#bkTrace'); pg.wait_for_timeout(800); check(pg.locator('#bkVizHost .trace').count()==1, 'A1 👣 한 줄씩 보기: 변수 표')
+    pg.evaluate("UI.go('lesson',{lessonId:'A2',page:4})"); pg.wait_for_timeout(300); at=pg.evaluate("[...document.querySelectorAll('.bk-task')].map(t=>t.innerText)")
+    check(len(at)==4 and 'print(is_balanced(' in at[0] and 'True\nFalse' in at[0] and '이 코드를 복사해서 고쳐' in at[1] and '시작 코드' in at[3] and not any('시각화' in x for x in at), 'A2 만들어 보기: 함수 문제 「확인 코드」+출력 · 버그는 고칠 코드 · 시작 코드 · 시각화 안내 없음')
+    pg.evaluate("UI.go('lesson',{lessonId:'AB4',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-task').count()==15 and pg.locator('.bk-prereq').count()==1, '모의고사 AB4: 15문제(시간 제한 없이 교과서로) + input.txt 경고')
+    pg.evaluate("UI.go('lesson',{lessonId:'A9',page:4})"); pg.wait_for_timeout(300); check('class Node' in pg.inner_text('.bk-task') and '채점' not in pg.inner_text('.bk-art'), 'A9 연결 리스트: Node 클래스가 시작 코드로 · 「채점용」 말 없음')
+    pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','deque'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=3 and pg.inner_text('.tb-title')=='알고리즘 도감', '알고리즘 도감: deque 검색(도구 상자 + 레슨)')
+    pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '알고리즘 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',1),('A0',0),('A5',0),('A12',2),('A13',4),('AB4',0),('E1',4)] ]
+    pg.set_viewport_size({'width':1280,'height':900}); aerr=errors[a0:]; check(not aerr, '알고리즘 교과서 pageerror 0 (%s)' % (aerr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); qerr=errors[q0:]; check(not qerr, 'SQL 교과서 pageerror 0 (%s)' % (qerr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); verr=errors[v0:]; check(not verr, 'Vim 교과서 pageerror 0 (%s)' % (verr[:2] or 'OK'))
     pg.goto(HUB); pg.wait_for_timeout(600); tgr=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/terminal-git/\"]'); const m=a && a.innerText.match(/읽은 레슨 (\\d+)\\/(\\d+)/); return m? [+m[1], +m[2]] : null; })()")

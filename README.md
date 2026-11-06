@@ -2,7 +2,7 @@
 
 사용자 본인이 쓰는 초보자용 학습 사이트. 여러 코스가 모이는 "아카데미" 구조(v2.0.0~).
 
-- **파이썬·터미널·Git·Vim 은 「교과서」**(v2.9.0·v2.10.0·v2.11.0~): 설명을 읽고 내 컴퓨터(VS Code·Git Bash·gVim)에서 직접 만들어 본다. 채점·XP·잠금 없음. 알고리즘·수학은 브라우저 실행 문제집, SQL·웹은 미리보기.
+- **파이썬·알고리즘·터미널·Git·SQL·웹·Vim 은 「교과서」**(v2.9.0~v2.15.0): 설명을 읽고 내 컴퓨터(VS Code·Git Bash·DB Browser·gVim)에서 직접 만들어 본다. 채점·XP·잠금 없음. 알고리즘은 레슨 예제를 👀 그림으로 볼 수 있다(누를 때만 브라우저 파이썬). 수학만 브라우저 실행 문제집.
 - **무엇이 정상이고 무엇이 버그인가는 [`specs/site-intent.md`](specs/site-intent.md)** — QA·새 세션은 이것부터.
 
 - 사이트(허브): https://jihoon380462.github.io/python-academy/ · 코스: `/courses/python/` · `/courses/terminal-git/` · `/courses/algo/` · `/courses/math/` · `/courses/sql/` · `/courses/web/` · 공용 `/courses/vim/` (교과서 코스의 옛 문제집 화면은 주소 끝 `?classic=1`)

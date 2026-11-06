@@ -448,3 +448,11 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 /* v2.14.0 웹 교과서 「브라우저에서 확인할 것」 */
 .book-mode .bk-checks ul { list-style: none; padding-left: 0; margin: 6px 0 0; }
 .book-mode .bk-checks li { padding: 3px 0; }
+/* v2.15.0 알고리즘 교과서: 레슨 예제의 「👀 그림으로 보기」·「👣 한 줄씩 보기」 — 지금 실행 중인 줄을 코드 칸에서 칠함 */
+.book-mode .bk-lined { max-height: 420px; overflow: auto; }
+.book-mode .bk-ln { display: block; border-radius: 3px; }
+.book-mode .bk-ln.on { background: rgba(255, 209, 102, .28); box-shadow: inset 3px 0 0 var(--accent, #ffd166); }
+.book-mode .bk-viz { margin-top: 12px; padding: 12px; }
+.book-mode .bk-viz-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.book-mode .bk-viz-note { margin-top: 6px; }
+.book-mode .bk-viz-host:not(:empty) { margin-top: 10px; }
