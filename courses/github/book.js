@@ -171,7 +171,7 @@ git config --global user.email</pre>둘 다 값이 나오면 OK(이메일은 레
       { title: 'squash 뒤 내 컴퓨터 뒷정리', text: '준비 명령은 GitHub 에서 PR 이 squash 로 합쳐지고 브랜치가 지워진 상태를 만들고, 아직 정리 안 한 내 컴퓨터(<code>work</code>, 지금 <code>readme-usage</code> 브랜치)로 들어가요. main 으로 옮겨 최신으로 받고, 지워진 원격 브랜치 흔적을 지우고, 다 쓴 브랜치를 지우세요(squash 라 <code>-d</code> 가 거절하면 Merged 를 확인했다고 치고 <code>-D</code>).',
         needs: [['git switch main · git pull', 'G7/1', '합친 결과 받기'], ['git fetch --prune', 'G7/1', '지운 원격 브랜치 흔적'], ['git branch -D 브랜치', 'G7/1', 'squash 뒤엔 -d 가 거절']],
         setup: GS('g7-2') + '\ngit init -q --bare remote.git && git clone -q remote.git work && cd work\necho "# todo" > README.md && git add . && git commit -qm "시작" && git push -q origin main\ngit switch -qc readme-usage && echo "## 사용법" >> README.md && git commit -qam "사용법" && echo "- add" >> README.md && git commit -qam "add 설명" && git push -q -u origin readme-usage && cd ..\ngit clone -q remote.git web && cd web && git merge -q --squash origin/readme-usage && git commit -qm "README 에 사용법 (#1)" && git push -q origin main && git push -q origin --delete readme-usage && cd ../work',
-        answer: 'git switch main\ngit pull\ngit fetch --prune\ngit branch -d readme-usage\ngit branch -D readme-usage', check: 'git branch -a\ngit log --format=%s -1', io: [{ output: '* main\n  remotes/origin/main\nREADME 에 사용법 (#1)' }] },
+        answer: 'git switch main\ngit pull\ngit fetch --prune\ngit branch -d readme-usage\ngit branch -D readme-usage', check: 'git branch\ngit branch -r | grep -c readme-usage\ngit log --format=%s -1', io: [{ output: '* main\n0\nREADME 에 사용법 (#1)' }] }, // git branch -a 는 Git 버전에 따라 origin/HEAD 줄이 더 나와서(2.48+) 내 브랜치·원격 흔적을 따로 셈
     ],
     G8: [
       { title: '웹에서 PR 충돌 풀기', text: '연습 저장소에서 일부러 충돌을 만들어 웹에서 풀어 보세요: ① 브랜치 <code>price</code> 에서 README 첫 줄을 바꿔 push · PR 열기 ② 그사이 main 에서(웹 연필로) 같은 첫 줄을 다르게 바꿔 커밋 ③ PR 에 충돌 상자가 뜨면 웹에서 풀고 합치기.', noRun: true,
@@ -202,7 +202,7 @@ git config --global user.email</pre>둘 다 값이 나오면 OK(이메일은 레
     GB2: [
       { title: '🏠 혼자 하는 협업 한 바퀴', text: '보스 1 의 내 프로젝트 저장소에서 챕터 2 전체를 한 바퀴 돌려요: ① 이슈 2개(버그 1 · 기능 1, Label · 보드에 카드) ② 이슈마다 브랜치 → PR(설명에 <code>Closes #n</code>) ③ 각 PR 에 리뷰(줄 코멘트 · Suggestion → 반영) ④ 둘 중 하나는 일부러 충돌을 만들어 풀기 ⑤ 둘 다 Squash and merge ⑥ 내 컴퓨터 뒷정리.', noRun: true,
         needs: [['Issues → New issue', 'G9/0', '이슈'], ['Closes #n', 'G9/2', '이슈 연결'], ['```suggestion · Commit suggestion', 'G6/1', '리뷰 반영'], ['Resolve conflicts · git pull origin main', 'G8/1', '충돌'], ['Squash and merge', 'G7/0', '합치기'], ['git fetch --prune · git branch -D', 'G7/1', '뒷정리']],
-        checks: [{ text: 'Issues 탭: 이슈 2개가 모두 Closed(PR 로 닫힘)' }, { text: 'Pull requests 탭 → Closed: PR 2개가 Merged, 각각 리뷰 코멘트가 있음' }, { text: '커밋 기록 맨 위 두 개가 「PR 제목 (#번호)」 squash 커밋' }, { text: '보드의 두 카드가 자동으로 Done' }, { text: '내 컴퓨터 git branch -a 에 main 과 origin/main 만 남음' }],
+        checks: [{ text: 'Issues 탭: 이슈 2개가 모두 Closed(PR 로 닫힘)' }, { text: 'Pull requests 탭 → Closed: PR 2개가 Merged, 각각 리뷰 코멘트가 있음' }, { text: '커밋 기록 맨 위 두 개가 「PR 제목 (#번호)」 squash 커밋' }, { text: '보드의 두 카드가 자동으로 Done' }, { text: '내 컴퓨터 git branch 에 main 만, git branch -r 에 지운 브랜치가 없음(origin/HEAD -> origin/main 줄은 있어도 돼요)' }],
         answer: '이슈 #1(bug) · #2(enhancement) → 보드에 추가\n#1: git switch -c fix-… → 고치기 → push → PR(Closes #1) → 리뷰(Comment·Suggestion) → 반영 → Squash and merge\n#2: git switch -c feat-… → 같은 줄을 #1 과 다르게 고쳐 충돌 → 웹 Resolve conflicts 또는 git pull origin main → Squash and merge\ngit switch main · git pull · git fetch --prune · git branch -D …' },
     ],
   },
