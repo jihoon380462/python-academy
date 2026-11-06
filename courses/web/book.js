@@ -322,7 +322,7 @@ requests.get(url, headers={"Authorization": f"Bearer {key}"})</pre>또는 <code>
     W1: [
       { title: '공지 상자', text: 'div 상자 하나 안에 h2 <code>공지</code> 와 문단 두 개를 넣고, 상자에 <code>id="notice"</code>, 두 문단에 <code>class="note"</code> 를 붙이세요. 들여쓰기도 맞춰요.', needs: [['<div>', 'W1/0', '상자'], ['id="…" · class="…"', 'W1/1', '이름표 속성'], ['<div><p>…</p></div>', 'W1/0', '중첩 — 안쪽 먼저 닫기']],
         answer: WH('공지', '  <div id="notice">\n    <h2>공지</h2>\n    <p class="note">내일은 휴무예요.</p>\n    <p class="note">모레는 오전만 열어요.</p>\n  </div>'), checks: [{ text: 'id="notice" 상자가 있어요', sel: '#notice', exists: true }, { text: '상자 안에 h2 「공지」', sel: '#notice h2', equals: '공지' }, { text: '상자 안에 class="note" 문단 2개', sel: '#notice p.note', count: 2 }] },
-      { title: '엇갈린 태그 고치기', text: '아래 HTML 은 굵은 글씨가 문단 밖까지 번져요. 짝을 맞게 고치세요(<code>휴무</code> 만 굵게).<pre class="code">&lt;p&gt;내일은 &lt;strong&gt;휴무&lt;/p&gt;&lt;/strong&gt;\n&lt;p&gt;모레는 정상 영업&lt;/p&gt;</pre>', needs: [['<p><strong>…</strong></p>', 'W1/2', '닫는 순서 — 안쪽 먼저'], ['F12 Elements', 'SETUP/2', '실제 나무 보기']],
+      { title: '엇갈린 태그 고치기', text: '아래 HTML 은 굵은 글씨가 문단 밖까지 번져요. 짝을 맞게 고치세요(<code>휴무</code> 만 굵게).<pre class="code">&lt;p&gt;내일은 &lt;strong&gt;휴무&lt;/p&gt;&lt;/strong&gt;\n&lt;p&gt;모레는 정상 영업&lt;/p&gt;</pre>', needs: [['<p><strong>…</strong></p>', 'W1/0', '닫는 순서 — 안쪽 먼저(중첩)'], ['F12 Elements', 'SETUP/2', '실제 나무 보기']],
         answer: WH('공지', '  <p>내일은 <strong>휴무</strong></p>\n  <p>모레는 정상 영업</p>'), checks: [{ text: '굵은 글씨는 「휴무」 하나', sel: 'strong', count: 1 }, { text: 'strong 내용이 「휴무」', sel: 'strong', equals: '휴무' }, { text: '둘째 문단은 굵지 않아요', sel: 'p:nth-of-type(2) strong', exists: false }] },
     ],
     W2: [

@@ -13,6 +13,7 @@ const TF = (name, lines) => `printf '%s\\n' ${lines.map(x => `'${x}'`).join(' ')
 const PLAY = TS('play', ['mkdir -p projects/web projects/api notes', TF('memo.txt', ['오늘 할 일', '- 터미널 열기', '- pwd 쳐 보기']), TF('projects/web/index.html', ['<h1>hi</h1>']), TF('notes/welcome.txt', ['터미널에 온 것을 환영해요.', '이 파일을 cat 으로 읽었다면 성공!']), TF('notes/diary.txt', ['월: 터미널 설치', '화: pwd ls cd', '수: 숙제 못 함', '목: 숙제 다 함']), 'pwd']);
 const BOOK = {
   meta: {
+    exampleErrorsOk: ['T1/3'], // 일부러 에러를 보여 주는 예제(오타 porjects·pdw, 파일로 cd) — check_book ⑧ 이 건너뜀
     kicker: '🎧 터미널·Git 교과서', hero: '읽고, Git Bash 에서 직접 쳐 보기',
     heroP: '레슨은 명령어 설명이에요. 각 레슨 끝 「만들어 보기」에 문장으로 된 문제와 그 문제에 필요한 명령이 있어요. 문제마다 연습 폴더를 만드는 <b>준비 명령</b>과, 다 했는지 보는 <b>확인 명령</b>이 같이 있어요. 채점·점수·잠금은 없어요.',
     dexName: '터미널·Git 명령 도감', dexShort: '명령 도감', dexWhat: '배운 명령', dexHint: '검색해서 바로 찾기(실전은 오픈북)',
@@ -99,7 +100,7 @@ $ </pre>
 -rw-r--r-- 1 me 197121  52 Nov  6 10:12 memo.txt
 drwxr-xr-x 1 me 197121   0 Nov  6 10:12 notes/
 drwxr-xr-x 1 me 197121   0 Nov  6 10:12 projects/</pre>
-<p>맨 앞 글자가 <code>d</code> 면 폴더(directory), <code>-</code> 면 파일이에요. 가운데 숫자 <code>52</code> 가 크기(바이트), 그 뒤가 고친 날짜예요. 나머지는 지금은 몰라도 돼요.</p>`, example: { shell: 'ls\nls notes\nls -a\nls -l\nls -la projects' } },
+<p>맨 앞 글자가 <code>d</code> 면 폴더(directory), <code>-</code> 면 파일이에요. 가운데 숫자 <code>52</code> 가 크기(바이트), 그 뒤가 고친 날짜예요. 나머지는 지금은 몰라도 돼요.</p>`, example: { shell: 'cd ~/terminal-study/play\nls\nls notes\nls -a\nls -l\nls -la projects' } /* v2.15.2 앞 쪽(T1/0)이 cd ~ 로 끝나서 연습 폴더로 먼저 */ },
       { title: '상대 경로와 . · .. · ~', html: `<p><code>/</code> 없이 시작하는 경로는 <b>상대 경로</b> — "<b>지금 폴더에서부터</b>" 라는 뜻이에요. <code>play</code> 에 있을 때 <code>cd projects/web</code> 는 "여기서 projects 로, 거기서 web 으로" 예요. 한 번에 여러 칸을 내려갈 수 있어요.</p>
 <table class="kb"><tbody><tr><td><code>.</code></td><td>지금 폴더</td></tr><tr><td><code>..</code></td><td>한 칸 <b>위</b> 폴더. <code>../..</code> 는 두 칸 위</td></tr><tr><td><code>~</code></td><td>홈 폴더. <code>cd</code> 만 쳐도 홈으로 가요</td></tr><tr><td><code>cd -</code></td><td>바로 <b>전에 있던</b> 폴더로 돌아가기 (TV 리모컨의 「이전 채널」)</td></tr></tbody></table>
 <p>옆 폴더로 건너갈 땐 위로 한 칸 올라갔다 내려와요. <code>projects/web</code> 에서 <code>projects/api</code> 로: <code>cd ../api</code>.</p>
@@ -519,7 +520,7 @@ Automatic merge failed; fix conflicts and then commit the result.</pre>
 =======
 라떼 4800            ← 합치려는 브랜치(feature)의 것
 &gt;&gt;&gt;&gt;&gt;&gt;&gt; feature</pre>
-<p><code>git status</code> 에는 <code>both modified: menu.txt</code>(짧게 <code>UU</code>)로 보여요.</p>` },
+<p><code>git status</code> 에는 <code>both modified: menu.txt</code>(짧게 <code>UU</code>)로 보여요.</p>`, example: { label: '충돌 직접 만들어 보기 — 따로 폴더(conflictplay)에서, 다음 쪽 「해결 세 단계」 는 이 상태에서 이어서', shell: ["cd ~ && mkdir -p terminal-study && cd terminal-study && rm -rf conflictplay && mkdir conflictplay && cd conflictplay", 'git init -b main', "printf '%s\\n' '아메리카노 4000' '라떼 4500' > menu.txt", 'git add menu.txt && git commit -m "메뉴판"', 'git switch -c feature', "printf '%s\\n' '아메리카노 4000' '라떼 4800' > menu.txt", 'git commit -am "라떼 할인"', 'git switch main', "printf '%s\\n' '아메리카노 4000' '라떼 5000' > menu.txt", 'git commit -am "라떼 인상"', 'git merge --no-edit feature', 'cat menu.txt', 'git status --short'].join('\n') } /* v2.15.2: 다음 쪽 예제(git add menu.txt …)가 기대는 충돌 상태를 만들 예제가 없던 것 */ },
     { title: '충돌 해결 세 단계', html: `<div class="bk-step-box"><b>① 파일을 고친다</b><br><code>notepad menu.txt</code> 나 <code>code menu.txt</code> 로 열어 <b>원하는 최종 모양</b>으로 만들고 <b>마커 세 줄</b>(<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> <code>=======</code> <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>)을 지워요. 한쪽만 남겨도, 둘을 섞어도, 완전히 새로 써도 돼요. VS Code 는 위에 「Accept Current Change · Accept Incoming Change · Accept Both Changes」 단추를 보여 줘요(Current = HEAD 쪽, Incoming = 합치려는 쪽).</div>
 <div class="bk-step-box"><b>② 해결했다고 알린다</b><br><code>git add menu.txt</code> — 충돌 난 파일을 add 하는 게 「해결함」 표시예요.</div>
 <div class="bk-step-box"><b>③ 병합을 마친다</b><br><code>git commit --no-edit</code>(기본 메시지로) 또는 <code>git commit -m "메뉴 가격 충돌 해결"</code>.</div>

@@ -1,7 +1,7 @@
 // tools/check_book.mjs — 교과서(book.js) 검사 (v2.9.0 파이썬 · v2.10.0 터미널·Git). `node tools/check_book.mjs [코스id]` (없으면 book.js 가 있는 코스 전부)
 // ① 「필요한 문법」 링크가 있는 레슨·쪽을 가리키는지 ② pid 가 있는 문제인지 ③ 예시 답을 실제로 돌려 출력 예와 같은지 (noRun 은 건너뜀)
 //   파이썬 코스: python3 로 answer 실행 · 셸 코스(runner:'shell'): bash 로 setup → answer → check 실행(HOME 은 임시 폴더, 출력의 그 경로는 /c/Users/me 로 바꿔 비교)
-import fs from 'fs'; import vm from 'vm'; import os from 'os'; import path from 'path'; import { execFileSync } from 'child_process';
+import fs from 'fs'; import vm from 'vm'; import os from 'os'; import path from 'path'; import { execFileSync, spawnSync } from 'child_process';
 const R = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const want = process.argv[2]; const courses = fs.readdirSync(R + '/courses').filter(d => fs.existsSync(`${R}/courses/${d}/book.js`) && (!want || d === want));
 let total = 0;
@@ -59,6 +59,52 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
   if (VIM || SHELL) return; // 단축키·명령 모음은 실행 결과가 없음
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
   ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
+// v2.15.1 사용자 「3, 4」(알고 교과서 자체 QA 에서 손으로 찾은 두 종류를 CI 로):
+// ⑤ 레슨 본문의 「실행하면 <code>값</code>」 이 그 쪽 예제를 실제로 돌린 출력에 있는지 — 파이썬 예제는 python3, SQL 예제는 tools/sql_book_run.py(cafe)
+//    본문 속 <code> 가 예제 코드에 그대로 있으면(「실행하면 heappop(h)[2] 로 …」 처럼 코드를 가리키는 말) 출력 주장이 아니라서 건너뜀. 화살표 →/-> 와 공백은 같게 보지 않음(그게 이번 버그)
+// ⑥ 필요한 문법의 코드 속 낱말(3글자 이상 이름) 중 하나라도 링크된 쪽(제목·본문·예제)에 나오는지 — 하나도 없으면 다른 쪽을 가리키는 것
+{ const PYEX = !COURSE || !COURSE.runner || COURSE.runner === 'python'; const SQLEX = COURSE && COURSE.runner === 'sql';
+  const ent = (x) => String(x).replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#92;/g, '\\').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
+  const bookPage = (lid, i) => { const pg = (pagesOf(lid) || [])[i]; if (!pg) return null; const o = (BOOK.pages || {})[`${lid}/${i}`]; let html = (o && o.html) || pg.html || ''; ((o && o.rep) || []).forEach(([a, b]) => { html = html.split(a).join(b); }); return { title: (o && o.title) || (BOOK.titles || {})[`${lid}/${i}`] || pg.title || '', html, example: (o && o.example) || pg.example || null }; };
+  const sq = (x) => x.replace(/\s+/g, ' ').trim();
+  //   ⑥ 의 「코드 낱말」: 파이썬이면 함수·메서드 이름(뒤에 ( · 앞에 .)과 키워드·모듈만 — score·total 같은 변수 이름은 문제마다 달라서 안 봄(대문자로 시작하는 내 클래스 이름도)
+  //      셸은 경로 조각(../../math)을, 웹은 내가 지은 .class · #id 이름을, Vim 은 : 명령만 봄
+  const PYKW = new Set('and or not in is for while if elif else def class return import from lambda with try except finally raise yield global break continue pass None True False print input'.split(' '));
+  const PYGEN = new Set('print input int str float bool len range sum min max sorted list dict set tuple split join get append abs round enumerate zip map filter strip lower upper type isinstance'.split(' ')); // 흔한 내장·메서드는 「약한」 낱말
+  const PYMOD = new Set('heapq bisect collections itertools functools sys math time random json csv os re datetime sqlite3 requests turtle'.split(' '));
+  const needWords = (syn, userDefs = new Set()) => { const ws = new Set(); const strong = new Set();
+    if (VIM) { for (const m of syn.matchAll(/:([a-z]{2,})/g)) ws.add(m[1]); return [...ws]; }
+    let x = syn.replace(/"[^"]*"|'[^']*'/g, ' ').replace(/\bself\.\w+/g, ' '); if (SHELL) x = x.replace(/(?:\.{1,2}|~)?\/[\w./~-]*/g, ' '); if (COURSE && COURSE.runner === 'web') x = x.replace(/(^|[\s·,(>])[.#][\w-]+/g, '$1');
+    for (const m of x.matchAll(/(\.)?([A-Za-z_][A-Za-z0-9_]{2,})(\s*\()?/g)) { const w = m[2];
+      if (!PYEX) { ws.add(w); continue; }
+      if (m[3] && userDefs.has(w)) continue; /* 이 문제에서 내가 만드는 함수(def rsum) */
+      if (PYGEN.has(w) && (m[1] || m[3])) ws.add(w); else if (m[1] || (m[3] && !/^[A-Z]/.test(w)) || ['Counter', 'deque', 'defaultdict'].includes(w)) strong.add(w); else if (PYKW.has(w) || PYMOD.has(w)) ws.add(w); }
+    return strong.size ? [...strong] : [...ws]; /* 함수·메서드 이름이 있으면 그것만(「import heapq」 만 있는 쪽이 heapq.heapify 를 설명하는 쪽으로 통과하지 않게) */ };
+  for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const pg = bookPage(l.id, i); const ex = pg.example || {}; const code = ex.code || ex.sql || '';
+    const claims = []; for (const m of pg.html.matchAll(/([^.。>]{0,40})실행하면([^.。]*?)(?=[.。]|<\/p>|<\/li>|$)/g)) if (!/고치|바꾸|바꿔|넣고|지우고/.test(m[1])) /* 「…로 고치고 다시 실행하면」 은 예제 그대로의 출력이 아님 */ for (const c of m[2].matchAll(/<code>([\s\S]*?)<\/code>/g)) { const v = ent(c[1]).trim(); if (v.length >= 2 && !sq(code).includes(sq(v))) claims.push(v); }
+    if (!code || !(PYEX || SQLEX)) return; if (!claims.length && !PYEX) return; // 파이썬 예제는 주장이 없어도 전부 돌려 봄(에러 나는 예제 찾기, BOOK.meta.exampleErrorsOk 는 일부러 에러)
+    const errOk = ((BOOK.meta && BOOK.meta.exampleErrorsOk) || []).includes(`${l.id}/${i}`);
+    let out = ''; try { if (PYEX) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ex-')); fs.writeFileSync(path.join(dir, 'main.py'), code); out = execFileSync('python3', ['main.py'], { cwd: dir, input: ex.stdin || '', encoding: 'utf8', timeout: 20000, stdio: ['pipe', 'pipe', 'pipe'] }); }
+      else { const r = JSON.parse(execFileSync('python3', [R + '/tools/sql_book_run.py'], { input: JSON.stringify({ dataset: ctx.SQL_DATASETS[ex.db || 'cafe'], answer: code }), encoding: 'utf8', timeout: 15000 })); if (r.error) return bad(`${l.id}/${i} 예제 실행 에러: ${r.error}`); out = r.out || r.output || ''; } }
+    catch (e) { const em = String(e.stderr || e.message); if (PYEX && e.status && (errOk || /No module named '(tkinter|_tkinter|turtle)'/.test(em))) out = String(e.stdout || '') + em; /* 에러를 보여 주는 예제(트레이스백 레슨)·거북이(Windows 파이썬엔 있음) */ else return bad(`${l.id}/${i} 「${pg.title}」 예제 실행 에러: ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
+    ran++; const o = sq(out); for (const v of claims) if (!o.includes(sq(v))) bad(`${l.id}/${i} 「${pg.title}」: 본문은 「실행하면 ${v}」 인데 예제 출력에 없어요 — 실제 출력 ${JSON.stringify(out.slice(0, 160))}`); });
+  // ⑧ 셸 교과서: 시작하기 → 레슨 순서대로 예제를 「한 사용자의 Git Bash」 처럼 이어서 실행(폴더 위치가 다음 예제로 이어짐) — 앞 예제가 다른 폴더에서 끝나 「No such file」 이 나는 예제를 찾음(v2.15.2 T1/1·T13/2)
+  //    Windows 에만 있는 프로그램(notepad·code·explorer·/c/…)은 괜찮음. 일부러 에러를 보여 주는 쪽은 BOOK.meta.exampleErrorsOk
+  if (SHELL) { const home = fs.mkdtempSync(path.join(os.tmpdir(), 'tgseq-')); const env = { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8', LC_ALL: 'C.UTF-8', TERM: 'dumb', GIT_EDITOR: 'false', GIT_PAGER: 'cat' };
+    execFileSync('bash', ['-c', 'git config --global init.defaultBranch main; git config --global core.quotepath false; git config --global pull.rebase false; git config --global user.name me; git config --global user.email me@example.com'], { env });
+    const okPages = new Set((BOOK.meta && BOOK.meta.exampleErrorsOk) || []); let cwd = home;
+    const seq = [...BOOK.setup.pages.map((_, i) => ['SETUP', i]), ...LESSONS.flatMap(l => (pagesOf(l.id) || []).map((_, i) => [l.id, i]))];
+    for (const [lid, i] of seq) { const pg = lid === 'SETUP' ? BOOK.setup.pages[i] : bookPage(lid, i); const ex = pg && pg.example; if (!ex || !ex.shell) continue;
+      const r = spawnSync('bash', ['-c', 'trap \'pwd > "$HOME/.cwd"\' EXIT\n' + ex.shell], { cwd, env, timeout: 15000, encoding: 'utf8' }); ran++;
+      try { cwd = fs.readFileSync(path.join(home, '.cwd'), 'utf8').trim() || cwd; } catch (e) {}
+      if (okPages.has(`${lid}/${i}`)) continue;
+      const errs = String(r.stderr || '').split('\n').filter(x => /command not found|No such file|fatal:|cannot access|cannot stat|invalid reference|Not a directory|pathspec/.test(x) && !/(notepad|code|explorer|start|clip): command not found|cd: \/c\//.test(x));
+      if (errs.length) bad(`${lid}/${i} 「${pg.title}」 예제를 앞 예제에 이어서 치면 에러: ${errs.slice(0, 2).join(' / ').split(home).join('~').slice(0, 220)}`); } }
+  // ⑦ 레슨 쪽에 예전 문제집 화면 말(이 앱 · 채점 · 입력창 · 슬라이더 · XP, 그림 없는 코스의 👀·👣)이 남았는지 — v2.15.2 파이썬 교과서에 8곳 남아 있던 것. 「채점 서버」(코딩테스트)는 괜찮음
+  const OLD0 = '이 앱|채점(?! 서버)|입력창|슬라이더|🎚|\\bXP\\b|다음 줄 실행|파일 트리|오른쪽 예제|가짜 터미널|미리보기 칸|▶ 실행|실행 버튼을 누르'; const OLDW = new RegExp(BOOK.meta && BOOK.meta.viz ? OLD0 : OLD0 + '|👀|👣');
+  for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const t = ent(bookPage(l.id, i).html); const m = t.match(new RegExp('.{0,30}(?:' + OLDW.source + ').{0,30}')); if (m) bad(`${l.id}/${i}: 예전 문제집 화면 말이 남았어요 「${m[0]}」 — BOOK.pages 의 rep 로 교과서 말로 바꾸세요`); });
+  for (const [lid, tasks] of Object.entries(BOOK.tasks)) tasks.forEach((t, ti) => (t.needs || []).forEach(([syn, ref]) => { const [nl, np] = String(ref).split('/'); const pg = bookPage(nl, +np); if (!pg) return; const hay = ent(pg.title + '\n' + pg.html) + '\n' + Object.values(pg.example || {}).filter(x => typeof x === 'string').join('\n');
+    const words = needWords(String(syn), new Set([...String(ctx.BookDerive.task(t, t.pid ? P[t.pid] : null, BOOK).answer + '\n' + (t.text || '') + '\n' + ((t.pid && P[t.pid] && P[t.pid].prompt) || '')).matchAll(/(?:def\s+|<code>)([A-Za-z_]\w*)\(/g)].map(m => m[1]))); if (words.length && !words.some(w => hay.includes(w))) bad(`${lid}#${ti + 1} ${t.title}: 필요한 문법 「${syn}」 → ${ref} 「${pg.title}」 쪽에 그 코드 낱말(${words.join(', ')})이 하나도 없어요 — 설명이 있는 쪽으로 링크를 바꾸세요`); })); }
 // 허브 카드(v2.10.1 사용자 「메인화면은 수정 안 했는데」): config.js 의 이 코스가 book:true 이고 lessons 가 열린 레슨 수와 같은지 — 허브는 book.js 를 안 읽어서 손으로 맞춰야 함
 { const cx = { window: {} }; vm.createContext(cx); vm.runInContext(fs.readFileSync(R + '/core/config.js', 'utf8').replace(/^(const|let) /gm, 'var '), cx); const cc = (cx.CONFIG.COURSES || []).find(c => c.id === cid);
   const open = LESSONS.filter(l => (!l.mock || ((BOOK.tasks || {})[l.id] || []).length) /* 모의고사는 교과서가 문제를 채웠을 때만(화면 lessonsOf 와 같게, v2.15.0) */ && (!l.draft || (BOOK.lessonPages || {})[l.id] || ((BOOK.tasks || {})[l.id] || []).length)).length;

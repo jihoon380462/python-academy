@@ -76,6 +76,12 @@ python3 tools/regress.py        # 화면 회귀(Playwright). 끝 줄 FAILS 0 이
 
 `check_book` 은 Vim 교과서의 예시 답 키를 **진짜 vim**(교과서의 기본 _vimrc 로)에 넣어 결과 파일·파이썬 실행 결과를 비교하고, 기본 _vimrc 가 에러 없이 읽히며 .py 에서 들여쓰기 설정이 켜지는지도 본다.
 
+`check_book` 은 v2.15.2 부터 이것도 본다(사용자 「3, 4」 — 알고 교과서를 손으로 QA 하며 찾은 종류를 자동으로):
+- ⑤ 레슨 본문의 「실행하면 <code>값</code>」 이 그 쪽 예제를 실제로 돌린 출력에 있는지(파이썬·알고리즘 python3, SQL SQLite). 파이썬 예제는 주장이 없어도 **전부** 돌려 에러가 나는지(일부러 에러를 보여 주는 쪽은 `BOOK.meta.exampleErrorsOk`).
+- ⑥ 「필요한 문법」 코드 속 함수·메서드 이름이 링크된 쪽(제목·본문·예제)에 실제로 나오는지 — 안 나오면 다른 쪽을 가리키는 것.
+- ⑦ 레슨 쪽에 예전 문제집 화면 말(이 앱·채점·입력창·슬라이더·XP·다음 줄 실행·파일 트리, 그림 없는 코스의 👀·👣)이 남았는지.
+- ⑧ 터미널 교과서: 시작하기 → 레슨 순서로 예제를 **한 사람의 Git Bash 처럼 이어서**(폴더 위치가 다음 예제로 이어짐) 쳤을 때 「No such file」·「not a git repository」 가 나는지.
+
 웹 교과서의 예시 답은 `python3 tools/run_web_solutions.py`(regress 단계)가 미리보기 iframe 에 넣어 「확인할 것」 전부 ✓ 인지 본다(fetch 는 mock, localStorage 는 메모리로 대신).
 
 자동 검사가 못 보는 것(사람·QA 가 볼 것): 글이 초보자에게 읽히는가, 준비 명령·예제가 **Windows Git Bash·VS Code·gVim 에서** 실제로 같은 결과인가(검사는 리눅스 bash·python3·vim 9.1), Vim 플러그인(vim-plug·LSP) 설치가 실제로 되는가, 설치 화면 이름이 지금 설치 프로그램과 같은가.
