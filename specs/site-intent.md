@@ -2,7 +2,7 @@
 
 > 사용자 지시(11/6) 「QA 가 해당 사이트의 의도를 파악할 수 있게 문서 최신화 진행」. 이 파일은 **「무엇이 정상이고 무엇이 버그인가」의 기준**이다.
 > 다른 문서(QA.md 옛 회전, QA-OPEN.md, specs/qa-team.md 의 옛 체크리스트, DESIGN.md 3~5절 XP·뱃지·블록)는 문제집 시절 기록이 섞여 있다. **서로 다르면 이 파일이 맞다.** 이 파일이 틀렸으면 고치고 `업데이트:` 줄을 바꾼다.
-> 업데이트: 2026-11-06 · v2.11.0 (공용 Vim 교과서 · 허브 「공간」 → 「공용」)
+> 업데이트: 2026-11-06 · v2.12.0 (터미널·Git 교과서 Git 편까지 완성)
 
 ## 1. 누구를 위한 사이트인가
 
@@ -16,7 +16,7 @@
 | 코스 | 모드 | 연습 도구 | 허브 카드에 보이는 것 | 정상 동작 |
 | --- | --- | --- | --- | --- |
 | 파이썬 `courses/python/` | **교과서**(v2.9.0~) | 사용자 PC 의 **VS Code + 파이썬** | 📖 교과서 · 읽은 레슨 n/45 | 브라우저에서 파이썬을 **실행하지 않는다**(Pyodide 안 받음). 예제는 📋 복사 → VS Code 에서 실행 |
-| 터미널·Git `courses/terminal-git/` | **교과서**(v2.10.0~) — 명령어 편 T0~T5·TB1 만 | 사용자 PC 의 **Git Bash**(진짜 터미널) | 📖 교과서 · 읽은 레슨 n/7 · 명령어 편 열림 · Git 편 준비 중 | Git 편 T6~TB3 은 목차에 「준비 중」, 눌러도·주소로 와도 안 열림(**정상**) |
+| 터미널·Git `courses/terminal-git/` | **교과서**(v2.10.0 명령어 편 · v2.12.0 Git 편) — T0~T16·TB1~TB3 전부 | 사용자 PC 의 **Git Bash**(진짜 터미널·진짜 git) | 📖 교과서 · 읽은 레슨 n/20 · 명령어 편 + Git 편 · 실제 GitHub 까지 | Git 의 push·pull·clone 연습은 「가짜 GitHub」 = 연습 폴더 안의 `remote.git`(bare 저장소)로 하는 게 **정상**. 실제 GitHub 는 T16(계정·New repository·첫 push 브라우저 로그인·PR) — 사이트가 검사하지 않음 |
 | SQL `courses/sql/` | 문제집 뼈대(미리보기) | 브라우저 SQLite(예정: DB Browser for SQLite 교과서, TODO N2) | 준비 중 · 미리보기 열림 | 첫 레슨만 |
 | 웹 `courses/web/` | 문제집 뼈대(미리보기) | 브라우저(예정: VS Code + 브라우저 교과서, TODO N3) | 준비 중 · 미리보기 열림 | 첫 레슨만 |
 | Vim 에디터 `courses/vim/` | **교과서**(v2.11.0~, 처음부터 교과서 · 허브 「공용」 칸) | 사용자 PC 의 **gVim 9.2**(Windows) + 파이썬 | 📖 교과서 · 읽은 레슨 n/14 · 공용 도구 | 설치·단축키·_vimrc·파이썬 자동 들여쓰기·F5 실행·자동완성(기본 Ctrl+n / 플러그인 LSP). 문제 화면이 원래 없음(`?classic=1` 도 빈 문제집) |
@@ -79,6 +79,5 @@ python3 tools/regress.py        # 화면 회귀(Playwright). 끝 줄 FAILS 0 이
 
 ## 8. 앞으로 바뀔 것 (TODO.md 1절)
 
-- N1 2차: 터미널·Git 의 Git 편(T6~TB3) — 채우면 `config.js` 의 `lessons`·`bookNote` 를 같이 바꾼다.
 - N2 SQL 교과서(DB Browser for SQLite) · N3 웹 교과서(VS Code + 브라우저) · N4 허브 카드 정리.
 - 알고리즘을 교과서로 바꿀지는 사용자 결정 대기(N5).

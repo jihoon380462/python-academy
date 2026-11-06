@@ -4,6 +4,15 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.12.0 — 2026-11-06 (Opus: 터미널·Git 교과서 2차 — Git 편, N1 완료)
+
+- 🌿 사용자 「2번 진행」(N1 2차) — 터미널·Git 교과서 **Git 편 T6~T16 + 보스 TB2·TB3** 를 채움. 진짜 git(Git Bash)으로 연습.
+  - 챕터 2 Git 기초: 버전 관리가 왜 필요한가 · Git 과 GitHub · **처음 설정**(user.name·email·core.quotepath·pull.rebase) / 세 칸(작업 폴더·스테이징·저장소) · init·status(--short 두 글자 읽기)·add(LF→CRLF 경고는 무시)·commit / log·diff·diff --staged·좋은 메시지 / restore·restore --staged·reset soft·mixed·hard 표·reflog / .gitignore·올리면 안 되는 것·rm --cached / 보스: 의미 있는 커밋 3개 + 🏠 일기장.
+  - 챕터 3 브랜치와 협업: 원격과 로컬 · **연습용 「가짜 GitHub」 = bare 저장소 폴더** · remote add·push -u·clone·pull·fetch / 브랜치는 이름표·switch -c / merge(fast-forward·3-way·--no-edit)·충돌 마커·해결 세 단계·merge --abort / stash·rebase·merge vs rebase / 실수 복구 5가지(amend·엉뚱한 브랜치·지운 파일·충돌 포기·비밀 커밋) / **실제 GitHub**(가입·New repository 칸·첫 push 의 Git Credential Manager 브라우저 로그인·fork·Pull Request 단추 순서) / 보스: 충돌 해결하고 push + 🏠 집·학교 컴퓨터.
+  - 만들어 보기 35문제 추가(터미널 교과서 전체 60). 준비 명령이 저장소·원격·「친구의 커밋」까지 만들어 줌. 확인 명령은 해시·날짜 없이(메시지·status --short·ls-files) 늘 같게.
+- 🏠 허브 터미널 카드 「읽은 레슨 n/20 · 명령어 편 + Git 편 · 실제 GitHub 까지」.
+- 🧪 check_book: 셸 코스를 git 환경(이름·이메일·main·pull.rebase·quotepath, 편집기 금지)으로 실행 — Git 편 예시 답 33개를 진짜 git 으로 돌려 비교(터미널 전체 실행 58). regress: Git 편 +5, 터미널 홈 20레슨·준비 중 0.
+
 ## v2.11.0 — 2026-11-06 (Opus: 공용 Vim 에디터 교과서 · 허브 「공간」 → 「공용」)
 
 - ⌨ 사용자 「공용에 windows 버전 vim 에디터 설치 및 사용법 그리고 단축키 교과서 만들어 그리고 파이썬과 연결하고 자동 띄어쓰기 및 자동완성 기능까지」 — **Vim 에디터 교과서**(`courses/vim/`, 처음부터 교과서 모드).
