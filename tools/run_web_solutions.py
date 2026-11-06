@@ -9,7 +9,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); URL = 'file:
 CHROME = '/usr/bin/google-chrome' if os.path.exists('/usr/bin/google-chrome') else None
 JS = """async () => {
   const out = []; const host = document.createElement('div'); host.style.cssText = 'position:fixed;left:0;top:0;width:1024px;height:700px;opacity:0.01;pointer-events:none'; document.body.appendChild(host);
-  const run = async (code, checks, api) => { const f = document.createElement('iframe'); f.style.cssText = 'width:1024px;height:700px;border:0'; host.appendChild(f); const errs = []; const ready = await Web.render(f, code, { onError: (e) => errs.push(e.text) }, { api: Object.assign({ delay: 20 }, api || {}) }); await new Promise(r => setTimeout(r, 150)); const res = checks ? await Web.check(f, checks) : []; f.remove(); return { ready, errs, res }; };
+  const run = async (code, checks, api) => { const f = document.createElement('iframe'); f.style.cssText = 'width:1024px;height:700px;border:0'; host.appendChild(f); const errs = []; const logs = []; const ready = await Web.render(f, code, { onError: (e) => errs.push(e.text), onConsole: (c) => logs.push(c.text) }, { api: Object.assign({ delay: 20 }, api || {}) }); await new Promise(r => setTimeout(r, 150)); const res = checks ? await Web.check(f, checks) : []; f.remove(); return { ready, errs, res, logs }; };
   for (const p of PROBLEMS.filter(p => p.type === 'web')) {
     const w = p.web || {}; const item = { id: p.id, title: p.title, free: !!w.free, bad: [], warn: [] };
     if (w.free) { const r = await run(w.starter || {}, null, w.api); if (!r.ready) item.bad.push('starter 미리보기 준비 안 됨'); r.errs.forEach(e => item.warn.push('starter JS 에러: ' + e)); out.push(item); continue; }
@@ -36,7 +36,12 @@ JS = """async () => {
     }
     for (const [lid, pgs] of Object.entries(BOOK.lessonPages || {})) for (const [i, pg] of pgs.entries()) {
       const c = pg.example && pg.example.code; if (!c || !/^\\s*</.test(c)) continue;
-      const r = await run({ html: c }, null); ex.push({ id: `book ${lid}/${i}`, ready: r.ready, errs: r.errs });
+      // v2.15.4: fetch("menu.json") 예제는 같은 레슨 앞 쪽의 menu.json 내용으로(Live Server 에서처럼). 본문의 「Console 에 <code>값</code>」·「실행하면 <code>값</code>」 이 실제 console.log 에 있는지도
+      let html = c; const js = (pgs.find(q => q.example && /^\\s*[\\[{]/.test(q.example.code || '')) || {}).example; if (js && /fetch\\(\\s*["']menu\\.json/.test(c)) { const m = '<script>(function(){var B=' + JSON.stringify(js.code) + ';var f=window.fetch;window.fetch=function(u,o){if(String(u).indexOf("menu.json")>=0)return Promise.resolve(new Response(B,{status:200,headers:{"Content-Type":"application/json"}}));return f.apply(this,arguments)}})();<\\/script>'; html = /<head>/.test(c) ? c.replace('<head>', '<head>' + m) : m + c; }
+      const r = await run({ html }, null); const ent = (x) => String(x).replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&'); const sq = (x) => x.replace(/\\s+/g, ' ').trim();
+      const claims = []; for (const m of String(pg.html).matchAll(/([^.。>]{0,40})(?:Console 에|콘솔에|실행하면)([^.。]*?)(?=[.。]|<\\/p>|<\\/li>|$)/g)) if (!/고치|바꾸|바꿔|지우고/.test(m[1])) for (const v of m[2].matchAll(/<code>([\\s\\S]*?)<\\/code>/g)) { const t = ent(v[1]).trim(); if (t.length >= 2 && !sq(c).includes(sq(t))) claims.push(t); }
+      const out = sq(r.logs.join('\\n')); const miss = /console\\.log/.test(c) ? claims.filter(t => !out.includes(sq(t))) : [];
+      ex.push({ id: `book ${lid}/${i}`, ready: r.ready, errs: r.errs.concat(miss.map(t => `본문은 Console 에 「${t}」 인데 실제 console.log 에 없어요 — 실제: ${r.logs.join(' / ').slice(0, 160)}`)) });
     }
   }
   host.remove(); return { probs: out, ex, bk };

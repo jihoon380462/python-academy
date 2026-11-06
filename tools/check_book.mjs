@@ -100,6 +100,20 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
       if (okPages.has(`${lid}/${i}`)) continue;
       const errs = String(r.stderr || '').split('\n').filter(x => /command not found|No such file|fatal:|cannot access|cannot stat|invalid reference|Not a directory|pathspec/.test(x) && !/(notepad|code|explorer|start|clip): command not found|cd: \/c\//.test(x));
       if (errs.length) bad(`${lid}/${i} 「${pg.title}」 예제를 앞 예제에 이어서 치면 에러: ${errs.slice(0, 2).join(' / ').split(home).join('~').slice(0, 220)}`); } }
+  // ⑨ 본문 <pre> 코드와 예제의 「print(x)   # 결과」 주석이 실제 출력과 같은지(tools/pre_claims.py — 값처럼 생긴 주석만, 반복은 「0, 1, 2」 로 이어서) v2.15.4
+  if (PYEX) { const items = []; for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const pg = bookPage(l.id, i); let k = 0; for (const m of pg.html.matchAll(/<pre[^>]*>([\s\S]*?)<\/pre>/g)) items.push({ id: `${l.id}/${i} 본문 코드 ${++k}`, code: ent(m[1].replace(/<br\s*\/?>/g, '\n')) }); if (pg.example && pg.example.code) items.push({ id: `${l.id}/${i} 예제`, code: pg.example.code }); });
+    let r = []; try { r = JSON.parse(execFileSync('python3', [R + '/tools/pre_claims.py'], { input: JSON.stringify(items), encoding: 'utf8', timeout: 120000 })); } catch (e) { bad(`pre_claims.py 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); } ran += items.length;
+    for (const x of r) bad(`${x.id}: 「${x.line}」 의 주석은 「${x.claim}」 인데 실제로는 「${x.got}」 이 나와요`); }
+  // ⑩ Vim 교과서: 본문·예제에 나오는 「:명령」 을 진짜 vim(교과서 기본 _vimrc)에서 하나씩 실행해 「없는 명령(E492)·없는 설정(E518)·잘못된 값(E474)·뒤에 남은 글자(E488)」 가 안 나는지. 끝내기(:q …)·플러그인 명령·한글 자리표시(:e 파일)는 건너뜀 v2.15.4
+  if (VIM) { const home = fs.mkdtempSync(path.join(os.tmpdir(), 'vimex-')); fs.mkdirSync(path.join(home, 'vim-study')); fs.writeFileSync(path.join(home, 'vimrc'), ctx.VIMRC_BASE_TEXT);
+    fs.writeFileSync(path.join(home, 'vim-study', 'play.txt'), Array.from({ length: 12 }, (_, k) => `line${k + 1} cat a i`).join('\n') + '\n');
+    const cmds = new Map(); const addc = (x, w) => { x = String(x).split('←')[0].trim(); if (!/^:[A-Za-z%'<0-9.,$]/.test(x) || cmds.has(x)) return; cmds.set(x, w); };
+    for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const pg = bookPage(l.id, i); const w = `${l.id}/${i}`; if (pg.example && pg.example.code) pg.example.code.split('\n').forEach(x => addc(x, w)); for (const m of pg.html.matchAll(/<code>([\s\S]*?)<\/code>/g)) addc(ent(m[1]), w); for (const m of pg.html.matchAll(/<pre[^>]*>([\s\S]*?)<\/pre>/g)) ent(m[1]).split('\n').forEach(x => addc(x.split('"')[0], w)); });
+    const skip = /^:(q|q!|qa|qa!|x|wq|wqa|PlugInstall|PlugUpdate|Lsp\w*|term|terminal|Lexplore|Ex|source)\b|[가-힣]|Ctrl\+|…/;
+    for (const [cmd, w] of cmds) { if (skip.test(cmd)) continue; fs.writeFileSync(path.join(home, 's.vim'), `edit! ~/vim-study/play.txt\nlet v:errmsg=''\nsilent! execute ${JSON.stringify(cmd.slice(1))}\nlet g:e=v:errmsg\nredir! > ${path.join(home, 'o.txt')}\necho 'ERR[' . g:e . ']'\nredir END\nqa!\n`);
+      spawnSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-S', path.join(home, 's.vim')], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8' }, timeout: 10000 }); ran++;
+      const o = fs.existsSync(path.join(home, 'o.txt')) ? fs.readFileSync(path.join(home, 'o.txt'), 'utf8') : ''; fs.rmSync(path.join(home, 'o.txt'), { force: true });
+      if (/E(492|518|474|488):/.test(o)) bad(`${w}: Vim 명령 「${cmd}」 이 vim 에서 에러 — ${(o.match(/ERR\[(.*)\]/) || [])[1]}`); } }
   // ⑦ 레슨 쪽에 예전 문제집 화면 말(이 앱 · 채점 · 입력창 · 슬라이더 · XP, 그림 없는 코스의 👀·👣)이 남았는지 — v2.15.2 파이썬 교과서에 8곳 남아 있던 것. 「채점 서버」(코딩테스트)는 괜찮음
   const OLD0 = '이 앱|채점(?! 서버)|입력창|슬라이더|🎚|\\bXP\\b|다음 줄 실행|파일 트리|오른쪽 예제|가짜 터미널|미리보기 칸|▶ 실행|실행 버튼을 누르'; const OLDW = new RegExp(BOOK.meta && BOOK.meta.viz ? OLD0 : OLD0 + '|👀|👣');
   for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const t = ent(bookPage(l.id, i).html); const m = t.match(new RegExp('.{0,30}(?:' + OLDW.source + ').{0,30}')); if (m) bad(`${l.id}/${i}: 예전 문제집 화면 말이 남았어요 「${m[0]}」 — BOOK.pages 의 rep 로 교과서 말로 바꾸세요`); });
