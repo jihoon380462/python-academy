@@ -433,3 +433,7 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .bk-back{display:flex;align-items:center;gap:6px;min-height:44px;margin:0 0 10px;padding:8px 14px;border-radius:10px;font-weight:700;max-width:100%;text-align:left;white-space:normal}
 .bk-flash{animation:bkFlash 1.4s ease-out}@keyframes bkFlash{0%{box-shadow:0 0 0 3px var(--primary)}100%{box-shadow:0 0 0 0 transparent}}
 .bk-task,.bk-dex-e,.bk-art h1{scroll-margin-top:72px}
+/* v2.10.0 교과서: 아직 안 채운 레슨(다음 업데이트) */
+.book-mode .bk-l.soon { opacity: .55; cursor: default; }
+.book-mode .bk-l.soon:hover { border-color: var(--border); }
+.book-mode #tutorPanel { display: none; } /* 교과서엔 선생님 창이 없음 — 화면 밖에 숨겨 둔 패널이 전체 캡처에 비치던 것 */
