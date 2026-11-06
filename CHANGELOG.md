@@ -4,6 +4,16 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.14.0 — 2026-11-06 (Opus: 웹 교과서 — N3, 코스 7개 전부 교과서·문제집으로 열림)
+
+- 🌐 사용자 「2번(SQL·터미널·웹 교과서) 해 · 내 컴퓨터 도구로」 · 「계속 다음 진행해」 — **웹 코스를 교과서로**(N3). 연습은 내 컴퓨터의 **VS Code + Live Server 확장 + 크롬/엣지 개발자 도구**.
+  - 시작하기 4쪽: 공부 폴더를 VS Code 로 열기·`!`+Tab 뼈대 · **Live Server**(확장 → Ritwick Dey → Install → Go Live · http://127.0.0.1:5500) · **F12**(Elements·Console·Network·폰 화면) · 쓰는 법.
+  - 레슨 14: 웹의 동작·HTML 뼈대 · 중첩·속성 · 목록·링크·이미지·표·시맨틱 · 폼 · CSS 선택자·색·박스 모델 · flex · 반응형(@media·모바일 먼저) · JS(파이썬 비교표·map/filter) · DOM·이벤트·폼 가로채기 · 상태와 render()·localStorage · HTTP(요청·응답·상태 코드·JSON) · fetch·async/await·에러 · 파이썬 requests·API 키 · REST·**GitHub Pages 배포**(Settings → Pages → Deploy from a branch).
+  - 만들어 보기 25 + 보스 3(🏠 내 소개 페이지 · 할 일 앱 · 카페 주문 화면) — 「브라우저에서 확인할 것」 ☐ 목록, 예시 답은 파일 전체. 준비 파일 menu.json.
+  - 「먼저 꼭!」 경고: Live Server(레슨 11 fetch 는 꼭) · JS 부터 F12 Console · 레슨 12 requests 설치 · 레슨 13 GitHub.
+- 🏠 허브: 웹 카드 「읽은 레슨 n/17」 — 코스 7개가 전부 열림(미리보기 코스 없음).
+- 🧪 `tools/run_web_solutions.py`: 교과서 예시 답 25개를 미리보기 iframe 에 넣어 checks 전부 ✓(fetch 는 mock, sandbox 의 localStorage 는 메모리로 대신) + 레슨 예제 렌더. check_book: 웹은 checks 가 있는지. `ui-views-book.js`: 「브라우저에서 확인할 것」 목록. 옛 편집기 회귀는 `?classic=1`. regress +12.
+
 ## v2.13.0 — 2026-11-06 (Opus: SQL 교과서 — N2)
 
 - 🗄️ 사용자 「2번(SQL·터미널·웹 교과서) 해 · 내 컴퓨터 도구로」 · 「일단 완성하는 게 목표니까 필수 사항은 강조하고 계속 다음 진행해」 — **SQL 코스를 교과서로**(N2). 연습은 내 컴퓨터의 **DB Browser for SQLite** + 연습 DB **cafe.db**.
