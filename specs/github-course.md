@@ -66,7 +66,7 @@
 | --- | --- | --- | --- |
 | G5 | 브랜치에서 PR 열기 | ① 왜 main 에 바로 안 올리나(이 사이트 예) · ② 로컬 `git switch -c` → push → 노란 띠 **Compare & pull request** · ③ PR 화면: base ← compare, 제목·설명(무엇·왜·확인 방법), **Draft** | 첫 PR(설명 3줄 양식) |
 | G6 | 코드 리뷰 | ① **Files changed** 탭 · 줄 번호 옆 **+** 로 줄 코멘트 · ② **Suggestion**(```suggestion 블록 → 작성자가 **Commit suggestion**) · ③ **Review changes**: Comment / Approve / Request changes — 내 PR 은 Approve 불가 · ④ 리뷰 반영은 같은 브랜치에 커밋 추가 → PR 에 자동으로 붙음 | 내 PR 에 줄 코멘트 2개 + Suggestion 1개 → 반영 |
-| G7 | 병합 세 가지와 뒷정리 | ① **Create a merge commit / Squash and merge / Rebase and merge** — 히스토리 그림 비교(T14 rebase 연결) · ② **Delete branch** · ③ 로컬 뒷정리 `git switch main` · `git pull` · `git branch -d` · `git fetch --prune` | squash 로 합치고 로컬 정리(확인 명령: `git log --oneline -3`, `git branch`) |
+| G7 | 합치는 방법 세 가지와 뒷정리 (v2.17.2 「병합」 → 본문과 같은 「합치기」) | ① **Create a merge commit / Squash and merge / Rebase and merge** — 히스토리 그림 비교(T14 rebase 연결) · ② **Delete branch** · ③ 로컬 뒷정리 `git switch main` · `git pull` · `git branch -d` · `git fetch --prune` | squash 로 합치고 로컬 정리(확인 명령: `git log --oneline -3`, `git branch`) |
 | G8 | PR 에 충돌이 나면 | ① 「This branch has conflicts that must be resolved」 · ② 웹 **Resolve conflicts** 편집기(마커는 T13 과 같음) · ③ 로컬에서: `git switch 내브랜치` → `git merge main` → 해결 → push | 일부러 충돌 만들고 웹에서 풀기 / 로컬에서 풀기 |
 | G9 | Issues 로 할 일 관리 | ① 이슈 쓰기(재현 방법·기대·실제 — 파이썬 L22 버그 보고와 연결) · ② Labels · Assignees · Milestone · ③ PR 설명에 `Closes #3` → 병합되면 이슈 자동 닫힘 · ④ 이슈 템플릿(`.github/ISSUE_TEMPLATE/`) | 이슈 → 브랜치 → `Closes #n` PR |
 | G10 | Projects 보드 | ① **Projects → New project → Board** · ② Todo / In Progress / Done 칸 · ③ 이슈·PR 을 카드로 · 자동으로 칸 옮기기(Workflows) 맛보기 | 내 프로젝트 보드에 카드 5장 |

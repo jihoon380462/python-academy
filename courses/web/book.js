@@ -149,7 +149,7 @@ h1 { color: purple; font-size: 32px; }</pre>
 <pre class="code">.cards { display: flex; flex-wrap: wrap; gap: 16px; }
 .card  { flex: 1 1 200px; }   ← 기본 200px, 남으면 늘고 모자라면 줄어듦</pre>
 <p><code>flex: 1 1 200px</code> = <code>flex-grow</code>(늘어나기) 1 · <code>flex-shrink</code>(줄어들기) 1 · <code>flex-basis</code>(기본 크기) 200px. 화면이 넓으면 한 줄에 여러 장, 좁으면 한 장씩 — 미디어 쿼리 없이도 어느 정도 반응형이 돼요.</p>
-<p>F12 → Elements 에서 flex 부모 옆에 작은 <b>flex</b> 단추가 붙어 있어요. 누르면 배치선이 화면에 그려지고, 오른쪽에서 justify-content 등을 눌러 바꿔 볼 수 있어요.</p>`, example: { code: '<style>\n  .cards { display: flex; flex-wrap: wrap; gap: 16px; }\n  .card { flex: 1 1 200px; padding: 16px; border: 1px solid #ccc; border-radius: 12px; }\n</style>\n<div class="cards">\n  <div class="card">아메리카노 4000</div>\n  <div class="card">카페라테 4500</div>\n  <div class="card">크루아상 3500</div>\n  <div class="card">치즈케이크 6000</div>\n</div>' } },
+<p>F12 → Elements 에서 flex 부모 옆에 작은 <b>flex</b> 버튼이 붙어 있어요. 누르면 배치선이 화면에 그려지고, 오른쪽에서 justify-content 등을 눌러 바꿔 볼 수 있어요.</p>`, example: { code: '<style>\n  .cards { display: flex; flex-wrap: wrap; gap: 16px; }\n  .card { flex: 1 1 200px; padding: 16px; border: 1px solid #ccc; border-radius: 12px; }\n</style>\n<div class="cards">\n  <div class="card">아메리카노 4000</div>\n  <div class="card">카페라테 4500</div>\n  <div class="card">크루아상 3500</div>\n  <div class="card">치즈케이크 6000</div>\n</div>' } },
     ],
     W6: [
       { title: 'viewport 와 폰에서 보기', html: `<p>폰 브라우저는 viewport 메타 태그가 없으면 페이지를 PC 폭(980px)으로 그린 다음 <b>작게 줄여</b> 보여 줘요 — 글씨가 깨알만 해져요.</p>
