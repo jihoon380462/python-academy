@@ -82,6 +82,7 @@ python3 tools/regress.py        # 화면 회귀(Playwright). 끝 줄 FAILS 0 이
 - ⑤ 레슨 본문의 「실행하면 <code>값</code>」 이 그 쪽 예제를 실제로 돌린 출력에 있는지(파이썬·알고리즘 python3, SQL SQLite). 파이썬 예제는 주장이 없어도 **전부** 돌려 에러가 나는지(일부러 에러를 보여 주는 쪽은 `BOOK.meta.exampleErrorsOk`).
 - ⑥ 「필요한 문법」 코드 속 함수·메서드 이름이 링크된 쪽(제목·본문·예제)에 실제로 나오는지 — 안 나오면 다른 쪽을 가리키는 것.
 - ⑦ 레슨 쪽에 예전 문제집 화면 말(이 앱·채점·입력창·슬라이더·XP·다음 줄 실행·파일 트리, 그림 없는 코스의 👀·👣)이 남았는지.
+- ⑨ (v2.15.4) 본문 `<pre>` 코드·예제의 `print(x)   # 결과` 주석이 실제 출력과 같은지(`tools/pre_claims.py` — 값처럼 생긴 주석만, 반복은 「0, 1, 2」 로 이어서). ⑩ Vim 교과서의 `:명령` 을 진짜 vim 에서 하나씩 실행해 없는 명령·설정 오타(E492·E518·E474·E488)가 없는지. 웹은 `run_web_solutions.py` 가 교과서 예제의 `fetch("menu.json")` 을 같은 레슨의 menu.json 으로 돌리고, 본문 「Console 에 `값`」 이 실제 console.log 에 있는지.
 - ⑧ 터미널 교과서: 시작하기 → 레슨 순서로 예제를 **한 사람의 Git Bash 처럼 이어서**(폴더 위치가 다음 예제로 이어짐) 쳤을 때 「No such file」·「not a git repository」 가 나는지.
 
 웹 교과서의 예시 답은 `python3 tools/run_web_solutions.py`(regress 단계)가 미리보기 iframe 에 넣어 「확인할 것」 전부 ✓ 인지 본다(fetch 는 mock, localStorage 는 메모리로 대신).
@@ -91,4 +92,5 @@ python3 tools/regress.py        # 화면 회귀(Playwright). 끝 줄 FAILS 0 이
 ## 8. 앞으로 바뀔 것 (TODO.md 1절)
 
 - N4 허브 카드 정리(코스 7개 전부 열림 — 남은 건 문구 점검).
+- N6 GitHub 교과서: 설계 완료(`specs/github-course.md`) · 구현 전 — 허브에 아직 카드 없음(정상).
 - N5 알고리즘 교과서 ✅ v2.15.0. 알고 예전 화면 QA(N7·N8)는 `?classic=1` 화면에만 해당 — 교과서에선 레슨 예제 그림만 남음.
