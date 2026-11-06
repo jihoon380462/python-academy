@@ -180,7 +180,7 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     // ---------- 챕터 1 들어가기 ----------
     A0: [
       { title: '두 가지 방법으로 합 구하기', text: '@prompt', pid: 'A0P3', needs: [['for i in range(1, n + 1):  total += i', 'A0/1', '하나씩 더하기'], ['n * (n + 1) // 2', 'A0/0', '공식으로 한 번에'], ['n = int(input())', 'SETUP/2', '숫자 한 개 입력받기']] },
-      { title: '합이 10인 쌍 세기', text: '@prompt', pid: 'A0P4', needs: [['for i in range(len(a)):  for j in range(i + 1, len(a)):', 'A0/3', '모든 쌍을 한 번씩(i < j)'], ['def count_pairs(a): … return cnt', 'A0/3', '세서 돌려주는 함수']] },
+      { title: '합이 10인 쌍 세기', text: '@prompt', pid: 'A0P4', needs: [['for i in range(len(a)):  for j in range(i + 1, len(a)):', 'A0/3', '모든 쌍을 한 번씩(i < j)'], ['def count_pairs(a): … return cnt', 'A0/2', '세서 돌려주는 함수']] },
       { title: '걸린 시간 재기', text: '<code>sum(range(1000000))</code> 이 걸린 시간을 재서 <code>0.012 초</code> 처럼 출력하세요. 아래 코드의 빈칸 <code>___1___</code> · <code>___2___</code> 를 채워 완성해요. (숫자는 컴퓨터마다 달라요)', pid: 'A0P5', noRun: true, needs: [['t = time.perf_counter()', 'A0/0', '지금 시각(초)'], ['time.perf_counter() - t', 'A0/0', '끝 시각 - 시작 시각 = 걸린 시간']] },
     ],
     A1: [
@@ -198,7 +198,7 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     ],
     AB1: [
       { title: '괄호 검사기', text: '@prompt', pid: 'AB1P1', needs: [['stack.append(ch)  stack.pop()', 'A2/1', '스택으로 괄호 짝'], ['elif ch in ")]}":', 'A2/1', '괄호가 아닌 글자는 건너뛰기'], ['for _ in range(n):  s = input()', 'SETUP/1', 'n 줄 입력받기']] },
-      { title: '프린터 대기열 (급한 문서)', text: '@prompt', pid: 'AB1P2', needs: [['q.append(x)  q.appendleft(x)', 'A3/2', '뒤에 넣기 · 앞에 넣기'], ['q.popleft() if q else "empty"', 'A2/2', '꺼내기 전에 비었는지 보기'], ['cmd = input().split()', 'A3/3', '명령과 이름 나누기']] },
+      { title: '프린터 대기열 (급한 문서)', text: '@prompt', pid: 'AB1P2', needs: [['q.append(x)  q.appendleft(x)', 'A3/2', '뒤에 넣기 · 앞에 넣기'], ['q.popleft() if q else "empty"', 'A3/2', '비었는지 보고 꺼내기'], ['cmd = input().split()', 'A3/3', '명령과 이름 나누기']] },
     ],
     // ---------- 챕터 2 찾고 정렬하기 ----------
     A4: [
@@ -285,10 +285,10 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
       { title: '모의 7: 회의실 배정', text: '@prompt', pid: 'AB4P7', needs: [['m.sort(key=lambda x: (x[1], x[0]))', 'A15/0', '끝나는 시간 순'], ['if s >= end:', 'A15/1', '끝=시작은 가능']] },
       { title: '모의 8: 구간 합 구하기', text: '@prompt', pid: 'AB4P8', needs: [['prefix[j] - prefix[i - 1]', 'A15/4', '1부터 세는 구간 합'], ['sys.stdin.readline', 'A20/2', '질의가 많으면 빠른 입력']] },
       { title: '모의 9: 카드 정렬 비용', text: '@prompt', pid: 'AB4P9', needs: [['heapq.heapify(h)', 'A11/3', '묶음 크기를 힙으로'], ['heapq.heappush(h, a + b)', 'A11/4', '가장 작은 두 개를 합쳐 다시']] },
-      { title: '모의 10: 단어 빈도 TOP 3', text: '@prompt', pid: 'AB4P10', needs: [['c[w] = c.get(w, 0) + 1', 'A8/1', '개수 세기'], ['sorted(c.items(), key=lambda x: (-x[1], x[0]))[:3]', 'A6/5', '많은 순, 같으면 사전순, 3개']] },
+      { title: '모의 10: 단어 빈도 TOP 3', text: '@prompt', pid: 'AB4P10', needs: [['c[w] = c.get(w, 0) + 1', 'A8/1', '개수 세기'], ['c.items()', 'A8/2', '(단어, 횟수) 짝으로 꺼내기'], ['sorted(…, key=lambda x: (-x[1], x[0]))[:3]', 'A6/5', '많은 순, 같으면 사전순, 3개']] },
       { title: '모의 11: 계단 오르기 (3칸까지)', text: '@prompt', pid: 'AB4P11', needs: [['dp[i] = (dp[i - 1] + dp[i - 2] + dp[i - 3]) % MOD', 'A14/1', '세 칸 전까지 더하기'], ['MOD = 1000000007', 'A14/1', '문제가 시키면 표에 넣을 때마다 % MOD (파이썬은 큰 수도 되지만 느려져요)']] },
-      { title: '모의 12: 최단 거리 (가중치)', text: '@prompt', pid: 'AB4P12', needs: [['graph[u].append((v, w))', 'A13/0', '한 방향 간선과 비용'], ['heapq.heappush(heap, (nd, v))', 'A13/1', '다익스트라'], ['print(d if d != INF else "INF")', 'A13/3', '못 가면 INF']] },
-      { title: '모의 13: 두 포인터로 합 찾기', text: '@prompt', pid: 'AB4P13', needs: [['a.sort();  lo, hi = 0, n - 1', 'A15/2', '정렬 후 양끝'], ['if s == x:  cnt += 1;  lo += 1;  hi -= 1', 'A15/2', '찾으면 둘 다 안으로']] },
+      { title: '모의 12: 최단 거리 (가중치)', text: '@prompt', pid: 'AB4P12', needs: [['graph[u].append((v, w))', 'A12/1', '한 방향 간선과 비용(간선 목록 → 그래프)'], ['heapq.heappush(heap, (nd, v))', 'A13/1', '다익스트라'], ['print(d if d != INF else "INF")', 'A13/3', '못 가면 INF']] },
+      { title: '모의 13: 두 포인터로 합 찾기', text: '@prompt', pid: 'AB4P13', needs: [['a.sort()', 'A6/4', '먼저 정렬'], ['lo, hi = 0, n - 1', 'A15/2', '정렬된 리스트의 양끝에서'], ['if s == x:  cnt += 1;  lo += 1;  hi -= 1', 'A15/2', '찾으면 둘 다 안으로']] },
       { title: '모의 14: 수 정렬하기', text: '@prompt', pid: 'AB4P14', needs: [['a.sort()', 'A6/4', '내장 정렬 O(n log n)'], ['print("\\n".join(map(str, a)))', 'A20/2', '한 번에 출력']] },
       { title: '모의 15: 연결 요소의 개수', text: '@prompt', pid: 'AB4P15', needs: [['for v in range(1, V + 1):  if not visited[v]:', 'A12/4', '아직 안 간 정점마다 새 덩어리'], ['queue = deque([v])', 'A12/2', '덩어리 하나를 BFS 로 전부 방문']] },
     ],
@@ -302,8 +302,8 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
       { title: '프로젝트: 지하철 최단 경로', text: '@prompt', pid: 'E2P1', needs: [['prev[nb] = node', 'E2/1', '경로 기록'], ['" -> ".join(path)', 'E2/2', '경로 출력'], ['sorted(..., key=lambda x: (dist[x], x))', 'E2/2', '(시간, 이름) 순']] },
     ],
     E3: [
-      { title: '연습: 필요한 교실 수만', text: '@prompt', pid: 'E3P2', needs: [['exams.sort(key=lambda e: (e[1], e[2], e[0]))', 'E3/1', '시작 시각 순'], ['if rooms and rooms[0] <= s:  heapq.heappop(rooms)', 'E3/1', '끝난 교실 다시 쓰기'], ['heapq.heappush(rooms, e)', 'E3/1', '끝나는 시각 힙']] },
-      { title: '프로젝트: 시험 시간표 짜기', text: '@prompt', pid: 'E3P1', needs: [['heapq.heappush(free, room_no)', 'E3/2', '번호가 가장 낮은 빈 교실'], ['events.sort()', 'E3/2', '스위프: 끝을 먼저 처리'], ['sorted(exams, key=lambda e: (e[2], e[1], e[0]))', 'A15/0', '끝 시각 그리디']] },
+      { title: '연습: 필요한 교실 수만', text: '@prompt', pid: 'E3P2', needs: [['exams.sort(key=lambda e: (e[1], e[2], e[0]))', 'E3/1', '시작 시각 순'], ['if rooms and rooms[0] <= s:  heapq.heapreplace(rooms, e)', 'E3/1', '끝난 교실 다시 쓰기(꺼내고 넣기를 한 번에)'], ['heapq.heappush(rooms, e)', 'E3/1', '끝나는 시각 힙']] },
+      { title: '프로젝트: 시험 시간표 짜기', text: '@prompt', pid: 'E3P1', needs: [['heapq.heappush(free, room_no)', 'E3/1', '번호가 가장 낮은 빈 교실(힙)'], ['events.sort()', 'E3/2', '스위프: 끝을 먼저 처리'], ['sorted(exams, key=lambda e: (e[2], e[1], e[0]))', 'A15/0', '끝 시각 그리디']] },
     ],
     E4: [
       { title: '연습: 친구 그룹 세기만', text: '@prompt', pid: 'E4P2', needs: [['for name in sorted(graph):  if name not in seen:', 'E4/2', '아직 안 본 사람마다 새 그룹'], ['q = deque([name])', 'E4/1', '그룹 하나를 BFS 로']] },
@@ -339,7 +339,7 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
       { title: '가지치기가 있는 부분합', text: '@prompt', pid: 'A19P4', needs: [['if s > target:  return False', 'A19/4', '넘으면 더 볼 필요 없음'], ['go(i + 1, s + a[i]) or go(i + 1, s)', 'A19/2', '넣는다 / 안 넣는다'], ['sys.setrecursionlimit(10000)', 'A20/2', '재귀 한도']] },
     ],
     A20: [
-      { title: '빠른 입출력', text: '@prompt', pid: 'A20P2', needs: [['data = sys.stdin.read().split()', 'A20/2', '한 번에 다 읽기'], ['sys.stdout.write("\\n".join(out) + "\\n")', 'A20/2', '한 번에 출력']] },
+      { title: '빠른 입출력', text: '@prompt', pid: 'A20P2', needs: [['data = sys.stdin.read().split()', 'A20/2', '한 번에 다 읽기'], ['print("\\n".join(out))', 'A20/2', '한 번에 출력']] },
       { title: '경계에서 터지는 코드', text: '@prompt', pid: 'A20P3', given: true, needs: [['if not nums:  print(0)', 'A20/3', '빈 입력을 먼저 처리'], ['max(nums) - min(nums)', 'A20/3', '빈 리스트에 max 하면 ValueError']] },
       { title: '제출 전 체크리스트 통과', text: '@prompt', pid: 'A20P5', needs: [['vals = sorted(set(nums), reverse=True)', 'A20/3', '같은 값은 하나로, 큰 순'], ['if len(vals) < 2:  print("없음")', 'A20/4', '0개 · 1개 · 전부 같은 값']] },
     ],
