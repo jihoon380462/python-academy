@@ -1,4 +1,5 @@
-// core/runners/web.js — 웹·HTTP·API 코스(Phase 4)의 러너: iframe srcdoc 샌드박스 + 가짜 API 서버 + 채점 체크 스크립트 (docs/EXPANSION.md 8절, v2.7.0 뼈대)
+// tools/web-preview.js — (v2.19.0 N13: 예전 core/runners/web.js) 웹 교과서 「만들어 보기」 예시 답을 검사하는 도구 tools/run_web_solutions.py 가 페이지에 넣어 씀. 사이트는 이 파일을 불러오지 않아요.
+//   원래: 웹·HTTP·API 코스(Phase 4)의 러너: iframe srcdoc 샌드박스 + 가짜 API 서버 + 채점 체크 스크립트 (docs/EXPANSION.md 8절, v2.7.0 뼈대)
 // 사용:
 //   await Web.render(iframe, { html, css, js }, { onConsole({level,text}), onError({text,line}), onFetch(rec) }, { api:{ delay, failRate, failFirst, todos } })
 //       → srcdoc 조립(css 는 <style>, js 는 <script>, 전체 문서(<html>)를 써도 됨). sandbox="allow-scripts allow-forms". 준비되면 resolve(최대 2.5초).

@@ -14,7 +14,7 @@ Opus 든 Fable 이든 **같다**. 콘텐츠·문서·`core/`·`tools/`·버전(`
 
 1. 시작: 저장소를 최신으로 당기고(`git fetch` + `reset --hard origin/main`), HANDOFF.md → 이 파일 → 맡은 지시서 순서로 읽는다. **main 에 직접 푸시하지 않는다 — 8절의 브랜치·PR 규칙대로.**
 2. 범위: 지시서에 적힌 파일만 고친다. 지시서에 없는 `core/` 파일을 고쳐야 하면 멈추고 사용자에게 "이 파일도 고쳐야 한다, Fable 검토 대상"이라고 알린다.
-3. 검증(푸시 전 필수): `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py`, 셸 관련이면 `node tools/test_shell.mjs`, 가능하면 `python3 tools/regress.py`.
+3. 검증(푸시 전 필수): `node tools/validate_content.mjs && node tools/check_book.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py`, 가능하면 `python3 tools/regress.py`(전체 명령은 `README.md` 「작업 방법」).
 4. 커밋 메시지: `core/`를 한 줄이라도 바꿨으면 맨 앞에 **`[core]`**. 예: `[core] v2.4.0: 터미널 러너 디스패치`. 콘텐츠만이면 표시 없음.
 5. HANDOFF 상태판·CHANGELOG는 기존 규칙대로 같은 커밋에. 상태판 "마지막 작업"에 **작업한 모델(Opus/Fable)**을 괄호로 적는다.
 7. **같은 문제의 나머지는 묻지 말고 이어서 끝낸다**(2026-11-06 사용자: 「1, 2번은 왜 안 하고 다시 물어보는 건데. 내가 다른 걸 먼저 하라고 하면 잊혀지는 거 아니냐」). 지적받은 문제와 같은 원인으로 다른 곳도 틀려 있으면(예: 「필요한 문법」 별명 → 쪽 제목·문제 제목도 별명) 그 자리에서 전부 고친다. 선택지로 내미는 것은 **새 일**만. 한 번에 못 끝내는 남은 일은 **바로 TODO.md 에 적고** 끝 보고에 「TODO 에 적어 둠」을 밝힌다.

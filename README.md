@@ -19,20 +19,20 @@
 | 수학 공간 (공용) | `/courses/math/` | 📖 교과서 · 레슨 45(그림 만지기) | 브라우저 그림 + VS Code + 파이썬 |
 
 - **교과서**: 설명을 읽고, 레슨 끝 「🛠 만들어 보기」 를 내 컴퓨터에서 직접 만든다. 채점·XP·잠금은 없다. 문제마다 「필요한 문법」(실제 코드 모양 + 그 레슨으로 가는 링크)이 있고, 코스마다 도감이 있다. ← → 키로 쪽을 넘긴다.
-- 교과서 코스의 옛 문제집 화면은 주소 끝에 `?classic=1` 을 붙이면 볼 수 있다.
+- 예전 문제집 화면(문제 풀기·채점·XP·뱃지·복습·가짜 터미널)은 v2.19.0 에 사이트에서 빼서 **`archive/classic/`** 에 보관했다(사이트는 안 불러옴). 되돌리는 법은 `archive/classic/README.md`.
 
 ## 폴더
 
 | 폴더 | 내용 |
 | --- | --- |
 | `index.html` · `core/hub.js` | 허브(메인 화면) |
-| `core/` | 공통 엔진·화면(교과서 화면 `ui-views-book.js`, 문제 파생 `book-derive.js`, 설정 `config.js` 의 `APP_VERSION`·`COURSES`), 러너(`runners/`) |
+| `core/` | 공통 바탕 — 교과서 화면 `ui-views-book.js` · 설정·용어집·시작 `app.js` · 만들어 보기 모양 `book-derive.js` · UI 공통 `ui-core.js` · 저장 `storage.js`·`sync.js` · `config.js`(`APP_VERSION`·`COURSES`) · 알고리즘 그림 `visualize.js`+`runners/python.js` · 수학 그림 `figure.js`+`ui-views-math.js` |
 | `courses/<id>/` | 코스 페이지(`index.html`) · 콘텐츠(`content.js`) · 교과서 데이터(`book.js`) |
-| `shared/` | 에러 사전 · 용어집 · 뱃지 |
-| `assets/img/` | 그림(뱃지·보스·마스코트 등, 요청서 `docs/IMAGES.md`) |
+| `shared/` | 에러 사전 · 용어집 |
+| `archive/classic/` | 보관: 예전 문제집 화면의 코드·그림·옛 문제·검사 도구(v2.19.0 까지, 사이트는 안 불러옴) |
 | `tools/` | 검사·도구(아래) |
 | `specs/` | 지시서 — 사이트 의도 · 코스 설계 · 작업 규칙 (끝난 것은 `specs/archive/`) |
-| `docs/` | 설계 결정 `DESIGN.md` · 확장 지시서 `EXPANSION.md` · 그림 요청서 `IMAGES.md` · QA 기록 `QA.md` (끝난 기록은 `docs/archive/`) |
+| `docs/` | 설계 결정 `DESIGN.md` · 확장 지시서 `EXPANSION.md` · QA 기록 `QA.md` (끝난 기록은 `docs/archive/`, 그림 요청서는 `archive/classic/docs-IMAGES.md`) |
 | `qa-reports/` | QA 채팅이 직접 플레이하고 올린 보고서 |
 | `python_academy.html` | 예전 주소(v1) → 파이썬 코스로 넘겨 주는 파일 |
 
@@ -47,7 +47,6 @@
   node tools/validate_content.mjs && node tools/check_level.mjs --gate && node tools/check_nesting.mjs
   node tools/check_book.mjs                       # 교과서: 예시 답·예제 실행, 「필요한 문법」, 옛 문구
   node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
-  node tools/test_shell.mjs && node tools/run_shell_solutions.mjs && python3 tools/run_sql_solutions.py
   python3 tools/regress.py && python3 tools/run_web_solutions.py   # Playwright
   ```
 - 저장은 브라우저 localStorage 의 `academy.*` 조각(스키마 v2). v1 키(`python_academy_save`)는 첫 실행에 자동 이전되고 `academy.backup.v1` 에 보관된다.

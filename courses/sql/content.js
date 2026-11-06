@@ -14,8 +14,7 @@
 //   DRILLS 는 안 쓴다(빈 배열).
 const COURSE = { id: 'sql', name: '데이터베이스(SQL)', runner: 'sql', bench: false,
   tutorPersona: '너는 SQL 을 처음 배우는 성인 입문자를 가르치는 친절한 선생님이다. 모든 예는 「동네 카페」 데이터(menu·customers·orders·order_items·staff·shifts)로 든다. 쿼리는 「무엇을 고르나(SELECT) → 어디서(FROM) → 어떤 조건(WHERE)」 순서로 읽어 준다. SQLite 에러 원문(영문)을 그대로 보여 주고 한국어로 풀어 준다. 정답 쿼리를 통째로 주지 말고 어느 절(SELECT/FROM/WHERE…)을 보라고 짚어 준다. 쉬운 말, 짧은 문장, ~해요체.' };
-const CHECKUPS = { after: {}, upto: {} }; // TODO(C-S): 챕터 A 끝(S3)·B 끝(S7) 뒤 종합 점검 — { after: { S3: 1, S7: 2 }, upto: { 1: 'S3', 2: 'S7' } }
-const WEAKNESS_TAGS = ['표읽기', 'SELECT', 'WHERE', '정렬', 'NULL', '집계', '그룹', 'JOIN', '서브쿼리', '함수', '수정', '설계', '인덱스', '트랜잭션', '파이썬연결'];
+// TODO(C-S): 챕터 A 끝(S3)·B 끝(S7) 뒤 종합 점검 — { after: { S3: 1, S7: 2 }, upto: { 1: 'S3', 2: 'S7' } }
 const CHAPTERS = [
   { ch: 1, name: '읽기', color: '#f4511e' },
   { ch: 2, name: '합치기', color: '#ef6c00' },
@@ -59,25 +58,5 @@ const LESSONS = [
 ];
 const PROBLEMS = [
 // ----- S0 데이터베이스란 (완성본 — 이 레슨이 C-S 의 본보기) -----
-{ id: 'S0P1', lesson: 'S0', type: 'sql', title: '메뉴 표 전부 보기', xp: 20, tags: ['표읽기', 'SELECT'],
-  prompt: `<p><code>menu</code> 표의 <b>모든 열, 모든 행</b>을 보여 주는 쿼리를 쓰세요. 레슨에서 친 것과 같아요.</p><p>결과는 10행 5열이면 돼요. 쓴 뒤 <b>▶ 실행</b>으로 확인하고 <b>✔ 제출하기</b>를 누르세요.</p>`,
-  hints: ['SELECT 로 시작해서 FROM 뒤에 표 이름을 써요', '모든 열은 열 이름 대신 별표 * 예요', 'SELECT * FROM menu'],
-  starter: '', solution: 'SELECT * FROM menu', sql: { dataset: 'cafe', expect: { kind: 'rows' } } },
-{ id: 'S0P2', lesson: 'S0', type: 'quiz', title: '결과 예측: 몇 열이 나올까', xp: 10, tags: ['표읽기'],
-  prompt: `<p>아래 쿼리를 실행하면 결과 표는 <b>몇 열</b>일까요? (menu 표에는 id, name, category, price, is_hot 다섯 열이 있어요)</p>`,
-  quiz: { code: `SELECT name, price FROM menu`, opts: ['1열', '2열', '5열', '10열'], ans: 1, why: 'SELECT 뒤에 적은 열만 나와요. name 과 price 두 개니까 2열이에요. 행 수(10)는 WHERE 가 없으니 그대로예요.' },
-  hints: ['SELECT 뒤에 적은 것이 열이에요', '쉼표로 나뉜 이름이 몇 개인지 세어 보세요', 'name, price → 2개'],
-  solution: 'SELECT name, price FROM menu' },
-{ id: 'S0P3', lesson: 'S0', type: 'fill', title: '빈칸: 손님 이름만 보기', xp: 15, tags: ['SELECT'],
-  prompt: `<p><code>customers</code> 표에서 <code>name</code> 열만 보여 주는 쿼리예요. 빈칸을 채우세요.</p>`,
-  fill: { code: `___1___ name\n___2___ customers`, blanks: [{ a: ['SELECT', 'select', 'Select'] }, { a: ['FROM', 'from', 'From'] }], why: 'SELECT 는 「어떤 열을」, FROM 은 「어느 표에서」예요. 순서는 항상 SELECT → FROM.' },
-  hints: ['첫 줄은 「골라 줘」, 둘째 줄은 「어디서」예요', '첫 칸은 S 로 시작하는 키워드, 둘째 칸은 F 로 시작해요', 'SELECT name FROM customers'],
-  solution: 'SELECT name\nFROM customers' },
-{ id: 'S0P4', lesson: 'S0', type: 'sql', title: '커피만 골라 보기', xp: 25, tags: ['SELECT', 'WHERE'],
-  prompt: `<p><code>menu</code> 표에서 <b>category 가 '커피' 인 행</b>만, <code>name</code> 과 <code>price</code> 두 열로 보여 주세요.</p><p>레슨 3쪽에서 친 쿼리와 같아요. 글자 조건은 작은따옴표로 감싸요. 결과는 5행이면 돼요.</p>`,
-  hints: ['SELECT name, price FROM menu 뒤에 WHERE 를 붙여요', "WHERE category = '커피' — 커피는 작은따옴표로", "SELECT name, price FROM menu WHERE category = '커피'"],
-  starter: 'SELECT name, price\nFROM menu\n', solution: "SELECT name, price FROM menu WHERE category = '커피'", sql: { dataset: 'cafe', expect: { kind: 'rows' } } },
 // TODO(C-S): S1~S13·SB1~SB3 문제 (총 70개 이상 — 쿼리 작성 50% / 빈칸 20% / 결과 예측 15% / 틀린 곳 고치기 15%). 파일 끝에 PROBLEMS.push(...) 로.
 ];
-const GUIDES = {};
-const DRILLS = [];

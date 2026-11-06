@@ -2,18 +2,15 @@
 // 코스 폴더에 book.js 가 있고 전역 BOOK 이 정의돼 있으면 켜진다(파이썬 v2.9.0 · 터미널·Git v2.10.0). 코스마다 다른 글귀는 BOOK.meta, 빈 레슨 쪽은 BOOK.lessonPages. book.js 가 없는 코스는 이 파일을 불러오지 않는다.
 //   사용자 말: 「학습은 repeat 만 있고 완강해도 혼자 create 는 못 할 것 같다 · 메인은 파이썬 설치와 VS Code 실행법 · 챕터는 문법 설명과 예제(문장으로 된 문제)만 ·
 //              문제와 그에 필요한 문법을 나열 · 어차피 나만 쓸 건데 억지로 붙잡을 필요 없다」
-//   → 문제·채점·타자 연습·복습·XP·잠금은 화면에서 숨긴다(콘텐츠는 content.js 에 그대로). 실행은 사용자의 VS Code 에서.
+//   → 문제·채점·타자 연습·복습·XP·잠금은 v2.19.0(N13)에 archive/classic/ 로 옮겼다. 실행은 사용자의 VS Code 에서.
 // BOOK = { setup: { title, pages:[{title, html}] }, tasks: { 레슨id: [{ title, text, needs:[[이름, '레슨id/쪽'], ...], io?:[{input, output}], pid?, answer? }] } }
 //   pid 가 있으면 그 문제의 첫 테스트를 입력 예·출력 예로, solution 을 예시 답으로 쓴다(정답 검증은 run_solutions 가 이미 함).
 (function () {
   if (typeof BOOK === 'undefined') return;
-  if (/[?&]classic\b/.test(location.search)) return; // 예전 문제집 화면(회귀 테스트·비교용): courses/python/index.html?classic=1
+  // v2.19.0 N13: 예전 문제집 화면(?classic=1)은 archive/classic/ 로 옮겨서 교과서 화면만 있어요
   document.documentElement.classList.add('book-mode');
-  Game.showGame = () => false; // XP·레벨·스트릭·콤보·뱃지 팝업 없음
   // 브라우저 실행 안 함 — 파이썬 엔진(수십 MB)도 안 받음. v2.15.0 알고리즘 교과서(BOOK.meta.viz): 레슨 예제의 「👀 그림으로 보기」·「👣 한 줄씩 보기」를 누를 때만 받음
-  let pyAllow = false; const pyRealStart = typeof Py !== 'undefined' ? Py.start.bind(Py) : null;
-  if (pyRealStart) Py.start = () => { if (pyAllow) pyRealStart(); };
-  if (typeof Onboarding !== 'undefined') Onboarding.start = async () => { Store.data.onboarded = true; Store.save(); }; // 닉네임·하루 목표 묻기 없음
+  const pyRealStart = typeof Py !== 'undefined' ? Py.start.bind(Py) : null; // 파이썬 엔진(수십 MB)은 알고리즘 레슨의 「👀 그림으로 보기」·「👣 한 줄씩 보기」를 누를 때만 받음
   const SETUP_ID = 'SETUP';
   // 코스마다 다른 글귀(v2.10.0: 터미널·Git 도 교과서) — book.js 의 BOOK.meta 가 덮어씀. 기본값 = 파이썬
   const M = Object.assign({
@@ -86,10 +83,10 @@
     const box = v ? `<div class="bk-code"><div class="bk-code-h"><span>${esc(ex.label || M.exampleLabel)}</span><button class="btn xs bk-copy" data-code="${esc(code)}">📋 복사</button></div><pre class="code bk-lined" id="bkExCode">${code.split('\n').map((ln, i) => `<span class="bk-ln" data-ln="${i + 1}">${esc(ln)}\n</span>`).join('')}</pre></div>` : codeBox(code, ex.label || M.exampleLabel);
     const inp = ex.stdin ? `<div class="bk-io"><div><div class="lbl">${M.inLabel}</div><pre class="code">${esc(String(ex.stdin).replace(/\n$/, ''))}</pre></div></div>` : '';
     if (!v) return box + inp;
-    return box + inp + `<div class="card bk-viz"><div class="bk-viz-bar">${ex.visualize ? '<button class="btn accent" id="bkViz">👀 그림으로 보기</button>' : ''}${ex.trace ? '<button class="btn" id="bkTrace">👣 한 줄씩 보기</button>' : ''}</div><div class="muted small bk-viz-note" id="bkVizNote">${ex.visualize ? '이 예제 코드를 돌리며 변수가 바뀌는 모습을 그림으로 보여 줘요' : '이 예제 코드를 한 줄씩 돌리며 변수 값을 표로 보여 줘요'}${Py.ready ? '' : ' · 처음 한 번은 파이썬 엔진을 받아요(몇 초 걸려요, 오른쪽 아래에 진행률)'}</div><div id="bkVizHost" class="bk-viz-host"></div></div>`; };
+    return box + inp + `<div class="card bk-viz"><div class="bk-viz-bar">${ex.visualize ? '<button class="btn accent" id="bkViz">👀 그림으로 보기</button>' : ''}${ex.trace ? '<button class="btn" id="bkTrace">👣 한 줄씩 보기</button>' : ''}</div><div class="muted small bk-viz-note" id="bkVizNote">${ex.visualize ? '이 예제 코드를 돌리며 변수가 바뀌는 모습을 그림으로 보여 줘요' : '이 예제 코드를 한 줄씩 돌리며 변수 값을 표로 보여 줘요'}${Py.ready ? '' : ' · 처음 한 번은 파이썬 엔진을 받아요(몇 초 걸려요 — 이 자리에 진행률이 나와요)'}</div><div id="bkVizHost" class="bk-viz-host"></div></div>`; };
   const bindViz = (root, pg) => { const ex = pg && pg.example; if (!vizOn(ex)) return; const host = $('#bkVizHost', root); const pre = $('#bkExCode', root);
     const ed = { setTraceLine(n) { $$('.bk-ln', pre).forEach(s => s.classList.toggle('on', +s.dataset.ln === n)); const on = n && $(`.bk-ln[data-ln="${n}"]`, pre); if (on && pre.scrollHeight > pre.clientHeight) pre.scrollTop = Math.max(0, on.offsetTop - pre.clientHeight / 2); } };
-    const prep = () => { pyAllow = true; if (!Py.ready) { Py.start(); host.innerHTML = '<div class="muted">파이썬 엔진을 받는 중… (처음 한 번만, 다음부터는 바로 돼요)</div>'; } };
+    const prep = () => { if (!Py.ready) { const show = () => { if (!Py.ready && host.isConnected && !host.querySelector('.viz, .trace')) host.innerHTML = `<div class="muted">${Py.failed ? '⚠ 파이썬 엔진을 받지 못했어요 — 인터넷 연결을 확인하고 다시 눌러 보세요' : `파이썬 엔진을 받는 중… ${Py.progress || 0}% (처음 한 번만, 다음부터는 바로 돼요)`}</div>`; }; if (!prep.hooked) { Py.onState(show); prep.hooked = true; } Py.start(); show(); } }; /* v2.19.0 N13: 예전 오른쪽 아래 진행 표시(Loader)는 보관 — 진행률을 그림 자리에 */
     const vb = $('#bkViz', root); if (vb) vb.onclick = async () => { prep(); await Viz.runAndShow(host, { code: ex.code, input: ex.stdin || '', spec: ex.visualize, editor: ed, title: pg.title }); };
     const tb = $('#bkTrace', root); if (tb) tb.onclick = async () => { prep(); const r = await Py.run({ code: ex.code, input: ex.stdin || '', trace: true }); if (!host.isConnected) return; if (r.trace && r.trace.length) { TracePanel.show(host, r, ed); } else host.innerHTML = `<div class="errbox"><b>${esc(r.ename || '오류')}</b>: ${esc(r.emsg || '')}</div>`; };
   };
@@ -113,8 +110,9 @@
     const d = Store.data;
     const render = () => {
       const isMake = hasMake && cur === pages.length; const pg = pages[cur];
-      if (isSetup) { d.lessons[SETUP_ID + '_' + cur] = { read: 1 }; } else { d.lessons[l.id] = d.lessons[l.id] || {}; d.lessons[l.id].page = cur; if (cur === total - 1) d.lessons[l.id].read = 1; }
-      Store.save({ silent: true });
+      const rk = isSetup ? SETUP_ID + '_' + cur : l.id; const wasRead = !!(d.lessons[rk] || {}).read;
+      if (isSetup) { d.lessons[rk] = { read: 1 }; } else { d.lessons[l.id] = d.lessons[l.id] || {}; d.lessons[l.id].page = cur; if (cur === total - 1) d.lessons[l.id].read = 1; }
+      Store.save({ silent: wasRead || !(d.lessons[rk] || {}).read }); // v2.19.0: 레슨을 처음 다 읽었을 때만 기기 연동으로 올림(쪽 넘김은 이 기기에만)
       const kicker = isSetup ? '🛠 시작하기' : l.boss ? `🛠 ${esc(chName(l.ch))} · 만들어 보기` : `LESSON ${String(l.n ?? '').padStart(2, '0')} <span class="muted">· ${esc(chName(l.ch))}</span>`;
       const tabs = `<div class="bk-tabs">${pages.map((p, i) => `<button class="bk-tab ${i === cur ? 'on' : ''}" data-pg="${i}" title="${esc(p.title)}">${i + 1}</button>`).join('')}${hasMake ? `<button class="bk-tab make ${cur === pages.length ? 'on' : ''}" data-pg="${pages.length}">🛠 만들어 보기</button>` : ''}</div>`;
       let body;
@@ -189,15 +187,6 @@
   };
   { const rt = UI.renderTopbar.bind(UI); UI.renderTopbar = () => { rt(); const tt = $('.tb-title'); if (!tt) return; if (UI.view === 'dogam') tt.textContent = M.dexName; else if (UI.view === 'lesson') { const ll = Content.lesson((UI.params || {}).lessonId); if (ll && ll.boss) tt.textContent = '🛠 만들어 보기'; else if ((UI.params || {}).lessonId === 'SETUP') tt.textContent = '🛠 시작하기'; } }; /* 교과서엔 「보스」 가 없음 */ }
   { const hf = UI.hashFor.bind(UI); UI.hashFor = (view, params) => view === 'dogam' ? '#dogam' : hf(view, params); }
-  // ---------- 설정: 교과서에서 의미 없는 칸 숨기기 (v2.9.5 A-3) ----------
-  // 남김: 테마·글자 크기·고대비·애니메이션 · 용어 사전/에러 사전 · 진행 데이터(내보내기·기기 연동·오프라인·초기화)
-  // 숨김: 키보드(코드 칸 단축키)·효과음·진동 · 하루 목표·게임 요소·코스 전제 무시·온보딩 다시 보기 · 클로드 선생님(API 키 — 교과서엔 선생님 창이 없음)
-  if (Views.settings) { const orig = Views.settings; Views.settings = (root, params) => { orig(root, params);
-    const HIDE_ROWS = ['키보드', '효과음', '진동', T.dailyGoal, '온보딩 다시 보기'];
-    $$('.srow', root).forEach(r => { const lab = ((r.querySelector('span') || {}).textContent || '').trim(); if (HIDE_ROWS.some(h => lab === h || lab.startsWith(h + ' ')) || r.querySelector('#sGame, #sUnlock, #sKeys, #sSound, #sVib, #sOnb')) r.remove(); });
-    $$('.card', root).forEach(c => { const h = (c.querySelector('.card-h') || {}).textContent || ''; if (/클로드 선생님/.test(h)) c.remove(); else if (/^학습/.test(h.trim())) { const hh = c.querySelector('.card-h'); hh.textContent = '찾아보기'; } });
-  }; }
   // 문제 화면 주소(#problem/ID, 예전 링크)는 그 레슨의 「만들어 보기」로
   Views.problem = (root, { pid, lessonId }) => { const p = Content.problem(pid); const lid = lessonId || (p && p.lesson); const l = lid && Content.lesson(lid); UI.go('lesson', { lessonId: lid || 'L0', page: l ? bookPages(l).length : 0 }, false); };
-  ['review', 'typing', 'challenge', 'timeattack', 'checkup', 'mock', 'reviewMore', 'weakness'].forEach(v => { if (Views[v]) Views[v] = () => UI.go('home', {}, false); });
 })();

@@ -1,5 +1,5 @@
 name: PR Check
-# 팀(Opus QA·콘텐츠) 브랜치의 PR 게이트. main 으로 가는 PR 마다: 스키마 검사 + 정답 코드 CPython 실행 + 셸 시뮬레이터 테스트 + 브라우저 회귀(Playwright).
+# main 으로 가는 PR 마다: 스키마 검사 + 교과서 검사(check_book — 예시 답 실제 실행) + 정답 코드 CPython 실행 + 브라우저 회귀(Playwright).
 # main 의 브랜치 보호 규칙에서 "verify" 체크를 필수로 걸면, 이 잡이 초록이 아닌 PR 은 병합할 수 없다 (specs/workflow.md 8절).
 on:
   pull_request:
@@ -34,14 +34,11 @@ jobs:
         run: node tools/check_book.mjs
       - name: run_solutions
         run: node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
-      - name: test_shell
-        run: node tools/test_shell.mjs
-      - run: node tools/run_shell_solutions.mjs # terminal-git 미션·명령 순서 정답을 셸 시뮬레이터로 실행해 goals/expect 통과 확인
-      - run: python3 tools/run_sql_solutions.py # sql 코스 정답 쿼리·예제를 Python sqlite3 로 실행해 에러 없음·1행 이상 확인
+      # v2.19.0 N13: test_shell · run_shell_solutions · run_sql_solutions 는 옛 문제집 화면(가짜 셸·SQL 채점)용이라 archive/classic/tools 로 옮김
       - name: regress (Playwright)
         run: |
           pip install --quiet playwright pillow
           # 브라우저는 러너에 깔린 /usr/bin/google-chrome 을 쓴다(regress.py·run_web_solutions.py 의 executable_path) — playwright install --with-deps 는 쓰지 않는 브라우저+apt 글꼴을 받느라 1.5~14분 걸려서 뺌 (TODO F0)
           test -x /usr/bin/google-chrome
           python3 tools/regress.py
-          python3 tools/run_web_solutions.py # web 코스: 모든 web 문제의 solution 을 미리보기 iframe 에 넣고 checks 전부 ✓ 인지 (Playwright)
+          python3 tools/run_web_solutions.py # 웹 교과서: 만들어 보기 예시 답을 미리보기(tools/web-preview.js)에 넣고 checks 전부 ✓ 인지 (Playwright)

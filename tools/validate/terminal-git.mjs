@@ -39,8 +39,8 @@ export default async (course, { err, warn }) => {
     (l.pages || []).forEach((pg, i) => { const ex = pg.example; if (!ex) return; const w = `레슨 ${l.id} p${i}`; if (ex.code != null) err(`${w}: example.code(파이썬) 는 이 코스에서 쓰지 않아요 — example.shell`); if (ex.shell != null) { if (typeof ex.shell !== 'string' || !ex.shell.trim()) err(`${w}: example.shell 은 명령 문자열(줄바꿈)`); if (ex.setup != null) checkSetup(ex.setup, w, err); const nd = nonDeclarative(ex.setup); if (nd) err(`${w}: example.setup ${nd}`); } else err(`${w}: example 에 shell 이 없어요`); });
     if (l.draft) continue;
     const ps = byLesson[l.id] || [];
-    if (l.boss) { const m = ps.filter(p => p.type === 'mission' && p.boss); if (!m.length) err(`보스 레슨 ${l.id} 에 boss:true 미션이 없어요 (draft 가 아니면 필수)`); }
-    else { if (ps.length < 3) err(`레슨 ${l.id}: 문제 3개 이상 (지금 ${ps.length})`); if (!ps.some(p => p.type === 'mission')) err(`레슨 ${l.id}: 미션 1개 이상`); if (!(l.pages && l.pages.length >= 3)) err(`레슨 ${l.id}: 쪽 3개 이상`); if (!(l.pages || []).some(pg => pg.example && pg.example.shell)) warn(`레슨 ${l.id}: example.shell 예제가 한 쪽도 없어요`); }
+    /* v2.19.0 N13: 레슨마다 미션·문제 개수 규칙은 옛 문제집용이라 뺌(교과서는 book.js 의 만들어 보기 — check_book) */
+    if (!l.boss) { if (!(l.pages && l.pages.length >= 3)) err(`레슨 ${l.id}: 쪽 3개 이상`); if (!(l.pages || []).some(pg => pg.example && pg.example.shell)) warn(`레슨 ${l.id}: example.shell 예제가 한 쪽도 없어요`); }
   }
   for (const p of course.PROBLEMS) if (p.boss) { const l = course.LESSONS.find(x => x.id === p.lesson); if (!(l && l.boss)) err(`${p.id}: boss 문제는 보스 레슨(TB*) 에만`); }
 };

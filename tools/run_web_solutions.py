@@ -50,7 +50,7 @@ with sync_playwright() as p:
     b = p.chromium.launch(executable_path=CHROME, args=['--no-sandbox', '--allow-file-access-from-files']) if CHROME else p.chromium.launch(args=['--no-sandbox', '--allow-file-access-from-files'])
     ctx = b.new_context(viewport={'width': 1280, 'height': 900}); pg = ctx.new_page(); perr = []
     pg.on('pageerror', lambda e: perr.append(str(e)[:300]))
-    pg.goto(URL); pg.wait_for_timeout(600)
+    pg.goto(URL); pg.wait_for_timeout(600); pg.add_script_tag(path=os.path.join(ROOT, 'tools/web-preview.js'))  # v2.19.0 N13: 사이트는 Web 러너를 안 불러서 검사할 때만 넣음
     pg.evaluate("document.querySelectorAll('.modal-ov').forEach(m => m.remove())")
     r = pg.evaluate(JS); b.close()
 fails = 0

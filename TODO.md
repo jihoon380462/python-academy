@@ -5,9 +5,9 @@
 
 ## 0. 지금 상태
 
-- **배포된 버전: v2.18.0** (main). 상태판은 `HANDOFF.md` 0절, **사이트 의도(정상·버그 기준)는 `specs/site-intent.md`**.
-- **교과서 8개**(파이썬 45 · 알고리즘 32 · 터미널·Git 20 · GitHub 22 · SQL 17 · 웹 17 · 공용 Vim 14 · 공용 수학 45) — 설명을 읽고 내 PC 의 진짜 도구로 「🛠 만들어 보기」, 채점·XP 없음, 코스마다 도감. **문제집 코스는 없음**(v2.18.0 수학도 교과서).
-- 다음은 1절 N13(사용자 확인 먼저) → N14 → N7·N8(사용자 11/7 「순서대로」), 그다음 아래 **「예정 코스」**(공용 5개 추가 — 11/6 사용자).
+- **배포된 버전: v2.19.0** (main). 상태판은 `HANDOFF.md` 0절, **사이트 의도(정상·버그 기준)는 `specs/site-intent.md`**.
+- **교과서 8개**(파이썬 45 · 알고리즘 32 · 터미널·Git 20 · GitHub 22 · SQL 17 · 웹 17 · 공용 Vim 14 · 공용 수학 45) — 설명을 읽고 내 PC 의 진짜 도구로 「🛠 만들어 보기」, 채점·XP 없음, 코스마다 도감. **문제집 코스는 없음**(v2.18.0 수학도 교과서) — 예전 문제집 화면은 v2.19.0 에 `archive/classic/` 로 보관.
+- 다음은 1절 N14 → N7·N8(사용자 11/7 「순서대로」), 그다음 아래 **「예정 코스」**(공용 5개 추가 — 11/6 사용자).
 
 ## 1. 남은 일 (위에서부터)
 
@@ -19,16 +19,16 @@
 | N4 | ✅ **완료**(v2.10.1~v2.14.0 · v2.17.1 안내 문구·「이어서 하기」·푸터 정리) — 허브 카드 7개 전부 열림: 교과서 5(파이썬·터미널·Vim·SQL·웹) 「읽은 레슨 n/m」, 문제집 2(알고리즘·수학). 앞으로 교과서를 고칠 때는 같은 PR 에서 `config.js` 의 `lessons`·`bookNote`·`desc`(check_book 이 레슨 수·옛 문구 검사) | `core/config.js` COURSES, `specs/site-intent.md` 6절 | — |
 | N5 | **알고리즘 코스를 교과서로** — 사용자 「1」(11/6) | — | ✅ **완료** v2.15.0 — VS Code 에서 풀기 + 레슨 예제 👀 그림으로 보기·👣 한 줄씩 보기(누를 때만 엔진), 시작하기 4 · 만들어 보기 100(모의고사 15·실전 6 포함, 함수 문제는 「확인 코드」) · 도구 상자 15. 문제 모양은 `core/book-derive.js`(화면·check_book 공용) |
 | N6 | 예정 코스 설계 — **T8 GitHub 가장 중요**(사용자 11/3). N1 터미널·Git 과 겹침(원격·PR·Pages)을 정리해서 설계 | **`specs/github-course.md`** | ✅ 설계 v2.15.4 · **v2.16.0 챕터 1 · v2.16.1 챕터 2 · v2.16.2 챕터 3 · v2.17.0 챕터 4 + G17 — 완성**(레슨 22 · 만들어 보기 63) |
-| N7 | 알고 시각화 core 버그 QA #50·#51·#52(deque·set·dict 그림, 함수 정의형 문제 그림), 편집기·레슨 창 #155~#159, 복습 #149 — 알고 코스(예전 화면 `?classic=1`)에 남은 것. **v2.15.0 부터 교과서에선 레슨 예제 그림(#50~#52 의 deque·set·dict 그림은 해당)만 보임** | `docs/QA.md`·`docs/archive/QA-OPEN.md` 1절 | 대기 |
-| N8 | 알고 C6~C9 (힌트 품질·실전 연습 문제), 알고 레슨 나누기 A6·A16·A18·A19 | `specs/content-team.md` 3절, C11 | 대기 |
+| N7 | 알고 시각화 core 버그 QA #50·#51·#52(deque·set·dict 그림) — 교과서 레슨 예제의 👀 그림에 해당. (편집기·레슨 창 #155~#159 · 복습 #149 · 함수 정의형 문제 그림은 옛 화면과 함께 보관돼서 끝, v2.19.0) | `docs/QA.md`·`docs/archive/QA-OPEN.md` 1절 | 대기 |
+| N8 | 알고 레슨 나누기 A6·A16·A18·A19 (C6~C9 힌트 품질·연습 문제는 옛 문제집용이라 끝, v2.19.0) | `specs/content-team.md` 3절, C11 | 대기 |
 | N9 | 수학 「상」 #145~#147 → 수학 「중」 → M2·M3 (D4 후순위) | `docs/QA.md`, `docs/EXPANSION.md` 14절 | 후순위 |
 | N10 | 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지), 8차 아트 납품되면 검수(docs/IMAGES.md 3-B) | — | ✅ CSS·MAP_DECOR 정리 v2.15.1(17종, 전후 캡처 픽셀 동일) · 아트 검수는 납품 뒤 |
 | N11 | GitHub 교과서 전체 교차 QA — 레슨 0~17 을 한 번에: 말투·용어 통일, 모든 링크에 돌아가기, 화면 이름 재확인 | `specs/github-course.md` | ✅ **완료 v2.17.2** — 따라 하다 막히는 것·레슨 번호·설명 없던 명령·용어(단추→버튼) 고침, 링크 돌아가기 전부 확인, 화면 이름 177개 docs 대조 |
 | N12 | 수학 공간을 교과서로(유일하게 남은 문제집 — D4 후순위였음) | `docs/EXPANSION.md` 14절 | ✅ **완료 v2.18.0** — 사용자 11/7: VS Code 과제 · 옛 문제는 `?classic=1` · 목록 목차(D11) |
-| N13 | 교과서 전환 뒤 안 쓰는 코드 정리(XP·뱃지·채점·복습·지식 지도 — v2.18.0 부터 **모든 코스가 교과서**라 `?classic=1` 화면만 씀, 그림 `assets/img/` 도 이름 조합으로 쓰는 중이라 확인하며). **먼저 사용자 확인**: classic 화면째 지울지, classic 은 남기고 허브·설정의 흔적만 정리할지 | — | 대기 · 사용자 확인 |
+| N13 | 교과서 전환 뒤 안 쓰는 코드 정리 — 사용자 11/7 「1번: 옛 화면을 사이트에서 빼서 다른 폴더에 정리해서 보관」(D12) | `archive/classic/README.md` | ✅ **완료 v2.19.0** — 옛 화면 코드 16·그림 88·옛 문제 268·타자 675 → `archive/classic/`, 되돌리기 브랜치 `classic-v2.18.0` |
 | N14 | **예정 코스 설계** — 아래 「예정 코스」(공용 5 + 코스 5). 순서는 2절 의존 관계 보고 사용자에게 선택지로 | 아래 | 설계 전 |
 
-검증 묶음: `node tools/validate_content.mjs && node tools/check_nesting.mjs && node tools/check_book.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별(`node tools/check_level.mjs --gate`, `node tools/test_shell.mjs`, `node tools/run_shell_solutions.mjs`, `python3 tools/run_sql_solutions.py`, `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py`. 화면을 바꾸면 APP_VERSION + `node tools/stamp.mjs`.
+검증 묶음: `node tools/validate_content.mjs && node tools/check_nesting.mjs && node tools/check_book.mjs && node tools/check_level.mjs --gate && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + `python3 tools/regress.py && python3 tools/run_web_solutions.py`(v2.19.0: 셸·SQL 옛 검사는 `archive/classic/tools`). 화면을 바꾸면 APP_VERSION + `node tools/stamp.mjs`.
 
 ## 2. 작업 방식 (사용자가 반복해서 지적한 것 — 꼭 지키기, 전문은 `specs/workflow.md` 3절)
 
@@ -54,11 +54,12 @@
 | D9 | **터미널·Git·SQL·웹도 교과서로, 연습은 내 컴퓨터 도구**(Git Bash·DB Browser for SQLite·VS Code+브라우저), 터미널·Git 먼저(11/6) | N1~N3 |
 | D10 | **공용 코스 5개 추가**(11/6): 리눅스(우분투 · VirtualBox) · CS(운영체제는 맛보기) · 운영체제(제대로, 우분투에서) · 어셈블리어(x86-64 · NASM · 우분투) · LLM 기초(원리 + 아주 작은 모델 직접). 나머지 예정 코스는 중복을 합쳐 그대로 | 아래 「예정 코스」 T9~T11 · T1 · T2 |
 | D11 | **수학 공간도 교과서**(11/7): 만들어 보기는 VS Code 파이썬 과제 · 옛 문제는 화면에서만 숨기기(`?classic=1`) · 목차는 다른 교과서처럼 목록(지식 지도 대신) | v2.18.0 |
+| D12 | **옛 문제집 화면은 사이트에서 빼서 보관**(11/7): 「1번 — 다른 폴더에 정리해서 보관」. 숨은 문(`?classic=1`)도 없앰, 자료는 `archive/classic/`, 기기의 옛 기록은 지우지 않음 | v2.19.0 |
 
 ## 4. 끝남·보류 (기록)
 
 - ✅ 블록 삭제(v2.4.0) · 레슨 나누기 1차·분 표시 삭제(v2.5.0) · 디자인 개편(v2.6.0) · `check_level` 도구(v2.7.0)·「풀 수 있나」 O1(v2.8.6~v2.8.10, 파이썬·알고 표 0) · CI 속도(v2.7.2) · 플레이 QA 1회전 PR #94(v2.8.11) · 교과서 전환(v2.9.0~v2.9.5).
-- ⏸ **교과서 전환으로 의미가 없어진 것**(파이썬 예전 화면 전용, `?classic=1` 에서만 보임): 파이썬 레슨 나누기 2차(옛 O5 의 L1·L2·L4·L5·L9·L13·L17·L19·L20·L21·L18B), 파이썬 힌트 품질(옛 O7 일부), 출력만 print 해도 통과(PR #94 P1-05), QA #66(B2P1 Parsons 다시 열기)·#160 후속(L12~L18 난이도), 새 코스의 문제 채점 설계(옛 F2: SQL 「기대한 결과」 표 등 — 교과서 방식이라 채점 없음).
+- ⏸ **교과서 전환으로 의미가 없어진 것**(예전 화면 전용 — v2.19.0 에 그 화면과 함께 `archive/classic/` 로 보관): 파이썬 레슨 나누기 2차(옛 O5 의 L1·L2·L4·L5·L9·L13·L17·L19·L20·L21·L18B), 파이썬 힌트 품질(옛 O7 일부), 출력만 print 해도 통과(PR #94 P1-05), QA #66(B2P1 Parsons 다시 열기)·#160 후속(L12~L18 난이도), 새 코스의 문제 채점 설계(옛 F2: SQL 「기대한 결과」 표 등 — 교과서 방식이라 채점 없음).
 - 옛 「★ 지금 할 일(11/5)」 1~7절 원문은 git 기록(`git show 7646efd:TODO.md`)에 있어요.
 
 ---

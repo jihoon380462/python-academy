@@ -7,9 +7,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| **현재 버전** | **v2.18.0 배포**(수학 공간 → 교과서 — 이제 모든 코스가 교과서). 버전별 내용은 [`CHANGELOG.md`](CHANGELOG.md) |
-| **마지막 작업** | (Opus, 11/7) **v2.17.2 N11** GitHub 교과서 교차 QA → **v2.18.0 N12 수학 교과서**(영역 = 챕터 목록 · 레슨 1~45 · 그림은 브라우저 · 만들어 보기 89개 VS Code · 옛 문제는 `?classic=1`) |
-| **다음 후보** | 사용자 「순서대로」(11/7) 의 남은 것 — 번호 선택지로 보여 주기: ① **N13 안 쓰는 코드 정리**(이제 문제집 코스 0개 → XP·뱃지·채점·복습·지식 지도는 `?classic=1` 만 씀 — 지울지, classic 째 둘지 사용자 확인) ② N14 예정 코스 설계(순서는 사용자 선택) ③ N7·N8 알고리즘 잔여 |
+| **현재 버전** | **v2.19.0 배포**(옛 문제집 화면을 사이트에서 빼서 `archive/classic/` 로 보관). 버전별 내용은 [`CHANGELOG.md`](CHANGELOG.md) |
+| **마지막 작업** | (Opus, 11/7) **v2.19.0 N13** — 사용자 「옛 화면을 사이트에서 빼서 다른 폴더에 정리해서 보관」: 옛 화면 코드 16개·그림 88개·옛 문제 268개·타자 연습 675개 → `archive/classic/`(되돌리기 브랜치 `classic-v2.18.0`), 설정·허브·상단바·키보드 안내를 교과서에 맞게, 용어집 돌아가기, 기기 연동이 레슨을 다 읽으면 올라가게, 검사 도구 정리 |
+| **다음 후보** | 사용자에게 번호 선택지로: ① **N14 예정 코스 설계**(공용 5 + 코스 5 중 무엇부터 — 리눅스가 운영체제·어셈블리의 연습 환경) ② N7 알고리즘 그림 버그(#50~#52 deque·set·dict) — 교과서의 👀 그림에 남은 것만 ③ N8 알고리즘 레슨 나누기(A6·A16·A18·A19) |
 | **막힌 것** | 없음 |
 
 ## 1. 이게 뭔가
@@ -52,7 +52,7 @@
 
 ## 4. 교과서 코스 구조 (새 교과서를 만들 때)
 
-- 파일: `courses/<id>/content.js`(COURSE · CHAPTERS · LESSONS — 레슨 `pages` 가 본문) + **`book.js`**(전역 `BOOK`) + `course.json` + `index.html`. 화면은 `core/ui-views-book.js`(마지막에 로드), 문제 모양 파생은 `core/book-derive.js`(화면과 `check_book` 이 같이 씀).
+- 파일: `courses/<id>/content.js`(COURSE · CHAPTERS · LESSONS — 레슨 `pages` 가 본문) + **`book.js`**(전역 `BOOK`) + `course.json` + `index.html`(스크립트 순서는 다른 코스 index.html 그대로 복사). 화면은 `core/ui-views-book.js`(마지막에 로드), 설정·용어집·시작은 `core/app.js`, 문제 모양 파생은 `core/book-derive.js`(화면과 `check_book` 이 같이 씀).
 - `BOOK` 의 주요 칸: `meta`(prereq 경고 · labels · viz) · `setup`(시작하기 쪽) · `builtins`(도감 항목 `{name, desc, code, ref}`) · `tasks`(레슨별 만들어 보기 `{title, text, needs:[[코드, '레슨/쪽', 설명]], answer, io, check, setup, noRun, checks}`) · `check`(검사 방식 `'vim' | 'sql' | 'web' | 'github'`, 없으면 파이썬 실행).
 - 검사: `node tools/check_book.mjs [코스]` 가 예시 답·본문 예제를 **진짜로 실행**(python3 · bash · SQLite · vim)해 출력 예와 비교하고, 「필요한 문법」 링크·단어, 옛 앱 문구, 거북이 `turtle.done()` 등을 본다(①~⑪, `specs/site-intent.md` 7절). 브라우저에서 확인하는 문제(`noRun`)는 `checks`(☐ 목록)가 있어야 한다.
 - 허브: `CONFIG.COURSES` 에 `book: true` · `lessons` · `bookNote` · `short`(허브 안내 문구용 짧은 이름) · 공용 칸이면 `space: true`, `core/hub.js` 의 glyph, `CONFIG.COURSE_ID_PATTERNS`(읽은 레슨 세기).
@@ -65,11 +65,11 @@
 - CI 의 git 은 새 버전(2.48+)이라 출력이 다를 수 있다(예: `git branch -a` 의 `origin/HEAD` 줄, `ls` 정렬은 로캘 영향 → `git ls-files` 사용).
 - 헤드리스에서는 CDN(Pyodide 등)을 못 받는 경우가 있어 regress 는 스텁으로 확인한다. 실제 실행 화면은 사용자가 브라우저에서 본다.
 
-## 6. 데이터 규칙 (문제집 코스 · 옛 문제 — 수학 공간과 `?classic=1` 화면)
+## 6. 데이터 규칙 (옛 문제 — 「만들어 보기」 의 재료)
 
-- 수학 공간: `courses/math/content.js` 맨 위 주석이 노드·문제 스키마(노드 = 레슨 + `subtitle/level/stars/prereq/params[]`, `pages[0].figure` 필수, 문제 `quiz kind:'explore'` · `num answer:{value,tol,unit,why}` …). 설계는 `docs/EXPANSION.md` 14절.
+- 수학: `courses/math/content.js` 맨 위 주석이 노드 스키마(노드 = 레슨 + `subtitle/level/stars/prereq/params[]`, `pages[0].figure` 필수 · `observe` 2~3개). 설계는 `docs/EXPANSION.md` 14절.
 - 옛 문제 스키마는 `courses/python/content.js` 맨 위 주석(+ `docs/EXPANSION.md` 4절 확장 필드). `vary:{a:[lo,hi]}` 의 기본값은 lo. 테스트는 최소 2개, 마지막 1개 숨김.
-- 교과서 화면의 옛 문제집 화면은 주소 끝 `?classic=1`(검수 대상 아님 — `specs/site-intent.md`).
+- content.js 의 `PROBLEMS` 에는 **「만들어 보기」 가 `pid` 로 쓰는 문제만** 있다(v2.19.0). 나머지 옛 문제·타자 연습·가이드와 예전 문제집 화면 전체는 **`archive/classic/`**(사이트는 안 불러옴 · 되돌리기는 브랜치 `classic-v2.18.0` — `archive/classic/README.md`). 기기에 쌓인 옛 XP·뱃지 기록은 저장소에 그대로 둔다(지우지 않음).
 
 ## 7. 문서 지도
 
@@ -79,4 +79,5 @@
 | `specs/site-intent.md` | 사이트 의도 · 코스별 정상 동작 · 자동 검사 — QA 기준 |
 | `specs/workflow.md` · `specs/qa-team.md` | 작업 규칙 · QA 채팅 지시서(QA 는 직접 플레이 → `qa-reports/` 에 PR) |
 | `specs/github-course.md` | GitHub 교과서 설계(새 코스 설계 문서의 본보기) |
-| `docs/` | 설계 결정 · 확장 지시서(EXPANSION) · 그림 요청서(IMAGES) · QA 기록, 끝난 기록은 `docs/archive/` |
+| `docs/` | 설계 결정 · 확장 지시서(EXPANSION) · QA 기록, 끝난 기록은 `docs/archive/` |
+| `archive/classic/` | 보관: 예전 문제집 화면(코드·그림·옛 문제·검사 도구) — `README.md` 에 무엇이 어디 있는지·되돌리는 법 |

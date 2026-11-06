@@ -13,8 +13,6 @@
 //   레슨 pages[].example: { shell:'pwd\nls', setup?:{...} } — 예제를 터미널 창에서 한 줄씩 실행해 보여 줌(파이썬 example.code 는 이 코스에서 쓰지 않는다)
 const COURSE = { id: 'terminal-git', name: '터미널·Git', runner: 'shell', bench: false,
   tutorPersona: '너는 터미널과 Git을 처음 보는 학생을 가르치는 선생님이다. 명령어는 "무엇을 하는지 → 어떻게 치는지 → 잘못 치면 어떻게 되는지" 순서로 설명한다. 실제 bash/Git 에러 문구(영문)를 그대로 보여 주고 한국어로 풀어 준다. 정답 명령을 바로 주지 말고 어느 명령 계열인지부터 짚는다.' };
-const CHECKUPS = { after: {}, upto: {} };
-const WEAKNESS_TAGS = ['경로', '파일조작', '찾기', '파이프', '커밋', '되돌리기', '브랜치', '병합', '원격', '충돌'];
 const CHAPTERS = [
   { ch: 1, name: '터미널', color: '#607d8b' },
   { ch: 2, name: 'Git 기초', color: '#f05033' },
@@ -79,41 +77,6 @@ bash: cd: porjects: No such file or directory</pre>
 ];
 const PROBLEMS = [
 // ---------- T0 터미널이란 (본보기: 미션 2 · 명령 퀴즈 1 · 빈칸 1) ----------
-{ id: 'T0P1', lesson: 'T0', type: 'mission', title: '미션: 어디, 뭐가, 들어가기', xp: 20, tags: ['경로'],
-  prompt: '<p>터미널이 열렸어요. 배운 명령 세 개로 다음을 하세요.</p><ol><li><code>pwd</code>로 지금 어디 있는지 확인하고</li><li><code>ls</code>로 뭐가 있는지 본 다음</li><li><code>projects</code> 폴더 <b>안으로 들어가세요</b>.</li></ol><p>목표 목록이 하나씩 체크되면 제출하면 돼요.</p>',
-  setup: { tree: T0_TREE },
-  goals: [{ text: '<code>pwd</code>로 지금 위치 보기', expect: { historyIncludes: ['pwd'] } }, { text: '<code>ls</code>로 목록 보기', expect: { historyIncludes: ['ls'] } }, { text: 'projects 폴더 안에 있기', expect: { cwd: '/home/me/projects' } }],
-  grader: 'state', expect: { cwd: '/home/me/projects', historyIncludes: ['pwd', 'ls'] },
-  solution: 'pwd\nls\ncd projects', hints: ['세 명령을 한 줄씩 차례로 쳐요. 결과가 안 나오는 명령도 있어요', 'cd 뒤에 띄어쓰기 하고 폴더 이름. 프롬프트의 ~ 뒤가 바뀌면 들어간 거예요', 'pwd → ls → cd projects'] },
-{ id: 'T0P2', lesson: 'T0', type: 'quiz', kind: 'cmd', title: '지금 어디 있지?', tags: ['경로'],
-  prompt: '폴더를 여러 번 옮겨 다녔더니 지금 어디 있는지 헷갈려요. <b>지금 폴더의 전체 경로</b>를 보려면 무엇을 칠까요?',
-  quiz: { opts: ['<code>pwd</code>', '<code>ls</code>', '<code>cd</code>', '<code>where</code>'], ans: 0, why: 'pwd 는 print working directory — "지금 작업 중인 폴더를 출력해" 예요. ls 는 안에 뭐가 있는지, cd 는 이동. 사실 프롬프트에도 늘 보여요.' },
-  hints: ['"어디(where)" 가 아니라 "폴더(directory)" 를 출력(print)하는 명령이에요', '세 글자이고 d 로 끝나요', '첫 번째 보기'] },
-{ id: 'T0P3', lesson: 'T0', type: 'fill', title: '빈칸: 터미널 장면 완성', tags: ['경로'],
-  prompt: '아래는 누군가의 터미널 화면이에요. 결과를 보고 <b>어떤 명령을 쳤는지</b> 빈칸을 채우세요 (<code>$</code> 뒤가 명령, 그 아랫줄이 결과예요).',
-  fill: { code: 'me@academy:~$ ___1___\n/home/me\nme@academy:~$ ___2___\nmemo.txt  notes/  projects/\nme@academy:~$ ___3___ notes\nme@academy:~/notes$ ', blanks: [{ a: ['pwd'] }, { a: ['ls'] }, { a: ['cd'] }], why: '경로가 나왔으면 pwd, 목록이 나왔으면 ls, 프롬프트의 폴더가 바뀌었으면 cd 예요. 결과의 모양으로 명령을 거꾸로 읽을 수 있어요.' },
-  hints: ['첫 결과는 / 로 시작하는 전체 경로예요 — 어디 있나 묻는 명령', '둘째 결과는 파일·폴더 이름이 나란히 — 뭐가 있나 묻는 명령', '셋째는 결과 없이 프롬프트의 ~ 가 ~/notes 로 바뀌었어요 — 이동 명령'] },
-{ id: 'T0P4', lesson: 'T0', type: 'mission', title: '미션: 환영 편지 읽기', xp: 25, tags: ['경로', '파일조작'],
-  prompt: '<p><code>notes</code> 폴더 안에 <code>welcome.txt</code> 라는 편지가 있어요.</p><ol><li><code>notes</code> 폴더로 들어가서</li><li><code>ls</code>로 파일 이름을 확인하고</li><li><code>cat 파일이름</code> 으로 내용을 읽으세요. <code>cat</code>은 파일 내용을 화면에 그대로 보여 주는 명령이에요(다음 레슨에서 자세히).</li></ol>',
-  setup: { tree: T0_TREE },
-  goals: [{ text: 'notes 폴더 안에 있기', expect: { cwd: '/home/me/notes' } }, { text: '<code>ls</code>로 파일 이름 확인', expect: { historyIncludes: ['ls'] } }, { text: '<code>cat</code>으로 편지 읽기', expect: { historyIncludes: ['cat welcome.txt'] } }],
-  grader: 'state', expect: { cwd: '/home/me/notes', historyIncludes: ['ls', 'cat welcome.txt'] },
-  solution: 'cd notes\nls\ncat welcome.txt', hints: ['먼저 cd 로 폴더에 들어가요. 프롬프트가 ~/notes 로 바뀌어야 해요', 'ls 를 치면 welcome.txt 가 보여요. Tab 을 누르면 이름이 자동완성돼요', 'cd notes → ls → cat welcome.txt'] },
 // ---------- TB1 보스: 엉망인 프로젝트 폴더 정리 ----------
-{ id: 'TB1P1', lesson: 'TB1', type: 'mission', boss: true, title: '보스: 엉망인 프로젝트 폴더 정리', xp: 60, tags: ['파일조작', '찾기', '경로'],
-  prompt: '<p><code>~/project</code> 폴더에 파일이 한곳에 뒤섞여 있어요. 아래 구조로 정리하고, <b>TODO</b> 라는 단어가 들어 있는 파일을 찾아 그 파일 이름을 <code>notes.txt</code> 끝에 적으세요.</p><pre>project/\n├── src/    ← .py 파일들\n├── docs/   ← README.md\n├── data/   ← data.csv\n└── notes.txt</pre><p>힌트: 내용으로 찾기는 <code>grep -r 단어 폴더</code>, 파일 끝에 한 줄 붙이기는 <code>echo 글자 &gt;&gt; 파일</code>. 챕터 A에서 배운 것 전부예요. <code>rm -r</code> 로 폴더째 지우지는 마세요.</p>',
-  setup: { cwd: '/home/me/project', tree: { home: { me: { project: { 'main.py': 'from util import helper\nprint(helper())\n', 'util.py': 'def helper():\n    # TODO: 진짜 계산으로 바꾸기\n    return 42\n', 'README.md': '# 프로젝트\n', 'data.csv': 'a,b\n1,2\n', 'notes.txt': 'TODO 가 들어 있는 파일:\n' } } } } },
-  goals: [
-    { text: '<code>src/</code> <code>docs/</code> <code>data/</code> 폴더 만들기', expect: { dirs: ['/home/me/project/src', '/home/me/project/docs', '/home/me/project/data'] } },
-    { text: '.py 파일 두 개를 <code>src/</code> 로 옮기기 (원래 자리에는 없어야)', expect: { files: { '/home/me/project/src/main.py': { includes: 'helper' }, '/home/me/project/src/util.py': { includes: 'TODO' } }, noFiles: ['/home/me/project/main.py', '/home/me/project/util.py'] } },
-    { text: '<code>README.md</code> 는 <code>docs/</code> 로', expect: { files: { '/home/me/project/docs/README.md': { includes: '프로젝트' } }, noFiles: ['/home/me/project/README.md'] } },
-    { text: '<code>data.csv</code> 는 <code>data/</code> 로', expect: { files: { '/home/me/project/data/data.csv': { includes: 'a,b' } }, noFiles: ['/home/me/project/data.csv'] } },
-    { text: 'TODO 가 든 파일 이름을 <code>notes.txt</code> 에 적기 (원래 줄은 그대로)', expect: { files: { '/home/me/project/notes.txt': { includes: 'util.py' } } } },
-  ],
-  grader: 'state', expect: { dirs: ['/home/me/project/src', '/home/me/project/docs', '/home/me/project/data'], files: { '/home/me/project/src/main.py': { includes: 'helper' }, '/home/me/project/src/util.py': { includes: 'TODO' }, '/home/me/project/docs/README.md': { includes: '프로젝트' }, '/home/me/project/data/data.csv': { includes: 'a,b' }, '/home/me/project/notes.txt': { includes: 'util.py' } }, noFiles: ['/home/me/project/main.py', '/home/me/project/util.py', '/home/me/project/README.md', '/home/me/project/data.csv'] },
-  forbid: ['rm -r', 'rm -rf'],
-  solution: 'mkdir src docs data\nmv main.py util.py src/\nmv README.md docs/\nmv data.csv data/\ngrep -r TODO src\necho util.py >> notes.txt',
-  hints: ['순서: 폴더 먼저 만들고(mkdir 는 한 번에 여러 개 가능), mv 로 옮기고, grep 으로 찾고, echo >> 로 적어요', 'mv 는 여러 파일을 한꺼번에 폴더로: mv main.py util.py src/ · 내용 찾기는 grep -r TODO . (결과 앞에 파일 이름이 나와요)', 'mkdir src docs data → mv main.py util.py src/ → mv README.md docs/ → mv data.csv data/ → grep -r TODO src → echo util.py >> notes.txt'] },
 ];
-const DRILLS = []; // 타자 연습 없음(공통 전역 const 구조 유지)
-const GUIDES = {};
+// 타자 연습 없음(공통 전역 const 구조 유지)

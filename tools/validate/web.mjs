@@ -38,5 +38,5 @@ export default async (course, { err, warn }) => {
     if (p.type === 'parsons' && p.parsons && /<\w+/.test(p.parsons.solution || '')) { const lines = String(p.parsons.solution).split('\n').filter(l => l.trim()); if (lines.some(l => /^ *\t/.test(l) || (l.match(/^ */)[0].length % 2))) err(`${where}: HTML parsons 는 들여쓰기 2칸 단위`); }
   }
   for (const l of course.LESSONS) (l.pages || []).forEach((pg, i) => { const ex = pg.example; if (!ex) return; if (ex.code != null) err(`레슨 ${l.id} p${i}: example.code(파이썬)는 이 코스에서 안 돼요 — example.web:{html,css,js}`); if (ex.web != null) { if (typeof ex.web !== 'object') return err(`레슨 ${l.id} p${i}: example.web 은 {html, css?, js?}`); for (const k of Object.keys(ex.web)) if (!TABS.includes(k) || typeof ex.web[k] !== 'string') err(`레슨 ${l.id} p${i}: example.web.${k} — html/css/js 문자열만`); if (ex.web.html == null) err(`레슨 ${l.id} p${i}: example.web.html 이 필요해요`); } });
-  const lessonsDone = course.LESSONS.filter(l => !l.draft && !l.boss); for (const l of lessonsDone) { const probs = course.PROBLEMS.filter(p => p.lesson === l.id); if (probs.length < 3) warn(`레슨 ${l.id}: 문제 ${probs.length}개 (3개 이상 권장)`); }
+  const lessonsDone = course.LESSONS.filter(l => !l.draft && !l.boss); for (const l of lessonsDone) { const probs = course.PROBLEMS.filter(p => p.lesson === l.id); /* v2.19.0 N13: 문제 개수 권장은 옛 문제집용 */ }
 };
