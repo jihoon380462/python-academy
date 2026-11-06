@@ -2,6 +2,7 @@
 // 화면은 core/ui-views-book.js (파이썬 교과서와 같은 틀). 연습은 사용자의 진짜 터미널 = Windows 의 Git Bash.
 // meta: 코스마다 다른 글귀 · setup: 첫 화면 「시작하기」 · lessonPages: 레슨 id → 쪽 목록 통째(content.js 의 「준비 중」 쪽 대신)
 // pages: 'T0/1' → { html | rep } 기존 쪽 고쳐 쓰기(T0 은 연습용 가짜 터미널 기준이라 Git Bash 기준으로)
+// v2.12.0: 파일 끝에 Git 편(GIT_PAGES → lessonPages, T6~TB3 tasks) — 진짜 git 으로 검사(check_book 이 이름·이메일·main·pull.rebase 를 환경 변수로 줌)
 // tasks: 레슨 id → 「만들어 보기」 문제. 필드:
 //   setup  : 준비 명령 — 붙여 넣으면 ~/terminal-study/<문제 폴더> 를 처음 상태로 만들고 그 안으로 들어간다
 //   answer : 예시 답(명령) · check: 확인 명령(다 했으면 치는 것) · io:[{output}] 이렇게 나오면 성공
@@ -19,7 +20,7 @@ const BOOK = {
     dexDocs: '명령 뒤에 <code>--help</code> 를 붙여 쳐 보거나(예: <code>ls --help</code>) bash 설명서 <a href="https://www.gnu.org/software/bash/manual/" target="_blank" rel="noopener">gnu.org/software/bash</a> · Git 설명서 <a href="https://git-scm.com/docs" target="_blank" rel="noopener">git-scm.com/docs</a>',
     dexRun: '예제는 📋 복사해서 Git Bash 에 붙여 넣으면 바로 돌아가고(시작하기 3 의 연습 폴더에서)',
     copyToast: '📋 복사했어요. Git Bash 창에서 마우스 오른쪽 → Paste (또는 Shift+Insert)', exampleLabel: '예제 명령 — 연습 폴더(~/terminal-study/play)에서 한 줄씩 쳐 보세요',
-    makeIntro: 'Git Bash 를 열고, 문제마다 먼저 <b>준비 명령</b>을 붙여 넣어 그 문제용 연습 폴더를 만든 다음 직접 명령을 쳐 보세요. 다 했으면 <b>확인 명령</b>을 쳐서 결과를 비교해요. 엉망이 되면 준비 명령을 다시 붙여 넣으면 처음 상태로 돌아가요.', makeTail: '막히면 「필요한 명령」을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답을 펴 보세요. 명령이 달라도 확인 결과가 같으면 맞아요.',
+    makeIntro: 'Git Bash 를 열고, 문제마다 먼저 <b>준비 명령</b>을 붙여 넣어 그 문제용 연습 폴더를 만든 다음 직접 명령을 쳐 보세요. 다 했으면 <b>확인 명령</b>을 쳐서 결과를 비교해요. 엉망이 되면 준비 명령을 다시 붙여 넣으면 처음 상태로 돌아가요.', makeTail: 'Git 문제(레슨 6~)는 레슨 6 의 이름·이메일 설정이 먼저예요. 막히면 「필요한 명령」을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답을 펴 보세요. 명령이 달라도 확인 결과가 같으면 맞아요.',
     fileExt: '', setupLabel: '준비 명령 — 붙여 넣으면 이 문제용 폴더가 생기고 그 안으로 들어가요', answerLabel: '예시 답(명령)', needsLabel: '필요한 명령',
     checkLabel: '확인 명령 — 다 했으면 이걸 쳐 보세요', outLabel: '이렇게 나오면 성공', inLabel: '입력',
     homeNote: '<code>/c/Users/me</code> 의 <code>me</code> 자리는 내 Windows 사용자 이름이에요',
@@ -49,7 +50,8 @@ const BOOK = {
 <li><b>필요한 명령</b> — 그 문제에 쓰는 명령과 설명 쪽 링크예요. 눌러서 보고 「← 돌아가기」 로 돌아와요.</li>
 <li><b>📚 명령 도감</b> — 배운 명령을 한곳에 모았어요. 실전은 오픈북이에요. 외우지 말고 찾아 쓰세요.</li>
 <li>결과에 보이는 <code>/c/Users/me</code> 의 <code>me</code> 는 사람마다 내 Windows 사용자 이름으로 나와요. 그 부분은 달라도 돼요.</li></ul>
-<p>채점·점수·잠금은 없어요. 아는 레슨은 건너뛰고, 필요한 곳부터 펴 보면 돼요. 챕터 2·3(Git)은 다음 업데이트에 채워져요.</p>` },
+<p>채점·점수·잠금은 없어요. 아는 레슨은 건너뛰고, 필요한 곳부터 펴 보면 돼요.</p>
+<p><b>챕터 2·3(Git)</b> 은 진짜 Git 으로 연습해요. 먼저 레슨 6 의 「처음 한 번: 이름·이메일 설정」 을 하세요(안 하면 준비 명령의 커밋이 <code>Author identity unknown</code> 으로 멈춰요). push·pull 연습은 내 컴퓨터 안의 폴더(<code>remote.git</code>)를 GitHub 대신 쓰고, 진짜 GitHub 는 레슨 16 에서 해요. 결과의 커밋 해시(<code>3f2a1c9</code> 같은 7글자)는 컴퓨터마다 달라서, 확인 명령은 메시지만 보여 줘요.</p>` },
     ],
   },
   // T0 은 연습용 가짜 터미널 기준으로 쓰였던 쪽 — Git Bash 기준으로 고쳐 씀
@@ -338,3 +340,386 @@ $ echo "안녕 $name"
     ],
   },
 };
+
+// ================= v2.12.0 Git 편 (T6~T16 · TB2 · TB3) — 사용자 11/6 「2번 진행」(N1 2차) =================
+// 연습은 진짜 git(Git Bash). 원격(push·pull·clone)은 처음엔 「내 컴퓨터 안의 가짜 GitHub」 = bare 저장소 폴더(remote.git)로, T16 에서 실제 GitHub.
+// 준비 명령의 git init 은 늘 -b main(설치 때 main 을 안 골랐어도 같게). 파일 이름은 영어(한글 이름은 git status 에 \355… 로 보임 — T6 설정에서 quotepath 를 끄지만 같게 보이도록).
+// 검사(check_book): 커밋 해시·날짜는 컴퓨터마다 달라서 확인 명령은 --format=%s(메시지)·status --short·ls-files 처럼 늘 같은 것만.
+const GI = 'git init -q -b main';
+const GC = (msg) => `git add -A && git commit -qm "${msg}"`;
+const GIT_PAGES = {
+  T6: [
+    { title: '최종_진짜최종.py 이야기', html: `<p>과제를 하다 보면 폴더가 이렇게 돼요.</p>
+<pre class="code">report.py
+report_수정.py
+report_최종.py
+report_최종_진짜최종.py
+report_최종_진짜최종_이게마지막.py</pre>
+<p>어느 게 진짜인지, 어제 잘 되던 건 어느 파일이었는지, 무엇이 바뀌었는지 아무도 몰라요. <b>버전 관리</b>는 이 문제를 이렇게 풀어요:</p>
+<ul><li>파일은 <b>하나</b>(<code>report.py</code>)만 둔다</li><li>「여기까지 잘 됨」 싶을 때마다 그 순간의 폴더 전체를 <b>사진 찍듯 기록</b>한다 — 이 기록 한 장이 <b>커밋</b>(commit)</li><li>커밋마다 <b>메시지</b>(무엇을 왜 바꿨나)를 붙인다</li><li>언제든 예전 커밋으로 <b>돌아가거나</b>, 두 커밋 사이에 <b>무엇이 바뀌었는지</b> 볼 수 있다</li></ul>
+<pre class="code">커밋 1 「과제 뼈대」 ── 커밋 2 「그래프 추가」 ── 커밋 3 「오타 수정」  ← 지금</pre>` },
+    { title: 'Git 과 GitHub 는 다른 것', html: `<table class="kb"><tbody><tr><td><b>Git</b></td><td><b>내 컴퓨터</b>의 프로그램. 커밋을 만들고, 역사를 보고, 되돌려요. 인터넷이 없어도 돼요. 시작하기 1 에서 깐 Git for Windows 가 이것</td></tr><tr><td><b>GitHub</b></td><td>Git 저장소를 <b>인터넷에 올려 두는 사이트</b>. 백업, 다른 컴퓨터에서 받기, 다른 사람과 같이 고치기(PR)에 써요. 레슨 11·16</td></tr><tr><td><b>저장소</b>(repository, repo)</td><td>Git 이 기록을 관리하는 폴더. 안에 숨은 <code>.git</code> 폴더가 있고 거기에 모든 커밋이 들어 있어요</td></tr></tbody></table>
+<p>그래서 순서는 늘 <b>① 내 컴퓨터에서 Git 으로 커밋</b> → <b>② 필요하면 GitHub 로 올리기(push)</b> 예요. 챕터 2 는 ①, 챕터 3 은 ② 와 여럿이 일하기예요.</p>
+<p class="muted small">비슷한 사이트로 GitLab·Bitbucket 이 있어요. Git 명령은 똑같아요.</p>` },
+    { title: '처음 한 번: 이름·이메일 설정', html: `<p>커밋마다 「누가 만들었나」 가 기록돼요. 그래서 Git 을 깐 뒤 <b>딱 한 번</b> 이름과 이메일을 알려 줘야 해요. 안 하면 첫 커밋에서 <code>Author identity unknown</code> 에러가 나요.</p>
+<table class="kb"><tbody><tr><td><code>git config --global user.name "지훈"</code></td><td>이름 — GitHub 에 올리면 다른 사람에게 보여요</td></tr><tr><td><code>git config --global user.email "me@example.com"</code></td><td>이메일 — 나중에 GitHub 계정 이메일과 같게 하면 GitHub 가 내 커밋으로 알아봐요</td></tr><tr><td><code>git config --global core.quotepath false</code></td><td>한글 파일 이름이 <code>"\\355\\225\\234"</code> 처럼 깨져 보이지 않게</td></tr><tr><td><code>git config --global pull.rebase false</code></td><td>레슨 11 의 <code>git pull</code> 이 「어떻게 합칠지 정하라」 고 멈추지 않게(설치 때 기본값을 골랐으면 이미 돼 있어요)</td></tr><tr><td><code>git config --global --list</code></td><td>설정한 것 전부 보기</td></tr></tbody></table>
+<p><code>--global</code> 은 「이 컴퓨터의 내 모든 저장소에」 라는 뜻이에요. 설정은 <code>~/.gitconfig</code> 파일에 저장돼요(<code>cat ~/.gitconfig</code> 로 볼 수 있어요).</p>`, example: { shell: 'git config --global user.name "지훈"\ngit config --global user.email "me@example.com"\ngit config --global core.quotepath false\ngit config --global pull.rebase false\ngit config --global --list' } },
+  ],
+  T7: [
+    { title: '세 칸: 작업 폴더 → 스테이징 → 저장소', html: `<p>Git 에서 파일은 세 칸 중 하나에 있어요. 이 그림이 Git 의 거의 전부예요.</p>
+<pre class="code">[작업 폴더]  ──git add──▶  [스테이징]  ──git commit──▶  [저장소(.git)]
+ 내가 고치는 곳             「이번 커밋에 넣을 것」        기록된 커밋들</pre>
+<ul><li><b>작업 폴더</b> — 탐색기에서 보이는 그 파일들. 고치면 여기가 바뀌어요</li><li><b>스테이징</b>(staging area) — 다음 커밋에 넣을 변경을 <b>골라 담는 바구니</b>. 바꾼 것 중 일부만 골라 커밋할 수 있는 이유</li><li><b>저장소</b> — 커밋이 쌓이는 곳. 한번 들어가면 웬만해선 사라지지 않아요</li></ul>
+<p>「왜 바로 커밋 안 하고 바구니를 거치지?」 — 파일 다섯 개를 고쳤는데 그중 두 개는 「로그인 기능」, 세 개는 「오타 수정」 이라면, 바구니에 나눠 담아 커밋 두 개로 남길 수 있어요. 커밋 하나에 「한 가지 일」 이 좋은 기록이에요.</p>` },
+    { title: 'git init · git status', html: `<table class="kb"><tbody><tr><td><code>git init</code></td><td>지금 폴더를 <b>저장소로</b> 만들기 — 숨은 <code>.git</code> 폴더가 생겨요. 프롬프트에 <code>(main)</code> 이 붙어요</td></tr><tr><td><code>git init -b main</code></td><td>첫 브랜치 이름을 확실히 <code>main</code> 으로(설치 때 「Override … main」 을 골랐으면 그냥 <code>git init</code> 과 같아요). 프롬프트가 <code>(master)</code> 면 이걸로 하거나 <code>git branch -m main</code></td></tr><tr><td><code>git status</code></td><td>지금 각 파일이 <b>어느 칸</b>에 있는지. 제일 많이 치는 명령</td></tr><tr><td><code>git status --short</code></td><td>짧게 한 줄씩</td></tr></tbody></table>
+<pre class="code">$ git status --short
+ M app.py       ← 고쳤는데 아직 add 안 함 (오른쪽 M = 작업 폴더에서 바뀜)
+A  new.py       ← add 함 = 스테이징에 있음 (왼쪽 A = 새 파일이 바구니에)
+M  util.py      ← 고치고 add 함 (왼쪽 M)
+?? notes.txt    ← Git 이 아직 모르는 파일(untracked)</pre>
+<p>짧은 표시는 <b>두 글자</b>예요: 왼쪽 = 스테이징, 오른쪽 = 작업 폴더. 아무것도 안 나오면 「커밋할 게 없음(깨끗함)」.</p>
+<p class="muted small"><code>git init</code> 을 홈 폴더(<code>~</code>)에서 하면 홈 전체가 저장소가 돼 버려요. 꼭 프로젝트 폴더 안에서. 잘못했으면 그 폴더의 <code>.git</code> 만 지우면(<code>rm -rf .git</code>) 원래대로예요.</p>`, example: { shell: 'cd ~ && mkdir -p terminal-study && cd terminal-study && rm -rf gitplay && mkdir gitplay && cd gitplay\ngit init -b main\necho "print(1)" > app.py\ngit status\ngit status --short' } },
+    { title: 'git add: 바구니에 담기', html: `<table class="kb"><tbody><tr><td><code>git add app.py</code></td><td>그 파일만</td></tr><tr><td><code>git add a.py b.py</code></td><td>여러 개</td></tr><tr><td><code>git add .</code></td><td>지금 폴더 아래 바뀐 것 <b>전부</b></td></tr><tr><td><code>git add *.py</code></td><td>와일드카드도 돼요(레슨 4)</td></tr></tbody></table>
+<pre class="code">warning: in the working copy of 'app.py', LF will be replaced by CRLF the next time Git touches it</pre>
+<p>Windows 에서 <code>git add</code> 할 때 이 경고가 자주 나와요. 줄바꿈 글자를 Windows 식으로 맞춰 주겠다는 안내일 뿐이라 <b>무시해도 돼요</b>(설치 때 고른 「Checkout Windows-style, commit Unix-style」 때문).</p>
+<p><code>git add .</code> 은 편하지만, 올리면 안 되는 파일(비밀번호·큰 데이터)까지 담길 수 있어요. 담은 뒤 <code>git status</code> 로 한 번 보는 습관 — 그리고 레슨 10 의 <code>.gitignore</code>.</p>`, example: { shell: 'git add app.py\ngit status --short\necho "메모" > notes.txt\ngit add .\ngit status --short' } },
+    { title: 'git commit -m: 기록하기', html: `<p><code>git commit -m "메시지"</code> — 바구니(스테이징)에 담긴 것을 커밋 하나로 기록해요. 바구니는 비워지고, 작업 폴더는 그대로예요.</p>
+<pre class="code">$ git commit -m "첫 프로그램"
+[main (root-commit) 3f2a1c9] 첫 프로그램
+ 2 files changed, 2 insertions(+)
+ create mode 100644 app.py
+ create mode 100644 notes.txt</pre>
+<ul><li><code>3f2a1c9</code> 는 커밋의 <b>이름표(해시)</b>. 컴퓨터마다 달라요</li><li><code>-m</code> 을 빼면 메시지를 쓰라고 <b>편집기</b>(설치 때 고른 VS Code)가 열려요. 쓰고 저장한 뒤 그 탭을 닫으면 커밋돼요</li><li><code>nothing to commit</code> = 바구니가 비었어요. <code>git add</code> 를 먼저</li><li><code>Author identity unknown</code> = 레슨 6 의 이름·이메일 설정을 먼저</li></ul>
+<p>한 바퀴: <b>고치기 → <code>git add</code> → <code>git commit -m</code> → (반복)</b>. 중간중간 <code>git status</code>.</p>`, example: { shell: 'git commit -m "첫 프로그램"\ngit status\necho "print(2)" >> app.py\ngit status --short\ngit add app.py\ngit commit -m "두 번째 줄 추가"' } },
+  ],
+  T8: [
+    { title: 'git log: 역사 보기', html: `<table class="kb"><tbody><tr><td><code>git log</code></td><td>커밋 목록(최근이 위). 해시·누가·언제·메시지</td></tr><tr><td><code>git log --oneline</code></td><td>한 줄에 하나 — 짧은 해시 + 메시지</td></tr><tr><td><code>git log -n 3</code></td><td>최근 3개만</td></tr><tr><td><code>git log --oneline 파일</code></td><td>그 파일을 바꾼 커밋만</td></tr><tr><td><code>git log --stat</code></td><td>커밋마다 어떤 파일이 몇 줄 바뀌었나</td></tr><tr><td><code>git show</code></td><td>마지막 커밋 하나의 내용(무엇이 바뀌었나)까지</td></tr></tbody></table>
+<pre class="code">$ git log --oneline
+b71e0d2 (HEAD -> main) 두 번째 줄 추가
+3f2a1c9 첫 프로그램</pre>
+<div class="bk-warn">목록이 길면 화면이 <code>:</code> 로 끝나며 멈춰요(less 로 보는 중). <kbd>Space</kbd> 다음 쪽, <kbd>q</kbd> 나가기.</div>` , example: { shell: 'git log\ngit log --oneline\ngit log --oneline -n 1\ngit log --stat' } },
+    { title: 'git diff: 무엇이 바뀌었나', html: `<table class="kb"><tbody><tr><td><code>git diff</code></td><td><b>작업 폴더</b> ↔ 스테이징 — 고쳤는데 아직 add 안 한 것</td></tr><tr><td><code>git diff --staged</code></td><td><b>스테이징</b> ↔ 마지막 커밋 — add 해서 「이번 커밋에 들어갈 것」</td></tr><tr><td><code>git diff HEAD~1</code></td><td>지금 ↔ 커밋 하나 전</td></tr></tbody></table>
+<pre class="code">$ git diff
+diff --git a/menu.txt b/menu.txt
+index 2c1f0e3..8d4b7a1 100644
+--- a/menu.txt
++++ b/menu.txt
+@@ -1,2 +1,2 @@
+ 아메리카노 4000
+-라떼 4500
++라떼 5000</pre>
+<p><code>-</code> 로 시작하는 줄 = <b>지워진</b> 줄(빨강), <code>+</code> = <b>새로 생긴</b> 줄(초록), 앞이 빈칸이면 그대로인 줄(앞뒤 맥락). 한 줄을 고치면 「옛 줄 지움 + 새 줄 추가」 로 보여요.</p>
+<p>커밋하기 전에 <code>git diff --staged</code> 로 「내가 무엇을 기록하려는지」 한 번 보는 게 좋은 습관이에요.</p>`, example: { shell: 'echo "print(3)" >> app.py\ngit diff\ngit add app.py\ngit diff\ngit diff --staged' } },
+    { title: '좋은 커밋 메시지', html: `<p>메시지는 <b>몇 달 뒤의 나</b>에게 쓰는 편지예요. <code>git log --oneline</code> 만 보고도 무슨 일이 있었는지 알 수 있어야 해요.</p>
+<table class="kb"><tbody><tr><td>❌ <code>수정</code> · <code>ㅇㅇ</code> · <code>asdf</code> · <code>최종</code></td><td>무엇을? 왜?</td></tr><tr><td>✅ <code>로그인 실패 시 에러 메시지 추가</code></td><td>무엇을 했는지 한눈에</td></tr><tr><td>✅ <code>합계 계산에서 빈 줄 건너뛰기 (빈 줄이면 0 으로 나뉨)</code></td><td>왜인지까지</td></tr></tbody></table>
+<ul><li>첫 줄은 <b>50자 안팎</b>으로 짧게 — 목록에서 잘리지 않게</li><li>「무엇을 + (필요하면) 왜」. 어떻게는 코드(diff)가 말해 줘요</li><li>커밋 하나 = 한 가지 일. 「로그인 추가 및 오타 수정 및 색 변경」 처럼 「및」 이 들어가면 나눌 때예요(레슨 7 의 바구니)</li><li>영어로 쓰는 곳도 많아요: <code>Add login error message</code> (명령형 동사로 시작)</li></ul>` },
+  ],
+  T9: [
+    { title: '고친 파일 되돌리기: git restore', html: `<p>「아까 커밋한 상태로 되돌리고 싶다」 — 커밋해 둔 덕분에 가능해요.</p>
+<table class="kb"><tbody><tr><td><code>git restore app.py</code></td><td>작업 폴더의 app.py 를 <b>마지막 커밋(또는 스테이징) 상태로</b>. 고친 내용은 <b>사라져요</b></td></tr><tr><td><code>git restore .</code></td><td>바꾼 파일 전부</td></tr><tr><td><code>git restore --staged app.py</code></td><td>바구니에서 <b>빼기</b>(unstage). 파일 내용은 그대로 — add 를 취소하는 것</td></tr><tr><td><code>git restore --source HEAD~2 app.py</code></td><td>두 커밋 전 모양으로 그 파일만</td></tr></tbody></table>
+<p><code>git status</code> 의 안내문에도 이 명령이 나와요: <code>(use "git restore &lt;file&gt;..." to discard changes in working directory)</code>.</p>
+<p class="muted small">옛 글에는 <code>git checkout -- 파일</code> 로 나와요. 같은 일을 하는 예전 명령이에요.</p>`, example: { shell: 'echo "망친 코드" > app.py\ngit status --short\ngit restore app.py\ncat app.py\ngit add notes.txt\ngit restore --staged notes.txt' } },
+    { title: '커밋 되돌리기: git reset 세 가지', html: `<p><code>git reset HEAD~1</code> = 「마지막 커밋을 없던 일로」. <code>HEAD</code> 는 지금 커밋, <code>HEAD~1</code> 은 하나 전, <code>HEAD~2</code> 는 둘 전. 옵션에 따라 <b>무엇을 남기는지</b>가 달라요.</p>
+<table class="kb"><tbody><tr><th>명령</th><th>커밋</th><th>스테이징</th><th>작업 폴더(파일 내용)</th></tr><tr><td><code>git reset --soft HEAD~1</code></td><td>취소</td><td><b>남음</b>(바구니에 다시 담긴 채)</td><td>남음</td></tr><tr><td><code>git reset HEAD~1</code> (= <code>--mixed</code>, 기본)</td><td>취소</td><td>비움</td><td><b>남음</b></td></tr><tr><td><code>git reset --hard HEAD~1</code></td><td>취소</td><td>비움</td><td><b>사라짐</b> ⚠</td></tr></tbody></table>
+<ul><li>「커밋 메시지를 다시 쓰고 싶다 / 파일을 더 넣고 다시 커밋」 → <code>--soft</code></li><li>「커밋을 나눠서 다시 하고 싶다」 → 기본(mixed)</li><li>「다 버리고 그 전으로」 → <code>--hard</code>. 커밋 안 한 변경까지 지워져요</li></ul>
+<div class="bk-warn">이미 <b>push 한</b>(GitHub 에 올린) 커밋을 reset 하면 다른 사람 기록과 어긋나요. 올린 뒤 되돌리기는 <code>git revert 커밋</code>(되돌리는 새 커밋을 만듦)이 안전해요.</div>`, example: { shell: 'git log --oneline\ngit reset --soft HEAD~1\ngit status --short\ngit commit -m "다시 커밋"\ngit log --oneline' } },
+    { title: 'git reset --hard 와 안전망 reflog', html: `<p><code>git reset --hard</code>(뒤에 아무것도 안 쓰면 <code>HEAD</code>) = 「마지막 커밋 이후 바꾼 것 <b>전부 버리기</b>」. 폴더가 엉망이 됐을 때 깨끗이 돌아가는 비상구예요.</p>
+<pre class="code">$ git reset --hard
+HEAD is now at b71e0d2 두 번째 줄 추가</pre>
+<p><b>커밋하지 않은 변경</b>은 진짜로 사라져요. 하지만 <b>커밋했던 것</b>은 reset 으로 지워도 한동안 Git 이 기억해요:</p>
+<pre class="code">$ git reflog
+b71e0d2 HEAD@{0}: reset: moving to HEAD~1
+9a8c7e6 HEAD@{1}: commit: 실수로 지운 커밋
+$ git reset --hard 9a8c7e6      ← 그 커밋으로 다시</pre>
+<p>그래서 「일단 커밋해 두기」 가 최고의 보험이에요. 커밋은 거의 잃어버리지 않아요.</p>`, example: { shell: 'echo "엉망" > app.py\ngit reset --hard\ncat app.py\ngit reflog -n 3' } },
+  ],
+  T10: [
+    { title: '.gitignore: Git 이 못 본 척할 파일', html: `<p>저장소 맨 위에 <code>.gitignore</code> 라는 파일을 만들고 한 줄에 하나씩 <b>무시할 이름(패턴)</b>을 적으면, Git 은 그 파일을 <code>git status</code> 에도 안 보이고 <code>git add .</code> 에도 안 담아요.</p>
+<table class="kb"><tbody><tr><td><code>*.log</code></td><td>.log 로 끝나는 파일 전부</td></tr><tr><td><code>__pycache__/</code></td><td>그 이름의 폴더 통째로(끝의 <code>/</code> = 폴더)</td></tr><tr><td><code>.env</code></td><td>그 파일 하나</td></tr><tr><td><code>data/*.csv</code></td><td>data 폴더의 csv 만</td></tr><tr><td><code>!keep.log</code></td><td>앞의 규칙의 예외 — 이건 무시하지 말 것</td></tr><tr><td><code># 메모</code></td><td>주석</td></tr></tbody></table>
+<p>만들기: <code>echo "*.log" &gt;&gt; .gitignore</code> 처럼 한 줄씩, 또는 <code>notepad .gitignore</code> / <code>code .gitignore</code>. <code>.gitignore</code> 자신은 <b>커밋해요</b> — 같이 일하는 사람도 같은 규칙을 쓰게.</p>
+<p class="muted small">파이썬 프로젝트용 모범 목록은 GitHub 의 <a href="https://github.com/github/gitignore/blob/main/Python.gitignore" target="_blank" rel="noopener">github/gitignore — Python.gitignore</a> 에 있어요.</p>`, example: { shell: 'echo "로그" > debug.log\ngit status --short\necho "*.log" >> .gitignore\ngit status --short\ngit add .gitignore\ngit commit -m ".gitignore 추가"' } },
+    { title: '올리면 안 되는 것', html: `<table class="kb"><tbody><tr><td><b>비밀</b></td><td>비밀번호, API 키, 토큰, <code>.env</code>, 개인키(<code>*.pem</code>) — GitHub 에 올리면 <b>몇 분 안에</b> 자동으로 긁어 가는 프로그램들이 있어요</td></tr><tr><td><b>만들어지는 것</b></td><td><code>__pycache__/</code>, <code>*.pyc</code>, 빌드 결과 — 코드만 있으면 다시 만들어져요</td></tr><tr><td><b>환경</b></td><td>가상환경 <code>venv/</code>·<code>.venv/</code>, <code>node_modules/</code> — 수천 개 파일, 컴퓨터마다 다름</td></tr><tr><td><b>큰 데이터</b></td><td>수백 MB 동영상·데이터셋 — GitHub 는 100MB 넘는 파일을 거절해요</td></tr><tr><td><b>개인 설정</b></td><td><code>.vscode/</code> 의 내 설정, OS 가 만드는 <code>Thumbs.db</code>·<code>.DS_Store</code></td></tr></tbody></table>
+<div class="bk-warn"><b>비밀을 한 번이라도 커밋했다면</b> 나중 커밋에서 지워도 <b>역사(옛 커밋)에 그대로 남아요</b>. 이미 push 했다면 그 키·비밀번호는 <b>바로 폐기하고 새로 발급</b>하는 게 정답이에요. 아직 push 전이면 레슨 15 의 방법으로 커밋에서 빼요.</div>` },
+    { title: '이미 커밋한 파일을 무시하려면: git rm --cached', html: `<p><code>.gitignore</code> 는 <b>아직 Git 이 모르는 파일</b>에만 통해요. 이미 커밋한 파일은 목록에 적어도 계속 추적돼요.</p>
+<pre class="code">git rm --cached debug.log      ← Git 의 목록에서만 빼기(파일은 내 폴더에 남음)
+echo "*.log" &gt;&gt; .gitignore
+git add .gitignore
+git commit -m "로그 파일 추적 그만"</pre>
+<table class="kb"><tbody><tr><td><code>git rm --cached 파일</code></td><td>추적만 그만 — 파일은 그대로</td></tr><tr><td><code>git rm 파일</code></td><td>추적 그만 + 파일도 지우기</td></tr><tr><td><code>git rm -r --cached 폴더</code></td><td>폴더째</td></tr><tr><td><code>git ls-files</code></td><td>지금 Git 이 추적하는 파일 목록</td></tr><tr><td><code>git check-ignore -v 파일</code></td><td>이 파일이 왜 무시되는지(어느 줄 때문인지)</td></tr></tbody></table>`, example: { shell: 'git ls-files\ngit check-ignore -v debug.log' } },
+  ],
+  T11: [
+    { title: '원격 저장소: 다른 곳에 있는 같은 저장소', html: `<p>지금까지의 저장소는 내 컴퓨터에만 있어요(<b>로컬</b>). 같은 저장소를 다른 곳(GitHub 등)에 하나 더 두면 그게 <b>원격</b>(remote)이에요. 둘은 <b>따로</b> 있고, 명령으로 맞춰요.</p>
+<pre class="code">[내 컴퓨터: 로컬]  ──git push──▶  [GitHub: 원격 origin]
+                  ◀──git pull──
+                  ◀──git clone── (처음 한 번 통째로 받기)</pre>
+<table class="kb"><tbody><tr><td><code>git push</code></td><td>내 커밋을 원격으로 <b>올리기</b></td></tr><tr><td><code>git pull</code></td><td>원격의 새 커밋을 <b>받아 합치기</b></td></tr><tr><td><code>git clone 주소</code></td><td>원격 저장소를 통째로 <b>복사해 오기</b>(처음 한 번)</td></tr><tr><td><code>origin</code></td><td>원격의 <b>별명</b>. 관례상 첫 원격을 origin 이라 불러요</td></tr></tbody></table>
+<p>커밋만 하고 push 를 안 하면 GitHub 에는 없어요. 「내 컴퓨터에서 커밋」 과 「올리기」 는 다른 일이에요.</p>` },
+    { title: '연습용 「가짜 GitHub」: 폴더 하나', html: `<p>원격은 꼭 인터넷일 필요가 없어요. <b>내 컴퓨터의 다른 폴더</b>도 원격이 될 수 있어요. 계정 없이 push·pull·clone 을 진짜와 똑같이 연습하려고, 「만들어 보기」 에서는 이걸 가짜 GitHub 로 써요.</p>
+<pre class="code">git init --bare remote.git     ← 원격 전용 저장소(작업 폴더 없음 = GitHub 쪽과 같은 모양)</pre>
+<p><code>--bare</code> 저장소는 파일을 직접 고치는 곳이 아니라 <b>커밋만 받아 두는 곳</b>이에요. GitHub 의 저장소도 이런 모양이에요. 주소 자리에 <code>https://github.com/…</code> 대신 폴더 경로(<code>../remote.git</code>)를 쓰는 것만 달라요 — 레슨 16 에서 진짜 주소로 바꿔요.</p>` },
+    { title: 'remote add · push -u · status', html: `<table class="kb"><tbody><tr><td><code>git remote add origin 주소</code></td><td>원격을 origin 이라는 별명으로 등록</td></tr><tr><td><code>git remote -v</code></td><td>등록된 원격 보기</td></tr><tr><td><code>git push -u origin main</code></td><td><b>처음</b> 올릴 때 — main 을 origin 의 main 과 짝지어(<code>-u</code>) 올리기. 다음부터는 <code>git push</code> 만</td></tr><tr><td><code>git status</code></td><td>짝지은 뒤에는 <code>Your branch is ahead of 'origin/main' by 1 commit.</code>(올릴 게 1개) 처럼 원격과의 차이도 알려 줘요</td></tr></tbody></table>
+<pre class="code">$ git push -u origin main
+To ../remote.git
+ * [new branch]      main -> main
+branch 'main' set up to track 'origin/main'.</pre>
+<p>push 가 <code>rejected … (fetch first)</code> 로 거절되면 = 원격에 내가 안 받은 커밋이 있어요. 먼저 <code>git pull</code> 하고 다시 push.</p>`, example: { shell: 'cd ~ && mkdir -p terminal-study && cd terminal-study && rm -rf remoteplay && mkdir remoteplay && cd remoteplay\ngit init --bare remote.git\ngit init -b main me && cd me\necho "hi" > a.txt && git add a.txt && git commit -m "첫 커밋"\ngit remote add origin ../remote.git\ngit push -u origin main\ngit status' } },
+    { title: 'clone · pull: 받아 오기', html: `<table class="kb"><tbody><tr><td><code>git clone 주소 폴더이름</code></td><td>원격을 통째로 받아 새 폴더로. origin 등록·짝짓기까지 자동</td></tr><tr><td><code>git pull</code></td><td>원격의 새 커밋을 받아(<code>fetch</code>) 내 브랜치에 합치기(<code>merge</code>)</td></tr><tr><td><code>git fetch</code></td><td>받기만 — 합치기 전에 무엇이 왔는지 보고 싶을 때(<code>git log --oneline main..origin/main</code>)</td></tr></tbody></table>
+<p>집 컴퓨터와 학교 컴퓨터, 또는 나와 동료가 같은 원격을 쓰는 흐름:</p>
+<pre class="code">일 시작 전:  git pull           ← 남이(다른 컴퓨터가) 올린 것 먼저 받기
+일하고:      git add · git commit
+끝나면:      git push</pre>
+<p><code>fatal: Need to specify how to reconcile divergent branches</code> 가 나오면 레슨 6 의 <code>git config --global pull.rebase false</code> 를 한 번 하고 다시 <code>git pull</code>.</p>`, example: { shell: 'cd ~/terminal-study/remoteplay\ngit clone remote.git friend\ncd friend && echo "친구" >> a.txt && git commit -am "친구가 고침" && git push\ncd ../me\ngit pull\ncat a.txt' } },
+  ],
+  T12: [
+    { title: '브랜치는 커밋에 붙은 이름표', html: `<p><b>브랜치</b>는 커밋 하나를 가리키는 <b>이름표</b>예요. <code>main</code> 도 브랜치예요. 커밋하면 지금 브랜치의 이름표가 새 커밋으로 한 칸 따라와요. <code>HEAD</code> 는 「내가 지금 쓰고 있는 이름표」.</p>
+<pre class="code">A ── B ── C   ← main ← HEAD
+          └── D   ← feature</pre>
+<p>왜 쓰나요? <b>main 은 늘 잘 돌아가는 상태</b>로 두고, 새 기능은 옆 가지(feature)에서 실험해요. 망하면 가지만 버리면 되고, 잘 되면 main 에 합쳐요(레슨 13). GitHub 의 PR(레슨 16)도 브랜치 단위예요.</p>
+<p>이름표라서 만들기·지우기가 아주 가벼워요 — 파일을 복사하는 게 아니에요.</p>` },
+    { title: 'git branch · git switch', html: `<table class="kb"><tbody><tr><td><code>git branch</code></td><td>브랜치 목록. <code>*</code> 가 지금 브랜치</td></tr><tr><td><code>git switch -c feature</code></td><td>feature 를 <b>만들고</b> 그리로 옮기기(create)</td></tr><tr><td><code>git switch main</code></td><td>main 으로 옮기기 — 작업 폴더 파일이 main 의 모양으로 바뀌어요</td></tr><tr><td><code>git branch -d feature</code></td><td>지우기(이미 합친 것만. 안 합친 걸 지우려면 <code>-D</code>)</td></tr><tr><td><code>git log --oneline --graph --all</code></td><td>모든 브랜치를 가지 그림으로</td></tr></tbody></table>
+<pre class="code">$ git branch
+  feature
+* main</pre>
+<p><code>git switch</code> 할 때 <b>커밋 안 한 변경</b>이 있으면 Git 이 막을 수 있어요(<code>Your local changes … would be overwritten</code>). 먼저 커밋하거나 레슨 14 의 <code>git stash</code>.</p>
+<p class="muted small">옛 글의 <code>git checkout -b feature</code> = <code>git switch -c feature</code>, <code>git checkout main</code> = <code>git switch main</code>. 프롬프트의 <code>(main)</code> 이 지금 브랜치예요.</p>`, example: { shell: 'cd ~/terminal-study/gitplay\ngit switch -c feature\necho "새 기능" > feature.txt\ngit add feature.txt && git commit -m "새 기능"\nls\ngit switch main\nls\ngit log --oneline --graph --all' } },
+    { title: '브랜치 이름과 습관', html: `<ul><li>이름은 <b>하는 일</b>로: <code>login-page</code>, <code>fix-total-bug</code>, <code>feat/chart</code>. 띄어쓰기 대신 <code>-</code>·<code>/</code></li><li>일 하나 = 브랜치 하나. 끝나면 합치고 지우기</li><li>main 에서 바로 커밋하기보다 브랜치에서 하고 합치는 습관 — 혼자여도 「실험이 망했을 때」 를 지켜 줘요</li><li>지금 어느 브랜치인지는 <b>프롬프트</b> <code>(feature)</code> 로 늘 확인</li></ul>
+<table class="kb"><tbody><tr><td><code>git branch -m 새이름</code></td><td>지금 브랜치 이름 바꾸기</td></tr><tr><td><code>git switch -</code></td><td>바로 전 브랜치로(<code>cd -</code> 처럼)</td></tr></tbody></table>` },
+  ],
+  T13: [
+    { title: 'git merge: 가지 합치기', html: `<p>main 으로 옮긴 다음 <code>git merge feature</code> = 「feature 의 커밋들을 지금 브랜치(main)에 합쳐라」.</p>
+<p><b>① fast-forward</b> — main 이 그사이 안 움직였으면, 이름표만 앞으로 옮겨요. 새 커밋이 안 생겨요.</p>
+<pre class="code">A ── B   ← main               A ── B ── C ── D   ← main, feature
+     └── C ── D  ← feature   ⇒</pre>
+<p><b>② 3-way 병합</b> — 양쪽 다 새 커밋이 있으면, 둘을 합친 <b>병합 커밋</b>을 하나 새로 만들어요.</p>
+<pre class="code">A ── B ── E   ← main          A ── B ── E ── M   ← main
+     └── C   ← feature    ⇒        └── C ──┘</pre>
+<p>병합 커밋은 메시지(<code>Merge branch 'feature'</code>)를 쓰라고 <b>편집기</b>를 열어요. 기본 메시지 그대로 저장하고 닫으면 끝. 편집기 없이 하려면 <code>git merge --no-edit feature</code>.</p>`, example: { shell: 'cd ~/terminal-study/gitplay\ngit switch main\ngit merge feature\ngit log --oneline --graph --all\ngit branch -d feature' } },
+    { title: '충돌: 같은 줄을 양쪽에서 고쳤을 때', html: `<p>두 가지가 <b>같은 파일의 같은 줄</b>을 다르게 고쳤으면 Git 은 어느 쪽이 맞는지 몰라서 멈춰요. 이게 <b>충돌</b>(conflict)이에요. 고장이 아니라 「사람이 정해 줘」 라는 요청이에요.</p>
+<pre class="code">$ git merge --no-edit feature
+Auto-merging menu.txt
+CONFLICT (content): Merge conflict in menu.txt
+Automatic merge failed; fix conflicts and then commit the result.</pre>
+<p>파일을 열면 Git 이 양쪽을 표시해 둬요:</p>
+<pre class="code">아메리카노 4000
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+라떼 5000            ← 지금 브랜치(main)의 것
+=======
+라떼 4800            ← 합치려는 브랜치(feature)의 것
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature</pre>
+<p><code>git status</code> 에는 <code>both modified: menu.txt</code>(짧게 <code>UU</code>)로 보여요.</p>` },
+    { title: '충돌 해결 세 단계', html: `<div class="bk-step-box"><b>① 파일을 고친다</b><br><code>notepad menu.txt</code> 나 <code>code menu.txt</code> 로 열어 <b>원하는 최종 모양</b>으로 만들고 <b>마커 세 줄</b>(<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> <code>=======</code> <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>)을 지워요. 한쪽만 남겨도, 둘을 섞어도, 완전히 새로 써도 돼요. VS Code 는 위에 「Accept Current Change · Accept Incoming Change · Accept Both Changes」 단추를 보여 줘요(Current = HEAD 쪽, Incoming = 합치려는 쪽).</div>
+<div class="bk-step-box"><b>② 해결했다고 알린다</b><br><code>git add menu.txt</code> — 충돌 난 파일을 add 하는 게 「해결함」 표시예요.</div>
+<div class="bk-step-box"><b>③ 병합을 마친다</b><br><code>git commit --no-edit</code>(기본 메시지로) 또는 <code>git commit -m "메뉴 가격 충돌 해결"</code>.</div>
+<p>마커를 지우지 않고 add 하면 <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> 가 그대로 커밋돼요. 커밋 전에 <code>grep -n "&lt;&lt;&lt;&lt;&lt;&lt;&lt;" 파일</code> 로 남은 마커가 없는지 확인하세요.</p>
+<p><b>그만두고 싶으면</b>: <code>git merge --abort</code> — 합치기 전 상태로 돌아가요.</p>`, example: { shell: 'git status\nnotepad menu.txt\ngrep -n "<<<<<<<" menu.txt\ngit add menu.txt\ngit commit --no-edit\ngit log --oneline --graph' } },
+  ],
+  T14: [
+    { title: 'git stash: 하던 일 잠깐 치워 두기', html: `<p>기능을 만들다가(커밋하기엔 덜 됐는데) 급히 다른 브랜치에서 버그를 고쳐야 할 때. 커밋 안 한 변경을 <b>서랍에 잠깐 넣어 두는</b> 게 <code>git stash</code> 예요.</p>
+<table class="kb"><tbody><tr><td><code>git stash</code></td><td>커밋 안 한 변경을 치우기 — 작업 폴더가 마지막 커밋 모양으로 깨끗해져요</td></tr><tr><td><code>git stash list</code></td><td>서랍 목록(<code>stash@{0}</code> 이 최근)</td></tr><tr><td><code>git stash pop</code></td><td>최근 것을 꺼내 다시 적용하고 서랍에서 빼기</td></tr><tr><td><code>git stash -u</code></td><td>Git 이 모르는 새 파일(<code>??</code>)까지 같이</td></tr><tr><td><code>git stash drop</code></td><td>꺼내지 않고 버리기</td></tr></tbody></table>
+<pre class="code">git stash               ← 하던 것 치우기
+git switch main         ← 급한 일
+… 고치고 커밋 …
+git switch feature
+git stash pop           ← 하던 것 다시</pre>`, example: { shell: 'cd ~/terminal-study/gitplay\necho "덜 된 작업" >> app.py\ngit stash\ngit status --short\ngit stash list\ngit stash pop\ngit status --short' } },
+    { title: 'git rebase: 내 커밋을 최신 main 끝으로 옮기기', html: `<p>feature 를 만든 뒤 main 에 새 커밋이 생겼어요. merge 하면 병합 커밋이 생기는데, <b>rebase</b> 는 내 커밋들을 main 의 <b>끝으로 옮겨 다시 붙여서</b> 한 줄로 만들어요.</p>
+<pre class="code">전:   A ── B ── E   ← main            후(git rebase main):
+           └── C ── D   ← feature      A ── B ── E ── C' ── D'   ← feature</pre>
+<table class="kb"><tbody><tr><td><code>git switch feature</code> → <code>git rebase main</code></td><td>feature 의 커밋을 main 끝으로</td></tr><tr><td>충돌이 나면</td><td>파일 고치고 <code>git add</code> → <code>git rebase --continue</code> · 그만두기 <code>git rebase --abort</code></td></tr></tbody></table>
+<p>그다음 main 에서 <code>git merge feature</code> 하면 fast-forward 로 깔끔하게 합쳐져요.</p>
+<div class="bk-warn">rebase 는 커밋을 <b>새로 만들어</b>(C' D' — 해시가 바뀜) 바꿔 끼워요. 그래서 <b>이미 push 해서 남과 같이 쓰는 브랜치</b>에는 하지 않아요. 내 컴퓨터에만 있는 내 브랜치를 정리할 때만.</div>` },
+    { title: 'merge 냐 rebase 냐', html: `<table class="kb"><tbody><tr><th></th><th>merge</th><th>rebase</th></tr><tr><td>역사 모양</td><td>가지가 갈라졌다 합쳐진 그대로 + 병합 커밋</td><td>한 줄로 곧게</td></tr><tr><td>커밋</td><td>그대로(해시 안 바뀜)</td><td>새로 만들어짐(해시 바뀜)</td></tr><tr><td>안전</td><td>언제나 안전</td><td>남과 같이 쓰는 브랜치엔 금지</td></tr><tr><td>충돌</td><td>한 번에 해결</td><td>커밋마다 나올 수 있음</td></tr></tbody></table>
+<p>입문자 규칙: <b>기본은 merge</b>. 혼자 쓰는 브랜치의 역사를 깔끔하게 하고 싶을 때만 rebase. 헷갈리면 merge 를 쓰면 틀릴 일이 없어요.</p>` },
+  ],
+  T15: [
+    { title: '① 메시지 오타 · 빠뜨린 파일: --amend', html: `<p>방금 한 커밋의 메시지를 고치거나, 깜빡한 파일을 <b>같은 커밋에 넣기</b>.</p>
+<pre class="code">git commit --amend -m "올바른 메시지"      ← 메시지만 다시
+
+git add 빠뜨린파일.py
+git commit --amend --no-edit               ← 파일 넣기(메시지 그대로)</pre>
+<p><code>--amend</code> 는 마지막 커밋을 <b>새 커밋으로 바꿔 끼워요</b>. push 하기 <b>전</b>에만 쓰세요(rebase 와 같은 이유).</p>` },
+    { title: '② main 에 잘못 커밋했다 → 브랜치로 옮기기', html: `<p>feature 에서 할 일을 main 에서 커밋해 버렸어요. 그 커밋을 새 브랜치로 옮기고 main 은 원래대로:</p>
+<pre class="code">git branch feature          ← 지금 커밋(실수한 것)에 feature 이름표를 붙이고
+git reset --hard HEAD~1     ← main 이름표만 한 칸 뒤로 (커밋은 feature 가 갖고 있음)
+git switch feature          ← 거기서 이어서 작업</pre>
+<p>이름표를 먼저 붙였기 때문에 <code>--hard</code> 로 main 을 되돌려도 커밋은 사라지지 않아요(레슨 12 「브랜치는 이름표」). 커밋 안 한 변경이 있으면 먼저 커밋하거나 stash.</p>` },
+    { title: '③ 파일을 실수로 지웠다 · ④ 충돌 중 포기', html: `<p><b>③</b> <code>rm app.py</code> 로 지웠거나 탐색기에서 지웠어요. 커밋해 둔 파일이면:</p>
+<pre class="code">git status --short     ← " D app.py" (지워짐)
+git restore app.py     ← 마지막 커밋 모양으로 되살리기</pre>
+<p>지우고 커밋까지 했으면 <code>git restore --source HEAD~1 app.py</code>(하나 전 커밋에서 꺼내기).</p>
+<p><b>④</b> merge 하다 충돌이 잔뜩 나서 일단 그만두고 싶어요:</p>
+<pre class="code">git merge --abort      ← merge 하기 전 상태로
+git rebase --abort     ← rebase 중이었다면</pre>
+<p>프롬프트에 <code>(main|MERGING)</code> 처럼 <code>MERGING</code> 이 붙어 있으면 「병합 중」 이에요. 끝내든(add·commit) 그만두든(--abort) 해야 해요.</p>` },
+    { title: '⑤ 비밀(.env)을 커밋했다', html: `<p><b>아직 push 전</b>이면 마지막 커밋에서 빼고 다시는 안 담기게:</p>
+<pre class="code">git rm --cached .env           ← 커밋 목록에서 빼기(파일은 남김)
+echo ".env" &gt;&gt; .gitignore      ← 앞으로 무시
+git add .gitignore
+git commit --amend --no-edit   ← 마지막 커밋을 .env 없이 다시</pre>
+<p>더 전의 커밋에 들어갔으면 역사를 고치는 도구(<code>git filter-repo</code>)가 필요해서 입문 범위를 넘어요.</p>
+<div class="bk-warn"><b>이미 push 했다면</b>: 역사에서 지우기 전에 <b>그 비밀번호·키부터 폐기하고 새로 발급</b>하세요. 한 번 공개된 비밀은 지워도 누군가 이미 가져갔다고 봐야 해요.</div>
+<table class="kb"><tbody><tr><th>사고</th><th>해결</th></tr><tr><td>메시지 오타·파일 빠짐</td><td><code>git commit --amend</code></td></tr><tr><td>엉뚱한 브랜치에 커밋</td><td><code>git branch 새이름</code> → <code>git reset --hard HEAD~1</code></td></tr><tr><td>파일 지움</td><td><code>git restore 파일</code></td></tr><tr><td>충돌 중 포기</td><td><code>git merge --abort</code></td></tr><tr><td>비밀 커밋(push 전)</td><td><code>git rm --cached</code> + <code>.gitignore</code> + <code>--amend</code></td></tr><tr><td>커밋을 날림</td><td><code>git reflog</code> → <code>git reset --hard 해시</code></td></tr></tbody></table>` },
+  ],
+  T16: [
+    { title: '실제 GitHub ① 계정과 새 저장소', html: `<div class="bk-step-box"><b>계정</b><br><a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a> 에서 이메일 → 비밀번호 → 사용자 이름(Username) → 이메일 인증. 레슨 6 의 <code>user.email</code> 과 같은 이메일이면 내 커밋에 내 프로필이 붙어요.</div>
+<div class="bk-step-box"><b>새 저장소</b><br>로그인 → 오른쪽 위 <b>+</b> → <b>New repository</b>.<ul><li><b>Repository name</b>: 예) <code>my-first-repo</code></li><li><b>Public</b>(누구나 봄) / <b>Private</b>(나만) — 연습은 Private 도 좋아요</li><li>내 컴퓨터에 이미 저장소가 있으면 <b>Add a README file</b>·<b>.gitignore</b>·<b>license</b> 는 <b>모두 비워 둬요</b>(빈 저장소여야 그대로 push 돼요)</li><li><b>Create repository</b></li></ul></div>
+<p>만든 직후 화면의 <b>「…or push an existing repository from the command line」</b> 칸에 내 저장소 주소가 들어간 명령 세 줄이 나와요. 다음 쪽에서 그대로 써요.</p>` },
+    { title: '실제 GitHub ② 첫 push 와 로그인', html: `<p>내 컴퓨터의 저장소 폴더에서(Git Bash):</p>
+<pre class="code">git remote add origin https://github.com/내아이디/my-first-repo.git
+git branch -M main
+git push -u origin main</pre>
+<p>레슨 11 의 <code>../remote.git</code> 자리에 진짜 주소가 들어갔을 뿐이에요. (<code>git branch -M main</code> 은 브랜치 이름을 main 으로 맞추는 것 — 이미 main 이면 아무 일 없어요.)</p>
+<div class="bk-step-box"><b>처음 push 할 때 로그인</b><br>「Connect to GitHub」 창(Git Credential Manager — 설치 때 고른 것)이 떠요 → <b>Sign in with your browser</b> → 브라우저에서 GitHub 로그인 → <b>Authorize</b>(git-ecosystem 허용) → 창이 닫히고 push 가 이어져요. 한 번 하면 Windows 가 기억해요.</div>
+<p>GitHub 저장소 페이지를 새로고침하면 파일과 커밋이 보여요. 이후로는 <b>커밋 → <code>git push</code></b> 만 하면 돼요.</p>
+<table class="kb"><tbody><tr><td><code>remote origin already exists</code></td><td>이미 origin 이 있어요 → <code>git remote set-url origin 새주소</code></td></tr><tr><td><code>Permission denied</code> · <code>403</code></td><td>다른 계정으로 로그인돼 있어요 → Windows 「자격 증명 관리자」 → Windows 자격 증명 → <code>git:https://github.com</code> 제거 후 다시 push</td></tr><tr><td><code>rejected … fetch first</code></td><td>GitHub 에 내가 없는 커밋(예: 웹에서 만든 README)이 있어요 → <code>git pull</code> 후 push</td></tr></tbody></table>` },
+    { title: '실제 GitHub ③ 남의 저장소 받기 · fork', html: `<table class="kb"><tbody><tr><td><b>clone</b></td><td>저장소 페이지의 초록 <b>&lt;&gt; Code</b> 단추 → HTTPS 주소 복사 → <code>git clone 주소</code></td></tr><tr><td><b>fork</b></td><td>남의 저장소를 <b>내 계정으로 복사</b>(오른쪽 위 <b>Fork</b> → <b>Create fork</b>). 남의 저장소엔 push 권한이 없으니, 내 fork 에 push 하고 PR 로 「받아 주세요」 해요</td></tr></tbody></table>
+<pre class="code">남의 저장소 ──Fork──▶ 내 GitHub 의 복사본 ──clone──▶ 내 컴퓨터
+                       ▲                                │
+                       └──────────── push ──────────────┘
+남의 저장소 ◀──── Pull Request(「내 변경을 합쳐 주세요」) ────</pre>` },
+    { title: '실제 GitHub ④ Pull Request 흐름', html: `<p>여럿이 일할 때(혼자여도 연습으로) main 에 바로 push 하지 않고 이렇게 해요:</p>
+<ol><li><code>git switch -c fix-typo</code> — 브랜치 만들기</li><li>고치고 <code>git add</code> · <code>git commit -m "README 오타 수정"</code></li><li><code>git push -u origin fix-typo</code> — 브랜치를 올리기</li><li>GitHub 저장소 페이지 위에 노란 띠 <b>「fix-typo had recent pushes」</b> → <b>Compare &amp; pull request</b></li><li>제목·설명(무엇을 왜) 쓰고 <b>Create pull request</b></li><li>(동료가) <b>Files changed</b> 탭에서 줄마다 의견 = <b>리뷰</b>. 고칠 게 있으면 같은 브랜치에 커밋·push 하면 PR 에 자동으로 붙어요</li><li><b>Merge pull request</b> → <b>Confirm merge</b> → <b>Delete branch</b></li><li>내 컴퓨터: <code>git switch main</code> → <code>git pull</code> → <code>git branch -d fix-typo</code></li></ol>
+<p>이 사이트(파이썬 아카데미)도 이 흐름으로 만들어지고 있어요 — PR 마다 자동 검사(CI)가 돌고, 통과하면 합쳐져요.</p>` },
+  ],
+};
+// 예제 상자 머리말: Git 예제는 레슨 7 에서 만드는 연습 저장소(gitplay)를 레슨 14 까지 이어 써요(원격은 레슨 11 의 remoteplay)
+const GIT_EX_LABEL = { T6: '예제 명령 — Git Bash 어디서나 (이름·이메일은 내 것으로)', T11: '예제 명령 — 연습 원격(~/terminal-study/remoteplay)에서 한 줄씩', 'T13/2': '충돌이 났을 때 치는 순서 — menu.txt 자리에 충돌 난 파일 이름' };
+for (const [lid, pgs] of Object.entries(GIT_PAGES)) pgs.forEach((pg, i) => { if (pg.example && !pg.example.label) pg.example.label = GIT_EX_LABEL[`${lid}/${i}`] || GIT_EX_LABEL[lid] || '예제 명령 — 레슨 7 에서 만든 연습 저장소(~/terminal-study/gitplay)에서 한 줄씩 (레슨 7 → 14 이어서)'; });
+// 레슨 쪽 → lessonPages
+Object.assign(BOOK.lessonPages, GIT_PAGES);
+Object.assign(BOOK.tasks, {
+  T6: [
+    { title: 'Git 처음 설정', text: '레슨 6 · 3쪽처럼 내 이름과 이메일을 Git 에 알려 주고, 한글 파일 이름이 깨지지 않게·pull 이 멈추지 않게 설정하세요. 끝나면 확인 명령으로 이름과 이메일이 보여야 해요. (이름·이메일은 내 것으로 — 아래 결과의 <code>지훈</code>·<code>me@example.com</code> 자리)',
+      setup: TS('t6-1', []), needs: [['git config --global user.name', 'T6/2', '이름'], ['git config --global user.email', 'T6/2', '이메일'], ['core.quotepath false', 'T6/2', '한글 파일 이름'], ['pull.rebase false', 'T6/2', 'pull 이 멈추지 않게']],
+      answer: 'git config --global user.name "지훈"\ngit config --global user.email "me@example.com"\ngit config --global core.quotepath false\ngit config --global pull.rebase false', check: 'git config --global user.name\ngit config --global user.email', io: [{ output: '지훈\nme@example.com' }] },
+  ],
+  T7: [
+    { title: '첫 저장소, 첫 커밋', text: '이 폴더를 Git 저장소로 만들고 <code>hello.py</code> <b>만</b> 담아 <code>hello 추가</code> 라는 메시지로 커밋하세요. <code>notes.txt</code> 는 아직 커밋하지 않아요.',
+      setup: TS('t7-1', [TF('hello.py', ['print("hello")']), TF('notes.txt', ['메모'])]), needs: [['git init', 'T7/1', '저장소 만들기'], ['git add 파일', 'T7/2', '바구니에 담기'], ['git commit -m', 'T7/3', '기록'], ['git status', 'T7/1', '확인']],
+      answer: 'git init\ngit add hello.py\ngit commit -m "hello 추가"', check: 'git log --format=%s\ngit status --short', io: [{ output: 'hello 추가\n?? notes.txt' }] },
+    { title: '세 칸 읽기', text: '이 저장소에는 ① 커밋한 뒤 고친 파일 ② add 한 새 파일 ③ Git 이 모르는 파일이 하나씩 있어요. <b>짧은 상태</b>를 보고 어느 파일이 어느 칸인지 맞혀 보세요.',
+      setup: TS('t7-2', [GI, TF('a.txt', ['처음']), GC('a 추가'), TF('a.txt', ['고침']), TF('b.txt', ['새 파일']), 'git add b.txt', TF('c.txt', ['모르는 파일'])]), needs: [['git status --short', 'T7/1', '두 글자: 왼쪽 스테이징 · 오른쪽 작업 폴더']],
+      answer: 'git status --short', io: [{ output: ' M a.txt\nA  b.txt\n?? c.txt' }] },
+    { title: '커밋을 두 개로 나누기', text: '파일 세 개를 만들었어요. 「한 커밋 = 한 가지 일」 로 ① <code>README.md</code> 만 <code>README 작성</code> ② <code>login.py</code>·<code>signup.py</code> 를 <code>로그인과 회원가입</code> — 커밋 두 개로 남기세요.',
+      setup: TS('t7-3', [GI, TF('README.md', ['# 내 앱']), TF('login.py', ['def login(): pass']), TF('signup.py', ['def signup(): pass'])]), needs: [['git add 파일', 'T7/2', '골라 담기'], ['git commit -m', 'T7/3', '기록'], ['*.py', 'T4/0', '.py 전부']],
+      answer: 'git add README.md\ngit commit -m "README 작성"\ngit add login.py signup.py\ngit commit -m "로그인과 회원가입"', check: 'git log --format=%s\ngit status --short', io: [{ output: '로그인과 회원가입\nREADME 작성' }] },
+  ],
+  T8: [
+    { title: '바뀐 줄 찾기', text: '<code>menu.txt</code> 를 누가 고쳤어요(아직 add 안 함). <code>git diff</code> 로 <b>지워진 줄</b>과 <b>새로 생긴 줄</b>을 찾으세요.',
+      setup: TS('t8-1', [GI, TF('menu.txt', ['americano 4000', 'latte 4500', 'mocha 5000']), GC('메뉴판'), TF('menu.txt', ['americano 4000', 'latte 5000', 'mocha 5000'])]), needs: [['git diff', 'T8/1', '작업 폴더 ↔ 스테이징'], ['- · +', 'T8/1', '지워진 줄 · 생긴 줄']],
+      answer: 'git diff', run: "git diff | grep '^[-+][^-+]'", io: [{ output: '-latte 4500\n+latte 5000' }] },
+    { title: '커밋할 것 미리 보기', text: '<code>price.txt</code> 를 고쳐 <b>add 까지</b> 했어요. 이 상태에서 그냥 <code>git diff</code> 를 치면 아무것도 안 나와요. 「커밋에 들어갈 변경」 을 보는 명령으로 보세요.',
+      setup: TS('t8-2', [GI, TF('price.txt', ['coffee 3000']), GC('가격표'), TF('price.txt', ['coffee 3500']), 'git add price.txt']), needs: [['git diff --staged', 'T8/1', '스테이징 ↔ 마지막 커밋']],
+      answer: 'git diff\ngit diff --staged', run: "git diff --staged | grep '^[-+][^-+]'", io: [{ output: '-coffee 3000\n+coffee 3500' }] },
+    { title: '그 파일을 바꾼 커밋은?', text: '커밋이 네 개 있어요. 그중 <code>price.txt</code> 를 바꾼 커밋들만 한 줄씩 보세요. (결과 앞의 7글자 해시는 컴퓨터마다 달라요 — 아래는 메시지만)',
+      setup: TS('t8-3', [GI, TF('menu.txt', ['menu']), GC('메뉴 추가'), TF('price.txt', ['3000']), GC('가격 추가'), TF('menu.txt', ['menu', 'tea']), GC('차 메뉴'), TF('price.txt', ['3500']), GC('가격 올림')]), needs: [['git log --oneline 파일', 'T8/0', '그 파일을 바꾼 커밋만']],
+      answer: 'git log --oneline price.txt', run: 'git log --format=%s price.txt', io: [{ output: '가격 올림\n가격 추가' }] },
+  ],
+  T9: [
+    { title: '망친 파일 되살리기', text: '<code>app.py</code> 를 실수로 덮어써서 엉망이 됐어요(아직 커밋 안 함). 마지막 커밋 상태로 되돌리세요.',
+      setup: TS('t9-1', [GI, TF('app.py', ['print("잘 되던 코드")']), GC('잘 되는 버전'), TF('app.py', ['망친 코드'])]), needs: [['git restore 파일', 'T9/0', '마지막 커밋 상태로']],
+      answer: 'git restore app.py', check: 'cat app.py\ngit status --short', io: [{ output: 'print("잘 되던 코드")' }] },
+    { title: '잘못 담은 것 빼기', text: '<code>git add .</code> 를 했더니 <code>secret.txt</code> 까지 바구니에 담겼어요. <code>secret.txt</code> <b>만</b> 바구니에서 빼세요. 파일은 지우지 않아요.',
+      setup: TS('t9-2', [GI, TF('main.py', ['print(1)']), GC('시작'), TF('feature.py', ['print(2)']), TF('secret.txt', ['password=1234']), 'git add .']), needs: [['git restore --staged', 'T9/0', '바구니에서 빼기(내용은 그대로)']],
+      answer: 'git restore --staged secret.txt', check: 'git status --short', io: [{ output: 'A  feature.py\n?? secret.txt' }] },
+    { title: '마지막 커밋 취소(파일은 남기고)', text: '방금 커밋 <code>대충 커밋</code> 이 마음에 안 들어요. 이 커밋을 <b>취소</b>하되, 파일 내용은 그대로 두고 바구니도 비운 상태로 만드세요(다시 나눠 커밋할 수 있게).',
+      setup: TS('t9-3', [GI, TF('a.txt', ['a']), GC('첫 커밋'), TF('b.txt', ['b']), TF('c.txt', ['c']), GC('대충 커밋')]), needs: [['git reset HEAD~1', 'T9/1', '커밋 취소 · 파일 남김(mixed)'], ['HEAD~1', 'T9/1', '하나 전 커밋']],
+      answer: 'git reset HEAD~1', check: 'git log --format=%s\ngit status --short', io: [{ output: '첫 커밋\n?? b.txt\n?? c.txt' }] },
+    { title: '다 버리고 마지막 커밋으로', text: '여러 파일을 이것저것 고쳐 봤는데 다 엉망이에요. 커밋 안 한 변경을 <b>전부</b> 버리고 마지막 커밋 상태로 한 번에 돌아가세요.',
+      setup: TS('t9-4', [GI, TF('a.txt', ['A']), TF('b.txt', ['B']), GC('깨끗한 상태'), TF('a.txt', ['엉망']), TF('b.txt', ['엉망']), 'git add a.txt']), needs: [['git reset --hard', 'T9/2', '커밋 안 한 변경 전부 버리기 ⚠']],
+      answer: 'git reset --hard', check: 'cat a.txt b.txt\ngit status --short', io: [{ output: 'A\nB' }] },
+  ],
+  T10: [
+    { title: '.gitignore 만들기', text: '이 프로젝트에는 올리면 안 되는 것(<code>debug.log</code>, <code>__pycache__</code> 폴더, <code>.env</code>)이 섞여 있어요. <code>.gitignore</code> 를 만들어 세 가지를 무시하게 하세요. <code>git status --short</code> 에 <code>.gitignore</code> 와 <code>main.py</code> 만 보이면 돼요.',
+      setup: TS('t10-1', [GI, 'mkdir __pycache__', TF('main.py', ['print(1)']), TF('debug.log', ['log']), TF('__pycache__/main.cpython-313.pyc', ['x']), TF('.env', ['API_KEY=abc'])]), needs: [['*.log', 'T10/0', '.log 전부'], ['__pycache__/', 'T10/0', '폴더 통째로'], ['.env', 'T10/0', '파일 하나'], ['echo >> .gitignore', 'T3/1', '한 줄씩 이어 쓰기']],
+      answer: 'echo "*.log" >> .gitignore\necho "__pycache__/" >> .gitignore\necho ".env" >> .gitignore', check: 'git status --short', io: [{ output: '?? .gitignore\n?? main.py' }] },
+    { title: '이미 커밋한 로그 파일 빼기', text: '<code>debug.log</code> 를 이미 커밋해 버렸어요. 파일은 내 폴더에 <b>남기고</b> Git 의 추적에서만 빼고, 앞으로 <code>*.log</code> 를 무시하게 한 뒤 <code>로그 파일 추적 그만</code> 으로 커밋하세요.',
+      setup: TS('t10-2', [GI, TF('main.py', ['print(1)']), TF('debug.log', ['log']), GC('처음')]), needs: [['git rm --cached', 'T10/2', '추적만 그만'], ['.gitignore', 'T10/0', '앞으로 무시'], ['git ls-files', 'T10/2', '추적 목록']],
+      answer: 'git rm --cached debug.log\necho "*.log" >> .gitignore\ngit add .gitignore\ngit commit -m "로그 파일 추적 그만"', check: 'git ls-files\nls debug.log\ngit status --short', io: [{ output: '.gitignore\nmain.py\ndebug.log' }] },
+  ],
+  TB2: [
+    { title: '의미 있는 커밋 3개', text: '작은 계산기 프로젝트를 저장소로 만들고, 아래 <b>순서와 메시지</b>로 커밋 세 개를 남기세요. 비밀(<code>.env</code>)과 로그(<code>*.log</code>)는 절대 커밋되면 안 돼요.<ol><li><code>.gitignore</code> 만 — 메시지 <code>gitignore 추가</code> (.env 와 *.log 무시)</li><li><code>calc.py</code>·<code>main.py</code> — <code>계산 기능</code></li><li><code>README.md</code> — <code>사용법 문서</code></li></ol>',
+      setup: TS('tb2-1', [TF('calc.py', ['def add(a, b):', '    return a + b']), TF('main.py', ['from calc import add', 'print(add(2, 3))']), TF('README.md', ['# 계산기', 'python main.py']), TF('.env', ['TOKEN=secret']), TF('run.log', ['ok'])]), needs: [['git init', 'T7/1', '저장소'], ['.gitignore', 'T10/0', '무시 규칙'], ['git add 파일', 'T7/2', '골라 담기'], ['git commit -m', 'T7/3', '기록'], ['git status', 'T7/1', '확인']],
+      answer: 'git init\necho ".env" >> .gitignore\necho "*.log" >> .gitignore\ngit add .gitignore\ngit commit -m "gitignore 추가"\ngit add calc.py main.py\ngit commit -m "계산 기능"\ngit add README.md\ngit commit -m "사용법 문서"',
+      check: "for c in $(git rev-list --reverse HEAD); do git show --name-only --format='[%s]' $c; done\ngit status --short", io: [{ output: '[gitignore 추가]\n\n.gitignore\n[계산 기능]\n\ncalc.py\nmain.py\n[사용법 문서]\n\nREADME.md' }] },
+    { title: '🏠 일기장 버전 관리', text: '일기 폴더를 저장소로 만들어요. ① <code>diary.txt</code> 를 <code>11월 5일</code> 로 커밋 ② 맨 끝에 <code>11/6 Git 배움</code> 한 줄을 붙여 <code>11월 6일</code> 로 커밋 ③ 그런데 실수로 <code>echo 망함 &gt; diary.txt</code>(<code>&gt;</code> 하나!)를 쳐 버렸어요 — 마지막 커밋 상태로 되살리세요.',
+      setup: TS('tb2-2', [TF('diary.txt', ['11/5 터미널 배움'])]), needs: [['git init', 'T7/1', '저장소'], ['>>', 'T3/1', '이어 쓰기'], ['git commit -am', 'T7/3', '(추적 중인 파일) add 와 commit 한 번에'], ['git restore', 'T9/0', '되살리기']],
+      answer: 'git init\ngit add diary.txt\ngit commit -m "11월 5일"\necho "11/6 Git 배움" >> diary.txt\ngit commit -am "11월 6일"\necho 망함 > diary.txt\ngit restore diary.txt', check: 'cat diary.txt\ngit log --format=%s', io: [{ output: '11/5 터미널 배움\n11/6 Git 배움\n11월 6일\n11월 5일' }] },
+  ],
+  T11: [
+    { title: '가짜 GitHub 에 첫 push', text: '<code>me</code> 저장소(커밋 1개)와 빈 원격 <code>remote.git</code> 이 있어요. 지금 <code>me</code> 안에 있어요. <code>../remote.git</code> 을 <code>origin</code> 으로 등록하고 main 을 올리세요(처음이니 짝짓기까지).',
+      setup: TS('t11-1', ['git init -q --bare remote.git', `${GI} me && cd me`, TF('app.py', ['print("v1")']), GC('첫 버전')]), needs: [['git remote add origin', 'T11/2', '원격 등록'], ['git push -u origin main', 'T11/2', '처음 올리기'], ['../', 'T1/2', '한 칸 위 폴더']],
+      answer: 'git remote add origin ../remote.git\ngit push -u origin main', check: 'git -C ../remote.git log --format=%s main\ngit status -sb | head -n 1', io: [{ output: '첫 버전\n## main...origin/main' }] },
+    { title: 'clone 으로 통째로 받기', text: '원격 <code>remote.git</code> 에 커밋이 두 개 있어요. 이걸 <code>mycopy</code> 라는 폴더로 받아 들어가서, 파일과 커밋 목록을 보세요.',
+      setup: TS('t11-2', ['git init -q --bare remote.git', `${GI} tmp && cd tmp`, TF('a.txt', ['A']), GC('a 추가'), TF('b.txt', ['B']), GC('b 추가'), 'git push -q ../remote.git main && cd .. && rm -rf tmp']), needs: [['git clone 주소 폴더', 'T11/3', '통째로 받기'], ['cd', 'T0/2', '들어가기'], ['git log', 'T8/0', '커밋 목록']],
+      answer: 'git clone remote.git mycopy\ncd mycopy\nls -1\ngit log --oneline', run: 'git clone -q remote.git mycopy\ncd mycopy\nls -1\ngit log --format=%s', io: [{ output: 'a.txt\nb.txt\nb 추가\na 추가' }] },
+    { title: '친구가 올린 것 받기', text: '나(<code>me</code>)와 친구(<code>friend</code>)가 같은 원격을 써요. 방금 친구가 <code>todo.txt</code> 에 한 줄을 더해 push 했어요. 지금 <code>me</code> 안에 있어요. 친구의 커밋을 받아 오세요.',
+      setup: TS('t11-3', ['git init -q --bare remote.git', 'git clone -q remote.git me 2>/dev/null && cd me', TF('todo.txt', ['- 장보기']), GC('할 일 시작'), 'git push -q -u origin main', 'cd .. && git clone -q remote.git friend && cd friend', 'echo "- 빨래 (친구)" >> todo.txt', GC('빨래 추가'), 'git push -q && cd ../me']), needs: [['git pull', 'T11/3', '받아 합치기']],
+      answer: 'git pull', check: 'cat todo.txt\ngit log --format=%s', io: [{ output: '- 장보기\n- 빨래 (친구)\n빨래 추가\n할 일 시작' }] },
+  ],
+  T12: [
+    { title: '브랜치에서 실험하기', text: '<code>feature</code> 브랜치를 만들어 옮긴 다음 <code>chart.py</code> 를 만들어 <code>차트 실험</code> 으로 커밋하세요. 그다음 <b>main 으로 돌아오면</b> <code>chart.py</code> 가 폴더에서 사라져 보이는 걸 확인하세요(feature 에만 있으니까).',
+      setup: TS('t12-1', [GI, TF('app.py', ['print("앱")']), GC('앱 시작')]), needs: [['git switch -c', 'T12/1', '만들고 옮기기'], ['git switch main', 'T12/1', '돌아오기'], ['ls', 'T1/1', '폴더 보기']],
+      answer: 'git switch -c feature\necho "print(\\"chart\\")" > chart.py\ngit add chart.py\ngit commit -m "차트 실험"\ngit switch main\nls', check: 'git branch --show-current\nls -1\ngit log --format=%s feature', io: [{ output: 'main\napp.py\n차트 실험\n앱 시작' }] },
+    { title: '지금 어느 브랜치?', text: '브랜치가 몇 개 있어요. 목록을 보고 <b>지금 있는 브랜치</b>(<code>*</code>)가 무엇인지 찾으세요.',
+      setup: TS('t12-2', [GI, TF('a.txt', ['a']), GC('첫'), 'git branch login-page', 'git branch fix-bug', 'git switch -q login-page']), needs: [['git branch', 'T12/1', '목록과 * 표시']],
+      answer: 'git branch', io: [{ output: '  fix-bug\n* login-page\n  main' }] },
+    { title: '다 쓴 브랜치 지우기', text: '<code>old-idea</code> 브랜치는 이미 main 에 합쳤어요. main 으로 옮겨서 <code>old-idea</code> 를 지우세요.',
+      setup: TS('t12-3', [GI, TF('a.txt', ['a']), GC('첫'), 'git switch -qc old-idea', TF('b.txt', ['b']), GC('아이디어'), 'git switch -q main', 'git merge -q old-idea', 'git switch -q old-idea']), needs: [['git switch main', 'T12/1', '옮기기(지금 브랜치는 못 지움)'], ['git branch -d', 'T12/1', '합친 브랜치 지우기']],
+      answer: 'git switch main\ngit branch -d old-idea', check: 'git branch', io: [{ output: '* main' }] },
+  ],
+  T13: [
+    { title: 'fast-forward 로 합치기', text: '<code>feature</code> 에 커밋 두 개가 있고, main 은 그사이 그대로예요. main 으로 가서 feature 를 합치세요.',
+      setup: TS('t13-1', [GI, TF('a.txt', ['a']), GC('시작'), 'git switch -qc feature', TF('b.txt', ['b']), GC('기능 1'), TF('c.txt', ['c']), GC('기능 2')]), needs: [['git switch main', 'T12/1', 'main 으로'], ['git merge', 'T13/0', '합치기']],
+      answer: 'git switch main\ngit merge feature', check: 'git log --format=%s\nls -1', io: [{ output: '기능 2\n기능 1\n시작\na.txt\nb.txt\nc.txt' }] },
+    { title: '양쪽 다 바뀌었을 때 합치기', text: 'main 과 <code>feature</code> 가 서로 <b>다른 파일</b>을 커밋했어요. main 에서 feature 를 합치되, 편집기 없이 기본 메시지로 병합 커밋을 만드세요.',
+      setup: TS('t13-2', [GI, TF('a.txt', ['a']), GC('시작'), 'git switch -qc feature', TF('style.css', ['body {}']), GC('스타일'), 'git switch -q main', TF('readme.txt', ['설명']), GC('설명서')]), needs: [['git merge --no-edit', 'T13/0', '3-way 병합 · 기본 메시지']],
+      answer: 'git merge --no-edit feature', check: 'git log --format=%s -n 1\nls -1', io: [{ output: "Merge branch 'feature'\na.txt\nreadme.txt\nstyle.css" }] },
+    { title: '충돌 해결하기', text: 'main 은 라떼를 <code>5000</code>, <code>feature</code> 는 <code>4800</code> 으로 고쳤어요. 합치면 충돌이 나요. 회의 결과 <b>4800</b> 으로 하기로 했어요 — 파일을 <code>americano 4000</code> / <code>latte 4800</code> 두 줄로 고치고(마커 없이) 해결을 마치세요.',
+      setup: TS('t13-3', [GI, TF('menu.txt', ['americano 4000', 'latte 4500']), GC('메뉴판'), 'git switch -qc feature', TF('menu.txt', ['americano 4000', 'latte 4800']), GC('라떼 4800'), 'git switch -q main', TF('menu.txt', ['americano 4000', 'latte 5000']), GC('라떼 5000')]), needs: [['git merge', 'T13/0', '합치기'], ['<<<<<<< ======= >>>>>>>', 'T13/1', '충돌 표시'], ['notepad 파일', 'T3/3', '편집기로 고치기'], ['git add → git commit', 'T13/2', '해결 표시 → 마치기']],
+      answer: 'git merge --no-edit feature\nnotepad menu.txt      # 마커 세 줄을 지우고 latte 4800 만 남겨 저장\ngit add menu.txt\ngit commit --no-edit', run: "git merge --no-edit feature\nprintf '%s\\n' 'americano 4000' 'latte 4800' > menu.txt\ngit add menu.txt\ngit commit -q --no-edit", check: "cat menu.txt\ngrep -c '<<<<<<<' menu.txt\ngit status --short\ngit log --format=%s -n 1", io: [{ output: "americano 4000\nlatte 4800\n0\nMerge branch 'feature'" }] },
+  ],
+  T14: [
+    { title: '하던 일 잠깐 치우기', text: '<code>app.py</code> 를 고치던 중(커밋 안 함)인데 급하게 깨끗한 상태가 필요해요. 변경을 stash 로 치워서 <code>git status</code> 가 깨끗한 걸 확인한 다음, 다시 꺼내 원래대로 이어 가세요.',
+      setup: TS('t14-1', [GI, TF('app.py', ['print("v1")']), GC('v1'), 'echo "print(\\"작업 중\\")" >> app.py']), needs: [['git stash', 'T14/0', '치우기'], ['git stash pop', 'T14/0', '다시 꺼내기'], ['git status', 'T7/1', '확인']],
+      answer: 'git stash\ngit status --short\ngit stash pop', check: 'cat app.py\ngit status --short\ngit stash list | wc -l', io: [{ output: 'print("v1")\nprint("작업 중")\n M app.py\n0' }] },
+    { title: '내 커밋을 최신 main 끝으로', text: '<code>feature</code> 를 만든 뒤 main 에 <code>보안 수정</code> 커밋이 생겼어요. 지금 feature 에 있어요. feature 의 커밋을 main 끝으로 옮겨 한 줄 역사로 만드세요.',
+      setup: TS('t14-2', [GI, TF('a.txt', ['a']), GC('시작'), 'git switch -qc feature', TF('f.txt', ['f']), GC('내 기능'), 'git switch -q main', TF('s.txt', ['s']), GC('보안 수정'), 'git switch -q feature']), needs: [['git rebase main', 'T14/1', 'main 끝으로 옮기기']],
+      answer: 'git rebase main', check: 'git log --format=%s\nls -1', io: [{ output: '내 기능\n보안 수정\n시작\na.txt\nf.txt\ns.txt' }] },
+  ],
+  T15: [
+    { title: '① 메시지 오타 고치기', text: '방금 커밋 메시지를 <code>로긴 추가</code> 라고 잘못 썼어요. <code>로그인 추가</code> 로 고치세요(아직 push 안 함).',
+      setup: TS('t15-1', [GI, TF('login.py', ['def login(): pass']), GC('로긴 추가')]), needs: [['git commit --amend -m', 'T15/0', '마지막 커밋 메시지 다시']],
+      answer: 'git commit --amend -m "로그인 추가"', check: 'git log --format=%s', io: [{ output: '로그인 추가' }] },
+    { title: '② main 에 잘못 커밋 → 브랜치로 옮기기', text: '<code>실험 기능</code> 커밋을 feature 에서 해야 했는데 main 에서 해 버렸어요. 그 커밋을 새 브랜치 <code>experiment</code> 로 옮기고, main 은 <code>안정 버전</code> 으로 되돌리세요.',
+      setup: TS('t15-2', [GI, TF('app.py', ['print(1)']), GC('안정 버전'), TF('exp.py', ['print("실험")']), GC('실험 기능')]), needs: [['git branch 이름', 'T15/1', '지금 커밋에 이름표'], ['git reset --hard HEAD~1', 'T15/1', 'main 만 한 칸 뒤로']],
+      answer: 'git branch experiment\ngit reset --hard HEAD~1', check: 'git log --format=%s main\ngit log --format=%s experiment', io: [{ output: '안정 버전\n실험 기능\n안정 버전' }] },
+    { title: '③ 지운 파일 되살리기', text: '<code>rm app.py</code> 로 파일을 지워 버렸어요(커밋은 해 뒀어요). 되살리세요.',
+      setup: TS('t15-3', [GI, TF('app.py', ['print("소중한 코드")']), GC('앱'), 'rm app.py']), needs: [['git status --short', 'T7/1', ' D = 지워짐'], ['git restore', 'T15/2', '되살리기']],
+      answer: 'git status --short\ngit restore app.py', check: 'cat app.py\ngit status --short', io: [{ output: 'print("소중한 코드")' }] },
+    { title: '④ 충돌 중 포기하기', text: '합치다가 충돌이 났어요(프롬프트에 <code>MERGING</code>). 오늘은 그만두고 합치기 <b>전</b> 상태로 돌아가세요.',
+      setup: TS('t15-4', [GI, TF('a.txt', ['원래']), GC('시작'), 'git switch -qc other', TF('a.txt', ['다른쪽']), GC('다른쪽'), 'git switch -q main', TF('a.txt', ['이쪽']), GC('이쪽'), 'git merge -q other >/dev/null 2>&1; true']), needs: [['git merge --abort', 'T15/2', '합치기 그만두기']],
+      answer: 'git merge --abort', check: 'cat a.txt\ngit status --short\ngit log --format=%s -n 1', io: [{ output: '이쪽\n이쪽' }] },
+    { title: '⑤ 비밀을 커밋했다(push 전)', text: '방금 <code>설정 추가</code> 커밋에 <code>.env</code>(비밀키)가 같이 들어갔어요. 아직 push 전이에요. <code>.env</code> 를 그 커밋에서 빼고(파일은 남기고) 앞으로 무시하도록 <code>.gitignore</code> 를 같은 커밋에 넣으세요. 메시지는 그대로.',
+      setup: TS('t15-5', [GI, TF('app.py', ['print(1)']), GC('앱'), TF('config.py', ['DEBUG = False']), TF('.env', ['KEY=secret']), GC('설정 추가')]), needs: [['git rm --cached', 'T10/2', '추적에서만 빼기'], ['.gitignore', 'T10/0', '앞으로 무시'], ['git commit --amend --no-edit', 'T15/0', '마지막 커밋 다시(메시지 그대로)']],
+      answer: 'git rm --cached .env\necho ".env" >> .gitignore\ngit add .gitignore\ngit commit --amend --no-edit', check: 'git show --name-only --format=%s HEAD\nls -a | grep env', io: [{ output: '설정 추가\n\n.gitignore\nconfig.py\n.env' }] },
+  ],
+  T16: [
+    { title: '내 GitHub 에 첫 저장소 올리기', text: '레슨 16 의 ①~② 를 따라 실제 GitHub 에 올려 보세요. 올릴 저장소는 아무거나 — 예: TB2 의 계산기(<code>~/terminal-study/tb2-1</code>). GitHub 저장소 페이지에 파일 세 개(<code>.gitignore</code>, <code>calc.py</code> …)와 커밋 3개가 보이고, <b><code>.env</code> 는 없으면</b> 성공이에요.',
+      needs: [['New repository', 'T16/0', 'GitHub 에서 빈 저장소'], ['git remote add origin https://…', 'T16/1', '진짜 주소 등록'], ['git push -u origin main', 'T16/1', '첫 push · 브라우저 로그인']],
+      answer: 'cd ~/terminal-study/tb2-1\ngit remote add origin https://github.com/내아이디/calc.git\ngit branch -M main\ngit push -u origin main', noRun: true },
+    { title: '혼자 해 보는 Pull Request', text: '위 저장소에서 레슨 16 · 4쪽의 PR 흐름을 한 바퀴 해 보세요: 브랜치 <code>docs-update</code> → README 에 한 줄 추가 → 커밋 → <code>git push -u origin docs-update</code> → GitHub 에서 <b>Compare &amp; pull request</b> → <b>Create pull request</b> → <b>Merge pull request</b> → 내 컴퓨터에서 main 으로 pull. 끝나면 <code>git log --oneline</code> 에 그 커밋이 main 에 있어야 해요.',
+      needs: [['git switch -c', 'T12/1', '브랜치'], ['git push -u origin 브랜치', 'T16/3', '브랜치 올리기'], ['Compare & pull request', 'T16/3', 'GitHub 단추'], ['git pull', 'T11/3', '합쳐진 main 받기']],
+      answer: 'git switch -c docs-update\necho "- 덧셈만 돼요" >> README.md\ngit commit -am "README 에 기능 설명"\ngit push -u origin docs-update\n(GitHub 에서 PR 만들고 Merge)\ngit switch main\ngit pull\ngit branch -d docs-update', noRun: true },
+  ],
+  TB3: [
+    { title: '충돌 해결하고 push', text: '친구(<code>friend</code>)가 방금 <code>menu.txt</code> 의 라떼를 <code>4800</code> 으로 바꿔 push 했어요. 나(<code>me</code>, 지금 여기)는 같은 줄을 <code>5000</code> 으로 바꿔 <b>커밋만</b> 해 둔 상태예요. 받아서 충돌을 <b>둘 다 살려</b> <code>latte 4800 (점심 할인 5000→4800)</code> 한 줄로 해결하고, 원격에 올리세요. 원격 main 에 병합 커밋이 1개(전체 커밋 4개: 메뉴판·라떼 할인·라떼 인상·병합) 있고 마커가 없어야 해요. <span class="muted small">(확인 명령의 <code>git -C 폴더</code> = 그 폴더에서 git 을 실행)</span>',
+      setup: TS('tb3-1', ['git init -q --bare remote.git', 'git clone -q remote.git me 2>/dev/null && cd me', TF('menu.txt', ['americano 4000', 'latte 4500']), GC('메뉴판'), 'git push -q -u origin main', 'cd .. && git clone -q remote.git friend && cd friend', TF('menu.txt', ['americano 4000', 'latte 4800']), GC('라떼 할인'), 'git push -q && cd ../me', TF('menu.txt', ['americano 4000', 'latte 5000']), GC('라떼 인상')]),
+      needs: [['git push', 'T11/2', '거절되면 먼저 pull'], ['git pull', 'T11/3', '받아 합치기 → 충돌'], ['<<<<<<< ======= >>>>>>>', 'T13/1', '충돌 표시'], ['git add → git commit', 'T13/2', '해결 마치기']],
+      answer: 'git push                 # rejected (fetch first) — 원격에 친구 커밋이 있어서\ngit pull --no-edit       # 충돌!\nnotepad menu.txt         # 마커를 지우고 latte 줄을 아래처럼 한 줄로\ngit add menu.txt\ngit commit --no-edit\ngit push',
+      run: "git pull -q --no-edit >/dev/null 2>&1; true\nprintf '%s\\n' 'americano 4000' 'latte 4800 (점심 할인 5000→4800)' > menu.txt\ngit add menu.txt\ngit commit -q --no-edit\ngit push -q", check: "git -C ../remote.git show main:menu.txt\ngit -C ../remote.git log --merges --oneline main | wc -l\ngit -C ../remote.git log --oneline main | wc -l", io: [{ output: "americano 4000\nlatte 4800 (점심 할인 5000→4800)\n1\n4" }] },
+    { title: '🏠 집 컴퓨터와 학교 컴퓨터', text: '같은 원격을 집(<code>home</code>)과 학교(<code>school</code>) 두 곳에서 써요. 학교에서 <code>hw.py</code> 를 만들어 push 해 둔 상태예요. 지금 <b>집</b>(<code>home</code>)에 있어요. ① 먼저 받고 ② <code>hw.py</code> 끝에 <code>print("집에서 마무리")</code> 를 붙여 <code>숙제 마무리</code> 로 커밋해 ③ 올리세요. 마지막으로 ④ 학교 폴더(<code>../school</code>)로 가서 받아 두세요(다음 날 학교에서 이어 하게).',
+      setup: TS('tb3-2', ['git init -q --bare remote.git', 'git clone -q remote.git home 2>/dev/null', 'cd home', TF('readme.txt', ['숙제 저장소']), GC('시작'), 'git push -q -u origin main && cd ..', 'git clone -q remote.git school && cd school', TF('hw.py', ['print("학교에서 시작")']), GC('숙제 시작'), 'git push -q && cd ../home']),
+      needs: [['git pull', 'T11/3', '일 시작 전 받기'], ['>>', 'T3/1', '끝에 이어 쓰기'], ['git commit -am', 'T7/3', 'add + commit'], ['git push', 'T11/2', '올리기']],
+      answer: 'git pull\necho "print(\\"집에서 마무리\\")" >> hw.py\ngit commit -am "숙제 마무리"\ngit push\ncd ../school\ngit pull', check: 'cat hw.py\ngit log --format=%s', io: [{ output: 'print("학교에서 시작")\nprint("집에서 마무리")\n숙제 마무리\n숙제 시작\n시작' }] },
+  ],
+});
