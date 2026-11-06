@@ -5,9 +5,9 @@
 
 ## 0. 지금 상태
 
-- **배포된 버전: v2.17.2** (main). 상태판은 `HANDOFF.md` 0절, **사이트 의도(정상·버그 기준)는 `specs/site-intent.md`**.
-- **교과서 7개**(파이썬 45 · 알고리즘 32 · 터미널·Git 20 · GitHub 22 · SQL 17 · 웹 17 · 공용 Vim 14) — 설명을 읽고 내 PC 의 진짜 도구로 「🛠 만들어 보기」, 채점·XP 없음, 코스마다 도감. **문제집은 공용 수학 공간 하나만** 남음.
-- 다음은 1절 N12~N14(사용자 11/7 「순서대로」), 그다음 아래 **「예정 코스」**(공용 5개 추가 — 11/6 사용자).
+- **배포된 버전: v2.18.0** (main). 상태판은 `HANDOFF.md` 0절, **사이트 의도(정상·버그 기준)는 `specs/site-intent.md`**.
+- **교과서 8개**(파이썬 45 · 알고리즘 32 · 터미널·Git 20 · GitHub 22 · SQL 17 · 웹 17 · 공용 Vim 14 · 공용 수학 45) — 설명을 읽고 내 PC 의 진짜 도구로 「🛠 만들어 보기」, 채점·XP 없음, 코스마다 도감. **문제집 코스는 없음**(v2.18.0 수학도 교과서).
+- 다음은 1절 N13(사용자 확인 먼저) → N14 → N7·N8(사용자 11/7 「순서대로」), 그다음 아래 **「예정 코스」**(공용 5개 추가 — 11/6 사용자).
 
 ## 1. 남은 일 (위에서부터)
 
@@ -24,8 +24,8 @@
 | N9 | 수학 「상」 #145~#147 → 수학 「중」 → M2·M3 (D4 후순위) | `docs/QA.md`, `docs/EXPANSION.md` 14절 | 후순위 |
 | N10 | 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지), 8차 아트 납품되면 검수(docs/IMAGES.md 3-B) | — | ✅ CSS·MAP_DECOR 정리 v2.15.1(17종, 전후 캡처 픽셀 동일) · 아트 검수는 납품 뒤 |
 | N11 | GitHub 교과서 전체 교차 QA — 레슨 0~17 을 한 번에: 말투·용어 통일, 모든 링크에 돌아가기, 화면 이름 재확인 | `specs/github-course.md` | ✅ **완료 v2.17.2** — 따라 하다 막히는 것·레슨 번호·설명 없던 명령·용어(단추→버튼) 고침, 링크 돌아가기 전부 확인, 화면 이름 177개 docs 대조 |
-| N12 | 수학 공간을 교과서로(유일하게 남은 문제집 — D4 후순위였음) | `docs/EXPANSION.md` 14절 | 대기 · 사용자 확인 |
-| N13 | 교과서 전환 뒤 안 쓰는 코드 정리(XP·뱃지·채점·복습 — 지금은 수학만 씀, 그림 `assets/img/` 도 이름 조합으로 쓰는 중이라 확인하며) — N12 뒤에 하면 더 많이 지울 수 있음 | — | 대기 |
+| N12 | 수학 공간을 교과서로(유일하게 남은 문제집 — D4 후순위였음) | `docs/EXPANSION.md` 14절 | ✅ **완료 v2.18.0** — 사용자 11/7: VS Code 과제 · 옛 문제는 `?classic=1` · 목록 목차(D11) |
+| N13 | 교과서 전환 뒤 안 쓰는 코드 정리(XP·뱃지·채점·복습·지식 지도 — v2.18.0 부터 **모든 코스가 교과서**라 `?classic=1` 화면만 씀, 그림 `assets/img/` 도 이름 조합으로 쓰는 중이라 확인하며). **먼저 사용자 확인**: classic 화면째 지울지, classic 은 남기고 허브·설정의 흔적만 정리할지 | — | 대기 · 사용자 확인 |
 | N14 | **예정 코스 설계** — 아래 「예정 코스」(공용 5 + 코스 5). 순서는 2절 의존 관계 보고 사용자에게 선택지로 | 아래 | 설계 전 |
 
 검증 묶음: `node tools/validate_content.mjs && node tools/check_nesting.mjs && node tools/check_book.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` + 코스별(`node tools/check_level.mjs --gate`, `node tools/test_shell.mjs`, `node tools/run_shell_solutions.mjs`, `python3 tools/run_sql_solutions.py`, `python3 tools/run_web_solutions.py`) + `python3 tools/regress.py`. 화면을 바꾸면 APP_VERSION + `node tools/stamp.mjs`.
@@ -53,6 +53,7 @@
 | D8 | **실전은 오픈북** — 문법을 숨기지 않고 도감으로(11/6) | v2.9.4 |
 | D9 | **터미널·Git·SQL·웹도 교과서로, 연습은 내 컴퓨터 도구**(Git Bash·DB Browser for SQLite·VS Code+브라우저), 터미널·Git 먼저(11/6) | N1~N3 |
 | D10 | **공용 코스 5개 추가**(11/6): 리눅스(우분투 · VirtualBox) · CS(운영체제는 맛보기) · 운영체제(제대로, 우분투에서) · 어셈블리어(x86-64 · NASM · 우분투) · LLM 기초(원리 + 아주 작은 모델 직접). 나머지 예정 코스는 중복을 합쳐 그대로 | 아래 「예정 코스」 T9~T11 · T1 · T2 |
+| D11 | **수학 공간도 교과서**(11/7): 만들어 보기는 VS Code 파이썬 과제 · 옛 문제는 화면에서만 숨기기(`?classic=1`) · 목차는 다른 교과서처럼 목록(지식 지도 대신) | v2.18.0 |
 
 ## 4. 끝남·보류 (기록)
 
