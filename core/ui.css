@@ -438,3 +438,10 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .book-mode .bk-l.soon:hover { border-color: var(--border); }
 .book-mode #tutorPanel { display: none; } /* 교과서엔 선생님 창이 없음 — 화면 밖에 숨겨 둔 패널이 전체 캡처에 비치던 것 */
 .book-mode .bk-prereq .btn { margin-top: 10px; } /* v2.12.1 레슨 6 설정 필수 경고의 단추 */
+.book-mode .bk-prereq { overflow-wrap: anywhere; } /* v2.13.0 긴 낱말이 폰에서 밀어내지 않게 */
+/* v2.13.0 SQL 교과서 결과 표 (DB Browser 결과 칸처럼) */
+.book-mode .bk-res-w { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.book-mode .bk-res { border-collapse: collapse; font-size: .88em; font-family: var(--mono); background: var(--ed-bg); color: var(--ed-fg); border-radius: 8px; min-width: 40%; }
+.book-mode .bk-res th, .book-mode .bk-res td { padding: 4px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+.book-mode .bk-res th { font-weight: 700; }
+.book-mode .bk-res td.null { opacity: .55; font-style: italic; }

@@ -9,9 +9,9 @@ for (const cid of courses) total += checkCourse(cid);
 process.exit(total ? 1 : 0);
 function checkCourse(cid) {
 const ctx = { window: {}, console }; vm.createContext(ctx);
-vm.runInContext(fs.readFileSync(`${R}/courses/${cid}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var ') + '\n' + fs.readFileSync(`${R}/courses/${cid}/book.js`, 'utf8').replace(/^const /gm, 'var '), ctx);
+vm.runInContext((fs.existsSync(`${R}/courses/${cid}/datasets.js`) ? fs.readFileSync(`${R}/courses/${cid}/datasets.js`, 'utf8').replace(/^(const|let) /gm, 'var ') + '\n' : '') + fs.readFileSync(`${R}/courses/${cid}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var ') + '\n' + fs.readFileSync(`${R}/courses/${cid}/book.js`, 'utf8').replace(/^const /gm, 'var '), ctx);
 const { LESSONS, PROBLEMS, BOOK, COURSE } = ctx; const L = Object.fromEntries(LESSONS.map(l => [l.id, l])); const P = Object.fromEntries(PROBLEMS.map(p => [p.id, p]));
-const SHELL = COURSE && COURSE.runner === 'shell'; const VIM = BOOK.check === 'vim'; // v2.11.0 Vim 교과서: 진짜 vim 으로 키 넣기
+const SHELL = COURSE && COURSE.runner === 'shell'; const VIM = BOOK.check === 'vim'; const SQLB = BOOK.check === 'sql'; // v2.13.0 SQL 교과서: tools/sql_book_run.py 로 실제 SQLite 실행 // v2.11.0 Vim 교과서: 진짜 vim 으로 키 넣기
 const pagesOf = (lid) => lid === 'SETUP' ? BOOK.setup.pages : (BOOK.lessonPages || {})[lid] || (L[lid] || {}).pages;
 for (const lid of Object.keys(BOOK.lessonPages || {})) if (!L[lid]) bad(`lessonPages ${lid}: 없는 레슨`);
 let fails = 0, ran = 0, n = 0;
@@ -27,6 +27,7 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
     if (!answer) bad(`${id}: 예시 답 없음`);
     if (JSON.stringify(io).includes('{{') || answer.includes('{{')) bad(`${id}: {{바꿔 끼우기}} 자리표시가 남음 — io·answer 를 직접 적으세요`);
     if (t.noRun) return;
+    if (SQLB) { for (const c of io) runSqlTask(id, t, answer, c); return; }
     if (VIM) { if (!t.setup) bad(`${id}: 준비 명령(setup) 없음`); for (const c of io) runVim(id, t, answer, c); return; }
     if (SHELL) { if (!t.setup) bad(`${id}: 준비 명령(setup) 없음`); for (const c of io) runShell(id, t, answer, c); return; }
     for (const c of io) {
@@ -38,6 +39,11 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
       if (norm(out) !== norm(c.output)) bad(`${id}: 출력이 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(out))}`);
     }
   });
+}
+if (SQLB) { // v2.13.0: 사이트에서 받는 cafe.db 가 datasets.js 의 cafe 와 같은지(표마다 전체 행) — 다르면 python3 tools/build_cafe_db.py
+  const py = `import sqlite3,sys,json\na=sqlite3.connect(sys.argv[1]);b=sqlite3.connect(':memory:');b.executescript(json.load(sys.stdin))\nts=[r[0] for r in b.execute("select name from sqlite_master where type='table' order by name")]\nbad=[t for t in ts if a.execute(f'select * from {t} order by 1').fetchall()!=b.execute(f'select * from {t} order by 1').fetchall()]\nprint(','.join(bad) or 'OK')`;
+  let o; try { o = execFileSync('python3', ['-c', py, `${R}/courses/sql/cafe.db`], { input: JSON.stringify(ctx.SQL_DATASETS.cafe), encoding: 'utf8' }).trim(); } catch (e) { o = String(e.stderr || e.message).trim().split('\n').pop(); }
+  ran++; if (o !== 'OK') bad(`courses/sql/cafe.db 가 datasets.js 와 달라요(${o}) — python3 tools/build_cafe_db.py`);
 }
 if (VIM) { // 교과서가 권하는 _vimrc 를 진짜 vim 이 에러 없이 읽는지 + .py 에서 들여쓰기 설정이 실제로 켜지는지
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'vimrc-')); fs.writeFileSync(path.join(home, 'vimrc'), ctx.VIMRC_BASE_TEXT); fs.writeFileSync(path.join(home, 't.py'), 'x = 1\n');
@@ -84,6 +90,16 @@ function runVim(id, t, answer, c) {
   if (norm(got) !== norm(c.output)) return bad(`${id}: 파일이 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(got))}`);
   if (t.py) { let out; try { out = execFileSync('python3', [fname], { cwd: path.join(home, 'vim-study'), input: t.py.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { return bad(`${id}: 파이썬 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
     ran++; if (norm(out) !== norm(t.py.output)) bad(`${id}: 실행 결과가 달라요\n      기대: ${JSON.stringify(norm(t.py.output))}\n      실제: ${JSON.stringify(norm(out))}`); }
+}
+function runSqlTask(id, t, answer, c) {
+  if (c.output == null) return bad(`${id}: 결과 없음`);
+  const req = { dataset: ctx.SQL_DATASETS[t.db || 'cafe'], setup: t.setup, answer, check: t.check, rollback: t.rollback, expectError: t.expectError, planOnly: t.planOnly, py: t.runPy, input: c.input };
+  let r; try { r = JSON.parse(execFileSync('python3', [R + '/tools/sql_book_run.py'], { input: JSON.stringify(req), encoding: 'utf8', timeout: 15000 })); } catch (e) { return bad(`${id}: 실행 도구 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
+  ran++; if (r.error) return bad(`${id}: ${r.error}`);
+  const norm = (s) => String(s ?? '').replace(/\r/g, '').split('\n').map(x => x.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
+  let a = norm(r.out), b = norm(c.output); if (t.anyOrder) { a = a.split('\n').sort().join('\n'); b = b.split('\n').sort().join('\n'); }
+  if (a !== b) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(b)}\n      실제: ${JSON.stringify(a)}`);
+  if (!t.runPy && !t.check && a.split('\n').length < 2) bad(`${id}: 결과가 0행 — 문제·데이터를 확인`);
 }
 function bad(m) { fails++; console.log('  ✗', `[${cid}]`, m); }
 }

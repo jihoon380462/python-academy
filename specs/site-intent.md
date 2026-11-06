@@ -2,7 +2,7 @@
 
 > 사용자 지시(11/6) 「QA 가 해당 사이트의 의도를 파악할 수 있게 문서 최신화 진행」. 이 파일은 **「무엇이 정상이고 무엇이 버그인가」의 기준**이다.
 > 다른 문서(QA.md 옛 회전, QA-OPEN.md, specs/qa-team.md 의 옛 체크리스트, DESIGN.md 3~5절 XP·뱃지·블록)는 문제집 시절 기록이 섞여 있다. **서로 다르면 이 파일이 맞다.** 이 파일이 틀렸으면 고치고 `업데이트:` 줄을 바꾼다.
-> 업데이트: 2026-11-06 · v2.12.0 (터미널·Git 교과서 Git 편까지 완성)
+> 업데이트: 2026-11-06 · v2.13.0 (SQL 교과서)
 
 ## 1. 누구를 위한 사이트인가
 
@@ -17,7 +17,7 @@
 | --- | --- | --- | --- | --- |
 | 파이썬 `courses/python/` | **교과서**(v2.9.0~) | 사용자 PC 의 **VS Code + 파이썬** | 📖 교과서 · 읽은 레슨 n/45 | 브라우저에서 파이썬을 **실행하지 않는다**(Pyodide 안 받음). 예제는 📋 복사 → VS Code 에서 실행 |
 | 터미널·Git `courses/terminal-git/` | **교과서**(v2.10.0 명령어 편 · v2.12.0 Git 편) — T0~T16·TB1~TB3 전부 | 사용자 PC 의 **Git Bash**(진짜 터미널·진짜 git) | 📖 교과서 · 읽은 레슨 n/20 · 명령어 편 + Git 편 · 실제 GitHub 까지 | Git 의 push·pull·clone 연습은 「가짜 GitHub」 = 연습 폴더 안의 `remote.git`(bare 저장소)로 하는 게 **정상**. 실제 GitHub 는 T16(계정·New repository·첫 push 브라우저 로그인·PR) — 사이트가 검사하지 않음 |
-| SQL `courses/sql/` | 문제집 뼈대(미리보기) | 브라우저 SQLite(예정: DB Browser for SQLite 교과서, TODO N2) | 준비 중 · 미리보기 열림 | 첫 레슨만 |
+| SQL `courses/sql/` | **교과서**(v2.13.0~) — S0~S13 · 보스 SB1~SB3 | 사용자 PC 의 **DB Browser for SQLite** + 연습 DB `cafe.db`(사이트에서 받음 · `courses/sql/cafe.db`), 레슨 13 은 VS Code 파이썬 `sqlite3` | 📖 교과서 · 읽은 레슨 n/17 | 「만들어 보기」 결과는 표로 보임(DB Browser 결과 칸처럼). 데이터를 바꾸는 문제(레슨 8~)는 **Write Changes** 를 눌러야 저장 — 경고 상자가 있는 게 정상. 브라우저 실행 화면은 `?classic=1` |
 | 웹 `courses/web/` | 문제집 뼈대(미리보기) | 브라우저(예정: VS Code + 브라우저 교과서, TODO N3) | 준비 중 · 미리보기 열림 | 첫 레슨만 |
 | Vim 에디터 `courses/vim/` | **교과서**(v2.11.0~, 처음부터 교과서 · 허브 「공용」 칸) | 사용자 PC 의 **gVim 9.2**(Windows) + 파이썬 | 📖 교과서 · 읽은 레슨 n/14 · 공용 도구 | 설치·단축키·_vimrc·파이썬 자동 들여쓰기·F5 실행·자동완성(기본 Ctrl+n / 플러그인 LSP). 문제 화면이 원래 없음(`?classic=1` 도 빈 문제집) |
 | 알고리즘 `courses/algo/` | **문제집 그대로**(사용자 「일단 파이썬만」) | 브라우저 Pyodide | n/145 문제 | 채점·XP·시각화 있음 — 예전 기준으로 검수 |
@@ -80,5 +80,5 @@ python3 tools/regress.py        # 화면 회귀(Playwright). 끝 줄 FAILS 0 이
 
 ## 8. 앞으로 바뀔 것 (TODO.md 1절)
 
-- N2 SQL 교과서(DB Browser for SQLite) · N3 웹 교과서(VS Code + 브라우저) · N4 허브 카드 정리.
+- N3 웹 교과서(VS Code + 브라우저) · N4 허브 카드 정리.
 - 알고리즘을 교과서로 바꿀지는 사용자 결정 대기(N5).
