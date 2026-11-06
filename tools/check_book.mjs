@@ -29,5 +29,6 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
   });
 }
 for (const [k, o2] of Object.entries(BOOK.pages || {})) { const [pl, pi] = k.split('/'); const pg = ((L[pl] || {}).pages || [])[+pi]; if (!pg) { bad(`pages ${k}: 없는 쪽`); continue; } for (const [a] of o2.rep || []) if (!pg.html.includes(a)) bad(`pages ${k}: 바꿀 글을 못 찾음 「${a.slice(0, 40)}」`); }
+for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/'); if (!((L[tl] || {}).pages || [])[+ti]) bad(`titles ${k}: 없는 쪽`); }
 const noTasks = LESSONS.filter(l => !l.mock && !(BOOK.tasks[l.id] || []).length).map(l => l.id); if (noTasks.length) console.log('  · 만들어 보기가 없는 레슨:', noTasks.join(', '));
 console.log(fails ? `✗ check_book 실패 ${fails} (문제 ${n}, 실행 ${ran})` : `✓ check_book OK (문제 ${n}, 예시 답 실행 ${ran})`); process.exit(fails ? 1 : 0);
