@@ -5,7 +5,7 @@
 
 ## 0. 지금 상태
 
-- **배포된 버전: v2.12.2** (main). **사이트 의도(정상·버그 기준)는 `specs/site-intent.md`.**
+- **배포된 버전: v2.13.0** (main). **사이트 의도(정상·버그 기준)는 `specs/site-intent.md`.**
 - **파이썬 코스 = 「교과서 모드」(v2.9.0~)**: 시작하기(파이썬·VS Code 설치) + 레슨(문법 설명) + 레슨 끝 「🛠 만들어 보기」(문장 문제·필요한 문법·예시 답, 채점 없음) + 📚 문법 도감(레슨 문법 226 + 내장 함수 18, 검색). 연습은 사용자 VS Code 에서. 문제·채점·XP 콘텐츠는 화면에서만 숨김(`?classic=1` 은 예전 화면). 구조: `courses/python/book.js` + `core/ui-views-book.js`, 검사 `node tools/check_book.mjs`.
 - **터미널·Git 코스도 교과서(v2.10.0~, 명령어 편)**: 시작하기(Git for Windows·Git Bash·연습 폴더 `~/terminal-study`) + T0~T5·TB1 설명 + 만들어 보기 25문제(준비 명령·확인 명령·결과) + 📚 명령 도감. Git 편 T6~TB3 도 v2.12.0 에 채움(진짜 git · 원격 연습은 remote.git · T16 실제 GitHub). 구조: `courses/terminal-git/book.js`(BOOK.meta 글귀 · lessonPages 레슨 쪽 통째) — 화면은 파이썬과 같은 `core/ui-views-book.js`, 검사 `node tools/check_book.mjs`(bash 로 준비→답→확인 실행). 연습 터미널(시뮬레이터)은 `?classic=1`.
 - **공용 Vim 에디터 교과서(v2.11.0~)**: 허브 「공용」 칸(사용자 「공간을 공용으로 변경」). Windows gVim 9.2 설치 → 기본기(모드·이동·입력·지우기·복사·찾기) → 파이썬 연결(_vimrc · 자동 들여쓰기 · F5/F6 실행 · Ctrl+n · vim-plug+vim-lsp+asyncomplete+pylsp) + 단축키 도감. 「만들어 보기」 44개 중 33개는 check_book 이 진짜 vim 으로 검사. 구조: `courses/vim/content.js`(레슨·VIMRC_BASE_TEXT·VIMRC_PLUG_TEXT) + `book.js`.
@@ -16,7 +16,7 @@
 | 순서 | 과제 | 상세 | 상태 |
 | --- | --- | --- | --- |
 | N1 | **터미널·Git 코스를 교과서로 채우기** — T1~T16·TB1~TB3 빈 레슨 19개: 설명 쪽 + 만들어 보기 + 필요한 문법 + 도감 + 시작하기(Git for Windows·Git Bash 설치). **연습은 내 컴퓨터의 Git Bash**(사용자 11/6) | `EXPANSION.md` 6절(범위), 파이썬 교과서 구조 재사용 | ✅ **완료** — 1차 명령어 편 T0~T5·TB1 (v2.10.0) · 2차 Git 편 T6~T16·TB2·TB3 (v2.12.0: 진짜 git, 원격은 bare 저장소 「가짜 GitHub」, T16 실제 GitHub·PR) |
-| N2 | **SQL 코스를 교과서로 채우기** — S1~S13·SB1~SB3 16개, **연습은 DB Browser for SQLite**(+ 파이썬 sqlite3) | `EXPANSION.md` 7절 | N1 다음 |
+| N2 | **SQL 코스를 교과서로 채우기** — S1~S13·SB1~SB3 16개, **연습은 DB Browser for SQLite**(+ 파이썬 sqlite3) | `EXPANSION.md` 7절 | ✅ **완료** v2.13.0 — DB Browser + cafe.db, 레슨 14·보스 3·만들어 보기 50(실제 SQLite 로 검사) |
 | N3 | **웹·HTTP·API 코스를 교과서로 채우기** — W1~W13·WB1~WB3 16개, **연습은 VS Code + 브라우저** | `EXPANSION.md` 8절 | N2 다음 |
 | N4 | 허브 카드: ✅ 파이썬·터미널 v2.10.1(`book:true` · 읽은 레슨 · 문구). **남은 것: 교과서를 채울 때마다 같은 PR 에서** `config.js` 의 그 코스 `lessons`·`bookNote`·`desc` 를 바꾸기(check_book 이 레슨 수·옛 문구 검사) — SQL·웹은 N2·N3 때 | `core/config.js` COURSES, `specs/site-intent.md` 6절 | 코스마다 같이 |
 | N5 | (사용자 결정 전) 알고리즘 코스도 교과서로 바꿀지 | — | 제안만 함(11/6) |

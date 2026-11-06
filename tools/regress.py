@@ -32,7 +32,7 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==7 and r['ready']==5, f"코스 카드 7개(코스 5 + 공용 2: 수학 공간·Vim), 열린 것 5개(파이썬·알고·수학·터미널 교과서·v2.11.0 Vim 교과서) (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==7 and r['ready']==6, f"코스 카드 7개(코스 5 + 공용 2: 수학 공간·Vim), 열린 것 6개(파이썬·알고·수학·터미널·Vim·v2.13.0 SQL 교과서) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and '#' in r['cont'], '이어서 하기 링크: '+str(r['cont']))
     check('오늘 2/5' in (r['today'] or '') and '오늘의 도전' not in (r['today'] or ''), '오늘의 할 일(문제 코스만 세기, 교과서엔 없는 「오늘의 도전」 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
@@ -420,9 +420,9 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('lesson',{lessonId:'T0',page:2})"); pg.wait_for_timeout(400); check(pg.evaluate('document.documentElement.scrollWidth')<=390, '폰 390px: T0 예제 쪽 가로 넘침 없음'); pg.set_viewport_size({'width':1280,'height':900})
     check(not [e for e in errors[tg0:]], 'terminal-git 코스 페이지 에러 0 (%s)' % errors[tg0:][:2])
     # ===== [코스 sql] ===== 데이터베이스(SQL) 코스 뼈대 (v2.7.0): 허브 카드 → 코스 열기 → S0 레슨 쪽·예제(CDN 차단 → Sql.unavailable 안내) → 문제 4개(가짜 엔진으로 채점 ok/실패) → draft 「준비 중」
-    print('[sql]'); SQLC='file://'+os.path.join(ROOT,'courses/sql/index.html'); n0=len(errors)
+    print('[sql]'); SQLC='file://'+os.path.join(ROOT,'courses/sql/index.html')+'?classic=1'; n0=len(errors)  # v2.13.0: 교과서가 기본 — 브라우저 실행(예전) 회귀는 ?classic=1
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600)
-    check(pg.locator('a.hc[href*="courses/sql/"]').count()==1 and '미리보기' in pg.locator('a.hc[href*="courses/sql/"]').inner_text(), '허브: SQL 카드가 미리보기로 열림')
+    check(pg.locator('a.hc[href*="courses/sql/"]').count()==1 and '읽은 레슨' in pg.locator('a.hc[href*="courses/sql/"]').inner_text() and '/17' in pg.locator('a.hc[href*="courses/sql/"]').inner_text(), 'v2.13.0 허브: SQL 카드가 교과서(읽은 레슨 n/17)')
     pg.goto(SQLC); pg.wait_for_timeout(900); pg.evaluate("Store.data.onboarded=true; Store.data.settings.unlockAll=true; Store.save(); document.querySelectorAll('.modal-ov').forEach(m=>m.remove()); UI.go('home')"); pg.wait_for_timeout(400)
     check(pg.evaluate("UI.view")=='home' and pg.evaluate("typeof Sql==='object' && typeof UI.modes.sql==='object' && typeof UI.examples.sql==='object'"), 'SQL 코스 홈 렌더 + Sql 러너·UI.modes.sql·UI.examples.sql 등록')
     check(pg.locator('.lc.draft').count()>=4 and pg.locator('.lc.draft').first.is_disabled(), '준비 중(draft) 레슨 카드가 비활성 (%d개)' % pg.locator('.lc.draft').count())
@@ -558,6 +558,21 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('lesson',{lessonId:'V8',page:3})"); pg.wait_for_timeout(300); vp8=pg.locator('.bk-prereq').count(); check(vp8==2, 'v2.12.2 Vim V8 만들어 보기: 경고 2개(_vimrc 먼저 · 파이썬 설치) (%d)' % vp8)
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==2, 'Vim 목차: 챕터 1(설치)·챕터 2(_vimrc) 위에 경고')
     pg.locator('.bk-prereq-go').nth(1).click(); pg.wait_for_timeout(300); check('기본 설정' in pg.evaluate("document.querySelector('.bk-art h1').textContent") and '목차로 돌아가기' in pg.inner_text('#bkBack'), 'Vim 경고 단추 → 레슨 6 기본 설정 쪽 + 목차로 돌아가기')
+    pg.set_viewport_size({'width':1280,'height':900})
+    # ===== [SQL 교과서 v2.13.0] 사용자 「2번(SQL·터미널·웹 교과서)」 · 「필수 사항은 강조하고 계속 다음 진행해」 = N2
+    print('[SQL 교과서 v2.13.0]'); q0=len(errors); SQB='file://'+os.path.join(ROOT,'courses/sql/index.html')
+    pg.goto(SQB); pg.wait_for_timeout(1000); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
+    qh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length})")
+    check(qh['book'] and qh['steps']==4 and qh['ls']==17 and qh['soon']==0 and qh['pre']==2, 'SQL 교과서 홈: 시작하기 4 · 레슨 17 · 준비 중 0 · 「먼저 꼭」 경고 2(설치·Write Changes) (%s)' % qh)
+    pg.evaluate("UI.go('lesson',{lessonId:'SETUP',page:1})"); pg.wait_for_timeout(300); check(pg.locator('a[href="cafe.db"][download]').count()==1 and 'CREATE TABLE menu' in pg.inner_text('.bk-code pre'), '시작하기 2: cafe.db 내려받기 링크 + SQL 로 만들기 상자')
+    pg.evaluate("UI.go('lesson',{lessonId:'S4',page:3})"); pg.wait_for_timeout(300); qt=pg.evaluate("[document.querySelectorAll('.bk-task').length, document.querySelectorAll('.bk-task table.bk-res').length, (document.querySelector('.bk-res th')||{}).textContent]")
+    check(qt[0]==3 and qt[1]==3 and qt[2]=='id', 'S4 만들어 보기: 결과가 표로(DB Browser 결과 칸처럼) (%s)' % qt)
+    pg.evaluate("UI.go('lesson',{lessonId:'S13',page:3})"); pg.wait_for_timeout(300); check(pg.locator('.bk-task table.bk-res').count()==0 and '아메리카노: 4000원' in pg.inner_text('.bk-task'), 'S13 파이썬 문제: 출력은 글자 그대로')
+    pg.evaluate("UI.go('lesson',{lessonId:'S8',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==1 and 'Write Changes' in pg.inner_text('.bk-prereq'), 'S8 1쪽: 「Write Changes 를 눌러야 저장」 경고')
+    pg.evaluate("UI.go('lesson',{lessonId:'SB1',page:0})"); pg.wait_for_timeout(300); check(pg.evaluate("document.querySelector('.bk-art h1').textContent")=='🛠 만들어 보기' and 'TODO' not in pg.inner_text('.bk-art'), '보스 SB1: 「준비 중」 쪽 없이 만들어 보기만')
+    pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','JOIN'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=3 and pg.inner_text('.tb-title')=='SQL 문법 도감', 'SQL 문법 도감: JOIN 검색')
+    pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'SQL 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',2),('S0',0),('S1',3),('S5',3),('S10',1),('SB2',0)] ]
+    pg.set_viewport_size({'width':1280,'height':900}); qerr=errors[q0:]; check(not qerr, 'SQL 교과서 pageerror 0 (%s)' % (qerr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); verr=errors[v0:]; check(not verr, 'Vim 교과서 pageerror 0 (%s)' % (verr[:2] or 'OK'))
     pg.goto(HUB); pg.wait_for_timeout(600); tgr=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/terminal-git/\"]'); const m=a && a.innerText.match(/읽은 레슨 (\\d+)\\/(\\d+)/); return m? [+m[1], +m[2]] : null; })()")
     check(bool(tgr) and tgr[1]==20 and 2<=tgr[0]<=20, '허브 터미널 카드: 끝까지 본 레슨(T2·TB1 …)이 「읽은 레슨」 에 셈 (%s)' % tgr)

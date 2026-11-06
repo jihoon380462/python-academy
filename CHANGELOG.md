@@ -4,6 +4,15 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.13.0 — 2026-11-06 (Opus: SQL 교과서 — N2)
+
+- 🗄️ 사용자 「2번(SQL·터미널·웹 교과서) 해 · 내 컴퓨터 도구로」 · 「일단 완성하는 게 목표니까 필수 사항은 강조하고 계속 다음 진행해」 — **SQL 코스를 교과서로**(N2). 연습은 내 컴퓨터의 **DB Browser for SQLite** + 연습 DB **cafe.db**.
+  - 시작하기 4쪽: DB Browser 3.13 설치(sqlitebrowser.org/dl 「Standard installer for 64-bit Windows」 · License · Shortcuts 의 DB Browser (SQLite) Desktop·Program Menu) · **cafe.db 내려받기**(못 받으면 「SQL 로 만들기」 상자) · Execute SQL 탭 쓰는 법(Ctrl+Enter · Shift+F5 · 메시지 칸) · **Write Changes / Revert Changes** · 쓰는 법.
+  - 레슨 14: 데이터베이스와 첫 SELECT · WHERE(AND/OR/IN/BETWEEN/LIKE) · ORDER BY·LIMIT·계산 열·DISTINCT·NULL · 집계·GROUP BY·HAVING · JOIN(왜 나누나·ON·별명) · LEFT JOIN·세 표·셀프 조인 · 서브쿼리·WITH·EXISTS · CASE·날짜·글자 함수 · INSERT/UPDATE/DELETE(WHERE 빠뜨리기 경고) · CREATE TABLE·제약 조건 · 정규화·ERD · 인덱스·EXPLAIN QUERY PLAN · 트랜잭션(DB Browser 에서는 BEGIN 대신 Write/Revert) · **파이썬 sqlite3**(connect·fetchall·? 자리표·commit).
+  - 만들어 보기 47 + 보스 3(10월 요약·TOP 5·시간대별 매출 / 직원 순위·단골 시간대·🏠 메뉴별 매출 보고서 / 🏠 가계부를 DB 로 — SQL·파이썬). 결과는 **표로**(DB Browser 결과 칸처럼, NULL 흐리게).
+  - 「먼저 꼭!」 경고: 시작하기 1~2(설치·cafe.db) · 챕터 3 의 Write Changes · 레슨 13 의 파이썬.
+- 🧪 `tools/sql_book_run.py`(새): 문제마다 실제 SQLite 로 cafe 데이터를 새로 만들어 예시 답(+확인 쿼리·되돌리기·기대 에러) 실행 → 결과 표 비교, 파이썬 문제는 cafe.db 옆에서 python3 실행. `tools/build_cafe_db.py`(새) — check_book 이 cafe.db 와 datasets.js 가 같은지 검사. 허브 SQL 카드 「읽은 레슨 n/17」. 옛 브라우저 실행 회귀는 `?classic=1`. regress +15.
+
 ## v2.12.2 — 2026-11-06 (Opus: 교과서마다 「먼저 꼭 할 것」 강조)
 
 - ⚠ 사용자 「일단 완성하는 게 목표니까 필수 사항은 강조하고 계속 다음 진행해」 — 모든 교과서에 「먼저 꼭!」 경고 상자(목차의 그 챕터 위 · 해당 레슨 1쪽 · 만들어 보기 맨 위, 단추 → 설정 쪽 → 돌아가기):
