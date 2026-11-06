@@ -9,6 +9,18 @@ const VPLAY = VS('play.txt', ['Vim 연습 파일이에요. 마음껏 고쳐 보�
 const BOOK = {
   check: 'vim',
   meta: {
+    // v2.12.2 사용자 「필수 사항은 강조하고」 — 먼저 해야 하는 것(목차·레슨 1쪽·만들어 보기 위 경고 상자)
+    prereq: [
+      { lessons: ['V0', 'V1'], chapters: [1], ref: 'SETUP/0', btn: '시작하기 1 · Vim 설치 보기',
+        title: '먼저 꼭! 「🛠 시작하기」 1~2 — gVim 설치(「Do not remap keys」 그대로) · 준비 명령 넣는 법',
+        html: '설치 화면 「Choose _vimrc settings」 에서 <b>Do not remap keys (Default)</b> 를 바꾸면 Ctrl+V·Ctrl+R 이 Windows 식으로 바뀌어 이 교과서의 단축키·준비 명령이 안 맞아요. 「만들어 보기」 는 문제마다 <b>준비 명령</b>(📋 → <code>:</code> → Ctrl+R → + → Enter)으로 파일을 여는 게 첫 단계예요(시작하기 2).' },
+      { lessons: ['V7', 'V8', 'V9', 'V10', 'VB2'], chapters: [2], ref: 'V6/1', btn: '레슨 6 · 기본 설정 보기',
+        title: '챕터 2 를 하기 전에 꼭! 레슨 6 의 기본 <code>_vimrc</code> 를 붙여 넣고 저장',
+        html: '자동 들여쓰기·<kbd>F5</kbd> 실행·자동완성은 전부 <code>~/_vimrc</code> 설정으로 켜져요. 안 하면 <code>:</code> 뒤에서 Enter 를 쳐도 들여쓰기가 안 되고 F5 가 아무 일도 안 해요. 확인: 아무 <code>.py</code> 에서 <code>:set shiftwidth?</code> → <code>shiftwidth=4</code>, <code>:echo $MYVIMRC</code> → <code>C:\\Users\\내이름\\_vimrc</code>.' },
+      { lessons: ['V8', 'V10', 'VB2'],
+        title: '파이썬이 설치돼 있어야 해요 (레슨 10 은 Git 도)',
+        html: '<kbd>F5</kbd>(<code>:!python %</code>)는 내 컴퓨터의 파이썬을 불러요 → <b>파이썬 교과서 「시작하기 1」</b>(Add python.exe to PATH). 레슨 10 의 플러그인 설치는 <b>Git</b> 도 필요해요 → <b>터미널·Git 교과서 「시작하기 1」</b>. 확인: 명령 프롬프트에서 <code>python --version</code> · <code>git --version</code>.' },
+    ],
     kicker: '⌨ Vim 에디터 교과서 · 공용', hero: '읽고, gVim 에서 직접 눌러 보기',
     heroP: 'Windows 용 Vim 설치부터 단축키, 그리고 파이썬과 연결(자동 들여쓰기·F5 실행·자동완성)까지. 각 레슨 끝 「만들어 보기」에 문제마다 <b>준비 명령</b>(연습 파일을 처음 상태로 여는 명령)과 다 하고 나면 파일이 어떻게 돼야 하는지가 있어요. 채점·점수·잠금은 없어요.',
     dexName: 'Vim 단축키 도감', dexShort: '단축키 도감', dexWhat: '레슨 쪽', dexHint: '「복사」「지우기」처럼 한국어로도 찾기',

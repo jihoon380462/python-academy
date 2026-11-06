@@ -25,10 +25,15 @@ const BOOK = {
     checkLabel: '확인 명령 — 다 했으면 이걸 쳐 보세요', outLabel: '이렇게 나오면 성공', inLabel: '입력',
     homeNote: '<code>/c/Users/me</code> 의 <code>me</code> 자리는 내 Windows 사용자 이름이에요',
     // v2.12.1 사용자 「나중에 할 거니까 레슨 6번은 설정을 해야 한다고 강조해」 — Git 레슨마다·목차에 경고 상자
-    prereq: { lessons: ['T7', 'T8', 'T9', 'T10', 'TB2', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'TB3'], chapters: [2, 3], ref: 'T6/2',
+    prereq: [
+    { lessons: ['T0', 'T1'], chapters: [1], ref: 'SETUP/0', btn: '시작하기 1 · Git Bash 설치 보기',
+      title: '먼저 꼭! 「🛠 시작하기」 1~3 — Git for Windows(Git Bash) 설치 · 연습 폴더 만들기',
+      html: '이 교과서는 전부 <b>내 컴퓨터의 Git Bash</b> 에서 쳐요(Windows 기본 「명령 프롬프트」 는 명령이 달라서 안 돼요). 레슨 예제는 시작하기 3 의 <b>연습 폴더</b>(<code>~/terminal-study/play</code>)를 전제로 해요. 확인: Git Bash 에서 <code>git --version</code> 이 버전을 보여 주면 설치 끝.' },
+    { lessons: ['T7', 'T8', 'T9', 'T10', 'TB2', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'TB3'], chapters: [2, 3], ref: 'T6/2',
       title: 'Git 을 하기 전에 꼭! 레슨 6 의 「처음 한 번: 이름·이메일 설정」',
       html: '이 설정을 <b>한 번도 안 했으면</b> 이 레슨의 준비 명령과 <code>git commit</code> 이 <code>Author identity unknown</code> 에러로 <b>전부 멈춰요</b>. 컴퓨터마다 한 번만 하면 돼요(Git Bash 에 네 줄 붙여 넣기, 1분). 했는지 모르겠으면 <code>git config --global user.name</code> 을 쳐 보세요 — 내 이름이 나오면 된 거예요.',
       btn: '레슨 6 · 설정하는 쪽 보기' },
+    ],
   },
   setup: {
     title: '시작하기: Git Bash 설치하고 연습 폴더 만들기',
