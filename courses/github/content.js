@@ -125,14 +125,152 @@ git push</pre>
   ],
   summary: ['# 제목 · - 목록 · **굵게** · [링크](주소)', '```python 코드 블록 · | 표 | · - [ ] 체크박스', '좋은 README: 무엇 → 화면 → 준비물 → 실행 → 사용법 → 라이선스'] },
 { id: 'GB1', ch: 1, boss: true, title: '보스: 내 파이썬 프로젝트 공개', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 1 종합. 파이썬 교과서에서 만든 프로그램 하나를 README·.gitignore·LICENSE 갖춘 공개 저장소로. 의미 있는 커밋 3개, noreply 이메일.' },
-// ================= 챕터 2 Pull Request 로 협업 (다음 업데이트) =================
-{ id: 'G5', ch: 2, n: 5, title: '브랜치에서 Pull Request 열기', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'switch -c → push → Compare & pull request → base ← compare, 제목·설명, Draft.' },
-{ id: 'G6', ch: 2, n: 6, title: '코드 리뷰: 줄 코멘트와 Suggestion', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'Files changed, 줄 코멘트, suggestion 블록 → Commit suggestion, Review changes(Comment/Approve/Request changes), 내 PR 은 Approve 불가.' },
-{ id: 'G7', ch: 2, n: 7, title: '병합 세 가지와 뒷정리', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'merge commit / squash / rebase, Delete branch, 로컬 pull · branch -d · fetch --prune.' },
-{ id: 'G8', ch: 2, n: 8, title: 'PR 에 충돌이 나면', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'This branch has conflicts → Resolve conflicts 편집기, 또는 로컬에서 main 병합 후 push.' },
-{ id: 'G9', ch: 2, n: 9, title: 'Issues 로 할 일 관리', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '이슈 쓰기, Labels·Assignees·Milestone, Closes #3, 이슈 템플릿.' },
-{ id: 'G10', ch: 2, n: 10, title: 'Projects 보드', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'Projects → Board, Todo/In Progress/Done, 이슈·PR 카드.' },
-{ id: 'GB2', ch: 2, boss: true, title: '보스: 혼자 하는 협업 한 바퀴', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '이슈 → 브랜치 → PR → 리뷰 → 충돌 → squash → 이슈 자동 닫힘.' },
+// ================= 챕터 2 Pull Request 로 협업 (v2.16.1) =================
+{ id: 'G5', ch: 2, n: 5, title: '브랜치에서 Pull Request 열기', mode: 'text', tutorSummary: 'main 에 바로 올리지 않는 이유. git switch -c → push -u → 노란 띠 Compare & pull request → base ← compare, 제목·설명 → Create pull request / Create draft pull request. PR 화면 탭: Conversation · Commits · Checks · Files changed.',
+  pages: [
+    { title: '왜 main 에 바로 올리지 않나', html: `<p>지금까지는 고친 걸 <code>main</code> 에 바로 커밋하고 push 했어요. 혼자면 괜찮지만, 여럿이 쓰거나 <b>main 이 늘 잘 돌아가야</b> 하는 저장소(이 사이트처럼 main = 실제 배포)에서는 위험해요.</p>
+<p>그래서 <b>브랜치에서 고치고 → Pull Request(PR)로 「합쳐 주세요」 요청 → 확인 → 합치기</b> 순서로 해요.</p>
+<pre class="code">main ──●──────────────●── (합친 뒤)
+        \\            /
+         ●──●──●────   ← 내 브랜치: 고친 커밋들
+              PR: 「이걸 main 에 합쳐 주세요」 → 리뷰 · 자동 검사 · 합치기</pre>
+<table class="kb"><tbody><tr><td>리뷰</td><td>합치기 전에 다른 사람(또는 나)이 바뀐 줄을 보고 코멘트</td></tr><tr><td>자동 검사</td><td>PR 마다 테스트가 돌아 초록 ✓ 가 떠야 합치기(챕터 4)</td></tr><tr><td>기록</td><td>「왜 이렇게 바꿨나」 가 PR 설명·대화로 남아요. 몇 달 뒤 찾아보기 좋아요</td></tr></tbody></table>
+<p>혼자 쓰는 저장소에서도 PR 로 하는 습관을 들이면, 나중에 팀에 가서도 그대로예요. 이 사이트의 모든 업데이트도 PR 로 올라가요.</p>` },
+    { title: 'Compare & pull request → Create pull request', html: `<div class="bk-step-box"><b>① 내 컴퓨터: 브랜치에서 고치고 올리기</b><pre>git switch -c readme-usage
+(README 고치기)
+git commit -am "README 에 사용법 추가"
+git push -u origin readme-usage</pre>브랜치 이름은 무엇을 하는지 영어로 짧게 — <code>readme-usage</code>, <code>fix-empty-input</code>(터미널·Git 교과서 레슨 12).</div>
+<div class="bk-step-box"><b>② GitHub: 노란 띠</b><br>push 하고 저장소 화면을 열면 파일 목록 위에 노란 띠가 떠요 → <b>Compare &amp; pull request</b>. 띠가 없으면 <b>Pull requests</b> 탭 → <b>New pull request</b>.</div>
+<div class="bk-step-box"><b>③ 합칠 방향</b><br>맨 위 두 칸: <b>base: main</b> ← <b>compare: readme-usage</b>. 「compare 의 커밋을 base 에 합친다」 는 뜻이에요. 그 아래 「Able to merge」(충돌 없음)가 보이면 좋아요.</div>
+<div class="bk-step-box"><b>④ 제목과 설명</b><br>제목 = 무엇을(<code>README 에 사용법 추가</code>). 설명 칸에는 세 줄이면 충분해요:<pre>## 무엇
+README 에 명령 표를 넣었어요.
+## 왜
+처음 온 사람이 실행 방법을 몰라서.
+## 확인 방법
+Preview 에서 표가 보이는지.</pre></div>
+<div class="bk-step-box"><b>⑤ 만들기</b><br><b>Create pull request</b>. 아직 덜 됐으면 단추 옆 ▾ → <b>Create draft pull request</b> → <b>Draft pull request</b>(초안 — 「아직 합치지 마세요」 표시).</div>
+<p>PR 화면 탭: <b>Conversation</b>(대화·설명) · <b>Commits</b>(이 PR 의 커밋들) · <b>Checks</b>(자동 검사) · <b>Files changed</b>(바뀐 줄). PR 은 번호가 붙어요(<code>#1</code>) — 이슈와 같은 번호 줄이에요.</p>` + GH_DATE, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g5 && mkdir g5 && cd g5\ngit init -q --bare remote.git && git clone -q remote.git work && cd work\necho "# todo" > README.md && git add . && git commit -qm "시작" && git push -q origin main\ngit switch -c readme-usage\necho "## 사용법" >> README.md\ngit commit -am "README 에 사용법 추가"\ngit push -u origin readme-usage\ngit branch -a', label: '예제 명령 — 브랜치를 원격에 올리기까지(PR 은 GitHub 화면에서)' } },
+    { title: 'PR 을 연 뒤에도 브랜치에 커밋하면 PR 에 붙어요', html: `<p>PR 은 「브랜치」 를 가리켜요. 그래서 PR 을 연 뒤에 같은 브랜치에 커밋을 더 push 하면 <b>PR 에 자동으로 붙어요</b>. 고칠 게 생기면 PR 을 닫고 새로 열 필요 없이 그냥 커밋 · push.</p>
+<pre>git switch readme-usage
+(더 고치기)
+git commit -am "표에 list 명령 추가"
+git push</pre>
+<p>PR 의 Commits 탭에 커밋이 하나 늘고, Conversation 에 「내아이디 added 1 commit」 이 보여요.</p>
+<div class="bk-warn"><b>main 에서 고치고 있지 않은지</b> 늘 확인해요: Git Bash 프롬프트 끝의 <code>(main)</code> / <code>(readme-usage)</code>. PR 을 연 다음 실수로 main 에 커밋하면 터미널·Git 교과서 레슨 15 ② 「main 에 잘못 커밋 → 브랜치로 옮기기」.</div>` },
+  ],
+  summary: ['브랜치 → push → Compare & pull request', 'base ← compare, 제목 + 무엇·왜·확인 방법', '같은 브랜치에 push 하면 PR 에 붙음'] },
+{ id: 'G6', ch: 2, n: 6, title: '코드 리뷰: 줄 코멘트와 Suggestion', mode: 'text', tutorSummary: 'Files changed 탭, 줄에 마우스 → + (Add a comment), Start a review / Add single comment. Insert a suggestion 로 suggestion 블록 → 작성자가 Commit suggestion. Submit review: Comment / Approve / Request changes. 내 PR 은 Approve·Request changes 불가.',
+  pages: [
+    { title: 'Files changed 에서 줄마다 코멘트', html: `<p>리뷰는 「바뀐 줄을 보며 질문·제안 남기기」 예요. PR 화면의 <b>Files changed</b> 탭에서 해요.</p>
+<div class="bk-step-box"><b>① 줄 고르기</b><br>코멘트하고 싶은 줄에 마우스를 올리면 줄 번호 옆에 파란 <b>+</b> 가 나와요 → 누르기. 여러 줄이면 + 를 누른 채 끌어요.</div>
+<div class="bk-step-box"><b>② 코멘트 쓰기</b><br>칸에 Markdown 으로 쓰고:
+<ul><li><b>Start a review</b> — 「검토 중」 으로 모아 뒀다가 마지막에 한꺼번에 보내기(보내기 전엔 나만 보여요)</li><li><b>Add single comment</b> — 지금 바로 하나만</li></ul></div>
+<div class="bk-step-box"><b>③ 좋은 코멘트</b><br>사람이 아니라 코드에 대해, 이유와 함께: 「여기서 입력이 비면 <code>IndexError</code> 가 날 것 같아요. <code>if not line:</code> 로 먼저 막으면 어때요?」. 칭찬도 리뷰예요(「이 함수 이름 좋네요」).</div>
+<p class="muted small">파일 하나를 다 봤으면 파일 이름 오른쪽의 <b>Viewed</b> 칸을 체크해 접어 둘 수 있어요.</p>` + GH_DATE },
+    { title: 'Suggestion: 고칠 코드를 바로 제안하기', html: `<p>「이렇게 바꾸면 어때요」 를 말 대신 <b>코드로</b> 남기는 기능이에요. 작성자는 단추 하나로 받아들일 수 있어요.</p>
+<div class="bk-step-box"><b>① 리뷰어: 제안 넣기</b><br>줄 코멘트 칸 위 도구 막대의 <b>±</b> 모양 단추(Insert a suggestion)를 누르면 그 줄이 이런 블록으로 들어가요 — 안의 코드를 원하는 모양으로 고쳐요:<pre>\`\`\`suggestion
+if not line:
+    continue
+\`\`\`</pre>→ <b>Start a review</b> 또는 <b>Add single comment</b>.</div>
+<div class="bk-step-box"><b>② 작성자: 받아들이기</b><br>Conversation 이나 Files changed 의 그 코멘트에 <b>Commit suggestion</b> → 커밋 메시지 확인 → 커밋. 브랜치에 커밋이 하나 생겨요. 여러 개를 한 커밋으로 받으려면 <b>Add suggestion to batch</b> 를 여러 번 → <b>Commit suggestions</b>.</div>
+<div class="bk-warn"><b>내 컴퓨터는 git pull</b> — 웹에서 Commit suggestion 을 했으면 GitHub 쪽 브랜치가 한 칸 앞서요(레슨 3 과 같은 상황). 그 브랜치에서 더 고치기 전에 <code>git pull</code>.</div>` + GH_DATE },
+    { title: 'Submit review: Comment · Approve · Request changes', html: `<p>Start a review 로 모은 코멘트는 마지막에 한꺼번에 보내요: Files changed 오른쪽 위 <b>Submit review</b> → 요약 한 줄 → 셋 중 하나 → <b>Submit review</b>.</p>
+<table class="kb"><tbody><tr><td><b>Comment</b></td><td>의견만(찬성·반대 표시 없이)</td></tr><tr><td><b>Approve</b></td><td>「합쳐도 돼요」</td></tr><tr><td><b>Request changes</b></td><td>「이건 고쳐야 합쳐요」</td></tr></tbody></table>
+<div class="bk-step-box"><b>혼자 연습할 때</b><br><b>내가 연 PR 에는 Approve · Request changes 를 고를 수 없어요</b>(GitHub 규칙). 그래서 이 교과서는 리뷰를 <b>Comment</b> 로 연습해요. 리뷰어 모자를 쓴 셈 치고 코멘트·Suggestion 을 남기고, 작성자 모자로 바꿔 받아들이거나 답글을 다는 식이에요.</div>
+<p>작성자가 코멘트를 다 처리했으면 그 대화의 <b>Resolve conversation</b> 을 눌러 접어요. 「무엇을 고쳤는지」 답글을 한 줄 남기면 더 좋아요(「고쳤어요 — a1b2c3d」).</p>` + GH_DATE },
+  ],
+  summary: ['Files changed → 줄의 + → Start a review / Add single comment', 'Insert a suggestion → 작성자가 Commit suggestion', 'Submit review: Comment · Approve · Request changes (내 PR 은 Comment 만)'] },
+{ id: 'G7', ch: 2, n: 7, title: '병합 세 가지와 뒷정리', mode: 'text', tutorSummary: 'Merge pull request(merge commit) / Squash and merge / Rebase and merge, Confirm …, Delete branch. 로컬: git switch main, git pull, git fetch --prune, squash 뒤 git branch -d 는 not fully merged → PR 이 merged 인지 보고 -D.',
+  pages: [
+    { title: 'Create a merge commit · Squash and merge · Rebase and merge', html: `<p>PR 화면 맨 아래 초록 단추 옆 <b>▾</b> 에서 합치는 방법을 골라요. 결과 기록 모양이 달라요.</p>
+<pre class="code">PR 브랜치 커밋: A, B, C
+
+① Create a merge commit
+main ─●──────────M
+       └─A─B─C──┘
+   (A·B·C 그대로 + 합친 커밋 M)
+
+② Squash and merge
+main ─●──S
+   (A·B·C 를 커밋 하나 S 로)
+
+③ Rebase and merge
+main ─●──A'─B'─C'
+   (main 끝에 하나씩 다시 쌓기)</pre>
+<table class="kb"><tbody><tr><td><b>Merge pull request</b><br>(Create a merge commit)</td><td>기록을 그대로 다 남겨요. 큰 기능·여러 사람 작업</td></tr><tr><td><b>Squash and merge</b></td><td>main 에는 PR 하나 = 커밋 하나. 「오타 고침」 같은 작은 커밋이 많을 때 깔끔. <b>이 사이트가 쓰는 방식</b>(커밋 끝에 <code>(#117)</code> 처럼 PR 번호가 붙어요)</td></tr><tr><td><b>Rebase and merge</b></td><td>합친 커밋 없이 한 줄로. 커밋 번호(해시)는 새로 생겨요(터미널·Git 교과서 레슨 14)</td></tr></tbody></table>
+<p>고른 뒤 <b>Confirm merge</b> · <b>Confirm squash and merge</b> · <b>Confirm rebase and merge</b>. 다 되면 PR 위에 보라색 <b>Merged</b> 가 붙고 <b>Delete branch</b> 단추가 나와요 → 눌러서 GitHub 쪽 브랜치를 지워요(필요하면 <b>Restore branch</b> 로 되살릴 수 있어요).</p>` + GH_DATE },
+    { title: '합친 뒤 내 컴퓨터 뒷정리', html: `<p>GitHub 에서 합쳤어도 <b>내 컴퓨터는 아직 모르는 상태</b>예요. 네 줄로 정리해요.</p>
+<pre>git switch main
+git pull
+git fetch --prune
+git branch -d readme-usage</pre>
+<table class="kb"><tbody><tr><td><code>git pull</code></td><td>합친 결과(squash 면 커밋 S)를 내 main 으로</td></tr><tr><td><code>git fetch --prune</code></td><td>GitHub 에서 지운 브랜치의 흔적(<code>origin/readme-usage</code>)도 지우기 — <code>git pull</code> 만으로는 안 지워져요</td></tr><tr><td><code>git branch -d</code></td><td>다 쓴 내 브랜치 지우기</td></tr></tbody></table>
+<div class="bk-warn"><b>Squash 로 합쳤으면 <code>-d</code> 가 거절해요</b><pre class="code">error: the branch 'readme-usage' is not fully merged.</pre>squash 는 A·B·C 를 <b>새 커밋 S</b> 로 만들어서, Git 이 보기엔 A·B·C 가 main 에 없거든요. GitHub 의 PR 에 보라색 <b>Merged</b> 가 붙은 걸 확인했으면 <code>git branch -D readme-usage</code>(대문자 D = 강제로 지우기). 확인 안 하고 -D 하면 진짜 안 합친 작업을 잃을 수 있어요.</div>
+<p>예제는 GitHub 에서 squash 로 합친 상황을 흉내 내서(다른 폴더에서 <code>git merge --squash</code>), 뒷정리를 해 보는 거예요.</p>`, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g7 && mkdir g7 && cd g7\ngit init -q --bare remote.git && git clone -q remote.git work && cd work\necho "# todo" > README.md && git add . && git commit -qm "시작" && git push -q origin main\ngit switch -qc readme-usage && echo "## 사용법" >> README.md && git commit -qam "사용법" && echo "- add" >> README.md && git commit -qam "add 설명" && git push -q -u origin readme-usage && cd ..\ngit clone -q remote.git web && cd web && git merge -q --squash origin/readme-usage && git commit -qm "README 에 사용법 (#1)" && git push -q origin main && git push -q origin --delete readme-usage && cd ../work\ngit switch main\ngit pull\ngit fetch --prune\ngit branch -d readme-usage\ngit branch -D readme-usage\ngit branch -a\ngit log --oneline', label: '예제 명령 — squash 뒤 -d 는 일부러 거절돼요' } },
+  ],
+  summary: ['merge commit · squash · rebase — 기록 모양이 다름', 'Confirm … → Merged → Delete branch', '내 컴퓨터: switch main → pull → fetch --prune → branch -d(squash 면 -D)'] },
+{ id: 'G8', ch: 2, n: 8, title: 'PR 에 충돌이 나면', mode: 'text', tutorSummary: 'This branch has conflicts that must be resolved. 웹: Resolve conflicts → 마커 지우고 고치기 → Mark as resolved → Commit merge. 로컬: git switch 브랜치 → git pull origin main(또는 git merge main) → 충돌 고치기 → add → commit → push.',
+  pages: [
+    { title: '「This branch has conflicts that must be resolved」', html: `<p>내가 PR 을 연 사이에 main 이 같은 줄을 다르게 바꾸면, PR 아래에 회색 상자가 떠요: <b>This branch has conflicts that must be resolved</b>. 초록 합치기 단추가 막혀요. 터미널·Git 교과서 레슨 13 의 충돌이 GitHub 에서 생긴 거예요 — 푸는 곳만 둘 중 하나를 고르면 돼요.</p>
+<table class="kb"><tbody><tr><td><b>웹에서</b>(2쪽)</td><td>충돌이 간단한 글자일 때. 브라우저에서 끝</td></tr><tr><td><b>내 컴퓨터에서</b>(3쪽)</td><td>코드가 돌아가는지 실행해 보며 고쳐야 할 때·파일이 많을 때</td></tr></tbody></table>
+<p>어느 쪽이든 결과는 같아요: <b>main 을 내 브랜치에 합치는 커밋</b>이 생기고, PR 이 다시 「합칠 수 있음」 이 돼요.</p>` + GH_DATE },
+    { title: '웹에서: Resolve conflicts → Mark as resolved → Commit merge', html: `<div class="bk-step-box"><b>① 열기</b><br>PR 아래 충돌 상자의 <b>Resolve conflicts</b>. 편집기에 충돌 파일이 마커와 함께 열려요:<pre class="code">&lt;&lt;&lt;&lt;&lt;&lt;&lt; readme-usage
+라떼 4800
+=======
+라떼 5000
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; main</pre>위가 내 브랜치, 아래가 main 이에요.</div>
+<div class="bk-step-box"><b>② 고치기</b><br>남길 모양으로 고치고 <b>마커 세 줄을 지워요</b>(<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> · <code>=======</code> · <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>). 한쪽만 남겨도, 섞어도 돼요.</div>
+<div class="bk-step-box"><b>③ 완료</b><br>파일마다 오른쪽 위 <b>Mark as resolved</b> → 다 됐으면 <b>Commit merge</b>. PR 화면으로 돌아오면 「This branch has no conflicts with the base branch」 와 초록 단추.</div>
+<div class="bk-warn">웹에서 풀면 GitHub 쪽 내 브랜치에 합친 커밋이 생겨요 → 내 컴퓨터의 그 브랜치에서 더 고치기 전에 <code>git pull</code>.</div>` + GH_DATE },
+    { title: '내 컴퓨터에서: main 을 내 브랜치로 받아 와 풀기', html: `<pre>git switch readme-usage
+git pull origin main --no-edit
+(충돌! 파일을 열어 고치고 마커 지우기)
+git add menu.txt
+git commit --no-edit
+git push</pre>
+<p><code>git pull origin main</code> = 「GitHub 의 main 을 받아서 지금 브랜치(내 PR 브랜치)에 합쳐」. 충돌 해결은 터미널·Git 교과서 레슨 13 과 똑같아요. push 하면 PR 이 바로 「충돌 없음」 으로 바뀌어요.</p>
+<p>예제는 원격의 main 과 내 브랜치가 같은 줄(라떼 가격)을 다르게 바꾼 상태를 만들고, 내 컴퓨터에서 풀어 보는 거예요. 고치는 줄은 <code>printf</code> 로 대신 썼어요(실제로는 편집기로).</p>`, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g8 && mkdir g8 && cd g8\ngit init -q --bare remote.git && git clone -q remote.git work && cd work\nprintf \'%s\\n\' "아메리카노 4000" "라떼 4500" > menu.txt && git add . && git commit -qm "메뉴판" && git push -q origin main\ngit switch -qc sale && printf \'%s\\n\' "아메리카노 4000" "라떼 4800" > menu.txt && git commit -qam "라떼 할인" && git push -q -u origin sale && cd ..\ngit clone -q remote.git web && cd web && printf \'%s\\n\' "아메리카노 4000" "라떼 5000" > menu.txt && git commit -qam "라떼 인상" && git push -q && cd ../work\ngit pull origin main --no-edit\ncat menu.txt\nprintf \'%s\\n\' "아메리카노 4000" "라떼 4800" > menu.txt\ngit add menu.txt\ngit commit --no-edit\ngit push\ngit log --oneline --graph', label: '예제 명령 — 충돌은 일부러 나요' } },
+  ],
+  summary: ['This branch has conflicts → 합치기 막힘', '웹: Resolve conflicts → 마커 지우기 → Mark as resolved → Commit merge', '내 컴퓨터: 브랜치에서 git pull origin main → 고치기 → add · commit · push'] },
+{ id: 'G9', ch: 2, n: 9, title: 'Issues 로 할 일 관리', mode: 'text', tutorSummary: 'Issues → New issue → 제목·설명(재현·기대·실제) → Submit new issue. Labels · Assignees · Milestone. PR 설명에 Closes #3 / Fixes #3 → 기본 브랜치에 합쳐지면 이슈 자동 닫힘. Settings → Features → Issues → Set up templates.',
+  pages: [
+    { title: '이슈 쓰기: 재현 방법 · 기대 · 실제', html: `<p><b>이슈</b>는 저장소의 할 일·버그·아이디어 글이에요. 혼자 쓰는 저장소에서도 「다음에 할 것」 메모장으로 좋아요.</p>
+<div class="bk-step-box"><b>만들기</b><br>저장소 <b>Issues</b> 탭 → <b>New issue</b>(템플릿이 있으면 고르는 화면 → 없으면 <b>Open a blank issue</b>) → 제목 · 설명 → <b>Submit new issue</b>. 이슈에도 번호가 붙어요(<code>#3</code>).</div>
+<p>버그 이슈는 남이 <b>그대로 따라 해서 같은 버그를 볼 수 있게</b> 써요(파이썬 교과서 레슨 22 「디버깅 사고법」 과 같은 생각):</p>
+<pre>## 재현 방법
+1. python todo.py
+2. 아무것도 안 치고 Enter
+
+## 기대
+「빈 입력이에요」 안내
+
+## 실제
+IndexError: list index out of range (todo.py 12번째 줄)
+
+## 환경
+Windows 11 · Python 3.15</pre>
+<p>코멘트에서 <code>#3</code> 처럼 번호를 쓰면 그 이슈·PR 로 가는 링크가 돼요. 커밋 해시(<code>a1b2c3d</code>)도 링크가 돼요.</p>` + GH_DATE },
+    { title: 'Labels · Assignees · Milestone', html: `<p>이슈 화면 오른쪽 칸들로 정리해요(이슈를 만들 때도, 나중에도).</p>
+<table class="kb"><tbody><tr><td><b>Labels</b></td><td>종류 꼬리표: <code>bug</code> · <code>enhancement</code>(기능) · <code>documentation</code> · <code>good first issue</code>(처음 오는 사람용) 등이 기본으로 있어요. Issues 탭 → <b>Labels</b> 에서 새로 만들 수도</td></tr><tr><td><b>Assignees</b></td><td>누가 할지. 혼자면 나 — 「assign yourself」</td></tr><tr><td><b>Milestone</b></td><td>묶음·마감: 「v1.0」 처럼. Issues 탭 → <b>Milestones</b> → <b>New milestone</b> 에서 만들면 진행률 막대가 생겨요</td></tr></tbody></table>
+<p>Issues 목록 위 검색 칸에서 거르기: <code>is:open label:bug</code> · <code>assignee:@me</code> · <code>milestone:v1.0</code>.</p>` + GH_DATE },
+    { title: 'Closes #3: PR 이 합쳐지면 이슈가 저절로 닫혀요', html: `<p>PR 설명에 <b>닫는 낱말 + 이슈 번호</b>를 쓰면 둘이 연결되고, <b>그 PR 이 기본 브랜치(main)에 합쳐질 때 이슈가 자동으로 닫혀요</b>.</p>
+<pre>Closes #3</pre>
+<p>쓸 수 있는 낱말: <code>close</code> · <code>closes</code> · <code>closed</code> · <code>fix</code> · <code>fixes</code> · <code>fixed</code> · <code>resolve</code> · <code>resolves</code> · <code>resolved</code>. 여러 개면 각각: <code>Fixes #3, fixes #5</code>.</p>
+<ul><li>연결되면 이슈 오른쪽 <b>Development</b> 칸에 PR 이 보여요.</li><li>main 이 아닌 브랜치로 합치는 PR 이면 자동으로 안 닫혀요.</li><li>커밋 메시지에 써도 돼요(<code>git commit -m "빈 입력 처리 (Fixes #3)"</code>) — main 에 들어갈 때 닫혀요.</li></ul>
+<div class="bk-step-box"><b>이슈 템플릿 (선택)</b><br>저장소 <b>Settings</b> → <b>General</b> 의 「Features」 칸 → <b>Issues</b> 아래 <b>Set up templates</b> → <b>Add template</b> ▾ → <b>Bug report</b> → <b>Propose changes</b> → 커밋. <code>.github/ISSUE_TEMPLATE/bug_report.md</code> 가 생기고, 다음부터 New issue 에서 그 틀을 고를 수 있어요. PR 틀은 <code>.github/pull_request_template.md</code> 파일을 만들면 돼요.</div>` + GH_DATE },
+  ],
+  summary: ['Issues → New issue → Submit new issue (재현·기대·실제)', 'Labels · Assignees · Milestone, 검색 is:open label:bug', 'PR 설명에 Closes #3 → main 에 합쳐지면 이슈 자동 닫힘'] },
+{ id: 'G10', ch: 2, n: 10, title: 'Projects 보드', mode: 'text', tutorSummary: '프로필 → Projects → New project → Start from scratch: Board → Project name → Create project. Todo / In Progress / Done 칸, + Add item 으로 이슈·PR 추가, 카드 끌어 옮기기, 기본 Workflows(닫히면 Done).',
+  pages: [
+    { title: '보드 만들기: Projects → New project → Board', html: `<p>이슈가 많아지면 「지금 뭘 하고 있지?」 를 한눈에 보고 싶어져요. <b>Projects</b> 는 이슈·PR 을 카드로 놓는 칸반 보드예요.</p>
+<div class="bk-step-box"><b>만들기</b><br>내 프로필(<code>github.com/내아이디</code>) → 위 <b>Projects</b> 탭 → <b>New project</b> → 「Start from scratch」 의 <b>Board</b> → 「Project name」 칸에 <code>todo-cli 할 일</code> → <b>Create project</b>.</div>
+<p>칸 세 개가 생겨요: <b>Todo</b>(할 것) · <b>In Progress</b>(하는 중) · <b>Done</b>(끝). 칸은 「Status」 값이라서 이름을 바꾸거나 칸을 더할 수 있어요.</p>
+<p class="muted small">프로젝트는 저장소가 아니라 <b>내 계정</b>에 붙어요. 그래서 여러 저장소의 이슈를 한 보드에 모을 수도 있어요. 저장소 화면에서 보이게 하려면 저장소 <b>Projects</b> 탭 → <b>Link a project</b>.</p>` + GH_DATE },
+    { title: '카드 넣고 옮기기, 그리고 자동으로 Done', html: `<ul><li><b>이슈 넣기</b>: 칸 맨 아래 <b>+ Add item</b> → <code>#</code> 를 치면 저장소 고르기 → 이슈 번호 고르기. 또는 이슈 화면 오른쪽 <b>Projects</b> 칸에서 보드 고르기.</li><li><b>메모 카드</b>: + Add item 에 그냥 글을 쓰면 「초안(draft)」 카드 — 나중에 이슈로 바꿀 수 있어요.</li><li><b>옮기기</b>: 카드를 끌어서 In Progress 로. 일을 시작할 때 옮기는 게 습관이에요.</li></ul>
+<div class="bk-step-box"><b>자동으로 Done</b><br>보드 오른쪽 위 <b>⋯</b> → <b>Workflows</b> 에 기본으로 켜진 자동화가 있어요: 이슈가 닫히거나 PR 이 합쳐지면 그 카드를 <b>Done</b> 으로. 레슨 9 의 <code>Closes #3</code> 와 같이 쓰면 「PR 합치기 → 이슈 닫힘 → 카드 Done」 이 한 번에 돼요.</div>` + GH_DATE },
+  ],
+  summary: ['프로필 → Projects → New project → Board', 'Todo · In Progress · Done, + Add item 으로 이슈', 'Workflows: 닫히면·합쳐지면 자동 Done'] },
+{ id: 'GB2', ch: 2, boss: true, title: '보스: 혼자 하는 협업 한 바퀴', mode: 'text', pages: [], summary: [], tutorSummary: '이슈 2개 → 브랜치 2개 → PR 2개(줄 코멘트·Suggestion 반영) → 하나는 충돌 해결 → squash → 이슈 자동 닫힘 → 보드 Done.' },
 // ================= 챕터 3 세상에 내놓기 (다음 업데이트) =================
 { id: 'G11', ch: 3, n: 11, title: 'fork 와 오픈소스 첫 기여', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'fork, upstream, Sync fork, CONTRIBUTING, 첫 기여 PR.' },
 { id: 'G12', ch: 3, n: 12, title: 'GitHub Pages 두 가지 방법', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'Deploy from a branch(웹 W13) vs GitHub Actions, 주소 규칙, 404.' },
