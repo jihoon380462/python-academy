@@ -32,7 +32,7 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==7 and r['ready']==7, f"코스 카드 7개(코스 5 + 공용 2: 수학 공간·Vim), 열린 것 7개 = 전부(v2.14.0 웹 교과서까지) (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==8 and r['ready']==8, f"코스 카드 8개(코스 6 + 공용 2: 수학 공간·Vim), 열린 것 8개 = 전부(v2.16.0 GitHub 교과서까지) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and '#' in r['cont'], '이어서 하기 링크: '+str(r['cont']))
     check('오늘 2/5' in (r['today'] or '') and '오늘의 도전' not in (r['today'] or ''), '오늘의 할 일(문제 코스만 세기, 교과서엔 없는 「오늘의 도전」 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
@@ -588,6 +588,20 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','flex'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=2 and pg.inner_text('.tb-title')=='웹 문법 도감', '웹 문법 도감: flex 검색')
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '웹 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',1),('W2',2),('W4',2),('W7',1),('W11',2),('WB3',0)] ]
     pg.set_viewport_size({'width':1280,'height':900}); werr=errors[w0:]; check(not werr, '웹 교과서 pageerror 0 (%s)' % (werr[:2] or 'OK'))
+    # ===== [GitHub 교과서 v2.16.0] N6 — 진짜 계정 + Git Bash, 설계 specs/github-course.md
+    print('[GitHub 교과서 v2.16.0]'); g0=len(errors); GHB='file://'+os.path.join(ROOT,'courses/github/index.html')
+    pg.goto(GHB); pg.wait_for_timeout(900); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
+    gh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length, kicker:(document.querySelector('.lp-kicker')||{}).textContent||''})")
+    check(gh['book'] and gh['steps']==4 and gh['ls']==6 and gh['soon']==16 and gh['pre']==1 and 'GitHub' in gh['kicker'], 'GitHub 교과서 홈: 시작하기 4 · 열린 레슨 6(챕터 1) · 준비 중 16 · 「먼저 꼭」 경고 1 (%s)' % gh)
+    pg.evaluate("UI.go('lesson',{lessonId:'SETUP',page:0})"); pg.wait_for_timeout(300); check(pg.locator('a[href="../terminal-git/#lesson/T16"][target="_blank"]').count()==1, '시작하기 1: 터미널·Git 레슨 16 은 새 탭으로(이 화면은 그대로 — 돌아오기 필요 없음)')
+    pg.evaluate("UI.go('lesson',{lessonId:'G1',page:0})"); pg.wait_for_timeout(300); t=pg.inner_text('.bk-art'); check('Enable two-factor authentication' in t and 'recovery codes' in t and pg.locator('.bk-prereq').count()==1, 'G1 1쪽: 2FA 단추 이름·복구 코드 + 「꼭!」 경고')
+    pg.evaluate("UI.go('lesson',{lessonId:'G2',page:3})"); pg.wait_for_timeout(300); gt=pg.evaluate("[...document.querySelectorAll('.bk-task')].map(x=>[!!x.querySelector('.bk-checks li'), !!x.querySelector('.bk-io'), x.innerText.includes('준비 명령')])")
+    check(len(gt)==3 and gt[0]==[True,False,False] and gt[1]==[False,True,True] and gt[2]==[False,True,True], 'G2 만들어 보기: 화면 문제는 「확인할 것」 ☐ · 명령 문제는 준비 명령 + 이렇게 나오면 성공 (%s)' % gt)
+    pg.evaluate("UI.go('lesson',{lessonId:'G2',page:0})"); pg.wait_for_timeout(300); check('Add README' in pg.inner_text('.bk-art') and pg.locator('.bk-prereq').count()==1 and 'Keep my email addresses private' in pg.inner_text('.bk-prereq'), 'G2 1쪽: New repository 칸 이름 + 「이메일 먼저」 경고')
+    pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','SSH'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=2 and pg.inner_text('.tb-title')=='GitHub 도감', 'GitHub 도감: SSH 검색')
+    pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'GitHub 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',0),('G0',0),('G1',2),('G2',2),('G2',3),('G3',3),('G4',1),('GB1',0)] ]
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); ghc=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/github/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    check('읽은 레슨' in ghc and '/6' in ghc and 'GitHub' in ghc, '허브 GitHub 카드: 교과서 · 읽은 레슨 n/6 (%s)' % ghc[:90]); gerr=errors[g0:]; check(not gerr, 'GitHub 교과서 pageerror 0 (%s)' % (gerr[:2] or 'OK'))
     # v2.15.3 사용자 「방향키 ← 이전 · → 다음 · 만들어 보기에서 목차로 가는 건 키 없이」
     print('[교과서 ← → 키 v2.15.3]'); PYB='file://'+os.path.join(ROOT,'courses/python/index.html'); pg.goto(PYB); pg.wait_for_timeout(800); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
     pg.evaluate("UI.go('lesson',{lessonId:'L2',page:4})"); pg.wait_for_timeout(250); pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(150); k1=pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")
