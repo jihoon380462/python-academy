@@ -130,10 +130,10 @@ const Sync = {
   card() {
     const on = this.on; const st = this.statusText();
     return `<div class="card sync"><div class="card-h">📱 기기 연동 (PC ↔ 모바일)</div>
-      ${on ? `<div id="syncSt" class="small">${st}</div><div class="muted small" style="margin:6px 0 8px">진행 상황·XP·뱃지·설정이 자동으로 맞춰져요. 문제를 풀면 3초 뒤 올리고, 앱을 다시 열면 내려받아요. <b>클로드 API 키는 기기마다 따로</b> 넣어야 해요.</div>
+      ${on ? `<div id="syncSt" class="small">${st}</div><div class="muted small" style="margin:6px 0 8px">읽은 레슨·설정이 자동으로 맞춰져요. 레슨을 끝까지 읽으면 잠시 뒤 올라가고, 다른 기기에서는 페이지를 열 때 받아와요.</div>
         <div class="row"><button class="btn primary" id="syncNow">🔄 지금 동기화</button><button class="btn" id="syncCode">📋 연동 코드 복사</button><button class="btn" id="syncOff">연동 해제</button></div>
         <div class="muted small" style="margin-top:8px">다른 기기에서: 이 사이트 열기 → ⚙ 설정 → 이 칸에 <b>연동 코드 붙여넣기 → 연동하기</b>. 끝!</div>`
-      : `<div class="muted small" style="margin-bottom:8px">PC에서 풀던 걸 폰에서 이어서 풀 수 있어요. 내 GitHub 계정의 <b>비공개 gist</b>에 저장되고, 다른 사람은 못 봐요.</div>
+      : `<div class="muted small" style="margin-bottom:8px">PC에서 읽던 곳을 폰에서 이어서 읽을 수 있어요. 내 GitHub 계정의 <b>비공개 gist</b>에 저장되고, 다른 사람은 못 봐요.</div>
         <div class="muted small" style="margin-bottom:8px"><b>처음 한 번(PC):</b> ① <a href="${this.TOKEN_URL}" target="_blank" rel="noopener">이 링크</a>를 열어 GitHub 로그인 → ② Expiration을 <b>No expiration</b>으로 → ③ 맨 아래 <b>Generate token</b> → ④ 나온 <code>ghp_…</code>를 아래 칸에 붙여넣고 연동하기 (gist 권한은 링크에 미리 체크돼 있어요)<br><b>두 번째 기기(폰):</b> PC 설정에서 복사한 <b>연동 코드</b>를 아래 칸에 붙여넣고 연동하기</div>
         <div class="row"><input class="input" type="password" id="syncIn" placeholder="ghp_… 토큰 또는 PA-SYNC:… 연동 코드" autocomplete="off" style="flex:1;min-width:200px"><button class="btn primary" id="syncGo">연동하기</button></div><div id="syncSt" class="small" style="margin-top:6px"></div>`}
     </div>`;

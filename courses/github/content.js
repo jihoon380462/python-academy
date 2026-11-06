@@ -4,8 +4,6 @@
 // 레슨 쪽 example.shell = Git Bash 에 칠 명령. 「만들어 보기」·시작하기·도감 도구 상자는 book.js. 검사: node tools/check_book.mjs github
 const COURSE = { id: 'github', name: 'GitHub', runner: 'none', bench: false,
   tutorPersona: '너는 GitHub 을 처음 쓰는 성인에게 진짜 계정으로 저장소·PR·Actions 를 가르치는 선생님이다. 화면은 「어느 화면 → 어느 칸 → 무슨 글자」 로 말한다.' };
-const CHECKUPS = { after: {}, upto: {} };
-const WEAKNESS_TAGS = ['계정', '저장소', 'PR', '리뷰', 'Actions', '공개'];
 const CHAPTERS = [
   { ch: 1, name: '내 저장소를 제대로', color: '#8250df' },
   { ch: 2, name: 'Pull Request 로 협업', color: '#1f883d' },
@@ -439,6 +437,4 @@ remote:        path: README.md:4</pre>→ 그 줄을 지우고, 마지막 커밋
   ],
   summary: ['winget install --id GitHub.cli → gh auth login', 'gh pr create --fill · gh pr checks · gh pr merge --squash --delete-branch', 'gh repo create · gh issue create · gh release create'] },
 ];
-const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)
-const DRILLS = [];
-const GUIDES = {};
+const PROBLEMS = []; // v2.19.0 N13: 이 코스의 옛 문제는 archive/classic/courses/github/content.js // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)

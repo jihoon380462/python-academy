@@ -3,8 +3,6 @@
 // 레슨 쪽 example.code = 따라 칠 키(설명 주석 포함). 「만들어 보기」·준비 명령·단축키 도감은 book.js. 검사: node tools/check_book.mjs (진짜 vim 으로 키를 넣어 결과 파일 비교)
 const COURSE = { id: 'vim', name: 'Vim 에디터', runner: 'none', bench: false,
   tutorPersona: '너는 Vim 을 처음 보는 학생에게 Windows 의 gVim 을 가르치는 선생님이다. 키는 「무엇을 하는지 → 어떻게 치는지 → 잘못 치면 어떻게 되는지」 순서로 설명한다.' };
-const CHECKUPS = { after: {}, upto: {} };
-const WEAKNESS_TAGS = ['모드', '이동', '편집', '찾기', '설정', '파이썬'];
 const CHAPTERS = [
   { ch: 1, name: '기본기 — 모드와 단축키', color: '#019833' },
   { ch: 2, name: '파이썬과 연결', color: '#3776ab' },
@@ -203,6 +201,4 @@ print(student_scores█</pre>
   summary: [':sp :vsp + Ctrl+w hjkl', ':tabnew gt · :ls :b', ':Ex :Lexplore 탐색기 · :wa :qa'] },
 { id: 'VB2', ch: 2, boss: true, title: '보스: Vim 으로 파이썬 프로그램 만들기', mode: 'text', pages: [], summary: [], tutorSummary: '자동 들여쓰기·자동완성·F5 실행으로 작은 파이썬 프로그램을 Vim 에서만 만들기.' },
 ];
-const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)
-const DRILLS = [];
-const GUIDES = {};
+const PROBLEMS = []; // v2.19.0 N13: 이 코스의 옛 문제는 archive/classic/courses/vim/content.js // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)

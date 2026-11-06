@@ -15,8 +15,6 @@
 //   tags: WEAKNESS_TAGS 중에서.
 const COURSE = { id: 'web', name: '웹·HTTP·API', runner: 'web', bench: false,
   tutorPersona: '너는 HTML·CSS·JavaScript 와 HTTP 를 처음 배우는 한국어 사용자를 가르치는 친절한 웹 선생님이야. 브라우저에 "무엇이 보이는지"와 "서버와 무슨 말이 오갔는지"를 먼저 눈으로 확인하게 하고, 태그·선택자·fetch 를 설명할 때는 파이썬과 비교해 준다. 정답 코드를 통째로 주지 말고 어느 태그·어느 줄을 보라고 짚어 준다. 쉬운 말, 짧은 문장, 답은 300자 안팎.' };
-const CHECKUPS = { after: {}, upto: {} };
-const WEAKNESS_TAGS = ['HTML', 'CSS', 'JS', 'DOM', '이벤트', '레이아웃', '반응형', '폼', 'HTTP', 'fetch', '비동기', 'JSON', 'API', '오개념'];
 const CHAPTERS = [
   { ch: 1, name: '화면 만들기', color: '#8e24aa' },
   { ch: 2, name: '움직이게', color: '#f9a825' },
@@ -62,39 +60,7 @@ const LESSONS = [
 
 const PROBLEMS = [
 // ---------- W0 웹은 어떻게 동작하나 ----------
-{ id: 'W0P1', lesson: 'W0', type: 'web', title: '첫 제목 만들기', xp: 30,
-  prompt: `<p><code>h1</code> 태그로 제목을 하나 만드세요. 제목 글자는 <b>내 첫 페이지</b> 예요.</p><p>HTML 탭에 한 줄만 쓰면 돼요. 타이핑을 멈추면 미리보기에 바로 보여요.</p><p><b>이렇게 보이면 돼요</b> — 미리보기에 큰 글씨로 「내 첫 페이지」</p>`,
-  tags: ['HTML'],
-  hints: ['여는 태그 <h1> 과 닫는 태그 </h1> 사이에 글자를 넣어요', '닫는 태그는 이름 앞에 / 가 붙어요: </h1>', '<h1>내 첫 페이지</h1>'],
-  web: { tabs: ['html'], starter: { html: `<!-- 여기에 h1 태그로 제목을 쓰세요 -->\n` },
-    checks: [
-      { text: 'h1 제목 태그가 있어요', sel: 'h1', exists: true },
-      { text: '제목 글자가 「내 첫 페이지」예요', sel: 'h1', equals: '내 첫 페이지' },
-    ] },
-  solution: `<h1>내 첫 페이지</h1>` },
 
-{ id: 'W0P2', lesson: 'W0', type: 'quiz', title: '주소를 치면 무슨 일이?', xp: 10,
-  prompt: `<p>주소창에 <code>https://example.com/menu</code> 를 치고 Enter 를 눌렀어요. 가장 먼저 일어나는 일은?</p>`,
-  tags: ['HTTP'],
-  hints: ['식당 비유를 떠올려요 — 손님이 먼저 하는 일은?', '브라우저는 손님, 서버는 주방이에요', '손님(브라우저)이 주방(서버)에 주문(요청)을 보내요'],
-  quiz: { opts: ['브라우저가 서버에 「/menu 페이지 주세요」 요청을 보낸다', '브라우저가 내 컴퓨터 안에서 페이지를 만들어 낸다', '서버가 먼저 내 브라우저에 페이지를 보내 준다', '주소창이 페이지를 그림으로 바꿔 보여 준다'], ans: 0, why: '주소는 「어느 서버의 어느 경로」예요. 브라우저가 그 서버에 요청을 보내고, 서버가 상태 번호(200 등)와 함께 HTML 을 응답하면 브라우저가 그려요.' } },
 
-{ id: 'W0P3', lesson: 'W0', type: 'fill', title: '태그 짝 맞추기', xp: 15,
-  prompt: `<p>빈칸에 알맞은 태그 이름을 넣어 제목 하나와 문단 하나를 완성하세요. (꺾쇠 <code>&lt; &gt;</code>는 이미 있으니 이름만)</p>`,
-  tags: ['HTML'],
-  hints: ['여는 태그와 닫는 태그는 이름이 같아요', '첫 줄은 </h1> 으로 닫히고, 둘째 줄은 <p> 로 열려요', '1번 칸 h1, 2번 칸 p'],
-  fill: { code: `<___1___>안녕하세요</h1>\n<p>첫 문단이에요.</___2___>`, blanks: [{ a: ['h1'] }, { a: ['p'] }], why: '닫는 태그 </h1> 의 짝은 <h1>, 여는 태그 <p> 의 짝은 </p> 예요. 여는 태그와 닫는 태그는 이름이 같고 닫는 쪽에만 / 가 붙어요.' } },
 
-{ id: 'W0P4', lesson: 'W0', type: 'web', title: '문단 두 개와 파란 글씨', xp: 30,
-  prompt: `<p>HTML 탭: 제목 아래에 <code>p</code> 문단을 <b>두 개</b> 만드세요(내용은 자유).</p><p>CSS 탭: <code>p</code> 의 글자색을 <code>blue</code> 로 하세요. 예제에서 본 <code>h1 { color: purple; }</code> 와 같은 모양이에요.</p>`,
-  tags: ['HTML', 'CSS'],
-  hints: ['문단은 <p>글자</p> 를 두 번 쓰면 돼요', 'CSS 는 선택자 { 속성: 값; } — 선택자 자리에 p, 속성은 color', 'HTML: <p>첫 문단</p><p>둘째 문단</p>  CSS: p { color: blue; }'],
-  web: { tabs: ['html', 'css'], starter: { html: `<h1>내 첫 페이지</h1>\n<!-- 아래에 p 태그 두 개 -->\n`, css: `/* p 의 글자색을 blue 로 */\n` },
-    checks: [
-      { text: 'h1 제목은 그대로 있어요', sel: 'h1', exists: true },
-      { text: 'p 문단이 2개예요', sel: 'p', count: 2 },
-      { text: '문단 글자색이 파랑(blue)이에요', sel: 'p', css: { prop: 'color', value: 'blue' } },
-    ] },
-  solution: `<style>\np { color: blue; }\n</style>\n<h1>내 첫 페이지</h1>\n<p>첫 문단이에요.</p>\n<p>둘째 문단이에요.</p>` },
 ];
-const DRILLS = [];
