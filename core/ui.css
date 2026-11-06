@@ -445,3 +445,6 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .book-mode .bk-res th, .book-mode .bk-res td { padding: 4px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
 .book-mode .bk-res th { font-weight: 700; }
 .book-mode .bk-res td.null { opacity: .55; font-style: italic; }
+/* v2.14.0 웹 교과서 「브라우저에서 확인할 것」 */
+.book-mode .bk-checks ul { list-style: none; padding-left: 0; margin: 6px 0 0; }
+.book-mode .bk-checks li { padding: 3px 0; }

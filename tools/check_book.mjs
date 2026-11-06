@@ -27,6 +27,7 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
     if (!answer) bad(`${id}: 예시 답 없음`);
     if (JSON.stringify(io).includes('{{') || answer.includes('{{')) bad(`${id}: {{바꿔 끼우기}} 자리표시가 남음 — io·answer 를 직접 적으세요`);
     if (t.noRun) return;
+    if (BOOK.check === 'web') { if (!(t.checks || []).length) bad(`${id}: 「브라우저에서 확인할 것」(checks) 없음`); return; } // v2.14.0 웹 교과서: 실제 검사는 tools/run_web_solutions.py(브라우저)
     if (SQLB) { for (const c of io) runSqlTask(id, t, answer, c); return; }
     if (VIM) { if (!t.setup) bad(`${id}: 준비 명령(setup) 없음`); for (const c of io) runVim(id, t, answer, c); return; }
     if (SHELL) { if (!t.setup) bad(`${id}: 준비 명령(setup) 없음`); for (const c of io) runShell(id, t, answer, c); return; }

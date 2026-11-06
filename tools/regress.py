@@ -32,7 +32,7 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==7 and r['ready']==6, f"코스 카드 7개(코스 5 + 공용 2: 수학 공간·Vim), 열린 것 6개(파이썬·알고·수학·터미널·Vim·v2.13.0 SQL 교과서) (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==7 and r['ready']==7, f"코스 카드 7개(코스 5 + 공용 2: 수학 공간·Vim), 열린 것 7개 = 전부(v2.14.0 웹 교과서까지) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and '#' in r['cont'], '이어서 하기 링크: '+str(r['cont']))
     check('오늘 2/5' in (r['today'] or '') and '오늘의 도전' not in (r['today'] or ''), '오늘의 할 일(문제 코스만 세기, 교과서엔 없는 「오늘의 도전」 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
@@ -324,8 +324,9 @@ with sync_playwright() as p:
     # ===== [코스 web] =====  (v2.7.0 뼈대: 허브 카드 → 코스 열기 → W0 예제 미리보기 → 러너 단위(가짜 API·체크 스크립트) → 문제 제출 정답/오답 → draft 「준비 중」 → 모바일. 메인 세션: 이 절은 python 코스 검사 뒤 아무 데나 둬도 됨(앞 절과 공유하는 것은 pg·b·check·errors·HUB·ROOT 뿐))
     print('[코스 web]'); pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600)
     wc=pg.evaluate("(()=>{ const a=[...document.querySelectorAll('a.hc')].find(x=>(x.getAttribute('href')||'').includes('courses/web/')); return a ? {href:a.getAttribute('href'), cls:a.className, txt:a.innerText} : null; })()")
-    check(bool(wc) and 'preview' in wc['cls'] and '미리보기' in wc['txt'], '허브: 웹 코스 카드가 「준비 중 · 미리보기 열림」으로 열림 (%s)' % (wc and wc['href']))
-    WEB='file://'+os.path.join(ROOT,'courses/web/index.html'); n0=len(errors); pg.goto(WEB); pg.wait_for_timeout(900); pg.evaluate("Store.data.onboarded=true; Store.save(); document.querySelectorAll('.modal-ov').forEach(m=>m.remove())")
+    check(bool(wc) and '읽은 레슨' in wc['txt'] and '/17' in wc['txt'], 'v2.14.0 허브: 웹 코스 카드가 교과서(읽은 레슨 n/17) (%s)' % (wc and wc['href']))
+    WEB='file://'+os.path.join(ROOT,'courses/web/index.html')+'?classic=1';  # v2.14.0: 교과서가 기본 — 브라우저 편집기(예전) 회귀는 ?classic=1
+    n0=len(errors); pg.goto(WEB); pg.wait_for_timeout(900); pg.evaluate("Store.data.onboarded=true; Store.save(); document.querySelectorAll('.modal-ov').forEach(m=>m.remove())")
     check(pg.evaluate("UI.view")=='home' and not [e for e in errors[n0:] if 'Py' in e] and pg.evaluate("typeof Web==='object' && typeof UI.modes.web==='object' && typeof UI.examples.web==='object' && !!document.querySelector('link[href^=\"course.css\"]')"), '웹 코스: Py 없이 홈 렌더 + Web 러너·UI.modes.web·UI.examples.web 등록 + course.css')
     check(pg.locator('.lc.draft').count()>=6 and pg.evaluate("(()=>{ const b=document.querySelector('.lc.draft'); return !!b && b.disabled && b.innerText.includes('준비 중'); })()"), '홈: draft 레슨 카드 「준비 중」(disabled) %d개' % pg.locator('.lc.draft').count())
     pg.evaluate("UI.go('lesson',{lessonId:'W0',page:3})"); pg.wait_for_timeout(1000)
@@ -572,6 +573,20 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('lesson',{lessonId:'SB1',page:0})"); pg.wait_for_timeout(300); check(pg.evaluate("document.querySelector('.bk-art h1').textContent")=='🛠 만들어 보기' and 'TODO' not in pg.inner_text('.bk-art'), '보스 SB1: 「준비 중」 쪽 없이 만들어 보기만')
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','JOIN'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=3 and pg.inner_text('.tb-title')=='SQL 문법 도감', 'SQL 문법 도감: JOIN 검색')
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'SQL 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',2),('S0',0),('S1',3),('S5',3),('S10',1),('SB2',0)] ]
+    pg.set_viewport_size({'width':1280,'height':900})
+    # ===== [웹 교과서 v2.14.0] N3 — VS Code + Live Server + 브라우저
+    print('[웹 교과서 v2.14.0]'); w0=len(errors); WBB='file://'+os.path.join(ROOT,'courses/web/index.html')
+    pg.goto(WBB); pg.wait_for_timeout(1000); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
+    wh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length})")
+    check(wh['book'] and wh['steps']==4 and wh['ls']==17 and wh['soon']==0 and wh['pre']==2, '웹 교과서 홈: 시작하기 4 · 레슨 17 · 준비 중 0 · 「먼저 꼭」 경고 2(Live Server·F12) (%s)' % wh)
+    pg.evaluate("UI.go('lesson',{lessonId:'SETUP',page:1})"); pg.wait_for_timeout(300); check('Ritwick Dey' in pg.inner_text('.bk-art') and 'Go Live' in pg.inner_text('.bk-art'), '시작하기 2: Live Server(Ritwick Dey) 설치·Go Live')
+    pg.evaluate("UI.go('lesson',{lessonId:'W8',page:3})"); pg.wait_for_timeout(300); wt=pg.evaluate("[...document.querySelectorAll('.bk-task')].map(t=>[!!t.querySelector('.bk-checks li'), /필요한 문법/.test(t.textContent)])")
+    check(len(wt)==3 and all(all(x) for x in wt), 'W8 만들어 보기 3문제: 「브라우저에서 확인할 것」 목록 + 필요한 문법 (%s)' % wt)
+    pg.evaluate("UI.go('lesson',{lessonId:'W11',page:3})"); pg.wait_for_timeout(300); check('menu.json' in pg.inner_text('.bk-task') and pg.locator('.bk-prereq').count()==1, 'W11: 준비 파일 menu.json + F12 경고')
+    pg.evaluate("UI.go('lesson',{lessonId:'W13',page:1})"); pg.wait_for_timeout(300); check('Deploy from a branch' in pg.inner_text('.bk-art') and 'github.io' in pg.inner_text('.bk-art'), 'W13: GitHub Pages 켜는 칸(Deploy from a branch)과 주소')
+    pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','flex'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=2 and pg.inner_text('.tb-title')=='웹 문법 도감', '웹 문법 도감: flex 검색')
+    pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '웹 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',1),('W2',2),('W4',2),('W7',1),('W11',2),('WB3',0)] ]
+    pg.set_viewport_size({'width':1280,'height':900}); werr=errors[w0:]; check(not werr, '웹 교과서 pageerror 0 (%s)' % (werr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); qerr=errors[q0:]; check(not qerr, 'SQL 교과서 pageerror 0 (%s)' % (qerr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); verr=errors[v0:]; check(not verr, 'Vim 교과서 pageerror 0 (%s)' % (verr[:2] or 'OK'))
     pg.goto(HUB); pg.wait_for_timeout(600); tgr=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/terminal-git/\"]'); const m=a && a.innerText.match(/읽은 레슨 (\\d+)\\/(\\d+)/); return m? [+m[1], +m[2]] : null; })()")

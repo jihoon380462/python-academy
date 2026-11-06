@@ -23,7 +23,23 @@ JS = """async () => {
   }
   const ex = [];
   for (const l of LESSONS) for (const [i, pg] of (l.pages || []).entries()) { if (!pg.example || !pg.example.web) continue; const r = await run(pg.example.web, null, pg.example.api); ex.push({ id: `${l.id} p${i}`, ready: r.ready, errs: r.errs }); }
-  host.remove(); return { probs: out, ex };
+  // v2.14.0 웹 교과서(book.js): 「만들어 보기」 예시 답(파일 전체)을 미리보기에 넣고 checks 전부 ✓ 인지. mock 이 있으면 그 주소의 fetch 를 가짜 JSON 으로(Live Server·인터넷 대신)
+  const bk = [];
+  if (typeof BOOK !== 'undefined') {
+    for (const [lid, ts] of Object.entries(BOOK.tasks || {})) for (const [i, t] of ts.entries()) {
+      if (t.noRun || !(t.checks || []).length) continue;
+      // 미리보기 iframe 은 sandbox 라 localStorage 가 막혀 있음 → 검사 때만 메모리 localStorage 로 대신(실제 브라우저·Live Server 에서는 진짜가 동작)
+      let html = t.answer.replace('<head>', '<head><script>try{localStorage.getItem("x")}catch(e){var S={};Object.defineProperty(window,"localStorage",{configurable:true,value:{getItem:function(k){return Object.prototype.hasOwnProperty.call(S,k)?S[k]:null},setItem:function(k,v){S[k]=String(v)},removeItem:function(k){delete S[k]},clear:function(){S={}}}})}<\\/script>');
+      if (t.mock) { const m = '<script>(function(){var M=' + JSON.stringify(t.mock) + ';var f=window.fetch;window.fetch=function(u,o){var s=String(u&&u.url||u);for(var k in M){if(s.indexOf(k)>=0){var st=(o&&o.method&&String(o.method).toUpperCase()==="POST")?201:200;var b=JSON.stringify(M[k]);return new Promise(function(r){setTimeout(function(){r(new Response(b,{status:st,headers:{"Content-Type":"application/json"}}))},30)})}}return f.apply(this,arguments)}})();<\\/script>'; html = html.replace('<head>', '<head>' + m); }
+      const r = await run({ html }, t.checks);
+      bk.push({ id: `${lid}#${i + 1} ${t.title}`, ready: r.ready, errs: r.errs, bad: r.res.filter(x => !x.ok).map(x => `${x.text} (지금: ${x.got})`) });
+    }
+    for (const [lid, pgs] of Object.entries(BOOK.lessonPages || {})) for (const [i, pg] of pgs.entries()) {
+      const c = pg.example && pg.example.code; if (!c || !/^\\s*</.test(c)) continue;
+      const r = await run({ html: c }, null); ex.push({ id: `book ${lid}/${i}`, ready: r.ready, errs: r.errs });
+    }
+  }
+  host.remove(); return { probs: out, ex, bk };
 }"""
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=CHROME, args=['--no-sandbox', '--allow-file-access-from-files']) if CHROME else p.chromium.launch(args=['--no-sandbox', '--allow-file-access-from-files'])
@@ -38,8 +54,12 @@ for it in r['probs']:
     if it['bad']: fails += 1; print(f"✗ {it['id']} ({tag}) {it['title']}"); [print('    ' + m) for m in it['bad']]
     else: print(f"✓ {it['id']} ({tag}) {it['title']}")
     for m in it['warn']: print('    ⚠ ' + m)
+for b in r.get('bk', []):
+    if not b['ready'] or b['errs'] or b['bad']:
+        fails += 1; print(f"✗ 교과서 {b['id']}"); [print('    ' + m) for m in (b['bad'] + [('JS 에러: ' + e) for e in b['errs']] + ([] if b['ready'] else ['미리보기 준비 안 됨']))]
+    else: print(f"✓ 교과서 {b['id']}")
 for e in r['ex']:
     if not e['ready'] or e['errs']: fails += 1; print(f"✗ 예제 {e['id']}: {'준비 안 됨' if not e['ready'] else ''} {' / '.join(e['errs'])}")
-print(f"예제 {len(r['ex'])}개 렌더 확인 · web 문제 {len(r['probs'])}개 · 실패 {fails}")
+print(f"예제 {len(r['ex'])}개 렌더 확인 · web 문제 {len(r['probs'])}개 · 교과서 만들어 보기 {len(r.get('bk', []))}개 · 실패 {fails}")
 if perr: print('페이지 에러(정답·예제 JS 에러는 위 항목에 포함):', perr[:5])
 sys.exit(1 if fails else 0)
