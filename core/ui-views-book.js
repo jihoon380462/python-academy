@@ -10,7 +10,9 @@
   if (/[?&]classic\b/.test(location.search)) return; // 예전 문제집 화면(회귀 테스트·비교용): courses/python/index.html?classic=1
   document.documentElement.classList.add('book-mode');
   Game.showGame = () => false; // XP·레벨·스트릭·콤보·뱃지 팝업 없음
-  if (typeof Py !== 'undefined') Py.start = () => {}; // 브라우저 실행 안 함 — 파이썬 엔진(수십 MB)도 안 받음
+  // 브라우저 실행 안 함 — 파이썬 엔진(수십 MB)도 안 받음. v2.15.0 알고리즘 교과서(BOOK.meta.viz): 레슨 예제의 「👀 그림으로 보기」·「👣 한 줄씩 보기」를 누를 때만 받음
+  let pyAllow = false; const pyRealStart = typeof Py !== 'undefined' ? Py.start.bind(Py) : null;
+  if (pyRealStart) Py.start = () => { if (pyAllow) pyRealStart(); };
   if (typeof Onboarding !== 'undefined') Onboarding.start = async () => { Store.data.onboarded = true; Store.save(); }; // 닉네임·하루 목표 묻기 없음
   const SETUP_ID = 'SETUP';
   // 코스마다 다른 글귀(v2.10.0: 터미널·Git 도 교과서) — book.js 의 BOOK.meta 가 덮어씀. 기본값 = 파이썬
@@ -25,16 +27,13 @@
     makeIntro: 'VS Code 에서 빈 파일(예: <code>{file}</code>)을 만들고 직접 짜 보세요.', fileExt: '.py', prepLabel: '준비 파일 — .py 파일과 같은 폴더에',
     setupLabel: '먼저 이 명령을 붙여 넣어 연습 폴더를 만드세요', answerLabel: '예시 답',
     makeTail: '막히면 「필요한 문법」을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답을 펴 보세요. 예시 답과 달라도 같은 결과가 나오면 맞아요.', needsLabel: '필요한 문법',
-    checkLabel: '확인 코드', outLabel: '출력 예', inLabel: '입력 예 <span class="muted small">(터미널에 치는 값)</span>', homeNote: '',
+    checkLabel: '확인 코드', startLabel: '시작 코드 — 복사해서 「# 여기에」 를 채우세요', outLabel: '출력 예', inLabel: '입력 예 <span class="muted small">(터미널에 치는 값)</span>', homeNote: '',
   }, BOOK.meta || {});
   const chName = (ch) => ((CHAPTERS || []).find(c => c.ch === ch) || {}).name || '';
-  const lessonsOf = (ch) => LESSONS.filter(l => l.ch === ch && !l.mock);
+  const lessonsOf = (ch) => LESSONS.filter(l => l.ch === ch && (!l.mock || ((BOOK.tasks || {})[l.id] || []).length)); // 모의고사는 교과서가 문제를 채웠을 때만(v2.15.0 알고리즘: 코딩테스트 15문제)
   // 「필요한 문법」 = [실제 문법(코드), '레슨/쪽', 설명] — v2.9.2 사용자 「분명히 필요 문법을 넣으라고 했다」(별명 대신 실제 코드)
   const pageLink = (ref) => { const [lid, pg] = String(ref).split('/'); return { lid, pg: +pg || 0 }; };
-  const tasksOf = (l) => {
-    const own = (BOOK.tasks || {})[l.id] || [];
-    return own.map(t => { const p = t.pid ? Content.problem(t.pid) : null; const tests = p ? (p.tests || []) : []; const io = t.io || (p && p.project ? tests.filter(c => !c.files && !c.inputGen && c.output !== '__COMPUTED__').filter((c, i, ok) => ok.findIndex(d => d.stage === c.stage) === i).slice(0, 4) : tests[0] ? [tests[0]] : []); /* 실전 프로젝트는 명령(단계)마다 하나씩 */ const up = p && p.files && p.files.upload; return { ...t, text: t.text === '@prompt' && p ? String(p.prompt).replace(/<p>📎[\s\S]*?<\/p>/g, '') : t.text, io, answer: t.answer || (p && p.solution) || '', given: t.given && p ? (t.given === true ? p.starter : t.given) : '', prep: up && up.sample ? { name: up.name, text: up.sample } : (t.prep || null) }; });
-  };
+  const tasksOf = (l) => ((BOOK.tasks || {})[l.id] || []).map(t => BookDerive.task(t, t.pid ? Content.problem(t.pid) : null, BOOK)); // v2.15.0: 모양 바꾸기는 core/book-derive.js(검사 tools/check_book.mjs 와 같은 함수)
   // 본문 속 「▶ 실행해 보기」 같은 이 앱 버튼 안내는 VS Code 기준으로
   const bookText = (html) => String(html || '')
     .replace(/<b>▶?\s*실행해 보기<\/b>/g, '<b>VS Code 에서 실행</b>').replace(/▶\s*실행해 보세요/g, 'VS Code 에서 실행해 보세요').replace(/아래 예제를\s*(?:<b>)?▶?\s*실행(?:<\/b>)?해 보세요/g, '아래 예제를 VS Code 에 붙여 실행해 보세요')
@@ -78,6 +77,22 @@
 
   // ---------- 레슨: 설명 쪽들 + 마지막 「만들어 보기」 ----------
   // 돌아가기(v2.9.4 사용자 「갈 수 있게만 하지 말고 다시 올 수 있게 해」): 다른 화면으로 보내는 버튼은 params.back = { label, view, params } 을 같이 넘기고, 받는 화면은 맨 위에 「← label」 을 그린다
+  // v2.15.0 알고리즘 교과서(BOOK.meta.viz): 예제 코드 + 입력 예 + 「👀 그림으로 보기」(정렬·탐색 애니메이션) · 「👣 한 줄씩 보기」(줄마다 변수 표)
+  //   예전 문제집 화면의 시각화를 그대로 씀(core/visualize.js Viz.runAndShow · core/ui-views-main.js TracePanel). 누를 때만 파이썬 엔진을 받아 이 예제 코드를 브라우저에서 돌림
+  //   코드 칸은 줄마다 나눠서 지금 실행 중인 줄을 칠함(예전 화면의 에디터 대신 — setTraceLine 만 있으면 됨)
+  const exCode = (ex) => ex && (ex.code || ex.shell || ex.sql);
+  const vizOn = (ex) => !!(M.viz && pyRealStart && ex && ex.code && (ex.visualize || ex.trace));
+  const exampleBox = (pg) => { const ex = pg.example; const code = exCode(ex); if (!code) return ''; const v = vizOn(ex);
+    const box = v ? `<div class="bk-code"><div class="bk-code-h"><span>${esc(ex.label || M.exampleLabel)}</span><button class="btn xs bk-copy" data-code="${esc(code)}">📋 복사</button></div><pre class="code bk-lined" id="bkExCode">${code.split('\n').map((ln, i) => `<span class="bk-ln" data-ln="${i + 1}">${esc(ln)}\n</span>`).join('')}</pre></div>` : codeBox(code, ex.label || M.exampleLabel);
+    const inp = ex.stdin ? `<div class="bk-io"><div><div class="lbl">${M.inLabel}</div><pre class="code">${esc(String(ex.stdin).replace(/\n$/, ''))}</pre></div></div>` : '';
+    if (!v) return box + inp;
+    return box + inp + `<div class="card bk-viz"><div class="bk-viz-bar">${ex.visualize ? '<button class="btn accent" id="bkViz">👀 그림으로 보기</button>' : ''}${ex.trace ? '<button class="btn" id="bkTrace">👣 한 줄씩 보기</button>' : ''}</div><div class="muted small bk-viz-note" id="bkVizNote">${ex.visualize ? '이 예제 코드를 돌리며 변수가 바뀌는 모습을 그림으로 보여 줘요' : '이 예제 코드를 한 줄씩 돌리며 변수 값을 표로 보여 줘요'}${Py.ready ? '' : ' · 처음 한 번은 파이썬 엔진을 받아요(몇 초 걸려요, 오른쪽 아래에 진행률)'}</div><div id="bkVizHost" class="bk-viz-host"></div></div>`; };
+  const bindViz = (root, pg) => { const ex = pg && pg.example; if (!vizOn(ex)) return; const host = $('#bkVizHost', root); const pre = $('#bkExCode', root);
+    const ed = { setTraceLine(n) { $$('.bk-ln', pre).forEach(s => s.classList.toggle('on', +s.dataset.ln === n)); const on = n && $(`.bk-ln[data-ln="${n}"]`, pre); if (on && pre.scrollHeight > pre.clientHeight) pre.scrollTop = Math.max(0, on.offsetTop - pre.clientHeight / 2); } };
+    const prep = () => { pyAllow = true; if (!Py.ready) { Py.start(); host.innerHTML = '<div class="muted">파이썬 엔진을 받는 중… (처음 한 번만, 다음부터는 바로 돼요)</div>'; } };
+    const vb = $('#bkViz', root); if (vb) vb.onclick = async () => { prep(); await Viz.runAndShow(host, { code: ex.code, input: ex.stdin || '', spec: ex.visualize, editor: ed, title: pg.title }); };
+    const tb = $('#bkTrace', root); if (tb) tb.onclick = async () => { prep(); const r = await Py.run({ code: ex.code, input: ex.stdin || '', trace: true }); if (!host.isConnected) return; if (r.trace && r.trace.length) { TracePanel.show(host, r, ed); } else host.innerHTML = `<div class="errbox"><b>${esc(r.ename || '오류')}</b>: ${esc(r.emsg || '')}</div>`; };
+  };
   const backBar = (back) => back ? `<button class="btn bk-back" id="bkBack">← ${esc(back.label)}</button>` : '';
   const bindBack = (back) => { const b = $('#bkBack'); if (b && back) b.onclick = () => UI.go(back.view, back.params || {}); };
   Views.lesson = (root, { lessonId, page = 0, back = null, task = null }) => {
@@ -100,18 +115,18 @@
       if (isMake) {
         body = `<h1 class="lp-h">🛠 만들어 보기</h1><p class="muted">${M.makeIntro.replace('{file}', esc((l.n != null ? 'l' + String(l.n).padStart(2, '0') : (l.id || '').toLowerCase()) + '_1' + M.fileExt))} ${M.makeTail}</p>${preBox(preFor(l.id))}
           <ol class="bk-tasks">${tasks.map((t, i) => `<li class="card bk-task" data-ti="${i}"><div class="bk-task-h"><span class="bk-task-n">${i + 1}</span><b>${esc(t.title)}</b></div><div class="bk-task-p lp-html">${UI.terms(t.text)}</div>
-            ${t.setup ? codeBox(t.setup, M.setupLabel) : ''}${t.given ? codeBox(t.given, '이 코드를 복사해서 고쳐 보세요') : ''}${t.prep ? `<div class="bk-prep"><div class="lbl">${M.prepLabel} <code>${esc(t.prep.name)}</code> 을 만들고 아래 내용을 붙여 넣으세요</div>${codeBox(t.prep.text, t.prep.name)}</div>` : ''}${/sys\.stdin\.read/.test(t.answer || '') ? '<div class="muted small bk-tip">💡 「끝까지」 읽는 프로그램이에요. VS Code 터미널에 입력을 다 붙여 넣은 뒤 <b>Windows: <kbd>Ctrl</kbd>+<kbd>Z</kbd> → <kbd>Enter</kbd></b>, Mac: <kbd>Ctrl</kbd>+<kbd>D</kbd> 를 누르면 입력이 끝나요.</div>' : ''}
+            ${t.setup ? codeBox(t.setup, M.setupLabel) : ''}${t.start ? codeBox(t.start, M.startLabel) : ''}${t.given ? codeBox(t.given, '이 코드를 복사해서 고쳐 보세요') : ''}${t.prep ? `<div class="bk-prep"><div class="lbl">${M.prepLabel} <code>${esc(t.prep.name)}</code> 을 만들고 아래 내용을 붙여 넣으세요</div>${codeBox(t.prep.text, t.prep.name)}</div>` : ''}${/sys\.stdin\.read/.test(t.answer || '') ? '<div class="muted small bk-tip">💡 「끝까지」 읽는 프로그램이에요. VS Code 터미널에 입력을 다 붙여 넣은 뒤 <b>Windows: <kbd>Ctrl</kbd>+<kbd>Z</kbd> → <kbd>Enter</kbd></b>, Mac: <kbd>Ctrl</kbd>+<kbd>D</kbd> 를 누르면 입력이 끝나요.</div>' : ''}
             ${t.checks && t.checks.length ? `<div class="bk-checks"><div class="lbl">${M.checksLabel || '브라우저에서 확인할 것'}</div><ul>${t.checks.map(c => `<li>☐ ${esc(c.text)}${c.viewport ? ` <span class="muted small">(폰 ${c.viewport}px 폭에서)</span>` : ''}</li>`).join('')}</ul></div>` : ''}<!-- v2.14.0 웹 교과서: 확인 목록(검사는 tools/run_web_solutions.py) -->
             ${t.check ? codeBox(t.check, M.checkLabel) : ''}${t.io && t.io.length ? `<div class="bk-io">${t.io.map(c => `${c.input != null && String(c.input).length ? `<div><div class="lbl">${M.inLabel}</div><pre class="code">${esc(c.input)}</pre></div>` : ''}<div><div class="lbl">${M.outLabel}</div>${resBox(c.output, t.py || t.runPy)}</div>`).join('')}</div>${t.py ? `<div class="bk-io">${t.py.input ? `<div><div class="lbl">입력</div><pre class="code">${esc(t.py.input)}</pre></div>` : ''}<div><div class="lbl">${M.pyLabel || '실행 결과'}</div><pre class="code">${esc(t.py.output)}</pre></div></div>` : ''}${M.homeNote && t.io.some(c => /\/c\/Users\/me/.test(c.output)) ? `<div class="muted small bk-tip">💡 ${M.homeNote}</div>` : ''}` : ''}
             ${t.needs && t.needs.length ? `<div class="bk-needs"><span class="lbl">${M.needsLabel}</span>${t.needs.map(([syn, ref, desc]) => { const { lid, pg: pn } = pageLink(ref); const ll = lid === SETUP_ID ? { n: '', title: BOOK.setup.title } : Content.lesson(lid); const where = lid === SETUP_ID ? '시작하기' : ll ? `레슨 ${ll.n ?? ''}` : ''; return `<button class="bk-need" data-ti="${i}" data-nl="${esc(lid)}" data-np="${pn}" title="${ll ? esc(`${where} ${ll.title}`) : ''}"><code class="bk-syn">${esc(syn)}</code><span class="bk-need-d">${esc(desc || '')}</span><span class="bk-need-w muted small">${esc(where)} ›</span></button>`; }).join('')}</div>` : ''}
             ${t.answer ? `<details class="bk-ans"><summary>${M.answerLabel} 보기</summary>${codeBox(t.answer, M.answerLabel)}</details>` : ''}</li>`).join('')}</ol>`;
       } else {
-        body = (cur === 0 ? preBox(preFor(l.id)) : '') + `<h1 class="lp-h">${esc(pg.title)}</h1><div class="lp-body lp-html">${UI.terms(bookText(pg.html))}</div>${pg.example && (pg.example.code || pg.example.shell || pg.example.sql) ? codeBox(pg.example.code || pg.example.shell || pg.example.sql, pg.example.label || M.exampleLabel) : ''}`;
+        body = (cur === 0 ? preBox(preFor(l.id)) : '') + `<h1 class="lp-h">${esc(pg.title)}</h1><div class="lp-body lp-html">${UI.terms(bookText(pg.html))}</div>${exampleBox(pg)}`;
       }
       root.innerHTML = `<div class="page bk-lesson">${backBar(back)}<div class="bk-crumb"><button class="lnk" id="bkHome">☰ 목차</button><span class="muted">/</span><span>${kicker}</span><span class="grow"></span><button class="lnk" id="bkDexL">📚 ${M.dexShort}</button></div>
         <div class="lp-kicker">${isSetup ? '' : esc(l.boss ? '' : l.title)}</div>${tabs}<article class="bk-art">${body}</article>
         <div class="bk-nav"><button class="btn" id="bkPrev" ${cur === 0 ? 'disabled' : ''}>← 이전</button><button class="btn accent" id="bkNext">${cur < total - 1 ? (hasMake && cur === pages.length - 1 ? '🛠 만들어 보기 →' : '다음 →') : '☰ 목차로'}</button></div></div>`;
-      UI.bindTerms(root); bindCopy(root);
+      UI.bindTerms(root); bindCopy(root); if (!isMake) bindViz(root, pg);
       bindBack(back); bindPre(root, { label: isMake ? `「${l.title}」 만들어 보기로 돌아가기` : `레슨 ${l.n ?? ''} 「${l.title}」로 돌아가기`, view: 'lesson', params: { lessonId: l.id, page: cur, back } }); $('#bkHome').onclick = () => UI.go('home'); $('#bkDexL').onclick = () => UI.go('dogam', { back: { label: isSetup ? '시작하기로 돌아가기' : `레슨 ${l.n ?? ''} 「${l.title}」로 돌아가기`, view: 'lesson', params: { lessonId: l.id, page: cur, back } } });
       $$('.bk-tab', root).forEach(b => b.onclick = () => { cur = +b.dataset.pg; render(); window.scrollTo(0, 0); });
       $('#bkPrev').onclick = () => { if (cur > 0) { cur--; render(); window.scrollTo(0, 0); } };

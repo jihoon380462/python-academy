@@ -2,14 +2,14 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.14.0',
+  APP_VERSION: '2.15.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
   COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', vim: '^(V|VB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
     { id: 'python', name: '파이썬', icon: '🐍', desc: '문법 설명을 읽고 VS Code 에서 직접 만들어 보는 파이썬 교과서', path: 'courses/python/', color: '#2bb673', ready: true, total: 170, lessons: 45, book: true /* v2.10.1: 교과서 코스 — 허브 카드는 문제 수 대신 「읽은 레슨」(lessons = 열린 레슨 수, check_book 이 맞는지 검사) */ },
-    { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '코드가 돌아가는 모습을 눈으로 보며, 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 145, lessons: 32, requires: null /* v2.9.0: 파이썬이 교과서(채점 없음)가 되어 보스 클리어로 여는 잠금을 없앰 */ },
+    { id: 'algo', name: '알고리즘·자료구조', icon: '🧭', desc: '그림으로 돌아가는 모습을 보며 읽고, VS Code 에서 직접 풀어 보는 알고리즘 교과서 — 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, total: 145, lessons: 32, book: true, bookNote: '그림으로 보기 · 모의고사 15문제' /* v2.15.0 N5: 교과서 */, requires: null /* v2.9.0: 파이썬이 교과서(채점 없음)가 되어 보스 클리어로 여는 잠금을 없앰 */ },
     { id: 'terminal-git', name: '터미널·Git', icon: '🎧', desc: 'Git Bash 에서 직접 쳐 보는 터미널·Git 교과서', path: 'courses/terminal-git/', color: '#607d8b', ready: true, book: true, bookNote: '명령어 편 + Git 편 · 실제 GitHub 까지', total: 0, lessons: 20 /* v2.10.0 명령어 편 T0~T5·TB1 + v2.12.0 Git 편 T6~TB3 */, requires: null /* v2.9.0: 파이썬이 교과서(채점 없음)가 되어 보스 클리어로 여는 잠금을 없앰 */ },
     { id: 'sql', name: '데이터베이스(SQL)', icon: '🗄️', desc: 'DB Browser 에서 동네 카페 데이터로 직접 쿼리하는 SQL 교과서', path: 'courses/sql/', color: '#f4511e', phase: 3, ready: true, book: true, bookNote: 'SELECT 부터 JOIN·설계·파이썬 sqlite3 까지', total: 0, lessons: 17 /* v2.13.0 S0~S13 + 보스 3 */, requires: null /* v2.9.0: 파이썬이 교과서(채점 없음)가 되어 보스 클리어로 여는 잠금을 없앰 */ },
     { id: 'math', name: '수학 공간', icon: '📐', desc: '프로그래머 수학 — 그림을 만지며 배우고, 계산은 파이썬이', path: 'courses/math/', color: '#e91e63', ready: true, total: 180, lessons: 45, space: true, map: 'graph', hubLabel: '언제든 들어와도 돼요' },

@@ -19,9 +19,9 @@
 | N2 | **SQL 코스를 교과서로 채우기** — S1~S13·SB1~SB3 16개, **연습은 DB Browser for SQLite**(+ 파이썬 sqlite3) | `EXPANSION.md` 7절 | ✅ **완료** v2.13.0 — DB Browser + cafe.db, 레슨 14·보스 3·만들어 보기 50(실제 SQLite 로 검사) |
 | N3 | **웹·HTTP·API 코스를 교과서로 채우기** — W1~W13·WB1~WB3 16개, **연습은 VS Code + 브라우저** | `EXPANSION.md` 8절 | ✅ **완료** v2.14.0 — VS Code + Live Server, 레슨 14·보스 3·만들어 보기 28(예시 답을 미리보기로 검사), GitHub Pages 배포까지 |
 | N4 | ✅ **완료**(v2.10.1~v2.14.0) — 허브 카드 7개 전부 열림: 교과서 5(파이썬·터미널·Vim·SQL·웹) 「읽은 레슨 n/m」, 문제집 2(알고리즘·수학). 앞으로 교과서를 고칠 때는 같은 PR 에서 `config.js` 의 `lessons`·`bookNote`·`desc`(check_book 이 레슨 수·옛 문구 검사) | `core/config.js` COURSES, `specs/site-intent.md` 6절 | — |
-| N5 | (사용자 결정 전) 알고리즘 코스도 교과서로 바꿀지 | — | 제안만 함(11/6) |
+| N5 | **알고리즘 코스를 교과서로** — 사용자 「1」(11/6) | — | ✅ **완료** v2.15.0 — VS Code 에서 풀기 + 레슨 예제 👀 그림으로 보기·👣 한 줄씩 보기(누를 때만 엔진), 시작하기 4 · 만들어 보기 100(모의고사 15·실전 6 포함, 함수 문제는 「확인 코드」) · 도구 상자 15. 문제 모양은 `core/book-derive.js`(화면·check_book 공용) |
 | N6 | 예정 코스 설계 — **T8 GitHub 가장 중요**(사용자 11/3). N1 터미널·Git 과 겹침(원격·PR·Pages)을 정리해서 설계 | 아래 「예정 코스」 | 대기 |
-| N7 | 알고 시각화 core 버그 QA #50·#51·#52(deque·set·dict 그림, 함수 정의형 문제 그림), 편집기·레슨 창 #155~#159, 복습 #149 — 알고 코스(예전 화면)에 남은 것 | `QA.md`·`QA-OPEN.md` 1절 | 대기 |
+| N7 | 알고 시각화 core 버그 QA #50·#51·#52(deque·set·dict 그림, 함수 정의형 문제 그림), 편집기·레슨 창 #155~#159, 복습 #149 — 알고 코스(예전 화면 `?classic=1`)에 남은 것. **v2.15.0 부터 교과서에선 레슨 예제 그림(#50~#52 의 deque·set·dict 그림은 해당)만 보임** | `QA.md`·`QA-OPEN.md` 1절 | 대기 |
 | N8 | 알고 C6~C9 (힌트 품질·실전 연습 문제), 알고 레슨 나누기 A6·A16·A18·A19 | `specs/content-team.md` 3절, C11 | 대기 |
 | N9 | 수학 「상」 #145~#147 → 수학 「중」 → M2·M3 (D4 후순위) | `QA.md`, `EXPANSION.md` 14절 | 후순위 |
 | N10 | 옛 지도 죽은 CSS·`MAP_DECOR` 정리(수학 홈이 쓰는 `.side`·`.card.prof`·`.ch-sec`·`.node.play` 는 유지), 8차 아트 납품되면 검수(IMAGES.md 3-B) | — | 대기(아트는 납품 전) |

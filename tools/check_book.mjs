@@ -9,7 +9,7 @@ for (const cid of courses) total += checkCourse(cid);
 process.exit(total ? 1 : 0);
 function checkCourse(cid) {
 const ctx = { window: {}, console }; vm.createContext(ctx);
-vm.runInContext((fs.existsSync(`${R}/courses/${cid}/datasets.js`) ? fs.readFileSync(`${R}/courses/${cid}/datasets.js`, 'utf8').replace(/^(const|let) /gm, 'var ') + '\n' : '') + fs.readFileSync(`${R}/courses/${cid}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var ') + '\n' + fs.readFileSync(`${R}/courses/${cid}/book.js`, 'utf8').replace(/^const /gm, 'var '), ctx);
+vm.runInContext((fs.existsSync(`${R}/courses/${cid}/datasets.js`) ? fs.readFileSync(`${R}/courses/${cid}/datasets.js`, 'utf8').replace(/^(const|let) /gm, 'var ') + '\n' : '') + fs.readFileSync(`${R}/courses/${cid}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var ') + '\n' + fs.readFileSync(`${R}/courses/${cid}/book.js`, 'utf8').replace(/^const /gm, 'var ') + '\n' + fs.readFileSync(`${R}/core/book-derive.js`, 'utf8').replace(/^const /gm, 'var '), ctx); // v2.15.0: 화면과 같은 core/book-derive.js 로 출력 예·예시 답을 만듦
 const { LESSONS, PROBLEMS, BOOK, COURSE } = ctx; const L = Object.fromEntries(LESSONS.map(l => [l.id, l])); const P = Object.fromEntries(PROBLEMS.map(p => [p.id, p]));
 const SHELL = COURSE && COURSE.runner === 'shell'; const VIM = BOOK.check === 'vim'; const SQLB = BOOK.check === 'sql'; // v2.13.0 SQL 교과서: tools/sql_book_run.py 로 실제 SQLite 실행 // v2.11.0 Vim 교과서: 진짜 vim 으로 키 넣기
 const pagesOf = (lid) => lid === 'SETUP' ? BOOK.setup.pages : (BOOK.lessonPages || {})[lid] || (L[lid] || {}).pages;
@@ -23,7 +23,8 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
     for (const nd of t.needs || []) if (nd.length !== 3 || !nd[2] || !/[A-Za-z0-9=+*\/%\[\](){}"<>.:▷|~$&^-]/.test(nd[0])) bad(`${id}: 필요한 문법은 [실제 문법(코드), '레슨/쪽', 설명] 이어야 해요 (v2.9.2) → ${JSON.stringify(nd)}`);
     for (const [name, ref] of t.needs || []) { const [nl, np] = String(ref).split('/'); const pages = pagesOf(nl); if (!pages || !(+np >= 0 && +np < pages.length)) bad(`${id}: 필요한 문법 「${name}」 → ${ref} 가 없는 쪽`); }
     if (t.text === '@prompt' && !p) bad(`${id}: @prompt 인데 pid 없음`);
-    const tests = (p && p.tests) || []; const io = t.io || (p && p.project ? tests.filter(c => !c.files && !c.inputGen && c.output !== '__COMPUTED__').filter((c, i, ok) => ok.findIndex(d => d.stage === c.stage) === i).slice(0, 4) : tests[0] ? [tests[0]] : []); const answer = t.answer || (p && p.solution) || '';
+    const dv = ctx.BookDerive.task(t, p, BOOK); const io = dv.io; const answer = dv.answer; const pyCheck = !SHELL && !VIM && !SQLB && dv.check ? '\n' + dv.check + '\n' : ''; // 함수 문제: 확인 코드(print(호출))를 답 아래에 붙여 돌림
+    if (dv.text && /👀|시각화|▶ 실행|입력창/.test(dv.text) && BOOK.fixPrompt) bad(`${id}: 지문에 이 앱 버튼 안내가 남음 「${(dv.text.match(/.{0,20}(👀|시각화|▶ 실행|입력창).{0,20}/) || [''])[0].replace(/<[^>]+>/g, '')}」 — BOOK.fixPrompt 로 지우거나 text 를 직접 쓰세요`);
     if (!answer) bad(`${id}: 예시 답 없음`);
     if (JSON.stringify(io).includes('{{') || answer.includes('{{')) bad(`${id}: {{바꿔 끼우기}} 자리표시가 남음 — io·answer 를 직접 적으세요`);
     if (t.noRun) return;
@@ -34,7 +35,7 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
     for (const c of io) {
       if (c.output == null) { bad(`${id}: 출력 예 없음`); continue; }
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'book-')); const up = p && p.files && p.files.upload; if (up && up.sample) fs.writeFileSync(path.join(dir, up.name), up.sample); if (t.prep) fs.writeFileSync(path.join(dir, t.prep.name), t.prep.text);
-      fs.writeFileSync(path.join(dir, 'main.py'), answer);
+      fs.writeFileSync(path.join(dir, 'main.py'), answer + pyCheck);
       let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: c.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); continue; }
       ran++; const norm = (s) => String(s).replace(/\r/g, '').split('\n').map(x => x.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
       if (norm(out) !== norm(c.output)) bad(`${id}: 출력이 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(out))}`);
@@ -60,7 +61,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
   ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
 // 허브 카드(v2.10.1 사용자 「메인화면은 수정 안 했는데」): config.js 의 이 코스가 book:true 이고 lessons 가 열린 레슨 수와 같은지 — 허브는 book.js 를 안 읽어서 손으로 맞춰야 함
 { const cx = { window: {} }; vm.createContext(cx); vm.runInContext(fs.readFileSync(R + '/core/config.js', 'utf8').replace(/^(const|let) /gm, 'var '), cx); const cc = (cx.CONFIG.COURSES || []).find(c => c.id === cid);
-  const open = LESSONS.filter(l => !l.mock && (!l.draft || (BOOK.lessonPages || {})[l.id] || ((BOOK.tasks || {})[l.id] || []).length)).length;
+  const open = LESSONS.filter(l => (!l.mock || ((BOOK.tasks || {})[l.id] || []).length) /* 모의고사는 교과서가 문제를 채웠을 때만(화면 lessonsOf 와 같게, v2.15.0) */ && (!l.draft || (BOOK.lessonPages || {})[l.id] || ((BOOK.tasks || {})[l.id] || []).length)).length;
   if (!cc || !cc.book || !cc.ready) bad(`config.js COURSES 의 ${cid} 에 ready:true, book:true 가 있어야 해요(허브 카드가 「읽은 레슨」으로 보이게)`); else if (cc.lessons !== open) bad(`config.js ${cid}.lessons = ${cc.lessons} 인데 열린 레슨은 ${open}개 — 허브 카드 숫자를 맞추세요`);
   if (cc && /가상|시뮬레이터|브라우저에서 바로/.test(cc.desc || '')) bad(`config.js ${cid}.desc 가 교과서와 안 맞아요: ${cc.desc}`); }
 const noTasks = LESSONS.filter(l => !l.mock && !(BOOK.tasks[l.id] || []).length).map(l => l.id); if (noTasks.length) console.log(`  · [${cid}] 만들어 보기가 없는 레슨:`, noTasks.join(', '));

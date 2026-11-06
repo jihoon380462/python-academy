@@ -29,10 +29,10 @@ const Hub = {
       <div class="tb-streak ${streak ? 'on' : ''}" title="${T.streak}">🔥${streak}</div>` : ''}
       ${Sync.on ? `<a class="tb-btn tb-sync ${Sync.state}" href="${this.courseUrl(py, 'settings')}" title="기기 연동: 마지막 동기화 ${Sync.ago()}">${Sync.icon()}</a>` : ''}<a class="tb-btn" href="${this.courseUrl(py, 'settings')}" title="${T.settings}">${UI.icon('settings')}</a>`;
     $('#view').innerHTML = `<div class="page hub">
-      <div class="hub-top"><div class="hub-kicker">코드 학습</div><h1 class="hub-title">${esc(T.appName)}</h1><p class="muted hub-lead">📖 교과서 코스(파이썬·터미널·Git)는 읽고 내 컴퓨터(VS Code·Git Bash)에서 직접 만들어 보고, 나머지 코스는 브라우저에서 바로 실행하며 배워요. 계정은 필요 없어요.</p></div>
+      <div class="hub-top"><div class="hub-kicker">코드 학습</div><h1 class="hub-title">${esc(T.appName)}</h1><p class="muted hub-lead">📖 교과서 코스(파이썬·알고리즘·터미널·Git·SQL·웹·Vim)는 읽고 내 컴퓨터(VS Code·Git Bash·DB Browser·Vim)에서 직접 만들어 보고, 수학 코스는 브라우저에서 바로 실행하며 배워요. 계정은 필요 없어요.</p></div>
       <div class="card hub-today"><div class="card-h">오늘의 할 일</div>
         <a class="btn primary big hub-cont" href="${this.courseUrl(contCourse, contHash)}">▶ ${contLabel}</a>
-        <div class="hub-stats"><span>문제 코스(알고리즘·수학) 오늘 <b>${Math.min(todayCount, d.dailyGoal)}/${d.dailyGoal}</b></span><span>복습 큐 <b>${rd.reduce((a, x) => a + x.n, 0)}</b>개${rd.length ? ' · ' + rd.map(x => `<a href="${this.courseUrl(x.c, 'review')}">${esc(x.c.name)} ${x.n}</a>`).join(' · ') : ''}</span></div>
+        <div class="hub-stats"><span>문제 코스(수학) 오늘 <b>${Math.min(todayCount, d.dailyGoal)}/${d.dailyGoal}</b></span><span>복습 큐 <b>${rd.reduce((a, x) => a + x.n, 0)}</b>개${rd.length ? ' · ' + rd.map(x => `<a href="${this.courseUrl(x.c, 'review')}">${esc(x.c.name)} ${x.n}</a>`).join(' · ') : ''}</span></div>
       </div>
       <h2 class="hub-h">코스</h2>
       <div class="hub-courses">${CONFIG.COURSES.filter(c => !c.space).map(c => this.courseCard(c)).join('')}</div>
