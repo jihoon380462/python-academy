@@ -437,3 +437,4 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .book-mode .bk-l.soon { opacity: .55; cursor: default; }
 .book-mode .bk-l.soon:hover { border-color: var(--border); }
 .book-mode #tutorPanel { display: none; } /* 교과서엔 선생님 창이 없음 — 화면 밖에 숨겨 둔 패널이 전체 캡처에 비치던 것 */
+.book-mode .bk-prereq .btn { margin-top: 10px; } /* v2.12.1 레슨 6 설정 필수 경고의 단추 */

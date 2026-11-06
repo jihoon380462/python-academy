@@ -5,7 +5,7 @@
 
 ## 0. 지금 상태
 
-- **배포된 버전: v2.12.0** (main). **사이트 의도(정상·버그 기준)는 `specs/site-intent.md`.**
+- **배포된 버전: v2.12.1** (main). **사이트 의도(정상·버그 기준)는 `specs/site-intent.md`.**
 - **파이썬 코스 = 「교과서 모드」(v2.9.0~)**: 시작하기(파이썬·VS Code 설치) + 레슨(문법 설명) + 레슨 끝 「🛠 만들어 보기」(문장 문제·필요한 문법·예시 답, 채점 없음) + 📚 문법 도감(레슨 문법 226 + 내장 함수 18, 검색). 연습은 사용자 VS Code 에서. 문제·채점·XP 콘텐츠는 화면에서만 숨김(`?classic=1` 은 예전 화면). 구조: `courses/python/book.js` + `core/ui-views-book.js`, 검사 `node tools/check_book.mjs`.
 - **터미널·Git 코스도 교과서(v2.10.0~, 명령어 편)**: 시작하기(Git for Windows·Git Bash·연습 폴더 `~/terminal-study`) + T0~T5·TB1 설명 + 만들어 보기 25문제(준비 명령·확인 명령·결과) + 📚 명령 도감. Git 편 T6~TB3 도 v2.12.0 에 채움(진짜 git · 원격 연습은 remote.git · T16 실제 GitHub). 구조: `courses/terminal-git/book.js`(BOOK.meta 글귀 · lessonPages 레슨 쪽 통째) — 화면은 파이썬과 같은 `core/ui-views-book.js`, 검사 `node tools/check_book.mjs`(bash 로 준비→답→확인 실행). 연습 터미널(시뮬레이터)은 `?classic=1`.
 - **공용 Vim 에디터 교과서(v2.11.0~)**: 허브 「공용」 칸(사용자 「공간을 공용으로 변경」). Windows gVim 9.2 설치 → 기본기(모드·이동·입력·지우기·복사·찾기) → 파이썬 연결(_vimrc · 자동 들여쓰기 · F5/F6 실행 · Ctrl+n · vim-plug+vim-lsp+asyncomplete+pylsp) + 단축키 도감. 「만들어 보기」 44개 중 33개는 check_book 이 진짜 vim 으로 검사. 구조: `courses/vim/content.js`(레슨·VIMRC_BASE_TEXT·VIMRC_PLUG_TEXT) + `book.js`.

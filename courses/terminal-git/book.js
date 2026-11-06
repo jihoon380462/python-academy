@@ -24,6 +24,11 @@ const BOOK = {
     fileExt: '', setupLabel: '준비 명령 — 붙여 넣으면 이 문제용 폴더가 생기고 그 안으로 들어가요', answerLabel: '예시 답(명령)', needsLabel: '필요한 명령',
     checkLabel: '확인 명령 — 다 했으면 이걸 쳐 보세요', outLabel: '이렇게 나오면 성공', inLabel: '입력',
     homeNote: '<code>/c/Users/me</code> 의 <code>me</code> 자리는 내 Windows 사용자 이름이에요',
+    // v2.12.1 사용자 「나중에 할 거니까 레슨 6번은 설정을 해야 한다고 강조해」 — Git 레슨마다·목차에 경고 상자
+    prereq: { lessons: ['T7', 'T8', 'T9', 'T10', 'TB2', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'TB3'], chapters: [2, 3], ref: 'T6/2',
+      title: 'Git 을 하기 전에 꼭! 레슨 6 의 「처음 한 번: 이름·이메일 설정」',
+      html: '이 설정을 <b>한 번도 안 했으면</b> 이 레슨의 준비 명령과 <code>git commit</code> 이 <code>Author identity unknown</code> 에러로 <b>전부 멈춰요</b>. 컴퓨터마다 한 번만 하면 돼요(Git Bash 에 네 줄 붙여 넣기, 1분). 했는지 모르겠으면 <code>git config --global user.name</code> 을 쳐 보세요 — 내 이름이 나오면 된 거예요.',
+      btn: '레슨 6 · 설정하는 쪽 보기' },
   },
   setup: {
     title: '시작하기: Git Bash 설치하고 연습 폴더 만들기',
@@ -51,7 +56,8 @@ const BOOK = {
 <li><b>📚 명령 도감</b> — 배운 명령을 한곳에 모았어요. 실전은 오픈북이에요. 외우지 말고 찾아 쓰세요.</li>
 <li>결과에 보이는 <code>/c/Users/me</code> 의 <code>me</code> 는 사람마다 내 Windows 사용자 이름으로 나와요. 그 부분은 달라도 돼요.</li></ul>
 <p>채점·점수·잠금은 없어요. 아는 레슨은 건너뛰고, 필요한 곳부터 펴 보면 돼요.</p>
-<p><b>챕터 2·3(Git)</b> 은 진짜 Git 으로 연습해요. 먼저 레슨 6 의 「처음 한 번: 이름·이메일 설정」 을 하세요(안 하면 준비 명령의 커밋이 <code>Author identity unknown</code> 으로 멈춰요). push·pull 연습은 내 컴퓨터 안의 폴더(<code>remote.git</code>)를 GitHub 대신 쓰고, 진짜 GitHub 는 레슨 16 에서 해요. 결과의 커밋 해시(<code>3f2a1c9</code> 같은 7글자)는 컴퓨터마다 달라서, 확인 명령은 메시지만 보여 줘요.</p>` },
+<div class="bk-warn"><b>⚠ 챕터 2·3(Git) 을 시작하기 전에 꼭: 레슨 6 의 「처음 한 번: 이름·이메일 설정」</b><br>안 하면 Git 레슨의 준비 명령과 커밋이 <code>Author identity unknown</code> 에러로 전부 멈춰요. 컴퓨터마다 한 번만, 1분이면 돼요.</div>
+<p><b>챕터 2·3(Git)</b> 은 진짜 Git 으로 연습해요. push·pull 연습은 내 컴퓨터 안의 폴더(<code>remote.git</code>)를 GitHub 대신 쓰고, 진짜 GitHub 는 레슨 16 에서 해요. 결과의 커밋 해시(<code>3f2a1c9</code> 같은 7글자)는 컴퓨터마다 달라서, 확인 명령은 메시지만 보여 줘요.</p>` },
     ],
   },
   // T0 은 연습용 가짜 터미널 기준으로 쓰였던 쪽 — Git Bash 기준으로 고쳐 씀
@@ -357,11 +363,13 @@ report_최종_진짜최종.py
 report_최종_진짜최종_이게마지막.py</pre>
 <p>어느 게 진짜인지, 어제 잘 되던 건 어느 파일이었는지, 무엇이 바뀌었는지 아무도 몰라요. <b>버전 관리</b>는 이 문제를 이렇게 풀어요:</p>
 <ul><li>파일은 <b>하나</b>(<code>report.py</code>)만 둔다</li><li>「여기까지 잘 됨」 싶을 때마다 그 순간의 폴더 전체를 <b>사진 찍듯 기록</b>한다 — 이 기록 한 장이 <b>커밋</b>(commit)</li><li>커밋마다 <b>메시지</b>(무엇을 왜 바꿨나)를 붙인다</li><li>언제든 예전 커밋으로 <b>돌아가거나</b>, 두 커밋 사이에 <b>무엇이 바뀌었는지</b> 볼 수 있다</li></ul>
-<pre class="code">커밋 1 「과제 뼈대」 ── 커밋 2 「그래프 추가」 ── 커밋 3 「오타 수정」  ← 지금</pre>` },
+<pre class="code">커밋 1 「과제 뼈대」 ── 커밋 2 「그래프 추가」 ── 커밋 3 「오타 수정」  ← 지금</pre>
+<div class="bk-warn"><b>⚠ 이 레슨 3쪽의 「처음 한 번: 이름·이메일 설정」 은 꼭 하고 넘어가세요.</b> 레슨 7 부터 모든 Git 문제가 이 설정이 돼 있어야 돌아가요.</div>` },
     { title: 'Git 과 GitHub 는 다른 것', html: `<table class="kb"><tbody><tr><td><b>Git</b></td><td><b>내 컴퓨터</b>의 프로그램. 커밋을 만들고, 역사를 보고, 되돌려요. 인터넷이 없어도 돼요. 시작하기 1 에서 깐 Git for Windows 가 이것</td></tr><tr><td><b>GitHub</b></td><td>Git 저장소를 <b>인터넷에 올려 두는 사이트</b>. 백업, 다른 컴퓨터에서 받기, 다른 사람과 같이 고치기(PR)에 써요. 레슨 11·16</td></tr><tr><td><b>저장소</b>(repository, repo)</td><td>Git 이 기록을 관리하는 폴더. 안에 숨은 <code>.git</code> 폴더가 있고 거기에 모든 커밋이 들어 있어요</td></tr></tbody></table>
 <p>그래서 순서는 늘 <b>① 내 컴퓨터에서 Git 으로 커밋</b> → <b>② 필요하면 GitHub 로 올리기(push)</b> 예요. 챕터 2 는 ①, 챕터 3 은 ② 와 여럿이 일하기예요.</p>
 <p class="muted small">비슷한 사이트로 GitLab·Bitbucket 이 있어요. Git 명령은 똑같아요.</p>` },
-    { title: '처음 한 번: 이름·이메일 설정', html: `<p>커밋마다 「누가 만들었나」 가 기록돼요. 그래서 Git 을 깐 뒤 <b>딱 한 번</b> 이름과 이메일을 알려 줘야 해요. 안 하면 첫 커밋에서 <code>Author identity unknown</code> 에러가 나요.</p>
+    { title: '처음 한 번: 이름·이메일 설정 (필수!)', html: `<div class="bk-warn"><b>⚠ 레슨 7 부터의 모든 Git 문제가 이 설정을 전제로 해요.</b> 안 하면 준비 명령의 <code>git commit</code> 이 <code>Author identity unknown</code> 에러로 멈춰요. 아래 상자의 네 줄을 <b>내 이름·이메일로 바꿔</b> Git Bash 에 붙여 넣으세요 — 이 컴퓨터에서 딱 한 번. 다른 컴퓨터(학교·회사)에서 Git 을 쓸 땐 거기서도 한 번.</div>
+<p>커밋마다 「누가 만들었나」 가 기록돼요. 그래서 Git 을 깐 뒤 <b>딱 한 번</b> 이름과 이메일을 알려 줘야 해요. 안 하면 첫 커밋에서 <code>Author identity unknown</code> 에러가 나요.</p>
 <table class="kb"><tbody><tr><td><code>git config --global user.name "지훈"</code></td><td>이름 — GitHub 에 올리면 다른 사람에게 보여요</td></tr><tr><td><code>git config --global user.email "me@example.com"</code></td><td>이메일 — 나중에 GitHub 계정 이메일과 같게 하면 GitHub 가 내 커밋으로 알아봐요</td></tr><tr><td><code>git config --global core.quotepath false</code></td><td>한글 파일 이름이 <code>"\\355\\225\\234"</code> 처럼 깨져 보이지 않게</td></tr><tr><td><code>git config --global pull.rebase false</code></td><td>레슨 11 의 <code>git pull</code> 이 「어떻게 합칠지 정하라」 고 멈추지 않게(설치 때 기본값을 골랐으면 이미 돼 있어요)</td></tr><tr><td><code>git config --global --list</code></td><td>설정한 것 전부 보기</td></tr></tbody></table>
 <p><code>--global</code> 은 「이 컴퓨터의 내 모든 저장소에」 라는 뜻이에요. 설정은 <code>~/.gitconfig</code> 파일에 저장돼요(<code>cat ~/.gitconfig</code> 로 볼 수 있어요).</p>`, example: { shell: 'git config --global user.name "지훈"\ngit config --global user.email "me@example.com"\ngit config --global core.quotepath false\ngit config --global pull.rebase false\ngit config --global --list' } },
   ],
@@ -588,7 +596,7 @@ for (const [lid, pgs] of Object.entries(GIT_PAGES)) pgs.forEach((pg, i) => { if 
 Object.assign(BOOK.lessonPages, GIT_PAGES);
 Object.assign(BOOK.tasks, {
   T6: [
-    { title: 'Git 처음 설정', text: '레슨 6 · 3쪽처럼 내 이름과 이메일을 Git 에 알려 주고, 한글 파일 이름이 깨지지 않게·pull 이 멈추지 않게 설정하세요. 끝나면 확인 명령으로 이름과 이메일이 보여야 해요. (이름·이메일은 내 것으로 — 아래 결과의 <code>지훈</code>·<code>me@example.com</code> 자리)',
+    { title: 'Git 처음 설정 (필수 — 레슨 7 전에 꼭)', text: '<b>레슨 7 부터의 모든 Git 문제가 이 설정이 돼 있어야 돌아가요.</b> 레슨 6 · 3쪽처럼 내 이름과 이메일을 Git 에 알려 주고, 한글 파일 이름이 깨지지 않게·pull 이 멈추지 않게 설정하세요. 끝나면 확인 명령으로 이름과 이메일이 보여야 해요. (이름·이메일은 내 것으로 — 아래 결과의 <code>지훈</code>·<code>me@example.com</code> 자리)',
       setup: TS('t6-1', []), needs: [['git config --global user.name', 'T6/2', '이름'], ['git config --global user.email', 'T6/2', '이메일'], ['core.quotepath false', 'T6/2', '한글 파일 이름'], ['pull.rebase false', 'T6/2', 'pull 이 멈추지 않게']],
       answer: 'git config --global user.name "지훈"\ngit config --global user.email "me@example.com"\ngit config --global core.quotepath false\ngit config --global pull.rebase false', check: 'git config --global user.name\ngit config --global user.email', io: [{ output: '지훈\nme@example.com' }] },
   ],
