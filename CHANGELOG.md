@@ -4,6 +4,16 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.10.0 — 2026-11-06 (Opus: 터미널·Git 교과서 1차 — 명령어 편)
+
+- 🎧 사용자 「2번(SQL·터미널·웹을 교과서로) 해 · 내 컴퓨터 도구로 · 터미널·Git 먼저」 — **터미널·Git 코스도 교과서**. 연습은 내 컴퓨터의 **Git Bash**(진짜 터미널).
+- 🛠 **시작하기 4단계**: Git for Windows 받기·설치(대부분 Next, 확인할 화면 3개 = 기본 편집기 VS Code · 첫 브랜치 이름 main · PATH) → Git Bash 여는 법 3가지(시작 메뉴·폴더 우클릭 「Open Git Bash here」·VS Code 터미널 기본 프로필) · 붙여 넣기 Shift+Insert/우클릭 · Ctrl+C = 멈추기 → **연습 폴더 `~/terminal-study`** 만들기 명령과 안전 수칙(rm 은 휴지통 없음) → 쓰는 법. Mac 안내 포함.
+- 📖 **레슨 T1~T5 설명 16쪽**(경로·ls 옵션·상대 경로·에러와 띄어쓰기 / mkdir·cp·mv·rm / cat·head·tail·echo > >>·결과를 파일로·notepad·code / * ·find·grep / 파이프·wc·sort·uniq·단축키·변수). T0 은 연습용 가짜 터미널 기준이던 글을 Git Bash 기준(프롬프트 MINGW64 모양 등)으로 고쳐 씀.
+- 🧩 **만들어 보기 25문제**(T0~T5 + 보스 TB1: 폴더 정리 · 🏠 다운로드 폴더 정리 · 🏠 로그 보고서): 문제마다 **준비 명령**(붙여 넣으면 그 문제용 폴더가 처음 상태로 생김) · **확인 명령** · 「이렇게 나오면 성공」 · 필요한 명령(→ 설명 쪽, 돌아가기) · 예시 답.
+- 📚 **터미널·Git 명령 도감**(21개, 검색). Git 편(T6~TB3)은 목차에 「준비 중 — 다음 업데이트」(눌러도 안 열림, 주소로 와도 목차로).
+- 🧱 `core/ui-views-book.js` 를 코스 공용으로: `BOOK.meta`(코스마다 글귀), `BOOK.lessonPages`(빈 레슨 쪽 통째), 문제 `setup`·`check`·`run`·`anyOrder`, 쪽 `example` 덮어쓰기. 교과서에서 안 쓰는 선생님 패널 숨김.
+- 🧪 check_book 이 book.js 있는 코스 전부 — 셸 코스는 **bash 로 준비 → 답 → 확인을 실제로 돌려** 결과 비교(HOME 은 /c/Users/me 로 보이게), 로케일마다 정렬이 달라질 이름 검사. 회귀: 터미널 교과서 +20, 옛 연습 터미널 회귀는 `?classic=1`.
+
 ## v2.9.5 — 2026-11-06 (Opus: 교과서 다듬기 A — 내장 함수 도감 · 생활형 만들어 보기 · 설정 정리 · █ → #)
 
 - 🧰 문법 도감 맨 앞 **「자주 쓰는 내장 함수」 18개**(`BOOK.builtins`): print(sep·end)·input·int/float/str·len·range·sum/max/min·sorted·reversed·round/abs(round(2.5)=2 함정)·divmod·enumerate·zip·map/filter·list/set/dict/tuple·any/all·type/isinstance·ord/chr·open. 쓰는 모양 · 설명 · 예제 · 실제 결과(check_book 이 python3 로 다시 확인) · 레슨 링크. 「🧰 내장 함수」 칩.
