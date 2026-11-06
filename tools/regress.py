@@ -41,7 +41,7 @@ with sync_playwright() as p:
     check('읽은 레슨' in hb['py'] and '남은 문제' not in hb['py'] and '/45' in hb['py'], '허브 파이썬 카드: 교과서 · 읽은 레슨 n/45 (문제 수 없음) (%s)' % hb['py'][:80])
     check('Git Bash' in hb['tg'] and '읽은 레슨' in hb['tg'] and '/20' in hb['tg'] and 'Git 편' in hb['tg'] and '시뮬레이터' not in hb['tg'] and '준비 중 ·' not in hb['tg'], '허브 터미널 카드: Git Bash 교과서 · 읽은 레슨 n/20 · 명령어 편 + Git 편 (%s)' % hb['tg'][:90])
     check('교과서' in hb['lead'] and 'Git Bash' in hb['lead'] and 'GitHub' in hb['lead'] and '계정은 필요 없' not in hb['lead'] and '가입' in hb['lead'], '허브 안내 문구: 교과서 코스(GitHub 포함)는 내 컴퓨터에서 · 「계정 필요 없음」 대신 「가입 없음」(v2.17.1)')
-    check('읽은 레슨' in hb['al'] and '/32' in hb['al'] and '남은 문제' not in hb['al'] and '알고리즘' in hb['lead'] and '알고리즘·수학' not in pg.inner_text('.hub-today'), '허브 알고리즘 카드: 교과서 · 읽은 레슨 n/32 · 안내 문구에 알고리즘 (v2.15.0) (%s)' % hb['al'][:80])
+    check('읽은 레슨' in hb['al'] and '/36' in hb['al'] and '남은 문제' not in hb['al'] and '알고리즘' in hb['lead'] and '알고리즘·수학' not in pg.inner_text('.hub-today'), '허브 알고리즘 카드: 교과서 · 읽은 레슨 n/32 · 안내 문구에 알고리즘 (v2.15.0) (%s)' % hb['al'][:80])
     pg.screenshot(path=SHOT+'/hub.png')
     # ===== [N13 v2.19.0] 옛 문제집 화면을 archive/classic 로 — 사이트엔 교과서만 (사용자 11/7 「1번 — 다른 폴더에 정리해서 보관」)
     print('[N13 v2.19.0 옛 화면 보관]'); n13=len(errors); MATH='file://'+os.path.join(ROOT,'courses/math/index.html')
@@ -270,7 +270,7 @@ with sync_playwright() as p:
     except Exception: pass
     pg.goto(ALB); pg.wait_for_timeout(1000); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
     ah=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length, mock:!!document.querySelector('button.bk-l[data-l=\"AB4\"]'), phase:Py.phase, worker:!!Py.worker})")
-    check(ah['book'] and ah['steps']==4 and ah['ls']==32 and ah['soon']==0 and ah['pre']==2 and ah['mock'], '알고리즘 교과서 홈: 시작하기 4 · 레슨 32(모의고사 포함) · 준비 중 0 · 「먼저 꼭」 경고 2 (%s)' % ah)
+    check(ah['book'] and ah['steps']==4 and ah['ls']==36 and ah['soon']==0 and ah['pre']==2 and ah['mock'], '알고리즘 교과서 홈: 시작하기 4 · 레슨 36(모의고사 포함) · 준비 중 0 · 「먼저 꼭」 경고 2 (%s)' % ah)
     check(ah['phase']=='idle' and not ah['worker'], '알고리즘 교과서: 그림 버튼을 누르기 전엔 파이썬 엔진을 안 받음 (%s/%s)' % (ah['phase'], ah['worker']))
     pg.evaluate("UI.go('lesson',{lessonId:'A5',page:0})"); pg.wait_for_timeout(300)
     check(pg.locator('#bkViz').count()==1 and pg.locator('.bk-ln').count()>=6 and 'VS Code' in pg.inner_text('.bk-code-h'), 'A5 1쪽: 예제 코드(줄 나눔) + 👀 그림으로 보기')
@@ -286,7 +286,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','deque'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=3 and pg.inner_text('.tb-title')=='알고리즘 도감', '알고리즘 도감: deque 검색(도구 상자 + 레슨)')
     # v2.19.1 N7 (QA #50·#51): deque·집합·딕셔너리를 그림이 그리는지 — 모든 프레임을 넘겨 「그리기 오류」 0, 딕셔너리 표는 「비어 있어요」 아닌 프레임이 있어야
     pg.evaluate("window.__vzm=[]; if(!Viz.__e0){ Viz.__e0=Viz.empty.bind(Viz); Viz.empty=(c,W,H,m,th)=>{ window.__vzm.push(m); return Viz.__e0(c,W,H,m,th); }; } 0")
-    for lid,pi in [('A3',3),('A8',2),('A12',2),('E4',1),('A14',0),('A16',3),('E5',0)]:
+    for lid,pi in [('A3',3),('A8',2),('A12',2),('E4',1),('A14',0),('A16B',0),('E5',0)]:
         pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % (lid,pi)); pg.wait_for_timeout(150); pg.click('#bkViz'); pg.wait_for_timeout(900)
         vr=pg.evaluate("""(async()=>{ const s=document.querySelector('#vzSlider'); if(!s) return null; const out={err:[],filled:0,n:+s.max+1}; for(let v=0; v<=+s.max; v++){ window.__vzm=[]; s.value=v; s.dispatchEvent(new Event('input')); await new Promise(r=>setTimeout(r,v%10==9?40:25)); const m=window.__vzm.slice(); out.err.push(...m.filter(x=>x.includes('오류'))); if(!m.some(x=>x.includes('비어 있어요'))) out.filled++; } out.err=[...new Set(out.err)]; return out; })()""")
         check(bool(vr) and not vr['err'] and vr['filled']>0, 'N7 %s %d쪽 👀 그림: 그리기 오류 0 · 그려진 프레임 있음 (%s)' % (lid, pi+1, vr))
