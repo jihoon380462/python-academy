@@ -456,3 +456,7 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .book-mode .bk-viz-bar { display: flex; flex-wrap: wrap; gap: 8px; }
 .book-mode .bk-viz-note { margin-top: 6px; }
 .book-mode .bk-viz-host:not(:empty) { margin-top: 10px; }
+
+/* v2.18.0 수학 교과서(N12): 「먼저 보면 좋은 레슨」 링크 줄 · 그림·식 칸 */
+.bk-prelinks{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 10px;padding:8px 12px;border:1px dashed var(--border);border-radius:10px}.bk-prelinks .lbl{margin:0;width:100%}.bk-prelink{white-space:normal;text-align:left}
+.bk-fig{margin:10px 0}.bk-formula{border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin:12px 0}.bk-formula .lbl{margin-bottom:4px}
