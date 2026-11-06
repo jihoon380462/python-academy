@@ -43,6 +43,11 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
 (BOOK.builtins || []).forEach((bi, i) => { n++; const id = `내장 함수 ${bi.name}`; if (bi.ref) { const [bl, bp] = bi.ref.split('/'); if (!(pagesOf(bl) || [])[+bp]) bad(`${id}: ref ${bi.ref} 가 없는 쪽`); }
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
   ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
+// 허브 카드(v2.10.1 사용자 「메인화면은 수정 안 했는데」): config.js 의 이 코스가 book:true 이고 lessons 가 열린 레슨 수와 같은지 — 허브는 book.js 를 안 읽어서 손으로 맞춰야 함
+{ const cx = { window: {} }; vm.createContext(cx); vm.runInContext(fs.readFileSync(R + '/core/config.js', 'utf8').replace(/^(const|let) /gm, 'var '), cx); const cc = (cx.CONFIG.COURSES || []).find(c => c.id === cid);
+  const open = LESSONS.filter(l => !l.mock && (!l.draft || (BOOK.lessonPages || {})[l.id] || ((BOOK.tasks || {})[l.id] || []).length)).length;
+  if (!cc || !cc.book || !cc.ready) bad(`config.js COURSES 의 ${cid} 에 ready:true, book:true 가 있어야 해요(허브 카드가 「읽은 레슨」으로 보이게)`); else if (cc.lessons !== open) bad(`config.js ${cid}.lessons = ${cc.lessons} 인데 열린 레슨은 ${open}개 — 허브 카드 숫자를 맞추세요`);
+  if (cc && /가상|시뮬레이터|브라우저에서 바로/.test(cc.desc || '')) bad(`config.js ${cid}.desc 가 교과서와 안 맞아요: ${cc.desc}`); }
 const noTasks = LESSONS.filter(l => !l.mock && !(BOOK.tasks[l.id] || []).length).map(l => l.id); if (noTasks.length) console.log(`  · [${cid}] 만들어 보기가 없는 레슨:`, noTasks.join(', '));
 console.log(fails ? `✗ check_book [${cid}] 실패 ${fails} (문제 ${n}, 실행 ${ran})` : `✓ check_book [${cid}] OK (문제 ${n}, 예시 답 실행 ${ran})`); return fails;
 // 셸: 빈 HOME 에서 setup → answer(또는 run) → check. 출력의 HOME 경로는 /c/Users/me 로(교과서가 Git Bash 기준으로 보여 주는 모양)

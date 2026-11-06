@@ -5,7 +5,7 @@
 
 ## 0. 지금 상태
 
-- **배포된 버전: v2.10.0** (main).
+- **배포된 버전: v2.10.1** (main). **사이트 의도(정상·버그 기준)는 `specs/site-intent.md`.**
 - **파이썬 코스 = 「교과서 모드」(v2.9.0~)**: 시작하기(파이썬·VS Code 설치) + 레슨(문법 설명) + 레슨 끝 「🛠 만들어 보기」(문장 문제·필요한 문법·예시 답, 채점 없음) + 📚 문법 도감(레슨 문법 226 + 내장 함수 18, 검색). 연습은 사용자 VS Code 에서. 문제·채점·XP 콘텐츠는 화면에서만 숨김(`?classic=1` 은 예전 화면). 구조: `courses/python/book.js` + `core/ui-views-book.js`, 검사 `node tools/check_book.mjs`.
 - **터미널·Git 코스도 교과서(v2.10.0~, 명령어 편)**: 시작하기(Git for Windows·Git Bash·연습 폴더 `~/terminal-study`) + T0~T5·TB1 설명 + 만들어 보기 25문제(준비 명령·확인 명령·결과) + 📚 명령 도감. Git 편 T6~TB3 은 목차에 「준비 중」. 구조: `courses/terminal-git/book.js`(BOOK.meta 글귀 · lessonPages 레슨 쪽 통째) — 화면은 파이썬과 같은 `core/ui-views-book.js`, 검사 `node tools/check_book.mjs`(bash 로 준비→답→확인 실행). 연습 터미널(시뮬레이터)은 `?classic=1`.
 - 알고리즘·수학 코스는 예전 문제집 화면 그대로(사용자 「일단 파이썬만」). SQL·웹은 첫 레슨만 있음.
@@ -17,7 +17,7 @@
 | N1 | **터미널·Git 코스를 교과서로 채우기** — T1~T16·TB1~TB3 빈 레슨 19개: 설명 쪽 + 만들어 보기 + 필요한 문법 + 도감 + 시작하기(Git for Windows·Git Bash 설치). **연습은 내 컴퓨터의 Git Bash**(사용자 11/6) | `EXPANSION.md` 6절(범위), 파이썬 교과서 구조 재사용 | **진행 중** — ✅ 1차 명령어 편 T0~T5·TB1 (v2.10.0) · ⏳ 2차 Git 편 T6~T10·TB2·T11~T16·TB3(로컬 Git 은 Git Bash, 원격·PR 은 실제 GitHub 계정 — 문제마다 준비 명령으로 저장소 만들기) |
 | N2 | **SQL 코스를 교과서로 채우기** — S1~S13·SB1~SB3 16개, **연습은 DB Browser for SQLite**(+ 파이썬 sqlite3) | `EXPANSION.md` 7절 | N1 다음 |
 | N3 | **웹·HTTP·API 코스를 교과서로 채우기** — W1~W13·WB1~WB3 16개, **연습은 VS Code + 브라우저** | `EXPANSION.md` 8절 | N2 다음 |
-| N4 | 세 코스가 다 차면 허브 카드 `ready: true`·설명 문구, 코스별 「시작하기」 연결 점검 | `core/config.js` COURSES | N1~N3 뒤 |
+| N4 | 허브 카드: ✅ 파이썬·터미널 v2.10.1(`book:true` · 읽은 레슨 · 문구). **남은 것: 교과서를 채울 때마다 같은 PR 에서** `config.js` 의 그 코스 `lessons`·`bookNote`·`desc` 를 바꾸기(check_book 이 레슨 수·옛 문구 검사) — SQL·웹은 N2·N3 때 | `core/config.js` COURSES, `specs/site-intent.md` 6절 | 코스마다 같이 |
 | N5 | (사용자 결정 전) 알고리즘 코스도 교과서로 바꿀지 | — | 제안만 함(11/6) |
 | N6 | 예정 코스 설계 — **T8 GitHub 가장 중요**(사용자 11/3). N1 터미널·Git 과 겹침(원격·PR·Pages)을 정리해서 설계 | 아래 「예정 코스」 | 대기 |
 | N7 | 알고 시각화 core 버그 QA #50·#51·#52(deque·set·dict 그림, 함수 정의형 문제 그림), 편집기·레슨 창 #155~#159, 복습 #149 — 알고 코스(예전 화면)에 남은 것 | `QA.md`·`QA-OPEN.md` 1절 | 대기 |

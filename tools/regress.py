@@ -32,9 +32,14 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==6 and r['ready']==3, f"코스 카드 6개(코스 5 + 수학 공간), 열린 것 3개(v2.9.0 파이썬 보스 잠금 없앰) (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==6 and r['ready']==4, f"코스 카드 6개(코스 5 + 수학 공간), 열린 것 4개(파이썬·알고·수학 + v2.10.1 터미널 교과서) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and '#' in r['cont'], '이어서 하기 링크: '+str(r['cont']))
-    check('일일 목표 2/5' in (r['today'] or ''), '오늘의 할 일: '+(r['today'] or '').replace('\n',' '))
+    check('오늘 2/5' in (r['today'] or '') and '오늘의 도전' not in (r['today'] or ''), '오늘의 할 일(문제 코스만 세기, 교과서엔 없는 「오늘의 도전」 없음): '+(r['today'] or '').replace('\n',' '))
+    # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
+    hb=pg.evaluate("(()=>{ const t=(id)=>{ const a=document.querySelector(`a.hc[href*=\"courses/${id}/\"]`); return a? a.innerText.replace(/\\n/g,' ') : ''; }; return {py:t('python'), tg:t('terminal-git'), lead:(document.querySelector('.hub-lead')||{}).textContent||''}; })()")
+    check('읽은 레슨' in hb['py'] and '남은 문제' not in hb['py'] and '/45' in hb['py'], '허브 파이썬 카드: 교과서 · 읽은 레슨 n/45 (문제 수 없음) (%s)' % hb['py'][:80])
+    check('Git Bash' in hb['tg'] and '읽은 레슨' in hb['tg'] and '/7' in hb['tg'] and '명령어 편' in hb['tg'] and '시뮬레이터' not in hb['tg'] and '준비 중 ·' not in hb['tg'], '허브 터미널 카드: Git Bash 교과서 · 읽은 레슨 n/7 · 명령어 편 열림 (%s)' % hb['tg'][:90])
+    check('교과서' in hb['lead'] and 'Git Bash' in hb['lead'], '허브 안내 문구: 교과서 코스는 내 컴퓨터에서')
     pg.screenshot(path=SHOT+'/hub.png')
     # ---- 2. 코스 페이지
     print('[코스 페이지]'); pg.goto(COURSE+'#problem/L3P2'); pg.wait_for_timeout(1500); pg.evaluate("Loader.minimized=true;Loader.render()")
@@ -356,7 +361,7 @@ with sync_playwright() as p:
     print('[terminal-git 코스]'); TG='file://'+os.path.join(ROOT,'courses/terminal-git/index.html')+'?classic=1'; tg0=len(errors)
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(500)
     tgc=pg.evaluate("(()=>{ const c=[...document.querySelectorAll('a.hc')].find(x=>(x.getAttribute('href')||'').includes('terminal-git')); return c? {href:c.getAttribute('href'), txt:c.innerText.replace(/\\n/g,' ')} : null; })()")
-    check(bool(tgc) and '준비 중' in tgc['txt'] and '미리보기' in tgc['txt'], '허브: 터미널·Git 카드가 「준비 중 · 미리보기 열림」 링크 (%s)' % (tgc and tgc['txt'][:40]))
+    check(bool(tgc) and '교과서' in tgc['txt'] and '읽은 레슨' in tgc['txt'], '허브: 터미널·Git 카드가 교과서(읽은 레슨) 링크 (%s)' % (tgc and tgc['txt'][:40]))
     pg.goto(TG); pg.wait_for_timeout(800); pg.evaluate("Store.data.onboarded=true; Store.save({silent:true}); document.querySelectorAll('.modal-ov').forEach(e=>e.remove()); UI.go('home')"); pg.wait_for_timeout(400)
     tgh=pg.evaluate("({view:UI.view, cards:document.querySelectorAll('.lc').length, draft:document.querySelectorAll('.lc.draft').length, modes:Object.keys(UI.modes).sort().join(','), ex:Object.keys(UI.examples).join(','), css:!![...document.styleSheets].find(s=>(s.href||'').includes('terminal-git/course.css'))})")
     check(tgh['view']=='home' and tgh['cards']>=5 and tgh['draft']>=4 and tgh['modes']=='mission,parsons' and tgh['ex']=='shell' and tgh['css'], 'terminal-git 홈: 레슨 카드 + draft 카드 「준비 중」, UI.modes mission·parsons, UI.examples shell, course.css (%s)' % tgh)
@@ -514,6 +519,8 @@ with sync_playwright() as p:
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '터미널 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',0),('T1',1),('T4',2),('T5',4),('TB1',0)] ]
     pg.set_viewport_size({'width':1280,'height':900})
     terr=errors[t0:]; check(not terr, '터미널 교과서 pageerror 0 (%s)' % (terr[:2] or 'OK'))
+    pg.goto(HUB); pg.wait_for_timeout(600); tgr=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/terminal-git/\"]'); const m=a && a.innerText.match(/읽은 레슨 (\\d+)\\/(\\d+)/); return m? [+m[1], +m[2]] : null; })()")
+    check(bool(tgr) and tgr[1]==7 and 2<=tgr[0]<=7, '허브 터미널 카드: 끝까지 본 레슨(T2·TB1 …)이 「읽은 레슨」 에 셈 (%s)' % tgr)
     b.close()
 cdn=[e for e in errors if 'importScripts' in e or 'pyodide' in e.lower()]
 real=[e for e in errors if e not in cdn]
