@@ -4,6 +4,16 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.16.0 — 2026-11-06 (Opus: GitHub 교과서 — N6 챕터 1)
+
+- 🐙 사용자 「1」(= GitHub 교과서 만들기, 설계 `specs/github-course.md` 의 Q1~Q4 는 제안대로) — **새 코스 「GitHub」**(허브 「코스」 칸 터미널·Git 다음, 처음부터 교과서). 연습은 **내 진짜 GitHub 계정** + Git Bash.
+  - 시작하기 4쪽: 준비물(터미널·Git 레슨 6·16 — 다른 코스는 **새 탭**으로 열어 이 화면이 그대로) · 꼭! 2FA·이메일 비공개 · 연습 폴더 `~/github-study` 와 연습 저장소 · 쓰는 법(계정 하나로 두 역할).
+  - 챕터 1 「내 저장소를 제대로」: G0 GitHub 은 무엇을(탭 둘러보기) · G1 계정 다듬기(2FA 단계별·복구 코드, Emails → Keep my email addresses private + noreply 주소, SSH 키) · G2 저장소 만들기(New repository 칸마다, 라이선스, 내 폴더 올리기·「rejected (fetch first)」) · G3 웹에서 고치기(Commit changes 창, History·Blame, github.dev, 웹에서 고친 뒤 pull) · G4 README Markdown · 보스 GB1 「내 파이썬 프로젝트 공개」.
+  - 만들어 보기 15: GitHub 화면 문제는 「내 GitHub 화면에서 확인할 것」 ☐, 명령 문제 4개는 준비 명령(원격은 내 컴퓨터 `remote.git`) + 이렇게 나오면 성공. 「먼저 꼭」 경고 3(터미널 6·16 · 2FA · 공개 전 이메일).
+  - 화면 이름은 docs.github.com 원문(github/docs 저장소 2026-11)으로 대조 — 예 「Toggle Add README to On」, 「Access → Password and authentication → Enable two-factor authentication」, 「Choose a license template → Review and submit」.
+  - 챕터 2~4·한 걸음 더(G5~G17·GB2~GB4)는 목차에 「준비 중」.
+- 🔧 check_book `BOOK.check = 'github'`: 화면 문제는 checks 필수, 명령 문제는 bash 로 실행 · 필요한 문법에 Markdown 기호(`#` · 백틱)도 문법으로 인정. regress 「GitHub 교과서」 절 + 허브 카드 8개.
+
 ## v2.15.4 — 2026-11-06 (Opus: Vim·웹·본문 코드 검사 보강 + GitHub 교과서 설계 — N6)
 
 - 🧪 사용자 「2, 4」 중 4 — 자동 검사 보강:
