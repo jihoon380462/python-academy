@@ -284,6 +284,12 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('lesson',{lessonId:'AB4',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-task').count()==15 and pg.locator('.bk-prereq').count()==1, '모의고사 AB4: 15문제(시간 제한 없이 교과서로) + input.txt 경고')
     pg.evaluate("UI.go('lesson',{lessonId:'A9',page:4})"); pg.wait_for_timeout(300); check('class Node' in pg.inner_text('.bk-task') and '채점' not in pg.inner_text('.bk-art'), 'A9 연결 리스트: Node 클래스가 시작 코드로 · 「채점용」 말 없음')
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','deque'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=3 and pg.inner_text('.tb-title')=='알고리즘 도감', '알고리즘 도감: deque 검색(도구 상자 + 레슨)')
+    # v2.19.1 N7 (QA #50·#51): deque·집합·딕셔너리를 그림이 그리는지 — 모든 프레임을 넘겨 「그리기 오류」 0, 딕셔너리 표는 「비어 있어요」 아닌 프레임이 있어야
+    pg.evaluate("window.__vzm=[]; if(!Viz.__e0){ Viz.__e0=Viz.empty.bind(Viz); Viz.empty=(c,W,H,m,th)=>{ window.__vzm.push(m); return Viz.__e0(c,W,H,m,th); }; } 0")
+    for lid,pi in [('A3',3),('A8',2),('A12',2),('E4',1),('A14',0),('A16',3),('E5',0)]:
+        pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % (lid,pi)); pg.wait_for_timeout(150); pg.click('#bkViz'); pg.wait_for_timeout(900)
+        vr=pg.evaluate("""(async()=>{ const s=document.querySelector('#vzSlider'); if(!s) return null; const out={err:[],filled:0,n:+s.max+1}; for(let v=0; v<=+s.max; v++){ window.__vzm=[]; s.value=v; s.dispatchEvent(new Event('input')); await new Promise(r=>setTimeout(r,v%10==9?40:25)); const m=window.__vzm.slice(); out.err.push(...m.filter(x=>x.includes('오류'))); if(!m.some(x=>x.includes('비어 있어요'))) out.filled++; } out.err=[...new Set(out.err)]; return out; })()""")
+        check(bool(vr) and not vr['err'] and vr['filled']>0, 'N7 %s %d쪽 👀 그림: 그리기 오류 0 · 그려진 프레임 있음 (%s)' % (lid, pi+1, vr))
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '알고리즘 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',1),('A0',0),('A5',0),('A12',2),('A13',4),('AB4',0),('E1',4)] ]
     pg.set_viewport_size({'width':1280,'height':900}); aerr=errors[a0:]; check(not aerr, '알고리즘 교과서 pageerror 0 (%s)' % (aerr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); qerr=errors[q0:]; check(not qerr, 'SQL 교과서 pageerror 0 (%s)' % (qerr[:2] or 'OK'))

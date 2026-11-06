@@ -14,6 +14,10 @@ const Viz = {
   css(name, fb) { const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fb; },
   theme() { return { bg: this.css('--surface', '#181b26'), fg: this.css('--text', '#e6e8f0'), muted: this.css('--muted', '#8b90a8'), border: this.css('--border', '#2d3247'), primary: this.css('--primary', '#1a73e8'), accent: this.css('--accent', '#2ea043'), warn: this.css('--warn', '#ffb347'), danger: this.css('--danger', '#ff5d6c'), gold: this.css('--gold', '#ffd166'), surface2: this.css('--surface2', '#222636') }; },
   num(v) { return typeof v === 'number' ? v : (typeof v === 'string' && v.trim() !== '' && !isNaN(+v)) ? +v : null; },
+  // QA #50: 리스트·집합({__set})·deque(리스트로 옴) 을 모두 배열로
+  seq(v) { return Array.isArray(v) ? v : (v && typeof v === 'object' && Array.isArray(v.__set)) ? v.__set : []; },
+  isDict(v) { return !!v && typeof v === 'object' && !Array.isArray(v) && !v.__set && !v.__cls && !v.__ref; },
+  cell(v) { if (v == null) return '·'; if (Array.isArray(v)) return '[' + v.join(',') + ']'; if (typeof v === 'object' && Array.isArray(v.__set)) return '{' + v.__set.join(',') + '}'; if (typeof v === 'object') return '{…}'; return String(v); },
   get(snap, name) { if (!name) return undefined; if (Array.isArray(name)) return name.map(n => snap[n]); return snap[name]; },
   // ---------- 개별 그림 ----------
   // 각 draw는 (ctx, W, H, snap, spec, prevSnap, t[0..1 트윈 진행]) 를 받는다
@@ -31,17 +35,17 @@ const Viz = {
     let lx = pad; (spec.hl || []).forEach((name, k) => { if (snap[name] === undefined) return; ctx.fillStyle = [th.danger, th.warn, th.gold][k % 3]; ctx.fillRect(lx, H - 12, 10, 10); ctx.fillStyle = th.fg; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.fillText(`${name} = ${snap[name]}`, lx + 14, H - 3); lx += 90; });
   },
   drawBoxes(ctx, W, H, snap, spec, prev, t, th) {
-    const a = (this.get(snap, spec.var) || []); const n = a.length; const vert = (spec.orient || 'v') === 'v';
+    const raw = this.get(snap, spec.var); const isSet = !!(raw && raw.__set); const a = this.seq(raw); const n = a.length; const vert = (spec.orient || 'v') === 'v';
     ctx.fillStyle = th.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.fillText(`${spec.var} (${n}개)${spec.label ? ' · ' + spec.label : ''}`, 10, 16);
     if (!n) { ctx.fillStyle = th.muted; ctx.textAlign = 'center'; ctx.fillText('(비어 있음)', W / 2, H / 2); }
-    const pn = prev ? (this.get(prev, spec.var) || []).length : n; const grow = n > pn;
+    const pn = prev ? this.seq(this.get(prev, spec.var)).length : n; const grow = n > pn;
     if (vert) { const bw = Math.min(160, W - 40), bh = Math.min(32, (H - 50) / Math.max(n, 1)); const x = (W - bw) / 2; const bottom = H - 10;
       a.forEach((v, i) => { const y = bottom - (i + 1) * (bh + 3); const isNew = grow && i === n - 1; const s = isNew ? 0.5 + 0.5 * t : 1; ctx.save(); ctx.translate(x + bw / 2, y + bh / 2); ctx.scale(s, s); ctx.fillStyle = i === n - 1 ? th.accent : th.primary; ctx.beginPath(); ctx.roundRect(-bw / 2, -bh / 2, bw, bh, 6); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = `${Math.min(14, bh - 6)}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(v), 0, 0); ctx.restore(); });
       ctx.strokeStyle = th.border; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x - 8, 24); ctx.lineTo(x - 8, bottom + 2); ctx.lineTo(x + bw + 8, bottom + 2); ctx.lineTo(x + bw + 8, 24); ctx.stroke();
       if (n) { ctx.fillStyle = th.accent; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText('← ' + (spec.top || 'top'), x + bw + 14, bottom - n * (bh + 3) + bh / 2 + 4); }
     } else { const bh = 36, bw = Math.min(90, (W - 40) / Math.max(n, 1) - 4); const y = H / 2 - bh / 2; let x = 20;
       a.forEach((v, i) => { const isNew = grow && i === n - 1; const s = isNew ? 0.5 + 0.5 * t : 1; ctx.save(); ctx.translate(x + bw / 2, y + bh / 2); ctx.scale(s, s); ctx.fillStyle = i === 0 ? th.accent : th.primary; ctx.beginPath(); ctx.roundRect(-bw / 2, -bh / 2, bw, bh, 6); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(v), 0, 0); ctx.restore(); x += bw + 4; });
-      ctx.fillStyle = th.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText('앞(먼저 나감) →', 20, y - 8); ctx.textAlign = 'right'; ctx.fillText('← 뒤(새로 들어옴)', W - 20, y - 8); }
+      ctx.fillStyle = th.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; if (isSet) ctx.fillText('집합 · 순서 없음 (작은 값부터 보여 줘요)', 20, y - 8); else { ctx.fillText('앞(먼저 나감) →', 20, y - 8); ctx.textAlign = 'right'; ctx.fillText('← 뒤(새로 들어옴)', W - 20, y - 8); } }
   },
   drawLinked(ctx, W, H, snap, spec, prev, t, th) {
     let node = this.get(snap, spec.var); const nodes = []; const seen = new Set(); const nk = spec.next || 'next', vk = spec.val || 'val';
@@ -78,8 +82,8 @@ const Viz = {
   drawGraph(ctx, W, H, snap, spec, prev, t, th) {
     const g = this.get(snap, spec.var); if (!g || typeof g !== 'object') return this.empty(ctx, W, H, `${spec.var} 가 비어 있어요`, th);
     const keys = Object.keys(g).filter(k => k !== '...'); const edges = []; const weights = {};
-    keys.forEach(u => { const adj = g[u]; const list = Array.isArray(adj) ? adj : (adj && typeof adj === 'object' ? Object.entries(adj).map(([v, w]) => [v, w]) : []); list.forEach(item => { let v = item, w = null; if (Array.isArray(item)) { v = item[0]; w = item[1]; } v = String(v); if (!keys.includes(v)) keys.push(v); edges.push([u, v]); if (w != null) weights[u + '>' + v] = w; }); });
-    const pos = this.graphLayout(keys, edges, W, H - 20); const visited = spec.visited ? (this.get(snap, spec.visited) || []) : []; const vis = Array.isArray(visited) ? visited : visited.__set ? visited.__set : Object.keys(visited); const visS = new Set(vis.map(String)); const cur = spec.cur ? String(this.get(snap, spec.cur) ?? '') : null; const queue = spec.queue ? (this.get(snap, spec.queue) || []) : []; const qS = new Set(queue.map(String)); const dist = spec.dist ? (this.get(snap, spec.dist) || {}) : null;
+    keys.forEach(u => { const adj0 = g[u]; const adj = adj0 && adj0.__set ? adj0.__set : adj0; const list = Array.isArray(adj) ? adj : (adj && typeof adj === 'object' ? Object.entries(adj).map(([v, w]) => [v, w]) : []); list.forEach(item => { let v = item, w = null; if (Array.isArray(item)) { v = item[0]; w = item[1]; } v = String(v); if (!keys.includes(v)) keys.push(v); edges.push([u, v]); if (w != null) weights[u + '>' + v] = w; }); });
+    const pos = this.graphLayout(keys, edges, W, H - 20); const visited = spec.visited ? (this.get(snap, spec.visited) || []) : []; const vis = Array.isArray(visited) ? visited : visited.__set ? visited.__set : Object.keys(visited); const visS = new Set(vis.map(String)); const cur = spec.cur ? String(this.get(snap, spec.cur) ?? '') : null; const queue = spec.queue ? this.seq(this.get(snap, spec.queue)) : []; const qS = new Set(queue.map(String)); const dist = spec.dist ? (this.get(snap, spec.dist) || {}) : null;
     const drawn = new Set(); ctx.lineWidth = 2; edges.forEach(([u, v]) => { const key = [u, v].sort().join('|'); const a = pos[u], b = pos[v]; if (!a || !b) return; ctx.strokeStyle = visS.has(u) && visS.has(v) ? th.accent : th.border; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); const w = weights[u + '>' + v]; if (w != null && !drawn.has(key)) { drawn.add(key); ctx.fillStyle = th.surface2; const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2; ctx.beginPath(); ctx.arc(mx, my, 10, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = th.warn; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(w), mx, my); } });
     keys.forEach(k => { const p = pos[k]; if (!p) return; const r = 17; ctx.fillStyle = k === cur ? th.warn : visS.has(k) ? th.accent : qS.has(k) ? th.gold : th.primary; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#fff'; ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(k, p.x, p.y); if (dist && dist[k] != null) { ctx.fillStyle = th.fg; ctx.font = '11px sans-serif'; ctx.fillText(String(dist[k]), p.x, p.y + r + 10); } });
     ctx.fillStyle = th.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(`${spec.var}${spec.visited ? ' · 초록=방문' : ''}${spec.cur ? ' · 주황=현재' : ''}${spec.queue ? ' · 노랑=대기' : ''}${spec.dist ? ' · 숫자=거리' : ''}`, 10, H - 6);
@@ -97,7 +101,8 @@ const Viz = {
     ctx.fillStyle = th.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(`${spec.var} ${rows}×${cols}${spec.visited ? ' · 초록=방문' : ''}${spec.pos ? ' · 주황=현재' : ''}${spec.path ? ' · 노랑=경로' : ''}`, 10, 14);
   },
   drawTable(ctx, W, H, snap, spec, prev, t, th) {
-    let g = this.get(snap, spec.var); if (!Array.isArray(g) || !g.length) return this.empty(ctx, W, H, `${spec.var} 가 비어 있어요`, th);
+    let g = this.get(snap, spec.var); if (this.isDict(g)) return this.drawDict(ctx, W, H, snap, spec, prev, t, th);
+    if (!Array.isArray(g) || !g.length) return this.empty(ctx, W, H, `${spec.var} 가 비어 있어요`, th);
     const two = Array.isArray(g[0]); if (!two) g = [g]; const rows = g.length, cols = Math.max(...g.map(r => r.length)); const cw = Math.min(56, (W - 40) / (cols + 1)), ch = Math.min(30, (H - 30) / (rows + 1)); const ox = 20, oy = 24;
     const pg = prev ? this.get(prev, spec.var) : null; const pgrid = pg && Array.isArray(pg) ? (Array.isArray(pg[0]) ? pg : [pg]) : null; const hl = spec.hl ? spec.hl.map(n => this.num(snap[n])) : null;
     ctx.font = '11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -105,9 +110,23 @@ const Viz = {
     for (let r = 0; r < rows; r++) { if (two) { ctx.fillStyle = th.muted; ctx.fillText(String(r), ox + cw / 2, oy + ch + r * ch + ch / 2); }
       for (let c = 0; c < cols; c++) { const v = g[r][c]; const x = ox + cw + c * cw, y = oy + ch + r * ch; const changed = pgrid && (!pgrid[r] || pgrid[r][c] !== v); const isHl = hl && (two ? (hl[0] === r && hl[1] === c) : hl[0] === c);
         ctx.fillStyle = isHl ? th.warn : changed ? th.accent : (v == null || v === 0 || v === -1 || v === Infinity) ? th.surface2 : th.primary; ctx.fillRect(x + 1, y + 1, cw - 2, ch - 2);
-        ctx.fillStyle = v == null ? th.muted : '#fff'; ctx.font = `${Math.min(13, cw / 3.2)}px sans-serif`; ctx.fillText(v == null ? '·' : String(v), x + cw / 2, y + ch / 2); } }
+        ctx.fillStyle = v == null ? th.muted : '#fff'; ctx.font = `${Math.min(13, cw / 3.2)}px sans-serif`; ctx.fillText(this.cell(v), x + cw / 2, y + ch / 2); } }
     ctx.fillStyle = th.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(`${spec.var} · 초록=방금 바뀜${spec.hl ? ' · 주황=지금 칸' : ''}`, 10, 14);
   },
+  // QA #51: 딕셔너리는 열 머리 = 키, 아래 칸 = 값. 키가 많으면 여러 줄로 접어요
+  drawDict(ctx, W, H, snap, spec, prev, t, th) {
+    const d = this.get(snap, spec.var); const keys = Object.keys(d).filter(k => k !== '...'); if (!keys.length) return this.empty(ctx, W, H, `${spec.var} 가 비어 있어요 ({})`, th);
+    const pd = prev && this.isDict(this.get(prev, spec.var)) ? this.get(prev, spec.var) : null; const more = '...' in d;
+    ctx.font = '12px sans-serif'; const txt = keys.map(k => [k, this.cell(d[k])]); const need = Math.max(...txt.map(([k, v]) => Math.max(ctx.measureText(k).width, ctx.measureText(v).width))) + 14;
+    const ox = 10, oy = 22; const per = Math.max(1, Math.min(keys.length, Math.floor((W - ox * 2) / Math.max(40, need)))); const cw = Math.min(120, (W - ox * 2) / per); const bands = Math.ceil(keys.length / per); const ch = Math.max(14, Math.min(28, (H - oy - 8) / (bands * 2)));
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    txt.forEach(([k, v], i) => { const b = Math.floor(i / per), c = i % per; const x = ox + c * cw, y = oy + b * ch * 2; if (y + ch * 2 > H) return;
+      const changed = pd && JSON.stringify(pd[k]) !== JSON.stringify(d[k]); ctx.fillStyle = th.surface2; ctx.fillRect(x + 1, y + 1, cw - 2, ch - 2); ctx.fillStyle = th.fg; ctx.font = `bold ${Math.min(12, ch - 4)}px sans-serif`; ctx.fillText(this.fit(ctx, k, cw - 6), x + cw / 2, y + ch / 2);
+      ctx.fillStyle = changed ? th.accent : th.primary; ctx.fillRect(x + 1, y + ch + 1, cw - 2, ch - 2); ctx.fillStyle = '#fff'; ctx.font = `${Math.min(13, ch - 4)}px sans-serif`; ctx.fillText(this.fit(ctx, v, cw - 6), x + cw / 2, y + ch * 1.5); });
+    const shown = Math.min(keys.length, per * Math.floor((H - oy) / (ch * 2)));
+    ctx.fillStyle = th.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(this.fit(ctx, `${spec.var} (${keys.length}${more ? '+' : ''}개)${shown < keys.length ? ` · 앞 ${shown}개만` : ''} · 위=키 아래=값 · 초록=방금 바뀜`, W - 20), 10, 14);
+  },
+  fit(ctx, s, w) { if (ctx.measureText(s).width <= w) return s; let t = s; while (t.length > 1 && ctx.measureText(t + '…').width > w) t = t.slice(0, -1); return t + '…'; },
   drawCallstack(ctx, W, H, step, spec, prev, t, th) {
     const stack = (step.stack || []).filter(s => s !== '<module>'); const n = stack.length; ctx.fillStyle = th.muted; ctx.font = '12px sans-serif'; ctx.textAlign = 'left'; ctx.fillText(`호출 스택 · 깊이 ${n}`, 10, 16);
     if (!n) { ctx.fillStyle = th.muted; ctx.textAlign = 'center'; ctx.fillText('(함수 밖: 메인)', W / 2, H / 2); return; }
