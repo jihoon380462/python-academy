@@ -2,10 +2,10 @@
 
 사용자 본인이 쓰는 초보자용 학습 사이트. 여러 코스가 모이는 "아카데미" 구조(v2.0.0~).
 
-- **파이썬·터미널·Git 은 「교과서」**(v2.9.0·v2.10.0~): 설명을 읽고 내 컴퓨터(VS Code·Git Bash)에서 직접 만들어 본다. 채점·XP·잠금 없음. 알고리즘·수학은 브라우저 실행 문제집, SQL·웹은 미리보기.
+- **파이썬·터미널·Git·Vim 은 「교과서」**(v2.9.0·v2.10.0·v2.11.0~): 설명을 읽고 내 컴퓨터(VS Code·Git Bash·gVim)에서 직접 만들어 본다. 채점·XP·잠금 없음. 알고리즘·수학은 브라우저 실행 문제집, SQL·웹은 미리보기.
 - **무엇이 정상이고 무엇이 버그인가는 [`specs/site-intent.md`](specs/site-intent.md)** — QA·새 세션은 이것부터.
 
-- 사이트(허브): https://jihoon380462.github.io/python-academy/ · 코스: `/courses/python/` · `/courses/terminal-git/` · `/courses/algo/` · `/courses/math/` · `/courses/sql/` · `/courses/web/` (교과서 코스의 옛 문제집 화면은 주소 끝 `?classic=1`)
+- 사이트(허브): https://jihoon380462.github.io/python-academy/ · 코스: `/courses/python/` · `/courses/terminal-git/` · `/courses/algo/` · `/courses/math/` · `/courses/sql/` · `/courses/web/` · 공용 `/courses/vim/` (교과서 코스의 옛 문제집 화면은 주소 끝 `?classic=1`)
 - 설계 결정: DESIGN.md · 문제 목록: PROBLEMS.md · 확장 지시서(멀티 코스): EXPANSION.md
 
 ## 개발/인수인계
