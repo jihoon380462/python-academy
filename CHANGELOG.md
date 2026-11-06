@@ -4,6 +4,16 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
+## v2.16.2 — 2026-11-06 (Opus: GitHub 교과서 챕터 3 + 파이썬 거북이 예제 turtle.done())
+
+- 🐢 사용자 「이 turtle 있으면 안 되는 거 아니야?」 — 파이썬 레슨 5 「turtle: 거북이에게 명령하기」 의 두 코드에 `turtle.done()` 이 없었어요. 예전 화면은 브라우저 캔버스라 필요 없었지만 VS Code 에서는 없으면 그림 창이 깜빡 뜨고 바로 닫혀요(같은 레슨의 만들어 보기 문제에는 있었음). 두 코드에 넣고 「창 ✕ 를 눌러야 끝나요」 · tkinter 가 없을 때(설치 Modify → ☑ tcl/tk and IDLE) 안내. turtle 자체는 Windows 파이썬 기본 설치에 들어 있어 VS Code 에서 돼요. check_book ⑪: 거북이 코드(예제·본문·예시 답)에 turtle.done() 이 없으면 실패.
+- 🐙 GitHub 교과서 챕터 3 「세상에 내놓기」 열림(레슨 3 + 보스 1, 만들어 보기 7 — 명령 문제 3개 bash 검사):
+  - G11 fork 와 오픈소스 첫 기여(Fork → Create fork · origin/upstream · git fetch upstream → merge · Sync fork → Update branch · `firstcontributions/first-contributions` 에 첫 PR — 2026-11-06 에도 PR 을 받는 것 확인)
+  - G12 GitHub Pages 두 가지(Settings → Code, planning, and automation → Pages · Deploy from a branch / GitHub Actions · 주소 규칙 · index.html 대소문자 · 링크는 / 없이 · 비공개 저장소도 사이트는 공개)
+  - G13 태그와 Releases(git tag -a · 태그는 따로 push · 큰.중간.작은 · Draft a new release → Choose a tag → Create new tag → Generate release notes → Publish release)
+  - 보스 GB3 「포트폴리오 공개」(프로필 README = 아이디와 같은 이름의 저장소 · Pin · Pages · v1.0.0)
+- 허브 카드 「읽은 레슨 n/17」, 도감 명령 2개(upstream · tag).
+
 ## v2.16.1 — 2026-11-06 (Opus: GitHub 교과서 챕터 2 — Pull Request 로 협업)
 
 - 🐙 챕터 2 열림(레슨 6 + 보스 1, 만들어 보기 12 — 명령 문제 4개는 bash 검사):
