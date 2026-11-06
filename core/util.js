@@ -12,5 +12,5 @@ const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const byteLen = (s) => new TextEncoder().encode(s).length;
 function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('load fail: ' + src)); document.head.appendChild(s); }); }
-// 아트 리소스 경로 (IMAGES.md): 허브(루트)와 코스 페이지(courses/<id>/)에서 같은 이름으로 쓴다
+// 아트 리소스 경로 (docs/IMAGES.md): 허브(루트)와 코스 페이지(courses/<id>/)에서 같은 이름으로 쓴다
 function assetUrl(name) { return (location.pathname.includes('/courses/') ? '../../' : '') + 'assets/img/' + name; }

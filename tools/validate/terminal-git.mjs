@@ -1,4 +1,4 @@
-// tools/validate/terminal-git.mjs — 터미널·Git 코스 전용 스키마 규칙. tools/validate_content.mjs 가 코스 공통 규칙 뒤에 부른다 (DESIGN.md 16절).
+// tools/validate/terminal-git.mjs — 터미널·Git 코스 전용 스키마 규칙. tools/validate_content.mjs 가 코스 공통 규칙 뒤에 부른다 (docs/DESIGN.md 16절).
 //   공통 규칙(힌트 3·tags·quiz/fill 형식·parsons 5줄·id 규칙)은 본체가 보고, 여기서는 mission·quiz kind:'cmd'·parsons(셸)·example.shell·보스 미션을 본다.
 //   정답 명령의 실제 실행 검증은 tools/run_shell_solutions.mjs.
 export const STATE_KEYS = ['cwd', 'cwdStartsWith', 'files', 'dirs', 'noFiles', 'git', 'commits', 'branchCommits', 'branches', 'noBranches', 'head', 'staged', 'stagedEmpty', 'clean', 'noConflictMarkers', 'tags', 'messages', 'lastMessage', 'remoteBranches', 'pushed', 'stash', 'forbid', 'historyIncludes']; // core/engine.js Grader.matchState 가 읽는 키

@@ -1,4 +1,4 @@
-// tools/validate/web.mjs — 웹·HTTP·API 코스 전용 필드 규칙 (validate_content.mjs 가 부른다, DESIGN.md 16절). 문제 유형 'web' 의 p.web 모양 + 예제 example.web 검사.
+// tools/validate/web.mjs — 웹·HTTP·API 코스 전용 필드 규칙 (validate_content.mjs 가 부른다, docs/DESIGN.md 16절). 문제 유형 'web' 의 p.web 모양 + 예제 example.web 검사.
 const TABS = ['html', 'css', 'js'];
 const COND_KEYS = ['exists', 'count', 'equals', 'contains', 'value', 'attr', 'css', 'js']; // text 는 체크리스트 문구라서 글자 비교는 equals/contains
 const ACT_KEYS = ['click', 'input', 'key', 'submit'];

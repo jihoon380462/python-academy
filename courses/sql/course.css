@@ -1,4 +1,4 @@
-/* courses/sql/course.css — 데이터베이스(SQL) 코스 전용 화면 (core/ui.css 는 건드리지 않는다, DESIGN.md 16절). 토큰은 v2.6.0 것 그대로 */
+/* courses/sql/course.css — 데이터베이스(SQL) 코스 전용 화면 (core/ui.css 는 건드리지 않는다, docs/DESIGN.md 16절). 토큰은 v2.6.0 것 그대로 */
 .sqlw{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:12px;align-items:start}
 .sqlw.compact{grid-template-columns:minmax(0,1fr) 200px}
 .sqlw-main{min-width:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--ed-bg)}

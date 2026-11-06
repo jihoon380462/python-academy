@@ -1,6 +1,6 @@
 # 파이썬 아카데미 — 설계 결정 요약
 
-> **2026-11-06: 파이썬·알고리즘(v2.15.0)·터미널·Git·SQL·웹·Vim 은 「교과서」 모드라 아래 3~5절(XP·뱃지·블록)·문제 화면 설명은 그 코스 화면에 보이지 않는다(수학에만 · 나머지는 `?classic=1`). 지금 기준은 [`specs/site-intent.md`](specs/site-intent.md).**
+> **2026-11-06: 파이썬·알고리즘(v2.15.0)·터미널·Git·SQL·웹·Vim 은 「교과서」 모드라 아래 3~5절(XP·뱃지·블록)·문제 화면 설명은 그 코스 화면에 보이지 않는다(수학에만 · 나머지는 `?classic=1`). 지금 기준은 [`specs/site-intent.md`](../specs/site-intent.md).**
 
 작성일: 2026-11-01 · 앱 버전 1.0.2 · 파일: `python_academy.html` (단일 파일, 약 345KB)
 
@@ -259,7 +259,7 @@ v1.0.1에서 **메인 스레드 보조 실행기**를 추가했습니다. 워커
 - 허브 "남은 시간" = 남은 문제 수 × 4분(`CONFIG.HUB.minutesPerProblem`). 저장 용량 경고 4MB(`CONFIG.STORAGE_WARN_BYTES`).
 - 코스 카드 순서·전제(`CONFIG.COURSES`): 알고리즘은 B3, 웹은 B2 보스 클리어. 설정 `settings.unlockAll`이 true면 전제 무시(스위치 UI는 Phase 5에서 노출).
 
-**지시서(EXPANSION.md)와 다르게 한 것과 이유**
+**지시서(docs/EXPANSION.md)와 다르게 한 것과 이유**
 - `core/util.js`를 추가(지시서 구조에는 없음): `$`, `esc`, `todayKey` 같은 유틸은 모든 파일이 쓰므로 config 바로 다음에 따로 둠.
 - `shared/badges.js`로 BADGES·INVENTORY를 묶음(지시서는 errors·glossary만 shared). 뱃지·보관함 아이템은 코스 공통이고 허브가 마스코트를 그릴 때 INVENTORY가 필요.
 - `core/tutor.js`에 API 호출(Tutor)과 패널(Tutor.ui)을 함께 둠. 선생님 UI는 코스 페이지 전용이지만 파일을 둘로 나누면 `Tutor.ui = {...}` 확장 순서 문제만 생기고 이득이 없음.
@@ -320,7 +320,7 @@ v1.0.1에서 **메인 스레드 보조 실행기**를 추가했습니다. 워커
 - 실전 프로젝트 xp 120(단계 4×25 = 100 이상, 검증기가 하한 검사). 업로드 미리보기는 결과 파일 앞부분만(`pre.small`, 스크롤). inputGen 입력은 300자 이하면 테스트 목록에 그대로 표시.
 - 미로 이웃 순서 위·아래·왼쪽·오른쪽을 지문에 고정 + 테스트 미로는 최단 경로가 유일한 것만 사용(스크립트로 경로 수 확인). 지하철 테스트 질의도 동률 없는 것만.
 
-**지시서(EXPANSION.md 9절 ②)와 다르게 한 것과 이유**
+**지시서(docs/EXPANSION.md 9절 ②)와 다르게 한 것과 이유**
 - 「미로 게임」의 "사용자 미로 입력"은 별도 격자 편집 UI 대신 **입력칸에 미로 문자를 그리는 방식**: 기존 입력칸·시각화 파이프라인을 그대로 쓰고, 텍스트 미로가 코딩테스트 입력 형식과 같아 학습 효과가 큼.
 - 「지하철」의 "소형 노선 데이터"는 코드 상수가 아니라 **입력 예시(13개 노선)**로 제공: 사용자가 자기 동네 노선을 넣을 수 있고 테스트에서 데이터를 바꿀 수 있음.
 - 단어 퀴즈의 랜덤은 `random.seed(S)`를 명령 인자로 받아 **재현 가능하게** — 채점 가능하면서 random 학습 유지.
@@ -352,13 +352,13 @@ v1.0.1에서 **메인 스레드 보조 실행기**를 추가했습니다. 워커
 ## 14-2. 설계 원칙: 난이도는 레슨이 가르친 만큼만 (2026-11-05, 사용자 제보 QA #160)
 
 - **문제는 그 시점의 본문으로 풀려야 한다.** 검수가 「정답이 맞나」만 보면 1,148문제 실패 0 이어도 학습자는 L11 에서 며칠을 막힌다. 난이도·순서·편집 방식 전환은 따로 본다(specs/qa-team.md 2-2절, specs/content-team.md 3-2절).
-- **(v2.6.0, 사용자 결정 D1·D3 11/5) 디자인 개편 — 성인·깔끔·모던.** 레퍼런스 `specs/ref/modern-ui-lesson.png`·`modern-ui-explorer.png`. 토큰은 `core/ui.css` 맨 위: 바탕 `--bg #141a26` → 카드 `--surface` → 칸 `--surface2` 세 단계, 액센트 `--primary`=`--accent` 파랑 하나(완료·제출·진행 막대 전부), `--success` 초록은 맞음/통과 표시에만, `--warn`·`--gold` 는 힌트·별에만 남김. 본문 16px, 제목은 크기·굵기로만(h1 1.8em/800). 화면 구조: 홈 = 탐색기(`.ex3-cols` 트리 260 / 카드 / 미리보기 320, ≤1099px 미리보기 숨김, ≤767px 챕터 칩), 레슨 = `.lp-cols.has-ex`(설명 40% / 편집기), 스텝퍼 `.lp-stepper`. 게임 요소는 `Game.showGame()`(= `settings.game`, 기본 false) 뒤로: UI.celebrate·renderTopbar·문제 결과·요약 목록·허브. 상단바 아이콘은 `UI.icon(name)` 인라인 SVG(hub·home·settings·keys). 아트 자리: 허브 hero·코스 아이콘·챕터 그림·노드 마스코트 삭제(파일 보존), 보스 그림은 `.lc.boss .lc-n` 56px — 새 스타일 요청은 IMAGES.md 3-B. 게임 끔 규칙(QA 2차): 직접 부르는 `UI.badgeFly`는 토스트로, `Confetti.rain/burst`는 안 그림(두 함수 안에서 확인하니 호출부에 조건 불필요), 「+N XP」 문구는 호출부에서 `Game.showGame()` 조건. 홈 탐색기 규칙: 잠긴 레슨은 트리·카드 둘 다 disabled + `pick()`이 `Game.lessonOpen` 확인, 레슨 열 때는 항상 저장 쪽(`d.lessons[id].page`)을 들고 감, ≤1099px 는 「오늘 할 일」을 `.td-narrow`(가운데 열 아래)로 보여 줌. 모의고사 레슨(`l.mock`)은 카드·미리보기 문구가 다름.
+- **(v2.6.0, 사용자 결정 D1·D3 11/5) 디자인 개편 — 성인·깔끔·모던.** 레퍼런스 `specs/ref/modern-ui-lesson.png`·`modern-ui-explorer.png`. 토큰은 `core/ui.css` 맨 위: 바탕 `--bg #141a26` → 카드 `--surface` → 칸 `--surface2` 세 단계, 액센트 `--primary`=`--accent` 파랑 하나(완료·제출·진행 막대 전부), `--success` 초록은 맞음/통과 표시에만, `--warn`·`--gold` 는 힌트·별에만 남김. 본문 16px, 제목은 크기·굵기로만(h1 1.8em/800). 화면 구조: 홈 = 탐색기(`.ex3-cols` 트리 260 / 카드 / 미리보기 320, ≤1099px 미리보기 숨김, ≤767px 챕터 칩), 레슨 = `.lp-cols.has-ex`(설명 40% / 편집기), 스텝퍼 `.lp-stepper`. 게임 요소는 `Game.showGame()`(= `settings.game`, 기본 false) 뒤로: UI.celebrate·renderTopbar·문제 결과·요약 목록·허브. 상단바 아이콘은 `UI.icon(name)` 인라인 SVG(hub·home·settings·keys). 아트 자리: 허브 hero·코스 아이콘·챕터 그림·노드 마스코트 삭제(파일 보존), 보스 그림은 `.lc.boss .lc-n` 56px — 새 스타일 요청은 docs/IMAGES.md 3-B. 게임 끔 규칙(QA 2차): 직접 부르는 `UI.badgeFly`는 토스트로, `Confetti.rain/burst`는 안 그림(두 함수 안에서 확인하니 호출부에 조건 불필요), 「+N XP」 문구는 호출부에서 `Game.showGame()` 조건. 홈 탐색기 규칙: 잠긴 레슨은 트리·카드 둘 다 disabled + `pick()`이 `Game.lessonOpen` 확인, 레슨 열 때는 항상 저장 쪽(`d.lessons[id].page`)을 들고 감, ≤1099px 는 「오늘 할 일」을 `.td-narrow`(가운데 열 아래)로 보여 줌. 모의고사 레슨(`l.mock`)은 카드·미리보기 문구가 다름.
 - **(v2.5.0, 사용자 결정 D5·D6 11/5) 레슨 나누기.** 한 레슨 = 개념 하나~둘, 5~6쪽 이하, 문제 3~5개(쉬운 것 → 합친 것). 나눌 때 **문제 id 는 바꾸지 않고 lesson 만 옮긴다**(저장 기록·복습·별이 그대로 이어지고 마이그레이션이 필요 없다). 새 레슨 id 는 알파벳 접미(`L3B`), 새 문제 id 는 `L3BP1`(COURSE_ID_PATTERNS 가 `[A-Z]?` 허용). 레슨 번호 `n` 은 파일 순서대로 다시 매기고, 본문·지문의 다른 레슨 참조는 `[[레슨:L11C]]` 토큰으로 써서 렌더 때 번호를 계산한다(QA #128). 「약 N분」은 삭제(사람마다 기준이 달라 의미 없음) → 「N쪽 · 문제 M개」. **진행 보호**: 레슨 열림은 「앞 레슨 완료」 외에 「한 문제라도 푼 가장 뒤 레슨(`Game.furthestIdx`)까지와 그 다음」을 항상 열고, 그 챕터까지 열어 둔다 — 나눈 레슨에 새 문제가 들어가도 옛 사용자가 앞으로 되돌아가지 않는다. 아직 안 나눈 7쪽 이상 레슨(L1·L2·L4·L5·L9·L13·L17·L19·L20·L21)은 다음 후보.
 - **(v2.4.0, 사용자 결정 D2 11/5) 블록·「Parsons/텍스트 고르기」 삭제, 전부 타자.** 블록 21문제·정답 4줄 이하 Parsons 7문제를 `code` 로 바꾸고, L0~L3 는 한두 줄 따라 치기, 그 뒤는 starter 에 틀 + 지문이 쓸 줄을 콕 집음. 남은 Parsons 6문제(L6P2·L7P2·B2P1·B2P2·L13P4·L14P5)는 줄 순서 자체가 연습인 것. `core/`: Blockly 로드·BlockEditor·놀이터 블록 탭·블록 코치(GUIDES)·`dual` XP 배율 삭제. 옛 저장의 `rec.mode` 'block'|'parsons' 는 무시하고 starter 로 연다(`regress.py` 검사). validate 가 `type:'block'`·`dual`·4줄 이하 Parsons 를 에러로 막는다. (이전 설계 「블록(L1~L8) → Parsons(L9~L10) → 타자(L11~) 계단」은 폐기)
 - **합친 문제는 마지막에, 그리고 한 줄만.** 레슨 기능을 여럿 합친 문제는 레슨 끝에 두고 starter 가 나머지를 적어 둔다(L11P1 「가운데 한 줄만」).
 - **`tools/check_level.mjs` (v2.7.0) — 「풀 수 있나」 자동 측정.** 코스 LESSONS 순서대로 레슨을 훑으며 「본문」(= 그 레슨까지의 `pages[].html` 에서 접힌 `<details>` 제외 + `example.code` + 같은 레슨 **앞** 문제의 지문·starter)에 나온 파이썬 기능을 누적하고, 문제마다 정답(`solution`/`bug.solution`/`parsons.solution`, fill 은 빈칸을 채운 코드)과 힌트 3이 쓰는 기능을 재서 ① **본문 밖 기능**(그 시점까지 본문에 한 번도 없음 — 그 문제의 지문·starter 에만 있으면 `(지문○)`, 힌트 3에서만 쓰면 `(힌트3)`) ② **새 기능 수**(이 레슨 본문에서 처음 나온 기능을 몇 개 합쳤나, 3개 이상 표시) ③ **첫 문제 경고**(첫 문제의 정답 줄 수 + 기능 수가 나머지 문제 중앙값보다 크면, 보스 레슨 제외)를 코스별 마크다운 표로 낸다. 기능 카탈로그는 파일 위쪽 `CATALOG` 한 곳(키워드·내장 함수 호출 꼴·메서드·f-string/슬라이싱/컴프리헨션/언패킹 같은 문법 꼴·모듈 호출, 2중 for·중첩 함수·재귀는 들여쓰기로), 문자열·주석 안과 에러 메시지 줄은 빼고 잰다. `SUB`(`int(input())`·`with open` 같은 세부 꼴)는 ①에만 쓰고 ②·무게엔 안 센다. 대상은 runner python + 지식 지도 아님(python·algo, algo 는 선수 코스 python 본문 전체를 배운 것으로 침). 정규식이라 **오탐 가능** — 표 위에 그렇게 적혀 있고, 근거는 `--lesson L11` 로 본다(기능마다 정답 몇 줄에서 쓰였고 어디서 처음 가르쳤는지). 명령: `node tools/check_level.mjs`(걸린 문제만) · `--all` · `--course python` · `--lesson L11` · `--json` · `--features --course python`(기능별 처음 나온 곳, 카탈로그 점검용). **래칫 게이트**: `tools/check_level.baseline.json` 에 코스별 ①②③ 걸린 수를 두고 `--gate`(CI `validate_content` 다음 단계)는 현재 수가 baseline 보다 **늘면** exit 1 — 지금 걸린 것들이 CI 를 바로 깨지 않고, 새로 나빠지는 것만 막는다. 걸린 수를 줄였으면 `--update-baseline` 으로 내려 잡는다.
 
-## 15. 유지보수 위임 `[core]` — 지시서(specs/schedule-week.md 3절)와 다르게 한 것 (2026-11-02, Opus·유지보수)
+## 15. 유지보수 위임 `[core]` — 지시서(specs/archive/schedule-week.md 3절)와 다르게 한 것 (2026-11-02, Opus·유지보수)
 
 - **QA #4** 이어서 하기 위치 저장: 지시서 `Store.save()` 대신 `Store.save({ silent: true })`. 화면 이동마다 `updatedAt` 을 올리고 기기 연동 push 를 예약하면 문제를 열기만 해도 동기화가 돌고 다른 기기와 충돌 판정이 잦아진다. 위치는 다음 실제 저장 때 같이 올라간다.
 - **QA #6** 시각화 ResizeObserver 가드: 지시서 `!host.isConnected` 에 `|| !cvs[0].isConnected` 추가. 에러가 나는 흔한 경로는 host 가 붙어 있는 채로 내용만 바뀌는 경우(👀 다시 누르기 = `runAndShow` 가 host.innerHTML 교체, 닫기 버튼 = host.innerHTML = '')라 host 검사만으로는 재현이 그대로 남았다.

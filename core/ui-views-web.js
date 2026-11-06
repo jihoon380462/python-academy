@@ -1,4 +1,4 @@
-// core/ui-views-web.js — 웹·HTTP·API 코스 화면 (v2.7.0 뼈대, EXPANSION.md 8절). 웹 코스 페이지(courses/web/index.html)에서만 로드된다.
+// core/ui-views-web.js — 웹·HTTP·API 코스 화면 (v2.7.0 뼈대, docs/EXPANSION.md 8절). 웹 코스 페이지(courses/web/index.html)에서만 로드된다.
 //   WebUI.workspace(host, opts)   HTML/CSS/JS 세 탭 편집기 + 미리보기 iframe(폰/PC 폭) + 출력(console)·네트워크·검사 결과 탭. 문제 화면과 레슨 예제가 같이 쓴다.
 //   UI.modes.web                  문제 유형 'web' — p.web = { tabs:['html','css','js'] 중 쓰는 것, starter:{html,css,js}, checks:[…], free?:true, api?:{…} }
 //                                 「✔ 제출하기」 → Web.check 결과를 체크리스트로, 전부 ✓ 면 ctx.submit({ok:true}). 실패 항목 클릭 → 미리보기에서 그 요소 강조.

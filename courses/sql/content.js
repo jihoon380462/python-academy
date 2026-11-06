@@ -1,4 +1,4 @@
-// courses/sql/content.js — 코스 4 데이터베이스(SQL) (Phase 3 → v2.7.0 뼈대). 설계 EXPANSION.md 7절, 플러그인 계약 DESIGN.md 16절, 채우는 규칙 specs/content-team.md 「C-S」절.
+// courses/sql/content.js — 코스 4 데이터베이스(SQL) (Phase 3 → v2.7.0 뼈대). 설계 docs/EXPANSION.md 7절, 플러그인 계약 docs/DESIGN.md 16절, 채우는 규칙 specs/content-team.md 「C-S」절.
 // 파이썬 content.js 와 같은 전역 const 구조(엔진이 그대로 읽는다). 뼈대: S0 만 완성본, 나머지 레슨은 draft:true(「준비 중」).
 //
 // 레슨 (LESSONS)  { id:'S0'(보스 'SB1'), ch, n, title, mode:'text', tutorSummary, terms?, pages:[{ title, html, example?:{ sql, dataset?, schema?, autoRun? } }], summary[3], draft? }

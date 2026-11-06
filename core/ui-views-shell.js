@@ -1,4 +1,4 @@
-// core/ui-views-shell.js — 터미널·Git 코스 화면 플러그인 (v2.7.0 뼈대, DESIGN.md 16절 · EXPANSION.md 6절). terminal-git 코스 페이지에서만 로드된다.
+// core/ui-views-shell.js — 터미널·Git 코스 화면 플러그인 (v2.7.0 뼈대, docs/DESIGN.md 16절 · docs/EXPANSION.md 6절). terminal-git 코스 페이지에서만 로드된다.
 //   ShellUI.term(host, opts)   공용 터미널 위젯: 검은 창(프롬프트 me@academy:~/경로 (브랜치)$ · ↑↓ 히스토리 · Tab 자동완성 · Ctrl+L) + 파일 트리 패널(현재 폴더 강조)
 //                              + Git 저장소가 있으면 3칸 상태 뷰(작업 폴더/스테이징/저장소) + 커밋 그래프(SVG). `edit 파일` 은 편집창(textarea 모달, 충돌이면 내 것/상대 것/둘 다 버튼).
 //   UI.modes.mission           미션형 문제: setup 으로 터미널을 만들고, 명령마다 Shell.state() 를 goals[].expect 와 Grader.matchState 로 대조해 체크리스트에 ✓.

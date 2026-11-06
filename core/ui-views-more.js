@@ -237,7 +237,7 @@ window.addEventListener('DOMContentLoaded', () => {
   Sync.init(); // 연동돼 있으면 다른 기기 진행 상황을 내려받아 합친다
 });
 
-// ---------- 내 작품 갤러리 (v2.2.3, NEXT.md WP-G G3·G4) ----------
+// ---------- 내 작품 갤러리 (v2.2.3, docs/archive/NEXT.md WP-G G3·G4) ----------
 // 실전 프로젝트 클리어 시 자동 저장된 작품(src=문제 id)과 (예전 놀이터에서) 저장한 코드를 한 화면에. 코드 복사·.py 내려받기·문제로·선생님 리뷰(키 있을 때).
 Views.works = (root) => {
   const d = Store.data; const works = d.works.slice().sort((a, b) => b.date - a.date); const projects = works.filter(w => w.src), free = works.filter(w => !w.src);
@@ -258,7 +258,7 @@ Views.works = (root) => {
   $$('[data-review]', root).forEach(b => b.onclick = async () => { const w = find(b.dataset.review); const p = Content.problemMap[w.src]; if (!Store.data.settings.apiKey) { UI.toast(T.noKey); UI.go('settings'); setTimeout(() => { const k = $('#sKey'); if (k) { k.scrollIntoView({ block: 'center' }); k.focus(); } }, 150); return; } b.disabled = true; b.textContent = '🎓 리뷰 중…'; try { const text = await Tutor.reviewProject(p, w.code); w.review = text; Store.save(); Game.stat('reviews'); Views.works(root); } catch (e) { UI.toast(Tutor.errMsg(e)); b.disabled = false; b.textContent = '🎓 선생님 리뷰'; } });
 };
 
-// ---------- 학습 통계 (v2.2.8, NEXT.md F3) — 서버·AI 없이 localStorage 만으로 ----------
+// ---------- 학습 통계 (v2.2.8, docs/archive/NEXT.md F3) — 서버·AI 없이 localStorage 만으로 ----------
 Views.stats = (root) => {
   const d = Store.data; const sm = Game.summary(); const days = Game.stats14(); const mx = Math.max(1, ...days.map(x => x.n)); const ts = Review.tagStats();
   const tagRows = Object.entries(ts).filter(([, s]) => s.clear + s.fails > 0).map(([t, s]) => ({ t, rate: Math.round(100 * s.clear / Math.max(1, s.clear + s.fails)), n: s.clear + s.fails })).sort((a, b) => a.rate - b.rate);

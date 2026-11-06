@@ -8,7 +8,7 @@ const Hub = {
     if (c.id === Store.course) { const total = PROBLEMS.length; const cleared = PROBLEMS.filter(p => (probs[p.id] || {}).status === 'clear').length; const stars = PROBLEMS.reduce((s, p) => s + ((probs[p.id] || {}).stars || 0), 0); return { total, cleared, stars, maxStars: total * 3, pct: total ? Math.round(100 * cleared / total) : 0 }; }
     const ids = Object.keys(probs); const cleared = ids.filter(id => probs[id].status === 'clear').length; const stars = ids.reduce((s, id) => s + (probs[id].stars || 0), 0); const total = c.total || 0; return { total, cleared, stars, maxStars: total * 3, pct: total ? Math.round(100 * cleared / total) : 0 };
   },
-  // 복습 큐를 코스 공통으로(v2.2.4, NEXT.md F1): 각 코스 저장 조각의 problems[].review.due 만 보면 되므로 콘텐츠가 없어도 셀 수 있다
+  // 복습 큐를 코스 공통으로(v2.2.4, docs/archive/NEXT.md F1): 각 코스 저장 조각의 problems[].review.due 만 보면 되므로 콘텐츠가 없어도 셀 수 있다
   // 교과서 코스(c.book, v2.10.1): 채점이 없으니 「읽은 레슨 n/m」. 읽음 표시는 코스 조각의 lessons[레슨id].read (시작하기 SETUP_n 은 빼고)
   bookProgress(c) { const ls = (c.id === Store.course ? Store.data.lessons : Store.courseData(c.id).lessons) || {}; const pat = new RegExp((CONFIG.COURSE_ID_PATTERNS || {})[c.id] || '^$'); const read = Math.min(c.lessons || 0, Object.keys(ls).filter(k => ls[k] && ls[k].read && pat.test(k)).length); return { read, total: c.lessons || 0, pct: c.lessons ? Math.round(100 * read / c.lessons) : 0 }; },
   reviewDue() { const today = todayKey(); return CONFIG.COURSES.filter(c => c.ready && !c.book).map(c => { const probs = Store.courseData(c.id).problems || {}; const n = Object.values(probs).filter(r => r && r.status === 'clear' && r.review && r.review.due <= today).length; return { c, n }; }).filter(x => x.n); },
@@ -23,21 +23,25 @@ const Hub = {
     const contCourse = lastCourse || py;
     const contHash = lastCourse ? (last.params.pid ? `problem/${last.params.pid}` : last.params.lessonId ? `lesson/${last.params.lessonId}` : '') : last ? (last.view === 'problem' && lastP ? `problem/${lastP.id}` : lastL ? `lesson/${lastL.id}` : '') : (cur ? `lesson/${cur.id}` : '');
     const contLabel = lastCourse ? (lastCourse.book ? `${esc(lastCourse.name)} 교과서 이어서 읽기` : lastCourse.space ? `${esc(lastCourse.name)} 이어서 하기` : lastCourse.book ? `${esc(lastCourse.name)} 교과서 이어서 읽기` : `${esc(lastCourse.name)} 코스 이어서 하기`) : last && lastP && py.book ? `레슨 "${esc(lessonOfP ? lessonOfP.title : lastP.title)}" 만들어 보기 이어서` : last && lastP ? `${esc(lastP.title)} 이어서 풀기` : last && lastL ? `레슨 "${esc(lastL.title)}" 이어서 보기` : cur ? `레슨 "${esc(cur.title)}" ${py.book ? '읽기' : '시작하기'}` : '파이썬 코스 열기';
+    const books = CONFIG.COURSES.filter(c => c.ready && c.book).sort((a, b) => !!a.space - !!b.space).map(c => esc(c.short || c.name)).join('·'); const probCourses = CONFIG.COURSES.filter(c => c.ready && !c.book);
+    /* v2.17.1: 안내 문구는 COURSES 에서 만든다(코스가 늘어도 빠지지 않게). GitHub 교과서는 내 GitHub 계정을 쓰므로 「계정 필요 없음」 은 빼고 「사이트 가입 없음」 */
+    const lead = `📖 교과서 코스(${books})는 설명을 읽고 내 컴퓨터에서 직접 만들어 봐요 — VS Code·Git Bash·DB Browser·Vim, GitHub 는 내 계정으로. ${probCourses.map(c => esc(c.name)).join('·')}만 브라우저에서 바로 실행하며 푸는 문제집이에요. 사이트 가입은 필요 없어요.`;
+    const mathOn = probCourses.some(c => Object.keys(Store.courseData(c.id).problems || {}).length) || rd.length; /* 문제집 코스를 시작했을 때만 오늘 문제·복습 줄 */
     const game = Game.showGame(); /* v2.6.0 ④·⑤: 허브는 마스코트·레벨·스트릭 없이 깔끔하게(설정 「게임 요소 보기」를 켜면 표시) */
     $('#topbar').innerHTML = `<div class="tb-title"><span class="tb-brand">${esc(T.appName)}</span>${game ? ` <span class="muted small">${esc(d.nick || '학습자')} · Lv.${lv.level} ${esc(Game.title(lv.level))}</span>` : ''}</div>
       ${game ? `<div class="tb-xp" title="레벨 ${lv.level}"><span class="tb-lv">Lv.${lv.level}</span><div class="xpbar"><div class="xpfill" style="width:${lv.need ? Math.round(100 * lv.into / lv.need) : 100}%"></div></div><span class="tb-xpn">${lv.into}/${lv.need || '최대'}</span></div>
       <div class="tb-streak ${streak ? 'on' : ''}" title="${T.streak}">🔥${streak}</div>` : ''}
       ${Sync.on ? `<a class="tb-btn tb-sync ${Sync.state}" href="${this.courseUrl(py, 'settings')}" title="기기 연동: 마지막 동기화 ${Sync.ago()}">${Sync.icon()}</a>` : ''}<a class="tb-btn" href="${this.courseUrl(py, 'settings')}" title="${T.settings}">${UI.icon('settings')}</a>`;
     $('#view').innerHTML = `<div class="page hub">
-      <div class="hub-top"><div class="hub-kicker">코드 학습</div><h1 class="hub-title">${esc(T.appName)}</h1><p class="muted hub-lead">📖 교과서 코스(파이썬·알고리즘·터미널·Git·SQL·웹·Vim)는 읽고 내 컴퓨터(VS Code·Git Bash·DB Browser·Vim)에서 직접 만들어 보고, 수학 코스는 브라우저에서 바로 실행하며 배워요. 계정은 필요 없어요.</p></div>
-      <div class="card hub-today"><div class="card-h">오늘의 할 일</div>
+      <div class="hub-top"><div class="hub-kicker">코드 학습</div><h1 class="hub-title">${esc(T.appName)}</h1><p class="muted hub-lead">${lead}</p></div>
+      <div class="card hub-today"><div class="card-h">이어서 하기</div>
         <a class="btn primary big hub-cont" href="${this.courseUrl(contCourse, contHash)}">▶ ${contLabel}</a>
-        <div class="hub-stats"><span>문제 코스(수학) 오늘 <b>${Math.min(todayCount, d.dailyGoal)}/${d.dailyGoal}</b></span><span>복습 큐 <b>${rd.reduce((a, x) => a + x.n, 0)}</b>개${rd.length ? ' · ' + rd.map(x => `<a href="${this.courseUrl(x.c, 'review')}">${esc(x.c.name)} ${x.n}</a>`).join(' · ') : ''}</span></div>
+        ${mathOn ? `<div class="hub-stats"><span>${probCourses.map(c => esc(c.name)).join('·')} 오늘 <b>${Math.min(todayCount, d.dailyGoal)}/${d.dailyGoal}</b> 문제</span><span>복습 <b>${rd.reduce((a, x) => a + x.n, 0)}</b>개${rd.length ? ' · ' + rd.map(x => `<a href="${this.courseUrl(x.c, 'review')}">${esc(x.c.name)} ${x.n}</a>`).join(' · ') : ''}</span></div>` : ''}
       </div>
       <h2 class="hub-h">코스</h2>
       <div class="hub-courses">${CONFIG.COURSES.filter(c => !c.space).map(c => this.courseCard(c)).join('')}</div>
       ${CONFIG.COURSES.some(c => c.space) ? `<h2 class="hub-h">공용 <small class="muted">코스 순서와 무관 — 언제든</small></h2><div class="hub-courses hub-spaces">${CONFIG.COURSES.filter(c => c.space).map(c => this.courseCard(c)).join('')}</div>` : ''}
-      <div class="muted small center hub-foot">${T.appName} v${CONFIG.APP_VERSION} · <b>완전 무료</b> · 계정 없음 · 진행은 내 기기에만 저장(설정에서 백업·기기 연동) · 한 번 연 뒤엔 오프라인도 OK</div>
+      <div class="muted small center hub-foot">${T.appName} v${CONFIG.APP_VERSION} · <b>완전 무료</b> · 사이트 가입 없음 · 진행은 내 기기에만 저장(설정에서 백업·기기 연동) · 한 번 연 뒤엔 오프라인도 OK</div>
     </div>`;
   },
   courseCard(c) {

@@ -1,4 +1,4 @@
-// courses/math/content.js — 수학 공간 콘텐츠 (v2.3.0 M1: 영역 1·3·5, 노드 25개 · v2.3.2 보강 +3 = 28개 · 콘텐츠팀 C10 영역 4 +6 = 34개 · C10 2부 영역 2 +4 = 38개 · 11/4 보강 영역 3·4·5 +7 = 45개). EXPANSION.md 14절.
+// courses/math/content.js — 수학 공간 콘텐츠 (v2.3.0 M1: 영역 1·3·5, 노드 25개 · v2.3.2 보강 +3 = 28개 · 콘텐츠팀 C10 영역 4 +6 = 34개 · C10 2부 영역 2 +4 = 38개 · 11/4 보강 영역 3·4·5 +7 = 45개). docs/EXPANSION.md 14절.
 //   노드 = 레슨 스키마 + { subtitle, level, stars(1~3), prereq:[id], uses:[], star(대학 맛보기), icon, params:[{id,label,min,max,step,default,unit}] }
 //   pages[0] 은 반드시 figure(만지는 그림): { title, scene(쓰임 한 컷), figure:{kind,...}, html(3줄 이내), observe:[질문] }
 //   pages[1] 은 식과 코드: { title, html, formula:[{latex, note}], example:{code} } — 슬라이더 ↔ 코드의 `id = 값` 줄이 동기화된다

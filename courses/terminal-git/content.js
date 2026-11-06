@@ -1,5 +1,5 @@
 // courses/terminal-git/content.js — 코스 3 터미널·Git (Phase 2, v2.7.0 뼈대). 레슨 20개 중 T0(완성 본보기)·TB1(보스 미션)만 채워져 있고 나머지는 draft:true(「준비 중」).
-// 채우는 규칙은 specs/content-team.md 「C-T 터미널·Git 채우기」, 설계는 EXPANSION.md 6절·DESIGN.md 16절. 파이썬/알고리즘 content.js 와 같은 전역 const 구조(엔진이 그대로 읽는다).
+// 채우는 규칙은 specs/content-team.md 「C-T 터미널·Git 채우기」, 설계는 docs/EXPANSION.md 6절·docs/DESIGN.md 16절. 파이썬/알고리즘 content.js 와 같은 전역 const 구조(엔진이 그대로 읽는다).
 //
 // 이 코스의 문제 유형과 필드 (화면: core/ui-views-shell.js · 셸: core/runners/shell.js · 채점 키: core/engine.js 끝 Grader.matchState · 검사: tools/validate/terminal-git.mjs · 정답 실행: tools/run_shell_solutions.mjs)
 //   type:'mission'  미션형. setup:{cwd?, tree, git?, remote?}(shell.js 머리말) · goals:[{text, expect:{...}}](실시간 체크리스트, 명령마다 Shell.state()와 대조)

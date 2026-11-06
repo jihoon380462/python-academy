@@ -1,4 +1,4 @@
-// core/ui-views-math.js — 수학 공간 화면 (v2.3.0, EXPANSION.md 14절 M1). 이 파일은 수학 코스 페이지에서만 로드된다.
+// core/ui-views-math.js — 수학 공간 화면 (v2.3.0, docs/EXPANSION.md 14절 M1). 이 파일은 수학 코스 페이지에서만 로드된다.
 //   Views.mathHome   지식 지도(영역별 노드 + 선수 관계 선 + 숙련도 링) · "이미 쓰고 있는 수학" 카드 · 테마 경로
 //   MathUI.lessonFigure(host, lesson, page, editor)  레슨 페이지의 만지는 그림 + 파라미터 슬라이더 ↔ 예제 코드 변수 동기화
 //   MathUI.formula(host, list)  KaTeX(있으면) 또는 글자 수식

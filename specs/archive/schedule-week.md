@@ -5,17 +5,17 @@
 ## 0. 이번 주 임시 규칙 (workflow 1절·8절의 예외, 11/5까지)
 
 1. **릴리스 당번 = 유지보수팀(Opus)**. (11/6 부터 권한 구분 없음 — workflow 1절) 절차는 4절. 사용자가 GitHub 에서 PR 「Merge」 버튼을 누르는 것도 같은 효과(그 뒤 릴리스 커밋만 유지보수팀).
-2. **아래 3절의 `[core]` 항목은 Opus 가 해도 된다** — 파일·함수·바꿀 내용이 전부 적혀 있으므로 workflow 1절 "지시서에 파일과 단계가 적힌 core 수정"에 해당. 커밋 접두 `[core]`, 적힌 범위 밖은 건드리지 않는다. 적힌 대로 해도 안 되면 QA.md 에 「Fable 재확인」으로 남기고 넘어간다.
+2. **아래 3절의 `[core]` 항목은 Opus 가 해도 된다** — 파일·함수·바꿀 내용이 전부 적혀 있으므로 workflow 1절 "지시서에 파일과 단계가 적힌 core 수정"에 해당. 커밋 접두 `[core]`, 적힌 범위 밖은 건드리지 않는다. 적힌 대로 해도 안 되면 docs/QA.md 에 「Fable 재확인」으로 남기고 넘어간다.
 3. 수학 `courses/math/content.js` 는 콘텐츠팀이 **영역 4·2 노드 추가(C10)** 로 쓴다(Fable M2 core 는 목요일 이후). 단 새 그림 kind·새 문제 type 은 만들지 않는다 — 기존 16종으로 되는 노드만.
 
 ## 1. 시간표 (팀별 · 하루 단위, 릴리스 창은 매일 18:00)
 
 | | 월 11/2 (오후) | 화 11/3 | 수 11/4 | 목 11/5 |
 | --- | --- | --- | --- | --- |
-| **QA팀** | 2회전: 알고·수학 정적 전수 검사(퀴즈 ans·why·수식·숫자 답 재계산) → QA.md | 2회전 마무리 + v2.3.8 재검(전날 릴리스분) | 3회전: C6~C8·C10 신규 콘텐츠 + core 수정 15건 재현 확인 | 4회전: 전체 회귀 + 사용자 브라우저 확인 항목 정리 → Fable 인수인계 표 |
+| **QA팀** | 2회전: 알고·수학 정적 전수 검사(퀴즈 ans·why·수식·숫자 답 재계산) → docs/QA.md | 2회전 마무리 + v2.3.8 재검(전날 릴리스분) | 3회전: C6~C8·C10 신규 콘텐츠 + core 수정 15건 재현 확인 | 4회전: 전체 회귀 + 사용자 브라우저 확인 항목 정리 → Fable 인수인계 표 |
 | **유지보수팀** | 3절 core 항목 **A그룹(#4·#6·#7·#9·#10·#11·#15, 한 줄짜리)** → `fix/core-a` PR · 18:00 릴리스 당번 | 3절 **B그룹(#1·#2·#8·#12·#14, 함수 하나)** + **D그룹(U-1·U-2 사용자 제보)** → PR · QA 2회전 열림 항목 · 릴리스 | 3절 **C그룹(#3 모의고사·#5·#13·#32)** · QA 3회전 항목 · 릴리스 | 남은 열림 전부 · 릴리스 · HANDOFF 상태판을 Fable 용으로 정리 |
 | **콘텐츠팀** | C6 파이썬 L9~L18 힌트 점검 → PR | C7 알고 힌트 점검 → PR · C8 알고 실전 연습 6문제 → PR | **C10 수학 영역 4 노드 6개**(아래 5절) → PR | **C10 수학 영역 2 노드 4개** → PR · C9 난이도 표기 |
-| **아트팀** | A0 90장 전수 재검수 → IMAGES.md 메모 PR | A1 6차 요청서: 영역 4·2 아이콘 2 + 영역 뱃지 2 + (자리 생기면) 노드 아이콘 — IMAGES.md 3절 | ChatGPT 납품 검수 → `art/6차` PR | 반려분 재검수 · 7차 요청서 초안(레슨 머리 그림 자리는 Fable 에게 제안만) |
+| **아트팀** | A0 90장 전수 재검수 → docs/IMAGES.md 메모 PR | A1 6차 요청서: 영역 4·2 아이콘 2 + 영역 뱃지 2 + (자리 생기면) 노드 아이콘 — docs/IMAGES.md 3절 | ChatGPT 납품 검수 → `art/6차` PR | 반려분 재검수 · 7차 요청서 초안(레슨 머리 그림 자리는 Fable 에게 제안만) |
 | **ChatGPT** | — | 6차 생성 시작 | 납품 | 반려분 재생성 |
 | **사용자** | GitHub main 보호 규칙 켜기(workflow 8절 6) · 18:00 PR 머지 확인 | 블록 문제·KaTeX·모의고사 시간을 실제 폰에서 한 번(QA #13·#14) | 폰 QA | Fable 호출: 「목요일 인수인계 읽고 M2 시작」 |
 
@@ -28,7 +28,7 @@
 - `core/config.js` 의 total/lessons 숫자는 PR 마다 바뀐다 → 충돌 나면 **실제 수(validate 가 알려 줌)** 로 맞춘다.
 - 릴리스 커밋만 `APP_VERSION`·`sw.js`·HTML `?v=` 를 바꾼다(팀 PR 은 금지).
 
-## 3. 유지보수팀에게 위임하는 `[core]` 수정 (QA.md 1회전, 파일·내용 지정)
+## 3. 유지보수팀에게 위임하는 `[core]` 수정 (docs/QA.md 1회전, 파일·내용 지정)
 
 A그룹 — 한 줄:
 - **#4** `core/ui-core.js` `go(...)`: `Store.data.last = {...}` 바로 뒤에 `Store.save();` 추가.
@@ -52,20 +52,20 @@ C그룹 — 조금 큼:
 - **#13** 콘텐츠: `courses/python/content.js` L5P6 힌트 2 를 블록 5칸 전제 없이 — 「출력 블록 하나에 글자 합치기(f"{n} x {i} = {n * i}") 블록을 넣으세요」 식으로(정답 코드와 같은 출력이 나오게).
 - **#32** 콘텐츠: `courses/math/content.js` M5_dist 첫 그림 `vecs` 의 `label` 을 레슨 글과 같게 `'A'`·`'B'`, 안내 문구(`b − a`)도 `B − A` 로 맞추거나 레슨 글을 소문자로 — 한쪽으로 통일.
 
-D그룹 — 사용자 플레이 제보(11/2 14:30, 수학 탐구 퀴즈). QA.md 에는 **다음 빈 번호**로 행을 추가한다(QA 2회전이 #34~#59 를 써서 아래 U-1·U-2 는 임시 표기):
+D그룹 — 사용자 플레이 제보(11/2 14:30, 수학 탐구 퀴즈). docs/QA.md 에는 **다음 빈 번호**로 행을 추가한다(QA 2회전이 #34~#59 를 써서 아래 U-1·U-2 는 임시 표기):
 - **U-1 탐구 퀴즈 잠금 조건** `core/ui-views-math.js` `MathUI.modeExplore`: 지금은 그림을 아무렇게나 움직이면 보기가 열림. 문제에 `unlockWhen: (p) => 조건` 함수가 있으면 **그 조건이 참이 될 때만** 열리게 — `onChange: (np) => { if (p.unlockWhen && !p.unlockWhen(np)) return; …보기 활성… }`, 게이트 문구도 `p.unlockText || '🎚 먼저 위 그림을 움직여 보세요 — 그래야 보기가 열려요'`. 콘텐츠: `courses/math/content.js` 의 M1_mod_q2 에 `unlockWhen: (p) => p.n % p.m === 0, unlockText: '🎚 n을 m의 배수로 맞추면 보기가 열려요'` 추가. 같은 식으로 지문이 "~로 맞춰 보세요"인 탐구 퀴즈(M1_gcd_q2 서로소 `gcd(p.a,p.b)===1`, M1_seq_q2 `p.r === 1`, M3_cond_q2 `p.pab === p.pa * p.pb / 100`, M5_add_q1 정반대, M5_dot_q1 내적 0 등 — 조건을 쓸 수 있는 것만)에도 붙인다. `tools/validate_content.mjs` 에 `unlockWhen` 이 있으면 함수인지 검사 한 줄.
 - **U-2 모바일에서 그림 글자 잘림** `core/figure.js` `Fig.kinds.modring.draw`: 오른쪽 설명(`${n} = ${m} × …`, `12칸 원을 1바퀴 돌고 11칸 더`)이 폰 폭(390px)에서 캔버스 밖으로 나감. `W < 480` 이면 원을 위쪽 가운데(cx = W/2, R 작게)에 두고 글자 네 줄을 원 아래에 가운데 정렬로 쌓는다. 다른 kind 도 같은 규칙으로 점검(euclid·floatline·montecarlo·cells 의 오른쪽 글자).
 
-각 그룹 = 브랜치 하나(`fix/core-a` 등) = PR 하나. 커밋 제목 `[core] QA #4 #6 #7 …: 한 줄 수정 7건`. PR 본문에 항목 번호와 확인 방법. QA.md 해당 행 상태를 「닫힘 [core] PR#n (Fable 검토 대기)」로.
+각 그룹 = 브랜치 하나(`fix/core-a` 등) = PR 하나. 커밋 제목 `[core] QA #4 #6 #7 …: 한 줄 수정 7건`. PR 본문에 항목 번호와 확인 방법. docs/QA.md 해당 행 상태를 「닫힘 [core] PR#n (Fable 검토 대기)」로.
 
 ## 4. 릴리스 당번 절차 (유지보수팀, 매일 18:00)
 
 1. `git fetch origin && git switch main && git reset --hard origin/main`
-2. `gh api "repos/jihoon380462/python-academy/pulls?state=open" -q '.[] | "\(.number) \(.head.ref) \(.title)"'` 로 열린 PR 확인. 각 PR 의 `PR Check` 가 초록인지: `gh api "repos/jihoon380462/python-academy/commits/<브랜치 최신 sha>/check-runs" -q '.check_runs[] | "\(.name) \(.conclusion)"'`. 빨간 PR 은 건너뛰고 낸 팀에 알린다(QA.md 맨 위 「릴리스 메모」).
+2. `gh api "repos/jihoon380462/python-academy/pulls?state=open" -q '.[] | "\(.number) \(.head.ref) \(.title)"'` 로 열린 PR 확인. 각 PR 의 `PR Check` 가 초록인지: `gh api "repos/jihoon380462/python-academy/commits/<브랜치 최신 sha>/check-runs" -q '.check_runs[] | "\(.name) \(.conclusion)"'`. 빨간 PR 은 건너뛰고 낸 팀에 알린다(docs/QA.md 맨 위 「릴리스 메모」).
 3. 초록 PR 을 순서대로 `git merge --no-edit origin/<브랜치>` (충돌 나면 2절 규칙으로 해결 — `core/config.js` 숫자는 validate 가 말해 주는 실제 수).
 4. 게이트: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py && node tools/test_shell.mjs && python3 tools/regress.py` — 하나라도 실패하면 **배포하지 않는다**. 원인 PR 을 되돌리고(`git reset --hard origin/main` 후 그 PR 빼고 다시) 낸 팀에 알린다.
 5. 릴리스 커밋: `core/config.js` `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG `## 미배포` 아래 항목들을 `## vX.Y.Z — 날짜 (릴리스 당번 Opus)` 머리글 아래로 옮기고 `## 미배포` 는 비워 둠 → HANDOFF 0절 상태판 「현재 버전」「마지막 작업 (Opus·유지보수 릴리스)」 → `git commit -m "vX.Y.Z: 릴리스 — PR #n, #m"` → `git push origin main` (main 보호가 켜져 있으면 `release/vX.Y.Z` 브랜치로 PR 을 내고 사용자가 Merge).
-6. `gh run list --workflow "Deploy to GitHub Pages" --limit 1` 이 `completed success` 인지 확인. 실패면 `gh run view <id> --log-failed` 를 QA.md 릴리스 메모에 붙이고 멈춘다.
+6. `gh run list --workflow "Deploy to GitHub Pages" --limit 1` 이 `completed success` 인지 확인. 실패면 `gh run view <id> --log-failed` 를 docs/QA.md 릴리스 메모에 붙이고 멈춘다.
 7. 사용자에게 보고: 버전, 들어간 PR 번호, 확인할 화면.
 
 ## 5. 콘텐츠팀 C10 — 수학 영역 4·2 노드 (기존 그림 종류만, Fable M2 의 콘텐츠 선행분)
@@ -89,20 +89,20 @@ D그룹 — 사용자 플레이 제보(11/2 14:30, 수학 탐구 퀴즈). QA.md 
 
 ## 6. 목요일 Fable 인수인계 (QA팀 4회전이 정리)
 
-- QA.md: 열림 중 「Fable 재확인」·「Fable」 담당만 모아 맨 위에 표. `[core]` PR 번호 목록(검토 대상).
+- docs/QA.md: 열림 중 「Fable 재확인」·「Fable」 담당만 모아 맨 위에 표. `[core]` PR 번호 목록(검토 대상).
 - HANDOFF 상태판: 이번 주 릴리스 버전들과 들어간 PR.
-- IMAGES.md: 6차 결과, 7차 초안.
+- docs/IMAGES.md: 6차 결과, 7차 초안.
 - 콘텐츠: C10 으로 들어간 노드 목록 → Fable 이 M2 core(새 그림 4종 + 나머지 노드 + 색 동기화)를 그 위에 얹는다.
 
 ## 7. 단일 세션 모드 첫 메시지 (Opus 채팅 하나로 전부)
 
 ```
-저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/schedule-week.md → QA.md 순서로 읽어.
+저장소 github.com/jihoon380462/python-academy 를 당기고 HANDOFF.md → specs/workflow.md → specs/archive/schedule-week.md → docs/QA.md 순서로 읽어.
 이번 주는 네가 QA·유지보수·콘텐츠·아트 네 팀 역할을 혼자 순서대로 한다. 매일 이 순서로:
 ① 릴리스 당번(schedule-week 4절): 열린 PR 중 초록을 병합해 release/ 브랜치로 PR → 나한테 알림
 ② schedule-week 1절 오늘 날짜 줄의 유지보수 → 콘텐츠 → 아트 → QA 순으로 각 팀 지시서(specs/*-team.md)대로 처리, 과제마다 브랜치 하나·PR 하나
 ③ 끝나면 내일 줄을 당겨서 계속. 할 게 없으면 멈추고 보고.
-규칙: main 직접 푸시 금지, APP_VERSION·stamp·HANDOFF 상태판은 릴리스 커밋에서만, core는 schedule-week 3절에 적힌 것만 [core]로. 사용자 제보는 QA.md에 행 추가 후 유지보수 절차로.
+규칙: main 직접 푸시 금지, APP_VERSION·stamp·HANDOFF 상태판은 릴리스 커밋에서만, core는 schedule-week 3절에 적힌 것만 [core]로. 사용자 제보는 docs/QA.md에 행 추가 후 유지보수 절차로.
 지금 바로 ①부터 시작해.
 ```
-채팅이 길어지면 새 채팅에 같은 메시지. 상태는 전부 저장소(QA.md·HANDOFF·PR)에 있다.
+채팅이 길어지면 새 채팅에 같은 메시지. 상태는 전부 저장소(docs/QA.md·HANDOFF·PR)에 있다.

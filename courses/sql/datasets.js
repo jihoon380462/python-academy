@@ -1,4 +1,4 @@
-// courses/sql/datasets.js — SQL 코스 샘플 데이터셋 (EXPANSION.md 7절). 문제·예제를 열 때마다 이 SQL 로 메모리 DB 를 새로 만든다(Sql.fresh(id)).
+// courses/sql/datasets.js — SQL 코스 샘플 데이터셋 (docs/EXPANSION.md 7절). 문제·예제를 열 때마다 이 SQL 로 메모리 DB 를 새로 만든다(Sql.fresh(id)).
 // 키 = 데이터셋 id (문제의 p.sql.dataset · 예제의 example.dataset). 값 = CREATE TABLE + INSERT 문장(전부 결정적 값, 난수·현재 시각 없음).
 //
 // cafe(동네 카페) — 뼈대 크기: menu 10 · customers 8 · orders 30 · order_items 60 · staff 4 · shifts 12.

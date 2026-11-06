@@ -1,11 +1,11 @@
-// core/runners/sql.js — SQL 러너 (v2.7.0 뼈대, EXPANSION.md 7절). sql.js(SQLite wasm) 를 CDN 에서 받아 브라우저 안에서 진짜 SQLite 를 돌린다.
+// core/runners/sql.js — SQL 러너 (v2.7.0 뼈대, docs/EXPANSION.md 7절). sql.js(SQLite wasm) 를 CDN 에서 받아 브라우저 안에서 진짜 SQLite 를 돌린다.
 //   Sql.start()            엔진 받기(한 번만). 실패하면 Sql.unavailable = true, Sql.reason 에 이유 — 화면은 「SQLite 엔진을 받지 못했어요」 + 재시도
 //   Sql.ready              엔진 준비 여부 · Sql.onState(fn) 상태 바뀔 때 알림
 //   Sql.fresh(datasetId)   SQL_DATASETS[datasetId](courses/<코스>/datasets.js) 로 새 메모리 DB
 //   Sql.exec(db, query)    → { columns, rows, ms, changes } 또는 { error: { msg(SQLite 원문), ko(한국어 풀이) } }. 여러 문장이면 마지막 결과 집합
 //   Sql.explain(msg, db)   SQLite 에러 → 한국어 풀이(흔한 것 7개 + 비슷한 표·열 이름 추천)
 //   Sql.isDangerous(query) WHERE 없는 DELETE/UPDATE 면 { kind } (실행은 하되 화면이 「모든 행이 바뀌었어요!」 경고)
-//   CDN 주소는 CONFIG 를 건드리지 않고 여기 상수로 둔다(코스 플러그인 규칙, DESIGN.md 16절). sw.js 캐시 대상이 아니라 처음엔 인터넷이 필요하다.
+//   CDN 주소는 CONFIG 를 건드리지 않고 여기 상수로 둔다(코스 플러그인 규칙, docs/DESIGN.md 16절). sw.js 캐시 대상이 아니라 처음엔 인터넷이 필요하다.
 const Sql = {
   VERSION: '1.13.0',
   URL: 'https://cdn.jsdelivr.net/npm/sql.js@1.13.0/dist/sql-wasm.js',   // + 같은 폴더의 sql-wasm.wasm (locateFile)

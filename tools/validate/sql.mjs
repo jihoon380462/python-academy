@@ -1,4 +1,4 @@
-// tools/validate/sql.mjs — 데이터베이스(SQL) 코스 전용 필드 규칙. validate_content.mjs 가 코스 sql 을 검사할 때 부른다 (DESIGN.md 16절).
+// tools/validate/sql.mjs — 데이터베이스(SQL) 코스 전용 필드 규칙. validate_content.mjs 가 코스 sql 을 검사할 때 부른다 (docs/DESIGN.md 16절).
 //   sql 유형: p.sql.dataset 이 courses/sql/datasets.js 의 SQL_DATASETS 키에 있어야 함 · p.sql.expect.kind 는 'rows'|'state' · solution 은 문자열 · state 면 expect.table · xp 는 선택(없으면 CONFIG.XP.sql)
 //   레슨 예제 { sql } 의 dataset 도 같은 규칙. 정답 쿼리 실행 검증은 tools/run_sql_solutions.py(Python sqlite3).
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';

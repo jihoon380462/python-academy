@@ -1,4 +1,4 @@
-// courses/web/content.js — 코스 5 웹·HTTP·API (Phase 4 → v2.7.0 뼈대). 설계: EXPANSION.md 8절, 플러그인 계약: DESIGN.md 16절, 채우기 지시: specs/content-team.md 「C-W」 절.
+// courses/web/content.js — 코스 5 웹·HTTP·API (Phase 4 → v2.7.0 뼈대). 설계: docs/EXPANSION.md 8절, 플러그인 계약: docs/DESIGN.md 16절, 채우기 지시: specs/content-team.md 「C-W」 절.
 // 파이썬/알고리즘 content.js 와 같은 전역 const 구조(엔진이 그대로 읽는다). 로직 없음.
 //
 // 이 코스의 문제 유형
