@@ -62,10 +62,10 @@ sys.stdin = open("input.txt", encoding="utf-8")</pre>이러면 아래의 <code>i
 <div class="bk-step-box"><b>① 걸린 시간 재기</b><pre>import time
 t = time.perf_counter()
 total = sum(range(10_000_000))
-print(round(time.perf_counter() - t, 3), "초")</pre>시작 전 시각을 적어 두고, 끝난 뒤 시각에서 빼요(레슨 0). 숫자는 컴퓨터마다 달라요 — <b>n 을 2배로 했을 때 몇 배가 되나</b>를 보세요.</div>
+print(round(time.perf_counter() - t, 3), "초")</pre>시작 전 시각을 적어 두고, 끝난 뒤 시각에서 빼요([[레슨:A0]]). 숫자는 컴퓨터마다 달라요 — <b>n 을 2배로 했을 때 몇 배가 되나</b>를 보세요.</div>
 <div class="bk-step-box"><b>② 안 끝날 때 멈추기</b><br>터미널을 한 번 누르고 <kbd>Ctrl</kbd>+<kbd>C</kbd>. <code>KeyboardInterrupt</code> 가 나오며 멈춰요. 무한 반복이거나 너무 느린 풀이예요.</div>
 <div class="bk-step-box"><b>③ 재귀가 깊으면</b><br><code>RecursionError: maximum recursion depth exceeded</code> 는 재귀가 1000번쯤 넘게 들어갔다는 뜻이에요. 기저 조건이 빠졌는지 먼저 보고, 정말 깊은 거면 맨 위에<pre>import sys
-sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).</div>
+sys.setrecursionlimit(10**6)</pre>([[레슨:A20]] 「입출력과 재귀 함정」).</div>
 <div class="bk-step-box"><b>④ 한 줄씩 따라가기(VS Code)</b><br>줄 번호 왼쪽을 눌러 빨간 점(중단점) → <kbd>F5</kbd> → 「Python Debugger: Debug Python File」. 왼쪽 <b>변수</b> 칸에 <code>stack</code>·<code>queue</code> 같은 값이 보이고 <kbd>F10</kbd> 으로 한 줄씩 내려가요. 이 교과서 레슨의 「👣 한 줄씩 보기」 와 같은 일이에요.</div>` },
       { title: '4. 이 교과서 쓰는 법', html: `<p>이 사이트는 문제집이 아니라 <b>옆에 펴 두는 교과서</b>예요. 점수·잠금·순서 강요가 없어요.</p>
 <div class="bk-step-box"><b>① 레슨 읽기 + 그림으로 보기</b><br>레슨은 기법 하나씩 설명해요. 예제 아래 <b>👀 그림으로 보기</b> 를 누르면 그 예제 코드가 브라우저에서 돌며 리스트 막대·스택·트리·그래프가 움직여요. <b>👣 한 줄씩 보기</b> 는 줄마다 변수 값을 표로 보여 줘요. 처음 한 번은 파이썬 엔진을 받느라 몇 초 걸려요.</div>
@@ -82,8 +82,8 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     { name: '최대 힙: heappush(h, -x)', desc: 'heapq 는 최소 힙뿐 — 부호를 바꿔 넣고 꺼낼 때 다시 바꿔요.', code: 'import heapq\nh = []\nfor x in [5, 1, 4]:\n    heapq.heappush(h, -x)\nprint(-heapq.heappop(h))', output: '5', ref: 'A11/3' },
     { name: 'bisect.bisect_left · bisect_right', desc: '정렬된 리스트에서 끼워 넣을 자리를 O(log n) 에. x 미만 개수 = bisect_left, x 이하 개수 = bisect_right.', code: 'import bisect\na = [1, 3, 3, 7]\nprint(bisect.bisect_left(a, 3), bisect.bisect_right(a, 3))\nprint(len(a) - bisect.bisect_left(a, 3), "개가 3 이상")', output: '1 3\n3 개가 3 이상', ref: 'A7/3' },
     { name: 'collections.Counter', desc: '개수 세기 딕셔너리. most_common(k) 로 많은 순 k개.', code: 'from collections import Counter\nc = Counter("banana")\nprint(c["a"], c["z"])\nprint(c.most_common(2))', output: '3 0\n[(\'a\', 3), (\'n\', 2)]', ref: 'A8/1' },
-    { name: 'collections.defaultdict', desc: '없는 키를 처음 쓰면 기본값(list 면 [], int 면 0)을 만들어 줘요. 그룹 묶기·인접 리스트에.', code: 'from collections import defaultdict\ng = defaultdict(list)\nfor a, b in [(1, 2), (1, 3), (2, 3)]:\n    g[a].append(b)\nprint(dict(g))', output: '{1: [2, 3], 2: [3]}', ref: 'A16/4' },
-    { name: 'sorted(목록, key=lambda x: (…, …))', desc: '기준이 여러 개면 튜플로. 큰 것부터는 숫자에 - 를 붙여요.', code: 'rows = [("민수", 90), ("영희", 95), ("철수", 90)]\nprint(sorted(rows, key=lambda r: (-r[1], r[0])))', output: '[(\'영희\', 95), (\'민수\', 90), (\'철수\', 90)]', ref: 'A6/5' },
+    { name: 'collections.defaultdict', desc: '없는 키를 처음 쓰면 기본값(list 면 [], int 면 0)을 만들어 줘요. 그룹 묶기·인접 리스트에.', code: 'from collections import defaultdict\ng = defaultdict(list)\nfor a, b in [(1, 2), (1, 3), (2, 3)]:\n    g[a].append(b)\nprint(dict(g))', output: '{1: [2, 3], 2: [3]}', ref: 'A16B/1' },
+    { name: 'sorted(목록, key=lambda x: (…, …))', desc: '기준이 여러 개면 튜플로. 큰 것부터는 숫자에 - 를 붙여요.', code: 'rows = [("민수", 90), ("영희", 95), ("철수", 90)]\nprint(sorted(rows, key=lambda r: (-r[1], r[0])))', output: '[(\'영희\', 95), (\'민수\', 90), (\'철수\', 90)]', ref: 'A6B/1' },
     { name: 'itertools.combinations · permutations', desc: '고르기(순서 없음) · 줄 세우기(순서 있음). 완전탐색에.', code: 'from itertools import combinations, permutations\nprint(list(combinations([1, 2, 3], 2)))\nprint(len(list(permutations("abc"))))', output: '[(1, 2), (1, 3), (2, 3)]\n6', ref: 'A19/1' },
     { name: 'itertools.accumulate', desc: '누적 합을 한 줄로. 앞에 0 을 붙이면 구간 합 = prefix[r+1] - prefix[l].', code: 'from itertools import accumulate\na = [3, 1, 4, 1, 5]\nprefix = [0] + list(accumulate(a))\nprint(prefix)\nprint(prefix[4] - prefix[1])', output: '[0, 3, 4, 8, 9, 14]\n6', ref: 'A15/4' },
     { name: 'functools.lru_cache', desc: '함수 결과를 기억해 같은 계산을 다시 안 함(메모이제이션).', code: 'from functools import lru_cache\n@lru_cache(maxsize=None)\ndef fib(n):\n    return n if n < 2 else fib(n - 1) + fib(n - 2)\nprint(fib(80))', output: '23416728348467685', ref: 'A14/0' },
@@ -112,8 +112,8 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     'A5/3': '삽입 정렬: key = a[i] 를 끼워 넣기',
     'A6/0': '병합 정렬 merge_sort: 나누고 합치기',
     'A6/2': '퀵 정렬: pivot 으로 가르기',
-    'A6/4': 'sorted(목록, key=…): 실전은 sorted 와 key',
-    'A6/5': 'key=lambda x: (기준1, 기준2): 기준이 여러 개일 때',
+    'A6B/0': 'sorted(목록, key=…): 실전은 sorted 와 key',
+    'A6B/1': 'key=lambda x: (기준1, 기준2): 기준이 여러 개일 때',
     'A7/0': '이진 탐색 mid = (lo + hi) // 2: 업다운 게임',
     'A7/2': 'while lo <= hi: 없는 값을 찾으면 -1',
     'A7/3': 'bisect.bisect_left: 끼워 넣을 자리',
@@ -148,9 +148,9 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     'A15/4': '누적 합 prefix[r + 1] - prefix[l]',
     'A16/0': '문자열 s[i] · s[a:b]: 글자 띠',
     'A16/2': '회문: lo · hi 양끝에서 가운데로',
-    'A16/3': 'c[ch] = c.get(ch, 0) + 1: 글자 개수로 비교하기',
-    'A16/4': '"".join(sorted(w)) 열쇠: 아나그램끼리 묶기',
-    'A16/6': 'result += ch 의 숨은 비용 → "".join(parts)',
+    'A16B/0': 'c[ch] = c.get(ch, 0) + 1: 글자 개수로 비교하기',
+    'A16B/1': '"".join(sorted(w)) 열쇠: 아나그램끼리 묶기',
+    'A16B/3': 'result += ch 의 숨은 비용 → "".join(parts)',
     'A17/0': 'bin(n): 2진수 읽기',
     'A17/1': '& | ^ << >>: 자리별로 계산하기',
     'A17/2': 'mask |= 1 << k: 비트마스크 = 작은 집합',
@@ -158,16 +158,16 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     'A18/0': '방향 배열 dr · dc: 시키는 대로 정확히',
     'A18/1': 'd = (d + 1) % 4: 회전은 번호 더하기',
     'A18/2': '0 <= r < R and 0 <= c < C: 범위 검사와 명령 분기',
-    'A18/4': 'new = a[:] 로 따로: 동시에 바뀌는 규칙',
+    'A18B/1': 'new = a[:] 로 따로: 동시에 바뀌는 규칙',
     'A19/0': 'itertools permutations · combinations: 다 해 보면 된다',
-    'A19/2': '백트래킹 path.append → 재귀 → path.pop()',
+    'A19B/0': '백트래킹 path.append → 재귀 → path.pop()',
     'A20/2': 'sys.stdin.read() · setrecursionlimit: 입출력과 재귀 함정',
   },
   pages: {
     'A0/0': { rep: [['🎚 슬라이더로 <code>n</code>을 키워 보세요.', 'VS Code 에서 코드 위쪽 <code>n = 1000000</code> 의 숫자를 키워 다시 실행해 보세요.']] },
-    'A0/4': { title: '이 교과서에서 하는 것', html: '<p>이 코스는 <b>코드가 돌아가는 모습을 눈으로 보면서</b> 배워요. 레슨 예제 아래 <b>👀 그림으로 보기</b> 를 누르면 그 예제가 브라우저에서 돌며 변수가 바뀌는 순간마다 그림이 움직이고, 지금 실행 중인 줄이 코드 칸에서 노랗게 칠해져요. 예제에 따라 <b>👣 한 줄씩 보기</b> 버튼도 있어요 — 줄마다 변수 값을 표로 보여 줘요.</p><p>아래 예제는 옆 두 칸을 비교해 큰 값을 뒤로 보내요. <code>[5, 3, 8, 1, 4]</code>에서 j = 0: 5 > 3 이라 바꿈 → [3, 5, 8, 1, 4] · j = 1: 5 &lt; 8 그대로 · j = 2: 8 > 1 바꿈 → [3, 5, 1, 8, 4] · j = 3: 8 > 4 바꿈 → <b>[3, 5, 1, 4, 8]</b>. 가장 큰 8이 맨 뒤로 갔어요(레슨 5의 버블 정렬).</p><p>직접 짜는 건 <b>VS Code</b> 에서 해요. 레슨 마지막 쪽 <b>「🛠 만들어 보기」</b> 의 문제를 빈 파일에서 풀고, 문제에 붙은 「필요한 문법」 을 누르면 그 설명으로 가요. 내 코드도 한 줄씩 보고 싶으면 VS Code 디버거(시작하기 3 ④)를 써요.</p><p>「패턴」 챕터 끝에는 진짜 코딩테스트 같은 <b>모의고사 15문제</b>가 있어요.</p>' },
+    'A0/4': { title: '이 교과서에서 하는 것', html: '<p>이 코스는 <b>코드가 돌아가는 모습을 눈으로 보면서</b> 배워요. 레슨 예제 아래 <b>👀 그림으로 보기</b> 를 누르면 그 예제가 브라우저에서 돌며 변수가 바뀌는 순간마다 그림이 움직이고, 지금 실행 중인 줄이 코드 칸에서 노랗게 칠해져요. 예제에 따라 <b>👣 한 줄씩 보기</b> 버튼도 있어요 — 줄마다 변수 값을 표로 보여 줘요.</p><p>아래 예제는 옆 두 칸을 비교해 큰 값을 뒤로 보내요. <code>[5, 3, 8, 1, 4]</code>에서 j = 0: 5 > 3 이라 바꿈 → [3, 5, 8, 1, 4] · j = 1: 5 &lt; 8 그대로 · j = 2: 8 > 1 바꿈 → [3, 5, 1, 8, 4] · j = 3: 8 > 4 바꿈 → <b>[3, 5, 1, 4, 8]</b>. 가장 큰 8이 맨 뒤로 갔어요([[레슨:A5]]의 버블 정렬).</p><p>직접 짜는 건 <b>VS Code</b> 에서 해요. 레슨 마지막 쪽 <b>「🛠 만들어 보기」</b> 의 문제를 빈 파일에서 풀고, 문제에 붙은 「필요한 문법」 을 누르면 그 설명으로 가요. 내 코드도 한 줄씩 보고 싶으면 VS Code 디버거(시작하기 3 ④)를 써요.</p><p>「패턴」 챕터 끝에는 진짜 코딩테스트 같은 <b>모의고사 15문제</b>가 있어요.</p>' },
     'A1/0': { rep: [['🎚 슬라이더로 n을 바꿔 보세요.', '코드의 <code>n = 8</code> 을 바꿔 다시 실행해 보세요.']] },
-    'A16/6': { rep: [['<code>n</code> 슬라이더를 키워 보세요.', '코드의 <code>n = 5</code> 를 키워 다시 실행해 보세요.']] },
+    'A16B/3': { rep: [['<code>n</code> 슬라이더를 키워 보세요.', '코드의 <code>n = 5</code> 를 키워 다시 실행해 보세요.']] },
     'A17/0': { rep: [['<code>n</code> 슬라이더를 움직여 보세요.', '코드의 <code>n = 13</code> 을 여러 값으로 바꿔 실행해 보세요.']] },
     'A20/0': { rep: [['<code>n</code> 슬라이더를 2배로 올리면 시간은 약 4배가 돼요.', '코드의 <code>n = 2000</code> 을 4000 으로 2배 올리면 시간은 약 4배가 돼요.']] },
     'A20/1': { rep: [['<code>n</code> 슬라이더를 바꿔 가며', '코드의 <code>n = 200000</code> 을 바꿔 가며']] },
@@ -214,8 +214,10 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     A6: [
       { title: '두 정렬 리스트 합치기', text: '@prompt', pid: 'A6P2', needs: [['while i < len(left) and j < len(right):', 'A6/1', '두 줄 맨 앞 비교'], ['merged += left[i:] + right[j:]', 'A6/1', '남은 쪽 통째로 붙이기']] },
       { title: '퀵 정렬 구현', text: '@prompt', pid: 'A6P3', needs: [['pivot = a[len(a) // 2]', 'A6/2', '기준값'], ['[x for x in a if x < pivot]', 'A6/2', '작은 묶음 만들기'], ['quick(small) + same + quick(big)', 'A6/3', '나눠서 재귀']] },
-      { title: '점수순 정렬', text: '@prompt', pid: 'A6P4', needs: [['sorted(students, key=lambda s: (-s[1], s[0]))', 'A6/5', '점수 내림차순, 같으면 이름'], ['key=lambda', 'A6/4', '무엇으로 줄 세울지']] },
-      { title: 'key로 길이순', text: '단어를 <b>길이가 짧은 순</b>, 같은 길이면 <b>사전순</b>으로 정렬하려고 해요. 아래 코드의 key 튜플 빈칸 <code>___1___</code> · <code>___2___</code> 를 채워 완성하세요.', pid: 'A6P5', io: [{ output: "['fig', 'kiwi', 'apple', 'banana']" }], needs: [['key=lambda w: (len(w), w)', 'A6/5', '첫 기준 길이, 둘째 기준 글자']] },
+    ],
+    A6B: [
+      { title: '점수순 정렬', text: '@prompt', pid: 'A6P4', needs: [['sorted(students, key=lambda s: (-s[1], s[0]))', 'A6B/1', '점수 내림차순, 같으면 이름'], ['key=lambda', 'A6B/0', '무엇으로 줄 세울지']] },
+      { title: 'key로 길이순', text: '단어를 <b>길이가 짧은 순</b>, 같은 길이면 <b>사전순</b>으로 정렬하려고 해요. 아래 코드의 key 튜플 빈칸 <code>___1___</code> · <code>___2___</code> 를 채워 완성하세요.', pid: 'A6P5', io: [{ output: "['fig', 'kiwi', 'apple', 'banana']" }], needs: [['key=lambda w: (len(w), w)', 'A6B/1', '첫 기준 길이, 둘째 기준 글자']] },
     ],
     A7: [
       { title: '이진 탐색 구현', text: '@prompt', pid: 'A7P3', needs: [['lo, hi = 0, len(a) - 1', 'A7/0', '찾을 범위'], ['mid = (lo + hi) // 2', 'A7/0', '가운데 보기'], ['lo = mid + 1  hi = mid - 1', 'A7/2', '반씩 줄이기, 없으면 -1']] },
@@ -228,8 +230,8 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
       { title: '두 수의 합', text: '@prompt', pid: 'A8P4', needs: [['if target - x in seen:', 'A8/3', '짝이 이미 나왔는지'], ['seen.add(x)', 'A8/3', '본 값 기억']] },
     ],
     AB2: [
-      { title: '성적표 정렬', text: '@prompt', pid: 'AB2P1', needs: [['rows.sort(key=lambda r: (-r[1], r[0]))', 'A6/5', '점수 내림차순, 같으면 이름'], ['name, score = input().split()', 'A12/1', '한 줄을 둘로 나눠 담기'], ['if score != prev:  rank = i + 1', 'A6/5', '같은 점수는 같은 등수']] },
-      { title: '점수 검색', text: '@prompt', pid: 'AB2P2', needs: [['scores = sorted(map(int, line))', 'A6/4', '한 번만 정렬'], ['n - bisect.bisect_left(scores, x)', 'A7/3', 'x 이상인 개수']] },
+      { title: '성적표 정렬', text: '@prompt', pid: 'AB2P1', needs: [['rows.sort(key=lambda r: (-r[1], r[0]))', 'A6B/1', '점수 내림차순, 같으면 이름'], ['name, score = input().split()', 'A12/1', '한 줄을 둘로 나눠 담기'], ['if score != prev:  rank = i + 1', 'A6B/1', '같은 점수는 같은 등수']] },
+      { title: '점수 검색', text: '@prompt', pid: 'AB2P2', needs: [['scores = sorted(map(int, line))', 'A6B/0', '한 번만 정렬'], ['n - bisect.bisect_left(scores, x)', 'A7/3', 'x 이상인 개수']] },
     ],
     // ---------- 챕터 3 연결된 구조 ----------
     A9: [
@@ -255,7 +257,7 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     ],
     AB3: [
       { title: '미로 최단 경로', text: '@prompt', pid: 'AB3P1', needs: [['grid.append(list(map(int, input().split())))', 'A12/1', '격자 읽기'], ['queue.append((nr, nc, d + 1))', 'A12/2', '거리를 같이 넣는 BFS'], ['0 <= nr < R and 0 <= nc < C', 'A12/4', '격자 안인지']] },
-      { title: '친구 추천', text: '@prompt', pid: 'AB3P2', needs: [['graph.setdefault(a, set()).add(b)', 'A12/1', '양방향 친구 관계'], ['for f in graph[me]:  for ff in graph[f]:', 'A12/0', '친구의 친구'], ['sorted(cnt, key=lambda x: (-cnt[x], x))', 'A6/5', '공통 친구 많은 순, 같으면 이름']] },
+      { title: '친구 추천', text: '@prompt', pid: 'AB3P2', needs: [['graph.setdefault(a, set()).add(b)', 'A12/1', '양방향 친구 관계'], ['for f in graph[me]:  for ff in graph[f]:', 'A12/0', '친구의 친구'], ['sorted(cnt, key=lambda x: (-cnt[x], x))', 'A6B/1', '공통 친구 많은 순, 같으면 이름']] },
     ],
     // ---------- 챕터 4 패턴 ----------
     A13: [
@@ -278,18 +280,18 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     AB4: [
       { title: '모의 1: 두 수의 합 개수', text: '@prompt', pid: 'AB4P1', needs: [['seen[K - x]', 'A8/3', '짝이 앞에 몇 번 나왔는지'], ['seen[x] = seen.get(x, 0) + 1', 'A8/1', '나온 횟수 세기']] },
       { title: '모의 2: 괄호 수정 횟수', text: '@prompt', pid: 'AB4P2', needs: [['open_cnt += 1  open_cnt -= 1', 'A2/1', '스택 대신 개수만 세기'], ['(a + 1) // 2 + (b + 1) // 2', 'A2/2', '남은 짝 없는 괄호로 답 계산']] },
-      { title: '모의 3: k번째 수', text: '@prompt', pid: 'AB4P3', needs: [['sorted(a[i - 1:j])[k - 1]', 'A6/4', '잘라서 정렬, k번째(1부터)']] },
+      { title: '모의 3: k번째 수', text: '@prompt', pid: 'AB4P3', needs: [['sorted(a[i - 1:j])[k - 1]', 'A6B/0', '잘라서 정렬, k번째(1부터)']] },
       { title: '모의 4: 수 찾기', text: '@prompt', pid: 'AB4P4', needs: [['A = set(input().split())', 'A8/1', '집합으로 담으면 in 이 O(1)'], ['" ".join(out)', 'A20/2', '한 줄에 띄어쓰기로 출력']] },
       { title: '모의 5: 최소 칸 수 미로', text: '@prompt', pid: 'AB4P5', needs: [['grid = [input().strip() for _ in range(N)]', 'E1/1', '붙어 있는 숫자 줄 읽기'], ['dist[nr][nc] = dist[r][c] + 1', 'A12/2', 'BFS 거리표'], ['for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):', 'A12/4', '상하좌우']] },
       { title: '모의 6: 연속 부분 수열의 최대 합', text: '@prompt', pid: 'AB4P6', needs: [['cur = max(x, cur + x)', 'A14/3', '카데인'], ['best = max(best, cur)', 'A14/3', '지금까지 최고']] },
       { title: '모의 7: 회의실 배정', text: '@prompt', pid: 'AB4P7', needs: [['m.sort(key=lambda x: (x[1], x[0]))', 'A15/0', '끝나는 시간 순'], ['if s >= end:', 'A15/1', '끝=시작은 가능']] },
       { title: '모의 8: 구간 합 구하기', text: '@prompt', pid: 'AB4P8', needs: [['prefix[j] - prefix[i - 1]', 'A15/4', '1부터 세는 구간 합'], ['sys.stdin.readline', 'A20/2', '질의가 많으면 빠른 입력']] },
       { title: '모의 9: 카드 정렬 비용', text: '@prompt', pid: 'AB4P9', needs: [['heapq.heapify(h)', 'A11/3', '묶음 크기를 힙으로'], ['heapq.heappush(h, a + b)', 'A11/4', '가장 작은 두 개를 합쳐 다시']] },
-      { title: '모의 10: 단어 빈도 TOP 3', text: '@prompt', pid: 'AB4P10', needs: [['c[w] = c.get(w, 0) + 1', 'A8/1', '개수 세기'], ['c.items()', 'A8/2', '(단어, 횟수) 짝으로 꺼내기'], ['sorted(…, key=lambda x: (-x[1], x[0]))[:3]', 'A6/5', '많은 순, 같으면 사전순, 3개']] },
+      { title: '모의 10: 단어 빈도 TOP 3', text: '@prompt', pid: 'AB4P10', needs: [['c[w] = c.get(w, 0) + 1', 'A8/1', '개수 세기'], ['c.items()', 'A8/2', '(단어, 횟수) 짝으로 꺼내기'], ['sorted(…, key=lambda x: (-x[1], x[0]))[:3]', 'A6B/1', '많은 순, 같으면 사전순, 3개']] },
       { title: '모의 11: 계단 오르기 (3칸까지)', text: '@prompt', pid: 'AB4P11', needs: [['dp[i] = (dp[i - 1] + dp[i - 2] + dp[i - 3]) % MOD', 'A14/1', '세 칸 전까지 더하기'], ['MOD = 1000000007', 'A14/1', '문제가 시키면 표에 넣을 때마다 % MOD (파이썬은 큰 수도 되지만 느려져요)']] },
       { title: '모의 12: 최단 거리 (가중치)', text: '@prompt', pid: 'AB4P12', needs: [['graph[u].append((v, w))', 'A12/1', '한 방향 간선과 비용(간선 목록 → 그래프)'], ['heapq.heappush(heap, (nd, v))', 'A13/1', '다익스트라'], ['print(d if d != INF else "INF")', 'A13/3', '못 가면 INF']] },
-      { title: '모의 13: 두 포인터로 합 찾기', text: '@prompt', pid: 'AB4P13', needs: [['a.sort()', 'A6/4', '먼저 정렬'], ['lo, hi = 0, n - 1', 'A15/2', '정렬된 리스트의 양끝에서'], ['if s == x:  cnt += 1;  lo += 1;  hi -= 1', 'A15/2', '찾으면 둘 다 안으로']] },
-      { title: '모의 14: 수 정렬하기', text: '@prompt', pid: 'AB4P14', needs: [['a.sort()', 'A6/4', '내장 정렬 O(n log n)'], ['print("\\n".join(map(str, a)))', 'A20/2', '한 번에 출력']] },
+      { title: '모의 13: 두 포인터로 합 찾기', text: '@prompt', pid: 'AB4P13', needs: [['a.sort()', 'A6B/0', '먼저 정렬'], ['lo, hi = 0, n - 1', 'A15/2', '정렬된 리스트의 양끝에서'], ['if s == x:  cnt += 1;  lo += 1;  hi -= 1', 'A15/2', '찾으면 둘 다 안으로']] },
+      { title: '모의 14: 수 정렬하기', text: '@prompt', pid: 'AB4P14', needs: [['a.sort()', 'A6B/0', '내장 정렬 O(n log n)'], ['print("\\n".join(map(str, a)))', 'A20/2', '한 번에 출력']] },
       { title: '모의 15: 연결 요소의 개수', text: '@prompt', pid: 'AB4P15', needs: [['for v in range(1, V + 1):  if not visited[v]:', 'A12/4', '아직 안 간 정점마다 새 덩어리'], ['queue = deque([v])', 'A12/2', '덩어리 하나를 BFS 로 전부 방문']] },
     ],
     // ---------- 챕터 5 실전 ----------
@@ -319,9 +321,12 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
     ],
     // ---------- 챕터 6 한 걸음 더 ----------
     A16: [
+      { title: '단어 점수', text: '@prompt', pid: 'A16P7', needs: [['for ch in s:', 'A16/0', '글자를 하나씩'], ['ord(ch) - 97 + 1', 'A16/1', 'a 에서 몇 번째 글자(1부터)']] },
       { title: '공백·대소문자 무시 회문', text: '@prompt', pid: 'A16P2', needs: [['s = input().replace(" ", "").lower()', 'A16/2', '공백 지우고 소문자로'], ['while lo < hi:  if s[lo] != s[hi]:', 'A16/2', '양끝에서 가운데로']] },
-      { title: '아나그램 그룹', text: '@prompt', pid: 'A16P3', needs: [['key = "".join(sorted(w))', 'A16/4', '글자를 정렬하면 같은 열쇠'], ['groups.setdefault(key, []).append(w)', 'A16/4', '열쇠별로 모으기(딕셔너리는 넣은 순서 유지)']] },
-      { title: '가장 긴 공통 접두사', text: '@prompt', pid: 'A16P5', needs: [['for i in range(len(words[0])):', 'A16/5', '첫 단어 글자를 하나씩'], ['all(len(w) > i and w[i] == ch for w in words)', 'A16/5', '모든 단어가 같은 글자인지']] },
+    ],
+    A16B: [
+      { title: '아나그램 그룹', text: '@prompt', pid: 'A16P3', needs: [['key = "".join(sorted(w))', 'A16B/1', '글자를 정렬하면 같은 열쇠'], ['groups.setdefault(key, []).append(w)', 'A16B/1', '열쇠별로 모으기(딕셔너리는 넣은 순서 유지)']] },
+      { title: '가장 긴 공통 접두사', text: '@prompt', pid: 'A16P5', needs: [['for i in range(len(words[0])):', 'A16B/2', '첫 단어 글자를 하나씩'], ['all(len(w) > i and w[i] == ch for w in words)', 'A16B/2', '모든 단어가 같은 글자인지']] },
     ],
     A17: [
       { title: '2진수 자릿수 세기', text: '@prompt', pid: 'A17P2', needs: [['bin(n)[2:]', 'A17/0', '0b 떼고 2진수 글자'], ['b.count("1")  len(b)', 'A17/0', '1의 개수 · 자릿수']] },
@@ -329,14 +334,20 @@ sys.setrecursionlimit(10**6)</pre>(레슨 24 「입출력과 재귀 함정」).<
       { title: '합이 되는 부분집합', text: '@prompt', pid: 'A17P4', needs: [['for mask in range(1 << n):', 'A17/4', '부분집합 2ⁿ개 전부'], ['if mask & (1 << i):  s += a[i]', 'A17/4', 'i번째를 골랐는지']] },
     ],
     A18: [
+      { title: '명령 사전으로 움직이기', text: '@prompt', pid: 'A18P7', needs: [['move = {"U": (-1, 0), …}', 'A18/2', '명령 → 이동량 딕셔너리'], ['if 0 <= nr < R and 0 <= nc < C:', 'A18/2', '밖이면 무시(다음 칸 먼저 계산)']] },
       { title: '로봇 명령 따라가기', text: '@prompt', pid: 'A18P2', needs: [['dr = [-1, 0, 1, 0];  dc = [0, 1, 0, -1]', 'A18/1', '방향 번호 → 한 칸 이동'], ['d = (d + 1) % 4  d = (d + 3) % 4', 'A18/1', '오른쪽 · 왼쪽으로 돌기'], ['if 0 <= nr < R and 0 <= nc < C:', 'A18/2', '격자 밖이면 무시']] },
-      { title: '동시에 바뀌어야 하는데', text: '@prompt', pid: 'A18P3', given: true, needs: [['new = [a[i - 1] if i > 0 else 0 for i in range(len(a))]', 'A18/4', '옛 값으로 새 리스트를 따로 만들기']] },
-      { title: '달팽이 채우기', text: '@prompt', pid: 'A18P4', needs: [['dr = [0, 1, 0, -1];  dc = [1, 0, -1, 0]', 'A18/3', '우·하·좌·상'], ['if not (0 <= nr < n and 0 <= nc < n) or grid[nr][nc]:  d = (d + 1) % 4', 'A18/3', '막히면 돌기'], ['print(" ".join(map(str, row)))', 'A18/0', '한 행씩 출력']] },
+    ],
+    A18B: [
+      { title: '동시에 바뀌어야 하는데', text: '@prompt', pid: 'A18P3', given: true, needs: [['new = [a[i - 1] if i > 0 else 0 for i in range(len(a))]', 'A18B/1', '옛 값으로 새 리스트를 따로 만들기']] },
+      { title: '달팽이 채우기', text: '@prompt', pid: 'A18P4', needs: [['dr = [0, 1, 0, -1];  dc = [1, 0, -1, 0]', 'A18B/0', '우·하·좌·상'], ['if not (0 <= nr < n and 0 <= nc < n) or grid[nr][nc]:  d = (d + 1) % 4', 'A18B/0', '막히면 돌기'], ['print(" ".join(map(str, row)))', 'A18/0', '한 행씩 출력']] },
     ],
     A19: [
       { title: '조합으로 세 수의 합', text: '@prompt', pid: 'A19P2', needs: [['from itertools import combinations', 'A19/1', '고르는 경우 전부'], ['for c in combinations(a, 3):  if sum(c) == target:', 'A19/1', '세 개씩 골라 확인']] },
-      { title: '백트래킹: 순열 생성', text: '@prompt', pid: 'A19P3', needs: [['used[i] = True;  path.append(s[i])', 'A19/2', '고르기'], ['go()', 'A19/2', '다음 칸으로 들어가기(재귀)'], ['path.pop();  used[i] = False', 'A19/3', '되돌리기']] },
-      { title: '가지치기가 있는 부분합', text: '@prompt', pid: 'A19P4', needs: [['if s > target:  return False', 'A19/4', '넘으면 더 볼 필요 없음'], ['go(i + 1, s + a[i]) or go(i + 1, s)', 'A19/2', '넣는다 / 안 넣는다'], ['sys.setrecursionlimit(10000)', 'A20/2', '재귀 한도']] },
+      { title: '자물쇠 비밀번호 후보', text: '@prompt', pid: 'A19P7', needs: [['from itertools import product', 'A19/0', '자리마다 따로 고르기'], ['product(range(10), repeat=n)', 'A19/0', 'n자리 번호 전부'], ['if sum(p) == target:  cnt += 1', 'A19/1', '조건에 맞는 것만 세기']] },
+    ],
+    A19B: [
+      { title: '가지치기가 있는 부분합', text: '@prompt', pid: 'A19P4', needs: [['if s > target:  return False', 'A19B/2', '넘으면 더 볼 필요 없음'], ['go(i + 1, s + a[i]) or go(i + 1, s)', 'A19B/0', '넣는다 / 안 넣는다'], ['sys.setrecursionlimit(10000)', 'A20/2', '재귀 한도']] },
+      { title: '백트래킹: 순열 생성', text: '@prompt', pid: 'A19P3', needs: [['used[i] = True;  path.append(s[i])', 'A19B/0', '고르기'], ['go()', 'A19B/0', '다음 칸으로 들어가기(재귀)'], ['path.pop();  used[i] = False', 'A19B/1', '되돌리기']] },
     ],
     A20: [
       { title: '빠른 입출력', text: '@prompt', pid: 'A20P2', needs: [['data = sys.stdin.read().split()', 'A20/2', '한 번에 다 읽기'], ['print("\\n".join(out))', 'A20/2', '한 번에 출력']] },

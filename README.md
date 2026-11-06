@@ -10,7 +10,7 @@
 | 코스 | 주소 | 모드 | 연습 도구 |
 | --- | --- | --- | --- |
 | 파이썬 | `/courses/python/` | 📖 교과서 · 레슨 45 | VS Code + 파이썬 |
-| 알고리즘·자료구조 | `/courses/algo/` | 📖 교과서 · 레슨 32(👀 그림으로 보기) | VS Code + 파이썬 |
+| 알고리즘·자료구조 | `/courses/algo/` | 📖 교과서 · 레슨 36(👀 그림으로 보기) | VS Code + 파이썬 |
 | 터미널·Git | `/courses/terminal-git/` | 📖 교과서 · 레슨 20 | Git Bash |
 | GitHub | `/courses/github/` | 📖 교과서 · 레슨 22 | 내 GitHub 계정 + Git Bash |
 | 데이터베이스(SQL) | `/courses/sql/` | 📖 교과서 · 레슨 17 | DB Browser for SQLite |
