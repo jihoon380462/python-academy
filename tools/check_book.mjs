@@ -116,6 +116,10 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
       spawnSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-S', path.join(home, 's.vim')], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8' }, timeout: 10000 }); ran++;
       const o = fs.existsSync(path.join(home, 'o.txt')) ? fs.readFileSync(path.join(home, 'o.txt'), 'utf8') : ''; fs.rmSync(path.join(home, 'o.txt'), { force: true });
       if (/E(492|518|474|488):/.test(o)) bad(`${w}: Vim 명령 「${cmd}」 이 vim 에서 에러 — ${(o.match(/ERR\[(.*)\]/) || [])[1]}`); } }
+  // ⑪ 거북이(turtle) 코드는 마지막에 turtle.done()(또는 mainloop·exitonclick) — VS Code 에서는 없으면 창이 깜빡 뜨고 바로 닫힘(예전 화면은 브라우저 캔버스라 필요 없었음). v2.16.2 사용자 「이 turtle 있으면 안 되는 거 아니야?」
+  if (PYEX) { const tdone = (code) => !/^\s*(import turtle|from turtle)/m.test(code) || /turtle\.(done|mainloop|exitonclick)\(\)|^\s*(done|mainloop|exitonclick)\(\)/m.test(code);
+    for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const pg = bookPage(l.id, i); const codes = [...pg.html.matchAll(/<pre[^>]*>([\s\S]*?)<\/pre>/g)].map(m => ent(m[1])); if (pg.example && pg.example.code) codes.push(pg.example.code); codes.forEach(c => { if (!tdone(c)) bad(`${l.id}/${i} 「${pg.title}」: 거북이 코드에 turtle.done() 이 없어요 — VS Code 에서는 창이 바로 닫혀요`); }); });
+    for (const [lid, tasks] of Object.entries(BOOK.tasks)) tasks.forEach((t, ti) => { const a = ctx.BookDerive.task(t, t.pid ? P[t.pid] : null, BOOK).answer; if (!tdone(a)) bad(`${lid}#${ti + 1} ${t.title}: 거북이 예시 답에 turtle.done() 이 없어요`); }); }
   // ⑦ 레슨 쪽에 예전 문제집 화면 말(이 앱 · 채점 · 입력창 · 슬라이더 · XP, 그림 없는 코스의 👀·👣)이 남았는지 — v2.15.2 파이썬 교과서에 8곳 남아 있던 것. 「채점 서버」(코딩테스트)는 괜찮음
   const OLD0 = '이 앱|채점(?! 서버)|입력창|슬라이더|🎚|\\bXP\\b|다음 줄 실행|파일 트리|오른쪽 예제|가짜 터미널|미리보기 칸|▶ 실행|실행 버튼을 누르'; const OLDW = new RegExp(BOOK.meta && BOOK.meta.viz ? OLD0 : OLD0 + '|👀|👣');
   for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const t = ent(bookPage(l.id, i).html); const m = t.match(new RegExp('.{0,30}(?:' + OLDW.source + ').{0,30}')); if (m) bad(`${l.id}/${i}: 예전 문제집 화면 말이 남았어요 「${m[0]}」 — BOOK.pages 의 rep 로 교과서 말로 바꾸세요`); });

@@ -271,11 +271,72 @@ Windows 11 · Python 3.15</pre>
   ],
   summary: ['프로필 → Projects → New project → Board', 'Todo · In Progress · Done, + Add item 으로 이슈', 'Workflows: 닫히면·합쳐지면 자동 Done'] },
 { id: 'GB2', ch: 2, boss: true, title: '보스: 혼자 하는 협업 한 바퀴', mode: 'text', pages: [], summary: [], tutorSummary: '이슈 2개 → 브랜치 2개 → PR 2개(줄 코멘트·Suggestion 반영) → 하나는 충돌 해결 → squash → 이슈 자동 닫힘 → 보드 Done.' },
-// ================= 챕터 3 세상에 내놓기 (다음 업데이트) =================
-{ id: 'G11', ch: 3, n: 11, title: 'fork 와 오픈소스 첫 기여', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'fork, upstream, Sync fork, CONTRIBUTING, 첫 기여 PR.' },
-{ id: 'G12', ch: 3, n: 12, title: 'GitHub Pages 두 가지 방법', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'Deploy from a branch(웹 W13) vs GitHub Actions, 주소 규칙, 404.' },
-{ id: 'G13', ch: 3, n: 13, title: '태그와 Releases', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'git tag v1.0.0, push 태그, Draft a new release, Generate release notes.' },
-{ id: 'GB3', ch: 3, boss: true, title: '보스: 포트폴리오 공개', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '저장소 2개 README, Pages, v1.0.0, 프로필 README.' },
+// ================= 챕터 3 세상에 내놓기 (v2.16.2) =================
+{ id: 'G11', ch: 3, n: 11, title: 'fork 와 오픈소스 첫 기여', mode: 'text', tutorSummary: 'Fork → Owner · Repository name · Copy the main branch only → Create fork. clone 내 fork, git remote add upstream 원래주소, git fetch upstream, git merge upstream/main, push. 웹 Sync fork → Update branch. 첫 기여: firstcontributions/first-contributions — Contributors.md 에 이름, PR base 는 원래 저장소.',
+  pages: [
+    { title: 'fork = 남의 저장소를 내 계정으로 복사', html: `<p>남의 공개 저장소는 내가 push 할 권한이 없어요. 그래서 <b>fork</b> 로 내 계정에 복사본을 만들고, 거기서 고친 다음 <b>원래 저장소로 PR</b> 을 보내요. 오픈소스 기여는 거의 다 이렇게 해요.</p>
+<pre class="code">원래 저장소 (upstream)   남아이디/프로젝트
+      │ Fork
+      ▼
+내 fork (origin)         내아이디/프로젝트   ← 내가 push 하는 곳
+      │ git clone
+      ▼
+내 컴퓨터
+
+PR:  내아이디/프로젝트 의 브랜치  ──▶  남아이디/프로젝트 의 main</pre>
+<div class="bk-step-box"><b>Fork 하기</b><br>원래 저장소 오른쪽 위 <b>Fork</b> → 「Owner」 는 나, 「Repository name」 은 그대로, ☑ <b>Copy the main branch only</b>(보통 그대로) → <b>Create fork</b>. 내 계정에 <code>내아이디/프로젝트</code> 가 생기고 이름 아래에 「forked from 남아이디/프로젝트」 가 보여요.</div>
+<table class="kb"><tbody><tr><td><b>branch</b></td><td>같은 저장소 안의 갈래 — 권한이 있을 때(내 저장소)</td></tr><tr><td><b>fork</b></td><td>다른 계정으로 저장소째 복사 — 권한이 없을 때(남의 저장소)</td></tr><tr><td><b>clone</b></td><td>GitHub 의 저장소를 내 컴퓨터로 복사</td></tr></tbody></table>
+<p class="muted small">내 저장소는 내 계정으로 fork 할 수 없어요(이미 내 거라서). 그래서 연습은 공개 연습 저장소로 해요(3쪽).</p>` + GH_DATE },
+    { title: 'upstream 연결하고 원래 저장소 따라가기', html: `<p>내가 fork 한 뒤에도 원래 저장소는 계속 바뀌어요. 내 fork 는 저절로 따라가지 않아요. 두 방법이 있어요.</p>
+<div class="bk-step-box"><b>① 웹: Sync fork</b><br>내 fork 화면의 파일 목록 위 <b>Sync fork</b> ▾ → 「This branch is N commits behind」 확인 → <b>Update branch</b>. 그다음 내 컴퓨터는 <code>git pull</code>.</div>
+<div class="bk-step-box"><b>② 내 컴퓨터: upstream 원격 더하기</b><pre>git remote add upstream https://github.com/남아이디/프로젝트.git
+git remote -v
+git fetch upstream
+git switch main
+git merge upstream/main
+git push</pre><code>origin</code> = 내 fork(push 하는 곳), <code>upstream</code> = 원래 저장소(받기만). 이름은 관습이에요.</div>
+<p>새 기여를 시작할 때마다 먼저 main 을 upstream 에 맞춘 다음 브랜치를 만들면, PR 에 충돌이 덜 나요.</p>
+<p>예제는 내 컴퓨터 폴더로 「원래 저장소(upstream.git)」 와 「내 fork(fork.git)」 를 만들어서 ② 를 해 보는 거예요.</p>` + GH_DATE, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g11 && mkdir g11 && cd g11\ngit init -q --bare upstream.git && git clone -q upstream.git owner && cd owner && echo "# 프로젝트" > README.md && git add . && git commit -qm "시작" && git push -q origin main && cd ..\ngit clone -q --bare upstream.git fork.git\ngit clone -q fork.git mine\ncd owner && echo "새 기능" >> README.md && git commit -qam "원래 저장소에 새 커밋" && git push -q && cd ../mine\ngit remote add upstream ../upstream.git\ngit remote -v\ngit fetch upstream\ngit switch main\ngit merge upstream/main\ngit push\ngit log --oneline', label: '예제 명령 — 원래 저장소의 새 커밋을 내 fork 로' } },
+    { title: '첫 기여: first-contributions 에 내 이름 올리기', html: `<p><a href="https://github.com/firstcontributions/first-contributions" target="_blank" rel="noopener">firstcontributions/first-contributions</a> 는 「첫 PR 연습용」 으로 유명한 공개 저장소예요. <code>Contributors.md</code> 에 내 이름 한 줄을 넣는 PR 을 보내면 받아 줘요(2026-11 에도 하루에 수십 개씩 합쳐지고 있어요). README 에 한국어 안내도 있어요.</p>
+<ol><li>그 저장소에서 <b>Fork</b> → <b>Create fork</b></li><li>내 fork 를 clone: <code>git clone https://github.com/내아이디/first-contributions.git</code></li><li><code>cd first-contributions</code> → <code>git switch -c add-내아이디</code></li><li><code>Contributors.md</code> 를 열어 <b>처음도 끝도 아닌 중간 아무 곳</b>에 내 이름(또는 아이디) 한 줄 → 저장</li><li><code>git add Contributors.md</code> → <code>git commit -m "Add 내아이디 to Contributors list"</code> → <code>git push -u origin add-내아이디</code></li><li>내 fork 화면의 노란 띠 <b>Compare &amp; pull request</b> → 맨 위가 <b>base repository: firstcontributions/first-contributions · base: main</b> ← <b>head repository: 내아이디/first-contributions · compare: add-내아이디</b> 인지 확인 → <b>Create pull request</b></li></ol>
+<div class="bk-warn"><b>공개 기록이에요.</b> 넣은 이름과 아이디는 전 세계에 보여요. 실명이 싫으면 아이디만 넣어요. 커밋 이메일이 noreply 인지 먼저 확인(레슨 1).</div>
+<p><b>진짜 프로젝트에 기여할 때</b>는: README 와 <code>CONTRIBUTING.md</code> 를 먼저 읽기 · 이슈 목록에서 <code>good first issue</code> 라벨 찾기 · 큰 작업은 PR 전에 이슈로 「이거 해도 될까요?」 묻기 · PR 은 작게, 설명에 무엇·왜·확인 방법.</p>` + GH_DATE },
+  ],
+  summary: ['Fork → Create fork = 내 계정으로 복사', 'origin = 내 fork, upstream = 원래 — fetch upstream · merge · push, 웹은 Sync fork', '첫 기여: first-contributions 의 Contributors.md'] },
+{ id: 'G12', ch: 3, n: 12, title: 'GitHub Pages 두 가지 방법', mode: 'text', tutorSummary: 'Settings → Code, planning, and automation → Pages → Build and deployment → Source: Deploy from a branch(Branch main · /(root) → Save) 또는 GitHub Actions. 주소 https://아이디.github.io/저장소/, 아이디.github.io 저장소는 루트. index.html(대소문자), 404.html, 링크는 상대 경로, 비공개 저장소라도 사이트는 공개.',
+  pages: [
+    { title: 'Deploy from a branch: 저장소의 파일을 그대로 사이트로', html: `<p><b>GitHub Pages</b> 는 저장소의 HTML 파일을 무료로 인터넷 주소에 올려 주는 기능이에요. 웹 교과서 레슨 13 에서 해 봤다면 복습이에요.</p>
+<div class="bk-step-box"><b>켜기</b><br>저장소 <b>Settings</b> → 왼쪽 「Code, planning, and automation」 의 <b>Pages</b> → 「Build and deployment」 의 「Source」 를 <b>Deploy from a branch</b> → Branch 칸에서 <b>main</b> · 폴더 <b>/ (root)</b> → <b>Save</b>.</div>
+<div class="bk-step-box"><b>기다리기</b><br>1~2분 뒤 같은 화면 위에 「Your site is live at <code>https://내아이디.github.io/저장소/</code>」 와 <b>Visit site</b>. 진행은 <b>Actions</b> 탭의 「pages build and deployment」 에서 볼 수 있어요. 그 뒤로는 main 에 push 할 때마다 저절로 다시 올라가요.</div>
+<p>첫 화면 파일(entry)은 <code>index.html</code> 이에요. 없으면 <code>index.md</code> 나 <code>README.md</code> 를 찾아요. 이름은 <b>대소문자를 가려요</b> — <code>Index.html</code> 은 안 돼요.</p>` + GH_DATE },
+    { title: 'Source: GitHub Actions — 이 사이트가 쓰는 방식', html: `<p>Source 를 <b>GitHub Actions</b> 로 고르면, 브랜치의 파일을 그대로 올리는 대신 <b>워크플로(자동 실행 파일)가 만든 결과</b>를 올려요. 올리기 <b>전에 검사</b>를 할 수 있다는 게 핵심이에요 — 이 사이트는 「검사(verify)가 통과해야만 배포」 해요.</p>
+<div class="bk-step-box"><b>켜기</b><br>Settings → Pages → Source: <b>GitHub Actions</b> → 아래에 추천 워크플로들이 보여요 → 그냥 HTML 사이트면 <b>Static HTML</b> 의 <b>Configure</b> → <code>.github/workflows/static.yml</code> 이 편집기로 열림 → <b>Commit changes…</b>.</div>
+<p>그 파일 안에서 중요한 줄은 두 개예요(자세한 읽기는 챕터 4):</p>
+<pre class="code">- uses: actions/upload-pages-artifact   ← 올릴 파일 묶기
+- uses: actions/deploy-pages            ← 사이트로 배포</pre>
+<table class="kb"><tbody><tr><td><b>Deploy from a branch</b></td><td>설정 한 번이면 끝. 그냥 HTML·README 사이트</td></tr><tr><td><b>GitHub Actions</b></td><td>배포 전에 검사·빌드가 필요할 때. 이 사이트처럼 「테스트 통과 → 배포」</td></tr></tbody></table>` + GH_DATE },
+    { title: '주소 · 404 · 링크 경로 · 공개 범위', html: `<table class="kb"><tbody><tr><td>프로젝트 사이트</td><td>저장소 <code>todo-cli</code> → <code>https://내아이디.github.io/todo-cli/</code></td></tr><tr><td>내 대표 사이트</td><td>저장소 이름을 딱 <code>내아이디.github.io</code> 로 만들면 → <code>https://내아이디.github.io/</code></td></tr><tr><td>없는 주소</td><td>저장소 맨 위에 <code>404.html</code> 을 두면 「없는 페이지」 화면을 내 것으로</td></tr></tbody></table>
+<div class="bk-warn"><b>링크를 <code>/</code> 로 시작하면 깨져요</b><br>프로젝트 사이트는 주소 끝에 <code>/todo-cli/</code> 가 붙어요. 그래서 <code>&lt;link href="/style.css"&gt;</code> 는 <code>내아이디.github.io/style.css</code>(없는 곳)를 찾아요. <b>앞의 <code>/</code> 를 빼서</b> <code>href="style.css"</code> 처럼 상대 경로로 써요. 내 컴퓨터(Live Server)에서는 되는데 Pages 에서만 CSS 가 안 먹으면 거의 이거예요.</div>
+<div class="bk-warn"><b>사이트는 공개예요</b> — 저장소를 비공개로 해도 Pages 사이트는 인터넷에 공개돼요. 비밀번호·개인 정보가 든 파일을 올리지 마세요.</div>
+<p>예제는 <code>/</code> 로 시작하는 링크를 찾아 상대 경로로 바꾸는 명령이에요(<code>sed</code> 는 터미널·Git 교과서 레슨 5 의 친구 — 몰라도 돼요, VS Code 의 바꾸기로 해도 같아요).</p>`, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g12 && mkdir g12 && cd g12\nprintf \'%s\\n\' \'<link rel="stylesheet" href="/style.css">\' \'<script src="/app.js"></script>\' \'<a href="/about.html">소개</a>\' > index.html\ngrep -n \'="/\' index.html\nsed -i \'s#="/#="#g\' index.html\ncat index.html', label: '예제 명령 — / 로 시작하는 링크를 상대 경로로' } },
+  ],
+  summary: ['Settings → Pages → Deploy from a branch → main · /(root) → Save', 'Source: GitHub Actions = 검사 뒤 배포(이 사이트)', '주소 아이디.github.io/저장소/, index.html, 링크는 / 없이, 사이트는 공개'] },
+{ id: 'G13', ch: 3, n: 13, title: '태그와 Releases', mode: 'text', tutorSummary: 'git tag -a v1.0.0 -m, git tag, git push origin v1.0.0 (태그는 따로 push). 버전 큰.중간.작은. Releases → Draft a new release → Choose a tag(Create new tag, Target main) → Release title → Generate release notes → Publish release.',
+  pages: [
+    { title: '태그: 커밋에 붙이는 버전 이름', html: `<p>「v1.0 은 어느 커밋이었지?」 를 커밋 해시 대신 이름으로 찾게 하는 게 <b>태그</b>예요. 브랜치와 달리 <b>움직이지 않는</b> 이름표예요.</p>
+<pre>git tag -a v1.0.0 -m "첫 공개 버전"
+git tag
+git show v1.0.0 --stat
+git push origin v1.0.0</pre>
+<table class="kb"><tbody><tr><td><code>git tag -a 이름 -m 설명</code></td><td>지금 커밋에 설명이 있는 태그(annotated). <code>-a</code> 없이 <code>git tag v1.0.0</code> 이면 이름만 있는 가벼운 태그</td></tr><tr><td><code>git push origin v1.0.0</code></td><td><b>태그는 그냥 <code>git push</code> 로는 안 올라가요</b>. 따로 올리거나 <code>git push --tags</code>(전부)</td></tr><tr><td><code>git switch --detach v1.0.0</code></td><td>그 버전의 파일로 잠깐 돌아가 보기(끝나면 <code>git switch main</code>)</td></tr></tbody></table>
+<div class="bk-step-box"><b>버전 번호 읽기: 큰.중간.작은</b><br><code>v2.16.1</code>(이 사이트) — <b>큰</b> 수 = 예전 것과 안 맞는 큰 변화 · <b>중간</b> = 기능 추가 · <b>작은</b> = 고침. 처음 공개는 보통 <code>v1.0.0</code>, 아직 실험이면 <code>v0.1.0</code>.</div>`, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g13 && mkdir g13 && cd g13\ngit init -q --bare remote.git && git clone -q remote.git work && cd work\necho "print(1)" > todo.py && git add . && git commit -qm "첫 기능" && git push -q origin main\ngit tag -a v1.0.0 -m "첫 공개 버전"\ngit tag\ngit push origin v1.0.0\ngit ls-remote --tags origin', label: '예제 명령 — 태그 만들고 올리기' } },
+    { title: 'Releases: 버전마다 공개 페이지 만들기', html: `<p><b>Release</b> 는 태그에 「무엇이 바뀌었나」 설명과 내려받을 파일을 붙인 공개 페이지예요. 쓰는 사람은 Releases 만 보면 돼요.</p>
+<div class="bk-step-box"><b>만들기</b><br>저장소 Code 탭 오른쪽 칸의 <b>Releases</b> → <b>Draft a new release</b> → <b>Choose a tag</b> ▾ 에서 올려 둔 <code>v1.0.0</code> 고르기(없으면 <code>v1.0.0</code> 을 쳐서 <b>Create new tag</b> → <b>Target</b> 은 main) → 「Release title」 칸에 <code>v1.0.0 첫 공개</code> → 설명 칸 위 <b>Generate release notes</b>(합친 PR 목록을 자동으로 써 줘요) → <b>Publish release</b>.</div>
+<ul><li>아직 시험판이면 <b>This is a pre-release</b> 체크.</li><li>설명을 나중에 쓰려면 <b>Save draft</b>.</li><li>Release 마다 <b>Source code (zip)</b> 가 자동으로 붙어요 — Git 을 모르는 사람도 받을 수 있어요.</li></ul>
+<p>릴리스 노트는 「무엇이 새로 됐나 · 무엇을 고쳤나 · 주의할 것」 순서면 충분해요. PR 제목을 잘 써 왔다면 Generate release notes 가 거의 다 해 줘요.</p>` + GH_DATE },
+  ],
+  summary: ['git tag -a v1.0.0 -m … → git push origin v1.0.0 (따로 push)', '버전 = 큰.중간.작은', 'Releases → Draft a new release → Choose a tag → Generate release notes → Publish release'] },
+{ id: 'GB3', ch: 3, boss: true, title: '보스: 포트폴리오 공개', mode: 'text', pages: [], summary: [], tutorSummary: '저장소 2개 README, Pages, v1.0.0 릴리스, 프로필 README(아이디/아이디 저장소).' },
 // ================= 챕터 4 자동화와 안전 (다음 업데이트) =================
 { id: 'G14', ch: 4, n: 14, title: 'GitHub Actions 첫 워크플로', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '.github/workflows/test.yml, on, jobs, runs-on, checkout, setup-python, pytest, Actions 탭 로그.' },
 { id: 'G15', ch: 4, n: 15, title: 'PR 에 초록 체크 + 보호 규칙', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'Checks, Rulesets: Require a pull request before merging, Require status checks to pass before merging, Block force pushes.' },
