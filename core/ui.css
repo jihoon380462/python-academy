@@ -419,3 +419,17 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .bk-need{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font:inherit;text-align:left;cursor:pointer}.bk-need:hover{border-color:var(--primary)}
 .bk-syn{font-family:var(--mono);font-size:.95em;font-weight:700;color:var(--code-fg,var(--text));background:var(--code-bg,transparent);border:1px solid var(--code-bd,var(--border));border-radius:6px;padding:2px 8px;white-space:pre-wrap;word-break:normal;overflow-wrap:break-word}
 .bk-need-d{flex:1;min-width:8em;font-size:.92em}.bk-need-w{flex:none;margin-left:auto}
+/* v2.9.4 파이썬 문법 도감 · 펼친 더 알아보기 */
+.bk-dex-card{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:12px;border:1px solid var(--primary);background:var(--surface);color:var(--text);font:inherit;text-align:left;cursor:pointer}.bk-dex-t{flex:1;display:flex;flex-direction:column;gap:2px}
+.bk-dex{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+.bk-dex-bar{position:sticky;top:56px;z-index:5;background:var(--bg);padding:8px 0 10px;margin-bottom:6px}
+.bk-dex-bar input{width:100%;min-height:46px;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font:inherit;font-size:1.02em}
+.bk-dex-chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}.bk-dex-chips .chip-btn{flex:none}
+.bk-dex-l{display:flex;align-items:baseline;gap:8px;font-size:1.05em;margin:18px 0 8px}
+.bk-dex-e{padding:12px 14px;margin-bottom:10px}.bk-dex-h{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}.bk-dex-h h3{margin:0;font-size:1.02em;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere}
+.bk-dex-go{flex:none;white-space:nowrap}.bk-dex-d{margin:6px 0 0;line-height:1.6;color:var(--muted)}.bk-dex-e .bk-code{margin:10px 0 0}
+.bk-more{border-left:3px solid var(--border);padding:4px 0 4px 12px;margin:14px 0}.bk-more-h{font-weight:800;margin-bottom:4px;color:var(--muted)}
+.bk-crumb .grow{flex:1}
+.bk-back{display:flex;align-items:center;gap:6px;min-height:44px;margin:0 0 10px;padding:8px 14px;border-radius:10px;font-weight:700;max-width:100%;text-align:left;white-space:normal}
+.bk-flash{animation:bkFlash 1.4s ease-out}@keyframes bkFlash{0%{box-shadow:0 0 0 3px var(--primary)}100%{box-shadow:0 0 0 0 transparent}}
+.bk-task,.bk-dex-e,.bk-art h1{scroll-margin-top:72px}
