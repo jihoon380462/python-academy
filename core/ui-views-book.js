@@ -38,10 +38,10 @@
     root.innerHTML = `<div class="page bk-home">
       <div class="bk-hero"><div class="lp-kicker">🐍 파이썬 교과서</div><h1 class="lp-h">읽고, VS Code 에서 직접 만들어 보기</h1>
         <p class="muted">레슨은 문법 설명이에요. 각 레슨 끝 「만들어 보기」에 문장으로 된 문제와 그 문제에 필요한 문법이 있어요. 채점·점수·잠금은 없어요 — 필요한 곳부터 펴 보면 돼요.</p></div>
-      <button class="card bk-dex-card" id="bkDex"><span class="bk-setup-ic">📚</span><span class="bk-dex-t"><b>파이썬 문법 도감</b><span class="muted small">배운 문법 ${dexEntries().length}개를 한곳에 — 검색해서 바로 찾기(실전은 오픈북)</span></span><span class="bk-go">›</span></button>
+      <button class="card bk-dex-card" id="bkDex"><span class="bk-setup-ic">📚</span><span class="bk-dex-t"><b>파이썬 문법 도감</b><span class="muted small">배운 문법 ${dexEntries().length}개 + 내장 함수 ${(BOOK.builtins || []).length}개를 한곳에 — 검색해서 바로 찾기(실전은 오픈북)</span></span><span class="bk-go">›</span></button>
       <div class="card bk-setup"><div class="bk-setup-h"><span class="bk-setup-ic">🛠</span><div><b>${esc(setup.title)}</b><div class="muted small">처음 한 번만 하면 돼요</div></div></div>
         <ol class="bk-steps">${setup.pages.map((p, i) => `<li><button class="bk-step" data-sp="${i}"><span class="bk-step-n">${i + 1}</span><span class="bk-step-t">${esc(p.title)}</span>${readOf(SETUP_ID + '_' + i) ? '<span class="bk-done">✓</span>' : ''}<span class="bk-go">›</span></button></li>`).join('')}</ol></div>
-      ${chs.map(ch => `<section class="bk-ch"><h2 class="bk-ch-h"><span class="bk-ch-n">${String(ch).padStart(2, '0')}</span>${esc(chName(ch))}</h2><div class="bk-list">${lessonsOf(ch).map(l => { const tk = tasksOf(l).length; return `<button class="bk-l ${l.boss ? 'boss' : ''}" data-l="${l.id}"><span class="bk-l-n">${l.boss ? '🛠' : esc(String(l.n ?? ''))}</span><span class="bk-l-t">${esc(l.boss ? l.title.replace(/^보스:\s*/, '만들어 보기: ') : l.title)}<span class="bk-l-sub muted">${l.boss ? '챕터를 묶는 큰 문제' : `설명 ${(l.pages || []).length}쪽${tk ? ` · 만들어 보기 ${tk}개` : ''}`}</span></span>${readOf(l.id) ? '<span class="bk-done">✓</span>' : ''}<span class="bk-go">›</span></button>`; }).join('')}</div></section>`).join('')}
+      ${chs.map(ch => `<section class="bk-ch"><h2 class="bk-ch-h"><span class="bk-ch-n">${String(ch).padStart(2, '0')}</span>${esc(chName(ch))}</h2><div class="bk-list">${lessonsOf(ch).map(l => { const tk = tasksOf(l).length; return `<button class="bk-l ${l.boss ? 'boss' : ''}" data-l="${l.id}"><span class="bk-l-n">${l.boss ? '🛠' : esc(String(l.n ?? ''))}</span><span class="bk-l-t">${esc(l.boss ? l.title.replace(/^보스:\s*/, '만들어 보기: ') : l.title)}<span class="bk-l-sub muted">${l.boss ? `챕터를 묶는 큰 문제${tasksOf(l).filter(t => /^🏠/.test(t.title)).length ? ` · 🏠 생활 프로그램 ${tasksOf(l).filter(t => /^🏠/.test(t.title)).length}개` : ''}` : `설명 ${(l.pages || []).length}쪽${tk ? ` · 만들어 보기 ${tk}개` : ''}`}</span></span>${readOf(l.id) ? '<span class="bk-done">✓</span>' : ''}<span class="bk-go">›</span></button>`; }).join('')}</div></section>`).join('')}
     </div>`;
     $('#bkDex').onclick = () => UI.go('dogam');
     $$('[data-sp]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: SETUP_ID, page: +b.dataset.sp }));
@@ -105,18 +105,22 @@
     }));
     return _dex;
   };
+  const dexBuiltins = () => (BOOK.builtins || []).map(b => ({ ...b, hay: (b.name + ' ' + b.desc + ' ' + b.code + ' 내장 함수').toLowerCase() }));
   Views.dogam = (root, { back = null, restore = false } = {}) => {
-    const all = dexEntries(); const chs = [...new Set(all.map(e => e.ch))];
+    const all = dexEntries(); const bis = dexBuiltins(); const chs = [...new Set(all.map(e => e.ch))];
     const st = UI._dex = UI._dex || { q: '', ch: 'all', y: 0 }; if (!restore) st.y = 0;
     root.innerHTML = `<div class="page bk-dex">${backBar(back)}<div class="bk-crumb"><button class="lnk" id="bkHome">☰ 목차</button><span class="muted">/</span><span>📚 파이썬 문법 도감</span></div>
-      <h1 class="lp-h">📚 파이썬 문법 도감</h1><p class="muted">배운 문법 ${all.length}개. 코드나 한국어로 검색하세요(예: <code>split</code>, <code>정렬</code>, <code>딕셔너리</code>, <code>파일</code>). 예제는 📋 복사해서 VS Code 에서 바로 돌려 볼 수 있고, 「레슨 ›」 을 누르면 자세한 설명으로 가요.</p>
-      <div class="bk-dex-bar"><input id="dexQ" type="search" placeholder="🔍 문법 찾기 — split, 정렬, 딕셔너리, open …" value="${esc(st.q)}" autocomplete="off" aria-label="문법 찾기"><div class="bk-dex-chips"><button class="chip-btn ${st.ch === 'all' ? 'on' : ''}" data-ch="all">전체</button>${chs.map(c => `<button class="chip-btn ${String(st.ch) === String(c) ? 'on' : ''}" data-ch="${c}">${esc(chName(c))}</button>`).join('')}</div><div class="muted small" id="dexN"></div></div>
+      <h1 class="lp-h">📚 파이썬 문법 도감</h1><p class="muted">배운 문법 ${all.length}개 + 자주 쓰는 내장 함수 ${bis.length}개. 코드나 한국어로 검색하세요(예: <code>split</code>, <code>정렬</code>, <code>딕셔너리</code>, <code>파일</code>). 예제는 📋 복사해서 VS Code 에서 바로 돌려 볼 수 있고, 「레슨 ›」 을 누르면 자세한 설명으로 가요.</p>
+      <div class="bk-dex-bar"><input id="dexQ" type="search" placeholder="🔍 문법 찾기 — split, 정렬, 딕셔너리, open …" value="${esc(st.q)}" autocomplete="off" aria-label="문법 찾기"><div class="bk-dex-chips"><button class="chip-btn ${st.ch === 'all' ? 'on' : ''}" data-ch="all">전체</button><button class="chip-btn ${st.ch === 'builtin' ? 'on' : ''}" data-ch="builtin">🧰 내장 함수</button>${chs.map(c => `<button class="chip-btn ${String(st.ch) === String(c) ? 'on' : ''}" data-ch="${c}">${esc(chName(c))}</button>`).join('')}</div><div class="muted small" id="dexN"></div></div>
       <div id="dexList"></div></div>`;
     const draw = () => {
       const terms = st.q.toLowerCase().split(/\s+/).filter(Boolean);
-      const hit = all.filter(e => (st.ch === 'all' || String(e.ch) === String(st.ch)) && terms.every(t => e.hay.includes(t)));
-      $('#dexN').textContent = terms.length || st.ch !== 'all' ? `${hit.length}개 찾음` : '';
+      const hit = st.ch === 'builtin' ? [] : all.filter(e => (st.ch === 'all' || String(e.ch) === String(st.ch)) && terms.every(t => e.hay.includes(t)));
+      const bhit = (st.ch === 'all' || st.ch === 'builtin') ? bis.filter(e => terms.every(t => e.hay.includes(t))) : [];
+      $('#dexN').textContent = terms.length || st.ch !== 'all' ? `${hit.length + bhit.length}개 찾음` : '';
       let last = null; let html = '';
+      if (bhit.length) { html += `<h2 class="bk-dex-l"><span class="bk-ch-n">🧰</span>자주 쓰는 내장 함수 <span class="muted small">· import 없이 바로</span></h2>`; bhit.forEach(e => { const [bl, bp] = String(e.ref || '').split('/'); const bL = bl && Content.lesson(bl);
+        html += `<article class="card bk-dex-e bi"><div class="bk-dex-h"><h3><code class="bk-syn">${esc(e.name)}</code></h3>${bL ? `<button class="lnk bk-dex-go" data-l="${bl}" data-p="${+bp || 0}">레슨 ${esc(String(bL.n ?? ''))} · ${(+bp || 0) + 1}쪽 ›</button>` : ''}</div><p class="bk-dex-d">${esc(e.desc)}</p>${codeBox(e.code, '예제')}<div class="bk-io">${e.input ? `<div><div class="lbl">입력</div><pre class="code">${esc(e.input)}</pre></div>` : ''}<div><div class="lbl">결과</div><pre class="code">${esc(e.output)}</pre></div></div></article>`; }); }
       hit.forEach(e => { if (e.lid !== last) { html += `<h2 class="bk-dex-l"><span class="bk-ch-n">${esc(String(e.n ?? ''))}</span>${esc(e.lesson)} <span class="muted small">· ${esc(chName(e.ch))}</span></h2>`; last = e.lid; }
         html += `<article class="card bk-dex-e"><div class="bk-dex-h"><h3>${esc(e.name)}</h3><button class="lnk bk-dex-go" data-l="${e.lid}" data-p="${e.pg}">레슨 ${esc(String(e.n ?? ''))} · ${e.pg + 1}쪽 ›</button></div>${e.desc ? `<p class="bk-dex-d">${esc(e.desc)}</p>` : ''}${codeBox(e.code, '예제')}</article>`; });
       $('#dexList').innerHTML = html || `<div class="card muted">「${esc(st.q)}」 는 도감에 없어요. 다른 말로 찾아보거나(예: 「자르기」 대신 <code>split</code>), 파이썬 공식 문서 <a href="https://docs.python.org/ko/3/library/index.html" target="_blank" rel="noopener">docs.python.org/ko</a> 를 찾아보세요.</div>`;
@@ -127,8 +131,16 @@
     $('#bkHome').onclick = () => UI.go('home'); bindBack(back);
     draw(); if (restore && st.y) setTimeout(() => window.scrollTo(0, st.y), 30);
   };
-  { const rt = UI.renderTopbar.bind(UI); UI.renderTopbar = () => { rt(); if (UI.view === 'dogam') { const tt = $('.tb-title'); if (tt) tt.textContent = '파이썬 문법 도감'; } }; }
+  { const rt = UI.renderTopbar.bind(UI); UI.renderTopbar = () => { rt(); const tt = $('.tb-title'); if (!tt) return; if (UI.view === 'dogam') tt.textContent = '파이썬 문법 도감'; else if (UI.view === 'lesson') { const ll = Content.lesson((UI.params || {}).lessonId); if (ll && ll.boss) tt.textContent = '🛠 만들어 보기'; else if ((UI.params || {}).lessonId === 'SETUP') tt.textContent = '🛠 시작하기'; } }; /* 교과서엔 「보스」 가 없음 */ }
   { const hf = UI.hashFor.bind(UI); UI.hashFor = (view, params) => view === 'dogam' ? '#dogam' : hf(view, params); }
+  // ---------- 설정: 교과서에서 의미 없는 칸 숨기기 (v2.9.5 A-3) ----------
+  // 남김: 테마·글자 크기·고대비·애니메이션 · 용어 사전/에러 사전 · 진행 데이터(내보내기·기기 연동·오프라인·초기화)
+  // 숨김: 키보드(코드 칸 단축키)·효과음·진동 · 하루 목표·게임 요소·코스 전제 무시·온보딩 다시 보기 · 클로드 선생님(API 키 — 교과서엔 선생님 창이 없음)
+  if (Views.settings) { const orig = Views.settings; Views.settings = (root, params) => { orig(root, params);
+    const HIDE_ROWS = ['키보드', '효과음', '진동', T.dailyGoal, '온보딩 다시 보기'];
+    $$('.srow', root).forEach(r => { const lab = ((r.querySelector('span') || {}).textContent || '').trim(); if (HIDE_ROWS.some(h => lab === h || lab.startsWith(h + ' ')) || r.querySelector('#sGame, #sUnlock, #sKeys, #sSound, #sVib, #sOnb')) r.remove(); });
+    $$('.card', root).forEach(c => { const h = (c.querySelector('.card-h') || {}).textContent || ''; if (/클로드 선생님/.test(h)) c.remove(); else if (/^학습/.test(h.trim())) { const hh = c.querySelector('.card-h'); hh.textContent = '찾아보기'; } });
+  }; }
   // 문제 화면 주소(#problem/ID, 예전 링크)는 그 레슨의 「만들어 보기」로
   Views.problem = (root, { pid, lessonId }) => { const p = Content.problem(pid); const lid = lessonId || (p && p.lesson); const l = lid && Content.lesson(lid); UI.go('lesson', { lessonId: lid || 'L0', page: l ? (l.pages || []).length : 0 }, false); };
   ['review', 'typing', 'challenge', 'timeattack', 'checkup', 'mock', 'reviewMore', 'weakness'].forEach(v => { if (Views[v]) Views[v] = () => UI.go('home', {}, false); });
