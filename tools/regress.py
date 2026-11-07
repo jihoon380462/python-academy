@@ -33,7 +33,7 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==8 and r['ready']==8, f"코스 카드 8개(코스 6 + 공용 2: 수학 공간·Vim), 열린 것 8개 = 전부(v2.16.0 GitHub 교과서까지) (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==9 and r['ready']==9, f"코스 카드 9개(코스 6 + 공용 3: 수학 공간·Vim·리눅스), 열린 것 9개 = 전부(v2.21.0 리눅스 교과서까지) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and r['cont'].rstrip('/').endswith('courses/python'), '이어서 하기 링크(아직 본 레슨이 없으면 파이썬 교과서 목차, v2.19.0): '+str(r['cont']))
     check('이어서 하기' in (r['today'] or '') and r['stats']==0 and '오늘의 도전' not in (r['today'] or ''), '이어서 하기 상자(v2.17.1: 문제집 코스(수학)를 시작하기 전엔 「오늘 n/5 문제·복습」 줄 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
@@ -47,7 +47,7 @@ with sync_playwright() as p:
     print('[N13 v2.19.0 옛 화면 보관]'); n13=len(errors); MATH='file://'+os.path.join(ROOT,'courses/math/index.html')
     hubg=pg.evaluate("({lessons:typeof LESSONS, content:[...document.scripts].some(x=>/content\\.js/.test(x.src)), imgs:document.querySelectorAll('img').length})"); check(hubg['lessons']=='undefined' and not hubg['content'] and hubg['imgs']==0, '허브: 코스 콘텐츠·그림 없이 「읽은 레슨」 만 셈 (%s)' % hubg)
     OLDG=['Game','Grader','Sessions','Tutor','QuickKeys','Loader','Coach','TextEditor','Confetti','BADGES','Haptic','myMascot','Review','Onboarding']
-    for cid in ['python','algo','terminal-git','github','sql','web','vim','math']:
+    for cid in ['python','algo','terminal-git','github','sql','web','vim','math','linux']:
         pg.goto('file://'+os.path.join(ROOT,'courses/%s/index.html?classic=1' % cid)); pg.wait_for_timeout(700)
         cr=pg.evaluate("(g)=>({book:document.documentElement.classList.contains('book-mode'), home:!!document.querySelector('.bk-home'), old:g.filter(n=>typeof window[n]!=='undefined' || (()=>{ try { return eval('typeof '+n)!=='undefined'; } catch(e){ return false; } })()), arch:[...document.scripts].map(x=>x.src).filter(x=>/game|tutor|fx\\.js|ui-editors|ui-views-(main|more|shell|sql|web)|badges|runners\\/(shell|sql|web)/.test(x)), imgs:document.querySelectorAll('img').length})", OLDG)
         check(cr['book'] and cr['home'] and not cr['old'] and not cr['arch'] and cr['imgs']==0, '%s: ?classic=1 을 붙여도 교과서 목차 · 옛 화면 코드(Game·Grader·Tutor…)·옛 스크립트·그림 없음 (%s)' % (cid, {k:v for k,v in cr.items() if k in ('old','arch','imgs')}))
@@ -87,7 +87,7 @@ with sync_playwright() as p:
     check(not bad, '수학 교과서 레슨 45개 첫 그림 전부 그려짐 · 폰 390 가로 넘침 없음 (%s)' % (bad or 'OK'))
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); check(pg.inner_text('.tb-title')=='수학 도감' and pg.locator('.bk-dex-e').count()>=80 and pg.evaluate("document.documentElement.scrollWidth")<=390, '수학 도감: 식과 코드 80개 이상 · 폰 가로 넘침 없음')
     merr=errors[m0:]; check(not merr, '수학 교과서 pageerror 0 (%s)' % (merr[:2] or 'OK'))
-    pg.goto(HUB); pg.wait_for_timeout(600); check(pg.locator('.hub-spaces .hc').count()==2 and '수학 공간' in pg.locator('.hub-spaces').inner_text() and 'Vim 에디터' in pg.locator('.hub-spaces').inner_text(), '허브: 「공용」 구역에 수학 공간 + Vim 에디터 카드')
+    pg.goto(HUB); pg.wait_for_timeout(600); check(pg.locator('.hub-spaces .hc').count()==3 and '수학 공간' in pg.locator('.hub-spaces').inner_text() and 'Vim 에디터' in pg.locator('.hub-spaces').inner_text() and '리눅스' in pg.locator('.hub-spaces').inner_text(), '허브: 「공용」 구역에 수학 공간 + Vim 에디터 + 리눅스 카드')
     check('공용' in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')") and '공간 ' not in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')"), 'v2.11.0 사용자 「공간을 공용으로 변경」: 허브 구역 이름 「공용」')
     check('코스 순서와 무관' not in pg.locator('.hub-spaces .hc').first.inner_text(), '허브 수학 카드 문구 중복 없음 (QA #12)')
     print('[모바일 390px]'); pg.set_viewport_size({'width':390,'height':800})
@@ -291,6 +291,19 @@ with sync_playwright() as p:
         vr=pg.evaluate("""(async()=>{ const s=document.querySelector('#vzSlider'); if(!s) return null; const out={err:[],filled:0,n:+s.max+1}; for(let v=0; v<=+s.max; v++){ window.__vzm=[]; s.value=v; s.dispatchEvent(new Event('input')); await new Promise(r=>setTimeout(r,v%10==9?40:25)); const m=window.__vzm.slice(); out.err.push(...m.filter(x=>x.includes('오류'))); if(!m.some(x=>x.includes('비어 있어요'))) out.filled++; } out.err=[...new Set(out.err)]; return out; })()""")
         check(bool(vr) and not vr['err'] and vr['filled']>0, 'N7 %s %d쪽 👀 그림: 그리기 오류 0 · 그려진 프레임 있음 (%s)' % (lid, pi+1, vr))
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '알고리즘 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',1),('A0',0),('A5',0),('A12',2),('A13',4),('AB4',0),('E1',4)] ]
+    # ===== [리눅스 교과서 v2.21.0] T9 — VirtualBox + Ubuntu 26.04, 설계 specs/linux-course.md · 결정 D13
+    print('[리눅스 교과서 v2.21.0]'); x0=len(errors); LXB='file://'+os.path.join(ROOT,'courses/linux/index.html')
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(LXB); pg.wait_for_timeout(900); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
+    lx=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length})")
+    check(lx['book'] and lx['steps']==3 and lx['ls']==6 and lx['soon']==12 and lx['pre']==2, '리눅스 교과서 홈: 시작하기 3 · 열린 레슨 6(챕터 1) · 준비 중 12 · 「먼저 꼭」 2 (%s)' % lx)
+    pg.evaluate("UI.go('lesson',{lessonId:'U1',page:2})"); pg.wait_for_timeout(300); t=pg.inner_text('.bk-art'); check('메모리 무결성' in t and 'hypervisorlaunchtype off' in t and 'hypervisorlaunchtype auto' in t and 'WSL2' in t, 'U1 3쪽 🐢: 끄는 법 + 대가(WSL2) + 되돌리기(auto) — 결정 D13')
+    pg.evaluate("UI.go('lesson',{lessonId:'U2',page:1})"); pg.wait_for_timeout(300); t=pg.inner_text('.bk-art'); check('8192 MB' in t and 'Unattended' in t and '40 GB' in t and 'Enable 3D Acceleration' in t, 'U2 2쪽: 8GB·CPU 4·40GB · 무인 설치 안 씀 · 3D 가속 끔'); pg.evaluate("UI.go('lesson',{lessonId:'U2',page:0})"); pg.wait_for_timeout(200); check(pg.locator('.bk-prereq').count()==1 and 'Erase disk' in pg.inner_text('.bk-prereq'), 'U2 1쪽: 「먼저 꼭」 메모리·디스크 · 가상 디스크만 지움')
+    pg.evaluate("UI.go('lesson',{lessonId:'U2',page:4})"); pg.wait_for_timeout(300); lt=pg.evaluate("[...document.querySelectorAll('.bk-task')].map(x=>[x.querySelectorAll('.bk-checks li').length, !!x.querySelector('.bk-io')])"); check(len(lt)==1 and lt[0][0]>=4 and not lt[0][1], 'U2 만들어 보기: 화면 문제 = 「내 화면에서 확인할 것」 ☐ 4개 이상 (%s)' % lt)
+    pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','스냅샷'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=2 and pg.inner_text('.tb-title')=='리눅스 도감', '리눅스 도감: 스냅샷 검색')
+    pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(200), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '리눅스 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',0),('U0',0),('U1',2),('U2',1),('U2',2),('U2',4),('U3',1),('U4',0),('UB1',0)] ]
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); lxc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/linux/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    check('읽은 레슨' in lxc and '/6' in lxc and '리눅스' in lxc, '허브 「공용」 칸에 리눅스 카드 · 읽은 레슨 n/6 (%s)' % lxc[-60:])
+    xerr=errors[x0:]; check(not xerr, '리눅스 교과서 pageerror 0 (%s)' % (xerr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); aerr=errors[a0:]; check(not aerr, '알고리즘 교과서 pageerror 0 (%s)' % (aerr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); qerr=errors[q0:]; check(not qerr, 'SQL 교과서 pageerror 0 (%s)' % (qerr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); verr=errors[v0:]; check(not verr, 'Vim 교과서 pageerror 0 (%s)' % (verr[:2] or 'OK'))

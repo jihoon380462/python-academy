@@ -1,0 +1,1 @@
+{ "id": "linux", "name": "리눅스(우분투)", "icon": "🐧", "desc": "내 PC 의 VirtualBox 에 우분투를 설치하고 apt·권한·서비스·SSH 를 직접 해 보는 교과서", "runner": "none", "mapColor": "#e95420", "mascotGear": "headset" }
