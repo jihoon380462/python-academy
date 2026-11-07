@@ -17,7 +17,7 @@
   - 만들어 보기 8문제 + **할 일 SDK 와 명령 줄 프로그램**(`todo add · list · done · rm`, `main(argv, client)`) — 서버 · SDK · 프로그램 세 겹이 다 내 것. SDK 문제는 FastAPI `TestClient` 를 `session` 으로 넣어 서버를 켜지 않고 실제 실행(503 두 번 뒤 성공 · POST 는 재시도 안 함 · 쪽 요청 수까지 출력으로 확인).
   - 「먼저 꼭」 챕터 4 위: 파이썬 클래스 · 예외 레슨을 먼저.
 - 허브 카드 HTTP·API·SDK n/21.
-- 🛠 내부: regress HTTP·API·SDK 절 완성 기준(열린 21 · 준비 중 0 · 「먼저 꼭」 넷 · 폰 390 18쪽 추가).
+- 🛠 내부: CI check_book 단계에 `requests` 설치도(챕터 4 SDK 가 import). regress HTTP·API·SDK 절 완성 기준(열린 21 · 준비 중 0 · 「먼저 꼭」 넷 · 폰 390 18쪽 추가).
 
 ## v2.28.0 — 2026-11-07 (Opus: HTTP·API·SDK 교과서 챕터 3 — 내 API 만들기)
 
