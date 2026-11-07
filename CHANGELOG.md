@@ -7,6 +7,16 @@
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
 
+## v2.22.0 — 2026-11-07 (Opus: T9 리눅스 교과서 챕터 2·3 — 완성)
+
+- 🐧 리눅스 교과서 **레슨 18 전부 열림**(사용자 「1, 2」).
+  - **챕터 2 「리눅스답게 쓰기」**: 레슨 5 같은 bash, 다른 집(/ 하나 · /home · 대소문자 · CRLF · man·type) · 6 리눅스 폴더 지도(/etc · /var/log · /usr/bin · /proc · /etc/os-release 를 grep·cut·tr 로) · 7 apt(update·install·remove·autoremove · snap · history.log, 어셈블리 도구 build-essential·nasm·gdb 미리) · 8 사용자와 권한(id · rwx · chmod 600/755/u+x · sudo·chown) · 9 내가 만든 명령(#!/bin/bash · PATH 와 ~/bin · alias · ~/.bashrc 는 >> 로) · 보스 「내 도구 상자」(bigfiles·mkday·diskuse).
+  - **챕터 3 「시스템 들여다보기」**: 레슨 10 프로세스(ps·pgrep·htop · & · jobs · fg · Ctrl+C/Z · kill / -9) · 11 서비스와 로그(systemctl · openssh-server 와 ssh.socket · journalctl -u/-f/-b -p err) · 12 디스크와 메모리(df·du·free·lsblk · 스냅샷이 먹는 공간 · 정리) · 13 네트워크와 SSH(NAT · **포트 포워딩 127.0.0.1:2222 → 22** · Windows 에서 ssh · ~/.ssh/config · 키 로그인 · **VS Code Remote - SSH**) · 14 예약 작업(tar · crontab 다섯 칸 · cron 의 짧은 PATH·% 함정) · 보스 「스스로 돌아가는 VM」(nightly 백업 + 디스크 경고 + cron + SSH 로 확인).
+  - 만들어 보기 25문제 추가(전체 33): **명령 문제 12개는 준비 명령(`~/linux-study/…`) + 확인 명령 + 「이렇게 나오면 성공」** — check_book 이 bash 로 실제 실행해 검사(권한 숫자 · PATH · alias · du 순서 · tar 목록 · kill 뒤 남은 프로세스 · LIMIT 0/101 로 경고 줄). 나머지는 「내 화면에서 확인할 것」 ☐.
+  - 「먼저 꼭」 2개 더(레슨 8 sudo · 레슨 13 Host IP 127.0.0.1), 도감 도구 상자 13 → 27.
+- 🐛 **폰에서 표 첫 칸이 낱말 중간에서 끊기던 것**(「Nam e」「Gue st IP」) — v2.19.0 의 「넘칠 때 줄바꿈」 규칙이 첫 칸 최소 너비를 한 글자로 만들어서. 첫 칸은 낱말 단위로만 끊게 고침(공용 CSS — GitHub 교과서 14쪽 · Vim · SQL · 웹 교과서 첫 쪽에도 있던 것). 글자 크기 보통·아주 크게 × 9코스 전 쪽 가로 넘침 0 확인.
+- 🧰 check_book: 리눅스 교과서의 명령 결과에서 임시 홈을 `/home/me` 로 보여 줌. regress 리눅스 절: 레슨 18 · 준비 중 0 · U13 포트 포워딩 · U8 명령 문제 모양 · 폰 390px 20쪽.
+
 ## v2.21.0 — 2026-11-07 (Opus: T9 리눅스 교과서 챕터 1)
 
 - 🐧 **공용 「리눅스(우분투)」 교과서** 새로(허브 「공용」 칸, 설계 `specs/linux-course.md` · 사용자 결정 D13). 내 Windows PC 의 **VirtualBox 7.2** 에 **Ubuntu Desktop 26.04 LTS** 를 설치해서 쓰는 연습장 — 앞으로 운영체제·어셈블리어 교과서의 연습 환경.
