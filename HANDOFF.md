@@ -7,7 +7,7 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| **현재 버전** | **v2.38.0 배포**(파이썬 교과서 **100 레슨** — 챕터 8 표준 라이브러리 더 · 9 실전 2 · 10 더 깊이 · 11 실전 3, 문제 412, 설계 `specs/python-100.md`). v2.37.0 은 67 레슨(타입 힌트 두 레슨 등). 손보기 1 · 2 · 3단계 끝(v2.34.0 ~ v2.36.0, 검토 `specs/python-review.md`). 버전별 내용은 [`CHANGELOG.md`](CHANGELOG.md) |
+| **현재 버전** | **v2.39.0 배포**(CI 줄이기 — 작업 셋 동시에 · check_book 교과서마다 동시에(`tools/check_book_par.mjs`) · 화면 검사 대기 줄이기(`REGRESS_WAIT_SCALE`) · 도감 검색 버그). 그 전 **v2.38.0**(파이썬 교과서 **100 레슨** — 챕터 8 표준 라이브러리 더 · 9 실전 2 · 10 더 깊이 · 11 실전 3, 문제 412, 설계 `specs/python-100.md`). v2.37.0 은 67 레슨(타입 힌트 두 레슨 등). 손보기 1 · 2 · 3단계 끝(v2.34.0 ~ v2.36.0, 검토 `specs/python-review.md`). 버전별 내용은 [`CHANGELOG.md`](CHANGELOG.md) |
 | **마지막 작업** | (Opus, 11/8) **파이썬 100 레슨**(사용자 「1, 2」): 뼈대 → 에이전트 9개 동시 작성 → 레슨 id 로 합치기(합치기 도구가 레슨을 못 찾아 문제를 지울 뻔한 것을 커밋 전에 잡고 안전장치 넣음) → 칩 22곳 → 이어 읽기 검토 2개 → 폰 표 · 제목. 그 전(11/7~8): **파이썬 교과서 전체 검토 → 손보기 3단계**(사용자 「반복 · 난이도 · 문제 성격 · 안 배운 것 · 기타」 → 「4」 = 1 · 2 · 3단계 모두): 검토 `specs/python-review.md`(측정 스크립트 + 읽기 에이전트 5 + 직접 확인, 잘못 본 판정은 「정정」 으로 남김) → v2.34.0 틀린 것 고치기 → v2.35.0 문제 189 → 232(출력 예측 · 고치기 · 에러 읽기 · 생활형) → v2.36.0 58 → 66 레슨(무거운 레슨 나누기 · 반복 정리 · 테스트/디버깅을 실전 앞으로). 단계마다 챕터별 에이전트 4~5개를 worktree 에서 돌리고 쪽 번호 대응표로 칩을 다시 맞춤 |
 | **다음 후보** | 예정 코스는 다 만듦 — 사용자가 정할 것: ① N9 수학 「상」 ② 새 코스 ③ 전체 손보기(교과서 사이 링크 · 용어 · 쪽 수 고르기 · 사람이 읽는 검수) ④ 공개 API 가 열린 곳에서 HTTP·API·SDK 응답 예 대조 |
 | **막힌 것** | 없음 |
@@ -57,6 +57,7 @@
 - `BOOK` 의 주요 칸: `meta`(prereq 경고 · labels · viz · `makeIntroBy`) · `setup`(시작하기 쪽) · `builtins`(도감 항목 `{name, desc, code, ref}`) · `tasks`(레슨별 만들어 보기 `{title, text, needs:[[코드, '레슨/쪽', 설명]], answer, io, check, setup, given, noRun, checks, outLabel}`) · `check`(검사 방식 `'vim' | 'sql' | 'web' | 'github' | 'linux' | 'os' | 'api'`, 없으면 파이썬 실행). `os` · `api` 는 파이썬 실행 + `noRun` 이면 ☐ 필수 + 도구 상자는 실행 안 함.
 - 레슨 쪽 `example.code` 는 파이썬이면 `check_book` 이 실제로 실행해요. 인터넷이 필요하거나 실행하면 안 되는 것(curl · requests · 브라우저 JS · 터미널 명령)은 `example.shell` 에(보여 주기만). 웹 교과서 만들어 보기의 검사(`tools/run_web_solutions.py`)는 `checks` 에 화면 검사 · 동작(click · dblclick · input · key · submit · viewport) · `{ text, console: true }`(console.log 를 io 와 줄마다 비교).
 - 검사: `node tools/check_book.mjs [코스]` 가 예시 답·본문 예제를 **진짜로 실행**(python3 · bash · SQLite · vim)해 출력 예와 비교하고, 「필요한 문법」 링크·단어, 옛 앱 문구, 거북이 `turtle.done()` 등을 본다(①~⑪, `specs/site-intent.md` 7절). 브라우저에서 확인하는 문제(`noRun`)는 `checks`(☐ 목록)가 있어야 한다.
+- 빠르게 전부: `node tools/check_book_par.mjs` 는 교과서마다 따로 띄워 CPU 수만큼 동시에 돌려요(v2.39.0, CI 도 이걸 씀). 화면 검사는 `REGRESS_WAIT_SCALE=0.25 python3 tools/regress.py` 로 고정 대기를 줄일 수 있어요(CI 값, 기본 1 = 예전 그대로).
 - 허브: `CONFIG.COURSES` 에 `book: true` · `lessons` · `bookNote` · `short`(허브 안내 문구용 짧은 이름) · 공용 칸이면 `space: true`, `core/hub.js` 의 glyph, `CONFIG.COURSE_ID_PATTERNS`(읽은 레슨 세기).
 - 설계 문서는 `specs/<코스>-course.md`(본보기 [`specs/github-course.md`](specs/github-course.md): 다른 코스와의 경계표 · 필수 경고 · 레슨표 · 화면 이름 출처).
 

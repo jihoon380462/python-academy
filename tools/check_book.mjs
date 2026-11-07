@@ -3,6 +3,8 @@
 //   파이썬 코스: python3 로 answer 실행 · 셸 코스(runner:'shell'): bash 로 setup → answer → check 실행(HOME 은 임시 폴더, 출력의 그 경로는 /c/Users/me 로 바꿔 비교)
 import fs from 'fs'; import vm from 'vm'; import os from 'os'; import path from 'path'; import { execFileSync, spawnSync } from 'child_process';
 const R = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+// v2.39.0: 예시 답 하나의 제한 시간 — 무한 반복을 잡는 용도. check_book_par 로 교과서 여럿을 동시에 돌리면 CPU 를 나눠 써서 학습 예제(LLM NB2#4 등)가 8초를 넘을 수 있어 30초로
+const RUN_TIMEOUT = +process.env.CHECK_BOOK_TIMEOUT || 30000;
 const want = process.argv[2]; const courses = fs.readdirSync(R + '/courses').filter(d => fs.existsSync(`${R}/courses/${d}/book.js`) && (!want || d === want));
 let total = 0;
 for (const cid of courses) total += checkCourse(cid);
@@ -39,7 +41,7 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
       if (c.output == null) { bad(`${id}: 출력 예 없음`); continue; }
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'book-')); const up = p && p.files && p.files.upload; if (up && up.sample) fs.writeFileSync(path.join(dir, up.name), up.sample); if (t.prep) fs.writeFileSync(path.join(dir, t.prep.name), t.prep.text);
       fs.writeFileSync(path.join(dir, 'main.py'), answer + pyCheck);
-      let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: c.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); continue; }
+      let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: c.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); continue; }
       ran++; const norm = (s) => String(s).replace(/\r/g, '').split('\n').map(x => x.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
       if (norm(out) !== norm(c.output)) bad(`${id}: 출력이 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(out))}`);
     }
@@ -52,7 +54,7 @@ if (SQLB) { // v2.13.0: 사이트에서 받는 cafe.db 가 datasets.js 의 cafe 
 }
 if (VIM) { // 교과서가 권하는 _vimrc 를 진짜 vim 이 에러 없이 읽는지 + .py 에서 들여쓰기 설정이 실제로 켜지는지
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'vimrc-')); fs.writeFileSync(path.join(home, 'vimrc'), ctx.VIMRC_BASE_TEXT); fs.writeFileSync(path.join(home, 't.py'), 'x = 1\n');
-  try { execFileSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-c', 'redir! > out.txt', '-c', 'echo "ERR[" . v:errmsg . "]"', '-c', 'set ft? et? sw? sts? ai?', '-c', 'nmap <F5>', '-c', 'redir END', '-c', 'qa!', 't.py'], { cwd: home, env: { PATH: process.env.PATH, HOME: home }, timeout: 10000, stdio: 'ignore' }); } catch (e) {}
+  try { execFileSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-c', 'redir! > out.txt', '-c', 'echo "ERR[" . v:errmsg . "]"', '-c', 'set ft? et? sw? sts? ai?', '-c', 'nmap <F5>', '-c', 'redir END', '-c', 'qa!', 't.py'], { cwd: home, env: { PATH: process.env.PATH, HOME: home }, timeout: RUN_TIMEOUT, stdio: 'ignore' }); } catch (e) {}
   const o = fs.existsSync(path.join(home, 'out.txt')) ? fs.readFileSync(path.join(home, 'out.txt'), 'utf8') : ''; ran++;
   if (!/ERR\[\]/.test(o) || !/filetype=python/.test(o) || !/\bexpandtab/.test(o) || !/shiftwidth=4/.test(o) || !/softtabstop=4/.test(o) || !/\bautoindent/.test(o) || !/:!python %/.test(o)) bad(`기본 _vimrc 가 vim 에서 제대로 안 읽힘:\n${o.trim()}`);
 }
@@ -60,7 +62,7 @@ for (const [k, o2] of Object.entries(BOOK.pages || {})) { const [pl, pi] = k.spl
 for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/'); if (!(pagesOf(tl) || [])[+ti]) bad(`titles ${k}: 없는 쪽`); }
 (BOOK.builtins || []).forEach((bi, i) => { n++; const id = `내장 함수 ${bi.name}`; if (bi.ref) { const [bl, bp] = bi.ref.split('/'); if (!(pagesOf(bl) || [])[+bp]) bad(`${id}: ref ${bi.ref} 가 없는 쪽`); }
   if (VIM || SHELL || ['github', 'linux', 'os', 'api', 'asm'].includes(BOOK.check)) return; // 단축키·명령·Markdown 모음은 실행 결과가 없음(운영체제 도구 상자도 터미널 명령)
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
   ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
 // v2.15.1 사용자 「3, 4」(알고 교과서 자체 QA 에서 손으로 찾은 두 종류를 CI 로):
 // ⑤ 레슨 본문의 「실행하면 <code>값</code>」 이 그 쪽 예제를 실제로 돌린 출력에 있는지 — 파이썬 예제는 python3, SQL 예제는 tools/sql_book_run.py(cafe)
@@ -88,8 +90,8 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
     if (ASMEX && code) { const r = asmRun(code, ex.stdin, ex.echoExit); if (r.error) { if (!((BOOK.meta && BOOK.meta.exampleErrorsOk) || []).includes(`${l.id}/${i}`)) bad(`${l.id}/${i} 「${pg.title}」 예제 ${r.stage} 에서 에러: ${String(r.error).split('\n').slice(0, 2).join(' / ')}`); return; } ran++; const o = sq(r.out); for (const v of claims) if (!o.includes(sq(v))) bad(`${l.id}/${i} 「${pg.title}」: 본문은 「실행하면 ${v}」 인데 예제 출력에 없어요 — 실제 출력 ${JSON.stringify(r.out.slice(0, 160))}`); return; } // v2.31.0 어셈블리 예제는 전부 빌드 · 실행
     if (!code || !(PYEX || SQLEX)) return; if (PYEX && /^\s*(import turtle|from turtle)/m.test(code)) return; /* 거북이는 창이 필요해서(CI 에 화면 없음) 안 돌림 */ if (!claims.length && !PYEX) return; // 파이썬 예제는 주장이 없어도 전부 돌려 봄(에러 나는 예제 찾기, BOOK.meta.exampleErrorsOk 는 일부러 에러)
     const errOk = ((BOOK.meta && BOOK.meta.exampleErrorsOk) || []).includes(`${l.id}/${i}`);
-    let out = ''; try { if (PYEX) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ex-')); fs.writeFileSync(path.join(dir, 'main.py'), code); out = execFileSync('python3', ['main.py'], { cwd: dir, input: ex.stdin || '', encoding: 'utf8', timeout: 20000, stdio: ['pipe', 'pipe', 'pipe'] }); }
-      else { const r = JSON.parse(execFileSync('python3', [R + '/tools/sql_book_run.py'], { input: JSON.stringify({ dataset: ctx.SQL_DATASETS[ex.db || 'cafe'], answer: code }), encoding: 'utf8', timeout: 15000 })); if (r.error) return bad(`${l.id}/${i} 예제 실행 에러: ${r.error}`); out = r.out || r.output || ''; } }
+    let out = ''; try { if (PYEX) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ex-')); fs.writeFileSync(path.join(dir, 'main.py'), code); out = execFileSync('python3', ['main.py'], { cwd: dir, input: ex.stdin || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); }
+      else { const r = JSON.parse(execFileSync('python3', [R + '/tools/sql_book_run.py'], { input: JSON.stringify({ dataset: ctx.SQL_DATASETS[ex.db || 'cafe'], answer: code }), encoding: 'utf8', timeout: RUN_TIMEOUT })); if (r.error) return bad(`${l.id}/${i} 예제 실행 에러: ${r.error}`); out = r.out || r.output || ''; } }
     catch (e) { const em = String(e.stderr || e.message); if (PYEX && e.status && (errOk || /No module named '(tkinter|_tkinter|turtle)'/.test(em))) out = String(e.stdout || '') + em; /* 에러를 보여 주는 예제(트레이스백 레슨)·거북이(Windows 파이썬엔 있음) */ else return bad(`${l.id}/${i} 「${pg.title}」 예제 실행 에러: ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
     ran++; const o = sq(out); for (const v of claims) if (!o.includes(sq(v))) bad(`${l.id}/${i} 「${pg.title}」: 본문은 「실행하면 ${v}」 인데 예제 출력에 없어요 — 실제 출력 ${JSON.stringify(out.slice(0, 160))}`); });
   // ⑧ 셸 교과서: 시작하기 → 레슨 순서대로 예제를 「한 사용자의 Git Bash」 처럼 이어서 실행(폴더 위치가 다음 예제로 이어짐) — 앞 예제가 다른 폴더에서 끝나 「No such file」 이 나는 예제를 찾음(v2.15.2 T1/1·T13/2)
@@ -99,7 +101,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
     const okPages = new Set((BOOK.meta && BOOK.meta.exampleErrorsOk) || []); let cwd = home;
     const seq = [...BOOK.setup.pages.map((_, i) => ['SETUP', i]), ...LESSONS.flatMap(l => (pagesOf(l.id) || []).map((_, i) => [l.id, i]))];
     for (const [lid, i] of seq) { const pg = lid === 'SETUP' ? BOOK.setup.pages[i] : bookPage(lid, i); const ex = pg && pg.example; if (!ex || !ex.shell) continue;
-      const r = spawnSync('bash', ['-c', 'trap \'pwd > "$HOME/.cwd"\' EXIT\n' + ex.shell], { cwd, env, timeout: 15000, encoding: 'utf8' }); ran++;
+      const r = spawnSync('bash', ['-c', 'trap \'pwd > "$HOME/.cwd"\' EXIT\n' + ex.shell], { cwd, env, timeout: RUN_TIMEOUT, encoding: 'utf8' }); ran++;
       try { cwd = fs.readFileSync(path.join(home, '.cwd'), 'utf8').trim() || cwd; } catch (e) {}
       if (okPages.has(`${lid}/${i}`)) continue;
       const errs = String(r.stderr || '').split('\n').filter(x => /command not found|No such file|fatal:|cannot access|cannot stat|invalid reference|Not a directory|pathspec/.test(x) && !/(notepad|code|explorer|start|clip): command not found|cd: \/c\//.test(x));
@@ -115,7 +117,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
     for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const pg = bookPage(l.id, i); const w = `${l.id}/${i}`; if (pg.example && pg.example.code) pg.example.code.split('\n').forEach(x => addc(x, w)); for (const m of pg.html.matchAll(/<code>([\s\S]*?)<\/code>/g)) addc(ent(m[1]), w); for (const m of pg.html.matchAll(/<pre[^>]*>([\s\S]*?)<\/pre>/g)) ent(m[1]).split('\n').forEach(x => addc(x.split('"')[0], w)); });
     const skip = /^:(q|q!|qa|qa!|x|wq|wqa|PlugInstall|PlugUpdate|Lsp\w*|term|terminal|Lexplore|Ex|source)\b|[가-힣]|Ctrl\+|<C-|…/;
     for (const [cmd, w] of cmds) { if (skip.test(cmd)) continue; fs.writeFileSync(path.join(home, 's.vim'), `edit! ~/vim-study/play.txt\nlet v:errmsg=''\nsilent! execute ${JSON.stringify(cmd.slice(1))}\nlet g:e=v:errmsg\nredir! > ${path.join(home, 'o.txt')}\necho 'ERR[' . g:e . ']'\nredir END\nqa!\n`);
-      spawnSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-S', path.join(home, 's.vim')], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8' }, timeout: 10000 }); ran++;
+      spawnSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-S', path.join(home, 's.vim')], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8' }, timeout: RUN_TIMEOUT }); ran++;
       const o = fs.existsSync(path.join(home, 'o.txt')) ? fs.readFileSync(path.join(home, 'o.txt'), 'utf8') : ''; fs.rmSync(path.join(home, 'o.txt'), { force: true });
       if (/E(492|518|474|488):/.test(o)) bad(`${w}: Vim 명령 「${cmd}」 이 vim 에서 에러 — ${(o.match(/ERR\[(.*)\]/) || [])[1]}`); } }
   // ⑪ 거북이(turtle) 코드는 마지막에 turtle.done()(또는 mainloop·exitonclick) — VS Code 에서는 없으면 창이 깜빡 뜨고 바로 닫힘(예전 화면은 브라우저 캔버스라 필요 없었음). v2.16.2 사용자 「이 turtle 있으면 안 되는 거 아니야?」
@@ -140,7 +142,7 @@ function runShell(id, t, answer, c) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'tg-'));
   // setup 출력은 버리고(cd 는 살아 있게 { } 로 묶음), check 가 있으면 answer 출력도 버린 뒤 check 출력만 비교
   const body = `{\n${t.setup}\n} >/dev/null\n` + (t.check ? `{\n${t.run || answer}\n} >/dev/null 2>&1\n${t.check}` : `${t.run || answer}`);
-  let out; try { out = execFileSync('bash', ['-c', body], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8', LC_ALL: 'C.UTF-8', /* v2.12.0 Git 편: T6 의 처음 설정(이름·이메일·main·pull.rebase)을 한 사용자처럼 */ GIT_AUTHOR_NAME: 'me', GIT_AUTHOR_EMAIL: 'me@example.com', GIT_COMMITTER_NAME: 'me', GIT_COMMITTER_EMAIL: 'me@example.com', GIT_CONFIG_COUNT: '3', GIT_CONFIG_KEY_0: 'init.defaultBranch', GIT_CONFIG_VALUE_0: 'main', GIT_CONFIG_KEY_1: 'pull.rebase', GIT_CONFIG_VALUE_1: 'false', GIT_CONFIG_KEY_2: 'core.quotepath', GIT_CONFIG_VALUE_2: 'false', GIT_EDITOR: 'false', GIT_PAGER: 'cat' }, encoding: 'utf8', timeout: 15000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { return bad(`${id}: 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
+  let out; try { out = execFileSync('bash', ['-c', body], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8', LC_ALL: 'C.UTF-8', /* v2.12.0 Git 편: T6 의 처음 설정(이름·이메일·main·pull.rebase)을 한 사용자처럼 */ GIT_AUTHOR_NAME: 'me', GIT_AUTHOR_EMAIL: 'me@example.com', GIT_COMMITTER_NAME: 'me', GIT_COMMITTER_EMAIL: 'me@example.com', GIT_CONFIG_COUNT: '3', GIT_CONFIG_KEY_0: 'init.defaultBranch', GIT_CONFIG_VALUE_0: 'main', GIT_CONFIG_KEY_1: 'pull.rebase', GIT_CONFIG_VALUE_1: 'false', GIT_CONFIG_KEY_2: 'core.quotepath', GIT_CONFIG_VALUE_2: 'false', GIT_EDITOR: 'false', GIT_PAGER: 'cat' }, encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { return bad(`${id}: 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
   ran++;
   const norm = (s) => { let ls = String(s).split(home).join(BOOK.check === 'linux' ? '/home/me' : '/c/Users/me') /* v2.22.0 리눅스 교과서는 우분투 홈 */.replace(/\r/g, '').split('\n').map(x => x.trim().replace(/\s+/g, ' ')).filter((x, i, a) => x || i < a.length - 1); while (ls.length && !ls[ls.length - 1]) ls.pop(); if (t.anyOrder) ls = ls.sort(); return ls.join('\n'); };
   if (norm(out) !== norm(c.output)) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(out))}`);
@@ -154,17 +156,17 @@ function runVim(id, t, answer, c) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'vim-')); fs.writeFileSync(path.join(home, 'vimrc'), ctx.VIMRC_BASE_TEXT);
   const fname = t.file || (String(t.setup).match(/edit! ~\/vim-study\/(\S+)/) || [])[1]; if (!fname) return bad(`${id}: setup 에서 연 파일 이름을 못 찾음`);
   fs.writeFileSync(path.join(home, 's.vim'), `${t.setup}\nexe "normal! " . "${vimKeys(answer)}"\nsilent! wall\nqa!\n`);
-  try { execFileSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-S', path.join(home, 's.vim')], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8' }, encoding: 'utf8', timeout: 10000, stdio: ['ignore', 'pipe', 'pipe'] }); } catch (e) { if (e.code === 'ETIMEDOUT' || e.signal) return bad(`${id}: vim 이 끝나지 않음(키가 입력 모드에 갇힘?)`); }
+  try { execFileSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-S', path.join(home, 's.vim')], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8' }, encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['ignore', 'pipe', 'pipe'] }); } catch (e) { if (e.code === 'ETIMEDOUT' || e.signal) return bad(`${id}: vim 이 끝나지 않음(키가 입력 모드에 갇힘?)`); }
   ran++; let got; try { got = fs.readFileSync(path.join(home, 'vim-study', fname), 'utf8'); } catch (e) { return bad(`${id}: 결과 파일 ${fname} 없음`); }
   const norm = (s) => String(s).replace(/\r/g, '').replace(/\n+$/, '');
   if (norm(got) !== norm(c.output)) return bad(`${id}: 파일이 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(got))}`);
-  if (t.py) { let out; try { out = execFileSync('python3', [fname], { cwd: path.join(home, 'vim-study'), input: t.py.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { return bad(`${id}: 파이썬 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
+  if (t.py) { let out; try { out = execFileSync('python3', [fname], { cwd: path.join(home, 'vim-study'), input: t.py.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { return bad(`${id}: 파이썬 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
     ran++; if (norm(out) !== norm(t.py.output)) bad(`${id}: 실행 결과가 달라요\n      기대: ${JSON.stringify(norm(t.py.output))}\n      실제: ${JSON.stringify(norm(out))}`); }
 }
 function runSqlTask(id, t, answer, c) {
   if (c.output == null) return bad(`${id}: 결과 없음`);
   const req = { dataset: ctx.SQL_DATASETS[t.db || 'cafe'], setup: t.setup, answer, check: t.check, rollback: t.rollback, expectError: t.expectError, planOnly: t.planOnly, py: t.runPy, input: c.input };
-  let r; try { r = JSON.parse(execFileSync('python3', [R + '/tools/sql_book_run.py'], { input: JSON.stringify(req), encoding: 'utf8', timeout: 15000 })); } catch (e) { return bad(`${id}: 실행 도구 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
+  let r; try { r = JSON.parse(execFileSync('python3', [R + '/tools/sql_book_run.py'], { input: JSON.stringify(req), encoding: 'utf8', timeout: RUN_TIMEOUT })); } catch (e) { return bad(`${id}: 실행 도구 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
   ran++; if (r.error) return bad(`${id}: ${r.error}`);
   const norm = (s) => String(s ?? '').replace(/\r/g, '').split('\n').map(x => x.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
   let a = norm(r.out), b = norm(c.output); if (t.anyOrder) { a = a.split('\n').sort().join('\n'); b = b.split('\n').sort().join('\n'); }

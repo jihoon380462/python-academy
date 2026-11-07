@@ -178,6 +178,7 @@
       <div class="bk-dex-bar"><input id="dexQ" type="search" placeholder="${esc(M.dexPlaceholder)}" value="${esc(st.q)}" autocomplete="off" aria-label="문법 찾기"><div class="bk-dex-chips"><button class="chip-btn ${st.ch === 'all' ? 'on' : ''}" data-ch="all">전체</button>${bis.length ? `<button class="chip-btn ${st.ch === 'builtin' ? 'on' : ''}" data-ch="builtin">${M.builtinsChip}</button>` : ''}${chs.map(c => `<button class="chip-btn ${String(st.ch) === String(c) ? 'on' : ''}" data-ch="${c}">${esc(chName(c))}</button>`).join('')}</div><div class="muted small" id="dexN"></div></div>
       <div id="dexList"></div></div>`;
     const draw = () => {
+      if (!$('#dexN') || !$('#dexList')) return; // v2.39.0: 검색 칸에 친 뒤 0.12초 안에 다른 화면으로 가면 예약된 다시 그리기가 사라진 칸을 건드려 에러 — 화면이 바뀌었으면 그냥 끝
       const terms = st.q.toLowerCase().split(/\s+/).filter(Boolean);
       const hit = st.ch === 'builtin' ? [] : all.filter(e => (st.ch === 'all' || String(e.ch) === String(st.ch)) && terms.every(t => e.hay.includes(t)));
       const bhit = (st.ch === 'all' || st.ch === 'builtin') ? bis.filter(e => terms.every(t => e.hay.includes(t))) : [];
