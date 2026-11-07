@@ -7,6 +7,17 @@
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
 
+## v2.28.0 — 2026-11-07 (Opus: HTTP·API·SDK 교과서 챕터 3 — 내 API 만들기)
+
+- 📖 **HTTP·API·SDK 교과서 챕터 3 「내 API 만들기」 완성**(레슨 16/21) — 이제 대답하는 쪽에 서요(FastAPI):
+  - 레슨 10 **FastAPI 첫 서버** — 설치 · `@app.get` · `fastapi dev main.py` · 내 PC 에서만(127.0.0.1), 서버 터미널의 요청 기록 · 404 · 405 · 500, `/docs`(저절로 생긴 OpenAPI 문서 · Try it out) · `TestClient` 로 서버 없이 시험.
+  - 레슨 11 **입력 받기** — 경로 파라미터(타입 힌트가 검사 · 글자면 422) · 쿼리(기본값 · true/1/yes) · 본문 Pydantic 모델(`Field` 규칙 · `model_dump`) · **422 읽기**(`loc` · `type` · `msg`).
+  - 레슨 12 **상태 코드와 저장** — 201 · `HTTPException(404)` · 204, SQLite 로 껐다 켜도 남게(`?` 자리표시 · `lastrowid` · `row_factory`), **CORS 를 내가 켜기**(`CORSMiddleware` · 허락한 출처만 · OPTIONS).
+  - 만들어 보기 6문제 + **할 일 API**(CRUD · SQLite · 보낸 칸만 바꾸는 PATCH · 201/404/204/422 · CORS) + 웹 교과서 할 일 앱이 이 API 와 대화하게. 서버 문제는 `TestClient` 로 실제 실행해 출력 예와 비교(출력은 답을 돌려서 채움), 브라우저 · 서버 켜기는 ☐.
+  - 「먼저 꼭」 챕터 3 위 · 레슨 10 · 할 일 API: FastAPI 설치 · 내 서버는 내 PC 에서만.
+- 허브 카드 HTTP·API·SDK n/16.
+- 🛠 내부: CI(ci.yml)의 check_book 단계에 `pip install fastapi httpx` — FastAPI 예제 · 예시 답을 TestClient 로 실제 실행(인터넷 API 는 여전히 안 부름). regress HTTP·API·SDK 절 열린 16 · 준비 중 5 · 「먼저 꼭」 셋 · 폰 390 14쪽 추가.
+
 ## v2.27.1 — 2026-11-07 (Opus: HTTP·API·SDK 교과서 챕터 2 — API 제대로 쓰기)
 
 - 📖 **HTTP·API·SDK 교과서 챕터 2 「API 제대로 쓰기」 완성**(레슨 12/21):

@@ -31,7 +31,9 @@ jobs:
       - name: check_nesting (괄호 지옥 — 함수 호출 3겹 이상 줄 0개, v2.8.2)
         run: node tools/check_nesting.mjs
       - name: check_book (파이썬 교과서 — 필요한 문법 링크·예시 답 실행, v2.9.0)
-        run: node tools/check_book.mjs
+        run: |
+          pip install --quiet fastapi httpx  # v2.28.0 HTTP·API·SDK 교과서 챕터 3: FastAPI 예제·예시 답을 TestClient 로 실제 실행(인터넷 API 는 안 부름)
+          node tools/check_book.mjs
       - name: run_solutions
         run: node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
       # v2.19.0 N13: test_shell · run_shell_solutions · run_sql_solutions 는 옛 문제집 화면(가짜 셸·SQL 채점)용이라 archive/classic/tools 로 옮김
