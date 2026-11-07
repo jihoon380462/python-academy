@@ -272,6 +272,9 @@ const LESSONS = [
       example:{ code:`def area(w, h):\n    """가로 w, 세로 h 인 네모의 넓이를 돌려줘요."""\n    return w * h\n\nprint(area(3, 4))\nprint(area.__doc__)\n\ndef total(*nums):\n    print("받은 값:", nums)\n    return sum(nums)\n\nprint(total(1, 2, 3, 4))`, trace:true } },
   ],
   summary:['기본값 end="!" 은 안 넘기면 쓰고, 키워드 name="지훈" 은 순서 상관없음','return a, b 로 여러 값, return 이 없으면 None','함수 안의 변수는 안에서만 — 바깥 값은 돌려주고 받아서 바꾼다'] },
+{ id:'L8C', ch:2, n:13, title:'함수 3: 범위 · 문서 · *args', mode:'text', draft:true,
+  tutorSummary:'(준비 중) 함수 3: 범위 · 문서 · *args',
+  pages:PY_TODO('L8B 의 지역 변수 · global · docstring · *args 를 옮겨 와 넉넉히'), summary:['(준비 중)'] },
 
 { id:'B2', ch:2, boss:true, title:'보스: 숫자 맞히기 게임 완성', mode:'text', pages:[], summary:[],
   tutorSummary:'미니 프로젝트 1. while 반복, 조건문, 시도 횟수 변수, 입력 형 변환을 합쳐 숫자 맞히기 게임을 완성한다.' },
@@ -279,7 +282,7 @@ const LESSONS = [
 
 
 LESSONS.push(
-{ id:'L9', ch:3, n:13, title:'문자열 다루기', mode:'text',
+{ id:'L9', ch:3, n:14, title:'문자열 다루기', mode:'text',
   tutorSummary:'문자열 인덱스·슬라이싱 s[a:b], len, upper/lower/replace/split/strip 메서드, f-string f"{변수}"로 값 끼워 넣기.',
   terms:{ '슬라이싱':'문자열이나 리스트의 일부를 [시작:끝]으로 잘라내는 것', '메서드':'값에 점(.)을 찍고 부르는 함수. "abc".upper() 처럼', 'f-string':'앞에 f를 붙인 문자열. 중괄호 { } 안에 변수를 넣으면 값이 끼워진다' },
   pages:[
@@ -302,7 +305,7 @@ LESSONS.push(
   ],
   summary:['s[a:b]로 자르기, s[::-1]로 뒤집기','upper, replace, split, strip 메서드','f"{변수}" 로 값 끼워 넣기'] },
 
-{ id:'L9B', ch:3, n:14, title:'문자열 더 다루기', mode:'text',
+{ id:'L9B', ch:3, n:15, title:'문자열 더 다루기', mode:'text',
   tutorSummary:'찾기 find(없으면 -1)·count·startswith·endswith. 검사 isdigit·isalpha·isspace — int() 하기 전에 숫자인지 본다. 칸 맞추기 f"{x:<8}" 왼쪽, f"{x:>5}" 오른쪽, f"{x:^8}" 가운데, f"{n:03}" 앞에 0. 소수 f"{x:.2f}", 쉼표 f"{n:,}". 여러 줄 """ , 줄바꿈 \\n, 탭 \\t.',
   pages:[
     { title:'찾기 find · count · startswith · endswith', html:`<p>문자열 안에서 찾고 확인하는 메서드예요.</p><pre>s = "banana"\nprint(s.find("na"))         # 2 — 처음 나온 자리\nprint(s.find("x"))          # -1 — 없으면 -1\nprint(s.count("a"))         # 3 — 몇 번\nprint(s.startswith("ba"))   # True — 이걸로 시작하나\nprint("cat.png".endswith(".png"))   # True — 이걸로 끝나나</pre><ul><li><code>find</code> 는 못 찾으면 에러 대신 <code>-1</code> 을 돌려줘요(리스트의 <code>index</code> 는 에러였죠)</li><li>있는지만 궁금하면 <code>"na" in s</code> → <code>True</code></li><li>파일 종류는 <code>endswith(".png")</code>, 명령어는 <code>startswith("/")</code> 처럼 앞뒤를 봐요</li></ul>`,
@@ -315,8 +318,11 @@ LESSONS.push(
       example:{ code:`pi = 3.14159\nprint(f"{pi:.2f}")\nprint(f"{1234567:,}")\nprint(f"{25000:,}원")\nprice = 4800\nprint(f"[{price:>8,}]")\nmenu = """1. 시작\n2. 끝내기"""\nprint(menu)\nprint("이름\\t점수")\nprint("첫 줄\\n둘째 줄")`, trace:true } },
   ],
   summary:['find 는 자리(없으면 -1), count · startswith · endswith','isdigit 로 숫자인지 먼저 보고 int()','f"{x:<8}" 칸 맞추기, f"{x:.2f}" 소수, f"{n:,}" 쉼표'] },
+{ id:'L9C', ch:3, n:16, title:'서식 출력: 칸 맞추기 · 소수 · 쉼표', mode:'text', draft:true,
+  tutorSummary:'(준비 중) 서식 출력: 칸 맞추기 · 소수 · 쉼표',
+  pages:PY_TODO('L9B 의 f-string 서식 쪽을 옮겨 와 나눠 설명'), summary:['(준비 중)'] },
 
-{ id:'L10', ch:3, n:15, title:'딕셔너리: 이름으로 찾기', mode:'text',
+{ id:'L10', ch:3, n:17, title:'딕셔너리: 이름으로 찾기', mode:'text',
   tutorSummary:'딕셔너리 {키: 값}. d[키]로 꺼내고 d[키] = 값으로 추가·수정. 없는 키는 KeyError, d.get(키, 기본값)은 안전. in으로 키 존재 확인, del d[키]로 지우기.',
   terms:{ '딕셔너리':'키(이름)로 값을 찾는 묶음. 중괄호 {키: 값}으로 만든다', '키':'딕셔너리에서 값을 찾을 때 쓰는 이름표' },
   pages:[
@@ -333,7 +339,7 @@ LESSONS.push(
   ],
   summary:['{키: 값}, d[키]로 찾고 d[키] = 값으로 넣기','없는 키는 KeyError, get(키, 기본값)은 안전','키 in d 로 있는지 묻고, del d[키]로 지우기'] },
 
-{ id:'L10B', ch:3, n:16, title:'딕셔너리 돌기와 세기', mode:'text',
+{ id:'L10B', ch:3, n:18, title:'딕셔너리 돌기와 세기', mode:'text',
   tutorSummary:'for k in d: 는 키를 하나씩, for k, v in d.items(): 는 키와 값을 함께, d.values()는 값만. 개수 세기 패턴 count[w] = count.get(w, 0) + 1. a, b = input().split() 로 한 줄의 두 값을 나눠 담는다.',
   pages:[
     { title:'for k in d: 키를 하나씩', html:`<p><code>for k in d:</code>는 딕셔너리의 <b>키</b>를 넣은 순서대로 하나씩 k에 담으며 반복해요.</p><pre>ages = {"민수": 12, "영희": 11}\nfor k in ages:\n    print(k, ages[k])   # 민수 12, 영희 11</pre><p>값이 필요하면 <code>ages[k]</code>로 꺼내요. <code>for k in ages.keys():</code>라고 써도 똑같아요(<code>keys()</code>는 키만 내줘요).</p>`,
@@ -349,7 +355,7 @@ LESSONS.push(
   ],
   summary:['for k, v in d.items(): 로 키와 값 함께','values()는 값만, count[w] = count.get(w, 0) + 1 로 개수 세기','a, b = input().split() 로 두 값 나눠 담기'] },
 
-{ id:'L11', ch:3, n:17, title:'튜플: 못 바꾸는 리스트', mode:'text',
+{ id:'L11', ch:3, n:19, title:'튜플: 못 바꾸는 리스트', mode:'text',
   tutorSummary:'튜플 (a, b)는 바꿀 수 없는 리스트, 꺼내는 법은 리스트와 같다. a, b = 1, 2 처럼 쉼표로 나눠 담고, x, y = point 로 튜플을 풀어 담는다. a, b = b, a 로 두 값을 맞바꾼다.',
   terms:{ '튜플':'한 번 만들면 바꿀 수 없는 리스트. 소괄호 ( )' },
   pages:[
@@ -362,7 +368,7 @@ LESSONS.push(
   ],
   summary:['튜플 (a, b)는 바꿀 수 없다','x, y = point 로 나눠 담기','a, b = b, a 로 맞바꾸기'] },
 
-{ id:'L11B', ch:3, n:18, title:'집합: 중복 제거', mode:'text',
+{ id:'L11B', ch:3, n:20, title:'집합: 중복 제거', mode:'text',
   tutorSummary:'집합은 같은 값이 한 번만 들어가는 묶음, 순서 없음. set(리스트)로 중복 제거, len(set(x))로 몇 종류, in 으로 있는지, sorted(집합)으로 정렬된 리스트. 집합 연산 a | b 합집합, a & b 교집합, a - b 차집합, add 로 넣기, discard 로 빼기(없어도 에러 없음).',
   terms:{ '집합':'중복이 없고 순서도 없는 묶음. set' },
   pages:[
@@ -377,7 +383,7 @@ LESSONS.push(
   ],
   summary:['set()으로 중복 제거','len(set(x)) 는 몇 종류, in 은 있는지, sorted() 로 늘어놓기','a | b 합집합 · a & b 교집합 · a - b 차집합, add · discard'] },
 
-{ id:'L11C', ch:3, n:19, title:'컴프리헨션: 한 줄로 리스트 만들기', mode:'text',
+{ id:'L11C', ch:3, n:21, title:'컴프리헨션: 한 줄로 리스트 만들기', mode:'text',
   tutorSummary:'리스트 컴프리헨션 [식 for x in 목록 if 조건]으로 한 줄에 리스트 만들기. nums = [int(x) for x in input().split()] 로 입력을 숫자 리스트로. " ".join(글자 리스트)로 한 줄 출력.',
   terms:{ '컴프리헨션':'[식 for 변수 in 목록] 처럼 한 줄로 리스트를 만드는 문법' },
   pages:[
@@ -392,7 +398,7 @@ LESSONS.push(
   ],
   summary:['[식 for x in 목록 if 조건]','[int(x) for x in input().split()] 로 입력을 숫자 리스트로','" ".join(글자 리스트) 로 한 줄 출력'] },
 
-{ id:'L12', ch:3, n:20, title:'리스트 안의 딕셔너리', mode:'text',
+{ id:'L12', ch:3, n:22, title:'리스트 안의 딕셔너리', mode:'text',
   tutorSummary:'리스트 안의 딕셔너리 [{"name":..}, ...]. 바깥 인덱스 먼저, 안쪽 키 다음: students[1]["name"]. for s in students: 로 한 명씩, append({...}) 로 추가. round(값, 자릿수)로 반올림.',
   pages:[
     { title:'리스트 안의 딕셔너리', html:`<p>리스트 칸마다 딕셔너리를 넣으면 <b>학생 명단</b> 같은 표가 돼요. 이렇게 상자 안에 상자를 넣는 모양을 [[중첩]]이라고 해요.</p><pre>students = [\n    {"name": "민수", "score": 90},\n    {"name": "영희", "score": 85},\n]\nprint(students[1]["name"])   # 영희</pre><p>꺼낼 때는 <b>바깥부터 한 겹씩</b>이에요. <code>students[1]</code> → 영희의 딕셔너리 → 그중 <code>["name"]</code> → <code>영희</code>.</p><details class="lp-more"><summary>💡 더 알아보기</summary><p>칸이 많으면 <code>[</code> 다음에서 줄을 바꿔 칸마다 한 줄씩 써도 돼요. 파이썬은 괄호가 닫힐 때까지를 한 줄로 읽어요. 마지막 칸 뒤에 쉼표가 하나 더 있어도 괜찮아요.</p></details>`,
@@ -406,7 +412,7 @@ LESSONS.push(
   ],
   summary:["students[0][\"name\"] 처럼 바깥 번호 먼저, 안쪽 키 다음", "for s in students: 로 한 명씩", "append({...}) 로 명단에 추가", "round(값, 1) 로 반올림"] },
 
-{ id:'L12B', ch:3, n:21, title:'2차원 리스트', mode:'text',
+{ id:'L12B', ch:3, n:23, title:'2차원 리스트', mode:'text',
   tutorSummary:'2차원 리스트 [[1,2],[3,4]], grid[행][열]. 행 하나는 그냥 리스트. print(x, end=" ")로 줄을 안 바꾼다. 중첩 for로 모든 칸을 돈다. 입력 줄마다 숫자 리스트로 바꿔 append 하면 표가 된다.',
   pages:[
     { title:'2차원 리스트', html:`<p>리스트 안에 리스트를 넣으면 <b>행(가로줄)과 열(세로줄)</b>이 있는 표가 돼요. <code>grid[행][열]</code>로 꺼내요.</p><pre>grid = &#91;[1, 2, 3], [4, 5, 6]]\nprint(grid[1])      # [4, 5, 6]\nprint(grid[1][0])   # 4</pre><p>바깥 번호가 먼저예요. <code>grid[1]</code>로 1번 행을 꺼내고, 그 안의 <code>[0]</code>번 칸이에요. <code>len(grid)</code>는 행 수 <code>2</code>예요.</p>`,
@@ -422,7 +428,7 @@ LESSONS.push(
   ],
   summary:['grid[행][열], 행 하나는 그냥 리스트','중첩 for 로 모든 칸 돌기, end=" " 로 한 줄에','입력 줄마다 append 해서 표 만들기'] },
 
-{ id:'L12C', ch:3, n:22, title:'정렬과 복사', mode:'text',
+{ id:'L12C', ch:3, n:24, title:'정렬과 복사', mode:'text',
   tutorSummary:'리스트.sort()는 그 자리에서 정렬, reverse=True 로 큰 것부터. key=lambda s: s["score"] 로 기준 지정. b = a 는 복사가 아니라 같은 상자, 따로 쓰려면 a.copy().',
   pages:[
     { title:'sort: 그 자리에서 정렬', html:`<p><code>리스트.sort()</code>는 리스트를 <b>그 자리에서</b> 작은 것부터 줄 세워요. <code>reverse=True</code>를 주면 큰 것부터예요.</p><pre>nums = [3, 1, 2]\nnums.sort()\nprint(nums)   # [1, 2, 3]\nnums.sort(reverse=True)\nprint(nums)   # [3, 2, 1]</pre><p>[[레슨:L11B]]의 <code>sorted()</code>는 정렬한 <b>새 리스트</b>를 주고, <code>sort()</code>는 <b>원래 리스트를 바꿔요</b>.</p>`,
@@ -437,7 +443,7 @@ LESSONS.push(
 { id:'B3', ch:3, boss:true, title:'보스: 간단한 가계부', mode:'text', pages:[], summary:[],
   tutorSummary:'미니 프로젝트 2. 명령을 입력받아 딕셔너리에 항목별 금액을 누적하고 합계·검색을 출력하는 프로그램. split, 딕셔너리 get, while/break 종합.' },
 
-{ id:'L13', ch:4, n:23, title:'예외 처리', mode:'text',
+{ id:'L13', ch:4, n:25, title:'예외 처리', mode:'text',
   tutorSummary:'try: 위험한 코드 except 에러이름: 대처. 여러 except 가능. else는 에러 없을 때, finally는 항상. 에러 종류를 지정해 잡는 것이 좋다.',
   terms:{ '예외':'실행 중에 생기는 에러. ValueError, ZeroDivisionError 등', '예외 처리':'에러가 나도 프로그램이 멈추지 않도록 try/except로 받아내는 것' },
   pages:[
@@ -458,7 +464,7 @@ LESSONS.push(
   ],
   summary:['try: 안의 에러를 except로 잡는다','except ValueError: 처럼 종류를 지정','else는 성공 시, finally는 항상'] },
 
-{ id:'L14', ch:4, n:24, title:'클래스 1: 객체 만들기', mode:'text',
+{ id:'L14', ch:4, n:26, title:'클래스 1: 객체 만들기', mode:'text',
   tutorSummary:"class 이름: 으로 설계도를 만들고 이름()으로 객체를 찍어낸다. __init__(self, ...)는 객체가 만들어질 때 실행되며 self.속성 = 값 으로 저장. self는 객체 자신. 메서드는 클래스 안의 def 로 객체.메서드()처럼 부른다. 같은 설계도로 여러 객체를 만들면 각자 따로다.",
   terms:{ '클래스':'객체를 찍어내는 설계도(틀)', '객체':'클래스로 만들어진 실제 물건. 자기만의 속성을 가진다', '속성':'객체가 가진 값. self.name 처럼 접근', 'self':'메서드 안에서 "이 객체 자신"을 가리키는 이름' },
   pages:[
@@ -477,7 +483,7 @@ LESSONS.push(
   ],
   summary:["class 이름: 설계도, 이름()으로 객체 생성", "__init__(self, ...)에서 self.속성 = 값", "메서드 def 이름(self): 는 물건이 하는 일, 객체.메서드()로 부르고 self는 안 넘긴다", "같은 설계도로 만든 객체 여러 개는 서로 다른 물건"] },
 
-{ id:'L15', ch:4, n:25, title:'클래스 2: 메서드와 상속', mode:'text',
+{ id:'L15', ch:4, n:27, title:'클래스 2: 메서드와 상속', mode:'text',
   tutorSummary:"클래스 안의 함수가 메서드. 첫 매개변수 self로 자기 속성을 읽고 바꾸며, 값을 더 받을 수도 있다. class 자식(부모): 로 상속하면 부모 메서드를 물려받고 같은 이름으로 덮어쓸 수 있다. __str__은 print할 때 보일 문자열, super().__init__(...)은 부모의 __init__을 불러 쓴다.",
   terms:{ '상속':'기존 클래스의 기능을 물려받아 새 클래스를 만드는 것', '오버라이딩':'부모에게 물려받은 메서드를 자식이 같은 이름으로 다시 정의해 덮어쓰는 것' },
   pages:[
@@ -496,7 +502,7 @@ LESSONS.push(
   ],
   summary:["메서드로 self.속성을 바꾸고, 값도 받을 수 있다", "class 자식(부모): 로 상속, 같은 이름이면 덮어씀(오버라이딩)", "__str__은 print할 때 보일 문자열", "super().__init__(...)로 부모의 __init__ 불러 쓰기"] },
 
-{ id:'L15B', ch:4, n:26, title:'클래스 3: 특수 메서드 · property · dataclass', mode:'text',
+{ id:'L15B', ch:4, n:28, title:'클래스 3: 특수 메서드 · property · dataclass', mode:'text',
   tutorSummary:'특수 메서드는 파이썬이 알아서 부르는 __이름__ 메서드. __repr__ 은 개발자용 모양(리스트 안·repr()에서 보임, __str__ 이 없으면 print 도 씀). __eq__(self, other) 는 ==, __lt__ 는 < — __lt__ 가 있으면 sorted·min·max 가 된다(없으면 TypeError). 클래스 속성은 class 바로 아래 변수로 모든 객체가 같이 보고, 바꿀 땐 클래스이름.count += 1(self.count 는 그 객체에만 새로 생김), 리스트는 클래스 속성으로 두지 않는다. @property 는 괄호 없이 읽는 계산 속성이고 읽기만 돼서(= 로 넣으면 AttributeError) 진짜 값은 self._balance 에 두고 검사하는 메서드로만 바꾼다. @dataclass(from dataclasses import dataclass)는 title: str 처럼 칸만 적으면 __init__·__repr__·__eq__ 를 만들어 준다. : str 은 타입 힌트 — 실행에는 영향 없음, 기본값 있는 칸은 뒤에.',
   terms:{ '특수 메서드':'__repr__ · __eq__ · __lt__ 처럼 앞뒤에 밑줄 두 개가 붙은 메서드. 직접 부르지 않고 print · == · sorted 같은 것을 쓸 때 파이썬이 불러 준다', '클래스 속성':'class 바로 아래(메서드 밖)에 적은 변수. 설계도에 붙어 있어서 모든 객체가 같은 값을 본다', 'property':'@property 를 붙인 메서드. 괄호 없이 속성처럼 읽고, 읽을 때마다 계산한다', '타입 힌트':'title: str 의 : str 처럼 「여기엔 이런 값이 들어가요」 하고 적어 두는 표시. 사람과 에디터가 보고, 실행에는 영향이 없다' },
   pages:[
@@ -512,7 +518,10 @@ LESSONS.push(
       example:{ code:`from dataclasses import dataclass\n\n@dataclass\nclass Todo:\n    title: str\n    done: bool = False\n\n    def check(self):\n        self.done = True\n\ntodos = [Todo("장보기"), Todo("숙제", done=True), Todo("운동")]\ntodos[0].check()\nfor t in todos:\n    print(t)\nprint(todos[1] == Todo("숙제", True))\nodd = Todo(123)\nprint(odd)`, trace:true } },
   ],
   summary:['__repr__ 은 리스트 안에서도 보이는 모양, __eq__ 는 ==, __lt__ 가 있으면 sorted 가 된다', '클래스 속성은 모두 같이(바꿀 땐 클래스이름.count), @property 는 괄호 없이 읽는 계산 속성이고 = 로는 못 바꾼다', '@dataclass 는 title: str 처럼 칸만 적으면 __init__ · __repr__ · __eq__ 가 생긴다'] },
-{ id:'L15C', ch:4, n:27, title:'내 예외 만들기: raise', mode:'text',
+{ id:'L15E', ch:4, n:29, title:'클래스 4: 클래스 속성 · property · dataclass', mode:'text', draft:true,
+  tutorSummary:'(준비 중) 클래스 4: 클래스 속성 · property · dataclass',
+  pages:PY_TODO('L15B 의 클래스 속성 · property · dataclass 를 옮겨 옴'), summary:['(준비 중)'] },
+{ id:'L15C', ch:4, n:30, title:'내 예외 만들기: raise', mode:'text',
   tutorSummary:'raise ValueError("설명") 으로 함수가 약속을 못 지킨다고 알린다 — 함수는 그 자리에서 멈추고 에러가 부른 쪽으로, except ValueError as e 로 잡으면 print(e) 에 설명. 없을 수도 있는 게 보통이면 None(찾기·get), 이 값으로는 일을 못 하면 raise(조용히 None·0 을 돌려주면 엉뚱한 곳에서 터짐). 내 예외는 class BalanceError(Exception): pass — 이름은 Error 로 끝나게, (Exception) 을 빼면 TypeError. 값을 같이 담으려면 __init__ 에서 super().__init__(메시지) + self.need = need. 예외의 가족: except 부모 는 자식까지 잡는다(Exception 이 거의 전부, LookupError 는 IndexError·KeyError), class AgeError(ValueError) 는 ValueError 로도 잡힘, 내 프로그램 예외를 한 가족(BankError 아래)으로, except 는 자식부터. 던지는 쪽(검사 함수는 raise 만)과 잡는 쪽(부르는 쪽이 메시지·다시 받기)을 나눈다. except 안의 raise 한 단어는 잡은 에러를 다시 던지고, raise 내예외(…) from e 는 바꿔 던지며 원래 에러를 붙여 둔다. except Exception: pass 로 조용히 넘기지 않기.',
   terms:{ 'raise':'에러를 일부러 던지는 것. raise 를 만나면 함수는 그 자리에서 멈추고 에러가 부른 쪽으로 간다', '내 예외':'Exception(이나 그 자식)을 물려받아 내가 만든 에러 클래스. 이름으로 「무슨 일인지」 알려 준다' },
   pages:[
@@ -528,7 +537,7 @@ LESSONS.push(
       example:{ code:`class ConfigError(Exception):\n    pass\n\ndef read_port(text):\n    try:\n        return int(text)\n    except ValueError as e:\n        raise ConfigError(f"포트는 숫자여야 해요: {text}") from e\n\nfor text in ["8080", "팔공"]:\n    try:\n        print("포트:", read_port(text))\n    except ConfigError as e:\n        print(e)\n        print("원래 에러:", e.__cause__)`, trace:true } },
   ],
   summary:['raise ValueError("설명") 으로 함수가 약속을 못 지킨다고 알린다 — 없을 수도 있는 게 보통이면 None', 'class BalanceError(Exception): 로 내 예외, 값은 super().__init__(메시지) 와 self.속성 에, except 부모 는 자식까지 잡는다', '검사 함수는 raise 만, 부르는 쪽이 잡는다 — 다시 던지기 raise · 바꿔 던지기 raise … from e'] },
-{ id:'L16', ch:4, n:28, title:'모듈과 random', mode:'text',
+{ id:'L16', ch:4, n:31, title:'모듈과 random', mode:'text',
   tutorSummary:"import 모듈 로 가져와 모듈.함수() 사용. from 모듈 import 이름 으로 바로 사용. math(sqrt, pi, floor, ceil), random(randint 는 끝 숫자 포함, choice 하나 고르기, shuffle 그 자리에서 섞기). seed 로 같은 결과 재현.",
   terms:{ '모듈':'미리 만들어진 코드 묶음(도구 상자). import로 가져온다', '표준 라이브러리':'파이썬에 기본으로 들어 있는 모듈 모음' },
   pages:[
@@ -547,7 +556,7 @@ LESSONS.push(
   ],
   summary:["import 모듈 → 모듈.함수(), from 모듈 import 이름 → 바로 사용", "random.randint(a, b)는 a~b 정수(b 포함), choice는 하나 고르기, shuffle은 그 자리에서 섞기", "random.seed로 같은 결과 재현"] },
 
-{ id:'L16B', ch:4, n:29, title:'날짜: datetime 맛보기', mode:'text',
+{ id:'L16B', ch:4, n:32, title:'날짜: datetime 맛보기', mode:'text',
   tutorSummary:'from datetime import date, timedelta. date(연, 월, 일)로 날짜, 날짜 + timedelta(days=n) 은 n일 뒤, (날짜 - 날짜).days 는 며칠 차이, 날짜.weekday() 는 월요일 0 ~ 일요일 6.',
   pages:[
     { title:'date: 날짜 만들기', html:`<p><code>datetime</code> 모듈의 <code>date</code>는 날짜를 다뤄요. <b>연, 월, 일</b> 숫자 세 개로 만들어요.</p><pre>from datetime import date\nd = date(2024, 3, 1)\nprint(d)   # 2024-03-01</pre><p>달마다 다른 날 수와 윤년은 date가 알아서 처리해요. 입력받은 날짜 글자를 날짜로 바꾸는 법·날짜 비교는 [[레슨:L19]](날짜와 시간)에서 더 배워요.</p>`,
@@ -559,7 +568,7 @@ LESSONS.push(
   ],
   summary:['date(연, 월, 일)','날짜 + timedelta(days=n) → n일 뒤, (날짜 - 날짜).days → 며칠','weekday() 는 월요일 0'] },
 
-{ id:'L16C', ch:4, n:30, title:'내 모듈과 패키지', mode:'text',
+{ id:'L16C', ch:4, n:33, title:'내 모듈과 패키지', mode:'text',
   tutorSummary:'프로그램이 길어지면 파일을 나눈다. 같은 폴더의 utils.py 를 main.py 에서 import utils 로 가져와 utils.add() 처럼 쓰고, from utils import add 면 이름만으로. 모듈 이름은 파일 이름에서 .py 를 뺀 것이고, 파이썬은 실행한 파일의 폴더를 먼저 찾는다. 그래서 내 파일을 random.py · json.py 처럼 표준 모듈 이름으로 지으면 import random 이 내 파일을 가져와 AttributeError(module \'random\' has no attribute \'randint\') — 이름을 바꾸면 된다. import 는 그 파일을 위에서 아래로 한 번 실행하므로, 시험 코드는 if __name__ == "__main__": 아래에 둔다(직접 실행하면 __name__ 은 "__main__", import 되면 모듈 이름). 큰 프로그램은 def main(): 을 만들어 그 if 아래에서 부른다. 폴더 + __init__.py = 패키지: from mypkg.tools import shout, 폴더 안의 __main__.py 는 바깥 폴더에서 python -m mypkg 로 실행(-m 은 모듈 이름으로 실행 — python -m pip 도 같은 것). 표준 라이브러리 맛보기: math.gcd · factorial · isqrt, collections.Counter(개수 세기, most_common, 없는 것은 0), itertools.combinations · permutations. 찾는 법: docs.python.org/ko 의 표준 라이브러리 목차, dir() · help(), VS Code 자동 완성.',
   terms:{ '내 모듈':'내가 만든 .py 파일. 같은 폴더의 다른 파일에서 import 파일이름 으로 가져다 쓴다', '패키지':'__init__.py 가 든 폴더. 모듈 여러 개를 한 이름으로 묶는다' },
   pages:[
@@ -573,7 +582,10 @@ LESSONS.push(
       example:{ code:`import math\nfrom collections import Counter\nfrom itertools import combinations\n\nprint(math.gcd(12, 18))\nwords = "사과 배 사과 귤 사과 배".split()\nc = Counter(words)\nprint(c.most_common(2))\nprint(c["포도"])\nfor pair in combinations(["가", "나", "다"], 2):\n    print(pair)`, trace:true } },
   ],
   summary:['import utils 로 같은 폴더의 내 파일을 — random.py 처럼 표준 모듈 이름은 피하기', 'if __name__ == "__main__": 아래는 직접 실행할 때만 돈다', '폴더 + __init__.py = 패키지, __main__.py 는 python -m 패키지'] },
-{ id:'L16D', ch:4, n:31, title:'pip 와 가상 환경', mode:'text',
+{ id:'L16E', ch:4, n:34, title:'표준 라이브러리 둘러보기', mode:'text', draft:true,
+  tutorSummary:'(준비 중) 표준 라이브러리 둘러보기',
+  pages:PY_TODO('L16C/3 의 math · collections · itertools 등을 옮겨 옴'), summary:['(준비 중)'] },
+{ id:'L16D', ch:4, n:35, title:'pip 와 가상 환경', mode:'text',
   tutorSummary:'표준 라이브러리 밖의 라이브러리는 PyPI(pypi.org)에 있고 pip 로 깐다: python -m pip install requests(딸린 라이브러리도 같이), python -m pip list · show · uninstall, ==버전 으로 고정. 그냥 pip 보다 python -m pip 이 「지금 그 python 의 pip」 이라 확실(Mac 은 python3). 안 깔고 import 하면 ModuleNotFoundError. 프로젝트마다 가상 환경: 프로젝트 폴더에서 python -m venv .venv → 켜기(PowerShell .venv\\Scripts\\Activate.ps1, Git Bash source .venv/Scripts/activate, Mac source .venv/bin/activate) → 줄 앞에 (.venv) → 그 안에서 pip install → deactivate 로 끄기. .venv 는 지우고 다시 만들어도 된다. PowerShell 이 「이 시스템에서 스크립트를 실행할 수 없으므로」 로 막으면 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned 한 번(내 계정만), 또는 Git Bash. 가상 환경 안인지는 sys.prefix != sys.base_prefix. VS Code 는 Ctrl+Shift+P → Python: Select Interpreter → .venv(오른쪽 아래 표시, Import could not be resolved 노란 밑줄은 인터프리터가 다를 때). python -m pip freeze > requirements.txt 로 이름==버전 목록을 남기고, 새 가상 환경에서 python -m pip install -r requirements.txt 로 똑같이. .venv/ 는 .gitignore 에 넣고 코드와 requirements.txt 만 올린다.',
   terms:{ 'PyPI':'파이썬 라이브러리를 모아 둔 공개 저장소(pypi.org). pip 가 여기서 받아 온다', 'pip':'파이썬 라이브러리를 깔고 지우는 도구. python -m pip 으로 부른다', '가상 환경':'프로젝트 폴더 안에 만드는 그 프로젝트 전용 파이썬 자리(.venv). 여기에 깐 라이브러리는 이 프로젝트에서만 보인다' },
   pages:[
@@ -588,7 +600,7 @@ LESSONS.push(
 { id:'B4', ch:4, boss:true, title:'보스: 클래스로 만든 가위바위보', mode:'text', pages:[], summary:[],
   tutorSummary:'Player 클래스(이름, 점수)와 승부 판정 함수로 여러 라운드의 가위바위보 결과와 최종 점수를 출력한다.' },
 
-{ id:'L17', ch:5, n:32, title:'파일 입출력', mode:'text',
+{ id:'L17', ch:5, n:36, title:'파일 입출력', mode:'text',
   tutorSummary:'with open(파일, "w") as f: f.write(...) 로 쓰기, "a"는 이어쓰기, "r"은 읽기. f.read()는 전체, f.readlines()는 줄 목록, for line in f: 로 한 줄씩. strip()으로 줄바꿈 제거. encoding="utf-8".',
   pages:[
     { title:'파일에 쓰기', html:`<p>변수는 프로그램이 끝나면 사라져요. [[파일]]에 적어 두면 <b>다음에도 남아요</b>.</p><pre>with open("hello.txt", "w", encoding="utf-8") as f:\n    f.write("안녕")</pre><ul><li><code>"w"</code>: 쓰기 모드. 파일이 없으면 새로 만들어요</li><li><code>encoding="utf-8"</code>: 한글이 깨지지 않게</li><li><code>as f</code>: 열린 파일을 f라고 불러요</li><li><code>with</code> 블록이 끝나면 파일을 자동으로 닫아요</li></ul><p>예제 끝 두 줄은 "r"로 다시 열어 <code>f.read()</code>로 내용을 읽어 출력하는 코드예요(다음 쪽).</p><details class="lp-more"><summary>💡 더 알아보기</summary><p>이 앱의 파일은 브라우저 안 가상 공간에 만들어져요. 한 번 실행하는 동안 쓰고 읽을 수 있어요.</p></details>`,
@@ -610,7 +622,7 @@ LESSONS.push(
   ],
   summary:['with open(파일, "w") as f: f.write()','"r"로 열어 for line in f: 한 줄씩','line.strip()으로 줄바꿈 제거'] },
 
-{ id:'L17B', ch:5, n:33, title:'파일 2: 경로 · 인코딩 · JSON', mode:'text',
+{ id:'L17B', ch:5, n:37, title:'파일 2: 경로 · 인코딩 · JSON', mode:'text',
   tutorSummary:'from pathlib import Path 로 경로를 다룬다. Path("data") / "scores.txt" 처럼 / 로 잇고(Windows 는 \\, Mac 은 / 로 알아서), .name · .stem · .suffix · .parent 로 조각을 꺼낸다. exists() 로 있는지, mkdir(exist_ok=True) 로 폴더 만들기(이미 있어도 에러 없음), sorted(folder.glob("*.txt")) 로 파일 고르기(glob 은 순서가 없어서 sorted). open() 에 Path 를 그대로 넣는다. 상대 경로는 .py 파일이 아니라 터미널이 있는 곳(작업 폴더, Path.cwd()) 기준이라, 프로그램과 같이 다니는 파일은 Path(__file__).parent / "이름" 으로 연다. 파일은 늘 encoding="utf-8" — 파이썬 3.15 부터는 Windows 도 기본이 utf-8 이지만, 3.14 이하 Windows 는 cp949 라 빼면 UnicodeDecodeError 나 깨진 글자(cp949 로 저장된 파일을 utf-8 로 읽어도 에러). with 는 블록이 끝나면(에러가 나도) 파일을 닫아 준다. JSON 은 리스트·딕셔너리를 글자로 저장하는 형식: json.dump(data, f, ensure_ascii=False, indent=2) 로 저장(ensure_ascii=False 는 한글 그대로, indent=2 는 보기 좋게), json.load(f) 로 불러오기. True→true, None→null, 튜플→리스트, 키는 늘 글자. 파일이 없으면 if not path.exists(): return 기본값 (또는 except FileNotFoundError).',
   terms:{ '경로':'파일이 어디 있는지 적은 이름. data/scores.txt 처럼 폴더와 파일 이름을 이어 적는다', '작업 폴더':'프로그램을 실행한 터미널이 있는 폴더. 폴더 없이 적은 파일 이름은 여기서 찾는다', '인코딩':'글자를 바이트(0~255 숫자)로 바꾸는 규칙. utf-8 · cp949 등이 있고, 쓸 때와 읽을 때 같아야 한다', 'JSON':'리스트·딕셔너리를 글자로 저장하는 형식. 사람도 읽을 수 있고 다른 언어·웹에서도 쓴다' },
   pages:[
@@ -626,7 +638,10 @@ LESSONS.push(
       example:{ code:`import json\nfrom pathlib import Path\n\ndef load(path, default):\n    if not path.exists():\n        return default\n    with open(path, encoding="utf-8") as f:\n        return json.load(f)\n\ndef save(path, data):\n    with open(path, "w", encoding="utf-8") as f:\n        json.dump(data, f, ensure_ascii=False, indent=2)\n\np = Path("visits.json")\nprint("처음엔 파일이 있나:", p.exists())\nfor run in range(3):\n    data = load(p, {"방문": 0})\n    data["방문"] += 1\n    save(p, data)\n    print("방문", data["방문"], "번째")`, trace:true } },
   ],
   summary:['Path("data") / "a.txt" 로 잇고, 같이 다니는 파일은 Path(__file__).parent 에서부터', '파일은 늘 encoding="utf-8" — 3.14 이하 Windows 기본은 cp949', 'json.dump(data, f, ensure_ascii=False, indent=2) 로 저장, json.load(f) 로 불러오기, 없으면 기본값'] },
-{ id:'L18', ch:5, n:34, title:'람다와 정렬 기준', mode:'text',
+{ id:'L17C', ch:5, n:38, title:'JSON 으로 저장하기', mode:'text', draft:true,
+  tutorSummary:'(준비 중) JSON 으로 저장하기',
+  pages:PY_TODO('L17B 의 JSON 쪽과 기본값을 옮겨 옴'), summary:['(준비 중)'] },
+{ id:'L18', ch:5, n:39, title:'람다와 정렬 기준', mode:'text',
   tutorSummary:'lambda 매개변수: 식 은 한 줄짜리 이름 없는 함수. sorted(목록, key=람다, reverse=True) 로 무엇을 기준으로 줄 세울지 정한다. 튜플 리스트는 key=lambda p: p[1].',
   terms:{ '람다':'lambda x: x * 2 처럼 한 줄로 쓰는 이름 없는 작은 함수' },
   pages:[
@@ -639,7 +654,7 @@ LESSONS.push(
   ],
   summary:["lambda x: 식 은 한 줄 함수(return 없이)", "sort·sorted(목록, key=람다) 로 기준 정하기, 큰 것부터는 reverse=True", "튜플 리스트는 key=lambda p: p[1]"] },
 
-{ id:'L18B', ch:5, n:35, title:'map·filter·enumerate·zip', mode:'text',
+{ id:'L18B', ch:5, n:40, title:'map·filter·enumerate·zip', mode:'text',
   tutorSummary:'map(함수, 목록)은 모두에 적용, filter(함수, 목록)은 True 인 것만 — list() 로 감싼다. enumerate 는 번호와 함께, zip 은 두 목록을 짝지어, max·min 은 가장 큰·작은 값.',
   pages:[
     { title:'map: 모두에 함수 적용', html:`<p><code>map(함수, 목록)</code>은 목록의 <b>모든 값에 함수를 한 번씩</b> 적용해요. 함수 자리에는 <code>int</code>처럼 이름만 써요(괄호 없이).</p><pre>nums = ["1", "2", "3"]\nints = list(map(int, nums))\nprint(ints)   # [1, 2, 3]\ntotal = sum(map(int, nums))\nprint(total)    # 6</pre><p>map의 결과는 그대로 print하면 내용이 안 보여서 <code>list()</code>로 감싸 리스트로 바꿔요. <code>sum()</code>에는 그대로 넣어도 돼요. 입력을 한꺼번에 숫자로: <code>map(int, input().split())</code>.</p>`,
@@ -655,7 +670,7 @@ LESSONS.push(
   ],
   summary:['map 은 모두에 적용, filter 는 골라내기 — list() 로 감싸기','enumerate 는 번호와 함께, zip 은 짝짓기','max·min 으로 가장 큰·작은 값'] },
 
-{ id:'L18C', ch:5, n:36, title:'반복자와 제너레이터', mode:'text',
+{ id:'L18C', ch:5, n:41, title:'반복자와 제너레이터', mode:'text',
   tutorSummary:'for 는 iter(목록) 으로 반복자를 받고 next() 로 하나씩 꺼내다가 StopIteration 이 나면 끝낸다. next(it, 기본값) 은 끝이면 기본값. 반복자(map·filter·zip 결과도)는 앞으로만 가서 한 번 다 쓰면 비어 있다 — 다시 쓰려면 list() 로 담아 둔다. yield 가 있는 함수는 제너레이터 — 불러도 바로 안 돌고, next 마다 yield 까지 돌아 값 하나를 내보내고 멈췄다가 다음에 그 자리부터 이어서 돈다. 필요할 때만 계산해 메모리를 아끼고 while True 로 끝없는 것도 된다. 제너레이터 식 (x * x for x in …) 은 컴프리헨션의 [] 를 () 로 바꾼 것, sum·max·join 에 바로 넣는다. for line in f 는 큰 파일도 한 줄씩 읽고, 제너레이터를 이어 붙여 읽기→고르기를 흘려보낸다. yield from 목록 은 for x in 목록: yield x 를 줄인 것.',
   terms:{ '반복자':'next() 로 다음 값을 하나씩 꺼내 주는 것. 다 꺼내면 StopIteration 으로 끝을 알리고, 앞으로만 가서 한 번 다 쓰면 비어 있다', '제너레이터':'yield 가 들어 있는 함수나 (식 for x in …) 가 만드는 반복자. 값을 미리 다 만들지 않고 꺼낼 때마다 하나씩 계산한다' },
   pages:[
@@ -669,7 +684,7 @@ LESSONS.push(
       example:{ code:`with open("log.txt", "w", encoding="utf-8") as f:\n    f.write("INFO 시작\\nERROR 디스크 부족\\nINFO 저장\\nERROR 연결 끊김\\n")\n\ndef read_lines(path):\n    with open(path, encoding="utf-8") as f:\n        for line in f:\n            yield line.strip()\n\ndef only_errors(lines):\n    for line in lines:\n        if line.startswith("ERROR"):\n            yield line\n\nfor line in only_errors(read_lines("log.txt")):\n    print(line)\n\ndef both(a, b):\n    yield from a\n    yield from b\n\nitems = list(both([1, 2], "ab"))\nprint(items)`, trace:true } },
   ],
   summary:['for 는 iter 로 반복자를 받고 next 로 하나씩 — 끝은 StopIteration, 한 번 쓰면 끝', 'yield 는 값 하나를 내보내고 멈췄다가 다음 next 에 이어서 돈다', '(x * x for x in …) 은 필요할 때만 계산 — sum(…) 에 바로, 큰 파일은 for line in f'] },
-{ id:'L18D', ch:5, n:37, title:'함수를 값처럼 · 데코레이터', mode:'text',
+{ id:'L18D', ch:5, n:42, title:'함수를 값처럼 · 데코레이터', mode:'text',
   tutorSummary:'함수도 값이다 — 괄호 없이 이름만 쓰면 함수 그 자체라 변수에 담고(say = hello), 인자로 넘기고(sorted 의 key=len, twice(func, x)), 딕셔너리에 담고(ops["+"](7, 2)), 돌려줄 수 있다. 클로저는 안쪽 함수가 바깥 함수의 변수를 기억하는 것(make_adder(3)), 바꾸려면 nonlocal — 카운터마다 자기 값을 따로 가진다. 데코레이터는 함수를 받아 감싼 함수(wrapper(*args) 안에서 func(*args) 를 부르고 결과를 return)를 돌려주는 함수, def 위의 @loud 는 add = loud(add) 를 줄여 쓴 것. @functools.wraps(func) 는 감싼 함수에 원래 이름·docstring 을 옮겨 준다. 괄호 있는 데코레이터 @get("/hello") 는 데코레이터를 돌려주는 함수. @property · @dataclass(L15B), FastAPI 의 @app.get, @functools.cache 가 모두 데코레이터.',
   terms:{ '클로저':'안쪽 함수가 바깥 함수의 변수를 기억하고 쓰는 것. 바깥 함수가 끝난 뒤에도 그 값이 남아 있다', '데코레이터':'함수를 받아서 그 함수를 감싼 새 함수를 돌려주는 함수. def 위에 @이름 으로 붙인다' },
   pages:[
@@ -683,7 +698,10 @@ LESSONS.push(
       example:{ code:`import functools\n\ndef loud(func):\n    @functools.wraps(func)\n    def wrapper(*args):\n        print("부르기 전")\n        return func(*args)\n    return wrapper\n\n@loud\ndef add(a, b):\n    """두 수를 더해요."""\n    return a + b\n\nprint(add(2, 3))\nprint(add.__name__)\nprint(add.__doc__)\n\nroutes = {}\n\ndef get(path):\n    def deco(func):\n        routes[path] = func\n        return func\n    return deco\n\n@get("/hello")\ndef hello():\n    return "안녕하세요"\n\n@get("/bye")\ndef bye():\n    return "잘 가요"\n\nfor path in sorted(routes):\n    print(path, "→", routes[path]())`, trace:true } },
   ],
   summary:['함수도 값 — 괄호 없이 담고, 넘기고(key=len), 돌려준다', '클로저는 바깥 값을 기억한다 — 바꾸려면 nonlocal', '@데코 는 f = 데코(f) — 감싼 wrapper 를 돌려주는 함수'] },
-{ id:'L18E', ch:5, n:38, title:'타입 힌트', mode:'text',
+{ id:'L18F', ch:5, n:43, title:'데코레이터', mode:'text', draft:true,
+  tutorSummary:'(준비 중) 데코레이터',
+  pages:PY_TODO('L18D 의 데코레이터 쪽을 옮겨 옴'), summary:['(준비 중)'] },
+{ id:'L18E', ch:5, n:44, title:'타입 힌트', mode:'text',
   tutorSummary:'타입 힌트는 매개변수·돌려주는 값에 「여기엔 이런 타입이 와요」 라고 적는 메모. 사람과 에디터가 읽고, 실행에는 영향 없음(틀려도 돌아감, double("ab") → abab). 파이썬은 함수.__annotations__ 에 적어 두기만 한다(돌려주는 값은 "return" 칸, 타입 이름은 .__name__). 모양 def f(name: str, n: int = 1) -> str: — 기본값은 힌트 뒤 = 양쪽 빈칸, 돌려주는 게 없으면 -> None, 변수는 빈 리스트·딕셔너리로 시작할 때 counts: dict[str, int] = {}. 컬렉션 list[int]·list[str]·dict[str, int]·tuple[int, str](딱 두 칸)·set[str], 옛 typing 의 List·Dict 는 같은 뜻. 없을 수도 있으면 str | None(받는 쪽은 if x is None: 먼저), 둘 중 하나 int | str, | 는 3.10 부터, Optional[str] 과 같음. 쓰이는 곳: VS Code 자동 완성, Type Checking Mode basic 으로 경고, 터미널 mypy, dataclass 의 칸, FastAPI·Pydantic 은 힌트로 진짜 검사(422). 내 코드에서 진짜 검사는 isinstance(값, 타입)·(int, float) 는 이 중 하나, type(값).__name__ 은 실제 타입 이름, 밖에서 온 값만 검사하고 raise. isinstance(True, int) 는 True(bool 은 int 의 한 종류).',
   terms:{ '타입':'값의 종류. int(정수) · float(소수) · str(글자) · bool(True · False) · list · dict …', '타입 힌트':'name: str · -> int 처럼 「여기엔 이런 타입이 와요」 라고 적어 두는 메모. 파이썬은 검사하지 않는다', '타입 검사기':'힌트와 다르게 쓴 곳을 실행하기 전에 찾아 주는 도구. VS Code 의 Pylance, 터미널의 mypy' },
   pages:[
@@ -1051,7 +1069,7 @@ const CHAPTERS = [
 // =====================================================================
 CHAPTERS.push({ ch: 6, name: '실전', color: '#ffd166' });
 LESSONS.push(
-{ id: 'X1', ch: 6, n: 39, practical: true, title: '실전 1: 내 CSV 분석기', mode: 'text',
+{ id: 'X1', ch: 6, n: 45, practical: true, title: '실전 1: 내 CSV 분석기', mode: 'text',
   tutorSummary: '실전 프로젝트 1. csv 모듈로 파일을 읽어 딕셔너리 리스트로 만들고, 명령(요약/평균/반별/저장)에 따라 집계해 출력한다. 저장은 result.csv로 쓰고 앱에서 내려받는다. 사용자가 자기 CSV를 올릴 수 있다.',
   terms: { 'CSV': '쉼표로 값을 나눈 표 파일. 엑셀에서 저장할 수 있다', '헤더': 'CSV의 첫 줄. 열 이름들' },
   pages:[
@@ -1073,7 +1091,7 @@ LESSONS.push(
       example:{ code:`import csv\nwith open("result.csv", "w", encoding="utf-8", newline="") as f:\n    w = csv.writer(f)\n    w.writerow(["반", "인원", "평균"])\n    w.writerow(["1", 3, "90.3"])\nwith open("result.csv", encoding="utf-8") as f:\n    print(f.read())`, trace:true } },
   ],
   summary: ['csv.DictReader로 줄마다 딕셔너리, 값은 글자라 int()로', '그룹 집계 = sums.get(k, 0) + v, counts.get(k, 0) + 1', 'csv.writer로 결과 파일 저장'] },
-{ id: 'X2', ch: 6, n: 40, practical: true, title: '실전 2: 단어 암기 퀴즈', mode: 'text',
+{ id: 'X2', ch: 6, n: 46, practical: true, title: '실전 2: 단어 암기 퀴즈', mode: 'text',
   tutorSummary: '실전 프로젝트 2. 단어 파일(words.csv)을 Card 객체 리스트로 읽고, 명령 루프(목록/퀴즈 seed/복습/끝)로 동작. 퀴즈는 random.seed 후 shuffle, 답을 input으로 받아 채점, 틀린 단어를 wrong.csv에 저장해 복습에 재출제.',
   terms: { '단어장': '영어 단어와 뜻을 모아 둔 파일' },
   pages:[
@@ -1128,7 +1146,7 @@ PROBLEMS.push(
 );
 // --- v2.2.3 (docs/archive/NEXT.md WP-G): 실전 3·4 ---
 LESSONS.push(
-{ id: 'X3', ch: 6, n: 41, practical: true, title: '실전 3: 할 일 관리 앱', mode: 'text',
+{ id: 'X3', ch: 6, n: 47, practical: true, title: '실전 3: 할 일 관리 앱', mode: 'text',
   tutorSummary: "실전 프로젝트 3. todo.json(리스트[{title, prio, due, done}])을 json.load로 읽고 명령 루프(목록/추가/완료/급한 날짜/저장/끝)로 다룬다. 한 줄 조건식 A if 조건 else B, f-string 안 따옴표는 바깥과 다르게. 목록은 (done, due, prio) 튜플 key 로 정렬. 못 찾으면 for … else. 저장은 json.dump(ensure_ascii=False, indent=2).",
   terms: { 'JSON': '리스트·딕셔너리를 글자로 저장하는 형식. 파이썬의 json 모듈로 읽고 쓴다' },
   pages:[
@@ -1150,7 +1168,7 @@ LESSONS.push(
       example:{ code:`todos = [{"title": "수학", "due": "2026-11-05", "done": False},\n         {"title": "독서", "due": "2026-11-10", "done": False}]\nurgent = [t for t in todos if not t["done"] and t["due"] <= "2026-11-06"]\nprint(len(urgent), urgent[0]["title"])`, trace:true } },
   ],
   summary: ["json.load / json.dump(ensure_ascii=False, indent=2)", "A if 조건 else B 한 줄 조건식, f-string 안에는 바깥과 다른 따옴표", "정렬 기준이 여러 개면 key에 튜플, YYYY-MM-DD 글자 비교 = 날짜 비교", "for … else: break 없이 끝까지 돌면 else"] },
-{ id: 'X4', ch: 6, n: 42, practical: true, title: '실전 4: 가계부 분석기', mode: 'text',
+{ id: 'X4', ch: 6, n: 48, practical: true, title: '실전 4: 가계부 분석기', mode: 'text',
   tutorSummary: '실전 프로젝트 4. ledger.csv(날짜,분류,금액)를 읽어 월별 합계·분류별 합계와 비율·최대 지출·텍스트 막대 그래프를 출력. 금액은 f"{n:,}"로 천 단위 쉼표. 막대 길이 = round(금액/최대*20).',
   terms: {},
   pages:[
@@ -1211,7 +1229,7 @@ PROBLEMS.push(
 // =====================================================================
 CHAPTERS.push({ ch: 7, name: '한 걸음 더', color: '#00acc1' });
 LESSONS.push(
-{ id: 'L19', ch: 7, n: 43, title: '날짜와 시간', mode: 'text',
+{ id: 'L19', ch: 7, n: 49, title: '날짜와 시간', mode: 'text',
   tutorSummary: 'datetime 모듈: date(년, 월, 일), date.fromisoformat("2026-11-02"), 두 날짜의 차 → timedelta.days, 더하기 timedelta(days=n), strftime("%Y-%m-%d")·weekday()(월=0). 채점은 고정 날짜만 쓴다(today() 금지).',
   terms: { '날짜 객체': '년·월·일을 묶어 둔 값. 빼면 며칠 차이인지 알 수 있다', 'timedelta': '날짜 사이의 간격(며칠, 몇 시간)' },
   pages:[
@@ -1231,7 +1249,7 @@ LESSONS.push(
       example:{ code:`from datetime import date\nprint("2026-9-5" < "2026-10-1")\nprint(date(2026, 9, 5) < date(2026, 10, 1))\na = date(2026, 9, 5)\nb = date(2026, 10, 1)\nprint(min(a, b))`, trace:true } },
   ],
   summary: ['date.fromisoformat(글자) → 날짜 객체, .isoformat() → 글자', '날짜 - 날짜 = timedelta, .days 로 며칠', '날짜 + timedelta(days=n), strftime("%Y-%m-%d")'] },
-{ id:'L19B', ch:7, n:44, title:'명령 줄 프로그램', mode:'text',
+{ id:'L19B', ch:7, n:50, title:'명령 줄 프로그램', mode:'text',
   tutorSummary:'명령 줄 인자: python app.py 장보기 3 으로 실행하면 sys.argv 는 ["app.py", "장보기", "3"] — 0번은 파일 이름, 넘긴 값은 sys.argv[1:], 늘 글자라 int() 로 바꾸고, 빠졌는지 len 으로 먼저 본다. VS Code 의 ▶ 는 인자 없이 실행하니 터미널에 직접 친다. argparse: parser = argparse.ArgumentParser(description=…), add_argument("km", type=float) 는 위치 인자(순서로), add_argument("--to", choices=[…], default="mile") 는 옵션(빼도 됨, 순서 상관없음), args = parser.parse_args() 후 args.km · args.to. 잘못 넣으면 argparse 가 안내를 보여 주고 끝 코드 2 로 끝내며, -h 도움말을 저절로 만든다(모양은 파이썬 판마다 조금 다름). 하위 명령: sub = parser.add_subparsers(dest="cmd", required=True), sub.add_parser("add") 마다 자기 인자, args.cmd 로 갈래. 끝 코드는 0 성공 · 그 밖 실패, sys.exit(1). def main(argv=None): … parse_args(argv) … return 0 으로 나누고 if __name__ == "__main__": sys.exit(main()) — 시험할 때는 main(["10", "--to", "mile"]) 처럼 리스트를 넣는다. argparse 의 에러는 SystemExit 예외.',
   terms:{ '명령 줄 인자':'python app.py 장보기 3 처럼 실행할 때 파일 이름 뒤에 띄어 적어 넘기는 값', '옵션':'--to mile 처럼 -- 로 시작하는 이름이 붙은 인자. 빼도 되고 순서도 상관없다', '하위 명령':'git commit · pip install 처럼 프로그램 이름 뒤 첫 단어로 할 일을 고르는 것', '끝 코드':'프로그램이 끝나며 운영체제에 남기는 숫자. 0 은 성공, 그 밖은 실패' },
   pages:[
@@ -1245,7 +1263,10 @@ LESSONS.push(
       example:{ code:`import argparse\nimport sys\n\ndef main(argv=None):\n    parser = argparse.ArgumentParser(prog="conv")\n    parser.add_argument("km", type=float)\n    args = parser.parse_args(argv)\n    if args.km < 0:\n        print("거리는 0 이상이어야 해요", file=sys.stderr)\n        return 1\n    print(f"{args.km * 0.621371:.2f} mile")\n    return 0\n\nprint("끝 코드", main(["10"]))\nprint("끝 코드", main(["-3"]))\ntry:\n    main(["abc"])\nexcept SystemExit as e:\n    print("argparse 가 끝낸 끝 코드", e.code)\nprint("끝 코드", main(["0"]))\n\n# 진짜 프로그램이라면 맨 아래는 이렇게:\n# if __name__ == "__main__":\n#     sys.exit(main())`, trace:true } },
   ],
   summary:['python app.py 장보기 3 → sys.argv 는 ["app.py", "장보기", "3"], 늘 글자', 'argparse: add_argument 로 위치 인자 · --옵션 · type=float, -h 도움말이 저절로, add_subparsers 로 하위 명령', 'main(argv) 로 나누고 sys.exit(main()) — 시험은 main(["10", "--to", "mile"])'] },
-{ id: 'L20', ch: 7, n: 45, title: '정규표현식 맛보기', mode: 'text',
+{ id:'L19C', ch:7, n:51, title:'명령 줄 프로그램 2: 하위 명령 · 끝 코드', mode:'text', draft:true,
+  tutorSummary:'(준비 중) 명령 줄 프로그램 2: 하위 명령 · 끝 코드',
+  pages:PY_TODO('L19B 의 하위 명령 · 끝 코드 · stderr 를 옮겨 옴'), summary:['(준비 중)'] },
+{ id: 'L20', ch: 7, n: 52, title: '정규표현식 맛보기', mode: 'text',
   tutorSummary: 're 모듈: re.findall(패턴, 글)로 전부 찾기, re.search로 첫 번째, re.sub로 바꾸기. 패턴 기초 \\d 숫자, \\w 글자, . 아무 글자, + 1개 이상, * 0개 이상, {n} 정확히 n개, [abc] 중 하나, ^ 시작 $ 끝. 전화번호·이메일·날짜 추출.',
   terms: { '정규표현식': '글자 패턴을 적는 작은 언어. "숫자 3개-숫자 4개" 같은 모양을 찾는다', '패턴': '정규표현식으로 적은 글자 모양' },
   pages:[
@@ -1267,7 +1288,10 @@ LESSONS.push(
       example:{ code:`import re\ns = "생일 2010-05-17"\nprint(re.sub(r"(\\d{4})-\\d{2}-\\d{2}", r"\\1-**-**", s))\nm = re.search(r"(\\d{4})-(\\d{2})", s)\nprint(m.group(1))\nprint(m.group(2))\ny, mo = m.groups()\nprint(m.groups())\nprint(y, mo)`, trace:true } },
   ],
   summary: ['re.findall(r"패턴", 글) → 전부 찾기, search → 첫 번째, fullmatch → 전체 검사, sub → 바꾸기', '\\d 숫자 \\w 글자 . 아무거나, + 1개 이상 * 0개 이상 {n} n개 [..] 중 하나', '패턴은 작게 쪼개서 하나씩 확인'] },
-{ id: 'L21', ch: 7, n: 46, title: '테스트 작성: 내 함수 검사하기', mode: 'text',
+{ id:'L20B', ch:7, n:53, title:'정규식 2: 줄 처음과 끝 · 통째로 맞는지', mode:'text', draft:true,
+  tutorSummary:'(준비 중) 정규식 2: 줄 처음과 끝 · 통째로 맞는지',
+  pages:PY_TODO('L20 의 fullmatch · search · group 과 X5 의 ^ $ re.M 을 옮겨 옴'), summary:['(준비 중)'] },
+{ id: 'L21', ch: 7, n: 54, title: '테스트 작성: 내 함수 검사하기', mode: 'text',
   tutorSummary: 'assert 식, "메시지": 거짓이면 AssertionError. 함수마다 정상·경계(0, 빈 값, 음수)·이상 입력 세 가지 테스트. 테스트 함수 test_xxx()를 모아 돌리고 통과 수 출력. 고치기 전에 테스트를 먼저 써서 버그를 재현한다.',
   terms: { 'assert': '"이게 참이어야 해"라고 선언하는 문장. 거짓이면 바로 에러로 알려 준다', '경계값': '0, 빈 리스트, 마지막 번호처럼 규칙이 바뀌는 지점의 값' },
   pages:[
@@ -1287,7 +1311,7 @@ LESSONS.push(
       example:{ code:`passed = 0\nfor x in [4, 7]:\n    try:\n        assert x % 2 == 0\n        passed += 1\n    except AssertionError:\n        pass\nprint(f"통과 {passed}/2")`, trace:true } },
   ],
   summary: ['assert 식, "메시지" — 거짓이면 AssertionError', '정상·경계(0, 빈 값, 1개)·이상(음수) 세 종류', '버그 재현 테스트 먼저 → 고치기 → 테스트는 남긴다'] },
-{ id: 'L22', ch: 7, n: 47, title: '디버깅 사고법', mode: 'text',
+{ id: 'L22', ch: 7, n: 55, title: '디버깅 사고법', mode: 'text',
   tutorSummary: '에러는 종류: 설명 한 줄과 에러 난 줄을 봐요(이 앱은 코드 칸 빨간 줄, 앱 밖 트레이스백은 마지막 줄이 종류, 그 위 line N 이 줄 번호). 재현 → 범위 좁히기(절반씩 주석) → print로 값 확인(변수 이름과 값을 같이) → 한 줄씩 보기. 버그 3종: 문법(실행 전), 실행 에러(멈춤), 논리(조용히 틀림). 논리 버그는 작은 입력으로 손으로 계산해 비교.',
   terms: { '논리 버그': '에러 없이 돌아가지만 결과가 틀린 버그. 가장 찾기 어렵다', '재현': '버그가 나는 상황을 같은 입력으로 다시 만드는 것' },
   pages:[
@@ -1305,7 +1329,7 @@ LESSONS.push(
       example:{ code:`scores = [90, 85]\nprint(sum(scores) // len(scores))\nprint(sum(scores) / len(scores))`, trace:true } },
   ],
   summary: ['에러는 종류: 설명 + 에러 난 줄(이 앱은 빨간 줄, 앱 밖은 line N)', '재현 → 절반씩 좁히기 → print("이름:", 값)', '작은 입력으로 손계산과 비교, 경계·초기값·누적 변수 의심'] },
-{ id: 'L23', ch: 7, n: 48, title: '코드 설계와 리팩터링', mode: 'text',
+{ id: 'L23', ch: 7, n: 56, title: '코드 설계와 리팩터링', mode: 'text',
   tutorSummary: '리팩터링 = 동작은 그대로, 모양만 좋게(테스트가 지켜줌). 규칙 4개: 함수 하나는 일 하나(10~15줄), 이름은 무엇인지 말하게(x→price), 같은 코드 두 번이면 함수로, 매직 넘버는 이름 붙인 상수로. 긴 함수를 "입력 받기 / 계산 / 출력"으로 나눈다.',
   terms: { '리팩터링': '겉으로 하는 일은 똑같이 두고 코드 속 모양만 읽기 좋게 고치는 것', '매직 넘버': '코드 안에 그냥 적힌 설명 없는 숫자(0.1, 86400 같은 것)' },
   pages:[
@@ -1423,7 +1447,7 @@ PROBLEMS.push(
 );
 // --- v2.2.20: 실전 5·6 (챕터 7 주제를 쓰는 프로젝트) ---
 LESSONS.push(
-{ id: 'X5', ch: 7, n: 49, practical: true, title: '실전 5: 일기장 통계', mode: 'text',
+{ id: 'X5', ch: 7, n: 57, practical: true, title: '실전 5: 일기장 통계', mode: 'text',
   tutorSummary: '실전 프로젝트 5. diary.txt(# YYYY-MM-DD 줄 아래 본문)를 정규식으로 날짜별로 나누고, 날짜별 글자 수·요일, 한글 단어 빈도 TOP 3, 주(월요일 시작)별 편수, 빠진 날짜를 datetime으로 계산. 저장은 report.txt.',
   terms: {},
   pages:[
@@ -1447,7 +1471,7 @@ LESSONS.push(
       example:{ code:`top = [("수학", 3), ("공부", 2), ("농구", 1)]\nwith open("report.txt", "w", encoding="utf-8") as f:\n    f.write("단어 TOP: " + ", ".join(w for w, n in top) + "\\n")\nwith open("report.txt", encoding="utf-8") as f:\n    print(f.read())`, trace:true } },
   ],
   summary: ['re.split 로 "# 날짜" 기준 나누기 (flags=re.M)', 're.findall(r"[가-힣]{2,}") 로 한글 단어, dict 로 세기', '주 시작 = d - timedelta(days=d.weekday()), 빠진 날은 하루씩 더하며 확인'] },
-{ id: 'X6', ch: 7, n: 50, practical: true, title: '실전 6: 비밀번호 검사기·생성기', mode: 'text',
+{ id: 'X6', ch: 7, n: 58, practical: true, title: '실전 6: 비밀번호 검사기·생성기', mode: 'text',
   tutorSummary: "실전 프로젝트 6. 규칙 목록 RULES = [(이름, 검사 함수)] 5개(길이 8+, 숫자, 소문자, 대문자, 특수문자 !@#$%)로 check(pw)가 (점수, 부족목록)을 돌려준다. 등급은 한 줄 조건식을 이어 쓰고, common.txt(흔한 비밀번호)에 있으면 경고. generate(n, seed)는 random.seed → string 모듈의 종류별 1개 → 나머지 n-4개 → shuffle → join. 테스트 명령은 assert 로 튜플째 비교.",
   terms: {},
   pages:[
