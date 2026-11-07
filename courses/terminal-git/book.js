@@ -718,7 +718,7 @@ Object.assign(BOOK.tasks, {
       answer: 'git rm --cached .env\necho ".env" >> .gitignore\ngit add .gitignore\ngit commit --amend --no-edit', check: 'git show --name-only --format=%s HEAD\nls -a | grep env', io: [{ output: '설정 추가\n\n.gitignore\nconfig.py\n.env' }] },
   ],
   T16: [
-    { title: '내 GitHub 에 첫 저장소 올리기', text: '레슨 16 의 ①~② 를 따라 실제 GitHub 에 올려 보세요. 올릴 저장소는 아무거나 — 예: TB2 의 계산기(<code>~/terminal-study/tb2-1</code>). GitHub 저장소 페이지에 파일 네 개(<code>.gitignore</code>, <code>calc.py</code>, <code>main.py</code>, <code>README.md</code>)와 커밋 3개가 보이고, <b><code>.env</code> 는 없으면</b> 성공이에요.',
+    { title: '내 GitHub 에 첫 저장소 올리기', text: '레슨 16 의 ①~② 를 따라 실제 GitHub 에 올려 보세요. 올릴 저장소는 아무거나 — 예: 챕터 2 끝 「만들어 보기: 의미 있는 커밋 3개」 의 계산기(<code>~/terminal-study/tb2-1</code>). GitHub 저장소 페이지에 파일 네 개(<code>.gitignore</code>, <code>calc.py</code>, <code>main.py</code>, <code>README.md</code>)와 커밋 3개가 보이고, <b><code>.env</code> 는 없으면</b> 성공이에요.',
       needs: [['New repository', 'T16/0', 'GitHub 에서 빈 저장소'], ['git remote add origin https://…', 'T16/1', '진짜 주소 등록'], ['git push -u origin main', 'T16/1', '첫 push · 브라우저 로그인']],
       answer: 'cd ~/terminal-study/tb2-1\ngit remote add origin https://github.com/내아이디/calc.git\ngit branch -M main\ngit push -u origin main', noRun: true },
     { title: '혼자 해 보는 Pull Request', text: '위 저장소에서 레슨 16 · 4쪽의 PR 흐름을 한 바퀴 해 보세요: 브랜치 <code>docs-update</code> → README 에 한 줄 추가 → 커밋 → <code>git push -u origin docs-update</code> → GitHub 에서 <b>Compare &amp; pull request</b> → <b>Create pull request</b> → <b>Merge pull request</b> → 내 컴퓨터에서 main 으로 pull. 끝나면 <code>git log --oneline</code> 에 그 커밋이 main 에 있어야 해요.',

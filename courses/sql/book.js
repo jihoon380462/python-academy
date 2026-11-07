@@ -19,7 +19,7 @@ const BOOK = {
     makeIntro: 'DB Browser 에서 <code>cafe.db</code> 를 열고 <b>Execute SQL</b> 탭에서 직접 써 보세요. 결과 표가 아래 「결과」 와 같으면 성공이에요.',
     makeTail: '막히면 「필요한 문법」을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답을 펴 보세요. 쿼리가 달라도 결과가 같으면 맞아요. 데이터를 바꾸는 문제(레슨 8~)를 하다 엉망이 되면 <b>Write Changes 를 누르지 말고 Revert Changes</b> 를 누르거나, cafe.db 를 다시 받으면 처음 상태예요.',
     outTable: true, // 결과를 표로(파이썬 문제의 출력은 그대로 글자)
-    setupLabel: '준비 SQL — 먼저 Execute SQL 탭에서 실행하세요(이 문제에 필요한 표를 만들어요. 이미 했으면 건너뛰기)', fileExt: '.sql', answerLabel: '예시 답(SQL · 레슨 13 은 파이썬)', needsLabel: '필요한 문법', checkLabel: '확인 쿼리 — 다 했으면 이걸 실행해 보세요', outLabel: '결과', pyLabel: '실행 결과',
+    setupLabel: '준비 SQL — 먼저 Execute SQL 탭에서 실행하세요(이 문제에 필요한 표를 만들어요. 이미 했으면 건너뛰기)', fileExt: '.sql', answerLabel: '예시 답(SQL)', answerLabelBy: { S13: '예시 답(파이썬)' }, needsLabel: '필요한 문법', checkLabel: '확인 쿼리 — 다 했으면 이걸 실행해 보세요', outLabel: '결과', pyLabel: '실행 결과',
     prereq: [
       { lessons: ['S0', 'S1'], chapters: [1], ref: 'SETUP/0', btn: '시작하기 1 · DB Browser 설치 보기',
         title: '먼저 꼭! 「🛠 시작하기」 1~2 — DB Browser for SQLite 설치 · cafe.db 받아서 열기',
@@ -27,7 +27,7 @@ const BOOK = {
       { lessons: ['S8', 'S9', 'S12', 'SB3'], chapters: [3], ref: 'S8/0', btn: '레슨 8 · Write Changes 설명 보기',
         title: '데이터를 바꾸는 SQL 은 「Write Changes」 를 눌러야 파일에 저장돼요',
         html: 'DB Browser 는 INSERT·UPDATE·DELETE·CREATE 를 실행해도 <b>바로 파일에 쓰지 않아요</b>. <b>Write Changes</b>(<kbd>Ctrl</kbd>+<kbd>S</kbd>)를 눌러야 저장되고, 안 누르고 끄면 묻는 창이 떠요. 반대로 실수했으면 <b>Revert Changes</b> 로 마지막 저장 상태로 돌아가요. 파이썬(레슨 13)에서 같은 파일을 열 때도 Write Changes 를 먼저 해야 바뀐 내용이 보여요.' },
-      { lessons: ['S13', 'SB3'], ref: 'S13/0', btn: '레슨 13 · 준비 보기',
+      { lessons: ['S13', 'SB3'], ref: 'S13/0', btn: '레슨 13 1쪽 · 파이썬 준비 보기',
         title: '레슨 13 은 파이썬이 필요해요 — 파이썬 교과서 「시작하기」 1~3',
         html: '<code>import sqlite3</code> 는 파이썬에 들어 있어서 따로 설치할 건 없지만, <b>VS Code 에서 파이썬이 실행돼야</b> 해요. 그리고 <code>cafe.db</code> 를 <b>.py 파일과 같은 폴더</b>에 두세요. DB Browser 에서 그 파일을 열어 둔 채 바꾼 게 있으면 Write Changes 를 먼저.' },
     ],

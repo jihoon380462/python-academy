@@ -15,7 +15,7 @@ const ERRORS = [
   { name:'FileNotFoundError', title:'파일 없음', why:'읽으려는 파일이 없어요. 이름이 틀렸거나 아직 만들지 않은 파일이에요.', bad:'open("없는파일.txt")', fix:'먼저 "w"로 만들거나 try/except FileNotFoundError로 받으세요.' },
   { name:'EOFError', title:'입력 부족', why:'input()을 불렀는데 읽을 입력값이 더 없어요. 이 앱에서는 입력값 칸의 줄 수가 부족할 때 나요.', bad:'a = input()\nb = input()  # 입력값 칸에 한 줄만 있음', fix:'입력값 칸에 input() 횟수만큼 줄을 적어 주세요.' },
   { name:'StopIteration', title:'반복 끝', why:'next()로 더 꺼낼 게 없는 곳에서 꺼냈어요. 초보 단계에서는 보기 드물어요.', bad:'it = iter([1])\nnext(it)\nnext(it)', fix:'for 문을 쓰면 자동으로 끝을 처리해 줘요.' },
-  { name:'무한루프', title:'무한루프 (에러는 아니에요)', why:'반복이 끝나는 조건이 영원히 안 만들어져요. 보통 while 안에서 조건을 바꾸는 줄을 깜빡했을 때예요. 이 앱은 5초 뒤 강제로 멈춰요.', bad:'i = 0\nwhile i < 3:\n    print(i)', fix:'반복 안에서 조건이 바뀌게 하세요.\nwhile i < 3:\n    print(i)\n    i += 1' },
+  { name:'무한루프', title:'에러는 아니에요 — 끝나지 않는 반복', why:'반복이 끝나는 조건이 영원히 안 만들어져요. 보통 while 안에서 조건을 바꾸는 줄을 깜빡했을 때예요. 이 앱은 5초 뒤 강제로 멈춰요.', bad:'i = 0\nwhile i < 3:\n    print(i)', fix:'반복 안에서 조건이 바뀌게 하세요.\nwhile i < 3:\n    print(i)\n    i += 1' },
 ];
 
 // 에러 한 줄 풀이 (에러 피드백용)

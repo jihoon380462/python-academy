@@ -23,7 +23,7 @@ const BOOK = {
     ],
     kicker: '⌨ Vim 에디터 교과서 · 공용', hero: '읽고, gVim 에서 직접 눌러 보기',
     heroP: 'Windows 용 Vim 설치부터 단축키, 그리고 파이썬과 연결(자동 들여쓰기·F5 실행·자동완성)까지. 각 레슨 끝 「만들어 보기」에 문제마다 <b>준비 명령</b>(연습 파일을 처음 상태로 여는 명령)과 다 하고 나면 파일이 어떻게 돼야 하는지가 있어요. 채점·점수·잠금은 없어요.',
-    dexName: 'Vim 단축키 도감', dexShort: '단축키 도감', dexWhat: '레슨 쪽', dexHint: '「복사」「지우기」처럼 한국어로도 찾기',
+    dexName: 'Vim 단축키 도감', dexShort: '단축키 도감', dexWhat: '레슨에서 배운 키', dexHint: '「복사」「지우기」처럼 한국어로도 찾기',
     dexExamples: '<code>복사</code>, <code>dd</code>, <code>바꾸기</code>, <code>들여쓰기</code>', dexPlaceholder: '🔍 단축키 찾기 — 복사, dd, 바꾸기, 저장 …', dexAlt: '「붙여넣기」 대신 <code>p</code>',
     dexDocs: 'Vim 안에서 <code>:help 키</code>(예: <code>:help ciw</code>) 나 Vim 공식 문서 <a href="https://vimhelp.org/" target="_blank" rel="noopener">vimhelp.org</a>',
     dexRun: '각 항목은 gVim 에서 바로 눌러 볼 수 있고(시작하기 2 의 연습 파일에서)', builtinsName: '자주 쓰는 단축키', builtinsSub: '이것만 알아도 일이 돼요', builtinsChip: '⌨ 단축키 한눈에',
