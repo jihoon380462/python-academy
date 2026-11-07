@@ -165,7 +165,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('lesson',{lessonId:'TB3',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==1, '보스 TB3 만들어 보기 맨 위에 경고')
     pg.click('.bk-prereq-go'); pg.wait_for_timeout(300); pq=pg.evaluate("[document.querySelector('.bk-art h1').textContent, (document.querySelector('#bkBack')||{}).textContent||'']")
     check('이름·이메일 설정' in pq[0] and '돌아가기' in pq[1], '경고의 단추 → 레슨 6 설정 쪽 + 돌아가기 (%s)' % pq)
-    pg.click('#bkBack'); pg.wait_for_timeout(300); check(pg.evaluate("document.querySelector('.bk-art h1').textContent")=='🛠 만들어 보기', '돌아가기 → TB3 만들어 보기로')
+    pg.click('#bkBack'); pg.wait_for_timeout(300); check(pg.evaluate("document.querySelector('.bk-art h1').textContent").startswith('🛠 만들어 보기'), '돌아가기 → TB3 만들어 보기로')
     pg.evaluate("UI.go('lesson',{lessonId:'T3',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==0, '명령어 편(T3)에는 경고 없음')
     pg.evaluate("UI.go('lesson',{lessonId:'T0',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==1 and 'Git Bash' in pg.inner_text('.bk-prereq'), 'v2.12.2 T0 1쪽: 「시작하기 1~3(Git Bash 설치·연습 폴더) 먼저」 경고')
     pg.evaluate("UI.go('lesson',{lessonId:'T7',page:1})"); pg.wait_for_timeout(300); g7=pg.evaluate("({h:document.querySelector('.bk-art h1').textContent, ex:(document.querySelector('.bk-code-h')||{}).textContent||'', pre:(document.querySelector('.bk-code pre')||{}).textContent||''})")
@@ -210,7 +210,7 @@ with sync_playwright() as p:
     check(qt[0]==3 and qt[1]==3 and qt[2]=='id', 'S4 만들어 보기: 결과가 표로(DB Browser 결과 칸처럼) (%s)' % qt)
     pg.evaluate("UI.go('lesson',{lessonId:'S13',page:3})"); pg.wait_for_timeout(300); check(pg.locator('.bk-task table.bk-res').count()==0 and '아메리카노: 4000원' in pg.inner_text('.bk-task'), 'S13 파이썬 문제: 출력은 글자 그대로')
     pg.evaluate("UI.go('lesson',{lessonId:'S8',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==1 and 'Write Changes' in pg.inner_text('.bk-prereq'), 'S8 1쪽: 「Write Changes 를 눌러야 저장」 경고')
-    pg.evaluate("UI.go('lesson',{lessonId:'SB1',page:0})"); pg.wait_for_timeout(300); check(pg.evaluate("document.querySelector('.bk-art h1').textContent")=='🛠 만들어 보기' and 'TODO' not in pg.inner_text('.bk-art'), '보스 SB1: 「준비 중」 쪽 없이 만들어 보기만')
+    pg.evaluate("UI.go('lesson',{lessonId:'SB1',page:0})"); pg.wait_for_timeout(300); check(pg.evaluate("document.querySelector('.bk-art h1').textContent").startswith('🛠 만들어 보기: ') and 'TODO' not in pg.inner_text('.bk-art'), '보스 SB1: 「준비 중」 쪽 없이 만들어 보기만')
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','JOIN'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=3 and pg.inner_text('.tb-title')=='SQL 문법 도감', 'SQL 문법 도감: JOIN 검색')
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'SQL 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',2),('S0',0),('S1',3),('S5',3),('S10',1),('SB2',0)] ]
     pg.set_viewport_size({'width':1280,'height':900})

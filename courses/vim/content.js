@@ -17,7 +17,7 @@ const LESSONS = [
     { title: 'Vim 은 왜 다를까: 모드', html: `<p>메모장이나 VS Code 는 키를 누르면 그 글자가 바로 써지죠. Vim 은 <b>모드</b>가 있어서, 같은 키가 모드에 따라 다른 일을 해요.</p>
 <table class="kb"><tbody><tr><td><b>노멀 모드</b></td><td>켜면 처음 있는 곳. 키가 전부 <b>명령</b>이에요 — <code>j</code> 는 아래로, <code>x</code> 는 한 글자 지우기, <code>dd</code> 는 한 줄 지우기</td></tr><tr><td><b>입력 모드</b></td><td>글자를 쓰는 모드. 노멀에서 <code>i</code> 를 누르면 들어가고, 아래에 <code>-- INSERT --</code>(한국어면 <code>-- 끼워넣기 --</code>)가 보여요</td></tr><tr><td><b>명령줄 모드</b></td><td>노멀에서 <code>:</code> 를 치면 맨 아래에 커서가 가요. <code>:w</code>(저장) 같은 긴 명령을 쳐요</td></tr><tr><td><b>비주얼 모드</b></td><td>노멀에서 <code>v</code> — 마우스로 끄는 것처럼 영역을 골라요(레슨 4)</td></tr></tbody></table>
 <p>모든 모드에서 <kbd>Esc</kbd> 를 누르면 <b>노멀 모드로 돌아와요</b>. 헷갈리면 일단 <kbd>Esc</kbd> 두 번. 이게 Vim 의 첫째 규칙이에요.</p>
-<p>왜 이렇게 만들었을까요? 코드를 고칠 때는 <b>쓰는 시간보다 옮겨 다니고 고치는 시간이 훨씬 길어요</b>. 노멀 모드에서는 마우스·방향키 없이 손가락을 글쇠 위에 둔 채로 「세 줄 지워」「이 단어 바꿔」 를 두세 글자로 해요.</p>`, example: { code: 'i          ← 입력 모드로 (아래에 -- INSERT --)\n안녕 Vim    ← 글자 쓰기\nEsc        ← 노멀 모드로 돌아오기\nx          ← 커서 글자 하나 지우기\nu          ← 방금 한 일 되돌리기' } },
+<p>왜 이렇게 만들었을까요? 코드를 고칠 때는 <b>쓰는 시간보다 옮겨 다니고 고치는 시간이 훨씬 길어요</b>. 노멀 모드에서는 마우스·방향키 없이 손가락을 글쇠 위에 둔 채로 「세 줄 지워」「이 단어 바꿔」 를 두세 글자로 해요.</p>`, example: { code: 'i          ← 입력 모드로 (아래에 -- INSERT --)\n안녕 Vim    ← 글자 쓰기\n<Esc>      ← 노멀 모드로 돌아오기\nx          ← 커서 글자 하나 지우기\nu          ← 방금 한 일 되돌리기' } },
     { title: '저장하고 나가기: :w · :q · :wq · :q!', html: `<p>「Vim 에서 못 나가요」 는 유명한 농담이에요. 나가는 법은 전부 <b>노멀 모드에서 <code>:</code></b> 로 시작해요. 친 뒤 <kbd>Enter</kbd>.</p>
 <table class="kb"><tbody><tr><td><code>:w</code></td><td>저장(write)</td></tr><tr><td><code>:q</code></td><td>나가기(quit). 저장 안 한 게 있으면 거절해요</td></tr><tr><td><code>:wq</code></td><td>저장하고 나가기 (<code>:x</code> · <code>ZZ</code> 도 같아요)</td></tr><tr><td><code>:q!</code></td><td><b>저장하지 않고</b> 나가기 — 고친 걸 버려요</td></tr><tr><td><code>:w 이름.txt</code></td><td>다른 이름으로 저장</td></tr><tr><td><code>:e 파일</code></td><td>파일 열기(edit). 없는 파일이면 새로 만들어요(<code>:w</code> 할 때 생겨요)</td></tr></tbody></table>
 <pre class="code">E37: No write since last change (add ! to override)</pre>
@@ -38,7 +38,7 @@ const LESSONS = [
     { title: '단어와 줄: w · b · e · 0 · ^ · $', html: `<table class="kb"><tbody><tr><td><code>w</code></td><td>다음 <b>단어</b> 처음으로 (word)</td></tr><tr><td><code>b</code></td><td>앞 단어 처음으로 (back)</td></tr><tr><td><code>e</code></td><td>단어 끝으로 (end)</td></tr><tr><td><code>0</code></td><td>줄 맨 앞 (0번째 칸)</td></tr><tr><td><code>^</code></td><td>줄의 첫 <b>글자</b> (들여쓰기 공백 건너뛰기 — 코드에서 편함)</td></tr><tr><td><code>$</code></td><td>줄 맨 끝</td></tr></tbody></table>
 <p>대문자 <code>W</code> <code>B</code> <code>E</code> 는 띄어쓰기만 단어 경계로 봐요. <code>print("hi")</code> 에서 <code>w</code> 는 <code>(</code>·<code>"</code> 마다 멈추지만 <code>W</code> 는 통째로 건너뛰어요.</p>`, example: { code: 'w w w      ← 단어씩 오른쪽\nb          ← 한 단어 뒤로\ne          ← 단어 끝\n$          ← 줄 끝\n0          ← 줄 맨 앞\n^          ← 첫 글자(들여쓰기 다음)' } },
     { title: '파일 안에서 멀리: gg · G · 숫자G · Ctrl+d/u', html: `<table class="kb"><tbody><tr><td><code>gg</code></td><td>파일 <b>맨 위</b></td></tr><tr><td><code>G</code></td><td>파일 <b>맨 아래</b></td></tr><tr><td><code>12G</code> 또는 <code>:12</code></td><td><b>12번째 줄</b>로 — 에러 메시지의 「line 12」 로 바로 갈 때</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>d</kbd> · <kbd>Ctrl</kbd>+<kbd>u</kbd></td><td>반 화면 아래(down) · 위(up)</td></tr><tr><td><code>%</code></td><td>짝 괄호로 — <code>(</code> 위에서 누르면 짝 <code>)</code> 로</td></tr><tr><td><code>''</code></td><td>(작은따옴표 두 번) 방금 뛰기 전 자리로 돌아가기</td></tr></tbody></table>
-<p>파이썬 에러가 <code>File "a.py", line 12</code> 라고 하면 Vim 에서 <code>12G</code> 한 번이면 그 줄이에요.</p>`, example: { code: 'G          ← 맨 아래\ngg         ← 맨 위\n5G         ← 5번째 줄\n:3         ← 3번째 줄 (Enter)\nCtrl+d     ← 반 화면 아래' } },
+<p>파이썬 에러가 <code>File "a.py", line 12</code> 라고 하면 Vim 에서 <code>12G</code> 한 번이면 그 줄이에요.</p>`, example: { code: 'G          ← 맨 아래\ngg         ← 맨 위\n5G         ← 5번째 줄\n:3         ← 3번째 줄 (Enter)\n<C-d>      ← 반 화면 아래' } },
     { title: '한 줄 안에서 찾아가기: f · t · ; · ,', html: `<p>줄 안의 특정 글자로 한 번에 가요.</p>
 <table class="kb"><tbody><tr><td><code>f(</code></td><td>오른쪽에서 처음 나오는 <code>(</code> <b>위로</b> (find)</td></tr><tr><td><code>t(</code></td><td><code>(</code> <b>바로 앞</b>까지 (till)</td></tr><tr><td><code>F(</code></td><td>왼쪽으로 찾기</td></tr><tr><td><code>;</code> · <code>,</code></td><td>방금 찾은 걸 다음 · 이전으로 반복</td></tr></tbody></table>
 <p><code>x = add(1, 2)</code> 에서 <code>f,</code> 하면 쉼표로, <code>f(</code> 하면 괄호로 한 번에 가요. 다음 레슨들의 「지우기·바꾸기」 와 합치면 <code>dt)</code>(<code>)</code> 앞까지 지우기) 같은 강력한 명령이 돼요.</p>`, example: { code: 'f(         ← ( 위로\nf,         ← , 위로\n;          ← 다음 , 로\nt)         ← ) 바로 앞까지\n0          ← 줄 앞으로 돌아가기' } },
@@ -47,23 +47,23 @@ const LESSONS = [
 { id: 'V2', ch: 1, n: 2, title: '입력하기', mode: 'text', tutorSummary: 'i a I A o O 로 입력 모드 들어가기. Esc 로 나오기. 입력 중 Ctrl+w(단어 지우기).',
   pages: [
     { title: 'i · a · I · A: 어디서부터 쓸까', html: `<table class="kb"><tbody><tr><td><code>i</code></td><td>커서 <b>앞</b>에서부터 쓰기 (insert)</td></tr><tr><td><code>a</code></td><td>커서 <b>뒤</b>에서부터 쓰기 (append)</td></tr><tr><td><code>I</code></td><td>줄의 첫 글자 앞에서 (들여쓰기 다음)</td></tr><tr><td><code>A</code></td><td>줄 <b>맨 끝</b>에서 — 코드 줄 끝에 <code>:</code> 붙일 때 가장 많이 써요</td></tr></tbody></table>
-<p>다 쓰면 <kbd>Esc</kbd>. 입력 모드에서 방향키로 돌아다니지 말고, <kbd>Esc</kbd> → 노멀에서 이동 → 다시 <code>i</code>/<code>A</code> 가 Vim 의 리듬이에요.</p>`, example: { code: 'A:Esc      ← 줄 끝에 : 붙이기 (A, :, Esc)\nI# Esc     ← 줄 앞에 "# " (주석으로)\nffaxEsc    ← f 위로 가서 그 뒤에 x' } },
+<p>다 쓰면 <kbd>Esc</kbd>. 입력 모드에서 방향키로 돌아다니지 말고, <kbd>Esc</kbd> → 노멀에서 이동 → 다시 <code>i</code>/<code>A</code> 가 Vim 의 리듬이에요.</p>`, example: { code: 'A:<Esc>    ← 줄 끝에 : 붙이기 (A, :, Esc)\nI# <Esc>   ← 줄 앞에 "# " (주석으로)\nffax<Esc>  ← f 위로 가서 그 뒤에 x' } },
     { title: 'o · O: 새 줄 열기', html: `<table class="kb"><tbody><tr><td><code>o</code></td><td>아래에 <b>새 줄</b>을 열고 입력 모드 (open)</td></tr><tr><td><code>O</code></td><td>위에 새 줄</td></tr></tbody></table>
 <p>줄 끝으로 가서 Enter 를 치는 것과 같지만 커서가 어디 있든 한 키로 돼요. 파이썬에서 <code>o</code> 를 누르면 <b>윗줄 들여쓰기를 이어서</b> 열어 줘요(레슨 7 설정을 하면 <code>:</code> 뒤에서는 한 칸 더 들어가요).</p>
-<p>입력 모드에서 쓸 만한 키: <kbd>Ctrl</kbd>+<kbd>w</kbd> 앞 단어 지우기 · <kbd>Ctrl</kbd>+<kbd>u</kbd> 줄 앞까지 지우기 · <kbd>Backspace</kbd>.</p>`, example: { code: 'o- 운동Esc     ← 아래에 새 줄 "- 운동"\nOTITLEEsc      ← 위에 새 줄 "TITLE"' } },
+<p>입력 모드에서 쓸 만한 키: <kbd>Ctrl</kbd>+<kbd>w</kbd> 앞 단어 지우기 · <kbd>Ctrl</kbd>+<kbd>u</kbd> 줄 앞까지 지우기 · <kbd>Backspace</kbd>.</p>`, example: { code: 'o- 운동<Esc>   ← 아래에 새 줄 "- 운동"\nOTITLE<Esc>    ← 위에 새 줄 "TITLE"' } },
     { title: 'Esc 가 멀면, 그리고 자주 하는 실수', html: `<ul><li><kbd>Esc</kbd> 대신 <kbd>Ctrl</kbd>+<kbd>[</kbd> 도 똑같이 노멀 모드로 가요(손이 덜 움직여요).</li>
 <li>노멀 모드인 줄 모르고 글을 치면 명령이 마구 실행돼요. 예: <code>hello</code> 를 치면 <code>h</code> 왼쪽, <code>e</code> 단어 끝, <code>l</code>, <code>l</code>, <code>o</code> → 새 줄이 열리고 입력 모드. 이상하게 됐으면 <kbd>Esc</kbd> 후 <code>u</code> 로 되돌려요.</li>
 <li>입력 모드인 줄 모르고 <code>:wq</code> 를 치면 글자로 써져요. 화면 아래 <code>-- INSERT --</code> 가 있으면 먼저 <kbd>Esc</kbd>.</li></ul>
-<p>「지금 무슨 모드지?」 는 <b>화면 맨 아래 줄</b>을 봐요. 아무것도 없으면 노멀, <code>-- INSERT --</code> 면 입력, <code>-- VISUAL --</code> 면 비주얼.</p>`, example: { code: 'Esc Esc    ← 확실히 노멀로\nu          ← 실수 되돌리기\nCtrl+r     ← 되돌린 걸 다시' } },
+<p>「지금 무슨 모드지?」 는 <b>화면 맨 아래 줄</b>을 봐요. 아무것도 없으면 노멀, <code>-- INSERT --</code> 면 입력, <code>-- VISUAL --</code> 면 비주얼.</p>`, example: { code: '<Esc> <Esc>  ← 확실히 노멀로\nu            ← 실수 되돌리기\n<C-r>        ← 되돌린 걸 다시' } },
   ],
   summary: ['i 앞 · a 뒤 · I 줄 앞 · A 줄 끝', 'o 아래 새 줄 · O 위 새 줄', '모드가 헷갈리면 화면 맨 아래를 보고 Esc'] },
 { id: 'V3', ch: 1, n: 3, title: '지우기·바꾸기·되돌리기', mode: 'text', tutorSummary: 'x dd D, 연산자(d c y) + 이동(w $ t) 문법, cw ciw ci" cc C r, u Ctrl+r, . 반복.',
   pages: [
     { title: 'x · dd · D · u · Ctrl+r', html: `<table class="kb"><tbody><tr><td><code>x</code></td><td>커서 글자 하나 지우기</td></tr><tr><td><code>dd</code></td><td>한 <b>줄</b> 지우기 (<code>3dd</code> = 3줄)</td></tr><tr><td><code>D</code></td><td>커서부터 줄 끝까지 지우기</td></tr><tr><td><code>r</code>글자</td><td>커서 글자 하나를 그 글자로 바꾸기 (<code>r0</code>)</td></tr><tr><td><code>u</code></td><td>되돌리기 (undo) — 몇 번이든</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>r</kbd></td><td>되돌린 걸 다시 (redo)</td></tr></tbody></table>
-<p>지운 것은 사라지지 않고 Vim 의 「주머니(레지스터)」 에 들어가요. 그래서 <code>dd</code> 로 지운 줄을 <code>p</code> 로 붙일 수 있어요 = <b>잘라내기</b>(레슨 4).</p>`, example: { code: 'x          ← 글자 하나 지우기\ndd         ← 줄 지우기\nu          ← 되돌리기\nCtrl+r     ← 다시\n3dd        ← 3줄 지우기' } },
+<p>지운 것은 사라지지 않고 Vim 의 「주머니(레지스터)」 에 들어가요. 그래서 <code>dd</code> 로 지운 줄을 <code>p</code> 로 붙일 수 있어요 = <b>잘라내기</b>(레슨 4).</p>`, example: { code: 'x          ← 글자 하나 지우기\ndd         ← 줄 지우기\nu          ← 되돌리기\n<C-r>      ← 다시\n3dd        ← 3줄 지우기' } },
     { title: 'Vim 의 문법: 연산자 + 이동', html: `<p>Vim 명령은 <b>「무엇을 할지(연산자) + 어디까지(이동)」</b> 로 조립돼요. 외울 게 확 줄어요.</p>
 <table class="kb"><tbody><tr><td><b>연산자</b></td><td><code>d</code> 지우기 · <code>c</code> 지우고 입력(change) · <code>y</code> 복사(yank) · <code>&gt;</code> 들여쓰기</td></tr><tr><td><b>이동</b></td><td><code>w</code> 단어 · <code>$</code> 줄 끝 · <code>t)</code> ) 앞까지 · <code>G</code> 끝까지 · <code>j</code> 아랫줄까지</td></tr></tbody></table>
-<p>그래서 <code>dw</code> = 단어 지우기, <code>d$</code> = 줄 끝까지 지우기, <code>dt)</code> = <code>)</code> 앞까지 지우기, <code>dG</code> = 끝까지 전부, <code>yw</code> = 단어 복사, <code>cw</code> = 단어 바꾸기. 연산자를 두 번 쓰면 「한 줄」 이에요: <code>dd</code> <code>cc</code> <code>yy</code> <code>&gt;&gt;</code>.</p>`, example: { code: 'dw         ← 단어 지우기\nd$         ← 줄 끝까지\ndt)        ← ) 앞까지\ncw새말Esc   ← 단어를 "새말"로\ncc         ← 줄 통째로 다시 쓰기' } },
+<p>그래서 <code>dw</code> = 단어 지우기, <code>d$</code> = 줄 끝까지 지우기, <code>dt)</code> = <code>)</code> 앞까지 지우기, <code>dG</code> = 끝까지 전부, <code>yw</code> = 단어 복사, <code>cw</code> = 단어 바꾸기. 연산자를 두 번 쓰면 「한 줄」 이에요: <code>dd</code> <code>cc</code> <code>yy</code> <code>&gt;&gt;</code>.</p>`, example: { code: 'dw         ← 단어 지우기\nd$         ← 줄 끝까지\ndt)        ← ) 앞까지\ncw새말<Esc>  ← 단어를 "새말"로\ncc         ← 줄 통째로 다시 쓰기' } },
     { title: '안쪽 고르기: ciw · ci" · ci(', html: `<p>커서가 단어나 따옴표 <b>한가운데</b> 있어도 통째로 고르는 「안쪽(inner)」 이동이 있어요. 코드 고칠 때 가장 많이 써요.</p>
 <table class="kb"><tbody><tr><td><code>ciw</code></td><td>커서가 있는 <b>단어</b>를 바꾸기 (change inner word)</td></tr><tr><td><code>ci"</code></td><td><code>"</code> 안쪽 글자를 바꾸기 — <code>print("안녕")</code> 에서 따옴표 안만</td></tr><tr><td><code>ci(</code></td><td>괄호 안쪽 바꾸기 — 함수 인자 통째로</td></tr><tr><td><code>diw</code> · <code>da"</code></td><td>지우기. <code>a</code> 는 따옴표·괄호까지 같이(around)</td></tr></tbody></table>
 <p><code>color = 'red'</code> 의 아무 곳에서나 <code>ci'</code> → <code>blue</code> → <kbd>Esc</kbd> 하면 <code>color = 'blue'</code>. 커서가 따옴표 앞에 있어도 그 줄의 첫 따옴표 쌍을 찾아가요.</p>`, example: { code: "ciwhelloEsc   ← 단어를 hello 로\nci\"안녕Esc     ← \"...\" 안을 안녕으로\nci(a, bEsc     ← (...) 안을 a, b 로\nda\"           ← 따옴표까지 지우기" } },
@@ -72,7 +72,7 @@ const LESSONS = [
 TODO 설거지
 TODO 청소</pre>
 <p>첫 줄에서 <code>cw</code> → <code>DONE</code> → <kbd>Esc</kbd> 한 번 한 다음, <code>j0.</code>(아래 줄 앞으로 가서 반복) 을 두 번이면 세 줄이 다 <code>DONE</code> 이 돼요.</p>
-<p>「똑같은 고치기를 여러 군데」 → 한 번 하고, 옮겨 가서 <code>.</code>. 여러 번이 아니라 수십 곳이면 레슨 5 의 <code>:%s</code> 가 더 빨라요.</p>`, example: { code: 'cwDONEEsc   ← 첫 TODO 를 DONE 으로\nj0.        ← 아래 줄 앞에서 반복\nj0.        ← 또' } },
+<p>「똑같은 고치기를 여러 군데」 → 한 번 하고, 옮겨 가서 <code>.</code>. 여러 번이 아니라 수십 곳이면 레슨 5 의 <code>:%s</code> 가 더 빨라요.</p>`, example: { code: 'cwDONE<Esc> ← 첫 TODO 를 DONE 으로\nj0.        ← 아래 줄 앞에서 반복\nj0.        ← 또' } },
   ],
   summary: ['x 글자 · dd 줄 · D 줄 끝까지 · u 되돌리기', '연산자(d c y >) + 이동(w $ t) = 명령', 'ciw · ci" 안쪽 바꾸기 · . 으로 반복'] },
 { id: 'V4', ch: 1, n: 4, title: '복사·붙여넣기와 비주얼 모드', mode: 'text', tutorSummary: 'yy yw p P, dd p 로 옮기기. v V Ctrl+v 로 골라서 d y > I. 클립보드 "+y "+p, Ctrl+R +.',
@@ -83,10 +83,10 @@ TODO 청소</pre>
     { title: '비주얼 모드: v · V · Ctrl+v', html: `<p>먼저 <b>고르고</b> 나서 명령하고 싶을 때 써요. 고른 다음 <code>d</code>(지우기) <code>y</code>(복사) <code>c</code>(바꾸기) <code>&gt;</code> <code>&lt;</code>(들여쓰기) 를 누르면 고른 곳에 적용돼요.</p>
 <table class="kb"><tbody><tr><td><code>v</code></td><td>글자 단위로 고르기 — 움직이는 만큼</td></tr><tr><td><code>V</code></td><td><b>줄</b> 단위로 고르기 — 코드 블록을 고를 때</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>v</kbd></td><td><b>세로 네모</b>로 고르기 — 여러 줄 앞에 한꺼번에 쓰기</td></tr><tr><td><code>gv</code></td><td>방금 골랐던 곳 다시 고르기</td></tr></tbody></table>
 <p>여러 줄 주석 달기: <kbd>Ctrl</kbd>+<kbd>v</kbd> → <code>jj</code>(세 줄) → <code>I</code> → <code># </code> → <kbd>Esc</kbd>. Esc 를 누르는 순간 세 줄 앞에 다 <code># </code> 가 생겨요.</p>
-<p class="muted small">설치 때 「Remap a few keys」 를 골랐다면 <kbd>Ctrl</kbd>+<kbd>v</kbd> 가 붙여 넣기가 돼요. 그땐 <kbd>Ctrl</kbd>+<kbd>q</kbd> 가 세로 고르기예요(시작하기 1 에서 「Do not remap keys」 를 권하는 이유).</p>`, example: { code: 'Vjj>       ← 세 줄 골라 들여쓰기\nvey        ← 단어 하나 골라 복사\nCtrl+v jj I# Esc   ← 세 줄 앞에 "# "' } },
+<p class="muted small">설치 때 「Remap a few keys」 를 골랐다면 <kbd>Ctrl</kbd>+<kbd>v</kbd> 가 붙여 넣기가 돼요. 그땐 <kbd>Ctrl</kbd>+<kbd>q</kbd> 가 세로 고르기예요(시작하기 1 에서 「Do not remap keys」 를 권하는 이유).</p>`, example: { code: 'Vjj>               ← 세 줄 골라 들여쓰기\nvey                ← 단어 하나 골라 복사\n<C-v> jj I# <Esc>  ← 세 줄 앞에 "# "' } },
     { title: 'Windows 클립보드와 주고받기', html: `<p>Vim 의 <code>y</code> <code>p</code> 는 Vim 안의 주머니를 써요. 브라우저·메모장과 주고받으려면 <b>클립보드 주머니 <code>+</code></b> 를 이름으로 불러요.</p>
 <table class="kb"><tbody><tr><td><code>"+yy</code></td><td>이 줄을 <b>Windows 클립보드로</b> 복사 → 다른 프로그램에서 <kbd>Ctrl</kbd>+<kbd>V</kbd></td></tr><tr><td><code>"+p</code></td><td>Windows 클립보드 내용을 붙여 넣기 (이 교과서의 📋 복사 → Vim 에서 <code>"+p</code>)</td></tr><tr><td>입력 모드에서 <kbd>Ctrl</kbd>+<kbd>r</kbd> <kbd>+</kbd></td><td>클립보드 붙여 넣기 (명령줄 <code>:</code> 에서도 됨 — 준비 명령 붙일 때)</td></tr><tr><td><code>:set clipboard=unnamed</code></td><td>그냥 <code>y</code>·<code>p</code> 가 늘 Windows 클립보드를 쓰게(레슨 6 설정 파일에 넣어요)</td></tr></tbody></table>
-<p>gVim 은 메뉴 <b>편집(Edit) → 붙여넣기(Paste)</b> 로도 돼요.</p>`, example: { code: '"+yy        ← 줄을 Windows 클립보드로\n"+p         ← 클립보드에서 붙이기\n:Ctrl+r +   ← 명령줄에 클립보드 붙이기' } },
+<p>gVim 은 메뉴 <b>편집(Edit) → 붙여넣기(Paste)</b> 로도 돼요.</p>`, example: { code: '"+yy        ← 줄을 Windows 클립보드로\n"+p         ← 클립보드에서 붙이기\n:<C-r>+     ← 명령줄에 클립보드 붙이기' } },
   ],
   summary: ['yy 복사 · p 아래 · P 위 · dd p 옮기기', 'v 글자 · V 줄 · Ctrl+v 세로 고르기', '"+y "+p 로 Windows 클립보드'] },
 { id: 'V5', ch: 1, n: 5, title: '찾기와 바꾸기', mode: 'text', tutorSummary: '/ ? n N *, :s/a/b/ :s///g :%s///g :%s///gc, ignorecase smartcase hlsearch :noh.',
@@ -124,7 +124,7 @@ TODO 청소</pre>
     return a + b█    ← Enter
 █                    ← return 뒤라 다시 바깥으로</pre>
 <table class="kb"><tbody><tr><td><code>filetype plugin indent on</code></td><td>파일 종류(.py)를 알아보고 그 언어의 들여쓰기 규칙을 켜기 — <code>:</code> 뒤 들여쓰기, <code>return</code>·<code>break</code> 뒤 내어쓰기</td></tr><tr><td><code>set autoindent</code></td><td>Enter 를 치면 윗줄과 같은 깊이로 시작</td></tr></tbody></table>
-<p>파이썬 파일(<code>.py</code>)을 열어야 켜져요. 확인: <code>:set filetype?</code> → <code>filetype=python</code>.</p>`, example: { code: ':set filetype?      ← filetype=python 이면 OK\n:set autoindent?\nodef f():Enter     ← 다음 줄이 4칸 들어가는지 보기' } },
+<p>파이썬 파일(<code>.py</code>)을 열어야 켜져요. 확인: <code>:set filetype?</code> → <code>filetype=python</code>.</p>`, example: { code: ':set filetype?      ← filetype=python 이면 OK\n:set autoindent?\nodef f():<Enter>     ← 다음 줄이 4칸 들어가는지 보기' } },
     { title: '탭 대신 스페이스 4칸', html: `<p>파이썬 공식 권장(PEP 8)은 <b>들여쓰기 = 스페이스 4칸</b>이에요. 탭과 스페이스가 섞이면 <code>TabError</code> 가 나요.</p>
 <table class="kb"><tbody><tr><td><code>set expandtab</code></td><td><kbd>Tab</kbd> 키를 누르면 스페이스로 바꿔 넣기</td></tr><tr><td><code>set tabstop=4</code></td><td>(이미 있는) 탭 글자를 4칸 너비로 보이기</td></tr><tr><td><code>set shiftwidth=4</code></td><td>자동 들여쓰기·<code>&gt;&gt;</code> 한 번 = 4칸</td></tr><tr><td><code>set softtabstop=4</code></td><td><kbd>Tab</kbd>·<kbd>Backspace</kbd> 가 4칸씩 — 스페이스인데도 한 번에 지워져요</td></tr><tr><td><code>:retab</code></td><td>파일의 탭 글자를 지금 설정(스페이스 4칸)으로 바꾸기</td></tr><tr><td><code>:set list</code></td><td>탭(<code>^I</code>)과 줄 끝(<code>$</code>)을 눈에 보이게 — 섞였는지 확인. 끄기 <code>:set nolist</code></td></tr></tbody></table>
 <p class="muted small">Vim 의 파이썬 설정은 원래 이 값을 쓰지만, 다른 파일(.txt 등)에서도 같게 하려고 <code>_vimrc</code> 에 적어 둬요.</p>`, example: { code: ':set list      ← 탭이 ^I 로 보임\n:retab         ← 탭을 스페이스 4칸으로\n:set nolist' } },
@@ -139,7 +139,7 @@ TODO 청소</pre>
 <pre class="code">:w            ← 먼저 저장! (저장 안 하면 옛날 내용이 실행돼요)
 :!python %    ← python hello.py 를 실행</pre>
 <p>gVim 에서는 검은 창이 잠깐 열려 결과를 보여 주고 <code>Hit any key to close this window...</code>(아무 키나 누르면 닫힘)가 나와요.</p>
-<table class="kb"><tbody><tr><td><code>'python' is not recognized…</code></td><td>Windows 가 python 을 못 찾음 → 파이썬 교과서 시작하기 1 의 <b>Add python.exe to PATH</b>. 설치 뒤 gVim 을 껐다 켜요</td></tr><tr><td><code>can't open file … No such file</code></td><td>파일을 아직 저장하지 않았어요(<code>:w 이름.py</code>)</td></tr><tr><td><code>File "hello.py", line 3</code></td><td>Vim 으로 돌아와 <code>3G</code> — 그 줄로</td></tr></tbody></table>`, example: { code: ':e ~/vim-study/hello.py\nOprint("안녕, Vim")Esc\n:w\n:!python %' } },
+<table class="kb"><tbody><tr><td><code>'python' is not recognized…</code></td><td>Windows 가 python 을 못 찾음 → 파이썬 교과서 시작하기 1 의 <b>Add python.exe to PATH</b>. 설치 뒤 gVim 을 껐다 켜요</td></tr><tr><td><code>can't open file … No such file</code></td><td>파일을 아직 저장하지 않았어요(<code>:w 이름.py</code>)</td></tr><tr><td><code>File "hello.py", line 3</code></td><td>Vim 으로 돌아와 <code>3G</code> — 그 줄로</td></tr></tbody></table>`, example: { code: ':e ~/vim-study/hello.py\nOprint("안녕, Vim")<Esc>\n:w\n:!python %' } },
     { title: 'F5 한 번으로: 저장하고 실행', html: `<p>매번 <code>:w</code> <code>:!python %</code> 를 치기 번거로우니 <b>키 하나에 묶어요</b>(키 매핑). 기본 <code>_vimrc</code> 에 이미 들어 있어요.</p>
 <pre class="code">augroup py_run
   autocmd!
@@ -150,7 +150,7 @@ augroup END</pre>
 <p>이제 파이썬 파일에서 <kbd>F5</kbd> = 저장 + 실행.</p>`, example: { code: 'F5         ← 저장하고 실행\nF6         ← 저장하고 아래 터미널 창에서 실행(input 용)' } },
     { title: 'input() 이 있는 프로그램: :terminal', html: `<p><code>:!python %</code> 로도 입력은 되지만, 입력하고 결과를 함께 오래 보려면 <b>Vim 안의 터미널 창</b>이 편해요.</p>
 <table class="kb"><tbody><tr><td><code>:terminal python %</code> (<kbd>F6</kbd>)</td><td>창이 위아래로 나뉘고 <b>위</b> 창에서 프로그램이 돌아요(코드는 아래 창). 거기서 입력을 쳐요</td></tr><tr><td><code>:term</code></td><td>그냥 명령 프롬프트 창 하나 열기 — <code>pip install</code> 같은 걸 칠 때</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>w</kbd> <kbd>w</kbd></td><td>위아래 창 오가기</td></tr><tr><td><code>:q</code> · 프로그램이 끝난 창에서</td><td>터미널 창 닫기 (프로그램이 도는 중이면 <code>exit</code> 나 <kbd>Ctrl</kbd>+<kbd>c</kbd> 먼저)</td></tr></tbody></table>
-<p>코드 창과 결과 창을 나란히 두고 「고치고 → <kbd>F6</kbd> → 확인」 을 반복하면 VS Code 의 실행 버튼과 같은 흐름이에요.</p>`, example: { code: 'F6           ← 위 창에서 실행 (입력 받기)\nCtrl+w w     ← 코드 창으로 돌아오기\n:term        ← 명령 프롬프트 창' } },
+<p>코드 창과 결과 창을 나란히 두고 「고치고 → <kbd>F6</kbd> → 확인」 을 반복하면 VS Code 의 실행 버튼과 같은 흐름이에요.</p>`, example: { code: 'F6           ← 위 창에서 실행 (입력 받기)\n<C-w> w      ← 코드 창으로 돌아오기\n:term        ← 명령 프롬프트 창' } },
   ],
   summary: [':w 후 :!python % (% = 지금 파일)', 'F5 저장+실행 · F6 :terminal 로 실행(input)', '에러 line N → NG'] },
 { id: 'V9', ch: 2, n: 9, title: '자동완성 1 — Vim 기본기', mode: 'text', tutorSummary: '입력 모드 Ctrl+n Ctrl+p(열린 파일의 낱말), Ctrl+x Ctrl+f(파일 이름), Ctrl+x Ctrl+l(줄). completeopt.',
@@ -160,10 +160,10 @@ augroup END</pre>
 <pre class="code">student_scores = [90, 80]
 print(stu█      ← Ctrl+n
 print(student_scores█</pre>
-<p>오타를 줄이는 데 효과가 커요. 단, 파이썬 문법을 아는 건 아니라서 <code>random.</code> 뒤에 함수 목록을 보여 주지는 못해요 — 그건 다음 레슨(LSP).</p>`, example: { code: 'ostudent_scores = [90, 80]Esc\noprint(stuCtrl+n)Esc      ← student_scores 로 완성' } },
+<p>오타를 줄이는 데 효과가 커요. 단, 파이썬 문법을 아는 건 아니라서 <code>random.</code> 뒤에 함수 목록을 보여 주지는 못해요 — 그건 다음 레슨(LSP).</p>`, example: { code: 'ostudent_scores = [90, 80]<Esc>\noprint(stu<C-n>)<Esc>     ← student_scores 로 완성' } },
     { title: 'Ctrl+x 모드: 파일 이름·줄 완성', html: `<p>입력 모드에서 <kbd>Ctrl</kbd>+<kbd>x</kbd> 를 누르고 다음 키로 「무엇으로 완성할지」 를 골라요.</p>
 <table class="kb"><tbody><tr><td><kbd>Ctrl</kbd>+<kbd>x</kbd> <kbd>Ctrl</kbd>+<kbd>f</kbd></td><td><b>파일 이름</b> — <code>open("da</code> 다음에 누르면 <code>data.csv</code></td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>x</kbd> <kbd>Ctrl</kbd>+<kbd>l</kbd></td><td><b>줄 통째로</b> — 비슷한 줄을 다시 쓸 때</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>x</kbd> <kbd>Ctrl</kbd>+<kbd>o</kbd></td><td>언어에 맞는 완성(omni). 다음 레슨의 LSP 를 깔면 여기에 파이썬 문법 완성이 연결돼요</td></tr></tbody></table>
-<p>후보 목록 모양은 <code>completeopt</code> 로 정해요. 기본 <code>_vimrc</code> 의 <code>set completeopt=menuone</code> 은 「후보가 하나여도 목록을 보여 주기」. 다음 레슨의 플러그인(asyncomplete)을 깔면 치는 동안 저절로 뜨는 목록에 맞게 이 값을 알아서 바꿔요.</p>`, example: { code: 'oopen("daCtrl+x Ctrl+f    ← 파일 이름 완성\nCtrl+x Ctrl+l             ← 줄 완성' } },
+<p>후보 목록 모양은 <code>completeopt</code> 로 정해요. 기본 <code>_vimrc</code> 의 <code>set completeopt=menuone</code> 은 「후보가 하나여도 목록을 보여 주기」. 다음 레슨의 플러그인(asyncomplete)을 깔면 치는 동안 저절로 뜨는 목록에 맞게 이 값을 알아서 바꿔요.</p>`, example: { code: 'oopen("da<C-x><C-f>       ← 파일 이름 완성\n<C-x><C-l>                ← 줄 완성' } },
   ],
   summary: ['Ctrl+n / Ctrl+p 열린 파일의 낱말로', 'Ctrl+x Ctrl+f 파일 이름 · Ctrl+x Ctrl+l 줄', '파이썬 문법을 아는 완성은 LSP(다음 레슨)'] },
 { id: 'V10', ch: 2, n: 10, title: '자동완성 2 — 플러그인과 LSP', mode: 'text', tutorSummary: 'vim-plug 설치(PowerShell iwr 또는 Git Bash curl), Plug vim-lsp·vim-lsp-settings·asyncomplete·asyncomplete-lsp, :PlugInstall, .py 에서 :LspInstallServer pylsp-all, Tab/Enter 매핑, gd K F2, :LspStatus.',
@@ -191,7 +191,7 @@ print(student_scores█</pre>
 { id: 'V11', ch: 2, n: 11, title: '창·탭·여러 파일', mode: 'text', tutorSummary: ':e :sp :vsp Ctrl+w hjkl w, :q, :only, :tabnew gt gT, :ls :b, :Ex / :Lexplore 파일 탐색기, :wa :qa.',
   pages: [
     { title: '창 나누기: :sp · :vsp · Ctrl+w', html: `<table class="kb"><tbody><tr><td><code>:sp 파일</code></td><td>위아래로 나눠 열기 (split). 파일을 빼면 같은 파일을 두 곳에서</td></tr><tr><td><code>:vsp 파일</code></td><td>좌우로 나눠 열기 — 함수 정의와 쓰는 곳을 나란히</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>w</kbd> <kbd>h</kbd>/<kbd>j</kbd>/<kbd>k</kbd>/<kbd>l</kbd></td><td>그 방향 창으로 (<kbd>Ctrl</kbd>+<kbd>w</kbd> <kbd>w</kbd> = 다음 창)</td></tr><tr><td><code>:q</code> · <code>:only</code></td><td>이 창 닫기 · 이 창만 남기기</td></tr><tr><td><code>:wa</code> · <code>:qa</code> · <code>:wqa</code></td><td>전부 저장 · 전부 닫기 · 전부 저장하고 닫기</td></tr></tbody></table>
-<p>창마다 따로 움직이지만 <code>y</code>·<code>p</code> 주머니는 같이 써요. 한 창에서 <code>yy</code> → <kbd>Ctrl</kbd>+<kbd>w</kbd> <kbd>j</kbd> → <code>p</code> 로 파일 사이 복사.</p>`, example: { code: ':vsp ~/vim-study/play.txt   ← 좌우로\nCtrl+w l     ← 오른쪽 창으로\nCtrl+w h     ← 왼쪽 창으로\n:only        ← 하나만 남기기' } },
+<p>창마다 따로 움직이지만 <code>y</code>·<code>p</code> 주머니는 같이 써요. 한 창에서 <code>yy</code> → <kbd>Ctrl</kbd>+<kbd>w</kbd> <kbd>j</kbd> → <code>p</code> 로 파일 사이 복사.</p>`, example: { code: ':vsp ~/vim-study/play.txt   ← 좌우로\n<C-w> l                    ← 오른쪽 창으로\n<C-w> h                    ← 왼쪽 창으로\n:only                      ← 하나만 남기기' } },
     { title: '탭과 버퍼: :tabnew · gt · :ls · :b', html: `<table class="kb"><tbody><tr><td><code>:tabnew 파일</code></td><td>새 탭에 열기</td></tr><tr><td><code>gt</code> · <code>gT</code></td><td>다음 · 이전 탭</td></tr><tr><td><code>:ls</code></td><td>열어 둔 파일(버퍼) 목록과 번호</td></tr><tr><td><code>:b 2</code> · <code>:b 이름</code></td><td>그 파일로 바꾸기 (이름은 앞 몇 글자 + <kbd>Tab</kbd>)</td></tr><tr><td><code>:e #</code> · <kbd>Ctrl</kbd>+<kbd>^</kbd></td><td>바로 전 파일로 왔다 갔다</td></tr></tbody></table>
 <p>Vim 은 한 번 연 파일을 닫지 않고 기억해 둬요(버퍼). 그래서 <code>:ls</code> 로 보고 <code>:b</code> 로 오가는 게 탭보다 많이 쓰여요.</p>`, example: { code: ':tabnew ~/_vimrc   ← 새 탭에\ngt                 ← 탭 오가기\n:ls                ← 연 파일 목록\n:b 1               ← 1번 파일로' } },
     { title: '파일 탐색기: :Ex · :Lexplore', html: `<p>Vim 에는 파일 탐색기(netrw)가 들어 있어요.</p>

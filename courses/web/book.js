@@ -419,7 +419,7 @@ requests.get(url, headers={"Authorization": f"Bearer {key}"})</pre>또는 <code>
         answer: 'import requests\n\nres = requests.get("https://jsonplaceholder.typicode.com/todos", params={"userId": 1})\nres.raise_for_status()\ntodos = res.json()\ndone = sum(1 for t in todos if t["completed"])\nprint("전체", len(todos))\nprint("끝냄", done)\nprint(f"비율 {done / len(todos) * 100:.0f}%")', io: [{ output: '전체 20\n끝냄 11\n비율 55%' }], noRun: true /* 인터넷·requests 설치가 필요 — 사이트 검사 밖 */ },
     ],
     W13: [
-      { title: '🏠 내 소개 페이지를 인터넷에', text: '보스 WB1 에서 만든 내 소개 페이지를 GitHub 저장소로 올리고 GitHub Pages 를 켜서, <code>https://내아이디.github.io/저장소이름/</code> 주소로 <b>폰에서</b> 열어 보세요.', needs: [['git init · git push', 'W13/1', '터미널·Git 교과서 레슨 7·16 의 순서'], ['Settings → Pages', 'W13/1', 'Pages 켜기'], ['index.html', 'W13/1', '첫 페이지 이름']],
+      { title: '🏠 내 소개 페이지를 인터넷에', text: '챕터 1 끝 「만들어 보기: 내 소개 페이지」 에서 만든 내 소개 페이지를 GitHub 저장소로 올리고 GitHub Pages 를 켜서, <code>https://내아이디.github.io/저장소이름/</code> 주소로 <b>폰에서</b> 열어 보세요.', needs: [['git init · git push', 'W13/1', '터미널·Git 교과서 레슨 7·16 의 순서'], ['Settings → Pages', 'W13/1', 'Pages 켜기'], ['index.html', 'W13/1', '첫 페이지 이름']],
         answer: 'cd ~/Documents/web-study/profile   (시작하기 1 에서 web-study 를 만든 곳 — 문서 폴더면 이 경로)\ngit init -b main\ngit add .\ngit commit -m "내 소개 페이지"\ngit remote add origin https://github.com/내아이디/profile.git\ngit push -u origin main\n(GitHub → Settings → Pages → Deploy from a branch → main / (root) → Save)', noRun: true },
     ],
     WB3: [

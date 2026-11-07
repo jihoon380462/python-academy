@@ -471,3 +471,40 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .bk-art p code,.bk-art li code,.bk-art td code{-webkit-box-decoration-break:clone;box-decoration-break:clone}
 /* 폰: 두 칸 표(이름 · 설명)는 위아래로 — 첫 칸이 좁아져 ssh.socke|t 처럼 쪼개지던 것 */
 @media (max-width:560px){.bk-art table.kb,.bk-art table.kb tbody,.bk-art table.kb tr,.bk-art table.kb td{display:block;width:auto}.bk-art table.kb tr{padding:6px 0;border-bottom:1px solid var(--border)}.bk-art table.kb td{border:0;padding:2px 8px}.bk-art table.kb td:first-child{font-weight:600}}
+/* v2.22.4 N15 전체 시각 검수 반영(docs/VISUAL-REVIEW-2026-11-07.md) */
+/* A1 「예시 답 보기」 가 눌리는 버튼으로 보이게 — ▸/▾ + 테두리 */
+.bk-ans summary{list-style:none;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:6px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font-weight:700}
+.bk-ans summary::-webkit-details-marker{display:none}
+.bk-ans summary:hover{border-color:var(--primary)}
+.bk-ans-m::before{content:'▸';color:var(--primary-text)}
+.bk-ans[open] .bk-ans-m::before{content:'▾'}
+/* A2 입력 예·출력 예는 한 줄에 한 쌍(예가 여럿이면 「예 n」 상자) */
+.bk-ios{display:flex;flex-direction:column;gap:12px}
+.bk-io-case{display:flex;flex-wrap:wrap;gap:10px;min-width:0}
+.bk-io-case>div{flex:1 1 220px;min-width:0}
+.bk-ios.multi .bk-io-case{padding:8px 10px 10px;border:1px solid var(--border);border-radius:10px}
+.bk-io-case>.bk-io-n{flex:0 0 100%;font-weight:800;font-size:.85em;color:var(--muted)}
+/* A3 출력 예는 줄바꿈하지 않고 칸 안에서 옆으로 밀기(한 줄 출력이 두 줄처럼 보이지 않게) */
+.bk-io pre.code{white-space:pre;overflow-x:auto}
+/* A4 짧은 글 속 코드(20자 이하)는 한 덩어리 */
+.book-mode code.nw{white-space:nowrap}
+/* A5 한글은 낱말 단위로 줄바꿈 */
+.book-mode .bk-art,.book-mode .bk-dex,.book-mode .bk-task,.book-mode .bk-code-h{word-break:keep-all;overflow-wrap:break-word}
+.bk-lbl-a{font-weight:700}
+/* A6 옆으로 더 있는 코드 상자는 오른쪽 끝을 흐리게 · 얇은 스크롤바 · 줄 번호 예제는 그림을 돌릴 때만 높이 제한 */
+pre.code.more-r{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),rgba(0,0,0,.25));mask-image:linear-gradient(to right,#000 calc(100% - 40px),rgba(0,0,0,.25))}
+.bk-code pre.code,.bk-io pre.code{scrollbar-width:thin}
+.book-mode .bk-lined{max-height:none}
+.book-mode .bk-lined.lim{max-height:420px;overflow:auto}
+/* A7 레슨 위 작은 제목은 대소문자 그대로(for와 range · input) */
+.book-mode .lp-kicker{text-transform:none;letter-spacing:.02em}
+/* A9 경로 줄은 한 줄 — 긴 레슨 이름은 말줄임, 📚 도감은 늘 오른쪽 */
+.bk-crumb{flex-wrap:nowrap}
+.bk-crumb>.lnk{flex:none;white-space:nowrap}
+.bk-crumb>span:not(.muted):not(.grow){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-next-hint .nw{white-space:nowrap}
+/* A10 도감 분류 칩: PC 는 여러 줄로(잘리지 않게), 폰은 옆으로 밀기 + 얇은 스크롤바 */
+@media (min-width:561px){.bk-dex-chips{flex-wrap:wrap;overflow:visible}}
+@media (max-width:560px){.bk-dex-chips{scrollbar-width:thin}}
+/* A5 폰: 코드 상자 머리글은 이름 한 줄 + 설명 다음 줄, 「필요한 문법」 은 코드 → 설명 → 링크 세로 */
+@media (max-width:560px){.bk-lbl-more{display:block;font-size:.92em}.bk-lbl-dash{display:none}.bk-code-h:has(.bk-lbl-more){align-items:flex-start}.bk-need{flex-direction:column;align-items:flex-start;gap:4px}.bk-need-w{margin-left:0}.bk-need-d{min-width:0}}

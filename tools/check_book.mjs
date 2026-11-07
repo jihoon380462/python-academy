@@ -111,7 +111,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
     fs.writeFileSync(path.join(home, 'vim-study', 'play.txt'), Array.from({ length: 12 }, (_, k) => `line${k + 1} cat a i`).join('\n') + '\n');
     const cmds = new Map(); const addc = (x, w) => { x = String(x).split('←')[0].trim(); if (!/^:[A-Za-z%'<0-9.,$]/.test(x) || cmds.has(x)) return; cmds.set(x, w); };
     for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const pg = bookPage(l.id, i); const w = `${l.id}/${i}`; if (pg.example && pg.example.code) pg.example.code.split('\n').forEach(x => addc(x, w)); for (const m of pg.html.matchAll(/<code>([\s\S]*?)<\/code>/g)) addc(ent(m[1]), w); for (const m of pg.html.matchAll(/<pre[^>]*>([\s\S]*?)<\/pre>/g)) ent(m[1]).split('\n').forEach(x => addc(x.split('"')[0], w)); });
-    const skip = /^:(q|q!|qa|qa!|x|wq|wqa|PlugInstall|PlugUpdate|Lsp\w*|term|terminal|Lexplore|Ex|source)\b|[가-힣]|Ctrl\+|…/;
+    const skip = /^:(q|q!|qa|qa!|x|wq|wqa|PlugInstall|PlugUpdate|Lsp\w*|term|terminal|Lexplore|Ex|source)\b|[가-힣]|Ctrl\+|<C-|…/;
     for (const [cmd, w] of cmds) { if (skip.test(cmd)) continue; fs.writeFileSync(path.join(home, 's.vim'), `edit! ~/vim-study/play.txt\nlet v:errmsg=''\nsilent! execute ${JSON.stringify(cmd.slice(1))}\nlet g:e=v:errmsg\nredir! > ${path.join(home, 'o.txt')}\necho 'ERR[' . g:e . ']'\nredir END\nqa!\n`);
       spawnSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-S', path.join(home, 's.vim')], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8' }, timeout: 10000 }); ran++;
       const o = fs.existsSync(path.join(home, 'o.txt')) ? fs.readFileSync(path.join(home, 'o.txt'), 'utf8') : ''; fs.rmSync(path.join(home, 'o.txt'), { force: true });

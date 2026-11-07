@@ -28,7 +28,7 @@ github.com (웹)
   + Issues · Actions · Pages</pre>
 <p>GitHub 이 Git 에 <b>더해 주는 것</b>들이 이 교과서의 차례예요.</p>
 <table class="kb"><tbody><tr><td><b>Pull Request</b></td><td>「이 브랜치를 main 에 합쳐 주세요」 요청 + 리뷰(챕터 2)</td></tr><tr><td><b>Issues · Projects</b></td><td>할 일·버그를 적고 관리(챕터 2)</td></tr><tr><td><b>Pages · Releases</b></td><td>사이트 공개·버전 배포(챕터 3)</td></tr><tr><td><b>Actions</b></td><td>push 할 때마다 테스트를 자동으로 돌리는 로봇(챕터 4)</td></tr></tbody></table>
-<p>이 사이트(파이썬 아카데미)도 이렇게 운영돼요: 브랜치 → Pull Request → 자동 검사 초록 체크 → 합치기 → 사이트 자동 배포. 마지막 보스에서 내 저장소를 똑같이 만들어요.</p>` },
+<p>이 사이트(파이썬 아카데미)도 이렇게 운영돼요: 브랜치 → Pull Request → 자동 검사 초록 체크 → 합치기 → 사이트 자동 배포. 마지막 「만들어 보기: 이 사이트처럼 운영하기」 에서 내 저장소를 똑같이 만들어요.</p>` },
     { title: '저장소 화면 둘러보기: Code · Issues · Pull requests · Actions · Settings', html: `<p>아무 저장소나 열면(예: 내 저장소 <code>https://github.com/내아이디/저장소이름</code>) 이름 아래에 <b>탭</b>이 한 줄 있어요.</p>
 <table class="kb"><tbody><tr><td><b>Code</b></td><td>파일 목록과 README. 초록 <b>Code</b> 버튼 → <b>Local</b> 탭에 clone 주소(HTTPS · SSH)</td></tr><tr><td><b>Issues</b></td><td>할 일·버그 글 목록</td></tr><tr><td><b>Pull requests</b></td><td>합쳐 달라는 요청 목록</td></tr><tr><td><b>Actions</b></td><td>자동 실행(워크플로) 기록 — 초록 ✓ · 빨간 ✗</td></tr><tr><td><b>Settings</b></td><td>저장소 설정(이름 바꾸기·Pages·보호 규칙·비밀값). 내 저장소에서만 보여요. 창이 좁으면 <b>⋯</b> 메뉴 안에 있어요</td></tr></tbody></table>
 <p>Code 탭 오른쪽 위에는 <b>⭐ Star</b>(즐겨찾기) · <b>Fork</b>(내 계정으로 복사, 챕터 3) · <b>Watch</b>(알림 받기)가 있어요. 왼쪽 위 브랜치 버튼(<code>main ▾</code>)로 다른 브랜치의 파일을 볼 수 있어요.</p>
