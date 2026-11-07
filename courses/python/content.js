@@ -1305,9 +1305,8 @@ LESSONS.push(
   summary: ['동작 그대로, 모양만 좋게 — 테스트가 지켜 준다', '이름은 뜻을 말하게, 함수 하나는 일 하나, 중복은 함수로, 숫자엔 이름', '한 번에 하나씩 고치고 매번 테스트'] },
 { id: 'B7', ch: 7, boss: true, title: '보스: 학교 알림 메시지 분석기', mode: 'text', pages: [], summary: [],
   tutorSummary: '챕터 7 보스. 알림 메시지 줄들(날짜 + 본문)에서 정규식으로 날짜·전화번호·금액을 뽑고, datetime으로 D-day를 계산하고, 결과를 assert로 자체 검증하는 프로그램. 문제 2개: 메시지 파싱·D-day, 전화번호 가리기·금액 합계.' },
-{ id:'B6', ch:7, boss:true, title:'보스: 내 명령 줄 메모 도구', mode:'text', draft:true,
-  tutorSummary:'챕터 4·5·7 을 묶는 만들어 보기. 가상 환경 + 패키지 폴더 memo/(__init__·store·cli·__main__) + argparse 하위 명령(add·list·find·rm) + pathlib·utf-8 JSON 저장 + @dataclass Memo + 내 예외 + 타입 힌트 + 테스트. python -m memo add "장보기".',
-  pages:PY_TODO('memo 패키지 · argparse 하위 명령 · JSON 저장 · dataclass · 내 예외 · 테스트'), summary:[] },
+{ id:'B6', ch:7, boss:true, title:'보스: 내 명령 줄 메모 도구', mode:'text', pages:[], summary:[],
+  tutorSummary:'챕터 4·5·7 을 묶는 만들어 보기 — 터미널에서 python -m memo add "장보기" 로 쓰는 메모 도구. 저장 부분(store): @dataclass Memo(id: int, text: str), 내 예외 class MemoError(Exception), load(파일이 없으면 [])·save(encoding="utf-8", json.dump(ensure_ascii=False, indent=2))·add(빈 글이면 raise MemoError, 번호는 마지막 + 1)·find·remove(없는 번호면 raise), 타입 힌트(path: Path, -> list[Memo]). 명령 줄 부분(cli): main(argv) 가 argparse 로 --file(기본 Path.home() / "memos.json" — 실행 위치와 상관없음)과 하위 명령 add·list·find·rm(type=int)을 읽고, MemoError 를 잡아 「에러: …」 를 출력하고 1, 잘 끝나면 0 을 돌려줌. 테스트: test_store 안의 assert(dataclass 라 == 로 비교, 없는 번호는 MemoError). 문제 4개: ① 한 파일로 만들고 tempfile.TemporaryDirectory() 임시 폴더에서 main(argv) 를 차례로 불러 출력 비교 ② ☐ 가상 환경(python -m venv .venv, 켜면 (.venv)) + 패키지 폴더 memo/(__init__.py·store.py·cli.py·__main__.py 의 sys.exit(main())) + test_memo.py(if __name__ == "__main__":) ③ ☐ 터미널에서 python -m memo add·list·find·rm·-h, 끝 코드($LASTEXITCODE), argparse 가 막는 rm abc, 파일 속 한글 ④ 🏠 done 명령과 [x] 표시, row.get("done", False) 로 예전 파일도 읽기, list --todo(action="store_true").' },
 );
 PROBLEMS.push(
 // ---------------- L19 날짜와 시간 ----------------
