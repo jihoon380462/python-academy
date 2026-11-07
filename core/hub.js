@@ -29,7 +29,7 @@ const Hub = {
   courseCard(c) {
     const bp = this.bookProgress(c);
     const body = `<div class="hc-body">${this.ring(bp.pct, 'var(--primary)')}<div class="hc-txt"><div class="hc-sub">📖 교과서 · 읽은 레슨 ${bp.read}/${bp.total}</div><div class="hc-sub muted">${c.bookNote ? esc(c.bookNote) : bp.read >= bp.total ? '다 읽었어요 🎉' : '채점 없이 읽고 내 컴퓨터에서 만들어 보기'}</div></div></div>`;
-    const glyph = { python: 'Py', algo: 'Al', 'terminal-git': '>_', sql: 'SQL', web: '</>', api: '{ }', math: '∑', vim: 'Vi', github: 'Gh', linux: 'Lx', os: 'OS' }[c.id] || (c.name || '?').slice(0, 1); const inner = `<div class="hc-head"><span class="hc-glyph" aria-hidden="true">${esc(glyph)}</span><span class="hc-name">${esc(c.name)}</span></div><div class="hc-desc muted small">${esc(c.desc)}${c.hubLabel ? ` · ${esc(c.hubLabel)}` : ''}</div>${body}`;
+    const glyph = { python: 'Py', algo: 'Al', 'terminal-git': '>_', sql: 'SQL', web: '</>', api: '{ }', math: '∑', vim: 'Vi', github: 'Gh', linux: 'Lx', os: 'OS', asm: 'As' }[c.id] || (c.name || '?').slice(0, 1); const inner = `<div class="hc-head"><span class="hc-glyph" aria-hidden="true">${esc(glyph)}</span><span class="hc-name">${esc(c.name)}</span></div><div class="hc-desc muted small">${esc(c.desc)}${c.hubLabel ? ` · ${esc(c.hubLabel)}` : ''}</div>${body}`;
     return c.ready ? `<a class="card hc ready" href="${this.courseUrl(c)}" style="--hc:var(--primary)">${inner}</a>` : `<div class="card hc soon">${inner}</div>`;
   },
 };

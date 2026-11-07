@@ -27,11 +27,12 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
     if (dv.text && /👀|시각화|▶ 실행|입력창/.test(dv.text) && BOOK.fixPrompt) bad(`${id}: 지문에 이 앱 버튼 안내가 남음 「${(dv.text.match(/.{0,20}(👀|시각화|▶ 실행|입력창).{0,20}/) || [''])[0].replace(/<[^>]+>/g, '')}」 — BOOK.fixPrompt 로 지우거나 text 를 직접 쓰세요`);
     if (!answer) bad(`${id}: 예시 답 없음`);
     if (/(^|[^$]){{/.test(JSON.stringify(io) + '\n' + answer)) /* ${{ … }} 는 GitHub Actions 문법이라 제외 */ bad(`${id}: {{바꿔 끼우기}} 자리표시가 남음 — io·answer 를 직접 적으세요`);
-    const GHB = ['github', 'linux'].includes(BOOK.check); if ((GHB || ['os', 'api'].includes(BOOK.check)) && t.noRun && !(t.checks || []).length) bad(`${id}: 화면에서 하는 문제인데 「확인할 것」(checks) 없음`); /* v2.23.0 운영체제 교과서: 터미널에서 보는 문제(ps·pstree·좀비)도 ☐ 필수, 파이썬 문제는 아래 python3 실행 */ /* v2.21.0 리눅스 교과서도 같은 방식(화면 = ☐ · 명령 = bash) */ // v2.16.0 GitHub 교과서: 화면 문제는 checks, 명령 문제는 셸로
+    const GHB = ['github', 'linux'].includes(BOOK.check); if ((GHB || ['os', 'api', 'asm'].includes(BOOK.check)) && t.noRun && !(t.checks || []).length) bad(`${id}: 화면에서 하는 문제인데 「확인할 것」(checks) 없음`); /* v2.23.0 운영체제 교과서: 터미널에서 보는 문제(ps·pstree·좀비)도 ☐ 필수, 파이썬 문제는 아래 python3 실행 */ /* v2.21.0 리눅스 교과서도 같은 방식(화면 = ☐ · 명령 = bash) */ // v2.16.0 GitHub 교과서: 화면 문제는 checks, 명령 문제는 셸로
     if (t.noRun) return;
     if (GHB) { if (!t.setup) bad(`${id}: 명령 문제인데 준비 명령(setup) 없음`); for (const c of io) runShell(id, t, answer, c); return; }
     if (BOOK.check === 'web') { if (!(t.checks || []).length) bad(`${id}: 「브라우저에서 확인할 것」(checks) 없음`); return; } // v2.14.0 웹 교과서: 실제 검사는 tools/run_web_solutions.py(브라우저)
     if (SQLB) { for (const c of io) runSqlTask(id, t, answer, c); return; }
+    if (BOOK.check === 'asm') { for (const c of io) { if (c.output == null) { bad(`${id}: 출력 예 없음`); continue; } const r = asmRun(answer, c.input, t.echoExit); if (r.error) { bad(`${id}: ${r.stage} 에서 에러 ${String(r.error).split('\n').slice(0, 2).join(' / ')}`); continue; } ran++; const norm = (x) => String(x).replace(/\r/g, '').split('\n').map(y => y.replace(/\s+$/, '')).join('\n').replace(/\n+$/, ''); if (norm(r.out) !== norm(c.output)) bad(`${id}: 출력이 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(r.out))}`); } return; } // v2.31.0 어셈블리어 교과서: tools/asm_book_run.py 로 nasm · ld(또는 gcc -no-pie) 빌드 후 실행
     if (VIM) { if (!t.setup) bad(`${id}: 준비 명령(setup) 없음`); for (const c of io) runVim(id, t, answer, c); return; }
     if (SHELL) { if (!t.setup) bad(`${id}: 준비 명령(setup) 없음`); for (const c of io) runShell(id, t, answer, c); return; }
     for (const c of io) {
@@ -58,14 +59,14 @@ if (VIM) { // 교과서가 권하는 _vimrc 를 진짜 vim 이 에러 없이 읽
 for (const [k, o2] of Object.entries(BOOK.pages || {})) { const [pl, pi] = k.split('/'); const pg = (pagesOf(pl) || [])[+pi]; if (!pg) { bad(`pages ${k}: 없는 쪽`); continue; } for (const [a] of o2.rep || []) if (!pg.html.includes(a)) bad(`pages ${k}: 바꿀 글을 못 찾음 「${a.slice(0, 40)}」`); }
 for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/'); if (!(pagesOf(tl) || [])[+ti]) bad(`titles ${k}: 없는 쪽`); }
 (BOOK.builtins || []).forEach((bi, i) => { n++; const id = `내장 함수 ${bi.name}`; if (bi.ref) { const [bl, bp] = bi.ref.split('/'); if (!(pagesOf(bl) || [])[+bp]) bad(`${id}: ref ${bi.ref} 가 없는 쪽`); }
-  if (VIM || SHELL || ['github', 'linux', 'os', 'api'].includes(BOOK.check)) return; // 단축키·명령·Markdown 모음은 실행 결과가 없음(운영체제 도구 상자도 터미널 명령)
+  if (VIM || SHELL || ['github', 'linux', 'os', 'api', 'asm'].includes(BOOK.check)) return; // 단축키·명령·Markdown 모음은 실행 결과가 없음(운영체제 도구 상자도 터미널 명령)
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
   ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
 // v2.15.1 사용자 「3, 4」(알고 교과서 자체 QA 에서 손으로 찾은 두 종류를 CI 로):
 // ⑤ 레슨 본문의 「실행하면 <code>값</code>」 이 그 쪽 예제를 실제로 돌린 출력에 있는지 — 파이썬 예제는 python3, SQL 예제는 tools/sql_book_run.py(cafe)
 //    본문 속 <code> 가 예제 코드에 그대로 있으면(「실행하면 heappop(h)[2] 로 …」 처럼 코드를 가리키는 말) 출력 주장이 아니라서 건너뜀. 화살표 →/-> 와 공백은 같게 보지 않음(그게 이번 버그)
 // ⑥ 필요한 문법의 코드 속 낱말(3글자 이상 이름) 중 하나라도 링크된 쪽(제목·본문·예제)에 나오는지 — 하나도 없으면 다른 쪽을 가리키는 것
-{ const PYEX = !COURSE || !COURSE.runner || COURSE.runner === 'python'; const SQLEX = COURSE && COURSE.runner === 'sql';
+{ const PYEX = !COURSE || !COURSE.runner || COURSE.runner === 'python'; const SQLEX = COURSE && COURSE.runner === 'sql'; const ASMEX = BOOK.check === 'asm';
   const ent = (x) => String(x).replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#92;/g, '\\').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
   const bookPage = (lid, i) => { const pg = (pagesOf(lid) || [])[i]; if (!pg) return null; const o = (BOOK.pages || {})[`${lid}/${i}`]; let html = (o && o.html) || pg.html || ''; ((o && o.rep) || []).forEach(([a, b]) => { html = html.split(a).join(b); }); return { title: (o && o.title) || (BOOK.titles || {})[`${lid}/${i}`] || pg.title || '', html, example: (o && o.example) || pg.example || null }; };
   const sq = (x) => x.replace(/\s+/g, ' ').trim();
@@ -84,6 +85,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
     return strong.size ? [...strong] : [...ws]; /* 함수·메서드 이름이 있으면 그것만(「import heapq」 만 있는 쪽이 heapq.heapify 를 설명하는 쪽으로 통과하지 않게) */ };
   for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const pg = bookPage(l.id, i); const ex = pg.example || {}; const code = ex.code || ex.sql || '';
     const claims = []; for (const m of pg.html.matchAll(/([^.。>]{0,40})실행하면([^.。]*?)(?=[.。]|<\/p>|<\/li>|$)/g)) if (!/고치|바꾸|바꿔|넣고|지우고/.test(m[1])) /* 「…로 고치고 다시 실행하면」 은 예제 그대로의 출력이 아님 */ for (const c of m[2].matchAll(/<code>([\s\S]*?)<\/code>/g)) { const v = ent(c[1]).trim(); if (v.length >= 2 && !sq(code).includes(sq(v))) claims.push(v); }
+    if (ASMEX && code) { const r = asmRun(code, ex.stdin, ex.echoExit); if (r.error) { if (!((BOOK.meta && BOOK.meta.exampleErrorsOk) || []).includes(`${l.id}/${i}`)) bad(`${l.id}/${i} 「${pg.title}」 예제 ${r.stage} 에서 에러: ${String(r.error).split('\n').slice(0, 2).join(' / ')}`); return; } ran++; const o = sq(r.out); for (const v of claims) if (!o.includes(sq(v))) bad(`${l.id}/${i} 「${pg.title}」: 본문은 「실행하면 ${v}」 인데 예제 출력에 없어요 — 실제 출력 ${JSON.stringify(r.out.slice(0, 160))}`); return; } // v2.31.0 어셈블리 예제는 전부 빌드 · 실행
     if (!code || !(PYEX || SQLEX)) return; if (PYEX && /^\s*(import turtle|from turtle)/m.test(code)) return; /* 거북이는 창이 필요해서(CI 에 화면 없음) 안 돌림 */ if (!claims.length && !PYEX) return; // 파이썬 예제는 주장이 없어도 전부 돌려 봄(에러 나는 예제 찾기, BOOK.meta.exampleErrorsOk 는 일부러 에러)
     const errOk = ((BOOK.meta && BOOK.meta.exampleErrorsOk) || []).includes(`${l.id}/${i}`);
     let out = ''; try { if (PYEX) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ex-')); fs.writeFileSync(path.join(dir, 'main.py'), code); out = execFileSync('python3', ['main.py'], { cwd: dir, input: ex.stdin || '', encoding: 'utf8', timeout: 20000, stdio: ['pipe', 'pipe', 'pipe'] }); }
@@ -171,3 +173,6 @@ function runSqlTask(id, t, answer, c) {
 }
 function bad(m) { fails++; console.log('  ✗', `[${cid}]`, m); }
 }
+
+// v2.31.0 어셈블리어 교과서: 예시 답 · 예제를 nasm · ld(또는 gcc -no-pie)로 빌드해 실행 — tools/asm_book_run.py
+function asmRun(code, stdin, echoExit) { try { return JSON.parse(execFileSync('python3', [R + '/tools/asm_book_run.py'], { input: JSON.stringify({ code, stdin: stdin || '', echoExit: !!echoExit }), encoding: 'utf8', timeout: 30000 })); } catch (e) { return { error: String(e.stderr || e.message).trim().split('\n').pop(), stage: 'asm_book_run' }; } }

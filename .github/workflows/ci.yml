@@ -32,6 +32,7 @@ jobs:
         run: node tools/check_nesting.mjs
       - name: check_book (파이썬 교과서 — 필요한 문법 링크·예시 답 실행, v2.9.0)
         run: |
+          sudo apt-get install -y -qq nasm  # v2.31.0~ 어셈블리어 교과서: 예시 답 · 예제를 nasm · ld · gcc 로 진짜 빌드 · 실행(tools/asm_book_run.py)
           pip install --quiet fastapi httpx requests  # v2.28.0~ HTTP·API·SDK 교과서: FastAPI 예제·예시 답을 TestClient 로 실제 실행, 챕터 4 SDK 는 requests 를 import(인터넷 API 는 안 부름)
           node tools/check_book.mjs
       - name: run_solutions
