@@ -87,7 +87,7 @@ print("부모의 money:", money)</pre>
 <p>실행하면 <code>자식의 money: 70</code> 다음에 <code>부모의 money: 100</code> 이 나와요. 두 프로세스는 메모리가 <b>따로따로</b>예요. 커널이 프로세스마다 자기만의 메모리를 주기 때문이에요(챕터 3 「가상 메모리」). 그래서 자식이 부모에게 결과를 알려 주려면 따로 길이 필요해요. 가장 간단한 길이 다음 쪽의 <b>종료 코드</b>, 더 많은 걸 주고받는 길은 레슨 5 의 <b>파이프</b>예요.</p>` + OS_DATE,
       example: { code: 'import os\nmoney = 100\npid = os.fork()\nif pid == 0:\n    money -= 30\n    print("자식의 money:", money, flush=True)\n    os._exit(0)\nos.waitpid(pid, 0)\nprint("부모의 money:", money)' } },
     { title: 'os.waitpid · 종료 코드 · 좀비와 고아', html: `<p>자식은 끝날 때 <b>종료 코드</b>(0~255 의 숫자)를 남겨요. 0 은 「잘 끝남」, 그 밖은 「무언가 잘못됨」 이 약속이에요(bash 의 <code>echo $?</code> 가 이 숫자).</p>
-<ul><li>자식: <code>os._exit(3)</code> — 3 을 남기고 끝.</li><li>부모: <code>_, status = os.waitpid(pid, 0)</code> — 그 자식이 끝날 때까지 기다렸다가 상태를 받아요. 상태에서 종료 코드를 꺼내는 건 <code>os.waitstatus_to_exitcode(status)</code>.</li><li><code>os.wait()</code> 는 「아무 자식이나 하나 끝날 때까지」 기다려요(자식 PID 와 상태를 돌려줘요).</li></ul>
+<ul><li>자식: <code>os._exit(3)</code> — 3 을 남기고 끝.</li><li>부모: <code>_, status = os.waitpid(pid, 0)</code> — 그 자식이 끝날 때까지 기다렸다가 상태를 받아요. 상태에서 종료 코드를 꺼내는 건 <code>os.waitstatus_to_exitcode(status)</code>.</li><li><code>os.wait()</code> 는 「아무 자식이나 하나 끝날 때까지」 기다려요(자식 PID 와 상태를 돌려줘요).</li><li><code>os.waitpid(-1, os.WNOHANG)</code> 은 <b>기다리지 않고</b> 확인만 해요 — 끝난 자식이 있으면 거두고, 없으면 바로 <code>(0, 0)</code> 을 돌려줘요. 뒤에서 도는 자식을 가끔 거둘 때 써요(챕터 4 「미니 셸 완성」).</li></ul>
 <pre class="code">import os
 pid = os.fork()
 if pid == 0:
@@ -180,7 +180,7 @@ print("받은 시그널:", signal.Signals(-code).name)</pre>
 os.write(1, "1번(stdout)에 바로 쓰기\n".encode())
 os.write(2, "2번(stderr)에 쓰기\n".encode())
 print("0번이 터미널인가요?", sys.stdin.isatty())</pre>
-<ul><li><code>os.write(번호, 바이트)</code> 는 print 를 거치지 않고 그 번호에 바로 써요(그래서 글자를 <code>.encode()</code> 로 바이트로).</li><li><code>sys.stdin.readline()</code> 은 0번에서 <b>한 줄</b>을 읽어요. 입력이 끝나면(파이프가 끝나거나 <kbd>Ctrl</kbd>+<kbd>D</kbd>) 빈 글자 <code>""</code> 를 돌려줘요.</li><li><code>sys.stdin.isatty()</code> 는 「0번이 사람이 치는 터미널인가」. 터미널에서 그냥 돌리면 <code>True</code>, <code>echo 값 | python3 파일.py</code> 처럼 파이프로 넣으면 <code>False</code> 예요.</li></ul>
+<ul><li><code>os.write(번호, 바이트)</code> 는 print 를 거치지 않고 그 번호에 바로 써요(그래서 글자를 <code>.encode()</code> 로 바이트로). <code>print(…, file=sys.stderr)</code> 는 print 를 2번으로 보내요 — 에러 글은 이쪽으로.</li><li><code>sys.stdin.readline()</code> 은 0번에서 <b>한 줄</b>을 읽어요. 입력이 끝나면(파이프가 끝나거나 <kbd>Ctrl</kbd>+<kbd>D</kbd>) 빈 글자 <code>""</code> 를 돌려줘요.</li><li><code>sys.stdin.isatty()</code> 는 「0번이 사람이 치는 터미널인가」. 터미널에서 그냥 돌리면 <code>True</code>, <code>echo 값 | python3 파일.py</code> 처럼 파이프로 넣으면 <code>False</code> 예요.</li></ul>
 <p><code>ls -l /proc/self/fd</code> 로 보면 0·1·2 가 모두 지금 터미널(<code>/dev/pts/0</code> 같은 것)을 가리켜요.</p>` + OS_DATE,
       example: { code: 'import os, sys\nos.write(1, "1번(stdout)에 바로 쓰기\\n".encode())\nos.write(2, "2번(stderr)에 쓰기\\n".encode())\nprint("0번이 터미널인가요?", sys.stdin.isatty())' } },
     { title: '리다이렉트 = os.dup2 로 1번을 바꿔 끼우기', html: `<p>bash 의 <code>echo 안녕 &gt; out.txt</code> 는 이렇게 만들어져요: 자식이 <b>out.txt 를 열고</b>, 그 번호를 <b>1번 자리에 복사해 끼운 뒤</b> <code>echo</code> 로 갈아타요. <code>echo</code> 는 평소처럼 1번에 썼을 뿐인데 글이 파일로 가요.</p>
@@ -215,7 +215,7 @@ os.close(w)
 os.wait()
 os.wait()</pre>
 <ol><li>첫째 자식: 쓰는 끝 w 를 <b>1번</b>에 끼우고 <code>echo</code> 로 → echo 의 출력이 파이프로 들어가요.</li><li>둘째 자식: 읽는 끝 r 을 <b>0번</b>에 끼우고 <code>wc -w</code> 로 → wc 가 키보드 대신 파이프에서 읽어요.</li><li>부모: 두 끝을 다 닫고, 자식 둘을 <code>os.wait()</code> 로 기다려요.</li></ol>
-<p>실행하면 <code>3</code> 이 나와요(낱말 3개). bash 의 <code>echo 하나 둘 셋 | wc -w</code> 와 같아요.</p>
+<p>실행하면 <code>3</code> 이 나와요(낱말 3개). bash 의 <code>echo 하나 둘 셋 | wc -w</code> 와 같아요. 셸은 입력한 줄을 <code>line.split("|")</code> 로 단계마다 나눠, 단계 사이마다 파이프를 하나씩 만들어 이렇게 이어요.</p>
 <div class="bk-step-box"><b>안 쓰는 끝은 꼭 닫기</b><br><code>wc</code> 는 「쓰는 끝이 <b>모두</b> 닫혀야」 입력이 끝났다고 알아요. 부모나 둘째 자식이 w 를 열어 둔 채면 wc 는 영원히 기다려요(프로그램이 멈춘 것처럼 보여요). 그래서 끼운 뒤에는 원래 번호를 닫고, 부모도 둘 다 닫아요.</div>` + OS_DATE,
       example: { code: 'import os\nr, w = os.pipe()\nif os.fork() == 0:\n    os.dup2(w, 1)\n    os.close(r)\n    os.close(w)\n    os.execvp("echo", ["echo", "하나", "둘", "셋"])\nif os.fork() == 0:\n    os.dup2(r, 0)\n    os.close(r)\n    os.close(w)\n    os.execvp("wc", ["wc", "-w"])\nos.close(r)\nos.close(w)\nos.wait()\nos.wait()' } },
   ],
@@ -573,10 +573,132 @@ print("최근 2개만 두면 30MB 안쪽인가요?", kept &lt; 30)</pre>
   summary: ['free -h 의 available 이 진짜 여유 · vmstat 1 의 si/so 가 계속이면 스래싱', 'RAM + 스왑이 바닥나면 OOM killer 가 oom_score 큰 프로세스를 SIGKILL(journalctl -k)', '누수 = 계속 넣기만 하는 목록·딕셔너리 → VmRSS 가 계속 오름 · deque(maxlen=) 로 크기 제한'] },
 
 { id: 'KB3', ch: 3, boss: true, title: '보스: 페이지 교체 실험실', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 3 종합. FIFO · LRU · OPT 를 함수로 만들어 교과서 참조 20개로 프레임 1~5 의 폴트 수 표를 찍고, 벨라디 예로 FIFO 의 이상을 확인. 브라우저 그림과 숫자가 같은지 비교.' },
-// ================= 챕터 4 시스템 콜과 파일 시스템 (다음 업데이트) =================
-{ id: 'K14', ch: 4, n: 14, title: '시스템 콜: 커널에게 부탁하기', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '사용자 모드 → 커널 모드 · strace -e trace=write · strace -c · C 맛보기.' },
-{ id: 'K15', ch: 4, n: 15, title: '파일 디스크립터와 버퍼', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '/proc/self/fd · 닫지 않으면 · 버퍼 · flush · os.fsync.' },
-{ id: 'K16', ch: 4, n: 16, title: '파일 시스템: inode 와 링크', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'inode · ls -i · stat · 하드 링크 · 심볼릭 링크 · df -i.' },
-{ id: 'KB4', ch: 4, boss: true, draft: true, title: '보스: 미니 셸 완성', mode: 'text', pages: [], summary: [], tutorSummary: '파이프 · 리다이렉트 · 백그라운드 & · 좀비 거두기 · Ctrl+C.' },
+// ================= 챕터 4 시스템 콜과 파일 시스템 =================
+{ id: 'K14', ch: 4, n: 14, title: '시스템 콜: 커널에게 부탁하기', mode: 'text', tutorSummary: '시스템 콜 = 사용자 모드 프로그램이 커널에게 하는 부탁(write · openat · read · close · mmap · clone · execve · wait4 · exit_group). print 아래에도 write. os.write(1, 바이트) 는 거의 그대로 write. strace -e trace=write · strace -c(몇 번) · strace -f(자식까지). C 로 만든 hello 는 수십 번, 파이썬은 수백 번(시작할 때 모듈을 읽어서).',
+  pages: [
+    { title: 'print 한 줄 아래: write', html: `<p>레슨 0 에서 「프로그램은 하드웨어를 직접 못 만지고 커널에게 부탁해요」 라고 했어요. 그 부탁이 <b>시스템 콜</b>이에요. 화면(터미널)에 글자를 쓰는 부탁은 <code>write</code> 예요.</p>
+<pre class="code">strace -e trace=write python3 -c 'print("hi")'
+write(1, "hi\\n", 3)                       = 3
++++ exited with 0 +++</pre>
+<p><code>strace</code> 는 프로그램이 부르는 시스템 콜을 하나하나 보여 줘요(없으면 <code>sudo apt install strace</code>). <code>write(1, "hi\\n", 3) = 3</code> 은 「1번(stdout)에 3바이트를 써 줘 → 3바이트 썼어요」.</p>
+<p>파이썬의 <code>os.write</code> 는 이 부탁을 거의 그대로 해요. 돌려주는 값은 <b>실제로 쓴 바이트 수</b>예요.</p>
+<pre class="code">import os
+n = os.write(1, "안녕\n".encode())
+print("쓴 바이트:", n)</pre>
+<p>실행하면 <code>안녕</code> 다음에 <code>쓴 바이트: 7</code>. 한글은 UTF-8 로 한 글자에 3바이트라서 「안녕」 6 + 줄바꿈 1 이에요.</p>` + OS_DATE,
+      example: { code: 'import os\nn = os.write(1, "안녕\\n".encode())\nprint("쓴 바이트:", n)' } },
+    { title: 'strace -c: 무엇을 몇 번 부탁하나', html: `<p><code>strace -c</code> 는 하나하나 대신 <b>종류별 횟수</b>를 표로 보여 줘요.</p>
+<pre class="code">strace -c ls
+% time     seconds  usecs/call     calls    errors syscall
+…
+  0.00    0.000000           0        17           mmap
+  0.00    0.000000           0         8           close
+…
+100.00    0.000190           2        70         6 total</pre>
+<p>이 교과서에서 쓴 파이썬 함수는 대부분 시스템 콜 하나와 짝이에요.</p>
+<table class="kb"><tbody><tr><td><code>open</code> · <code>os.open</code></td><td><code>openat</code></td></tr><tr><td><code>f.read()</code> · <code>os.read</code></td><td><code>read</code></td></tr><tr><td><code>print</code> · <code>os.write</code></td><td><code>write</code></td></tr><tr><td><code>os.fork()</code></td><td><code>clone</code>(리눅스에서 fork 는 clone 으로)</td></tr><tr><td><code>os.execvp</code></td><td><code>execve</code></td></tr><tr><td><code>os.waitpid</code></td><td><code>wait4</code></td></tr><tr><td><code>os._exit</code></td><td><code>exit_group</code></td></tr><tr><td><code>mmap.mmap</code></td><td><code>mmap</code></td></tr></tbody></table>
+<p><code>strace -f</code> 는 자식 프로세스까지 따라가요. 레슨 3 의 「fork + exec + wait」 프로그램을 <code>strace -f -e trace=clone,execve,wait4 python3 k03.py</code> 로 돌리면 세 부탁이 차례로 보여요.</p>` + OS_DATE,
+      example: { label: '예제 명령 — 우분투 터미널에서', shell: 'sudo apt install -y strace\nstrace -c ls > /dev/null\nstrace -e trace=write python3 -c \'print("hi")\'' } },
+    { title: 'C 맛보기: 파이썬 아래의 아래', html: `<p>파이썬은 내 코드를 읽어 실행해 주는 큰 프로그램(<code>python3</code>)이에요. 그래서 <code>print("hi")</code> 한 줄을 돌려도 파이썬 자신이 시작하며 모듈 파일을 여럿 열고 읽어요. 같은 일을 <b>C</b> 로 짜면 기계어로 바로 바뀐 작은 프로그램이 돼요.</p>
+<pre class="code">#include &lt;stdio.h&gt;
+int main(void) {
+    printf("hi\\n");
+    return 0;
+}</pre>
+<ol><li>위 내용을 <code>hello.c</code> 로 저장(<code>gcc</code> 는 리눅스 교과서 레슨 7 의 <code>build-essential</code> 로 이미 깔려 있어요).</li><li><code>gcc -o hello hello.c</code> — C 코드를 실행 파일 <code>hello</code> 로 바꿔요(컴파일).</li><li><code>./hello</code> → <code>hi</code></li><li><code>strace -c ./hello</code> 와 <code>strace -c python3 -c 'print("hi")'</code> 의 맨 아래 <code>total</code> 을 비교해요.</li></ol>
+<p>C 의 hello 는 시스템 콜이 <b>수십 번</b>, 파이썬은 <b>수백 번</b>이에요. 화면에 쓰는 마지막 <code>write</code> 는 둘 다 똑같이 한 번이고요. 어셈블리어 교과서(예정)에서는 이 <code>write</code> 를 함수도 없이 CPU 명령 <code>syscall</code> 로 직접 불러요.</p>` + OS_DATE,
+      example: { label: '예제 명령 — 우분투 터미널에서(hello.c 를 저장한 폴더)', shell: "gcc -o hello hello.c\n./hello\nstrace -c ./hello 2>&1 | tail -1\nstrace -c python3 -c 'print(\"hi\")' 2>&1 | tail -1" } },
+  ],
+  summary: ['시스템 콜 = 커널에게 하는 부탁 — print 아래에도 write(1, …)', 'strace -e trace=이름 · strace -c(횟수) · strace -f(자식까지) — open→openat · fork→clone · exec→execve', 'C 의 hello 는 수십 번, 파이썬은 수백 번(시작할 때 모듈을 읽어서) · gcc -o hello hello.c'] },
+
+{ id: 'K15', ch: 4, n: 15, title: '파일 디스크립터와 버퍼', mode: 'text', tutorSummary: '파일을 열면 비어 있는 가장 작은 번호(fd, 보통 3 부터)를 받음 — f.fileno() · /proc/self/fd. 닫지 않으면 계속 쌓여 한도(ulimit -n · resource.RLIMIT_NOFILE)에서 Too many open files → with 로 닫기. 파이썬 파일은 버퍼에 모았다가 씀(flush 전에는 파일 크기 0) · os.fsync 는 디스크까지 · os.write 는 버퍼 없음.',
+  pages: [
+    { title: '/proc/self/fd: 지금 열어 둔 번호들', html: `<p>레슨 5 에서 0 · 1 · 2 를 봤죠. 파일을 <b>열면</b> 커널이 비어 있는 <b>가장 작은 번호</b>를 줘요. 처음 연 파일은 보통 <b>3</b> 이에요.</p>
+<pre class="code">import os
+before = len(os.listdir("/proc/self/fd"))
+f = open("note.txt", "w")
+print("받은 번호:", f.fileno())
+print("열린 번호가 하나 늘었나요?", len(os.listdir("/proc/self/fd")) == before + 1)
+f.close()
+print("닫으니 원래대로?", len(os.listdir("/proc/self/fd")) == before)</pre>
+<ul><li><code>f.fileno()</code> 는 파이썬 파일 뒤에 있는 진짜 번호(fd)예요.</li><li><code>/proc/self/fd</code> 폴더에는 지금 열어 둔 번호마다 이름이 하나씩 있어요. 터미널에서 <code>ls -l /proc/$$/fd</code> 로 보면 어느 파일을 가리키는지도 보여요.</li><li>번호는 <b>프로세스마다</b> 따로예요. fork 한 자식은 부모의 번호표를 복사해 받아요 — 레슨 5 에서 파이프 끝을 자식에게 넘길 수 있었던 이유예요.</li></ul>` + OS_DATE,
+      example: { code: 'import os\nbefore = len(os.listdir("/proc/self/fd"))\nf = open("note.txt", "w")\nprint("받은 번호:", f.fileno())\nprint("열린 번호가 하나 늘었나요?", len(os.listdir("/proc/self/fd")) == before + 1)\nf.close()\nprint("닫으니 원래대로?", len(os.listdir("/proc/self/fd")) == before)' } },
+    { title: '닫지 않으면: 한도와 with', html: `<p>번호에는 <b>한도</b>가 있어요(우분투 기본은 한 프로세스에 1024개). 파일을 열기만 하고 닫지 않는 코드가 오래 돌면 번호가 바닥나서 <code>OSError: [Errno 24] Too many open files</code> 로 멈춰요.</p>
+<pre class="code">import os, resource
+soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+print("한도가 있나요?", soft &gt; 0)
+before = len(os.listdir("/proc/self/fd"))
+kept = [open("note.txt", "w") for _ in range(3)]
+print("닫지 않은 3개:", len(os.listdir("/proc/self/fd")) - before)
+for f in kept:
+    f.close()
+for _ in range(3):
+    with open("note.txt", "w") as f:
+        f.write("x")
+print("with 로 3번:", len(os.listdir("/proc/self/fd")) - before)</pre>
+<p>실행하면 <code>닫지 않은 3개: 3</code>, <code>with 로 3번: 0</code>. <code>with</code> 는 블록이 끝나면(에러가 나도) 닫아 줘요. 터미널에서는 <code>ulimit -n</code> 이 한도예요.</p>` + OS_DATE,
+      example: { code: 'import os, resource\nsoft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)\nprint("한도가 있나요?", soft > 0)\nbefore = len(os.listdir("/proc/self/fd"))\nkept = [open("note.txt", "w") for _ in range(3)]\nprint("닫지 않은 3개:", len(os.listdir("/proc/self/fd")) - before)\nfor f in kept:\n    f.close()\nfor _ in range(3):\n    with open("note.txt", "w") as f:\n        f.write("x")\nprint("with 로 3번:", len(os.listdir("/proc/self/fd")) - before)' } },
+    { title: '버퍼 · flush · os.fsync', html: `<p>시스템 콜은 공짜가 아니라서, 파이썬은 <code>f.write</code> 를 할 때마다 <code>write</code> 를 부르지 않고 <b>버퍼</b>에 모았다가 한 번에 써요(레슨 2 의 <code>flush=True</code> 가 이것).</p>
+<pre class="code">import os
+f = open("buf.txt", "w")
+f.write("hello")
+print("flush 전 파일 크기:", os.path.getsize("buf.txt"))
+f.flush()
+print("flush 뒤 파일 크기:", os.path.getsize("buf.txt"))
+os.fsync(f.fileno())
+f.close()</pre>
+<table class="kb"><tbody><tr><td><code>f.flush()</code></td><td>파이썬 버퍼 → 커널로(<code>write</code>). 이제 다른 프로그램이 읽으면 보여요</td></tr><tr><td><code>os.fsync(fd)</code></td><td>커널의 캐시 → <b>디스크</b>까지. 정전이 나도 남아야 하는 저장(데이터베이스 · 설정)에서 써요</td></tr><tr><td><code>os.write(fd, 바이트)</code></td><td>파이썬 버퍼 없이 바로 <code>write</code></td></tr></tbody></table>
+<p>실행하면 <code>flush 전 파일 크기: 0</code>, <code>flush 뒤 파일 크기: 5</code>. <code>close()</code> 도 닫기 전에 flush 해 줘요 — 그래서 보통은 신경 쓸 일이 없지만, 다른 프로세스와 같은 파일을 볼 때는 이 순서가 중요해요.</p>` + OS_DATE,
+      example: { code: 'import os\nf = open("buf.txt", "w")\nf.write("hello")\nprint("flush 전 파일 크기:", os.path.getsize("buf.txt"))\nf.flush()\nprint("flush 뒤 파일 크기:", os.path.getsize("buf.txt"))\nos.fsync(f.fileno())\nf.close()' } },
+  ],
+  summary: ['열면 비어 있는 가장 작은 번호(보통 3) — f.fileno() · /proc/self/fd · 자식은 번호표를 복사', '번호에는 한도(ulimit -n · RLIMIT_NOFILE) — 안 닫으면 Too many open files → with', '버퍼: flush 전엔 파일 크기 0 · flush = 커널로 · os.fsync = 디스크까지 · os.write 는 버퍼 없음'] },
+
+{ id: 'K16', ch: 4, n: 16, title: '파일 시스템: inode 와 링크', mode: 'text', tutorSummary: '파일의 진짜 몸통은 inode(번호 · 크기 · 권한 · 데이터 위치 · 링크 수), 이름은 폴더 안의 「이름 → inode 번호」 한 줄. ls -i · stat · os.stat(...).st_ino / st_nlink. 이름 바꾸기(os.rename)는 inode 그대로. 하드 링크(os.link · ln) = 같은 inode 에 이름 하나 더(원본 지워도 읽힘), 심볼릭 링크(os.symlink · ln -s) = 경로를 적은 작은 파일(원본 지우면 깨짐). 지우기(os.remove) = 링크 수 줄이기 — 0 이 되고 아무도 안 열고 있을 때 공간이 비워짐. df -i.',
+  pages: [
+    { title: '이름 ≠ 파일: inode', html: `<p>디스크의 파일에는 <b>inode</b> 라는 카드가 하나씩 있어요. 카드에는 번호 · 크기 · 주인 · 권한 · 만든·고친 시각 · <b>데이터가 디스크 어디에 있나</b> · <b>링크 수</b>가 적혀 있어요. 그런데 <b>파일 이름은 카드에 없어요</b>.</p>
+<p>이름은 <b>폴더</b> 안에 있어요. 폴더는 사실 「이름 → inode 번호」 줄들의 목록이에요. 그래서 이름을 바꾸는 건 폴더의 한 줄만 고치는 거라 아무리 큰 파일도 순식간이에요.</p>
+<pre class="code">import os
+with open("a.txt", "w") as f:
+    f.write("안녕\n")
+before = os.stat("a.txt").st_ino
+os.rename("a.txt", "b.txt")
+print("이름을 바꿔도 inode 가 같나요?", os.stat("b.txt").st_ino == before)
+print("크기:", os.stat("b.txt").st_size, "바이트")
+os.remove("b.txt")</pre>
+<p>실행하면 <code>이름을 바꿔도 inode 가 같나요? True</code>, <code>크기: 7 바이트</code>. 터미널에서는 <code>ls -i</code>(앞 숫자가 inode 번호)와 <code>stat 파일</code>(카드 전체)로 봐요.</p>` + OS_DATE,
+      example: { code: 'import os\nwith open("a.txt", "w") as f:\n    f.write("안녕\\n")\nbefore = os.stat("a.txt").st_ino\nos.rename("a.txt", "b.txt")\nprint("이름을 바꿔도 inode 가 같나요?", os.stat("b.txt").st_ino == before)\nprint("크기:", os.stat("b.txt").st_size, "바이트")\nos.remove("b.txt")' } },
+    { title: '하드 링크와 심볼릭 링크', html: `<table class="kb"><tbody><tr><td><b>하드 링크</b> <code>ln 원본 새이름</code> · <code>os.link</code></td><td>같은 inode 에 <b>이름을 하나 더</b> 붙여요. 두 이름은 완전히 같은 파일 — 원본을 지워도 다른 이름으로 그대로 읽혀요. 링크 수(<code>st_nlink</code>)가 2 가 돼요</td></tr><tr><td><b>심볼릭 링크</b> <code>ln -s 원본 새이름</code> · <code>os.symlink</code></td><td><b>원본의 경로를 적은 작은 파일</b>(바로 가기). 자기 inode 가 따로 있고, 원본을 지우면 <b>깨져요</b>(가리키는 곳이 없음). 폴더 · 다른 디스크도 가리킬 수 있어요</td></tr></tbody></table>
+<pre class="code">import os
+for name in ("a.txt", "hard.txt", "soft.txt"):
+    if os.path.lexists(name):
+        os.remove(name)
+with open("a.txt", "w") as f:
+    f.write("안녕\n")
+os.link("a.txt", "hard.txt")
+os.symlink("a.txt", "soft.txt")
+print("하드 링크는 같은 inode:", os.stat("hard.txt").st_ino == os.stat("a.txt").st_ino)
+print("링크 수:", os.stat("a.txt").st_nlink)
+os.remove("a.txt")
+with open("hard.txt") as f:
+    print("원본을 지운 뒤 하드 링크:", f.read().strip())
+print("심볼릭 링크는 깨졌나요?", not os.path.exists("soft.txt"))</pre>
+<p>실행하면 <code>링크 수: 2</code>, <code>원본을 지운 뒤 하드 링크: 안녕</code>, <code>심볼릭 링크는 깨졌나요? True</code>. 깨진 심볼릭 링크도 이름은 남아 있어서 지울 땐 <code>os.path.lexists</code>(링크 자체가 있나)로 찾아요. <code>ls -l</code> 에서 심볼릭 링크는 <code>soft.txt -&gt; a.txt</code> 처럼 보여요.</p>` + OS_DATE,
+      example: { code: 'import os\nfor name in ("a.txt", "hard.txt", "soft.txt"):\n    if os.path.lexists(name):\n        os.remove(name)\nwith open("a.txt", "w") as f:\n    f.write("안녕\\n")\nos.link("a.txt", "hard.txt")\nos.symlink("a.txt", "soft.txt")\nprint("하드 링크는 같은 inode:", os.stat("hard.txt").st_ino == os.stat("a.txt").st_ino)\nprint("링크 수:", os.stat("a.txt").st_nlink)\nos.remove("a.txt")\nwith open("hard.txt") as f:\n    print("원본을 지운 뒤 하드 링크:", f.read().strip())\nprint("심볼릭 링크는 깨졌나요?", not os.path.exists("soft.txt"))' } },
+    { title: '지우기 = 링크 수 줄이기 · df -i', html: `<p><code>rm</code> · <code>os.remove</code> 는 사실 「폴더에서 이름 한 줄을 지우고 링크 수를 1 줄이기」 예요(시스템 콜 이름도 <code>unlink</code>). 공간이 진짜로 비워지는 건 <b>링크 수가 0 이고, 그 파일을 열고 있는 프로세스도 없을 때</b>예요.</p>
+<pre class="code">import os
+with open("log.txt", "w") as f:
+    f.write("아직 읽을 수 있어요\n")
+f = open("log.txt")
+os.remove("log.txt")
+print("이름은 사라졌나요?", not os.path.exists("log.txt"))
+print("연 채로 읽기:", f.read().strip())
+f.close()</pre>
+<p>실행하면 이름은 사라졌는데 열어 둔 번호로는 끝까지 읽혀요. 「큰 로그 파일을 지웠는데 디스크가 안 비어요」 의 범인이 이것이에요 — 아직 그 파일을 열고 있는 프로그램을 다시 시작해야 비워져요.</p>
+<p><code>df -i</code> 는 inode 카드가 얼마나 남았나를 보여 줘요. 아주 작은 파일이 수백만 개면 공간이 남아도 카드가 바닥나 「No space left on device」 가 날 수 있어요.</p>` + OS_DATE,
+      example: { code: 'import os\nwith open("log.txt", "w") as f:\n    f.write("아직 읽을 수 있어요\\n")\nf = open("log.txt")\nos.remove("log.txt")\nprint("이름은 사라졌나요?", not os.path.exists("log.txt"))\nprint("연 채로 읽기:", f.read().strip())\nf.close()' } },
+  ],
+  summary: ['inode = 파일 카드(번호 · 크기 · 권한 · 데이터 위치 · 링크 수) · 이름은 폴더에(이름 → inode) · ls -i · stat · os.stat', '하드 링크(os.link · ln) = 같은 inode 에 이름 하나 더 · 심볼릭 링크(os.symlink · ln -s) = 경로 쪽지(원본 지우면 깨짐)', '지우기 = 링크 수 줄이기(unlink) — 0 이고 아무도 안 열 때 비워짐 · df -i'] },
+
+{ id: 'KB4', ch: 4, boss: true, title: '보스: 미니 셸 완성', mode: 'text', pages: [], summary: [], tutorSummary: '교과서 종합. KB1 셸에 파이프(|, 여러 단계) · 리다이렉트(> · >>) · 뒤에서 돌리기(&) + 끝난 자식 거두기(os.waitpid(-1, os.WNOHANG) — 좀비 방지) · 에러 글은 2번으로. Ctrl+C 는 앞에서 도는 명령만.' },
 ];
 const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)
