@@ -39,7 +39,7 @@
 | U2 1쪽 | 디스크 40GB · 메모리 넉넉히 | 우분투 26.04 데스크톱 공식 최소는 **메모리 6GB · 디스크 25GB**(24.04 의 4GB 에서 올라감). VM 에 8GB 를 주려면 PC 메모리가 16GB 이상이어야 편해요 |
 | U2 3쪽 | 「디스크를 지우고 설치」 는 **가상 디스크만** | 설치 화면의 「디스크 지우기」 가 지우는 건 VM 안의 빈 가상 디스크(`.vdi` 파일) — Windows 디스크는 안 건드려요. 단 **VM 창 안에서 하는지** 꼭 확인 |
 | U4 1쪽 · 챕터 2·3 위 | 위험한 실험 전에는 스냅샷 | 권한·서비스를 만지기 전에 **Machine → Take Snapshot**. 망가지면 Restore 로 1분 만에 원래대로 |
-| U8 1쪽 | sudo 는 「관리자로 한 번」 | `sudo rm -rf /`·남이 준 `curl … \| sudo bash` 는 그대로 치지 않기. 비밀번호는 설치 때 정한 것(화면에 안 보이는 게 정상) |
+| U8 1쪽 | sudo 는 「관리자로 한 번」 | `sudo rm -rf /`·남이 준 `curl … \| sudo bash` 는 그대로 치지 않기. 비밀번호는 설치 때 정한 것(26.04 의 sudo 는 글자 대신 * 만 보임) |
 | U13 2쪽 | 포트 포워딩은 내 PC 안에서만 | 호스트 IP 칸을 `127.0.0.1` 로(비워 두면 같은 공유기의 다른 기기도 접속 시도 가능). VirtualBox 는 보안 업데이트가 자주 나오니 최신 7.2.x 로 |
 
 ## 5. 목차 (챕터 3 · 레슨 15 + 보스 3)
@@ -72,7 +72,7 @@
 
 | id | 제목 | 쪽 | 만들어 보기 |
 | --- | --- | --- | --- |
-| U10 | 프로세스 보기와 멈추기 | ① `ps aux` · `htop`(설정 앱 「Resources」 와 같은 정보) · ② `sleep 100 &` · `jobs` · `fg` · **Ctrl+C**(멈춤) vs **Ctrl+Z**(잠깐 세움) · ③ `kill PID` · `kill -9`(마지막 수단) — 시그널 이름만 | 무한 반복 파이썬을 띄우고 찾아서 끄기(bash 검사 가능 부분 + ☐) |
+| U10 | 프로세스 보기와 멈추기 | ① `ps aux` · `htop`(Resources 앱과 같은 정보) · ② `sleep 100 &` · `jobs` · `fg` · **Ctrl+C**(멈춤) vs **Ctrl+Z**(잠깐 세움) · ③ `kill PID` · `kill -9`(마지막 수단) — 시그널 이름만 | 무한 반복 파이썬을 띄우고 찾아서 끄기(bash 검사 가능 부분 + ☐) |
 | U11 | 서비스와 로그 | ① 서비스 = 늘 켜져 있는 프로그램 · `systemctl status` · `start`/`stop` · `enable`(부팅 때 자동) · ② `journalctl -u 이름` · `-f`(따라 보기) · `/var/log` · ③ 예: `openssh-server` 설치하고 상태 보기 | ssh 서비스 `active (running)` ☐ |
 | U12 | 디스크와 메모리 | ① `df -h`(남은 공간) · `du -sh *`(어디가 큰가) · `free -h` · `lsblk` · ② 가상 디스크가 꽉 차면(스냅샷이 공간을 먹음) · ③ 정리: `sudo apt autoremove` · `journalctl --vacuum-size` | 홈 폴더에서 가장 큰 폴더 3개(bash 검사) |
 | U13 | 네트워크와 SSH | ① `ip a` · `ping -c 3` · `curl -I` · ② VirtualBox 네트워크(NAT) · **Settings → Network → Adapter 1 → Port Forwarding**: Host IP `127.0.0.1` · Host Port `2222` · Guest Port `22` · ③ Windows 터미널에서 `ssh -p 2222 이름@127.0.0.1` · ④ **VS Code → Remote - SSH** 로 VM 안 파일을 Windows 의 VS Code 로 고치기(Q4) | Windows 에서 ssh 로 들어가 `hostname` ☐ · VS Code 로 VM 파일 저장 ☐ |
