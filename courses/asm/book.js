@@ -46,7 +46,15 @@ ld hello.o -o hello
         example: { label: '예제 명령 — 우분투 터미널에서', shell: 'cd ~/asm\nnasm -f elf64 hello.asm -o hello.o\nld hello.o -o hello\n./hello\necho $?' } },
     ],
   },
-  builtins: [],
+  builtins: [ // 「📋 자주 보는 표」 — 도감에 따로(설계 7절). 실행은 안 함(check_book 은 asm 의 builtins 를 건너뜀)
+    { name: 'write — rax = 1', desc: '글자 쓰기. rdi = 1(화면), rsi = 글자 주소, rdx = 길이 → rax = 쓴 바이트 수.', code: 'mov rax, 1\nmov rdi, 1\nmov rsi, msg\nmov rdx, len\nsyscall', ref: 'R2/2' },
+    { name: 'exit — rax = 60', desc: '프로그램 끝내기. rdi = 종료 코드(0~255, echo $? 로 봄).', code: 'mov rax, 60\nmov rdi, 0\nsyscall', ref: 'R2/2' },
+    { name: 'read — rax = 0', desc: '입력 받기. rdi = 0(키보드), rsi = 버퍼 주소, rdx = 최대 길이 → rax = 받은 바이트 수(줄바꿈 포함).', code: 'mov rax, 0\nmov rdi, 0\nlea rsi, [buf]\nmov rdx, 64\nsyscall', ref: 'R9/0' },
+    { name: 'syscall 이 바꾸는 레지스터', desc: 'syscall 뒤에는 rax(결과) · rcx · r11 이 바뀌어요. 반복 카운터는 rbx 같은 다른 레지스터에.', code: '; 바뀜: rax rcx r11\n; 그대로: rbx rbp rsp rsi rdi rdx r8~r10 r12~r15', ref: 'R6/3' },
+    { name: '레지스터 16개', desc: '64비트 이름 — 작은 이름은 eax(32) · ax(16) · al(8), r8 은 r8d · r8w · r8b.', code: 'rax rbx rcx rdx rsi rdi rbp rsp\nr8  r9  r10 r11 r12 r13 r14 r15', ref: 'R1/0' },
+    { name: '빌드 세 줄', desc: '어셈블(nasm) → 링크(ld) → 실행. C 와 섞거나 printf 를 쓰면 ld 대신 gcc -no-pie.', code: 'nasm -f elf64 hello.asm -o hello.o\nld hello.o -o hello\n./hello\necho $?', ref: 'R2/3' },
+    { name: '조건 점프', desc: 'cmp a, b 다음에 — 부호 있는 수는 jl · jle · jg · jge, 부호 없는 수는 jb · jbe · ja · jae, 같음 je · 다름 jne.', code: 'cmp rax, rbx\nje  같음\njl  작음      ; rax < rbx (부호 있음)\njb  작음_u    ; rax < rbx (부호 없음)', ref: 'R5/2' },
+  ],
   tasks: {
     R0: [
       { title: '종료 코드 42 로 끝나는 프로그램', text: '1쪽의 예제를 <code>~/asm/exit42.asm</code> 으로 만들어 빌드하고 <code>./exit42; echo $?</code> 로 실행해 보세요. 복사해도 되지만, 세 줄뿐이니 <b>직접 쳐 보면</b> 더 좋아요(빈칸 4개 들여쓰기 · 쉼표까지). <code>42</code> 가 보이면 첫 어셈블리 프로그램 완성이에요. 다 되면 42 를 다른 수로 바꿔 다시 빌드해 보세요.', echoExit: true,
