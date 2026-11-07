@@ -250,14 +250,109 @@ Segmentation fault (core dumped)
 <div class="bk-warn"><b>세그멘테이션 폴트는 VM 이 망가진 게 아니에요</b> — 멈춘 건 내 프로그램 하나뿐이에요. 커널이 막아 줬으니 우분투도, 다른 프로그램도 멀쩡해요. 코드를 고치고 다시 빌드하면 돼요. 파이썬과 달리 어셈블리는 <b>끝내기를 내가 직접</b> 해야 해요.</div>` },
   ],
   summary: ['파일 모양: section .data(데이터) → section .text → global _start → _start: · 주석은 ;', 'msg db "글자", 10 · len equ $ - msg · 시스템 콜은 rax 에 번호(write=1 · exit=60), rdi rsi rdx 에 인자, syscall', 'nasm -f elf64 → ld → ./실행 · 에러는 「파일:줄」 부터 · exit 을 빼면 Segmentation fault'] },
-{ id: 'R3', ch: 1, n: 3, title: '계산: add · sub · imul · idiv', mode: 'text', draft: true,
-  tutorSummary: 'add · sub · inc · dec · neg. imul rax, rbx. idiv 는 rdx:rax 를 나눔 — cqo 먼저, 몫 rax 나머지 rdx. 64비트를 넘으면 잘림, 음수는 2의 보수(종료 코드 255 = -1).',
-  pages: ASM_TODO('add · sub · inc · dec · imul · idiv(cqo) · 넘침과 2의 보수'), summary: ['add · sub · imul 은 앞 레지스터에 결과', 'idiv 는 cqo 먼저, 몫 rax 나머지 rdx', '음수는 2의 보수'] },
-{ id: 'R4', ch: 1, n: 4, title: '비트 연산: and · or · xor · shl · shr', mode: 'text', draft: true,
-  tutorSummary: 'and 로 고르기, or 로 켜기, xor 로 뒤집기, xor rax, rax = 0. shl = ×2, shr = ÷2, sar 는 부호 유지. and rax, 1 로 홀짝, xor al, 0x20 으로 대소문자.',
-  pages: ASM_TODO('and · or · xor · shl · shr · sar · 홀짝 · 대소문자'), summary: ['and 고르기 · or 켜기 · xor 뒤집기', 'shl ×2 · shr ÷2', 'xor rax, rax 는 0'] },
-{ id: 'RB1', ch: 1, boss: true, title: '만들어 보기: 계산 결과 알림', mode: 'text', draft: true,
-  tutorSummary: '챕터 1 묶기 — 레지스터 · 계산 · write · exit 로 계산 결과를 종료 코드와 메시지로.', pages: [], summary: [] },
+{ id: 'R3', ch: 1, n: 3, title: '계산: add · sub · imul · idiv', mode: 'text',
+  tutorSummary: 'add rax, rbx 는 rax += rbx(결과는 받는 쪽), sub · inc · dec · neg. imul rax, rbx / imul rax, 10 / imul rcx, rbx, 3. idiv rbx 는 rdx:rax 를 나눔 — cqo 먼저, 몫 rax 나머지 rdx, 숫자로는 못 나눔, 0 으로 나누면 Floating point exception. 음수는 2의 보수(뒤집고 1 더하기, 종료 코드 255 = -1). 64비트를 넘으면 위가 잘림(넘침).',
+  terms: { '2의 보수': '음수를 비트로 적는 방법. 양수의 비트를 전부 뒤집고 1 을 더해요. −1 은 비트가 전부 1, 맨 왼쪽 비트가 1 이면 음수', '넘침': '계산 결과가 레지스터 크기(64비트)를 넘어 위쪽이 버려지는 것. 오버플로(overflow)' },
+  pages: [
+    { title: 'add rax, rbx · sub · inc · dec', html: `<p>계산 명령도 <code>mov</code> 처럼 <b>받는 쪽이 앞</b>이에요. <code>add rax, rbx</code> 는 「rax 에 rbx 를 더해서 <b>rax 에</b> 넣어라」 — 파이썬의 <code>rax += rbx</code> 예요. 뒤의 rbx 는 그대로예요.</p>
+<table class="kb"><tbody><tr><td><code>add rax, rbx</code></td><td>rax = rax + rbx</td></tr><tr><td><code>sub rax, 5</code></td><td>rax = rax − 5 (주는 쪽에는 숫자도 돼요)</td></tr><tr><td><code>inc rax</code></td><td>rax = rax + 1</td></tr><tr><td><code>dec rbx</code></td><td>rbx = rbx − 1</td></tr></tbody></table>
+<p>예제를 한 줄씩 따라가면 레지스터가 이렇게 바뀌어요.</p>
+<pre>명령             rax   rbx
+mov rax, 10       10     -
+mov rbx, 3        10     3
+add rax, rbx      13     3
+sub rax, 5         8     3
+inc rax            9     3
+dec rbx            9     2
+add rax, rbx      11     2</pre>
+<p>결과는 [[레슨:R1]] 에서처럼 <code>rdi</code> 에 옮기고 <code>exit</code> 해요. 빌드한 뒤 <code>./calc; echo $?</code> 로 실행하면 <code>11</code>.</p>
+<div class="bk-warn"><b>파이썬의 「c = a + b」 같은 모양은 없어요</b> — 계산 명령은 두 칸(받는 쪽, 주는 쪽)이고 결과는 늘 받는 쪽에 덮어써요. 원래 값을 남기려면 먼저 <code>mov rcx, rax</code> 로 복사하고 <code>add rcx, rbx</code>. 받는 쪽에 숫자를 쓰면(<code>add 5, rax</code>) nasm 이 <code>invalid combination of opcode and operands</code> 라고 해요.</div>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 10         ; rax = 10\n    mov rbx, 3          ; rbx = 3\n    add rax, rbx        ; rax = 10 + 3 = 13\n    sub rax, 5          ; rax = 13 - 5 = 8\n    inc rax             ; rax = 9\n    dec rbx             ; rbx = 2\n    add rax, rbx        ; rax = 9 + 2 = 11\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+    { title: 'imul rax, rbx — 곱하기', html: `<p>곱하기는 <code>imul</code>(integer multiply — 부호 있는 정수 곱하기)이에요. 쓰는 모양이 세 가지예요.</p>
+<table class="kb"><tbody><tr><td><code>imul rax, rbx</code></td><td>rax = rax × rbx</td></tr><tr><td><code>imul rax, 10</code></td><td>rax = rax × 10</td></tr><tr><td><code>imul rcx, rbx, 3</code></td><td>rcx = rbx × 3 — 세 칸 모양(받는 쪽, 곱할 레지스터, 숫자). rbx 는 그대로라 복사가 필요 없어요</td></tr></tbody></table>
+<p>예제는 6 × 7 = 42 를 rax 에, 7 × 3 = 21 을 rcx 에 만들고 둘을 더해요. 실행하면 <code>63</code>.</p>
+<p class="muted small">64비트 × 64비트는 128비트까지 커질 수 있어요. 이 모양의 imul 은 아래 64비트만 남겨요(넘침은 이 레슨 마지막 쪽). 부호 없는 곱하기 <code>mul</code> 도 있지만 이 교과서는 imul 만 써요.</p>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 6\n    mov rbx, 7\n    imul rax, rbx       ; rax = 6 × 7 = 42\n    imul rcx, rbx, 3    ; rcx = 7 × 3 = 21 (rbx 는 그대로)\n    add rax, rcx        ; rax = 42 + 21 = 63\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+    { title: 'idiv rbx · cqo — 몫과 나머지', html: `<p>나누기는 조금 특별해요. <code>idiv rbx</code> 는 칸이 하나뿐이고, 나눌 수는 <b>정해진 자리</b>에 미리 넣어 둬요.</p>
+<pre>  rdx:rax     ← 나눌 수 (rdx 와 rax 를 이어 붙인 128비트)
+÷ rbx         ← idiv 뒤에 쓴 레지스터
+= 몫은 rax, 나머지는 rdx</pre>
+<p>나눌 수는 보통 rax 하나에 들어 있으니 rdx 를 rax 에 맞게 채워야 해요. 그게 <code>cqo</code> — rax 가 양수면 rdx 를 전부 0 으로, 음수면 전부 1 로 채워 「rdx:rax = rax」 가 되게 해요. 그래서 <b>idiv 바로 앞에는 늘 cqo</b>.</p>
+<table class="kb"><tbody><tr><td><code>mov rax, 47</code></td><td>나눌 수</td></tr><tr><td><code>mov rbx, 5</code></td><td>나누는 수 — <code>idiv 5</code> 처럼 숫자는 못 써요, 레지스터에 넣어서</td></tr><tr><td><code>cqo</code></td><td>rdx:rax = 47</td></tr><tr><td><code>idiv rbx</code></td><td>rax = 9 (몫) · rdx = 2 (나머지)</td></tr></tbody></table>
+<p>파이썬의 <code>47 // 5</code> 와 <code>47 % 5</code> 를 한 번에 하는 셈이에요. 종료 코드는 숫자 하나뿐이라 예제는 「몫 × 10 + 나머지」 로 묶었어요. 실행하면 <code>92</code> — 몫 9, 나머지 2.</p>
+<div class="bk-warn"><b>0 으로 나누면 프로그램이 멈춰요</b> — rbx 가 0 이면 터미널에 <code>Floating point exception (core dumped)</code> 가 나오고 끝나요(<code>echo $?</code> 는 136). 이름은 「부동소수점」 이지만 정수 나눗셈 에러예요. VM 이 망가진 게 아니라 그 프로그램만 멈춘 거예요.</div>
+<p class="muted small">음수를 나누면 몫은 0 쪽으로 버려져요. −9 ÷ 2 는 몫 −4 · 나머지 −1 이에요(파이썬 <code>-9 // 2</code> 는 −5 라 달라요).</p>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 47         ; 나눌 수\n    mov rbx, 5          ; 나누는 수\n    cqo                 ; rdx:rax = 47 (rdx 를 rax 의 부호로 채움)\n    idiv rbx            ; 몫 rax = 9, 나머지 rdx = 2\n    imul rax, 10        ; 9 × 10 = 90\n    add rax, rdx        ; 90 + 2 = 92\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+    { title: 'neg · 음수와 2의 보수', html: `<p><code>sub rax, 5</code> 로 3 − 5 를 하면 rax 는 −2 가 돼요. 그런데 레지스터에는 「−」 를 적는 칸이 따로 없어요. 음수는 [[2의 보수]]로 적어요.</p>
+<pre> 2 = 0000 0000 … 0000 0010
+−2 = 1111 1111 … 1111 1110   ← 2 의 비트를 전부 뒤집고(…1101) 1 더하기
+−1 = 1111 1111 … 1111 1111   ← 64비트가 전부 1</pre>
+<p>맨 왼쪽 비트가 1 이면 음수로 봐요. 이렇게 적으면 더하기 회로 하나로 빼기까지 돼요 — −2 + 2 를 비트로 더하면 받아올림이 맨 왼쪽 밖으로 빠져나가고 0 만 남아요.</p>
+<p><code>neg rax</code> 는 부호를 뒤집어요(rax = −rax). 하는 일이 바로 「비트를 다 뒤집고 1 더하기」 예요.</p>
+<p>종료 코드는 rdi 의 아래 8비트만 보여 줘요([[레슨:R1]]). −1 의 아래 8비트는 <code>1111 1111</code> = 255, −2 는 254, −3 은 253 … 예제는 3 − 5 = −2 에 −1 을 더해요. 실행하면 <code>253</code> — −3 이에요.</p>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 3\n    sub rax, 5          ; rax = 3 - 5 = -2\n    mov rbx, 1\n    neg rbx             ; rbx = -1 (부호 뒤집기)\n    add rax, rbx        ; rax = -2 + (-1) = -3\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+    { title: '넘침: 64비트를 넘으면 잘려요', html: `<p>레지스터는 64칸짜리 상자라서 결과가 64비트를 넘으면 <b>넘친 위쪽은 버려져요</b>. 이게 [[넘침]](오버플로)이에요. 파이썬 정수는 얼마든지 커지지만 레지스터는 아니에요.</p>
+<pre>  0xFFFFFFFFFFFFFFFF    ← 64비트가 전부 1
++ 0x000000000000002B    ← 43
+= 0x1000000000000002A   ← 65번째 자리의 1 은 버려짐
+→ rax = 0x2A = 42</pre>
+<p>실행하면 <code>42</code>. 같은 64비트를 부호 있는 수로 보면 0xFFFFFFFFFFFFFFFF 는 −1 이라 −1 + 43 = 42 — 이것도 맞아요. 비트는 같고, <b>부호 있게 볼지 없게 볼지는 사람(과 다음에 쓰는 명령)이 정해요</b>.</p>
+<table class="kb"><tbody><tr><td><b>부호 없이</b></td><td>0 ~ 18446744073709551615 (2⁶⁴ − 1)</td></tr><tr><td><b>부호 있게</b></td><td>−9223372036854775808 ~ 9223372036854775807</td></tr></tbody></table>
+<p>가장 큰 양수 0x7FFFFFFFFFFFFFFF 에 1 을 더하면 0x8000000000000000 — 맨 왼쪽 비트가 켜져서 가장 작은 음수가 돼요. CPU 는 이런 일이 생겼다는 표시(플래그)를 남겨 두는데, 그건 [[레슨:R5]] 에서 봐요.</p>
+<div class="bk-warn"><b>종료 코드가 잘리는 것과는 다른 이야기예요</b> — 종료 코드가 0~255 인 건 운영체제가 rdi 의 아래 8비트만 넘겨줘서고([[레슨:R1]]), 넘침은 계산 자체가 64비트에서 잘리는 거예요.</div>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 0xFFFFFFFFFFFFFFFF ; 64비트가 전부 1\n    add rax, 43         ; 넘친 맨 위 1 은 버려짐 → 42\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+  ],
+  summary: ['add · sub · imul 은 앞(받는 쪽) 레지스터에 결과', 'idiv 는 cqo 먼저 — 몫 rax, 나머지 rdx', '음수는 2의 보수(255 = −1) · 64비트를 넘으면 잘림'] },
+{ id: 'R4', ch: 1, n: 4, title: '비트 연산: and · or · xor · shl · shr', mode: 'text',
+  tutorSummary: '비트 자리별 계산(결과는 받는 쪽): and 로 고르기, or 로 켜기, xor 로 뒤집기, not 은 전부 뒤집기. xor rax, rax = 0(mov rax, 0 보다 짧음), and rbx, 0xFF 는 아래 8비트. shl = ×2ⁿ, shr = ÷2ⁿ(부호 없음), sar 는 부호 유지. and rax, 1 로 홀짝, and rax, 7 은 8 로 나눈 나머지. 아스키 대소문자는 0x20 한 비트 차이: xor al, 0x20 뒤집기, and al, 0xDF 늘 대문자. 알고리즘 교과서 A17 비트 연산과 짝.',
+  terms: { '마스크': '골라내거나 켜거나 뒤집을 비트 자리에만 1 을 둔 수. and · or · xor 의 뒤에 와요' },
+  pages: [
+    { title: 'and · or · xor — 비트 자리별 계산', html: `<p>비트 연산은 두 수를 2진수로 세로로 맞춰 놓고 <b>같은 자리끼리</b> 계산해요. 개념은 <a href="../algo/#lesson/A17" target="_blank" rel="noopener">알고리즘 교과서 「비트 연산」 ↗</a> 에서 파이썬 <code>&amp;</code> <code>|</code> <code>^</code> 로 봤어요. 어셈블리에서는 명령 이름이 그대로고, 결과는 역시 받는 쪽(앞)에 들어가요.</p>
+<table class="kb"><tbody><tr><td><code>and rax, rbx</code></td><td>둘 다 1 이면 1</td><td><b>고르기</b> — 마스크가 1 인 자리만 남김</td></tr><tr><td><code>or rax, rbx</code></td><td>하나라도 1 이면 1</td><td><b>켜기</b> — 마스크 자리를 1 로</td></tr><tr><td><code>xor rax, rbx</code></td><td>서로 다르면 1</td><td><b>뒤집기</b> — 마스크 자리를 0 ↔ 1</td></tr><tr><td><code>not rax</code></td><td>전부 뒤집기</td><td>칸이 하나</td></tr></tbody></table>
+<p>뒤에 오는 수를 [[마스크]]라고 생각하면 쉬워요 — 「어느 자리를 건드릴지」 를 1 로 표시한 수예요. 숫자는 <code>0b</code> 로 2진수 그대로 써도 돼요([[레슨:R1]]).</p>
+<pre>              1100 1100   rax = 204
+and 마스크    1010 1010 → 1000 1000  (136)
+or  마스크    0000 0011 → 1000 1011  (139)
+xor 마스크    1111 1111 → 0111 0100  (116)</pre>
+<p>실행하면 <code>116</code>.</p>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 0b11001100 ; 204\n    and rax, 0b10101010 ; 고르기 → 0b10001000 (136)\n    or  rax, 0b00000011 ; 켜기   → 0b10001011 (139)\n    xor rax, 0b11111111 ; 뒤집기 → 0b01110100 (116)\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+    { title: 'xor rax, rax 로 0 · and 0xFF', html: `<p>자기 자신과 xor 하면 모든 자리가 「같음」 이라 전부 0 이에요. 그래서 <code>xor rax, rax</code> 는 rax 를 0 으로 만들어요. <code>mov rax, 0</code> 과 결과는 같은데 기계어가 더 짧아서, 컴파일러가 만든 코드([[레슨:R15]])에서 아주 자주 봐요.</p>
+<pre>mov rax, 0     →  b8 00 00 00 00   (5바이트)
+xor rax, rax   →  48 31 c0         (3바이트)
+xor eax, eax   →  31 c0            (2바이트)</pre>
+<p><code>xor eax, eax</code> 도 rax 전체가 0 이 돼요 — 32비트 이름에 쓰면 위 32비트가 0 이 되니까요([[레슨:R1]]). 바이트는 <code>objdump -d -M intel 파일.o</code> 로 직접 볼 수 있어요.</p>
+<p>and 는 「아래 8비트만 고르기」 에도 써요. <code>and rbx, 0xFF</code> 의 0xFF 는 <code>1111 1111</code> 이라 아래 8칸만 남기고 위는 전부 0 으로 만들어요. 300 = <code>1 0010 1100</code> → <code>0010 1100</code> = 44 — 종료 코드가 큰 수를 잘라 보여 주는 것([[레슨:R1]])과 같은 일이에요. 실행하면 <code>44</code>.</p>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 300\n    mov rbx, rax        ; rbx = 300\n    and rbx, 0xFF       ; 아래 8비트만 → 44\n    xor rax, rax        ; rax = 0\n    add rax, rbx        ; rax = 0 + 44\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+    { title: 'shl · shr · sar — 비트 밀기', html: `<p><code>shl rax, 3</code> 은 비트를 왼쪽으로 3칸 밀고 오른쪽 빈칸은 0 으로 채워요. 2진수에서 한 칸 = ×2 라서 3칸은 ×8 이에요(파이썬 <code>&lt;&lt;</code>). <code>shr rax, 1</code> 은 오른쪽으로 밀어요 = ÷2. 떨어져 나간 비트는 버려서 몫만 남아요(파이썬 <code>&gt;&gt;</code>).</p>
+<pre>5            = 0000 0101
+shl rax, 3   = 0010 1000   (40 = 5 × 8)
+shr rax, 1   = 0001 0100   (20 = 40 ÷ 2)</pre>
+<p>음수에 shr 을 쓰면 왼쪽 빈칸이 0 으로 채워져서 맨 왼쪽(부호) 비트가 0 이 돼요 — 엉뚱한 큰 양수가 돼요. 부호를 지키며 나누려면 <code>sar</code>(산술 시프트). 빈칸을 원래 맨 왼쪽 비트로 채워요.</p>
+<pre>−16          = 1111 … 1111 0000
+shr rbx, 2   = 0011 … 1111 1100   (4611686018427387900 — 엉뚱한 수)
+sar rbx, 2   = 1111 … 1111 1100   (−4 = −16 ÷ 4)</pre>
+<p>예제는 5 → 40 → 20 과 −16 → −4 를 더해요. 실행하면 <code>16</code>.</p>
+<p class="muted small">shl 은 imul 보다 빨라서 컴파일러가 ×8 같은 곱을 shl 로 바꾸곤 해요. 밀 칸 수에는 숫자나 <code>cl</code>(rcx 의 아래 8비트)만 쓸 수 있어요. sar 는 아래쪽으로 버려서 −7 을 sar 1 하면 −4 예요(idiv 는 −3).</p>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 5\n    shl rax, 3          ; 5 × 8 = 40\n    shr rax, 1          ; 40 ÷ 2 = 20\n    mov rbx, -16\n    sar rbx, 2          ; -16 ÷ 4 = -4 (부호를 지킴)\n    add rax, rbx        ; 20 + (-4) = 16\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+    { title: 'and rax, 1 — 홀짝과 나머지', html: `<p>2진수의 맨 오른쪽 비트(1 의 자리)는 홀수면 1, 짝수면 0 이에요. 그래서 <code>and rax, 1</code> 하면 홀수 1 · 짝수 0 — idiv 없이 「2 로 나눈 나머지」 예요. 같은 방법으로 <code>and rax, 7</code> 은 8 로 나눈 나머지, <code>and rax, 15</code> 는 16 으로 나눈 나머지예요(2의 거듭제곱 − 1 을 마스크로).</p>
+<pre>1234567  = … 1101 0110 1000 0111
+and 1    =                     1   → 홀수
+and 7    =                   111   → 7 (8 로 나눈 나머지)</pre>
+<p>예제는 두 결과를 「홀짝 × 10 + 나머지」 로 묶어요. 실행하면 <code>17</code>.</p>
+<p>음수도 돼요. −3 은 2의 보수로 <code>…1111 1101</code>([[레슨:R3]])이라 and 1 → 1, 홀수예요.</p>
+<p class="muted small">「홀수면 이걸 해라」 같은 갈래는 [[레슨:R5]] 의 비교와 점프로 만들어요. 지금은 결과를 숫자로 보기만 해요.</p>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 1234567\n    mov rbx, rax\n    and rax, 1          ; 홀짝: 홀수면 1\n    and rbx, 7          ; 8 로 나눈 나머지 = 7\n    imul rax, 10\n    add rax, rbx        ; 1 × 10 + 7 = 17\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+    { title: 'xor al, 0x20 — 대문자 ↔ 소문자', html: `<p>글자도 숫자예요(아스키 번호). 영어 대문자와 소문자는 정확히 32(0x20)씩 떨어져 있고, 2진수로 보면 <b>딱 한 비트</b>(0x20 자리)만 달라요.</p>
+<table class="kb"><tbody><tr><td><b>글자</b></td><td><b>10진</b></td><td><b>16진</b></td><td><b>2진</b></td></tr><tr><td>A</td><td>65</td><td>0x41</td><td>0100 0001</td></tr><tr><td>a</td><td>97</td><td>0x61</td><td>0110 0001</td></tr><tr><td>G</td><td>71</td><td>0x47</td><td>0100 0111</td></tr><tr><td>g</td><td>103</td><td>0x67</td><td>0110 0111</td></tr></tbody></table>
+<table class="kb"><tbody><tr><td><code>xor al, 0x20</code></td><td>뒤집기 — 대문자 ↔ 소문자</td></tr><tr><td><code>and al, 0xDF</code></td><td>0x20 자리 끄기 — 늘 대문자 (0xDF = 1101 1111)</td></tr><tr><td><code>or al, 0x20</code></td><td>0x20 자리 켜기 — 늘 소문자</td></tr></tbody></table>
+<p>글자 하나는 1바이트라 al(rax 의 아래 8비트, [[레슨:R1]])로 다뤄요. NASM 에서 <code>'a'</code> 처럼 작은따옴표로 쓰면 그 글자의 번호(97)예요. 실행하면 <code>65</code> — 표에서 A 예요.</p>
+<div class="bk-warn"><b>영어 글자에만 돼요</b> — 숫자 1(0x31)이나 ! 에 xor 0x20 을 하면 엉뚱한 글자가 되고, 한글은 UTF-8 로 한 글자가 3바이트라 이 방법이 안 맞아요. 글자인지 먼저 확인하는 건 [[레슨:R5]] 의 비교, 문자열 전체를 바꾸는 건 [[레슨:R8]].</div>
+<p class="muted small">바꾼 글자를 화면에 찍으려면 메모리에 다시 써야 해서([[레슨:R7]]) 지금은 종료 코드로 번호만 봐요.</p>`,
+      example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, \'a\'        ; rax = 97 (0x61)\n    xor al, 0x20        ; 0x20 자리 뒤집기 → 65 (0x41) = \'A\'\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
+  ],
+  summary: ['and 고르기 · or 켜기 · xor 뒤집기 · xor rax, rax 는 0', 'shl ×2 · shr ÷2 · 음수는 sar', 'and rax, 1 홀짝 · xor al, 0x20 대소문자'] },
+{ id: 'RB1', ch: 1, boss: true, title: '만들어 보기: 계산 결과 알림', mode: 'text',
+  tutorSummary: '챕터 1 묶기 — calc.asm: 두 수(r8 · r9)의 합 · 차 · 곱을 r12 · r13 · r14 에, 제목은 write, 합은 종료 코드로. 갈래(점프)는 아직 없으니 메시지는 계산으로 고름: 같은 길이 메시지 두 줄을 나란히 두고, 100 - 합 을 shr 63 해서 0/1(넘었나), and 1 로 홀짝, 그 수 × 한 줄 길이를 주소에 더해 write. syscall 은 rcx · r11 을 망가뜨림.', pages: [], summary: [] },
 { id: 'R5', ch: 2, n: 5, title: '비교와 점프: cmp · jmp · je · jl', mode: 'text', draft: true,
   tutorSummary: '라벨과 jmp. cmp a, b 는 빼 보고 플래그(ZF SF CF OF)만 남김. je jne jl jle jg jge(부호 있음), jb ja(부호 없음). if/else 모양.',
   pages: ASM_TODO('라벨과 jmp · cmp 와 플래그 · 조건 점프 표 · if/else 모양'), summary: ['cmp 는 빼 보고 플래그만', 'je · jne · jl · jg 로 갈래', '부호 없으면 jb · ja'] },
