@@ -1,15 +1,15 @@
 # HANDOFF — 다음 작업 세션 인수인계
 
 > 새 채팅은 **「HANDOFF.md 읽고 TODO 대로 진행」** 으로 시작한다. 읽는 순서: **이 파일 → [`specs/site-intent.md`](specs/site-intent.md)(무엇이 정상·버그인가) → [`TODO.md`](TODO.md)(지금 할 일 · 예정 코스)**.
-> 2026-11-06 v2.17.1 시점에 다시 썼다. 그 전 내용은 [`docs/archive/HANDOFF-2026-11-06-old.md`](docs/archive/HANDOFF-2026-11-06-old.md)(권한·머지 규칙 등이 지금과 다름).
+> 2026-11-06 v2.17.1 시점에 다시 썼고, 2026-11-07 v2.28.1 시점에 최신화했다(사용자 「HANDOFF.md 와 TODO.md 최신화」). 그 전 내용은 [`docs/archive/HANDOFF-2026-11-06-old.md`](docs/archive/HANDOFF-2026-11-06-old.md)(권한·머지 규칙 등이 지금과 다름). 버전별로 무엇이 바뀌었는지는 [`CHANGELOG.md`](CHANGELOG.md).
 
 ## 0. 상태판 (배포할 때마다 갱신)
 
 | 항목 | 내용 |
 | --- | --- |
 | **현재 버전** | **v2.28.1 배포**(HTTP·API·SDK 교과서 완성 — 레슨 21). 버전별 내용은 [`CHANGELOG.md`](CHANGELOG.md) |
-| **마지막 작업** | (Opus, 11/7) **v2.27.0~v2.28.1 HTTP·API·SDK 교과서 완성**(사용자 「ㄱ」): 챕터 1 HTTP · 2 requests · 3 FastAPI · 4 SDK(TodoClient · 내 예외 · 재시도 · iter_all · 패키지 · 명령 줄 프로그램). 함수 · 서버 · SDK 문제는 python3 로 실제 실행(서버는 FastAPI TestClient — CI 가 fastapi · httpx 설치), 진짜 공개 API 문제는 ☐. 그 전: **v2.28.0 HTTP·API·SDK 챕터 3**(FastAPI 첫 서버 · 입력과 422 · 상태 코드 · SQLite · CORS + 할 일 API, CI 에 fastapi · httpx 설치). 그 전: **v2.27.1 HTTP·API·SDK 챕터 2**(requests · REST · 인증 · 페이지/한도/재시도 · 문서 읽기 + 저장소 보고서). 그 전: **v2.27.0 HTTP·API·SDK 교과서 시작**(사용자 「ㄱ」 — 설계 [`specs/http-api-course.md`](specs/http-api-course.md)): `courses/api/` 뼈대 · 허브 카드 · `check_book` 의 `'api'` · 시작하기 2쪽 · 챕터 1(레슨 0~4 · 날씨 알리미). 응답 예는 이 환경에서 공개 API 가 막혀 있어 httpbin 을 로컬로 띄워 실제로 받은 모양을 씀(Host · origin 은 httpbin.org 로). 그 전: **v2.25.0~v2.26.0 웹 교과서 34레슨 완성**(D16 · 사용자 「일단 웹만」 · 「1」) — 챕터마다 한 릴리스, 만들어 보기 전부 자동 확인(새 Console 출력 비교 · dblclick · 대비 계산). v2.26.0 은 챕터 6 「더 단단한 화면」(async/await · 폼 검사와 접근성 · 모듈 · F12/배포 · 카페 주문). 그 전: **v2.25.4 웹 챕터 5 브라우저와 DOM**(레슨 22 이벤트 · 23 폼, 할 일 앱에 필터 · 고치기 · 안전한 글). 그 전: **v2.25.3 웹 챕터 4 JS 언어**(레슨 15~20 + Console 가계부, 만들어 보기 19 — Console 출력 자동 비교 검사 새로). 그 전: **v2.25.2 웹 챕터 3 CSS 배치**(레슨 11 grid · 12 position, 내 소개 페이지에 갤러리 · sticky · 변수). 그 전: **v2.25.1 웹 챕터 2 CSS 기본**(레슨 6 우선순위·상속 · 7 단위 · 8 꾸미기·변수 · 9 가상 클래스·전환·애니메이션, 만들어 보기 10). 그 전: **v2.25.0 웹 교과서 키우기 시작**(D16 — 사용자 「HTML-CSS-JS 를 몇 쪽으로 충분하냐」 → 「1」): 설계 [`specs/web-course.md`](specs/web-course.md) 6챕터 34레슨, 목차 뼈대(새 레슨 15개 「준비 중」) + 챕터 1 새 레슨 3 「head 와 의미 있는 태그 · 그림과 영상」 + 만들어 보기 「레시피 페이지」(HTML 만), 레슨 번호가 바뀌어 본문의 「레슨 N」 을 모두 고침, 허브 이름 「웹」. 그 전: **v2.23.0~v2.24.0 T2 운영체제 교과서 완성** — 설계 [`specs/os-course.md`](specs/os-course.md)(사용자 「전부 추천대로」). 프로세스 · CPU 나눠 쓰기와 동기화 · 메모리 · 시스템 콜과 파일 시스템, 끝은 파이썬 미니 셸 완성(파이프 · 리다이렉트 · 뒤에서). 만들어 보기 문제 41개(파이썬 29 = check_book 이 python3 로 실제 실행 · 터미널 ☐ 12) · 그림 3종(간트 차트 · 교착 상태 · 페이지 교체) |
-| **다음 후보** | ① (선택) 공개 API 가 열린 환경에서 HTTP·API·SDK 교과서의 응답 예(httpbin.org · jsonplaceholder · Open-Meteo · GitHub)를 실제로 한 번씩 받아 대조 — 이 작업 환경은 그 주소들이 막혀 있어 httpbin 을 로컬로 띄워 확인했음 ② 다음 공용 코스(사용자가 고를 것): T10 어셈블리어(추천) · T1 CS · T11 LLM 기초 · N9 수학 「상」(후순위) |
+| **마지막 작업** | (Opus, 11/7) ① **파이썬 교과서 검토 → 키우기 설계**(사용자 「45개로 충분한지 검토하고 부족하면 설계」): 부족 — 12가지가 빠짐(내 예외 · 제너레이터 · 데코레이터 · 함수 2 · 내 모듈 · pip/venv · 명령 줄 · 경로/인코딩 · 타입 힌트 · 클래스 3 · 리스트 더 · 문자열 더) → 45 → **58**, 설계 [`specs/python-course.md`](specs/python-course.md)(문서만, 화면 변화 없음). HTTP·API·SDK 교과서가 「파이썬 교과서의 예외 만들기 · 제너레이터 · 데코레이터」 를 가리키는데 그 레슨이 아직 없음 → 설계 6절에서 같이 고침. ② HANDOFF · TODO 최신화. 그 전: **v2.27.0~v2.28.1 HTTP·API·SDK 교과서 완성**(21레슨) · **v2.25.0~v2.26.0 웹 교과서 34레슨** · **v2.23.0~v2.24.0 운영체제 교과서** — 자세히는 CHANGELOG |
+| **다음 후보** | ① **파이썬 교과서 키우기 구현**(설계 [`specs/python-course.md`](specs/python-course.md) 8절: v2.29.0 뼈대 + 챕터 2·3 → v2.29.1 챕터 4 → v2.29.2 챕터 5 → v2.30.0 챕터 7) — 사용자가 「진행」 하면 ② 다음 공용 코스(사용자가 고를 것): T10 어셈블리어(추천) · T1 CS · T11 LLM 기초 · N9 수학 「상」(후순위) ③ (선택) 공개 API 가 열린 환경에서 HTTP·API·SDK 교과서의 응답 예(httpbin.org · jsonplaceholder · Open-Meteo · GitHub)를 실제로 받아 대조 — 이 작업 환경은 그 주소들이 막혀 있었음 |
 | **막힌 것** | 없음 |
 
 ## 1. 이게 뭔가
@@ -32,15 +32,15 @@
 3. 검사 전부(= CI `verify`, 명령은 `README.md` 「작업 방법」 · 설명은 `specs/site-intent.md` 7절). `python3 tools/regress.py` 끝 줄 **FAILS 0**.
 4. **QA 를 직접**: Playwright 로 휴대폰 390 · PC 1440 화면을 찍어 **눈으로** 보기(가로 넘침 · pageerror 0), 「이 시점의 초보자가 따라 할 수 있나」. 사이트 전체(또는 코스 몇 개)는 **`python3 tools/qa_screens.py --out /tmp/qa_pc`**(PC) · `--w 390 --h 844`(폰) · `--theme light` · `--font 3` — 모든 쪽을 열어 대비·글자 크기·누를 곳·가로 넘침을 재고 캡처를 남긴다(쓰는 법은 파일 맨 위 주석, `specs/qa-team.md`).
 5. 문서: **이 파일 0절 상태판** + `CHANGELOG.md` 새 항목(+ 바뀐 규칙이면 `specs/site-intent.md`, 할 일이면 `TODO.md`).
-6. 커밋(끝에 세션 지침의 Co-Authored-By · Claude-Session 줄) → push → `gh api repos/jihoon380462/python-academy/pulls -f title=… -f head=… -f base=main -f body=…`(본문 끝에 🤖 Generated with Claude Code 줄 + 세션 주소).
-7. **사용자에게 「CI 기다리는 중」 이라고 먼저 말하고** check-run `verify` 가 success 될 때까지 기다림 → `gh api -X PUT …/pulls/<n>/merge -f merge_method=squash`.
-8. main 의 새 SHA 로 두 배포 run(「Deploy to GitHub Pages」 · 「pages build and deployment」)이 success 인지 확인 → `git checkout main && git reset --hard origin/main`.
+6. 커밋(끝에 세션 지침의 Co-Authored-By · Claude-Session 줄) → push → PR(본문 끝에 🤖 Generated with Claude Code 줄 + 세션 주소). **도구**: `gh` CLI 가 있으면 `gh api repos/jihoon380462/python-academy/pulls …`, 클라우드 세션(claude.ai/code)이면 GitHub MCP 도구(`create_pull_request` · `pull_request_read`(get_check_runs) · `merge_pull_request`(squash, `expectedHeadSha` 40자) · `actions_list`).
+7. **사용자에게 「CI 기다리는 중」 이라고 먼저 말하고** check-run `verify` 가 success 될 때까지 기다림(클라우드 세션은 `subscribe_pr_activity` 로 CI 결과가 저절로 옴 — 기다리며 다음 챕터를 미리 만들어 둬도 됨, 단 커밋은 머지 뒤) → squash 머지. 빨가면 로그(`get_job_logs`)로 원인을 찾아 고쳐 push(예: v2.28.1 은 CI 에 `requests` 가 없어 실패 → ci.yml 설치 줄에 더함).
+8. main 의 새 SHA 로 배포 run(「Deploy to GitHub Pages」)이 success 인지 확인 → 작업 브랜치를 main 으로 되돌림(`git checkout -B <브랜치> origin/main`). 같은 이름의 원격 브랜치에 squash 전 커밋이 남아 있으면 force push 대신 `git merge -s ours origin/<브랜치>` 로 이어 붙이고 push(클라우드 세션은 force push 가 막혀 있음).
 9. 사용자에게: 무엇이 바뀌었나(짧게) + **다음 선택지 목록**.
 
 ## 3. 사용자의 작업 선호 (반복해서 지적한 것 — 꼭 지키기)
 
 - **답은 항상 한국어**(영어로 답하면 강하게 항의함 — 최종 보고도).
-- 하기 전에 **무엇을 왜** 할지 먼저. 오래 걸리면 **진행률 %** 를 보이는 메시지로(SendUserMessage — 작업 사이 글은 사용자에게 안 보임). 무엇을 기다리는 중이면 **기다린다고 먼저 말하기**.
+- 하기 전에 **무엇을 왜** 할지 먼저. 오래 걸리면 중간중간 무엇을 하는 중인지 짧게 알리기(작업 사이 글이 안 보이는 환경이면 보이는 메시지로). 무엇을 기다리는 중이면 **기다린다고 먼저 말하기**.
 - 작업 중 들어온 질문에는 **바로** 답하기. 문제를 지적하면 「원래 그렇다」로 넘기지 말고 **원인을 실제로 분석**.
 - 한 단계가 끝나면 「뭐 할까요?」가 아니라 **다음 선택지 목록**. 단 **같은 원인의 나머지는 묻지 말고 이어서 끝내기**(미루면 잊힌다고 지적).
 - **기술적인 설계 선택은 묻지 말고 정해서 진행**(11/7 「굳이 나한테 물어보는 이유가 뭔데」): 예제를 어떻게 보여 줄지 · 그림 종류 · 검사 방법 같은 건 Claude 가 정하고 「무엇을 왜」 만 알림. 묻는 건 사용자만 정할 수 있는 것(다음 코스 · 사이트 방향)뿐. 물을 때도 **「Q2」 같은 번호만 쓰지 말고 질문 내용을 그대로**(「Q 숫자로 하면 내가 알아들을 수 있다고 생각하냐」).
@@ -54,7 +54,8 @@
 ## 4. 교과서 코스 구조 (새 교과서를 만들 때)
 
 - 파일: `courses/<id>/content.js`(COURSE · CHAPTERS · LESSONS — 레슨 `pages` 가 본문) + **`book.js`**(전역 `BOOK`) + `course.json` + `index.html`(스크립트 순서는 다른 코스 index.html 그대로 복사). 화면은 `core/ui-views-book.js`(마지막에 로드), 설정·용어집·시작은 `core/app.js`, 문제 모양 파생은 `core/book-derive.js`(화면과 `check_book` 이 같이 씀).
-- `BOOK` 의 주요 칸: `meta`(prereq 경고 · labels · viz) · `setup`(시작하기 쪽) · `builtins`(도감 항목 `{name, desc, code, ref}`) · `tasks`(레슨별 만들어 보기 `{title, text, needs:[[코드, '레슨/쪽', 설명]], answer, io, check, setup, noRun, checks}`) · `check`(검사 방식 `'vim' | 'sql' | 'web' | 'github'`, 없으면 파이썬 실행).
+- `BOOK` 의 주요 칸: `meta`(prereq 경고 · labels · viz · `makeIntroBy`) · `setup`(시작하기 쪽) · `builtins`(도감 항목 `{name, desc, code, ref}`) · `tasks`(레슨별 만들어 보기 `{title, text, needs:[[코드, '레슨/쪽', 설명]], answer, io, check, setup, given, noRun, checks, outLabel}`) · `check`(검사 방식 `'vim' | 'sql' | 'web' | 'github' | 'linux' | 'os' | 'api'`, 없으면 파이썬 실행). `os` · `api` 는 파이썬 실행 + `noRun` 이면 ☐ 필수 + 도구 상자는 실행 안 함.
+- 레슨 쪽 `example.code` 는 파이썬이면 `check_book` 이 실제로 실행해요. 인터넷이 필요하거나 실행하면 안 되는 것(curl · requests · 브라우저 JS · 터미널 명령)은 `example.shell` 에(보여 주기만). 웹 교과서 만들어 보기의 검사(`tools/run_web_solutions.py`)는 `checks` 에 화면 검사 · 동작(click · dblclick · input · key · submit · viewport) · `{ text, console: true }`(console.log 를 io 와 줄마다 비교).
 - 검사: `node tools/check_book.mjs [코스]` 가 예시 답·본문 예제를 **진짜로 실행**(python3 · bash · SQLite · vim)해 출력 예와 비교하고, 「필요한 문법」 링크·단어, 옛 앱 문구, 거북이 `turtle.done()` 등을 본다(①~⑪, `specs/site-intent.md` 7절). 브라우저에서 확인하는 문제(`noRun`)는 `checks`(☐ 목록)가 있어야 한다.
 - 허브: `CONFIG.COURSES` 에 `book: true` · `lessons` · `bookNote` · `short`(허브 안내 문구용 짧은 이름) · 공용 칸이면 `space: true`, `core/hub.js` 의 glyph, `CONFIG.COURSE_ID_PATTERNS`(읽은 레슨 세기).
 - 설계 문서는 `specs/<코스>-course.md`(본보기 [`specs/github-course.md`](specs/github-course.md): 다른 코스와의 경계표 · 필수 경고 · 레슨표 · 화면 이름 출처).
@@ -62,8 +63,9 @@
 ## 5. 환경 메모 (작업 샌드박스)
 
 - 파이썬은 `python3` 만 있다(`python` 없음) → 검사로 돌리는 셸 과제는 `python` 을 부르지 않게.
-- 로컬 확인 서버: `cd <저장소> && python3 -m http.server 8766 --bind 127.0.0.1`. Playwright · Chromium 이 깔려 있음(`playwright install` 하지 말 것 — 샌드박스는 패키지 설치가 막혀 있을 수 있음). `tools/qa_screens.py` 는 서버를 스스로 띄우고 `/usr/bin/google-chrome` 을 쓴다.
-- 사용자 PC 와 연결된 채팅이면 `mcp__remote-devices__*` 로 파일을 주고받을 수 있지만, 이 저장소 작업은 샌드박스의 clone(`/home/claude/python-academy`)에서 한다(새 채팅은 `add_repo` → clone → `register_repo_root`).
+- 로컬 확인 서버: `cd <저장소> && python3 -m http.server 8766 --bind 127.0.0.1`. Playwright · Chromium 이 깔려 있음(`playwright install` 하지 말 것). `tools/qa_screens.py` · `regress.py` 는 `/usr/bin/google-chrome` 을 쓴다(파이썬 `playwright` 패키지가 없으면 `pip install playwright` 만).
+- HTTP·API·SDK 교과서 검사에는 `pip install fastapi httpx requests`(CI 의 ci.yml 도 같은 줄). 클라우드 세션의 네트워크는 PyPI · npm 은 되지만 **httpbin.org · jsonplaceholder · open-meteo · api.github.com 같은 공개 API 는 막혀 있었음**(11/7) → 응답 모양은 httpbin 을 venv 에 깔아 로컬로 띄워 확인(`/tmp/hb/bin/gunicorn -b 127.0.0.1:8099 httpbin:app`).
+- 사용자 PC 와 연결된 채팅이면 `mcp__remote-devices__*` 로 파일을 주고받을 수 있지만, 이 저장소 작업은 샌드박스의 clone(클라우드 세션은 `/home/user/python-academy`)에서 한다(새 채팅은 `add_repo` → clone → `register_repo_root`).
 - CI 의 git 은 새 버전(2.48+)이라 출력이 다를 수 있다(예: `git branch -a` 의 `origin/HEAD` 줄, `ls` 정렬은 로캘 영향 → `git ls-files` 사용).
 - 헤드리스에서는 CDN(Pyodide 등)을 못 받는 경우가 있어 regress 는 스텁으로 확인한다. 실제 실행 화면은 사용자가 브라우저에서 본다.
 
@@ -77,11 +79,12 @@
 
 | 문서 | 용도 |
 | --- | --- |
-| `TODO.md` | 지금 할 일(1절) · 사용자 결정(3절) · **예정 코스**(공용 5 + 코스 5, 설계 전) |
+| `TODO.md` | 지금 할 일(1절) · 사용자 결정(3절) · **예정 코스**(남은 것: 공용 T1 CS · T10 어셈블리어 · T11 LLM, 코스 T3~T7) |
 | `specs/site-intent.md` | 사이트 의도 · 코스별 정상 동작 · 자동 검사 — QA 기준 |
 | `specs/workflow.md` · `specs/qa-team.md` | 작업 규칙 · QA 채팅 지시서(QA 는 직접 플레이 → `qa-reports/` 에 PR, 화면 검수 도구 `tools/qa_screens.py`) |
-| `specs/linux-course.md` | 리눅스 교과서 설계(VirtualBox + 우분투 26.04, T2 운영체제 · T10 어셈블리어의 선수) |
+| `specs/python-course.md` | **파이썬 교과서 검토와 키우기 설계**(45 → 58, 아직 구현 전) |
+| `specs/linux-course.md` · `specs/os-course.md` | 리눅스 교과서 설계(VirtualBox + 우분투 26.04, T2 운영체제 · T10 어셈블리어의 선수) · 운영체제 교과서 설계 |
 | `specs/github-course.md` | GitHub 교과서 설계(새 코스 설계 문서의 본보기) |
-| `specs/web-course.md` · `specs/http-api-course.md` | 웹 교과서(34레슨, 화면만) · HTTP·API·SDK 교과서 설계 |
+| `specs/web-course.md` · `specs/http-api-course.md` | 웹 교과서(34레슨, 화면만) · HTTP·API·SDK 교과서(21레슨) 설계 — 둘 다 완성 |
 | `docs/` | 설계 결정 · 확장 지시서(EXPANSION) · QA 기록 · **`VISUAL-REVIEW-2026-11-07.md`(N15 할 일 표)**, 끝난 기록은 `docs/archive/` |
 | `archive/classic/` | 보관: 예전 문제집 화면(코드·그림·옛 문제·검사 도구) — `README.md` 에 무엇이 어디 있는지·되돌리는 법 |
