@@ -1,0 +1,1 @@
+{"id": "oop", "name": "객체지향·설계", "icon": "🧱", "desc": "캡슐화 · 합성 · 다형성 · 설계 원칙 · 디자인 패턴 · 리팩터링으로 고치기 쉬운 파이썬 코드를 짜는 교과서", "runner": "python", "mapColor": "#5d4037", "mascotGear": null}

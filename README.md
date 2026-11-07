@@ -16,6 +16,11 @@
 | 데이터베이스(SQL) | `/courses/sql/` | 📖 교과서 · 레슨 17 | DB Browser for SQLite |
 | 웹 | `/courses/web/` | 📖 교과서 · 레슨 34(HTML · CSS · JS) | VS Code + Live Server + 브라우저 |
 | HTTP·API·SDK | `/courses/api/` | 📖 교과서 · 레슨 21(HTTP → requests → FastAPI → SDK) | VS Code + 파이썬 requests + curl + 브라우저 F12 |
+| 디버깅·테스트 | `/courses/debug/` | 📖 교과서 · 레슨 18 | VS Code + 파이썬 + pytest |
+| 데이터 분석 | `/courses/data/` | 📖 교과서 · 레슨 18 | VS Code + 파이썬 + pandas · matplotlib |
+| 객체지향·설계 | `/courses/oop/` | 📖 교과서 · 레슨 17 | VS Code + 파이썬 |
+| AI·머신러닝 기초 | `/courses/ml/` | 📖 교과서 · 레슨 16 | VS Code + 파이썬 + numpy · scikit-learn |
+| AI와 협업 | `/courses/ai/` | 📖 교과서 · 레슨 16 | VS Code + 파이썬 + 내가 쓰는 AI 도구 |
 | Vim 에디터 (공용) | `/courses/vim/` | 📖 교과서 · 레슨 14 | gVim + 파이썬 |
 | 리눅스(우분투) (공용) | `/courses/linux/` | 📖 교과서 · 레슨 18(챕터 3) | VirtualBox 7.2 + Ubuntu 26.04 LTS |
 | 운영체제 (공용) | `/courses/os/` | 📖 교과서 · 레슨 21 | 우분투 VM 안의 python3 |
