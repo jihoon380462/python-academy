@@ -136,7 +136,7 @@ $ ls 2026
 <p class="muted small">탐색기에서 드래그해서 옮기는 것과 같아요. 다른 점은 파일 수십 개도 한 줄로 옮길 수 있다는 것(레슨 4 의 <code>*</code> 와 같이 쓰면).</p>`, example: { shell: 'cd ~/terminal-study/play\ntouch draft.txt\nmv draft.txt notes/\nls notes\nmv notes/draft.txt notes/final.txt\nls notes' } },
       { title: 'rm: 지우기 — 휴지통이 없어요', html: `<div class="bk-warn"><b><code>rm</code> 으로 지운 파일은 휴지통에 가지 않아요.</b> 바로 사라지고 되살릴 수 없어요. 그래서 지우기 전에 <code>ls</code> 로 무엇을 지우는지 꼭 봐요.</div>
 <table class="kb"><tbody><tr><td><code>rm 파일</code></td><td>파일 지우기. 여러 개도: <code>rm a.txt b.txt</code></td></tr><tr><td><code>rm -r 폴더</code></td><td>폴더와 그 안의 것 <b>전부</b> 지우기</td></tr><tr><td><code>rmdir 폴더</code></td><td><b>빈</b> 폴더만 지우기 — 안에 뭐가 있으면 거절해요(안전)</td></tr><tr><td><code>rm -i 파일</code></td><td>하나씩 물어보고 지우기 (<code>remove regular file 'a.txt'?</code>)</td></tr></tbody></table>
-<p><code>rm -rf</code> 의 <code>f</code> 는 force — "묻지도 따지지도 말고" 예요. 인터넷에서 본 명령에 <code>rm -rf</code> 가 들어 있으면 <b>뒤에 무엇이 오는지</b> 꼭 읽으세요. <code>rm -rf ~</code> 는 홈 폴더 전체, <code>rm -rf /</code> 는 컴퓨터 전체예요.</p>
+<p><code>rm -rf</code> 의 <code>f</code> 는 force — "묻지도 따지지도 말고" 예요. 인터넷에서 본 명령에 <code>rm -rf</code> 가 들어 있으면 <b>뒤에 무엇이 오는지</b> 꼭 읽으세요. <code>rm -rf ~</code> 는 홈 폴더 전체, <code>rm -rf /c</code> 는 C 드라이브 전체예요(Git Bash 에서 <code>/c</code> = <code>C:</code>).</p>
 <pre class="code">$ rm notes
 rm: cannot remove 'notes': Is a directory
 $ rmdir notes
@@ -440,7 +440,7 @@ index 2c1f0e3..8d4b7a1 100644
     { title: 'git reset --hard 와 안전망 reflog', html: `<p><code>git reset --hard</code>(뒤에 아무것도 안 쓰면 <code>HEAD</code>) = 「마지막 커밋 이후 바꾼 것 <b>전부 버리기</b>」. 폴더가 엉망이 됐을 때 깨끗이 돌아가는 비상구예요.</p>
 <pre class="code">$ git reset --hard
 HEAD is now at b71e0d2 두 번째 줄 추가</pre>
-<p><b>커밋하지 않은 변경</b>은 진짜로 사라져요. 하지만 <b>커밋했던 것</b>은 reset 으로 지워도 한동안 Git 이 기억해요:</p>
+<p><b>커밋하지 않은 변경</b>은 진짜로 사라져요(단 Git 이 모르는 새 파일 <code>??</code> 은 그대로 남아요 — 그것까지 지우는 건 <code>git clean</code>). 하지만 <b>커밋했던 것</b>은 reset 으로 지워도 한동안 Git 이 기억해요:</p>
 <pre class="code">$ git reflog
 b71e0d2 HEAD@{0}: reset: moving to HEAD~1
 9a8c7e6 HEAD@{1}: commit: 실수로 지운 커밋
@@ -575,7 +575,7 @@ git commit --amend --no-edit   ← 마지막 커밋을 .env 없이 다시</pre>
   ],
   T16: [
     { title: '실제 GitHub ① 계정과 새 저장소', html: `<div class="bk-step-box"><b>계정</b><br><a href="https://github.com/signup" target="_blank" rel="noopener">github.com/signup</a> 에서 이메일 → 비밀번호 → 사용자 이름(Username) → 이메일 인증. 레슨 6 의 <code>user.email</code> 과 같은 이메일이면 내 커밋에 내 프로필이 붙어요.</div>
-<div class="bk-step-box"><b>새 저장소</b><br>로그인 → 오른쪽 위 <b>+</b> → <b>New repository</b>.<ul><li><b>Repository name</b>: 예) <code>my-first-repo</code></li><li><b>Public</b>(누구나 봄) / <b>Private</b>(나만) — 연습은 Private 도 좋아요</li><li>내 컴퓨터에 이미 저장소가 있으면 <b>Add a README file</b>·<b>.gitignore</b>·<b>license</b> 는 <b>모두 비워 둬요</b>(빈 저장소여야 그대로 push 돼요)</li><li><b>Create repository</b></li></ul></div>
+<div class="bk-step-box"><b>새 저장소</b><br>로그인 → 오른쪽 위 <b>+</b> → <b>New repository</b>.<ul><li><b>Repository name</b>: 예) <code>my-first-repo</code></li><li><b>Public</b>(누구나 봄) / <b>Private</b>(나만) — 연습은 Private 도 좋아요</li><li>내 컴퓨터에 이미 저장소가 있으면 <b>Add README</b> 는 <b>Off</b>, <b>Add .gitignore</b> 는 <b>No .gitignore</b>, <b>Add license</b> 는 <b>No license</b> 로 둬요(빈 저장소여야 그대로 push 돼요)</li><li><b>Create repository</b></li></ul></div>
 <p>만든 직후 화면의 <b>「…or push an existing repository from the command line」</b> 칸에 내 저장소 주소가 들어간 명령 세 줄이 나와요. 다음 쪽에서 그대로 써요.</p>` },
     { title: '실제 GitHub ② 첫 push 와 로그인', html: `<p>내 컴퓨터의 저장소 폴더에서(Git Bash):</p>
 <pre class="code">git remote add origin https://github.com/내아이디/my-first-repo.git
@@ -718,7 +718,7 @@ Object.assign(BOOK.tasks, {
       answer: 'git rm --cached .env\necho ".env" >> .gitignore\ngit add .gitignore\ngit commit --amend --no-edit', check: 'git show --name-only --format=%s HEAD\nls -a | grep env', io: [{ output: '설정 추가\n\n.gitignore\nconfig.py\n.env' }] },
   ],
   T16: [
-    { title: '내 GitHub 에 첫 저장소 올리기', text: '레슨 16 의 ①~② 를 따라 실제 GitHub 에 올려 보세요. 올릴 저장소는 아무거나 — 예: TB2 의 계산기(<code>~/terminal-study/tb2-1</code>). GitHub 저장소 페이지에 파일 세 개(<code>.gitignore</code>, <code>calc.py</code> …)와 커밋 3개가 보이고, <b><code>.env</code> 는 없으면</b> 성공이에요.',
+    { title: '내 GitHub 에 첫 저장소 올리기', text: '레슨 16 의 ①~② 를 따라 실제 GitHub 에 올려 보세요. 올릴 저장소는 아무거나 — 예: TB2 의 계산기(<code>~/terminal-study/tb2-1</code>). GitHub 저장소 페이지에 파일 네 개(<code>.gitignore</code>, <code>calc.py</code>, <code>main.py</code>, <code>README.md</code>)와 커밋 3개가 보이고, <b><code>.env</code> 는 없으면</b> 성공이에요.',
       needs: [['New repository', 'T16/0', 'GitHub 에서 빈 저장소'], ['git remote add origin https://…', 'T16/1', '진짜 주소 등록'], ['git push -u origin main', 'T16/1', '첫 push · 브라우저 로그인']],
       answer: 'cd ~/terminal-study/tb2-1\ngit remote add origin https://github.com/내아이디/calc.git\ngit branch -M main\ngit push -u origin main', noRun: true },
     { title: '혼자 해 보는 Pull Request', text: '위 저장소에서 레슨 16 · 4쪽의 PR 흐름을 한 바퀴 해 보세요: 브랜치 <code>docs-update</code> → README 에 한 줄 추가 → 커밋 → <code>git push -u origin docs-update</code> → GitHub 에서 <b>Compare &amp; pull request</b> → <b>Create pull request</b> → <b>Merge pull request</b> → 내 컴퓨터에서 main 으로 pull. 끝나면 <code>git log --oneline</code> 에 그 커밋이 main 에 있어야 해요.',

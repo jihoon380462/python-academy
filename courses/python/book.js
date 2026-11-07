@@ -10,14 +10,14 @@ const BOOK = {
   meta: { exampleErrorsOk: ['L22/0'] /* 트레이스백을 보여 주려고 일부러 IndexError 가 나는 예제 — check_book ⑤ */, prereq: [
     { lessons: ['L0', 'L1'], chapters: [0], ref: 'SETUP/0', btn: '시작하기 1 · 파이썬 설치 보기',
       title: '먼저 꼭! 「🛠 시작하기」 1~3 — 파이썬 설치 · VS Code 연결 · 첫 파일 실행',
-      html: '이 교과서의 예제와 「만들어 보기」 는 전부 <b>내 컴퓨터의 VS Code</b> 에서 돌려요. 파이썬 설치 때 <b>「Add python.exe to PATH」</b> 를 체크하지 않았거나 VS Code 의 <b>Python 확장</b>이 없으면 아무것도 실행되지 않아요. 확인: 터미널에서 <code>python --version</code> 이 버전을 보여 주고, VS Code 오른쪽 위 ▶ 로 <code>hello.py</code> 가 돌면 준비 끝.' },
+      html: '이 교과서의 예제와 「만들어 보기」 는 전부 <b>내 컴퓨터의 VS Code</b> 에서 돌려요. VS Code 의 <b>Python 확장</b>이 없으면 오른쪽 위 ▶ 가 없고, 파이썬 설치 때 <b>「Add python.exe to PATH」</b> 를 체크하지 않으면 터미널에 치는 <code>python</code> 명령이 안 돼요. 확인: 터미널에서 <code>python --version</code> 이 버전을 보여 주고, VS Code 오른쪽 위 ▶ 로 <code>hello.py</code> 가 돌면 준비 끝.' },
   ] },
   setup: {
     title: '시작하기: 파이썬 설치하고 VS Code 에서 실행하기',
     pages: [
       { title: '1. 파이썬 설치하기 (Windows)', html: `<p>파이썬 코드를 내 컴퓨터에서 돌리려면 먼저 <b>파이썬</b>을 설치해야 해요. 한 번만 하면 돼요.</p>
-<div class="bk-step-box"><b>① 받기</b><br>브라우저로 <a href="https://www.python.org/downloads/windows/" target="_blank" rel="noopener">python.org/downloads/windows</a> 에 들어가서, 맨 위 <b>Stable Releases</b> 의 가장 최신 버전(예: Python 3.15.x) 아래 <b>「Download Windows installer (64-bit)」</b> 를 눌러 받아요.<br><span class="muted small">python.org 첫 화면의 노란 버튼은 「Python install manager」 예요. 그걸로 설치해도 되지만, 이 안내는 설명이 쉬운 일반 설치 파일(installer) 기준이에요.</span></div>
-<div class="bk-step-box"><b>② 설치 — 이 칸이 제일 중요해요</b><br>받은 <code>python-3.xx.x-amd64.exe</code> 를 더블클릭하면 첫 화면이 떠요. 맨 아래 <b>☑ Add python.exe to PATH</b> 칸에 <b>체크</b>하고 나서 <b>「Install Now」</b> 를 눌러요.<br><span class="muted small">이 칸을 안 켜면 나중에 「python 은 내부 또는 외부 명령이 아닙니다」 에러가 나요.</span></div>
+<div class="bk-step-box"><b>① 받기</b><br>브라우저로 <a href="https://www.python.org/downloads/windows/" target="_blank" rel="noopener">python.org/downloads/windows</a> 에 들어가서, <b>Stable Releases</b> 에서 번호가 가장 큰 버전(예: Python 3.15.x — 목록이 날짜순이라 맨 위가 아닐 수 있어요) 아래 <b>「Download Windows installer (64-bit)」</b> 를 눌러 받아요.<br><span class="muted small">python.org 첫 화면의 노란 버튼은 「Python install manager」 예요. 앞으로는 그쪽이 기본이 될 예정이지만(일반 설치 파일은 3.16 부터 안 나와요), 지금 이 안내는 PATH 칸이 보이는 일반 설치 파일(installer) 기준이에요. install manager 로 설치했다면 아래 ② 대신 그 화면의 안내를 따르고, 터미널에서 <code>python --version</code> 만 확인하세요.</span></div>
+<div class="bk-step-box"><b>② 설치 — 이 칸이 제일 중요해요</b><br>받은 <code>python-3.xx.x-amd64.exe</code> 를 더블클릭하면 첫 화면이 떠요. 맨 아래 <b>☑ Add python.exe to PATH</b> 칸에 <b>체크</b>하고 나서 <b>「Install Now」</b> 를 눌러요.<br><span class="muted small">이 칸을 안 켜면 터미널에서 <code>python</code> 이 안 돼요(PowerShell 은 「'python' 용어가 … 인식되지 않습니다」, 또는 Microsoft Store 가 열려요).</span></div>
 <div class="bk-step-box"><b>③ 끝</b><br>「Setup was successful」 이 뜨면 <b>Close</b>. (「Disable path length limit」 이 보이면 눌러 둬도 괜찮아요.)</div>
 <div class="bk-step-box"><b>④ 잘 깔렸는지 확인</b><br>키보드 <kbd>Win</kbd> 키 → <code>cmd</code> 입력 → <b>명령 프롬프트</b> 를 열고 아래를 치고 <kbd>Enter</kbd>.<pre>python --version</pre><code>Python 3.15.2</code> 처럼 버전이 나오면 성공이에요.</div>
 <div class="bk-warn"><b>Microsoft Store 가 열리거나 아무것도 안 나오면</b><br>Windows <b>설정</b> → <b>앱</b> → <b>고급 앱 설정</b> → <b>앱 실행 별칭</b> 에서 <code>python.exe</code>·<code>python3.exe</code>(「앱 설치 관리자」) 두 개를 <b>끔</b>으로 바꾸고 명령 프롬프트를 새로 열어 다시 쳐 보세요. 그래도 안 되면 ② 에서 PATH 칸을 안 켠 거예요 — 설치 파일을 다시 실행 → <b>Modify</b> → Next → <b>☑ Add Python to environment variables</b> 체크 → Install.</div>
@@ -67,7 +67,7 @@ const BOOK = {
   titles: {
     'L0/0': '첫 코드: print("안녕!")',
     'L1/2': 'print(3): 숫자는 따옴표 없이',
-    'L1/3': 'SyntaxError: 따옴표를 빠뜨리면',
+    'L1/3': 'NameError: 따옴표를 빠뜨리면',
     'L1/4': 'print 여러 번: 여러 줄 출력하기',
     'L1/5': 'print(a, b): 쉼표로 여러 개',
     'L2/0': '변수 name = 값: 이름표 붙인 상자',
@@ -206,9 +206,9 @@ const BOOK = {
   // 레슨 본문 중 이 앱의 버튼(실행해 보기·입력값 칸·한 줄씩 보기)을 말하는 곳만 VS Code 기준으로 — 키 '레슨id/쪽', rep = [바꿀 글, 새 글]
   pages: {
     'L0/0': { rep: [['이 앱에서는 진짜 파이썬이 바로 [[실행]]돼요. 아래 예제의 <b>실행해 보기</b> 버튼을 눌러 보세요.', '이 교과서의 코드는 내 컴퓨터의 VS Code 에서 [[실행]]해요(맨 앞 「시작하기」). 아래 예제를 복사해 <code>hello.py</code> 에 붙이고 ▷ 로 실행해 보세요.']] },
-    'L0/2': { rep: [['예제의 <b>👣 한 줄씩 보기</b>를 누르면 지금 실행하는 줄이 노랗게 보여요.', 'VS Code 에서는 줄 번호 왼쪽을 눌러 빨간 점(중단점)을 찍고 <kbd>F5</kbd> → 「Python Debugger: Debug Python File」 을 고르면 그 줄에서 멈춰요. 왼쪽 <b>변수</b> 칸에 지금 값이 보이고, <kbd>F10</kbd> 을 누를 때마다 한 줄씩 내려가요.'], [' (↺ 원래대로 버튼으로 되돌릴 수 있어요)', '']] },
+    'L0/2': { rep: [['예제의 <b>👣 한 줄씩 보기</b>를 누르면 지금 실행하는 줄이 노랗게 보여요.', 'VS Code 에서는 줄 번호 왼쪽을 눌러 빨간 점(중단점)을 찍고 오른쪽 위 ▷ 옆 <b>∨</b> → 「Python Debugger: Debug Python File」(또는 <kbd>F5</kbd> → 목록에서 「Python File」)을 고르면 그 줄에서 멈춰요. 왼쪽 <b>변수</b> 칸에 지금 값이 보이고, <kbd>F10</kbd> 을 누를 때마다 한 줄씩 내려가요.'], [' (↺ 원래대로 버튼으로 되돌릴 수 있어요)', '']] },
     'L0/4': { title: '이 교과서 쓰는 법', html: '<p>레슨을 읽고, 예제를 VS Code 에서 돌려 보고, 레슨 마지막 쪽 <b>「🛠 만들어 보기」</b> 의 문제를 빈 파일에서 직접 만들어요. 점수·잠금은 없어요.</p><ul><li>문제마다 <b>필요한 문법</b> 이 붙어 있어요 — 누르면 그 설명으로 가요.</li><li>막히면 펼쳐 보는 <b>예시 답</b> 이 있어요. 보고 나면 닫고 안 보고 다시 쳐 보세요.</li><li>설치·VS Code 연결은 홈 맨 위 <b>「시작하기」</b> 에 있어요.</li></ul>' },
-    'L2/3': { rep: [['<b>👣 한 줄씩 보기</b>를 누르면 변수 표에서 값이 바뀌는 걸 볼 수 있어요.', 'VS Code 에서는 줄 번호 왼쪽을 눌러 빨간 점(중단점)을 찍고 <kbd>F5</kbd> → 「Python Debugger: Debug Python File」 을 고르면 그 줄에서 멈춰요. 왼쪽 <b>변수</b> 칸에 지금 값이 보이고, <kbd>F10</kbd> 을 누를 때마다 한 줄씩 내려가요.']] },
+    'L2/3': { rep: [['<b>👣 한 줄씩 보기</b>를 누르면 변수 표에서 값이 바뀌는 걸 볼 수 있어요.', 'VS Code 에서는 줄 번호 왼쪽을 눌러 빨간 점(중단점)을 찍고 오른쪽 위 ▷ 옆 <b>∨</b> → 「Python Debugger: Debug Python File」(또는 <kbd>F5</kbd> → 목록에서 「Python File」)을 고르면 그 줄에서 멈춰요. 왼쪽 <b>변수</b> 칸에 지금 값이 보이고, <kbd>F10</kbd> 을 누를 때마다 한 줄씩 내려가요.']] },
     'L3B/0': { rep: [['이 앱에서는 에디터 아래 [[입력값]] 칸에 미리 적어 둔 내용을 읽어요. 입력값을 바꾸면 코드는 그대로인데 결과가 바뀌어요.', 'VS Code 에서 실행하면 아래 <b>터미널</b>에서 커서가 깜빡이며 기다려요. 터미널을 한 번 누르고 <code>민수</code> 를 친 뒤 <kbd>Enter</kbd>. 다른 이름을 치면 코드는 그대로인데 결과가 바뀌어요.']] },
     'L3B/3': { rep: [['부를 때마다 입력값 칸의 <b>다음 한 줄</b>을 읽어요.', '부를 때마다 터미널에 치는 <b>다음 한 줄</b>을 읽어요(값을 치고 <kbd>Enter</kbd>, 또 치고 <kbd>Enter</kbd>).']] },
     'L6/2': { rep: [['이 앱은 5초가 지나면 반복을 강제로 멈추고 알려 줘요.', 'VS Code 에서 무한루프가 돌면 터미널을 누르고 <kbd>Ctrl</kbd>+<kbd>C</kbd> 로 멈춰요.']] },
@@ -226,7 +226,7 @@ const BOOK = {
     // v2.16.2 사용자 「이 turtle 있으면 안 되는 거 아니야?」 — 예전 화면은 브라우저 캔버스라 필요 없던 turtle.done() 이 VS Code 에선 꼭 필요(없으면 창이 깜빡 뜨고 바로 닫힘). check_book ⑪ 이 turtle 예제마다 확인
     'L5/7': { rep: [['<pre>import turtle\nturtle.forward(100)\nturtle.left(90)</pre>', '<pre>import turtle\nturtle.forward(100)\nturtle.left(90)\nturtle.done()</pre>'], ['<p>「앞으로 + 90도 돌기」를 4번 반복하면 정사각형이에요.</p>', '<p>「앞으로 + 90도 돌기」를 4번 반복하면 정사각형이에요.</p><div class="bk-warn"><b>마지막 줄 <code>turtle.done()</code> 을 꼭 넣어요</b><br>VS Code 에서 실행하면 거북이 그림 <b>창</b>이 따로 떠요. <code>turtle.done()</code> 이 없으면 다 그리자마자 프로그램이 끝나서 창이 깜빡 떴다 바로 닫혀요. 이 줄이 있으면 창이 그대로 남고, <b>창의 ✕ 를 눌러 닫아야</b> 프로그램이 끝나요(터미널이 그때까지 기다려요).</div><p class="muted small">창이 안 뜨고 <code>No module named \'tkinter\'</code> 가 나오면 파이썬 설치 때 「tcl/tk and IDLE」 이 빠진 거예요 — 설치 파일을 다시 실행 → <b>Modify</b> → ☑ <b>tcl/tk and IDLE</b> → Next → Install.</p>']], example: { code: 'import turtle\nfor i in range(4):\n    turtle.forward(100)\n    turtle.left(90)\nturtle.done()' } },
     'L22/0': { rep: [['<p><b>이 앱에서는</b> 출력 칸에 <code>IndexError: list index out of range</code> 처럼 종류와 설명 한 줄이 나오고, 에러 난 줄은 <b>코드 칸에 빨간 줄</b>로 칠해져요. 아래 예제를 ▶ 실행해 보세요.</p><p>앱 밖(내 컴퓨터의 파이썬)에서는 에러 메시지([[트레이스백]])가 여러 줄로 나와요.', '<p>아래 예제를 VS Code 에서 실행해 보세요. 터미널에 에러 메시지([[트레이스백]])가 여러 줄로 나와요.'], ['이 몇 번째 줄이에요.</p>', '이 몇 번째 줄이에요. VS Code 터미널에서 <code>line 4</code> 가 있는 줄을 <kbd>Ctrl</kbd>+클릭하면 그 줄로 바로 가요.</p>'], ['상단 메뉴의 에러 사전에 정리돼 있어요.', '']] },
-    'L22/4': { rep: [['「👣 한 줄씩 보기」로 변수가 언제 이상해지는지 보는 것도 같은 방법이에요.', 'VS Code 에서는 줄 번호 왼쪽을 눌러 빨간 점(중단점)을 찍고 <kbd>F5</kbd> → 「Python Debugger: Debug Python File」 을 고르면 그 줄에서 멈춰요. 왼쪽 <b>변수</b> 칸에 지금 값이 보이고, <kbd>F10</kbd> 을 누를 때마다 한 줄씩 내려가요.']] },
+    'L22/4': { rep: [['「👣 한 줄씩 보기」로 변수가 언제 이상해지는지 보는 것도 같은 방법이에요.', 'VS Code 에서는 줄 번호 왼쪽을 눌러 빨간 점(중단점)을 찍고 오른쪽 위 ▷ 옆 <b>∨</b> → 「Python Debugger: Debug Python File」(또는 <kbd>F5</kbd> → 목록에서 「Python File」)을 고르면 그 줄에서 멈춰요. 왼쪽 <b>변수</b> 칸에 지금 값이 보이고, <kbd>F10</kbd> 을 누를 때마다 한 줄씩 내려가요.']] },
   },
   tasks: {
     L0: [
@@ -274,7 +274,7 @@ const BOOK = {
       { title: '구구단 한 단', text: '숫자 n 을 입력받아 <code>n x 1 = n</code> 부터 <code>n x 9</code> 까지 아홉 줄을 출력하세요.', needs: [['for i in range(1, 10):', 'L5/1', 'i 가 1, 2, … 9 로 바뀜'], ['print(a, b, c)', 'L1/5', '띄어쓰기 한 칸씩 이어 출력'], ['int(input())', 'L3B/1', '입력을 숫자로']], pid: 'L5P6' },
       { title: '짝수만', text: '2 부터 20 까지 짝수만 한 줄에 하나씩 출력하세요. <code>if</code> 없이 range 의 간격으로 해 보세요.', needs: [['range(2, 21, 2)', 'L5/4', '2 씩 건너뛰기']], io: [{ output: '2\n4\n6\n8\n10\n12\n14\n16\n18\n20' }], answer: 'for i in range(2, 21, 2):\n    print(i)' },
       { title: '3 의 배수 세기', text: '1 부터 30 까지 중 3 의 배수가 몇 개인지 세어 출력하세요.', needs: [['for …:  if 조건:', 'L5/6', '반복하며 골라내기'], ['n % 2', 'L3/4', '나머지 (0 이면 짝수)'], ['x += 1', 'L2/5', 'x = x + 1 을 줄여 쓰기']], io: [{ output: '10' }], answer: 'count = 0\nfor i in range(1, 31):\n    if i % 3 == 0:\n        count += 1\nprint(count)' },
-      { title: '거북이 정사각형', text: '거북이로 한 변이 100 인 정사각형을 그리세요. 「앞으로 100, 왼쪽 90도」 를 4 번 반복하면 돼요. VS Code 에서 실행하면 그림 창이 떠요 — 마지막 줄에 <code>turtle.done()</code> 을 넣어야 창이 바로 닫히지 않아요.', needs: [['turtle.forward(100)  turtle.left(90)', 'L5/7', '앞으로 가기 · 돌기'], ['for i in range(5):', 'L5/0', '같은 일을 여러 번']], noRun: true, answer: 'import turtle\nfor i in range(4):\n    turtle.forward(100)\n    turtle.left(90)\nturtle.done()' },
+      { title: '거북이 정사각형', text: '거북이로 한 변이 100 인 정사각형을 그리세요. 「앞으로 100, 왼쪽 90도」 를 4 번 반복하면 돼요. VS Code 에서 실행하면 그림 창이 떠요 — 마지막 줄에 <code>turtle.done()</code> 을 넣어야 창이 바로 닫히지 않아요.', needs: [['turtle.forward(100)  turtle.left(90)', 'L5/7', '앞으로 가기 · 돌기'], ['for i in range(4):', 'L5/0', '같은 일을 네 번(변 4개)']], noRun: true, answer: 'import turtle\nfor i in range(4):\n    turtle.forward(100)\n    turtle.left(90)\nturtle.done()' },
     ],
     L6: [
       { title: '1 부터 5 까지 세기 (while)', text: '1 부터 5 까지 <code>while</code> 반복으로 한 줄에 하나씩 출력하세요.', needs: [['while 조건:', 'L6/0', '조건이 참인 동안 반복'], ['i = 0   while total <= 100:   i += 1', 'L6/1', '시작값·조건·바꾸기']], pid: 'L6P1' },
@@ -434,7 +434,7 @@ const BOOK = {
       { title: '아이디 검사 테스트 5 개 쓰기', text: '<code>is_valid_id(s)</code> 는 아이디가 4~12 글자이고 영문 소문자·숫자만이면 True 예요(아래 코드에 있어요). 정상 1 개·경계 2 개(딱 4 글자, 딱 12 글자)·이상 2 개(3 글자, 대문자 섞임), 모두 5 개의 <code>assert</code> 를 써서 전부 통과하면 <code>테스트 5개 통과</code> 가 나오게 하세요. 한글은 이 함수가 따로 거르지 않으니 이상한 값은 한글 없이 만드세요.', given: true, needs: [['assert not 조건', 'L21/2', '거짓이어야 통과'], ['assert is_valid_id("abcd")', 'L21/3', '규칙이 바뀌는 딱 그 값 검사'], ['assert not is_valid_id("ab")', 'L21/4', '이상한 값은 거짓이어야']], pid: 'L21P5' },
     ],
     L22: [
-      { title: '버그 3 개 고치기', text: '아래 코드는 점수들의 합·평균·최고점을 출력하려는데, 에러 없이 결과만 틀리는 버그가 3 개 있어요. VS Code 에 붙여 실행해 보고, <code>print</code> 로 값을 찍어 가며 고쳐서 출력 예와 같게 만드세요.', needs: [['for i in range(len(scores)):', 'L22/1', '번호 0 부터 전부 (1 부터면 하나 빠짐)'], ['print("x:", x, "result:", result)', 'L22/2', '중간값 찍어 보기'], ['7 / 2   # 3.5   ·   7 // 2   # 3', 'L3/3', '평균은 / (// 는 몫만)']], given: true, pid: 'L22P2' },
+      { title: '버그 3 개 고치기', text: '아래 코드는 점수들의 합·평균·최고점을 출력하려는데, 에러 없이 결과만 틀리는 버그가 3 개 있어요. VS Code 에 붙여 실행해 보고, <code>print</code> 로 값을 찍어 가며 고쳐서 출력 예와 같게 만드세요.', needs: [['for i in range(len(scores)):', 'L22/0', '번호 0 부터 전부 (1 부터면 하나 빠짐)'], ['print("x:", x, "result:", result)', 'L22/2', '중간값 찍어 보기'], ['7 / 2   # 3.5   ·   7 // 2   # 3', 'L3/3', '평균은 / (// 는 몫만)']], given: true, pid: 'L22P2' },
       { title: '결과가 비는 버그 찾기', text: '아래 함수는 짝수만 두 배로 바꾼 새 리스트를 만들려는데 결과가 비어요. 반복 안에 <code>print("x:", x, "result:", result)</code> 를 넣어 보고 버그를 찾아 고치세요.', needs: [['print("x:", x, "result:", result)', 'L22/2', '중간값 찍어 보기'], ['result = []  (반복 앞에 한 번)', 'L22/5', '반복 안에서 비우면 매번 초기화']], given: true, pid: 'L22P5' },
     ],
     L23: [

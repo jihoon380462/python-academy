@@ -19,7 +19,7 @@ button{font:inherit;cursor:pointer}textarea,input,select{font:inherit}a{color:va
 code,pre,.code,.stdin,.out{font-family:var(--mono)}
 pre{margin:0;white-space:pre-wrap;word-break:break-word}
 h2,h3{margin:.2em 0 .5em}h2 small,h3 small{color:var(--muted);font-weight:normal;font-size:.7em}
-.muted{color:var(--muted)}.small{font-size:.85em}.center{text-align:center}.ok{color:var(--success);font-weight:600}.warn{color:var(--warn)}.big{font-size:2.2em;font-weight:800}
+.muted{color:var(--muted)}.small{font-size:.85em}.lbl .small{font-size:.95em} /* v2.22.2: 「입력 예 (터미널에 치는 값)」 11.6px → 읽기 쉽게 */.center{text-align:center}.ok{color:var(--success);font-weight:600}.warn{color:var(--warn)}.big{font-size:2.2em;font-weight:800}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}.row.center{justify-content:center}
 .lbl{display:block;font-size:.85em;color:var(--muted);margin:10px 0 4px;font-weight:600}.lbl.inline{display:inline-flex;align-items:center;gap:6px;margin:0}
 .chip{display:inline-block;padding:2px 9px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-size:.8em;margin-right:4px}.chip.boss{background:#7b1e3a;color:#fff;border-color:#a33}.chip.hot{background:var(--gold);color:#222;border-color:transparent}.chip.xp{color:var(--gold)}
@@ -86,7 +86,7 @@ select{padding:8px 10px;border-radius:8px;border:1px solid var(--border);backgro
 .lp-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;animation:pop .25s}
 .lp-html p{margin:.5em 0}.lp-html ul{padding-left:1.2em}
 .uibtn{display:inline-block;padding:2px 10px;margin:0 2px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-weight:700;font-size:.92em;line-height:1.5;box-shadow:0 2px 0 rgba(0,0,0,.25);vertical-align:baseline;white-space:nowrap}.uibtn.primary{background:var(--primary);border-color:transparent;color:var(--on-primary)}.uibtn.accent{background:var(--accent);border-color:transparent;color:#fff}.uibtn.tutor{background:linear-gradient(135deg,#8e6cff,#5b8def);border-color:transparent;color:#fff}
-dfn.term{font-style:normal;font-weight:800;font-size:1.12em;text-decoration:underline dotted var(--primary);text-decoration-thickness:2px;text-underline-offset:4px;cursor:help;color:var(--primary);padding:0 2px}
+dfn.term{font-style:normal;font-weight:800;font-size:1.12em;text-decoration:underline dotted var(--primary);text-decoration-thickness:2px;text-underline-offset:4px;cursor:help;color:var(--primary-text);padding:0 2px} /* v2.22.2 PC 검수: --primary(#1f6feb)는 어두운 바탕에서 대비 4.08(그림 상자 위 3.23) → 글자용 --primary-text */
 .term-pop{position:absolute;z-index:500;background:var(--surface);border:1px solid var(--primary);border-radius:10px;padding:8px 12px;max-width:270px;box-shadow:var(--shadow);font-size:.9em;animation:pop .2s}
 .ex{margin-top:14px;border-top:1px dashed var(--border);padding-top:12px}
 .lp-nav{display:flex;justify-content:space-between;gap:10px;margin-top:6px}

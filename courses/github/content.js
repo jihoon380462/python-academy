@@ -302,7 +302,7 @@ git push</pre><code>origin</code> = 내 fork(push 하는 곳), <code>upstream</c
 <p><b>진짜 프로젝트에 기여할 때</b>는: README 와 <code>CONTRIBUTING.md</code> 를 먼저 읽기 · 이슈 목록에서 <code>good first issue</code> Label(꼬리표, 레슨 9) 찾기 · 큰 작업은 PR 전에 이슈로 「이거 해도 될까요?」 묻기 · PR 은 작게, 설명에 무엇·왜·확인 방법.</p>` + GH_DATE },
   ],
   summary: ['Fork → Create fork = 내 계정으로 복사', 'origin = 내 fork, upstream = 원래 — fetch upstream · merge · push, 웹은 Sync fork', '첫 기여: first-contributions 의 Contributors.md'] },
-{ id: 'G12', ch: 3, n: 12, title: 'GitHub Pages 두 가지 방법', mode: 'text', tutorSummary: 'Settings → Code, planning, and automation → Pages → Build and deployment → Source: Deploy from a branch(Branch main · /(root) → Save) 또는 GitHub Actions. 주소 https://아이디.github.io/저장소/, 아이디.github.io 저장소는 루트. index.html(대소문자), 404.html, 링크는 상대 경로, 비공개 저장소라도 사이트는 공개.',
+{ id: 'G12', ch: 3, n: 12, title: 'GitHub Pages 두 가지 방법', mode: 'text', tutorSummary: 'Settings → Code, planning, and automation → Pages → Build and deployment → Source: Deploy from a branch(Branch main · /(root) → Save) 또는 GitHub Actions. 주소 https://아이디.github.io/저장소/, 아이디.github.io 저장소는 루트. index.html(대소문자), 404.html, 링크는 상대 경로, 무료 계정은 공개 저장소에서만 Pages(유료로 비공개에서 켜도 사이트는 공개).',
   pages: [
     { title: 'Deploy from a branch: 저장소의 파일을 그대로 사이트로', html: `<p><b>GitHub Pages</b> 는 저장소의 HTML 파일을 무료로 인터넷 주소에 올려 주는 기능이에요. 웹 교과서 레슨 13 에서 해 봤다면 복습이에요.</p>
 <div class="bk-step-box"><b>켜기</b><br>저장소 <b>Settings</b> → 왼쪽 「Code, planning, and automation」 의 <b>Pages</b> → 「Build and deployment」 의 「Source」 를 <b>Deploy from a branch</b> → Branch 칸에서 <b>main</b> · 폴더 <b>/ (root)</b> → <b>Save</b>.</div>
@@ -316,7 +316,7 @@ git push</pre><code>origin</code> = 내 fork(push 하는 곳), <code>upstream</c
 <table class="kb"><tbody><tr><td><b>Deploy from a branch</b></td><td>설정 한 번이면 끝. 그냥 HTML·README 사이트</td></tr><tr><td><b>GitHub Actions</b></td><td>배포 전에 검사·빌드가 필요할 때. 이 사이트처럼 「테스트 통과 → 배포」</td></tr></tbody></table>` + GH_DATE },
     { title: '주소 · 404 · 링크 경로 · 공개 범위', html: `<table class="kb"><tbody><tr><td>프로젝트 사이트</td><td>저장소 <code>todo-cli</code> → <code>https://내아이디.github.io/todo-cli/</code></td></tr><tr><td>내 대표 사이트</td><td>저장소 이름을 딱 <code>내아이디.github.io</code> 로 만들면 → <code>https://내아이디.github.io/</code></td></tr><tr><td>없는 주소</td><td>저장소 맨 위에 <code>404.html</code> 을 두면 「없는 페이지」 화면을 내 것으로</td></tr></tbody></table>
 <div class="bk-warn"><b>링크를 <code>/</code> 로 시작하면 깨져요</b><br>프로젝트 사이트는 주소 끝에 <code>/todo-cli/</code> 가 붙어요. 그래서 <code>&lt;link href="/style.css"&gt;</code> 는 <code>내아이디.github.io/style.css</code>(없는 곳)를 찾아요. <b>앞의 <code>/</code> 를 빼서</b> <code>href="style.css"</code> 처럼 상대 경로로 써요. 내 컴퓨터(Live Server)에서는 되는데 Pages 에서만 CSS 가 안 먹으면 거의 이거예요.</div>
-<div class="bk-warn"><b>사이트는 공개예요</b> — 저장소를 비공개로 해도 Pages 사이트는 인터넷에 공개돼요. 비밀번호·개인 정보가 든 파일을 올리지 마세요.</div>
+<div class="bk-warn"><b>사이트는 공개예요</b> — 무료 계정은 <b>공개 저장소</b>에서만 Pages 를 켤 수 있고(비공개 저장소는 유료 Pro 부터), 유료로 비공개 저장소에서 켜도 사이트 자체는 인터넷에 공개돼요. 비밀번호·개인 정보가 든 파일을 올리지 마세요.</div>
 <p>예제는 <code>/</code> 로 시작하는 링크를 찾아 상대 경로로 바꾸는 명령이에요(<code>grep -n</code> 은 터미널·Git 교과서 레슨 4. <code>sed -i 's#찾을#바꿀#g' 파일</code> = 파일 안의 글자를 전부 찾아 바꾸고 그 파일에 저장하는 명령 — 터미널·Git 교과서에는 없어서 몰라도 돼요. VS Code 의 바꾸기(<kbd>Ctrl</kbd>+<kbd>H</kbd>)로 해도 같아요).</p>`, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g12 && mkdir g12 && cd g12\nprintf \'%s\\n\' \'<link rel="stylesheet" href="/style.css">\' \'<script src="/app.js"></script>\' \'<a href="/about.html">소개</a>\' > index.html\ngrep -n \'="/\' index.html\nsed -i \'s#="/#="#g\' index.html\ncat index.html', label: '예제 명령 — / 로 시작하는 링크를 상대 경로로' } },
   ],
   summary: ['Settings → Pages → Deploy from a branch → main · /(root) → Save', 'Source: GitHub Actions = 검사 뒤 배포(이 사이트)', '주소 아이디.github.io/저장소/, index.html, 링크는 / 없이, 사이트는 공개'] },
@@ -337,7 +337,7 @@ git push origin v1.0.0</pre>
   summary: ['git tag -a v1.0.0 -m … → git push origin v1.0.0 (따로 push)', '버전 = 큰.중간.작은', 'Releases → Draft a new release → Choose a tag → Generate release notes → Publish release'] },
 { id: 'GB3', ch: 3, boss: true, title: '보스: 포트폴리오 공개', mode: 'text', pages: [], summary: [], tutorSummary: '저장소 2개 README, Pages, v1.0.0 릴리스, 프로필 README(아이디/아이디 저장소).' },
 // ================= 챕터 4 자동화와 안전 (v2.16.3) =================
-{ id: 'G14', ch: 4, n: 14, title: 'GitHub Actions 첫 워크플로', mode: 'text', tutorSummary: '.github/workflows/test.yml: name, on: [push, pull_request], jobs.test.runs-on ubuntu-latest, steps: actions/checkout@v6, actions/setup-python@v5(python-version 3.13), run: python test_todo.py. 종료 코드 0 = 초록 ✓, 아니면 빨간 ✗. Actions 탭 → 실행 → job → 단계 펼쳐 로그 맨 아래. 공개 저장소 무료.',
+{ id: 'G14', ch: 4, n: 14, title: 'GitHub Actions 첫 워크플로', mode: 'text', tutorSummary: '.github/workflows/test.yml: name, on: [push, pull_request], jobs.test.runs-on ubuntu-latest, steps: actions/checkout@v7, actions/setup-python@v7(python-version 3.13), run: python test_todo.py. 종료 코드 0 = 초록 ✓, 아니면 빨간 ✗. Actions 탭 → 실행 → job → 단계 펼쳐 로그 맨 아래. 공개 저장소 무료.',
   pages: [
     { title: '워크플로 = push 할 때마다 도는 로봇', html: `<p><b>GitHub Actions</b> 는 「저장소에 무슨 일이 생기면(push · PR) GitHub 의 컴퓨터가 내가 정한 명령을 실행」 하게 하는 기능이에요. 제일 흔한 쓰임은 <b>테스트 자동 실행</b>이에요 — 사람이 깜빡해도 로봇은 매번 돌려요.</p>
 <pre class="code">git push
@@ -360,12 +360,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       - run: python test_todo.py</pre>
-<table class="kb"><tbody><tr><td><code>name: test</code></td><td>Actions 탭에 보일 이름</td></tr><tr><td><code>on: [push, pull_request]</code></td><td>언제 — push 할 때, PR 이 열리거나 바뀔 때</td></tr><tr><td><code>jobs:</code> → <code>test:</code></td><td>job 이름(레슨 15 의 보호 규칙에서 이 이름을 골라요)</td></tr><tr><td><code>runs-on: ubuntu-latest</code></td><td>GitHub 이 빌려줄 컴퓨터 종류(리눅스)</td></tr><tr><td><code>uses: actions/checkout@v6</code></td><td>저장소 파일 받기 — 거의 모든 워크플로의 첫 단계</td></tr><tr><td><code>uses: actions/setup-python@v5</code> + <code>with:</code></td><td>파이썬 3.13 준비</td></tr><tr><td><code>run: python test_todo.py</code></td><td>내 테스트 실행. pytest 를 쓰면 <code>run: pip install pytest</code> 다음 <code>run: python -m pytest</code></td></tr></tbody></table>
+<table class="kb"><tbody><tr><td><code>name: test</code></td><td>Actions 탭에 보일 이름</td></tr><tr><td><code>on: [push, pull_request]</code></td><td>언제 — push 할 때, PR 이 열리거나 바뀔 때</td></tr><tr><td><code>jobs:</code> → <code>test:</code></td><td>job 이름(레슨 15 의 보호 규칙에서 이 이름을 골라요)</td></tr><tr><td><code>runs-on: ubuntu-latest</code></td><td>GitHub 이 빌려줄 컴퓨터 종류(리눅스)</td></tr><tr><td><code>uses: actions/checkout@v7</code></td><td>저장소 파일 받기 — 거의 모든 워크플로의 첫 단계</td></tr><tr><td><code>uses: actions/setup-python@v7</code> + <code>with:</code></td><td>파이썬 3.13 준비</td></tr><tr><td><code>run: python test_todo.py</code></td><td>내 테스트 실행. pytest 를 쓰면 <code>run: pip install pytest</code> 다음 <code>run: python -m pytest</code></td></tr></tbody></table>
 <div class="bk-warn"><b>YAML 은 들여쓰기가 문법이에요</b> — 빈칸 두 칸씩, <kbd>Tab</kbd> 은 안 돼요(VS Code 는 .yml 에서 Tab 을 빈칸으로 바꿔 줘요). <code>-</code> 뒤에 빈칸 하나. 틀리면 Actions 탭에 「Invalid workflow file」 이 떠요.</div>` + GH_DATE },
     { title: 'Actions 탭에서 결과 읽기: 빨간 ✗ 를 만나면', html: `<p>push 하고 저장소 <b>Actions</b> 탭을 열면 실행 목록이 있어요. 노란 ● = 도는 중, 초록 ✓ = 성공, 빨간 ✗ = 실패. 커밋 목록·PR 에도 같은 표시가 붙어요.</p>
 <div class="bk-step-box"><b>실패 원인 찾기</b><br>빨간 실행을 누름 → 왼쪽 job 이름(<code>test</code>) → 빨간 ✗ 가 붙은 단계(<code>Run python test_todo.py</code>)를 펼침 → <b>맨 아래 줄부터</b> 읽어요. 파이썬 교과서 레슨 35 「디버깅 사고법」 의 트레이스백 읽기와 똑같아요:<pre class="code">  File "test_todo.py", line 7, in test_add
@@ -414,7 +414,7 @@ key = os.environ.get("API_KEY")</pre>
 <p><code>.gitignore:1:.env	.env</code> 처럼 「몇 번째 줄 규칙에 걸렸다」 가 나오면 무시되고 있는 거예요. 아무것도 안 나오면 <b>올라갈 수 있는 상태</b>예요.</p>
 <p class="muted small"><code>.env</code> 를 읽어 <code>os.environ</code> 에 넣으려면 보통 <code>python-dotenv</code> 패키지를 써요(<code>pip install python-dotenv</code> → <code>from dotenv import load_dotenv; load_dotenv()</code>). 그리고 저장소에는 값 없이 이름만 적은 <code>.env.example</code> 을 올려 두면 다른 사람이 무엇이 필요한지 알아요.</p>`, example: { shell: 'cd ~ && mkdir -p github-study && cd github-study && rm -rf g16 && mkdir g16 && cd g16\ngit init -q -b main\necho "API_KEY=abc123" > .env && echo "print(1)" > app.py\ngit status --short\necho ".env" > .gitignore\ngit status --short\ngit check-ignore -v .env', label: '예제 명령 — .gitignore 전후로 git status 가 어떻게 바뀌나' } },
     { title: 'Actions 의 비밀값: secrets', html: `<p>워크플로가 비밀(배포 토큰 등)을 써야 하면 파일에 쓰지 않고 <b>저장소 설정에 숨겨 두고 이름으로 불러요</b>.</p>
-<div class="bk-step-box"><b>① 넣기</b><br>저장소 <b>Settings</b> → 왼쪽 「Security」 묶음의 <b>Secrets and variables</b> → <b>Actions</b> → <b>Secrets</b> 탭 → <b>New repository secret</b> → 「Name」 칸 <code>API_KEY</code> · 「Secret」 칸에 값 → <b>Add secret</b>. 넣은 뒤엔 나도 값을 다시 볼 수 없어요(바꾸기만).</div>
+<div class="bk-step-box"><b>① 넣기</b><br>저장소 <b>Settings</b> → 왼쪽 「Security」(화면에 따라 「Security and quality」) 묶음의 <b>Secrets and variables</b> → <b>Actions</b> → <b>Secrets</b> 탭 → <b>New repository secret</b> → 「Name」 칸 <code>API_KEY</code> · 「Secret」 칸에 값 → <b>Add secret</b>. 넣은 뒤엔 나도 값을 다시 볼 수 없어요(바꾸기만).</div>
 <div class="bk-step-box"><b>② 워크플로에서 쓰기</b><pre>      - run: python app.py
         env:
           API_KEY: \${{ secrets.API_KEY }}</pre>코드에서는 <code>os.environ["API_KEY"]</code>. 실행 로그에 그 값이 찍히면 GitHub 이 <code>***</code> 로 가려요.</div>
