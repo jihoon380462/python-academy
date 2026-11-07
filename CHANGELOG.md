@@ -7,6 +7,19 @@
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
 
+## v2.25.3 — 2026-11-07 (Opus: 웹 교과서 챕터 4 — JavaScript 언어, Console 에서)
+
+- 📖 **웹 교과서 챕터 4 「JavaScript 언어 — Console 에서」 완성**(D16): 화면 코드와 섞지 않고 언어부터 — 파이썬과 **다른 점 · 함정** 중심, 새 레슨 6개(각 3쪽) + 만들어 보기:
+  - 레슨 15 **값과 변수** — const 기본 · let · var 를 안 쓰는 이유 · 블록 범위, 타입(number 하나 · null/undefined · typeof), `"3" + 1` 은 `"31"` · Number · parseInt · NaN.
+  - 레슨 16 **조건** — `===` 만(== 함정 표 · 배열은 같은 상자인지), 거짓 같은 값 여섯 개(빈 배열은 참!), `||` · `??` · `&&` · `?.` · 삼항 · switch.
+  - 레슨 17 **반복** — for 세 가지(of 는 값 · in 은 키), while · break · continue · 무한 반복 대처, 중첩 · `repeat` · forEach · entries.
+  - 레슨 18 **함수** — 기본값 · return 없으면 undefined · 인자를 덜 주면, 화살표 함수 · 콜백, 범위와 클로저(카운터).
+  - 레슨 19 **배열과 객체** — push/pop/slice/splice/find/some/every, **sort 의 글자 순서 함정**, map · filter · reduce(묶어 세기), 구조 분해 · 펼치기 · JSON.
+  - 레슨 20 **글자 · 숫자 · 에러 · 클래스** — trim · split · replaceAll · padStart, Math · toFixed · `toLocaleString("ko-KR")`, try/catch/throw, class · constructor · this(파이썬 클래스와 비교).
+  - **만들어 보기 18문제 + 「Console 가계부」**(class Ledger · 잘못된 금액은 에러 · 분류별 · 가장 큰 지출 · 달별) — 문제마다 「Console 에 이렇게 나오면 성공」 상자.
+- 허브 카드 웹 n/32.
+- 🛠 내부: **Console 검사** — 만들어 보기 checks 에 `{ text, console: true }` 를 두면 `tools/run_web_solutions.py` 가 예시 답의 console.log 를 모아 io 출력과 줄마다 비교(+ var · == · class 같은 코드 모양 검사). 미리보기 Console 이 NaN 을 `null` 로 찍던 것(JSON 으로 바꾸던 것) 고침. 교과서 화면: 문제마다 출력 상자 이름(`outLabel`)을 바꿀 수 있게. 예시 답에서 `const top` 이 브라우저의 `window.top` 과 부딪히는 것을 검사가 잡아 이름을 바꿈. regress 웹 절 열린 32 · 준비 중 2 · Console 레슨 상자 · 폰 390 16쪽 추가.
+
 ## v2.25.2 — 2026-11-07 (Opus: 웹 교과서 챕터 3 — CSS 배치)
 
 - 📖 **웹 교과서 챕터 3 「CSS 배치 — 어디에」 완성**(D16):
