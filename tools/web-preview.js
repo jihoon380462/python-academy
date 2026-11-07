@@ -102,7 +102,7 @@ const Web = {
     options: 'opts.api = { delay: ms(기본 300~800 무작위), failRate: 0~1(무작위 500), failFirst: n(처음 n번 500), todos: [{id,title,done}] }',
   },
   CHECK_DOC: `checks 항목: { text:'설명', sel:'CSS 선택자', 검사 하나 }  검사 = exists:true|false · count:n|{min,max} · equals:'글자가 정확히'(공백 정리 후) · contains:'글자 포함' · value:'입력값' · attr:{name,value?} · css:{prop,value}(색은 rgb 로 정규화, px 는 ±2) · js:'식(참이면 통과)'
-  동작 뒤 검사: { text, click:'#btn', times?:n, then:{ sel, … } } · { text, input:{sel,value}, then:{…} } · { text, key:{sel,key:'Enter'}, then:{…} } · wait:ms(기본 300, 가짜 서버 응답이 끝날 때까지는 자동 대기) · viewport:390(그 폭에서 검사)`,
+  동작 뒤 검사: { text, click:'#btn', times?:n, then:{ sel, … } } · { text, dblclick:'#item', then:{…} } · { text, input:{sel,value}, then:{…} } · { text, key:{sel,key:'Enter'}, then:{…} } · wait:ms(기본 300, 가짜 서버 응답이 끝날 때까지는 자동 대기) · viewport:390(그 폭에서 검사)`,
 };
 
 // ===== iframe 안에서 도는 bridge (자기 완결 — 바깥 변수 참조 금지) =====
@@ -215,6 +215,7 @@ function __academyBridge(cfg) {
         if (it.input) { var ie = document.querySelector(it.input.sel); if (!ie) return fail('입력창 ' + it.input.sel + ' 이 없어요'); try { ie.focus(); } catch (e) {} ie.value = it.input.value; ie.dispatchEvent(new Event('input', { bubbles: true })); ie.dispatchEvent(new Event('change', { bubbles: true })); acted = true; }
         if (it.key) { var ke = document.querySelector(it.key.sel); if (!ke) return fail('요소 ' + it.key.sel + ' 이 없어요'); ['keydown', 'keypress', 'keyup'].forEach(function (tp) { ke.dispatchEvent(new KeyboardEvent(tp, { key: it.key.key || 'Enter', code: it.key.key || 'Enter', bubbles: true })); }); acted = true; }
         if (it.click) { var times = it.times || 1; for (var i = 0; i < times; i++) { var ce = document.querySelector(it.click); if (!ce) return fail('누를 요소 ' + it.click + ' 이 없어요'); ce.click(); } acted = true; }
+        if (it.dblclick) { var dc = document.querySelector(it.dblclick); if (!dc) return fail('두 번 누를 요소 ' + it.dblclick + ' 이 없어요'); dc.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true })); acted = true; } /* v2.25.4 할 일 앱 편집 */
         if (it.submit) { var fe = document.querySelector(it.submit); if (!fe) return fail('폼 ' + it.submit + ' 이 없어요'); if (fe.requestSubmit) fe.requestSubmit(); else fe.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); acted = true; }
         var ms = it.wait != null ? it.wait : (acted ? 300 : 0);
         (ms || acted ? settle(ms) : Promise.resolve()).then(function () { var r = evalCond(it.then || it); out.ok = !!r.ok; out.got = r.got; resolve(out); }).catch(function (e) { fail('검사 오류: ' + e.message); });
