@@ -1,0 +1,1 @@
+{ "id": "api", "name": "HTTP·API·SDK", "icon": "🔌", "desc": "curl 과 requests 로 남의 API 를 부르고, 내 API 서버와 그 SDK 까지 만드는 교과서", "runner": "python", "mapColor": "#00897b", "mascotGear": "headset" }

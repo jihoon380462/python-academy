@@ -14,9 +14,11 @@
 | 터미널·Git | `/courses/terminal-git/` | 📖 교과서 · 레슨 20 | Git Bash |
 | GitHub | `/courses/github/` | 📖 교과서 · 레슨 22 | 내 GitHub 계정 + Git Bash |
 | 데이터베이스(SQL) | `/courses/sql/` | 📖 교과서 · 레슨 17 | DB Browser for SQLite |
-| 웹·HTTP·API | `/courses/web/` | 📖 교과서 · 레슨 17 | VS Code + Live Server + 브라우저 |
+| 웹 | `/courses/web/` | 📖 교과서 · 레슨 34(HTML · CSS · JS) | VS Code + Live Server + 브라우저 |
+| HTTP·API·SDK | `/courses/api/` | 📖 교과서 · 레슨 6/21(챕터 1, 만드는 중) | VS Code + 파이썬 requests + curl + 브라우저 F12 |
 | Vim 에디터 (공용) | `/courses/vim/` | 📖 교과서 · 레슨 14 | gVim + 파이썬 |
 | 리눅스(우분투) (공용) | `/courses/linux/` | 📖 교과서 · 레슨 18(챕터 3) | VirtualBox 7.2 + Ubuntu 26.04 LTS |
+| 운영체제 (공용) | `/courses/os/` | 📖 교과서 · 레슨 21 | 우분투 VM 안의 python3 |
 | 수학 공간 (공용) | `/courses/math/` | 📖 교과서 · 레슨 45(그림 만지기) | 브라우저 그림 + VS Code + 파이썬 |
 
 - **교과서**: 설명을 읽고, 레슨 끝 「🛠 만들어 보기」 를 내 컴퓨터에서 직접 만든다. 채점·XP·잠금은 없다. 문제마다 「필요한 문법」(실제 코드 모양 + 그 레슨으로 가는 링크)이 있고, 코스마다 도감이 있다. ← → 키로 쪽을 넘긴다.

@@ -7,6 +7,15 @@
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
 
+## v2.27.0 — 2026-11-07 (Opus: 새 HTTP·API·SDK 교과서 — 챕터 1 HTTP 들여다보기)
+
+- 📖 **새 교과서 「HTTP·API·SDK」**(T12 · D15 「HTTP-API-SDK 는 서로 연결되니까 같이」 · 사용자 「ㄱ」, 설계 [`specs/http-api-course.md`](specs/http-api-course.md)) — HTTP(말) → API(약속) → SDK(감싼 라이브러리), 남의 API 부르기 → 내 API 만들기 → 내 SDK 만들기. 허브 「코스」 칸 웹 다음에 카드 🔌 HTTP·API·SDK(읽은 레슨 n/6).
+  - 시작하기 2쪽(파이썬 · requests · curl — PowerShell 은 `curl.exe` · 이 교과서 쓰는 법) + 「먼저 꼭」.
+  - 챕터 1 **HTTP 들여다보기** — 레슨 0 API 가 뭔가(세 겹 · 준비) · 1 요청 한 줄씩(주소 해부 · `curl -v` 의 `>`/`<` · 메서드) · 2 상태 코드(첫 숫자로 읽기 · `curl -i` · `-L` · 누구 탓인가 표) · 3 헤더와 JSON(봉투 · `json.loads/dumps` · `ensure_ascii=False` · 깨진 JSON · 「알고 보니 HTML」) · 4 브라우저에서 본 HTTP · CORS(F12 Network · fetch 로 jsonplaceholder · CORS 는 브라우저의 규칙).
+  - 만들어 보기 10문제 + **날씨 알리미**(Open-Meteo): 응답을 인자로 받는 함수 문제 5개는 출력 예(check_book 이 python3 로 실제 실행), 진짜 API 를 부르는 문제는 「내 화면에서 확인할 것」 ☐ — CI 는 인터넷 API 를 부르지 않아요.
+  - 챕터 2~4(레슨 5~16 · 만들어 보기 3개)는 목차에 「준비 중」.
+- 🛠 내부: `courses/api/`(content.js · book.js · course.json · index.html), `CONFIG.COURSES` 의 api · `COURSE_ID_PATTERNS.api`, 허브 글리프 `{ }`, `check_book` 의 `BOOK.check = 'api'`(운영체제와 같은 규칙 — noRun 은 ☐ 필수 · 도구 상자는 실행 안 함), regress HTTP·API·SDK 절 · 허브 카드 11개, qa_screens 기본 코스에 api. 레슨 예제는 인터넷이 필요한 것(curl · requests · 브라우저 JS)을 「예제 명령」 상자에 두어 검사에서 실행하지 않음. 응답 예는 httpbin 을 로컬로 띄워 실제로 받은 모양.
+
 ## v2.26.0 — 2026-11-07 (Opus: 웹 교과서 완성 — 챕터 6 「더 단단한 화면」)
 
 - 📖 **웹 교과서 완성 — 6챕터 34레슨**(D15 · D16, [`specs/web-course.md`](specs/web-course.md)). 챕터 6 을 옛 「서버와 대화」(HTTP · 파이썬 requests · REST)에서 **「더 단단한 화면」** 으로 바꿈 — 웹 교과서는 화면(HTML · CSS · JavaScript)만:

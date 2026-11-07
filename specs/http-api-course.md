@@ -119,8 +119,8 @@ HTTP  요청 줄 · 헤더 · 본문 / 상태 코드 · 헤더 · 본문  ← �
 
 ## 8. 만들 순서 (구현 계획)
 
-1. `courses/api/` 뼈대(content.js · book.js · course.json · index.html) + 허브 카드 + `check_book` 의 `'api'` 검사 + regress 절 + **시작하기 + 챕터 1(H0~H4 · HB1)** · **챕터 2(H5~H9 · HB2)** — 지금 웹 W10~W12 의 글을 옮겨 다듬고 새 쪽을 씀. 응답 예시는 그날 실제로 받아 확인.
-2. 웹 교과서 챕터 3 바꾸기(`specs/web-course.md` 8절) — 1 이 나간 다음.
+1. ✅ **v2.27.0** `courses/api/` 뼈대(content.js · book.js · course.json · index.html) + 허브 카드 + `check_book` 의 `'api'` 검사 + regress 절 + **시작하기 + 챕터 1(H0~H4 · HB1)**. 응답 예는 httpbin 을 로컬로 띄워 실제로 받은 모양(작업 환경에서 공개 API 가 막혀 있었음). 다음 **v2.27.1 챕터 2(H5~H9 · HB2)** — 옛 웹 W11~W12(git 기록 v2.25.4)의 requests 글을 옮겨 다듬음.
+2. ✅ 웹 교과서 챕터 6 바꾸기 — 사용자 「일단 웹만」 으로 웹 v2.26.0 에서 먼저 함(그래서 v2.26.0~v2.27.0 사이 HTTP 설명이 잠시 없었음).
 3. 챕터 3(H10~H12 · HB3) — CI 에 `fastapi` 설치 + `TestClient` 검사.
 4. 챕터 4(H13~H16 · HB4) — SDK 검사(검사 때 서버 띄우기) · PyGithub 는 ☐(토큰 필요).
 5. 단계마다: 공식 문서(requests · FastAPI · GitHub REST · Open-Meteo)로 대조 · 폰 390/PC QA(`tools/qa_screens.py api`) · 문서(site-intent 코스 표 · TODO · CHANGELOG · HANDOFF).
@@ -137,4 +137,4 @@ HTTP  요청 줄 · 헤더 · 본문 / 상태 코드 · 헤더 · 본문  ← �
 | 유료 SDK(LLM) | 레슨 16 끝 「선택 · 코드 읽기 위주」 | 무료 교육 원칙(교육을 돈 받지 않음)과 별개로 학습자에게 요금이 나가지 않게. 깊은 내용은 T7 · T11 |
 | CI 검사 | 인터넷 API 는 부르지 않고 ☐, 로직 · 서버 · SDK 는 자동 | 공개 API 가 바뀌거나 느려도 CI 가 빨개지지 않게. 서버·SDK 는 내 PC 와 같은 코드로 진짜 실행 |
 | 레슨 id · 폴더 | `H0`~`H16` · `HB1`~`HB4` · `courses/api/` | `A`(알고리즘) · `W`(웹)와 안 겹치고 「HTTP」 의 H |
-| 웹 교과서와의 순서 | 이 교과서 챕터 1·2 를 먼저 내고 웹 챕터 3 을 바꿈 | 사이트에서 HTTP 내용이 비는 때가 없게 |
+| 웹 교과서와의 순서 | (처음 계획) 이 교과서 챕터 1·2 를 먼저 → (실제) 사용자 「일단 웹만」 으로 웹을 먼저 끝내고 바로 이 교과서 | 사이트에서 HTTP 내용이 비는 때를 짧게 — 웹 v2.26.0 다음 릴리스가 바로 이 교과서 챕터 1 |

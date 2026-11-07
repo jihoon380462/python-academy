@@ -45,7 +45,7 @@ EXTRA=r"""() => { const o={h1lines:0, chipTall:[], emptyBox:[], imgBroken:0};
 import argparse
 ap=argparse.ArgumentParser(); ap.add_argument('--out'); ap.add_argument('--w',type=int,default=1440); ap.add_argument('--h',type=int,default=900); ap.add_argument('--theme',default='dark'); ap.add_argument('--font',default='1'); ap.add_argument('--shots',type=int,default=1); ap.add_argument('courses',nargs='*')
 A=ap.parse_args(); OUT=A.out
-courses=A.courses or ['python','algo','math','terminal-git','github','sql','web','vim','linux','os']
+courses=A.courses or ['python','algo','math','terminal-git','github','sql','web','vim','linux','os','api']
 with sync_playwright() as p:
     b=p.chromium.launch(executable_path='/usr/bin/google-chrome',args=['--no-sandbox'])
     for c in courses:
