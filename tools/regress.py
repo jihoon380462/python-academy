@@ -217,15 +217,18 @@ with sync_playwright() as p:
     # ===== [웹 교과서 v2.14.0] N3 — VS Code + Live Server + 브라우저
     print('[웹 교과서 v2.14.0]'); w0=len(errors); WBB='file://'+os.path.join(ROOT,'courses/web/index.html')
     pg.goto(WBB); pg.wait_for_timeout(1000); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
-    wh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length})")
-    check(wh['book'] and wh['steps']==4 and wh['ls']==17 and wh['soon']==0 and wh['pre']==2, '웹 교과서 홈: 시작하기 4 · 레슨 17 · 준비 중 0 · 「먼저 꼭」 경고 2(Live Server·F12) (%s)' % wh)
+    wh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length, chs:document.querySelectorAll('.bk-ch').length})")
+    check(wh['book'] and wh['steps']==4 and wh['ls']==19 and wh['soon']==15 and wh['pre']==2 and wh['chs']==6, '웹 교과서 홈(v2.25.0 34레슨 설계): 시작하기 4 · 챕터 6 · 열린 레슨 19 · 준비 중 15 · 「먼저 꼭」 경고 2(Live Server·F12) (%s)' % wh)
+    pg.evaluate("UI.go('lesson',{lessonId:'W2B',page:3})"); pg.wait_for_timeout(300); w2b=pg.evaluate("[document.querySelectorAll('.bk-tab').length, document.querySelectorAll('.bk-task').length, LESSONS.find(l=>l.id==='W2B').n, LESSONS.find(l=>l.id==='W13').n]")
+    check(w2b[0]==4 and w2b[1]==3 and w2b[2]==3 and w2b[3]==28, 'W2B(새 레슨): 설명 3쪽 + 만들어 보기 3문제 · 레슨 번호 W2B 3 · W13 28 (%s)' % w2b)
+    pg.evaluate("UI.go('lesson',{lessonId:'WB0',page:0})"); pg.wait_for_timeout(300); check('레시피' in pg.inner_text('.bk-art') and 'TODO' not in pg.inner_text('.bk-art'), 'WB0 레시피 페이지: 만들어 보기만')
     pg.evaluate("UI.go('lesson',{lessonId:'SETUP',page:1})"); pg.wait_for_timeout(300); check('Ritwick Dey' in pg.inner_text('.bk-art') and 'Go Live' in pg.inner_text('.bk-art'), '시작하기 2: Live Server(Ritwick Dey) 설치·Go Live')
     pg.evaluate("UI.go('lesson',{lessonId:'W8',page:3})"); pg.wait_for_timeout(300); wt=pg.evaluate("[...document.querySelectorAll('.bk-task')].map(t=>[!!t.querySelector('.bk-checks li'), /필요한 문법/.test(t.textContent)])")
     check(len(wt)==3 and all(all(x) for x in wt), 'W8 만들어 보기 3문제: 「브라우저에서 확인할 것」 목록 + 필요한 문법 (%s)' % wt)
     pg.evaluate("UI.go('lesson',{lessonId:'W11',page:3})"); pg.wait_for_timeout(300); check('menu.json' in pg.inner_text('.bk-task') and pg.locator('.bk-prereq').count()==1, 'W11: 준비 파일 menu.json + F12 경고')
     pg.evaluate("UI.go('lesson',{lessonId:'W13',page:1})"); pg.wait_for_timeout(300); check('Deploy from a branch' in pg.inner_text('.bk-art') and 'github.io' in pg.inner_text('.bk-art'), 'W13: GitHub Pages 켜는 칸(Deploy from a branch)과 주소')
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','flex'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=2 and pg.inner_text('.tb-title')=='웹 문법 도감', '웹 문법 도감: flex 검색')
-    pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '웹 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',1),('W2',2),('W4',2),('W7',1),('W11',2),('WB3',0)] ]
+    pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '웹 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',1),('W2',2),('W2B',0),('W2B',2),('W2B',3),('WB0',0),('W4',2),('W7',1),('W11',2),('WB3',0)] ]
     pg.set_viewport_size({'width':1280,'height':900}); werr=errors[w0:]; check(not werr, '웹 교과서 pageerror 0 (%s)' % (werr[:2] or 'OK'))
     # ===== [GitHub 교과서 v2.16.0] N6 — 진짜 계정 + Git Bash, 설계 specs/github-course.md
     print('[GitHub 교과서 v2.16.0]'); g0=len(errors); GHB='file://'+os.path.join(ROOT,'courses/github/index.html')

@@ -4,9 +4,18 @@
 
 ## 미배포 (다음 릴리스에 들어갈 것 — 팀 PR 은 여기에 항목만 추가, 버전 머리글은 Fable 이 릴리스 때)
 
-- 📝 문서만(화면 변화 없음 · 11/7 Opus): **웹·HTTP·API 를 둘로 — 설계 두 개**(사용자 D15 「웹은 따로, HTTP-API-SDK 는 같이 묶어」). [`specs/web-course.md`](specs/web-course.md) — 웹은 화면만, 챕터 3 을 「더 단단한 화면」(async·await 와 내 JSON · 폼 검사와 접근성 · 모듈 · F12 와 배포 + 카페 주문 화면)으로, 레슨 id·수 그대로. [`specs/http-api-course.md`](specs/http-api-course.md) — 새 교과서 HTTP·API·SDK: 챕터 1 HTTP 들여다보기(curl -v · 상태 코드 · 헤더/JSON · F12/CORS + 날씨 알리미) · 2 API 를 제대로 쓰기(requests · REST · 토큰 · 페이지/한도/재시도 · 문서 읽기 + GitHub 저장소 보고서) · 3 내가 API 만들기(FastAPI · 입력 검사 422 · 상태 코드 · SQLite · CORS + 할 일 API ← 웹의 할 일 앱 연결) · 4 SDK(PyGithub 비교 · 내 SDK 클래스 · 재시도/페이지 숨기기 · 패키지 + 할 일 SDK 와 명령 줄 프로그램), 레슨 17 + 만들어 보기 4. TODO D15 · 예정 코스 W→ · T12.
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
+
+## v2.25.0 — 2026-11-07 (Opus: 웹 교과서를 34레슨으로 — 목차 뼈대 + 챕터 1)
+
+- 📖 **웹 교과서를 크게 다시**(사용자 「HTML-CSS-JS 를 설명 몇 쪽으로 충분히 처리 가능한 거야?」 → 「1」, D16): 설계 [`specs/web-course.md`](specs/web-course.md) — 챕터 6개(HTML 뼈대 · CSS 기본 · CSS 배치 · JavaScript 언어(Console 에서) · 브라우저와 DOM · 더 단단한 화면), 설명 레슨 29 + 만들어 보기 5 = 34.
+  - 목차를 6챕터로: 지금 레슨은 id 그대로 두고 새 레슨 15개를 사이에 「준비 중」 으로(W4B~W4E · W5B · W5C · W7B~W7G · Console 가계부 · W8B · W8C). 레슨 번호가 목차 순서(0~28)로 바뀌어 본문 속 「레슨 N」 언급을 모두 새 번호로(GitHub 교과서의 「웹 교과서 레슨 13」 → 28 포함).
+  - **챕터 1 완성** — 새 레슨 3 「head 와 의미 있는 태그 · 그림과 영상」(head 의 charset · viewport · description · 파비콘 / article · section · aside · time · 제목 순서 / figure · width·height · `loading="lazy"` · video · audio) + 만들어 보기 3문제, 새 **만들어 보기: 레시피 페이지**(CSS 없이 HTML 만 — 사진 · 재료 · 순서 · 영양 표 · 출처 · 후기 폼, 확인할 것 13개 자동).
+  - 챕터 6 은 v2.26.0 까지 지금의 HTTP 레슨(「서버와 대화」) 그대로 — 내용이 비는 때가 없게.
+- 허브 카드 이름 「웹·HTTP·API」 → **「웹」**, 「HTML · CSS · JavaScript 를 제대로 — 혼자 화면을 끝까지」, 읽은 레슨 n/19.
+- 📝 설계 둘(D15 「웹은 따로, HTTP-API-SDK 는 같이 묶어」): [`specs/web-course.md`](specs/web-course.md) · [`specs/http-api-course.md`](specs/http-api-course.md)(#141 에서 문서만 먼저).
+- 🛠 내부: `COURSE_ID_PATTERNS.web` 에 `[A-Z]?`(W2B 같은 id 도 읽은 레슨에 셈). regress 웹 절 = 챕터 6 · 열린 레슨 19 · 준비 중 15 · W2B 3쪽+3문제 · 폰 390 쪽 추가. run_web_solutions 만들어 보기 29개 전부 ✓.
 
 ## v2.24.0 — 2026-11-07 (Opus: 운영체제 교과서 완성 — 챕터 4 시스템 콜과 파일 시스템)
 

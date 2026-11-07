@@ -60,6 +60,7 @@
 | D13 | **리눅스 교과서(T9) 설계 결정**(11/7): 순서는 「T9 리눅스 먼저」 · 우분투는 **직접 설치**(Skip Unattended) · 🐢 거북이는 **끄는 법 + 대가·되돌리기** · VM **8GB · CPU 4 · 40GB** · **VS Code Remote-SSH 넣음** | `specs/linux-course.md` 9절 |
 | D14 | **N15 시각 검수의 의도 충돌 4건**(11/7 「전부 너의 추천대로」): 설명 쪽 결과 주석 코드 + 「예제 코드」 상자 둘 다 둠 · 수학 「먼저 꼭!」 경고 두 번 둠 · 「채점·점수·잠금은 없어요」 문구 둠 · 실전 레슨이 「한 걸음 더」 를 쓰면 그 챕터 끝으로 | v2.22.5 |
 | D15 | **웹·HTTP·API 를 둘로**(11/7): 「웹은 따로 빼서 하고, HTTP-API-SDK 는 서로 연결되니까 같이 묶을 거야. 각각 레슨 설계해」 → 웹 교과서는 화면만(챕터 3 을 비동기 · 폼 검사/접근성 · 모듈 · F12/배포로), **새 HTTP·API·SDK 교과서**(HTTP → API → SDK, 남의 API 쓰기 → 내 API 만들기 → 내 SDK 만들기). 기술적 선택(FastAPI · PyGithub · 연습 API · CI 검사)은 Claude | `specs/web-course.md` · `specs/http-api-course.md` |
+| D16 | **웹 교과서를 크게**(11/7): 「HTML-CSS-JS 를 설명 몇 쪽으로 충분히 처리 가능한 거야?」 → 레슨 17(JS 3레슨)로는 모자라다고 답함 → 「1」(30개 안팎으로 키우기). 6챕터 · 설명 29 + 만들어 보기 5 = 34, 지금 id 그대로 + `W2B` 처럼 끼워 넣기, JS 언어 챕터는 Console 에서 — 기술적 선택은 Claude | [`specs/web-course.md`](specs/web-course.md) |
 
 ## 4. 끝남·보류 (기록)
 
@@ -100,7 +101,7 @@
 
 | # | 코스 | 상태 |
 | --- | --- | --- |
-| W→ | **웹 교과서 다시 설계**(D15) — 챕터 3 을 「더 단단한 화면」 으로(HTTP 부분은 아래 HTTP·API·SDK 로) | 설계 ✅ → [`specs/web-course.md`](specs/web-course.md) · HTTP·API·SDK 챕터 1·2 가 나간 다음 구현 |
+| W→ | **웹 교과서 크게 다시 만들기**(D15 · D16) — 6챕터 34레슨(HTML · CSS 기본 · CSS 배치 · JS 언어 · 브라우저와 DOM · 더 단단한 화면) | 설계 ✅ → [`specs/web-course.md`](specs/web-course.md) · **v2.25.0 ✅ 목차 뼈대 + 챕터 1**(W2B · WB0 레시피) · 다음 v2.25.1 챕터 2(W4B~W4E) → 챕터 3 → 4(+ Console 검사) → 5 → v2.26.0 챕터 6 |
 | T12 | **HTTP · API · SDK**(새 · D15) — HTTP(curl·F12) → API(requests · REST · 인증 · 페이지/한도) → 내 API(FastAPI) → 내 SDK(클래스 · 패키지), 레슨 17 + 만들어 보기 4 | 설계 ✅ → [`specs/http-api-course.md`](specs/http-api-course.md) · 구현 순서: 챕터 1·2 → 웹 챕터 3 바꾸기 → 챕터 3 → 챕터 4 |
 | T3 | 디버깅·테스트 | 예정 — 설계 전 |
 | T4 | 데이터 분석 | 예정 — 설계 전 |
