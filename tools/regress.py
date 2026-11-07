@@ -257,7 +257,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('lesson',{lessonId:'L2',page:%d})" % nlast); pg.wait_for_timeout(200); nx=pg.inner_text('#bkNext'); hint=pg.inner_text('.bk-next-hint') if pg.locator('.bk-next-hint').count() else ''
     pg.click('#bkNext'); pg.wait_for_timeout(250); went=pg.evaluate("(UI.params||{}).lessonId")
     check(nx.strip()=='다음 레슨 →' and '목차로' in hint and went and went!='L2', '만들어 보기 끝: 다음 레슨 → (%s → %s) · 목차로 링크' % (hint[:30], went))
-    lastid=pg.evaluate("(()=>{const f=CHAPTERS.map(c=>c.ch).flatMap(ch=>LESSONS.filter(l=>l.ch===ch&&!l.draft)); return f[f.length-1].id})()"); pg.evaluate("UI.go('lesson',{lessonId:'%s',page:99})" % lastid); pg.wait_for_timeout(200)
+    lastid=pg.evaluate("(()=>{const f=CHAPTERS.map(c=>c.ch).flatMap(ch=>LESSONS.filter(l=>l.ch===ch&&!l.draft).sort((a,b)=>!!a.boss-!!b.boss)); return f[f.length-1].id})()"); pg.evaluate("UI.go('lesson',{lessonId:'%s',page:99})" % lastid); pg.wait_for_timeout(200)
     check('목차' in pg.inner_text('#bkNext'), '마지막 레슨의 만들어 보기는 ☰ 목차로 (%s)' % lastid)
     pg.evaluate("UI.go('lesson',{lessonId:'L2',page:0})"); pg.wait_for_timeout(200); pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(150); check(pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")=='0', '첫 쪽에서 ← 는 그대로')
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(250); pg.click('#dexQ'); pg.keyboard.type('split'); pg.keyboard.press('ArrowLeft'); pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(200); check(pg.evaluate("UI.view")=='dogam', '도감 검색칸에서 ← → 는 글자 커서만(쪽 넘기기 아님)')

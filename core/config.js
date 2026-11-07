@@ -2,7 +2,7 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.22.4',
+  APP_VERSION: '2.22.5',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
@@ -14,7 +14,7 @@ const CONFIG = {
     { id: 'github', short: 'GitHub', name: 'GitHub', icon: '🐙', desc: '내 진짜 GitHub 계정으로 저장소·Pull Request·Actions·Pages — 협업하고 공개하는 교과서', path: 'courses/github/', color: '#8250df', ready: true, book: true, lessons: 22, bookNote: '터미널·Git 다음 · PR·Actions·Pages 까지 내 계정으로' /* v2.16.0 N6 설계 specs/github-course.md — 챕터 1 부터 */ },
     { id: 'sql', short: 'SQL', name: '데이터베이스(SQL)', icon: '🗄️', desc: 'DB Browser 에서 동네 카페 데이터로 직접 쿼리하는 SQL 교과서', path: 'courses/sql/', color: '#f4511e', ready: true, book: true, bookNote: 'SELECT 부터 JOIN·설계·파이썬 sqlite3 까지', lessons: 17 /* v2.13.0 S0~S13 + 보스 3 */ },
     { id: 'math', short: '수학', name: '수학 공간', icon: '📐', desc: '프로그래머 수학 — 그림을 만지며 규칙을 찾고, VS Code 에서 파이썬으로 계산해 보는 교과서', path: 'courses/math/', color: '#e91e63', ready: true, lessons: 45, space: true, book: true, bookNote: '그림 만지기 · 영역 순서 자유', hubLabel: '언제든 들어와도 돼요' /* v2.18.0 N12: 교과서 */ },
-    { id: 'vim', short: 'Vim', name: 'Vim 에디터', icon: '⌨', desc: 'Windows Vim 설치·단축키부터 파이썬 자동 들여쓰기·F5 실행·자동완성까지', path: 'courses/vim/', color: '#019833', ready: true, book: true, space: true, bookNote: '공용 도구 — 어느 코스를 하다가도', lessons: 14 /* v2.11.0 사용자 「공용에 windows 버전 vim 에디터 … 교과서」 */ },
+    { id: 'vim', short: 'Vim', name: 'Vim 에디터', icon: '⌨', desc: 'Windows Vim 설치·단축키부터 파이썬 자동 들여쓰기·F5 실행·자동완성까지', path: 'courses/vim/', color: '#019833', ready: true, book: true, space: true, bookNote: '공용 도구 — 어느 코스를 하다가도 펴 보면 돼요', lessons: 14 /* v2.11.0 사용자 「공용에 windows 버전 vim 에디터 … 교과서」 */ },
     { id: 'linux', short: '리눅스', name: '리눅스(우분투)', icon: '🐧', desc: '내 PC 의 VirtualBox 에 우분투를 설치하고 apt·권한·서비스·SSH 를 직접 해 보는 교과서', path: 'courses/linux/', color: '#e95420', ready: true, book: true, space: true, bookNote: '공용 — 앞으로 만들 운영체제·어셈블리 교과서의 연습장', lessons: 18 /* v2.21.0 T9 설계 specs/linux-course.md — 챕터 1 부터 */ },
     { id: 'web', short: '웹', name: '웹·HTTP·API', icon: '🌐', desc: 'VS Code 와 브라우저로 만들고 인터넷에 올리는 웹 교과서', path: 'courses/web/', color: '#8e24aa', ready: true, book: true, bookNote: 'HTML·CSS·JS 부터 fetch·API·GitHub Pages 배포까지', lessons: 17 /* v2.14.0 W0~W13 + 보스 3 */ },
   ],
