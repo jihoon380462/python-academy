@@ -33,7 +33,7 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==10 and r['ready']==10, f"코스 카드 10개(코스 6 + 공용 4: 수학 공간·Vim·리눅스·운영체제), 열린 것 10개 = 전부(v2.23.0 운영체제 교과서까지) (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==11 and r['ready']==11, f"코스 카드 11개(코스 7 + 공용 4: 수학 공간·Vim·리눅스·운영체제), 열린 것 11개 = 전부(v2.27.0 HTTP·API·SDK 교과서까지) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and r['cont'].rstrip('/').endswith('courses/python'), '이어서 하기 링크(아직 본 레슨이 없으면 파이썬 교과서 목차, v2.19.0): '+str(r['cont']))
     check('이어서 하기' in (r['today'] or '') and r['stats']==0 and '오늘의 도전' not in (r['today'] or ''), '이어서 하기 상자(v2.17.1: 문제집 코스(수학)를 시작하기 전엔 「오늘 n/5 문제·복습」 줄 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
@@ -47,7 +47,7 @@ with sync_playwright() as p:
     print('[N13 v2.19.0 옛 화면 보관]'); n13=len(errors); MATH='file://'+os.path.join(ROOT,'courses/math/index.html')
     hubg=pg.evaluate("({lessons:typeof LESSONS, content:[...document.scripts].some(x=>/content\\.js/.test(x.src)), imgs:document.querySelectorAll('img').length})"); check(hubg['lessons']=='undefined' and not hubg['content'] and hubg['imgs']==0, '허브: 코스 콘텐츠·그림 없이 「읽은 레슨」 만 셈 (%s)' % hubg)
     OLDG=['Game','Grader','Sessions','Tutor','QuickKeys','Loader','Coach','TextEditor','Confetti','BADGES','Haptic','myMascot','Review','Onboarding']
-    for cid in ['python','algo','terminal-git','github','sql','web','vim','math','linux','os']:
+    for cid in ['python','algo','terminal-git','github','sql','web','vim','math','linux','os','api']:
         pg.goto('file://'+os.path.join(ROOT,'courses/%s/index.html?classic=1' % cid)); pg.wait_for_timeout(700)
         cr=pg.evaluate("(g)=>({book:document.documentElement.classList.contains('book-mode'), home:!!document.querySelector('.bk-home'), old:g.filter(n=>typeof window[n]!=='undefined' || (()=>{ try { return eval('typeof '+n)!=='undefined'; } catch(e){ return false; } })()), arch:[...document.scripts].map(x=>x.src).filter(x=>/game|tutor|fx\\.js|ui-editors|ui-views-(main|more|shell|sql|web)|badges|runners\\/(shell|sql|web)/.test(x)), imgs:document.querySelectorAll('img').length})", OLDG)
         check(cr['book'] and cr['home'] and not cr['old'] and not cr['arch'] and cr['imgs']==0, '%s: ?classic=1 을 붙여도 교과서 목차 · 옛 화면 코드(Game·Grader·Tutor…)·옛 스크립트·그림 없음 (%s)' % (cid, {k:v for k,v in cr.items() if k in ('old','arch','imgs')}))
@@ -341,6 +341,19 @@ with sync_playwright() as p:
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); osc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/os/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
     check('읽은 레슨' in osc and '/21' in osc and '운영체제' in osc, '허브 「공용」 칸에 운영체제 카드 · 읽은 레슨 n/21 (%s)' % osc[-60:])
     oerr=errors[o0:]; check(not oerr, '운영체제 교과서 pageerror 0 (%s)' % (oerr[:2] or 'OK'))
+    # ===== [HTTP·API·SDK 교과서 v2.27.0] D15 — curl · requests · F12 로 남의 API, 설계 specs/http-api-course.md (사용자 「ㄱ」 11/7)
+    print('[HTTP·API·SDK 교과서 v2.27.0]'); h0=len(errors); APB='file://'+os.path.join(ROOT,'courses/api/index.html')
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(APB); pg.wait_for_timeout(900); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
+    ah=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length, chs:document.querySelectorAll('.bk-ch').length})")
+    check(ah['book'] and ah['steps']==2 and ah['ls']==6 and ah['soon']==15 and ah['pre']==1 and ah['chs']==4, 'HTTP·API·SDK 교과서 홈: 시작하기 2 · 챕터 4 · 열린 레슨 6(챕터 1) · 준비 중 15 · 「먼저 꼭: requests · curl.exe」 (%s)' % ah)
+    pg.evaluate("UI.go('lesson',{lessonId:'H0',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==1 and 'curl.exe' in pg.inner_text('.bk-prereq'), 'H0 1쪽: 「먼저 꼭」 requests · curl.exe')
+    pg.evaluate("UI.go('lesson',{lessonId:'H0',page:2})"); pg.wait_for_timeout(300); check('curl.exe' in pg.inner_text('.bk-art') and 'Invoke-WebRequest' in pg.inner_text('.bk-art'), 'H0 3쪽: PowerShell 의 curl 은 Invoke-WebRequest 별명 → curl.exe')
+    pg.evaluate("UI.go('lesson',{lessonId:'H1',page:1})"); pg.wait_for_timeout(300); t=pg.inner_text('.bk-art'); check('GET /get?city=seoul HTTP/1.1' in t and 'HTTP/1.1 200 OK' in t, 'H1 2쪽: curl -v 의 요청 줄 · 상태 줄')
+    pg.evaluate("UI.go('lesson',{lessonId:'HB1',page:0})"); pg.wait_for_timeout(300); ht=pg.evaluate("[...document.querySelectorAll('.bk-task')].map(x=>[!!x.querySelector('.bk-io'), x.querySelectorAll('.bk-checks li').length])")
+    check(len(ht)==2 and ht[0][1]>=3 and ht[1][0], 'HB1 날씨 알리미: 진짜 API 문제(☐) + 응답으로 한 줄 만들기(출력 예) (%s)' % ht)
+    pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'HTTP·API·SDK 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',0),('H0',1),('H1',0),('H1',1),('H1',2),('H2',1),('H3',0),('H3',2),('H4',1),('H4',2),('H4',3),('HB1',0)] ]
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); apc=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/api/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    check('읽은 레슨' in apc and '/6' in apc and 'HTTP·API·SDK' in apc, '허브 HTTP·API·SDK 카드: 교과서 · 읽은 레슨 n/6 (%s)' % apc[:90]); aerr=errors[h0:]; check(not aerr, 'HTTP·API·SDK 교과서 pageerror 0 (%s)' % (aerr[:2] or 'OK'))
     b.close()
 cdn=[e for e in errors if 'importScripts' in e or 'pyodide' in e.lower()]
 real=[e for e in errors if e not in cdn]

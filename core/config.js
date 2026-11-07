@@ -2,11 +2,11 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.26.0',
+  APP_VERSION: '2.27.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
-  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+[A-Z]?([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', vim: '^(V|VB)\\d+(P\\d+)?$', github: '^(G|GB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+[A-Z]?(P\\d+)?$', linux: '^(U|UB)\\d+(P\\d+)?$', os: '^(K|KB)\\d+(P\\d+)?$' },
+  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+[A-Z]?([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', vim: '^(V|VB)\\d+(P\\d+)?$', github: '^(G|GB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+[A-Z]?(P\\d+)?$', api: '^(H|HB)\\d+(P\\d+)?$', linux: '^(U|UB)\\d+(P\\d+)?$', os: '^(K|KB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
     { id: 'python', short: '파이썬', name: '파이썬', icon: '🐍', desc: '문법 설명을 읽고 VS Code 에서 직접 만들어 보는 파이썬 교과서', path: 'courses/python/', color: '#2bb673', ready: true, lessons: 45, book: true /* v2.10.1: 교과서 코스 — 허브 카드는 문제 수 대신 「읽은 레슨」(lessons = 열린 레슨 수, check_book 이 맞는지 검사) */ },
     { id: 'algo', short: '알고리즘', name: '알고리즘·자료구조', icon: '🧭', desc: '그림으로 돌아가는 모습을 보며 읽고, VS Code 에서 직접 풀어 보는 알고리즘 교과서 — 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, lessons: 36, book: true, bookNote: '그림으로 보기 · 모의고사 15문제' /* v2.15.0 N5: 교과서 */ },
@@ -18,6 +18,7 @@ const CONFIG = {
     { id: 'linux', short: '리눅스', name: '리눅스(우분투)', icon: '🐧', desc: '내 PC 의 VirtualBox 에 우분투를 설치하고 apt·권한·서비스·SSH 를 직접 해 보는 교과서', path: 'courses/linux/', color: '#e95420', ready: true, book: true, space: true, bookNote: '공용 — 운영체제 교과서의 연습장 · 어셈블리어는 앞으로', lessons: 18 /* v2.21.0 T9 설계 specs/linux-course.md — 챕터 1 부터 */ },
     { id: 'os', short: '운영체제', name: '운영체제', icon: '⚙️', desc: '리눅스 교과서의 우분투 VM 에서 프로세스·시그널·파이프·스레드·메모리를 작은 파이썬 코드로 직접 일으켜 보는 교과서', path: 'courses/os/', color: '#4f6bed', ready: true, book: true, space: true, bookNote: '공용 — 우분투에서 직접 일으켜 보기 · 끝은 내 미니 셸 완성', lessons: 21 /* v2.23.0 T2 설계 specs/os-course.md — 챕터 1(K0~K5 · KB1) · v2.23.1 챕터 2(K6~K9 · KB2) · v2.23.2 챕터 3(K10~K13 · KB3) · v2.24.0 챕터 4(K14~K16 · KB4) 완성 */ },
     { id: 'web', short: '웹', name: '웹', icon: '🌐', desc: 'VS Code 와 브라우저로 화면을 만드는 웹 교과서', path: 'courses/web/', color: '#8e24aa', ready: true, book: true, bookNote: 'HTML · CSS · JavaScript 를 제대로 — 혼자 화면을 끝까지', lessons: 34 /* v2.26.0 웹 교과서 완성 — 34레슨 전부(specs/web-course.md) */ },
+    { id: 'api', short: 'HTTP·API', name: 'HTTP·API·SDK', icon: '🔌', desc: 'curl 과 requests 로 남의 API 를 부르고, 내 API 서버와 그 SDK 까지 만드는 교과서', path: 'courses/api/', color: '#00897b', ready: true, book: true, bookNote: '남의 API 부르기 → 내 API 만들기 → 내 SDK 만들기', lessons: 6 /* v2.27.0 챕터 1(H0~H4 + 보스) — 21 까지(specs/http-api-course.md) */ },
   ],
 
   // --- 외부 라이브러리 (버전 고정) ---
