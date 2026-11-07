@@ -253,6 +253,12 @@ with sync_playwright() as p:
     nlast=pg.evaluate("document.querySelectorAll('.bk-tab').length-1"); pg.evaluate("UI.go('lesson',{lessonId:'L2',page:%d})" % nlast); pg.wait_for_timeout(250); pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(300)
     check(pg.evaluate("UI.view")=='lesson' and pg.locator('.bk-tab.make.on').count()==1, '만들어 보기(마지막 쪽)에서 → 는 목차로 안 감')
     pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(150); check(pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")==str(nlast-1), '만들어 보기에서 ← 는 앞 쪽으로')
+    # v2.22.3 전체 검수: 만들어 보기 끝 = 「다음 레슨 →」(목차 순서) + 작은 「☰ 목차로」, 마지막 레슨에서만 「☰ 목차로」
+    pg.evaluate("UI.go('lesson',{lessonId:'L2',page:%d})" % nlast); pg.wait_for_timeout(200); nx=pg.inner_text('#bkNext'); hint=pg.inner_text('.bk-next-hint') if pg.locator('.bk-next-hint').count() else ''
+    pg.click('#bkNext'); pg.wait_for_timeout(250); went=pg.evaluate("(UI.params||{}).lessonId")
+    check(nx.strip()=='다음 레슨 →' and '목차로' in hint and went and went!='L2', '만들어 보기 끝: 다음 레슨 → (%s → %s) · 목차로 링크' % (hint[:30], went))
+    lastid=pg.evaluate("(()=>{const f=CHAPTERS.map(c=>c.ch).flatMap(ch=>LESSONS.filter(l=>l.ch===ch&&!l.draft)); return f[f.length-1].id})()"); pg.evaluate("UI.go('lesson',{lessonId:'%s',page:99})" % lastid); pg.wait_for_timeout(200)
+    check('목차' in pg.inner_text('#bkNext'), '마지막 레슨의 만들어 보기는 ☰ 목차로 (%s)' % lastid)
     pg.evaluate("UI.go('lesson',{lessonId:'L2',page:0})"); pg.wait_for_timeout(200); pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(150); check(pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")=='0', '첫 쪽에서 ← 는 그대로')
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(250); pg.click('#dexQ'); pg.keyboard.type('split'); pg.keyboard.press('ArrowLeft'); pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(200); check(pg.evaluate("UI.view")=='dogam', '도감 검색칸에서 ← → 는 글자 커서만(쪽 넘기기 아님)')
     pg.evaluate("UI.go('lesson',{lessonId:'L5',page:7})"); pg.wait_for_timeout(250); tt=pg.inner_text('.bk-art'); check(tt.count('turtle.done()')>=3 and 'tcl/tk and IDLE' in tt, '파이썬 레슨 5 거북이: 예제 끝에 turtle.done() + 창이 닫히는 이유·tkinter 없을 때 (v2.16.2 사용자 지적)')

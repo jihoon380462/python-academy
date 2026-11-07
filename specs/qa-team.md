@@ -8,6 +8,10 @@
 - 자동 회귀: `python3 tools/regress.py` (Playwright). QA에서 찾은 재현 가능한 버그는 **고쳐진 뒤** 여기에 `check(...)` 한 줄을 추가해도 된다(허용된 core 외 파일).
 - 콘텐츠 게이트: `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py`.
 - 화면 폭: PC 1100 · 모바일 390 (Playwright `set_viewport_size`). 테마: 설정 → 테마 다크/라이트, 접근성 → 고대비·글자 아주 크게.
+- **전 화면 검수 도구 `tools/qa_screens.py`**(v2.22.3): 모든 코스의 모든 쪽(목차 · 시작하기 · 레슨 쪽 · 만들어 보기 · 도감) + 허브 · 설정을 열어 자동 측정(글자 대비 4.5:1 · 12.5px 미만 글자 · 24px 미만 누를 곳 · 가로 넘침 · 3줄 넘게 접힌 글 속 코드 · 3줄 넘는 제목)하고 캡처를 남긴다.
+  - PC: `python3 tools/qa_screens.py --out /tmp/qa_pc --w 1440 --h 900` · 폰: `--w 390 --h 844 --out /tmp/qa_m` · 라이트: `--theme light --shots 0` · 큰 글자: `--font 3` · 코스만: 끝에 `linux sql` 처럼 id.
+  - 요약은 표준 출력, 화면별 값은 `<out>/<코스>/report.json`. 도감 칩 줄 · SQL 결과 표의 「overflow」 는 가로 스크롤 상자라 정상.
+  - 캡처는 사람이 직접 또는 코스별 검수 에이전트에게 나눠 **눈으로**(겹침 · 잘림 · 어색한 줄바꿈 · 빈 상자 · 그림 깨짐 · 버튼 정렬).
 
 ## 2. 회전 체크리스트 (v2.10.1 기준 — 코스마다 모드가 다르다, site-intent.md 2절)
 

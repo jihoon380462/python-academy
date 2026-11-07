@@ -381,7 +381,7 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 
 /* ---------- v2.9.0 교과서 모드 (core/ui-views-book.js, 파이썬 코스) ---------- */
 .book-mode #view{max-width:none}
-.bk-home,.bk-lesson{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+.bk-home,.bk-lesson{max-width:780px;margin:0 auto;padding:18px 16px 60px}
 .bk-hero{margin:8px 0 18px}.bk-hero p{line-height:1.6;max-width:62ch}
 .bk-setup{padding:14px 16px;margin-bottom:22px;border-color:var(--primary)}
 .bk-setup-h{display:flex;gap:12px;align-items:center;margin-bottom:8px}.bk-setup-ic{font-size:1.6em}
@@ -421,7 +421,7 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .bk-need-d{flex:1;min-width:8em;font-size:.92em}.bk-need-w{flex:none;margin-left:auto}
 /* v2.9.4 파이썬 문법 도감 · 펼친 더 알아보기 */
 .bk-dex-card{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin-bottom:12px;border:1px solid var(--primary);background:var(--surface);color:var(--text);font:inherit;text-align:left;cursor:pointer}.bk-dex-t{flex:1;display:flex;flex-direction:column;gap:2px}
-.bk-dex{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+.bk-dex{max-width:780px;margin:0 auto;padding:18px 16px 60px}
 .bk-dex-bar{position:sticky;top:56px;z-index:5;background:var(--bg);padding:8px 0 10px;margin-bottom:6px}
 .bk-dex-bar input{width:100%;min-height:46px;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font:inherit;font-size:1.02em}
 .bk-dex-chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}.bk-dex-chips .chip-btn{flex:none}
@@ -464,3 +464,10 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .bk-art .lp-h,.bk-art .lp-html,.bk-art .bk-task,.bk-art .bk-warn,.bk-art table.kb td{overflow-wrap:anywhere}.bk-art table.kb{max-width:100%}
 /* v2.22.0: 표 첫 칸(항목 이름)은 낱말 중간에서 끊지 않기 — anywhere 는 최소 너비를 한 글자로 만들어 폰에서 「Nam e」「Gue st IP」 처럼 쪼개졌음. 아주 긴 한 낱말만 넘칠 때 끊음 */
 .bk-art table.kb td:first-child{overflow-wrap:break-word;word-break:keep-all}
+
+/* v2.22.3 전체 검수 */
+.bk-next-hint{text-align:right;margin:8px 2px 0}.bk-next-hint .lnk{font-size:inherit}
+/* 줄이 넘어가는 글 속 코드 조각도 줄마다 둥근 테두리·여백(조각이 잘린 상자처럼 보이지 않게) */
+.bk-art p code,.bk-art li code,.bk-art td code{-webkit-box-decoration-break:clone;box-decoration-break:clone}
+/* 폰: 두 칸 표(이름 · 설명)는 위아래로 — 첫 칸이 좁아져 ssh.socke|t 처럼 쪼개지던 것 */
+@media (max-width:560px){.bk-art table.kb,.bk-art table.kb tbody,.bk-art table.kb tr,.bk-art table.kb td{display:block;width:auto}.bk-art table.kb tr{padding:6px 0;border-bottom:1px solid var(--border)}.bk-art table.kb td{border:0;padding:2px 8px}.bk-art table.kb td:first-child{font-weight:600}}
