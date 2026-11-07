@@ -25,7 +25,7 @@ const BOOK = {
         html: 'Host IP 칸을 비우면 같은 와이파이의 다른 기기도 VM 의 SSH 에 접속을 시도할 수 있어요. <b>127.0.0.1</b> 로 적어 두고, 비밀번호는 쉬운 걸 쓰지 마세요. VirtualBox 는 보안 업데이트가 자주 나오니 최신 7.2.x 로 유지해요.' },
     ],
     kicker: '🐧 리눅스 교과서', hero: '내 PC 안의 우분투로 리눅스 익히기',
-    heroP: 'Windows 위에 <b>VirtualBox</b> 를 깔고 그 안에 <b>Ubuntu 26.04 LTS</b> 를 설치해요. 실수해도 <b>스냅샷</b>으로 1분 만에 되돌릴 수 있는 연습장이에요. 여기서 익힌 우분투가 앞으로 만들 운영체제·어셈블리어 교과서의 연습장이 돼요. 레슨 끝 「만들어 보기」 의 ☐ 목록을 내 화면에서 확인하면 완성이에요.',
+    heroP: 'Windows 위에 <b>VirtualBox</b> 를 깔고 그 안에 <b>Ubuntu 26.04 LTS</b> 를 설치해요. 실수해도 <b>스냅샷</b>으로 1분 만에 되돌릴 수 있는 연습장이에요. 여기서 익힌 우분투가 <b>운영체제 교과서</b>(공용 칸)와 앞으로 만들 어셈블리어 교과서의 연습장이 돼요. 레슨 끝 「만들어 보기」 의 ☐ 목록을 내 화면에서 확인하면 완성이에요.',
     dexName: '리눅스 도감', dexShort: '도감', dexWhat: '화면·명령', dexHint: '「스냅샷」「가상화」 처럼 한국어로도 찾기',
     dexExamples: '<code>apt</code>, <code>스냅샷</code>, <code>Guest Additions</code>, <code>가상화</code>', dexPlaceholder: '🔍 찾기 — apt, 스냅샷, 클립보드, 가상화 …', dexAlt: '「설치 프로그램」 대신 <code>apt</code>',
     dexDocs: 'VirtualBox 매뉴얼 <a href="https://www.virtualbox.org/manual/" target="_blank" rel="noopener">virtualbox.org/manual</a> · 우분투 문서 <a href="https://documentation.ubuntu.com/desktop/" target="_blank" rel="noopener">documentation.ubuntu.com</a>',

@@ -1,0 +1,1 @@
+{ "id": "os", "name": "운영체제", "icon": "⚙️", "desc": "리눅스 교과서의 우분투 VM 에서 프로세스·시그널·파이프·스레드·메모리를 작은 파이썬 코드로 직접 일으켜 보는 교과서", "runner": "python", "mapColor": "#4f6bed", "mascotGear": "headset" }
