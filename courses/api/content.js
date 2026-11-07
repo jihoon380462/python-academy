@@ -11,7 +11,6 @@ const CHAPTERS = [
   { ch: 4, name: 'SDK 만들기', color: '#f57c00' },
 ];
 const API_DATE = '<p class="muted small">이 쪽의 응답 모양은 2026년 11월 기준이에요. 공개 API 는 바뀔 수 있고, Host · Date · origin 같은 줄은 사람마다 달라요.</p>';
-const TODO = (t) => [{ title: '준비 중', html: `<p>TODO: ${t}</p>` }];
 const LESSONS = [
 // ================= 챕터 1 HTTP 들여다보기 =================
 { id: 'H0', ch: 1, n: 0, title: 'API 가 뭔가: 프로그램끼리의 약속', mode: 'text', tutorSummary: '같은 서버가 사람에겐 화면(HTML), 프로그램에겐 데이터(JSON)를 줌. API = 「이 주소로 이렇게 물으면 이런 모양으로 답할게」 라는 약속. HTTP(말하는 방법) → API(약속) → SDK(약속을 감싼 라이브러리) 세 겹. 준비: curl --version, python -m pip install requests, PowerShell 에서는 curl.exe.',
@@ -380,10 +379,203 @@ app.add_middleware(
   summary: ['만들면 201 · 없으면 HTTPException(404) · 지우면 204', 'sqlite3 로 파일에 — 값은 늘 ? 자리표시', 'CORSMiddleware 로 내 화면의 출처만 허락'] },
 { id: 'HB3', ch: 3, boss: true, title: '보스: 할 일 API', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 3 종합. GET/POST /todos · GET/PATCH/DELETE /todos/{id} + SQLite + 201 · 404 · 204 · 422 + Pydantic(TodoIn · TodoPatch 의 None 칸) + CORS. 웹 교과서의 할 일 앱이 localStorage 대신 이 API 를 쓰게(같은 화면이 서버와 대화).' },
 // ================= 챕터 4 SDK =================
-{ id: 'H13', ch: 4, n: 13, title: 'SDK 란: requests 코드 vs SDK 코드', mode: 'text', draft: true, tutorSummary: '같은 일을 requests 와 PyGithub 로 나란히, SDK 가 숨겨 준 것, SDK 의 모양, 공식 vs 커뮤니티.', pages: TODO('requests vs PyGithub · SDK 의 모양'), summary: ['SDK = 클라이언트 · 메서드 · 결과 객체 · 예외', 'SDK 가 주소 · 페이지 · 에러를 숨긴다', '없으면 HTTP 로'] },
-{ id: 'H14', ch: 4, n: 14, title: '내 SDK 만들기 1: 클래스로 감싸기', mode: 'text', draft: true, tutorSummary: 'class TodoClient, Session, 메서드 하나 = 엔드포인트 하나, 내 예외(TodoNotFound · ValidationError · APIError).', pages: TODO('TodoClient · 메서드 · 내 예외'), summary: ['메서드 하나 = 엔드포인트 하나', '404 → TodoNotFound', '그 밖 → APIError'] },
-{ id: 'H15', ch: 4, n: 15, title: '내 SDK 만들기 2: 숨겨 주는 것들', mode: 'text', draft: true, tutorSummary: '타임아웃 · 재시도를 SDK 안에, iter_all 제너레이터, @dataclass Todo, 타입 힌트 · docstring.', pages: TODO('재시도 · 제너레이터 · dataclass'), summary: ['쓰는 사람은 재시도를 모른다', 'for todo in client.iter_all()', '결과는 dataclass'] },
-{ id: 'H16', ch: 4, n: 16, title: '패키지로 묶어 쓰고 나눠 주기', mode: 'text', draft: true, tutorSummary: 'todo_sdk 폴더 구조, pyproject.toml, pip install -e ., 버전 · README, (선택) LLM SDK 맛보기.', pages: TODO('패키지 · pyproject.toml · pip install -e .'), summary: ['pip install -e . 로 어디서나 import', '버전과 바뀐 점', '진짜 SDK 도 같은 모양'] },
-{ id: 'HB4', ch: 4, boss: true, title: '보스: 할 일 SDK 와 명령 줄 프로그램', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '챕터 4 종합. todo_sdk + argparse 명령 줄 프로그램 — 서버 · SDK · 프로그램이 다 내 것.' },
+{ id: 'H13', ch: 4, n: 13, title: 'SDK 란: requests 코드 vs SDK 코드', mode: 'text', tutorSummary: '같은 일(내 저장소 목록)을 requests(주소 · 헤더 · 쪽 넘기기 · 에러 직접)와 PyGithub(Github(auth=Auth.Token(token)).get_user().get_repos())로 나란히. SDK 가 숨긴 것: 기본 주소 · 헤더 · 쪽 넘기기 · JSON→객체 · 상태 코드→예외(BadCredentialsException · UnknownObjectException · RateLimitExceededException). SDK 의 모양 = 클라이언트 · 자원별 메서드 · 결과 객체 · 예외. 공식 vs 커뮤니티 · 버전 고정 · 없으면 HTTP 로.',
+  pages: [
+    { title: 'requests 코드 vs SDK 코드', html: `<p>챕터 2 의 「내 저장소 목록」 을 두 가지로 써 봐요. 왼쪽은 HTTP 를 직접, 오른쪽은 GitHub API 의 파이썬 <b>SDK</b> 인 <b>PyGithub</b>(<code>python -m pip install PyGithub</code>).</p>
+<pre class="code"># requests — 내가 다 챙김
+s = requests.Session()
+s.headers.update({"Authorization": f"Bearer {token}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28"})
+url = "https://api.github.com/user/repos?per_page=100"
+while url:
+    res = s.get(url, timeout=10)
+    res.raise_for_status()
+    for r in res.json():
+        print(r["full_name"], r["stargazers_count"])
+    url = res.links.get("next", {}).get("url")</pre>
+<pre class="code"># PyGithub — SDK 가 챙김
+from github import Auth, Github
+
+g = Github(auth=Auth.Token(token))
+for repo in g.get_user().get_repos():
+    print(repo.full_name, repo.stargazers_count)</pre>
+<table class="kb"><tbody><tr><th>SDK 가 숨긴 것</th><th>requests 에서는</th></tr><tr><td>기본 주소 · 헤더 · 버전</td><td>내가 Session 에 세 줄</td></tr><tr><td>쪽 넘기기</td><td><code>res.links["next"]</code> 반복 — SDK 는 <code>for</code> 를 돌리면 필요할 때 다음 쪽을 받아요</td></tr><tr><td>JSON → 객체</td><td><code>r["full_name"]</code> 대신 <code>repo.full_name</code>(VS Code 가 자동 완성)</td></tr><tr><td>상태 코드 → 예외</td><td>401 · 404 · 한도를 내가 확인 — SDK 는 <code>BadCredentialsException</code> · <code>UnknownObjectException</code> · <code>RateLimitExceededException</code></td></tr></tbody></table>` },
+    { title: 'SDK 의 모양', html: `<p>회사마다 SDK 는 달라도 모양은 거의 같아요. 이 모양을 알면 처음 보는 SDK 도 금방 써요.</p>
+<table class="kb"><tbody><tr><td>① <b>클라이언트 객체</b></td><td>설정(주소 · 키 · 시간 제한)을 <b>한 번</b>: <code>g = Github(auth=…)</code></td></tr><tr><td>② <b>자원별 메서드</b></td><td>API 의 엔드포인트 하나 = 메서드 하나: <code>g.get_repo("octocat/Hello-World")</code> = <code>GET /repos/octocat/Hello-World</code></td></tr><tr><td>③ <b>결과는 객체</b></td><td>딕셔너리 대신 속성: <code>repo.stargazers_count</code> · 다음 요청도 객체에서 <code>repo.get_issues()</code></td></tr><tr><td>④ <b>에러는 예외</b></td><td><code>except UnknownObjectException:</code> — 상태 코드 숫자 대신 이름으로</td></tr><tr><td>⑤ (많은 SDK) <b>재시도 · 한도 · 쪽 넘기기</b></td><td>안에서 알아서. <code>g.rate_limiting</code> 은 (남은 횟수, 한도)</td></tr></tbody></table>
+<p>①~④ 를 그대로 거꾸로 하면 <b>SDK 를 만드는 법</b>이 돼요 — 레슨 14 · 15 에서 챕터 3 의 할 일 API 로 해요.</p>`,
+      example: { label: '예제 코드 — 인터넷 + 토큰(환경 변수)이 필요해요', shell: 'import os\n\nfrom github import Auth, Github, UnknownObjectException\n\ng = Github(auth=Auth.Token(os.environ["GITHUB_TOKEN"]))\nrepo = g.get_repo("octocat/Hello-World")\nprint(repo.full_name, repo.stargazers_count, repo.default_branch)\ntry:\n    g.get_repo("octocat/없는-저장소")\nexcept UnknownObjectException:\n    print("그런 저장소는 없어요(404)")\nprint("남은 한도, 한도:", g.rate_limiting)' } },
+    { title: '공식 SDK vs 커뮤니티 SDK · 버전', html: `<table class="kb"><tbody><tr><td><b>공식 SDK</b></td><td>API 를 만든 회사가 직접 — 새 기능이 빨리 들어오고 문서에 같이 나와요(예: 결제 · 클라우드 · AI 회사의 파이썬 SDK)</td></tr><tr><td><b>커뮤니티 SDK</b></td><td>다른 사람들이 만든 것 — PyGithub 이 그래요(GitHub 의 공식 SDK 는 JavaScript 의 Octokit 등). 고를 땐 <b>최근 업데이트 · 문서 · 라이선스 · 쓰는 사람 수</b>를 봐요</td></tr><tr><td><b>버전 고정</b></td><td>SDK 가 바뀌면 내 코드가 깨질 수 있어서 <code>requirements.txt</code> 에 <code>PyGithub==2.*</code> 처럼 적고, 올릴 땐 바뀐 점(CHANGELOG)을 읽어요</td></tr><tr><td><b>SDK 가 없거나 기능이 빠졌으면</b></td><td>챕터 2 처럼 HTTP 로 직접 — SDK 도 결국 안에서 HTTP 를 보내요. 그래서 HTTP 를 알면 SDK 에 막혀도 길이 있어요</td></tr></tbody></table>` },
+  ],
+  summary: ['SDK = 클라이언트 · 자원별 메서드 · 결과 객체 · 예외', 'SDK 가 주소 · 헤더 · 쪽 넘기기 · 에러를 숨긴다', '없거나 빠졌으면 HTTP 로 — SDK 도 결국 HTTP'] },
+{ id: 'H14', ch: 4, n: 14, title: '내 SDK 만들기 1: 클래스로 감싸기', mode: 'text', tutorSummary: 'class TodoClient: __init__(base_url, token=None, session=None, timeout=10) — 설정은 한 번, session 을 받아 시험할 땐 TestClient 를 넣음. _request(method, path, **kw) 한 곳에서 주소 · 헤더 · 상태 코드 처리, 204 면 None. 메서드 하나 = 엔드포인트 하나: list · get · create · update(보낸 칸만) · delete. 내 예외: TodoError ← TodoNotFound(404) · ValidationError(422, errors) · APIError(status, body).',
+  pages: [
+    { title: 'class TodoClient: 설정은 한 번', html: `<p>챕터 3 의 할 일 API 를 쓰는 사람이 <code>requests</code> 와 주소를 몰라도 되게, <b>클래스 하나</b>로 감싸요.</p>
+<pre class="code">import requests
+
+class TodoClient:
+    def __init__(self, base_url, token=None, session=None, timeout=10):
+        self.base_url = base_url.rstrip("/")
+        self.session = session or requests.Session()
+        self.timeout = timeout
+        if token:
+            self.session.headers.update({"Authorization": f"Bearer {token}"})
+
+client = TodoClient("http://127.0.0.1:8000")</pre>
+<table class="kb"><tbody><tr><td><code>base_url</code></td><td>서버 주소는 한 번만 — 내 PC · 회사 서버를 바꿔 끼우기 쉽게</td></tr><tr><td><code>session=None</code></td><td>안 주면 <code>requests.Session()</code>. <b>시험할 땐</b> FastAPI 의 <code>TestClient(app)</code> 를 넣어요 — 생김새(<code>.request(…)</code> · <code>.headers</code>)가 같아서 서버를 켜지 않고 SDK 를 확인할 수 있어요(이 교과서의 SDK 문제가 그렇게 검사돼요)</td></tr><tr><td><code>timeout</code></td><td>모든 요청에 같은 값 — 쓰는 사람은 잊어버려도 돼요. TestClient 로 시험할 땐 <code>timeout=None</code></td></tr></tbody></table>` },
+    { title: '메서드 하나 = 엔드포인트 하나', html: `<pre class="code">    def _request(self, method, path, **kwargs):
+        if self.timeout is not None:
+            kwargs["timeout"] = self.timeout
+        res = self.session.request(method, self.base_url + path, **kwargs)
+        self._raise_for(res)                      # 다음 쪽
+        return None if res.status_code == 204 else res.json()
+
+    def list(self, done=None):
+        params = {} if done is None else {"done": done}
+        return self._request("GET", "/todos", params=params)
+
+    def get(self, todo_id):
+        return self._request("GET", f"/todos/{todo_id}")
+
+    def create(self, text):
+        return self._request("POST", "/todos", json={"text": text})
+
+    def update(self, todo_id, *, text=None, done=None):
+        body = {k: v for k, v in {"text": text, "done": done}.items() if v is not None}
+        return self._request("PATCH", f"/todos/{todo_id}", json=body)
+
+    def delete(self, todo_id):
+        self._request("DELETE", f"/todos/{todo_id}")</pre>
+<table class="kb"><tbody><tr><td><code>_request</code></td><td>주소 붙이기 · timeout · 상태 코드 처리를 <b>한 곳</b>에서. 이름 앞 <code>_</code> 는 「안에서만 쓰는 것」 이라는 약속</td></tr><tr><td><code>update(…, *, text=None, done=None)</code></td><td><code>*</code> 뒤는 이름을 꼭 써서 부르기(<code>update(3, done=True)</code>) · 보낸 칸만 본문에 — API 의 PATCH 와 맞춤</td></tr><tr><td>쓰는 쪽</td><td><code>client.create("장보기")</code> · <code>client.update(1, done=True)</code> — 주소 · 메서드 · JSON 이 안 보여요</td></tr></tbody></table>` },
+    { title: '에러를 내 예외로', html: `<p>쓰는 사람이 상태 코드 숫자를 외우지 않게, <b>내 예외 클래스</b>로 바꿔 던져요(파이썬 교과서의 예외 만들기).</p>
+<pre class="code">class TodoError(Exception):          # 이 SDK 의 모든 에러의 부모
+    pass
+
+class TodoNotFound(TodoError):       # 404
+    pass
+
+class ValidationError(TodoError):    # 422 — 무엇이 틀렸는지 같이
+    def __init__(self, errors):
+        super().__init__("입력이 규칙에 안 맞아요: " + ", ".join(e["loc"][-1] for e in errors))
+        self.errors = errors
+
+class APIError(TodoError):           # 그 밖의 4xx · 5xx
+    def __init__(self, status, body):
+        super().__init__(f"API 에러 {status}: {body}")
+        self.status = status
+
+    def _raise_for(self, res):           # (TodoClient 안의 메서드)
+        if res.status_code == 404:
+            raise TodoNotFound(res.json().get("detail", "없어요"))
+        if res.status_code == 422:
+            raise ValidationError(res.json()["detail"])
+        if res.status_code >= 400:
+            raise APIError(res.status_code, res.text[:200])</pre>
+<p>쓰는 쪽은 <code>except TodoNotFound:</code> 로 「없는 할 일」 만 따로, <code>except TodoError:</code> 로 이 SDK 의 에러를 한 번에 잡아요. 레슨 11 의 422 <code>detail</code> 목록이 <code>e.errors</code> 에 그대로 들어 있어요.</p>` },
+  ],
+  summary: ['설정은 __init__ 한 번 · session 을 받아 시험 가능하게', '메서드 하나 = 엔드포인트 하나, 처리는 _request 한 곳', '404 → TodoNotFound · 422 → ValidationError · 그 밖 → APIError'] },
+{ id: 'H15', ch: 4, n: 15, title: '내 SDK 만들기 2: 숨겨 주는 것들', mode: 'text', tutorSummary: '재시도를 SDK 안에: 5xx · 429 · 연결 에러면 sleep(1 → 2 → 4) 후 다시, 멱등인 GET · PUT · PATCH · DELETE 만(POST 는 안 함), sleep 을 받아 시험할 땐 기다리지 않게. 쪽 넘기기를 제너레이터로: def iter_all(): … yield from items — for todo in client.iter_all(). 결과는 @dataclass Todo(Todo(**data)) · 타입 힌트 · docstring(VS Code 에 설명이 뜸).',
+  pages: [
+    { title: '재시도를 SDK 안에', html: `<p>레슨 8 의 재시도 규칙을 <code>_request</code> 안에 넣으면, SDK 를 쓰는 사람은 서버가 잠깐 503 을 내도 <b>모르고 지나가요</b>.</p>
+<pre class="code">RETRY_STATUS = {429, 500, 502, 503, 504}
+SAFE = {"GET", "PUT", "PATCH", "DELETE"}            # 다시 보내도 되는 것(POST 빼고)
+
+    def _request(self, method, path, **kwargs):
+        for attempt in range(1, self.max_tries + 1):
+            try:
+                res = self.session.request(method, self.base_url + path, **kwargs)
+            except requests.exceptions.ConnectionError:
+                res = None
+            retry = res is None or res.status_code in RETRY_STATUS
+            if not retry or method not in SAFE or attempt == self.max_tries:
+                break
+            self.sleep(2 ** (attempt - 1))           # 1, 2, 4초
+        if res is None:
+            raise TodoError("서버에 연결할 수 없어요")
+        self._raise_for(res)
+        return None if res.status_code == 204 else res.json()</pre>
+<table class="kb"><tbody><tr><td><code>self.sleep</code></td><td><code>__init__(…, sleep=time.sleep)</code> 로 받아 둬요. 시험할 땐 <b>기다리지 않고 기록만</b> 하는 함수(예: <code>waited = []</code> 를 만들고 <code>sleep=waited.append</code>)를 넣어 「1초 · 2초 쉬었나」 를 확인</td></tr><tr><td>POST 는 재시도 안 함</td><td>응답만 끊기고 서버는 만들었을 수 있어서(레슨 6 의 멱등)</td></tr><tr><td>끝까지 실패하면</td><td>마지막 응답으로 내 예외(503 이면 <code>APIError</code>)</td></tr></tbody></table>` },
+    { title: '쪽 넘기기를 제너레이터로', html: `<p>목록이 쪽으로 나뉘어 오는 API(<code>GET /todos?page=2</code> → <code>{"items": […], "next_page": 3}</code>)라면, SDK 가 쪽을 넘겨 주고 쓰는 사람은 <code>for</code> 만 돌리게 해요.</p>
+<pre class="code">    def iter_all(self):
+        page = 1
+        while page:
+            data = self._request("GET", "/todos", params={"page": page})
+            yield from data["items"]          # 이 쪽의 할 일을 하나씩 내보내기
+            page = data["next_page"]          # 없으면 None → 끝
+
+for todo in client.iter_all():               # 쓰는 쪽
+    print(todo["text"])</pre>
+<table class="kb"><tbody><tr><td><code>yield</code></td><td>값을 <b>하나 내보내고 거기서 잠깐 멈추는</b> 함수(제너레이터) — <code>for</code> 가 다음 값을 달라고 할 때 이어서 돌아요(파이썬 교과서의 제너레이터)</td></tr><tr><td>필요할 때만 요청</td><td>처음 몇 개만 보고 <code>break</code> 하면 뒤쪽 요청은 아예 안 보내요 — PyGithub 의 <code>get_repos()</code> 가 바로 이렇게 동작</td></tr><tr><td>전부 리스트로</td><td><code>list(client.iter_all())</code></td></tr></tbody></table>` },
+    { title: '결과는 dataclass · 타입 힌트 · docstring', html: `<pre class="code">from dataclasses import dataclass
+
+@dataclass
+class Todo:
+    """할 일 하나."""
+    id: int
+    text: str
+    done: bool = False
+
+    def get(self, todo_id: int) -> Todo:
+        """id 로 할 일 하나를 가져와요. 없으면 TodoNotFound."""
+        return Todo(**self._request("GET", f"/todos/{todo_id}"))</pre>
+<table class="kb"><tbody><tr><td><code>@dataclass</code></td><td>칸만 적으면 <code>__init__</code> · 보기 좋은 출력(<code>Todo(id=1, text='장보기', done=False)</code>) · <code>==</code> 비교를 만들어 줘요</td></tr><tr><td><code>Todo(**data)</code></td><td>응답 딕셔너리를 그대로 객체로 — <code>todo.text</code> 로 쓰고 VS Code 가 자동 완성</td></tr><tr><td>타입 힌트 <code>-&gt; Todo</code></td><td>무엇을 돌려주는지 — 에디터가 미리 알려 줌</td></tr><tr><td>docstring <code>"""…"""</code></td><td>VS Code 에서 메서드에 마우스를 올리면 이 설명이 떠요 — SDK 의 문서</td></tr></tbody></table>
+<p>이게 레슨 13 의 「결과는 객체」 를 내 SDK 에 넣은 거예요.</p>`,
+      example: { code: 'from dataclasses import dataclass\n\n\n@dataclass\nclass Todo:\n    """할 일 하나."""\n    id: int\n    text: str\n    done: bool = False\n\n\ndata = {"id": 1, "text": "장보기", "done": False}\ntodo = Todo(**data)\nprint(todo)\nprint(todo.text, todo == Todo(1, "장보기"))', label: '예제 코드 — 인터넷 없이 돌아요' } },
+  ],
+  summary: ['재시도는 SDK 안에 — 멱등인 것만, sleep 은 받아서', 'iter_all 은 yield from 으로 쪽을 넘김', '결과는 @dataclass · 타입 힌트 · docstring'] },
+{ id: 'H16', ch: 4, n: 16, title: '패키지로 묶어 쓰고 나눠 주기', mode: 'text', tutorSummary: 'todo_sdk/__init__.py(밖에 보일 이름 · __version__) · client.py · errors.py · models.py, pyproject.toml([project] name · version · dependencies), python -m pip install -e . 로 어느 폴더에서나 import todo_sdk. 버전 0.1.0 → 0.2.0(기능) → 0.2.1(고침) → 1.0.0, CHANGELOG · README 빠른 시작, GitHub 에 올려 pip install git+https://…. (선택) LLM 회사의 공식 SDK 도 클라이언트 → 메서드 → 결과 객체 → 예외 · 재시도 내장 — 유료 키.',
+  pages: [
+    { title: '폴더 구조와 pyproject.toml', html: `<pre class="code">todo-sdk/                  ← 프로젝트 폴더(GitHub 저장소 하나)
+├── pyproject.toml
+├── README.md
+└── todo_sdk/              ← 패키지(import 할 이름)
+    ├── __init__.py
+    ├── client.py          ← TodoClient
+    ├── errors.py          ← TodoError · TodoNotFound …
+    └── models.py          ← @dataclass Todo</pre>
+<pre class="code"># todo_sdk/__init__.py — 밖에서 「from todo_sdk import …」 로 쓸 이름
+from .client import TodoClient
+from .errors import APIError, TodoError, TodoNotFound, ValidationError
+from .models import Todo
+
+__version__ = "0.1.0"</pre>
+<pre class="code"># pyproject.toml
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "todo-sdk"
+version = "0.1.0"
+description = "할 일 API 의 파이썬 SDK"
+requires-python = ">=3.10"
+dependencies = ["requests>=2.31"]</pre>
+<p><code>todo-sdk</code> 폴더에서 <code>python -m pip install -e .</code>(<code>-e</code> = 고치면 바로 반영) 하면 <b>어느 폴더에서나</b> <code>import todo_sdk</code> 가 돼요. 확인은 다른 폴더에서 아래 한 줄.</p>
+<pre class="code">python -c "import todo_sdk; print(todo_sdk.__version__)"</pre>` },
+    { title: '버전 · README · 나눠 주기', html: `<table class="kb"><tbody><tr><td><code>0.1.0</code> → <code>0.2.0</code></td><td>기능을 더함(<code>iter_all</code> 추가)</td></tr><tr><td><code>0.2.0</code> → <code>0.2.1</code></td><td>고치기만(버그)</td></tr><tr><td><code>1.0.0</code></td><td>「이제 모양을 함부로 안 바꿀게요」 약속 — 그 뒤 쓰는 사람 코드가 깨지는 변경이면 2.0.0</td></tr></tbody></table>
+<p>버전을 올릴 땐 <code>pyproject.toml</code> 의 <code>version</code> 과 <code>__version__</code> 을 같이 바꾸고, <code>CHANGELOG.md</code> 에 바뀐 점을 적어요(이 아카데미의 CHANGELOG 처럼).</p>
+<pre class="code">## 빠른 시작
+python -m pip install git+https://github.com/내아이디/todo-sdk
+from todo_sdk import TodoClient
+client = TodoClient("http://127.0.0.1:8000"); client.create("장보기")</pre>
+<p>README 맨 위의 「빠른 시작」 세 줄이 SDK 의 첫인상이에요. GitHub 에 올리면(GitHub 교과서) 다른 사람이 위 한 줄로 설치할 수 있어요. 누구나 <code>pip install todo-sdk</code> 로 받게 하려면 PyPI 에 올리는데, 이 교과서 범위 밖이에요.</p>` },
+    { title: '(선택) 진짜 회사의 SDK 도 같은 모양', html: `<div class="bk-warn"><b>유료 API 는 돈이 나가요.</b> 이 쪽은 <b>코드 읽기</b>가 목적이에요. 직접 해 보려면 키를 만들기 전에 그 회사의 <b>요금 · 사용 한도 설정</b> 화면부터 봐요. 이 교과서의 다른 실습은 모두 무료예요.</div>
+<p>AI(LLM) 회사의 공식 파이썬 SDK 도 내가 만든 SDK 와 모양이 같아요. 예를 들어 Anthropic 의 파이썬 SDK:</p>
+<pre class="code">import anthropic
+
+client = anthropic.Anthropic()               # ① 클라이언트 — 키는 환경 변수 ANTHROPIC_API_KEY 에서
+try:
+    message = client.messages.create(        # ② 자원별 메서드 = POST /v1/messages
+        model="claude-sonnet-5-5",
+        max_tokens=300,
+        messages=[{"role": "user", "content": "HTTP 상태 코드 429 를 한 줄로 설명해 줘"}],
+    )
+    print(message.content[0].text)           # ③ 결과는 객체
+except anthropic.RateLimitError:             # ④ 에러는 이름 있는 예외(429)
+    print("잠시 뒤에 다시")</pre>
+<p>키는 코드 밖(환경 변수) · 클라이언트 한 번 · 메서드 · 결과 객체 · 예외 — 그리고 이 SDK 도 429 · 5xx 를 <b>안에서 자동으로 몇 번 재시도</b>해요(<code>max_retries</code>). 레슨 14 · 15 에서 내가 만든 것과 같죠. AI 를 쓰는 법 자체는 「AI 와 협업」 · 「LLM 기초」 교과서(예정)에서.</p>` },
+  ],
+  summary: ['todo_sdk/__init__.py 가 밖에 보일 이름 · __version__', 'pyproject.toml + pip install -e . 로 어디서나 import', '진짜 SDK 도 클라이언트 · 메서드 · 결과 객체 · 예외'] },
+{ id: 'HB4', ch: 4, boss: true, title: '보스: 할 일 SDK 와 명령 줄 프로그램', mode: 'text', pages: [], summary: [], tutorSummary: '교과서 종합. 할 일 SDK(TodoClient · 내 예외 · 멱등만 재시도 · dataclass Todo)와 그걸 쓰는 argparse 명령 줄 프로그램 todo add 장보기 · todo list · todo done 3 · todo rm 3. 서버(HB3) · SDK · 프로그램 세 겹이 다 내 것. main(argv, client) 로 나눠 TestClient 로 검사.' },
 ];
 const PROBLEMS = [];
