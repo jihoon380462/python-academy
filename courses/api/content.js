@@ -131,12 +131,129 @@ No 'Access-Control-Allow-Origin' header is present on the requested resource.</p
   summary: ['F12 Network 의 한 줄 = 요청 하나(Headers · Response · Timing)', 'fetch 는 404 여도 에러가 아니라 res.ok 를 본다', 'CORS 는 브라우저의 규칙 — 허락은 서버의 Access-Control-Allow-Origin'] },
 { id: 'HB1', ch: 1, boss: true, title: '보스: 날씨 알리미', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 1 종합. Open-Meteo(키 없음)에 위도·경도와 current · daily 파라미터로 GET, 상태 코드 확인, requests.exceptions(연결 · 시간 초과) 처리, 응답 JSON 에서 지금 기온 · 오늘 최고/최저 · 비 올 확률을 꺼내 한 줄로. 응답 모양이 이상하면 알려 주기.' },
 // ================= 챕터 2 API 를 제대로 쓰기 =================
-{ id: 'H5', ch: 2, n: 5, title: 'requests 기본기', mode: 'text', draft: true, tutorSummary: 'requests.get(url, params=, timeout=10) — timeout 은 늘. status_code · headers · json() · raise_for_status(). post(json=) vs data=. Session 으로 헤더를 한 번에 · 연결 재사용.', pages: TODO('get · params · timeout · json() · raise_for_status · post(json=) · Session'), summary: ['timeout 은 늘', 'raise_for_status 로 4xx·5xx 를 예외로', 'json= 은 JSON 본문'] },
-{ id: 'H6', ch: 2, n: 6, title: 'REST: 주소와 메서드의 약속', mode: 'text', draft: true, tutorSummary: '자원(명사) + 메서드(동사): GET /todos · GET /todos/1 · POST /todos · PUT/PATCH /todos/1 · DELETE /todos/1. jsonplaceholder 로 CRUD 한 바퀴. 나쁜 주소와 비교, 멱등.', pages: TODO('CRUD 표 · jsonplaceholder 한 바퀴 · 멱등'), summary: ['주소는 명사, 메서드는 동사', 'POST 201 · GET 200 · 없으면 404', 'GET · PUT · DELETE 는 멱등'] },
-{ id: 'H7', ch: 2, n: 7, title: '인증: API 키와 토큰', mode: 'text', draft: true, tutorSummary: 'Authorization: Bearer 토큰, 쿼리 키의 위험, GitHub fine-grained token 으로 GET /user, 401 vs 403, 환경 변수 · .env + python-dotenv + .gitignore.', pages: TODO('Bearer · GitHub 토큰 · 401/403 · 환경 변수 · .env'), summary: ['토큰은 Authorization 헤더로', '401 누구세요 · 403 권한 없음', '키는 코드 밖(환경 변수 · .env)'] },
-{ id: 'H8', ch: 2, n: 8, title: '페이지 · 한도 · 재시도', mode: 'text', draft: true, tutorSummary: 'per_page · page · Link 헤더(res.links), X-RateLimit-Remaining · Retry-After · 429, 재시도는 5xx·429·끊김만 1→2→4초.', pages: TODO('페이지 넘기기 · 한도 헤더 · 재시도 규칙'), summary: ['res.links["next"] 가 없을 때까지', '한도는 X-RateLimit-Remaining', '4xx 는 다시 해도 같다'] },
-{ id: 'H9', ch: 2, n: 9, title: 'API 문서 읽는 법', mode: 'text', draft: true, tutorSummary: '기본 주소 · 인증 · 엔드포인트 · 파라미터 · 응답 예시 · 에러 · 한도 · 버전. GitHub REST 문서 한 쪽 읽기. OpenAPI.', pages: TODO('문서에서 찾을 것 · GitHub 문서 · OpenAPI'), summary: ['문서의 여덟 칸', '예시 응답부터 본다', 'OpenAPI 는 기계도 읽는 문서'] },
-{ id: 'HB2', ch: 2, boss: true, title: '보스: 내 GitHub 저장소 보고서', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '챕터 2 종합. 토큰으로 내 저장소를 페이지를 넘겨 전부, 언어별 개수 · 별 많은 순 · 최근 고친 것, 한도가 바닥나면 기다릴 시간.' },
+{ id: 'H5', ch: 2, n: 5, title: 'requests 기본기', mode: 'text', tutorSummary: 'requests.get(url, params={...}, timeout=10) — timeout 은 늘(없으면 영원히 기다릴 수 있음). res.status_code · res.ok · res.headers(대소문자 무시) · res.text · res.json() · res.url. raise_for_status() 로 4xx·5xx 를 HTTPError 로, requests.exceptions(ConnectionError · Timeout · 전부 RequestException). post(json=) 는 JSON 본문 + Content-Type, data= 는 폼. Session 으로 헤더를 한 번에 · 연결 재사용.',
+  pages: [
+    { title: 'get · params · timeout', html: `<pre class="code">import requests
+
+res = requests.get("https://httpbin.org/get", params={"city": "서울", "days": 3}, timeout=10)</pre>
+<table class="kb"><tbody><tr><td><code>params={…}</code></td><td>쿼리를 딕셔너리로 — 한글 · 공백은 알아서 % 로 바꿔 붙여요. 실제로 간 주소는 <code>res.url</code></td></tr><tr><td><code>timeout=10</code></td><td><b>늘 붙여요.</b> 없으면 서버가 대답을 안 할 때 프로그램이 영원히 기다릴 수 있어요(10초 넘으면 <code>Timeout</code> 예외)</td></tr><tr><td><code>res.status_code</code> · <code>res.ok</code></td><td>상태 코드 · 200~399 인지</td></tr><tr><td><code>res.headers["content-type"]</code></td><td>응답 헤더(이름의 대소문자 무시)</td></tr><tr><td><code>res.text</code> · <code>res.json()</code></td><td>본문 글자 · 본문을 JSON 으로 읽은 dict/list(JSON 이 아니면 에러)</td></tr><tr><td><code>res.elapsed</code></td><td>걸린 시간</td></tr></tbody></table>
+<p>httpbin 의 <code>/get</code> 이 되돌려 준 <code>res.json()["args"]</code> 는 <code>{'city': '서울', 'days': '3'}</code> 이에요 — 쿼리는 늘 <b>글자</b>로 가요(3 도 <code>'3'</code>).</p>${API_DATE}`,
+      example: { label: '예제 코드 — 인터넷이 필요해요(VS Code 의 .py 로)', shell: 'import requests\n\nres = requests.get("https://httpbin.org/get", params={"city": "서울", "days": 3}, timeout=10)\nprint(res.status_code, res.ok)\nprint(res.url)\nprint(res.headers["content-type"])\nprint(res.json()["args"])' } },
+    { title: 'raise_for_status 와 예외 잡기', html: `<p><code>requests</code> 는 404 · 500 을 받아도 <b>에러를 내지 않아요</b> — 응답을 받는 데는 성공했으니까요. 「4xx · 5xx 면 멈춰」 를 원하면 <code>res.raise_for_status()</code> 를 불러요.</p>
+<table class="kb"><tbody><tr><td><code>requests.exceptions.HTTPError</code></td><td><code>raise_for_status()</code> 가 4xx · 5xx 에서 냄 — <code>e.response.status_code</code> 로 코드</td></tr><tr><td><code>ConnectionError</code></td><td>서버를 못 찾음 · 연결 안 됨(인터넷 끊김 · 주소 오타)</td></tr><tr><td><code>Timeout</code></td><td><code>timeout=</code> 시간을 넘김</td></tr><tr><td><code>RequestException</code></td><td>위 전부의 부모 — 한 번에 잡을 때</td></tr></tbody></table>
+<pre class="code">try:
+    res = requests.get(url, timeout=10)
+    res.raise_for_status()
+    data = res.json()
+except requests.exceptions.HTTPError as e:
+    print("서버가 거절:", e.response.status_code)
+except requests.exceptions.RequestException as e:
+    print("연결 문제:", type(e).__name__)</pre>
+<p><code>except</code> 는 <b>좁은 것부터</b> 써요(HTTPError 도 RequestException 의 자식이라, 넓은 것을 먼저 쓰면 좁은 것이 안 잡혀요).</p>` },
+    { title: 'post(json=) · data= · Session', html: `<table class="kb"><tbody><tr><td><code>requests.post(url, json={"name": "지훈"})</code></td><td>딕셔너리를 JSON 글자로 바꿔 본문에 + <code>Content-Type: application/json</code> 헤더까지 — API 는 대부분 이것</td></tr><tr><td><code>requests.post(url, data={"name": "지훈"})</code></td><td>HTML 폼 모양(<code>name=%EC%A7%80…</code>) — httpbin 은 <code>json</code> 칸이 아니라 <code>form</code> 칸에 보여 줘요</td></tr><tr><td><code>headers={"User-Agent": "my-app/0.1"}</code></td><td>헤더 붙이기(모든 메서드)</td></tr></tbody></table>
+<p>같은 서버에 여러 번 보낼 땐 <b>Session</b> 을 써요. 헤더를 한 번만 정하면 되고, 연결을 다시 써서 빨라요.</p>
+<pre class="code">with requests.Session() as s:
+    s.headers.update({"User-Agent": "my-app/0.1", "Accept": "application/json"})
+    a = s.get("https://httpbin.org/get", timeout=10)
+    b = s.post("https://httpbin.org/post", json={"cups": 2}, timeout=10)</pre>
+<p><code>timeout</code> 은 Session 에 한 번에 못 정해서 요청마다 붙여요(챕터 4 의 내 SDK 에서는 이걸 감춰 줘요).</p>`,
+      example: { label: '예제 코드 — 인터넷이 필요해요', shell: 'import requests\n\nwith requests.Session() as s:\n    s.headers.update({"User-Agent": "my-app/0.1"})\n    r1 = s.post("https://httpbin.org/post", json={"name": "지훈"}, timeout=10)\n    r2 = s.post("https://httpbin.org/post", data={"name": "지훈"}, timeout=10)\n    print(r1.json()["json"], r1.json()["headers"]["Content-Type"])\n    print(r2.json()["form"], r2.json()["headers"]["Content-Type"])' } },
+  ],
+  summary: ['requests.get(url, params=…, timeout=10) — timeout 은 늘', 'raise_for_status() 로 4xx·5xx 를 예외로', 'post(json=) 은 JSON 본문 · Session 은 헤더 한 번에'] },
+{ id: 'H6', ch: 2, n: 6, title: 'REST: 주소와 메서드의 약속', mode: 'text', tutorSummary: 'REST = 자원(명사 · 복수) 주소 + 메서드(동사). GET /todos 목록 · GET /todos/1 하나 · POST /todos 만들기(201) · PUT 통째 · PATCH 일부 · DELETE 지우기. 없으면 404. jsonplaceholder 는 가짜라 진짜로 바뀌진 않음. 나쁜 주소 /getTodo?id=1. 멱등: GET · PUT · DELETE 는 두 번 해도 같음, POST 는 두 번이면 두 개 — 재시도에 중요.',
+  pages: [
+    { title: '자원과 메서드: CRUD 표', html: `<p><b>REST</b> 는 API 주소를 짓는 흔한 규칙이에요. <b>주소는 무엇(명사 · 복수)</b>, <b>메서드는 무엇을 할지(동사)</b>. 만들기 · 읽기 · 바꾸기 · 지우기(CRUD)가 모두 이 표 안에 들어가요.</p>
+<table class="kb"><tbody><tr><th>하고 싶은 일</th><th>메서드 · 주소</th><th>성공하면</th></tr><tr><td>목록</td><td><code>GET /todos</code> (조건은 쿼리 <code>?userId=1</code>)</td><td>200 + 배열</td></tr><tr><td>하나</td><td><code>GET /todos/5</code></td><td>200 + 객체 · 없으면 404</td></tr><tr><td>만들기</td><td><code>POST /todos</code> + 본문</td><td><b>201</b> + 만든 것(새 id)</td></tr><tr><td>통째로 바꾸기</td><td><code>PUT /todos/5</code> + 전체 본문</td><td>200</td></tr><tr><td>일부만 바꾸기</td><td><code>PATCH /todos/5</code> + 바꿀 칸만</td><td>200</td></tr><tr><td>지우기</td><td><code>DELETE /todos/5</code></td><td>200 또는 204</td></tr><tr><td>딸린 것</td><td><code>GET /users/1/todos</code></td><td>1번 사용자의 할 일</td></tr></tbody></table>
+<p>이 규칙을 알면 처음 보는 API 문서도 「아, 목록은 GET 이겠구나」 하고 금방 읽혀요.</p>` },
+    { title: 'jsonplaceholder 로 한 바퀴', html: `<p><b>jsonplaceholder</b> 는 연습용 가짜 REST API 예요. 만들고 · 바꾸고 · 지워도 <b>진짜로 저장되지는 않고</b> 그럴듯한 응답만 줘요 — 마음껏 연습해도 돼요.</p>
+<table class="kb"><tbody><tr><td><code>GET /todos?userId=1</code></td><td>200 · 할 일 20개</td></tr><tr><td><code>GET /todos/1</code></td><td>200 · <code>{"userId": 1, "id": 1, "title": "delectus aut autem", "completed": false}</code></td></tr><tr><td><code>POST /todos</code> <code>{"title": "장보기", "completed": false, "userId": 1}</code></td><td><b>201</b> · 보낸 것 + <code>"id": 201</code></td></tr><tr><td><code>PATCH /todos/1</code> <code>{"completed": true}</code></td><td>200 · 1번이 바뀐 모양</td></tr><tr><td><code>DELETE /todos/1</code></td><td>200 · <code>{}</code></td></tr><tr><td><code>GET /todos/9999</code></td><td><b>404</b> · <code>{}</code></td></tr></tbody></table>
+<p>만든 201번을 다시 <code>GET /todos/201</code> 하면 404 예요 — 가짜라서 저장이 안 됐으니까요. 진짜로 저장되는 API 는 챕터 3 에서 내가 만들어요.</p>${API_DATE}`,
+      example: { label: '예제 코드 — 인터넷이 필요해요', shell: 'import requests\n\nBASE = "https://jsonplaceholder.typicode.com"\nr = requests.post(f"{BASE}/todos", json={"title": "장보기", "completed": False, "userId": 1}, timeout=10)\nprint(r.status_code, r.json())\nr = requests.patch(f"{BASE}/todos/1", json={"completed": True}, timeout=10)\nprint(r.status_code, r.json()["completed"])\nr = requests.delete(f"{BASE}/todos/1", timeout=10)\nprint(r.status_code, r.json())\nr = requests.get(f"{BASE}/todos/9999", timeout=10)\nprint(r.status_code)' } },
+    { title: '나쁜 주소 · 멱등', html: `<table class="kb"><tbody><tr><th>❌ 주소에 동사</th><th>✅ REST</th></tr><tr><td><code>GET /getTodo?id=5</code></td><td><code>GET /todos/5</code></td></tr><tr><td><code>POST /createTodo</code></td><td><code>POST /todos</code></td></tr><tr><td><code>GET /deleteTodo/5</code></td><td><code>DELETE /todos/5</code> — GET 으로 지우면, 링크를 미리 읽는 프로그램이 지나가기만 해도 지워져요</td></tr></tbody></table>
+<p><b>멱등</b>(같은 요청을 두 번 보내도 결과가 한 번 보낸 것과 같음)은 「다시 보내도 되나」 를 정해요.</p>
+<table class="kb"><tbody><tr><td><code>GET</code> · <code>PUT</code> · <code>DELETE</code></td><td>멱등 — 두 번 해도 같은 상태(두 번째 DELETE 는 404 일 수 있지만 지워진 상태는 같음)</td></tr><tr><td><code>POST</code></td><td><b>멱등 아님</b> — 두 번 보내면 두 개 만들어져요(주문 두 번!)</td></tr><tr><td><code>PATCH</code></td><td>바꾸는 내용에 따라 — <code>{"completed": true}</code> 는 멱등, 「수량 +1」 은 아님</td></tr></tbody></table>
+<p>그래서 응답이 끊겼을 때 <b>GET 은 마음 놓고 다시</b>, POST 는 조심해서(레슨 8 의 재시도 규칙).</p>` },
+  ],
+  summary: ['주소는 명사(복수), 메서드는 동사', 'POST 201 · GET 200 · 없으면 404', 'GET · PUT · DELETE 는 멱등, POST 는 아님'] },
+{ id: 'H7', ch: 2, n: 7, title: '인증: API 키와 토큰', mode: 'text', tutorSummary: '인증 = 누가 · 얼마나 · 무엇을. 헤더 Authorization: Bearer 토큰(쿼리 ?api_key= 는 주소가 기록에 남아 위험). GitHub fine-grained token(만료일 · 필요한 권한만)으로 GET /user — 헤더 Accept: application/vnd.github+json · X-GitHub-Api-Version. 401 토큰이 없거나 틀림 · 403 권한 없음. 키는 코드 밖: 환경 변수(os.environ) · .env + python-dotenv + .gitignore. 올렸으면 바로 폐기하고 새로.',
+  pages: [
+    { title: '왜 신분증이 필요한가 · Bearer', html: `<p>공개 API 도 대부분 <b>누가 부르는지</b> 알고 싶어해요: 누구의 데이터를 보여 줄지, 얼마나 자주 불러도 되는지(한도), 무엇을 해도 되는지(권한). 그래서 요청마다 <b>신분증</b>을 붙여요.</p>
+<pre class="code">Authorization: Bearer ghp_xxxxxxxxxxxxxxxxxxxx</pre>
+<table class="kb"><tbody><tr><td><b>토큰</b> · <b>API 키</b></td><td>비밀번호 대신 쓰는 긴 글자. 사람 비밀번호와 달리 <b>권한 · 만료일</b>을 좁게 정할 수 있고 언제든 폐기</td></tr><tr><td><code>Authorization: Bearer 토큰</code></td><td>가장 흔한 모양(「이 토큰을 가진 사람이에요」)</td></tr><tr><td><code>?api_key=…</code> 쿼리</td><td>이렇게 받는 API 도 있지만, 주소는 서버 기록 · 브라우저 기록 · 화면 공유에 남아서 <b>더 위험</b>해요. 고를 수 있으면 헤더로</td></tr></tbody></table>
+<p>httpbin 의 <code>/bearer</code> 는 Bearer 헤더가 없으면 <b>401</b>, 있으면 200 과 <code>{"authenticated": true, "token": "…"}</code> 을 줘요.</p>${API_DATE}`,
+      example: { label: '예제 명령 — Git Bash', shell: 'curl -i https://httpbin.org/bearer\ncurl -i https://httpbin.org/bearer -H "Authorization: Bearer test123"' } },
+    { title: 'GitHub 토큰으로 GET /user', html: `<p>진짜 서비스의 API 로 해 봐요. GitHub 교과서에서 만든 계정으로 <b>fine-grained 토큰</b>을 만들어요(화면 자세히는 GitHub 교과서).</p>
+<div class="bk-step-box"><b>① 만들기</b><br>GitHub → 오른쪽 위 프로필 → <b>Settings</b> → 맨 아래 <b>Developer settings</b> → <b>Personal access tokens → Fine-grained tokens</b> → <b>Generate new token</b>.</div>
+<div class="bk-step-box"><b>② 좁게</b><br>이름 <code>api-study</code> · <b>Expiration</b> 30일 · <b>Repository access</b> 는 <b>Public repositories</b>(읽기만). 이 교과서는 이것으로 충분해요 → Generate → 토큰을 <b>한 번만</b> 보여 주니 바로 복사해 다음 쪽처럼 저장.</div>
+<table class="kb"><tbody><tr><td><code>GET https://api.github.com/user</code></td><td>토큰 주인의 정보(<code>login</code> · <code>public_repos</code> …)</td></tr><tr><td>헤더 <code>Accept: application/vnd.github+json</code> · <code>X-GitHub-Api-Version: 2022-11-28</code></td><td>GitHub 문서가 권하는 두 줄</td></tr><tr><td><b>401</b> <code>Bad credentials</code></td><td>토큰이 없거나 틀림 · 만료</td></tr><tr><td><b>403</b> <code>Resource not accessible by personal access token</code></td><td>토큰은 맞는데 그 일을 할 <b>권한</b>이 없음</td></tr></tbody></table>${API_DATE}`,
+      example: { label: '예제 코드 — 인터넷 + 토큰이 필요해요(다음 쪽처럼 환경 변수에 넣은 뒤)', shell: 'import os\nimport requests\n\ntoken = os.environ["GITHUB_TOKEN"]\nheaders = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}\nres = requests.get("https://api.github.com/user", headers=headers, timeout=10)\nprint(res.status_code)\nprint(res.json()["login"], res.json()["public_repos"])' } },
+    { title: '키는 코드 밖으로: 환경 변수 · .env', html: `<div class="bk-warn"><b>토큰을 코드에 직접 쓰지 마세요.</b> 그 파일을 GitHub 에 올리는 순간 공개돼요(공개 저장소는 몇 분 안에 자동으로 긁어 가는 프로그램이 있어요). 한 번이라도 올렸으면 <b>지우는 걸로는 부족</b>해요(commit 기록에 남음) — 그 토큰을 바로 <b>폐기(Delete)하고 새로 만들어요</b>(GitHub 교과서 레슨 16).</div>
+<table class="kb"><tbody><tr><td><b>환경 변수</b></td><td>그 터미널에서만 사는 이름표. PowerShell <code>$env:GITHUB_TOKEN="…"</code> · Git Bash <code>export GITHUB_TOKEN="…"</code> → 같은 터미널에서 <code>python app.py</code>. 파이썬은 <code>os.environ.get("GITHUB_TOKEN")</code></td></tr><tr><td><b><code>.env</code> 파일</b></td><td>프로젝트 폴더에 <code>GITHUB_TOKEN=…</code> 한 줄 → <code>python -m pip install python-dotenv</code> → 코드 맨 위 <code>from dotenv import load_dotenv; load_dotenv()</code></td></tr><tr><td><b><code>.gitignore</code></b></td><td><code>.env</code> 한 줄을 꼭 — Git 이 그 파일을 못 본 척해요. <code>git status</code> 에 <code>.env</code> 가 안 보이면 성공</td></tr></tbody></table>
+<p>토큰이 없을 때 프로그램은 에러 화면 대신 <b>무엇을 해야 하는지</b> 알려 주고 멈춰요. 화면 · 기록에 찍을 땐 앞 몇 글자만(<code>ghp_…</code>).</p>`,
+      example: { label: '예제 코드 — .env 를 쓰는 모양', shell: '# .env (같은 폴더, .gitignore 에 .env 를 꼭)\n# GITHUB_TOKEN=github_pat_xxxxxxxx\n\nimport os\nfrom dotenv import load_dotenv\n\nload_dotenv()\ntoken = os.environ.get("GITHUB_TOKEN")\nif not token:\n    raise SystemExit("GITHUB_TOKEN 이 없어요 — .env 에 넣었는지 확인하세요")\nprint("토큰:", token[:4] + "…")' } },
+  ],
+  summary: ['토큰은 Authorization: Bearer 헤더로', '401 누구세요 · 403 권한 없음', '키는 코드 밖(환경 변수 · .env + .gitignore)'] },
+{ id: 'H8', ch: 2, n: 8, title: '페이지 · 한도 · 재시도', mode: 'text', tutorSummary: '목록은 나눠서: per_page · page, GitHub 은 Link 헤더(rel="next") — requests 는 res.links["next"]["url"], 없을 때까지 반복. 한도: x-ratelimit-limit · remaining · reset(초 단위 시각), 넘으면 403/429 + Retry-After. 재시도는 5xx · 429 · 끊김만, 1→2→4초 늘리며 몇 번까지, 4xx 는 다시 해도 같아서 안 함, POST 는 멱등이 아니라 조심.',
+  pages: [
+    { title: '한 번에 다 안 줘요: 페이지', html: `<p>저장소가 300개여도 API 는 한 번에 <b>30개씩</b>(GitHub 기본) 줘요. 다음 묶음은 <code>?page=2</code>. 한 번에 받을 개수는 <code>per_page</code>(GitHub 최대 100).</p>
+<p>「다음 쪽이 있나」 는 응답 헤더 <b><code>Link</code></b> 가 알려 줘요.</p>
+<pre class="code">Link: &lt;https://api.github.com/user/repos?per_page=100&amp;page=2&gt;; rel="next",
+      &lt;https://api.github.com/user/repos?per_page=100&amp;page=3&gt;; rel="last"</pre>
+<p><code>requests</code> 는 이걸 <code>res.links</code> 로 풀어 줘요: <code>res.links["next"]["url"]</code>. 마지막 쪽에는 <code>"next"</code> 가 없어요 — 그때까지 반복.</p>
+<pre class="code">url = "https://api.github.com/user/repos?per_page=100"
+repos = []
+while url:
+    res = s.get(url, timeout=10)
+    res.raise_for_status()
+    repos += res.json()
+    url = res.links.get("next", {}).get("url")   # 없으면 None → 끝</pre>
+<p>API 마다 방식이 달라요: <code>page</code> 번호 · <code>Link</code> 헤더 · 본문의 <code>next</code> 주소 · <code>cursor</code>. 문서(레슨 9)에서 확인해요.</p>` },
+    { title: '한도: X-RateLimit · 429 · Retry-After', html: `<p>API 는 한 사람이 너무 자주 부르지 못하게 <b>한도</b>를 둬요. GitHub 는 토큰 없이 <b>시간당 60번</b>, 토큰이 있으면 <b>5000번</b>. 응답 헤더로 남은 횟수를 알려 줘요.</p>
+<table class="kb"><tbody><tr><td><code>x-ratelimit-limit</code></td><td>한 시간에 몇 번까지</td></tr><tr><td><code>x-ratelimit-remaining</code></td><td>남은 횟수</td></tr><tr><td><code>x-ratelimit-reset</code></td><td>다시 채워지는 시각(1970년부터 센 <b>초</b> — <code>time.time()</code> 과 같은 단위)</td></tr><tr><td><b>403 · 429</b> + <code>Retry-After: 60</code></td><td>다 썼어요 — 몇 초 뒤에 오라는 뜻</td></tr></tbody></table>
+<div class="bk-warn"><b>남의 서버를 두드리지 마세요.</b> 반복문으로 부를 땐 <code>remaining</code> 을 보고, 막혔으면 <b>기다려요</b>. 계속 두드리면 한동안 차단될 수 있어요. 연습할 땐 몇 번만, 사이에 <code>time.sleep(1)</code>.</div>
+<p><code>GET https://api.github.com/rate_limit</code> 은 한도를 쓰지 않고 지금 남은 횟수를 보여 줘요.</p>${API_DATE}`,
+      example: { label: '예제 명령 — Git Bash(토큰 없이)', shell: 'curl -s -i https://api.github.com/users/octocat | grep -i ratelimit\ncurl -s https://api.github.com/rate_limit' } },
+    { title: '재시도: 언제 · 얼마나', html: `<table class="kb"><tbody><tr><td><b>다시 해 볼 만함</b></td><td>5xx(500 · 502 · 503 · 504) · 429 · 연결 끊김 · 시간 초과 — 잠깐 뒤엔 될 수 있음</td></tr><tr><td><b>다시 해도 소용없음</b></td><td>400 · 401 · 403(권한) · 404 · 422 — 내 요청을 고쳐야 해요</td></tr><tr><td><b>얼마나 기다리나</b></td><td><code>Retry-After</code> 가 있으면 그만큼, 없으면 <b>1 → 2 → 4초</b>처럼 두 배씩(서버가 숨 돌릴 틈)</td></tr><tr><td><b>몇 번까지</b></td><td>3~5번에서 포기하고 알리기 — 끝없이 하지 않아요</td></tr><tr><td><b>POST 는 조심</b></td><td>멱등이 아니라(레슨 6), 응답만 끊기고 서버는 만들었을 수 있어요 — 다시 보내면 두 개</td></tr></tbody></table>
+<pre class="code">import time
+
+for attempt in range(1, 5):
+    try:
+        res = requests.get(url, timeout=10)
+    except requests.exceptions.RequestException:
+        res = None
+    if res is not None and res.status_code not in (429, 500, 502, 503, 504):
+        break                               # 성공이거나, 다시 해도 소용없는 4xx
+    time.sleep(2 ** (attempt - 1))          # 1, 2, 4, 8초</pre>
+<p>이 규칙은 챕터 4 의 내 SDK 안에 넣어서, SDK 를 쓰는 사람은 신경 쓰지 않게 해요.</p>` },
+  ],
+  summary: ['res.links["next"] 가 없을 때까지 모은다', '한도는 x-ratelimit-remaining · 막히면 Retry-After 만큼 기다림', '5xx · 429 · 끊김만 1→2→4초로 다시, 4xx 는 안 함'] },
+{ id: 'H9', ch: 2, n: 9, title: 'API 문서 읽는 법', mode: 'text', tutorSummary: '문서에서 찾을 여덟 칸: 기본 주소 · 인증 · 엔드포인트 · 파라미터(경로 · 쿼리 · 본문, 필수?) · 응답 예 · 에러 · 한도 · 버전. GitHub 「List repositories for a user」 = GET /users/{username}/repos, type · sort · direction · per_page(최대 100, 기본 30) · page. OpenAPI = 문서를 기계도 읽는 모양(paths · parameters · responses), Swagger UI 의 Try it out, FastAPI /docs.',
+  pages: [
+    { title: '문서에서 찾을 여덟 칸', html: `<table class="kb"><tbody><tr><td>① <b>기본 주소</b></td><td>모든 주소의 앞부분 — <code>https://api.github.com</code></td></tr><tr><td>② <b>인증</b></td><td>키가 필요한가 · 어디에(헤더 · 쿼리) · 어떤 권한</td></tr><tr><td>③ <b>엔드포인트</b></td><td>메서드 + 경로 — <code>GET /users/{username}/repos</code>(<code>{ }</code> 는 내가 채울 칸)</td></tr><tr><td>④ <b>파라미터</b></td><td>경로 · 쿼리 · 본문 — <b>필수(required)</b>인지 · 기본값 · 고를 수 있는 값</td></tr><tr><td>⑤ <b>응답 예</b></td><td>성공하면 어떤 모양이 오는지 — <b>여기부터 보면 빨라요</b></td></tr><tr><td>⑥ <b>에러</b></td><td>어떤 상태 코드가 왜 오는지</td></tr><tr><td>⑦ <b>한도</b></td><td>몇 번까지 · 페이지 크기</td></tr><tr><td>⑧ <b>버전</b></td><td><code>X-GitHub-Api-Version</code> · <code>/v1/</code> — 바뀌어도 내 코드가 안 깨지게</td></tr></tbody></table>
+<p>문서를 처음부터 다 읽지 않아요. 하고 싶은 일의 <b>엔드포인트 하나</b>를 찾고, 그 쪽에서 ④ ⑤ ⑥ 만 읽고, curl 로 한 번 불러 봐요.</p>` },
+    { title: 'GitHub 문서 한 쪽 같이 읽기', html: `<p>GitHub REST 문서(<code>docs.github.com/rest</code>)의 「Repositories → <b>List repositories for a user</b>」 쪽이에요.</p>
+<table class="kb"><tbody><tr><td>엔드포인트</td><td><code>GET /users/{username}/repos</code> — 그 사람의 <b>공개</b> 저장소(토큰 없이도 돼요)</td></tr><tr><td>경로 파라미터</td><td><code>username</code> (required)</td></tr><tr><td>쿼리 파라미터</td><td><code>type</code> = all · owner · member(기본 owner) · <code>sort</code> = created · updated · pushed · full_name(기본 full_name) · <code>direction</code> = asc · desc · <code>per_page</code>(기본 30, 최대 100) · <code>page</code>(기본 1)</td></tr><tr><td>응답</td><td><code>200</code> + 저장소 객체의 <b>배열</b>(<code>full_name</code> · <code>stargazers_count</code> · <code>language</code> · <code>pushed_at</code> …)</td></tr><tr><td>내 저장소 전부(비공개까지)</td><td>다른 쪽 「List repositories for the authenticated user」 = <code>GET /user/repos</code> + 토큰</td></tr></tbody></table>
+<p>그대로 옮기면 아래 한 줄이에요.</p>
+<pre class="code">GET https://api.github.com/users/octocat/repos?sort=updated&amp;per_page=5</pre>
+<p>문서의 오른쪽에는 curl · JavaScript · GitHub CLI 예제와 응답 예가 같이 있어요.</p>${API_DATE}`,
+      example: { label: '예제 명령 — Git Bash(토큰 없이)', shell: 'curl -s "https://api.github.com/users/octocat/repos?sort=updated&per_page=5" -H "Accept: application/vnd.github+json"' } },
+    { title: 'OpenAPI: 기계도 읽는 문서', html: `<p>사람이 읽는 문서 말고, <b>기계도 읽을 수 있게</b> API 를 적는 약속이 <b>OpenAPI</b> 예요(JSON · YAML 파일). 어느 주소에 어떤 메서드 · 파라미터 · 응답이 있는지가 정해진 모양으로 들어 있어요.</p>
+<pre class="code">paths:
+  /todos:
+    get:
+      summary: 할 일 목록
+      parameters:
+        - name: done
+          in: query
+          required: false
+    post:
+      summary: 할 일 만들기
+      responses:
+        "201": { description: 만들어짐 }</pre>
+<table class="kb"><tbody><tr><td><b>Swagger UI</b></td><td>OpenAPI 파일을 웹 화면 문서로 — 엔드포인트마다 <b>Try it out</b> 으로 그 자리에서 불러 볼 수 있어요</td></tr><tr><td>SDK 자동 생성</td><td>OpenAPI 파일로 여러 언어의 SDK 를 기계가 만들기도 해요(챕터 4)</td></tr><tr><td>GitHub</td><td>GitHub REST API 도 OpenAPI 파일을 공개해요</td></tr><tr><td><b>FastAPI</b></td><td>챕터 3 에서 내가 만든 서버는 <code>/docs</code> 에 이 화면이 <b>저절로</b> 생겨요</td></tr></tbody></table>` },
+  ],
+  summary: ['문서의 여덟 칸 — 엔드포인트 · 파라미터 · 응답 예부터', '{username} 같은 칸은 내가 채운다', 'OpenAPI 는 기계도 읽는 문서(Swagger UI · /docs)'] },
+{ id: 'HB2', ch: 2, boss: true, title: '보스: 내 GitHub 저장소 보고서', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 2 종합. 환경 변수의 토큰 + Session(헤더 세 줄) + GET /user/repos?per_page=100 을 Link 의 next 가 없을 때까지, 언어별 개수 · 별 많은 순 3개 · 최근 push 3개 · 남은 한도, 한도가 0 이면 reset 까지 몇 분 기다릴지. 보고서 만드는 부분은 저장소 목록을 인자로 받는 함수.' },
 // ================= 챕터 3 내가 API 만들기 =================
 { id: 'H10', ch: 3, n: 10, title: 'FastAPI 첫 서버', mode: 'text', draft: true, tutorSummary: '설치 fastapi[standard], @app.get, fastapi dev main.py, 브라우저 · curl · requests 로 부르기, /docs.', pages: TODO('첫 서버 · 요청 기록 · /docs'), summary: ['@app.get("/hello")', 'fastapi dev main.py', '/docs 에 문서가 저절로'] },
 { id: 'H11', ch: 3, n: 11, title: '입력 받기: 경로 · 쿼리 · 본문', mode: 'text', draft: true, tutorSummary: '경로 파라미터 /todos/{todo_id}: int, 쿼리 기본값, Pydantic BaseModel 본문, 422 응답 읽기.', pages: TODO('경로 · 쿼리 · Pydantic · 422'), summary: ['타입 힌트가 검사가 된다', '본문은 BaseModel', '틀리면 422'] },

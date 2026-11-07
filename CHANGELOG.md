@@ -7,6 +7,19 @@
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
 
+## v2.27.1 — 2026-11-07 (Opus: HTTP·API·SDK 교과서 챕터 2 — API 제대로 쓰기)
+
+- 📖 **HTTP·API·SDK 교과서 챕터 2 「API 제대로 쓰기」 완성**(레슨 12/21):
+  - 레슨 5 **requests 기본기** — `get(url, params=…, timeout=10)`(timeout 은 늘) · status_code · headers · json() · url, `raise_for_status()` 와 `requests.exceptions`(좁은 것부터 잡기), `post(json=)` vs `data=` · `Session`.
+  - 레슨 6 **REST** — 자원(명사) + 메서드(동사) CRUD 표, jsonplaceholder 로 한 바퀴(201 · 200 · 404 — 가짜라 저장은 안 됨), 나쁜 주소 · **멱등**(POST 를 다시 보내면 두 개).
+  - 레슨 7 **인증** — `Authorization: Bearer`(쿼리 키가 더 위험한 이유) · GitHub fine-grained 토큰(30일 · 읽기만)으로 `GET /user` · 401 vs 403 · 키는 코드 밖(환경 변수 · `.env` + python-dotenv + `.gitignore`, 올렸으면 폐기).
+  - 레슨 8 **페이지 · 한도 · 재시도** — `per_page` · `Link` 헤더와 `res.links["next"]`, `x-ratelimit-*` · 403/429 · `Retry-After` · 남의 서버를 두드리지 않기, 재시도는 5xx · 429 · 끊김만 1→2→4초 · POST 는 조심.
+  - 레슨 9 **API 문서 읽는 법** — 문서의 여덟 칸, GitHub 「List repositories for a user」 한 쪽 같이 읽기, OpenAPI · Swagger UI(챕터 3 의 `/docs` 예고).
+  - 만들어 보기 10문제 + **내 GitHub 저장소 보고서**(Session · 쪽 넘기기 · 한도 · 언어별 · 별 많은 순 · 최근 고친 것). 함수 문제 6개는 가짜 응답 · 가짜 쪽으로 출력 예(python3 로 실제 실행), 진짜 API 문제는 ☐.
+  - 「먼저 꼭」 챕터 2 위 · 레슨 7 · 보고서: API 키 · 토큰은 코드에 쓰지 않기.
+- 허브 카드 HTTP·API·SDK n/12.
+- 🛠 내부: regress HTTP·API·SDK 절 열린 12 · 준비 중 9 · 레슨 7 경고 · 폰 390 15쪽 추가.
+
 ## v2.27.0 — 2026-11-07 (Opus: 새 HTTP·API·SDK 교과서 — 챕터 1 HTTP 들여다보기)
 
 - 📖 **새 교과서 「HTTP·API·SDK」**(T12 · D15 「HTTP-API-SDK 는 서로 연결되니까 같이」 · 사용자 「ㄱ」, 설계 [`specs/http-api-course.md`](specs/http-api-course.md)) — HTTP(말) → API(약속) → SDK(감싼 라이브러리), 남의 API 부르기 → 내 API 만들기 → 내 SDK 만들기. 허브 「코스」 칸 웹 다음에 카드 🔌 HTTP·API·SDK(읽은 레슨 n/6).
