@@ -1,0 +1,1 @@
+{"id": "llm", "name": "LLM 기초", "icon": "🤖", "desc": "다음 글자 맞히기부터 어텐션까지 — numpy 로 아주 작은 언어 모델을 직접 만들어 보는 교과서", "runner": "python", "mapColor": "#8e24aa", "mascotGear": null}

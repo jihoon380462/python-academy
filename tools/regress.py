@@ -33,7 +33,7 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==12 and r['ready']==12, f"코스 카드 12개(코스 7 + 공용 5: 수학 공간·Vim·리눅스·운영체제·어셈블리어), 열린 것 12개 = 전부(v2.31.0 어셈블리어 교과서까지) (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==14 and r['ready']==14, f"코스 카드 14개(코스 7 + 공용 7: 수학 공간·Vim·리눅스·운영체제·어셈블리어·CS·LLM 기초), 열린 것 14개 = 전부(v2.32.0 까지) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and r['cont'].rstrip('/').endswith('courses/python'), '이어서 하기 링크(아직 본 레슨이 없으면 파이썬 교과서 목차, v2.19.0): '+str(r['cont']))
     check('이어서 하기' in (r['today'] or '') and r['stats']==0 and '오늘의 도전' not in (r['today'] or ''), '이어서 하기 상자(v2.17.1: 문제집 코스(수학)를 시작하기 전엔 「오늘 n/5 문제·복습」 줄 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
@@ -47,7 +47,7 @@ with sync_playwright() as p:
     print('[N13 v2.19.0 옛 화면 보관]'); n13=len(errors); MATH='file://'+os.path.join(ROOT,'courses/math/index.html')
     hubg=pg.evaluate("({lessons:typeof LESSONS, content:[...document.scripts].some(x=>/content\\.js/.test(x.src)), imgs:document.querySelectorAll('img').length})"); check(hubg['lessons']=='undefined' and not hubg['content'] and hubg['imgs']==0, '허브: 코스 콘텐츠·그림 없이 「읽은 레슨」 만 셈 (%s)' % hubg)
     OLDG=['Game','Grader','Sessions','Tutor','QuickKeys','Loader','Coach','TextEditor','Confetti','BADGES','Haptic','myMascot','Review','Onboarding']
-    for cid in ['python','algo','terminal-git','github','sql','web','vim','math','linux','os','asm','api']:
+    for cid in ['python','algo','terminal-git','github','sql','web','vim','math','linux','os','asm','cs','llm','api']:
         pg.goto('file://'+os.path.join(ROOT,'courses/%s/index.html?classic=1' % cid)); pg.wait_for_timeout(700)
         cr=pg.evaluate("(g)=>({book:document.documentElement.classList.contains('book-mode'), home:!!document.querySelector('.bk-home'), old:g.filter(n=>typeof window[n]!=='undefined' || (()=>{ try { return eval('typeof '+n)!=='undefined'; } catch(e){ return false; } })()), arch:[...document.scripts].map(x=>x.src).filter(x=>/game|tutor|fx\\.js|ui-editors|ui-views-(main|more|shell|sql|web)|badges|runners\\/(shell|sql|web)/.test(x)), imgs:document.querySelectorAll('img').length})", OLDG)
         check(cr['book'] and cr['home'] and not cr['old'] and not cr['arch'] and cr['imgs']==0, '%s: ?classic=1 을 붙여도 교과서 목차 · 옛 화면 코드(Game·Grader·Tutor…)·옛 스크립트·그림 없음 (%s)' % (cid, {k:v for k,v in cr.items() if k in ('old','arch','imgs')}))
@@ -87,7 +87,7 @@ with sync_playwright() as p:
     check(not bad, '수학 교과서 레슨 45개 첫 그림 전부 그려짐 · 폰 390 가로 넘침 없음 (%s)' % (bad or 'OK'))
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); check(pg.inner_text('.tb-title')=='수학 도감' and pg.locator('.bk-dex-e').count()>=80 and pg.evaluate("document.documentElement.scrollWidth")<=390, '수학 도감: 식과 코드 80개 이상 · 폰 가로 넘침 없음')
     merr=errors[m0:]; check(not merr, '수학 교과서 pageerror 0 (%s)' % (merr[:2] or 'OK'))
-    pg.goto(HUB); pg.wait_for_timeout(600); check(pg.locator('.hub-spaces .hc').count()==5 and '어셈블리어' in pg.locator('.hub-spaces').inner_text() and '수학 공간' in pg.locator('.hub-spaces').inner_text() and 'Vim 에디터' in pg.locator('.hub-spaces').inner_text() and '리눅스' in pg.locator('.hub-spaces').inner_text() and '운영체제' in pg.locator('.hub-spaces').inner_text(), '허브: 「공용」 구역에 수학 공간 + Vim 에디터 + 리눅스 + 운영체제 + 어셈블리어 카드')
+    pg.goto(HUB); pg.wait_for_timeout(600); check(pg.locator('.hub-spaces .hc').count()==7 and 'LLM 기초' in pg.locator('.hub-spaces').inner_text() and '어셈블리어' in pg.locator('.hub-spaces').inner_text() and '수학 공간' in pg.locator('.hub-spaces').inner_text() and 'Vim 에디터' in pg.locator('.hub-spaces').inner_text() and '리눅스' in pg.locator('.hub-spaces').inner_text() and '운영체제' in pg.locator('.hub-spaces').inner_text(), '허브: 「공용」 구역에 수학 공간 + Vim 에디터 + 리눅스 + 운영체제 + 어셈블리어 카드')
     check('공용' in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')") and '공간 ' not in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')"), 'v2.11.0 사용자 「공간을 공용으로 변경」: 허브 구역 이름 「공용」')
     check('코스 순서와 무관' not in pg.locator('.hub-spaces .hc').first.inner_text(), '허브 수학 카드 문구 중복 없음 (QA #12)')
     print('[모바일 390px]'); pg.set_viewport_size({'width':390,'height':800})
@@ -358,6 +358,34 @@ with sync_playwright() as p:
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); asc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/asm/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
     check('읽은 레슨' in asc and '/21' in asc and '어셈블리어' in asc, '허브 「공용」 칸에 어셈블리어 카드 · 읽은 레슨 n/21 (%s)' % asc[-60:])
     aerr=errors[a0:]; check(not aerr, '어셈블리어 교과서 pageerror 0 (%s)' % (aerr[:2] or 'OK'))
+    # ===== [CS 교과서 v2.32.0] — 설계 specs/cs-course.md (사용자 「1번진행」 11/7 · 레슨은 서브 에이전트가 동시에, Opus 검수)
+    print('[CS 교과서 v2.32.0]'); z0=len(errors); ZB='file://'+os.path.join(ROOT,'courses/cs/index.html')
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(ZB); pg.wait_for_timeout(900); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
+    zh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, chs:document.querySelectorAll('.bk-ch').length})")
+    check(zh['book'] and zh['steps']==1 and zh['ls']==23 and zh['soon']==0 and zh['chs']==6, 'CS 교과서 홈: 시작하기 1 · 열린 레슨 23 · 준비 중 0 · 챕터 6 (%s)' % zh)
+    pg.evaluate("UI.go('lesson',{lessonId:'C0',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()>=1 and '파이썬 교과서' in pg.inner_text('.bk-prereq'), 'C0 1쪽: 「먼저 꼭」 파이썬 교과서')
+    for bid in ['CB1','CB2','CB3','CB4']:
+        pg.evaluate("UI.go('lesson',{lessonId:'%s',page:0})" % bid); pg.wait_for_timeout(250); check(pg.locator('.bk-task').count()>=1 and pg.locator('.bk-ans').count()>=1 and pg.evaluate("document.querySelector('.bk-art h1').textContent").startswith('🛠 만들어 보기: '), 'CS %s: 만들어 보기 문제 + 예시 답' % bid)
+    pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','encode'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=1 and pg.inner_text('.tb-title')=='CS 도감', 'CS 도감: encode 검색')
+    pg.set_viewport_size({'width':390,'height':800}); zlp=[('SETUP',i) for i in range(1)]+[(l, p) for l, p in pg.evaluate("LESSONS.flatMap(l=>{ const n=(BOOK.lessonPages&&BOOK.lessonPages[l.id]||l.pages||[]).length; return Array.from({length:n+1},(_,i)=>[l.id,i]); })")]
+    for lp in zlp: pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp); pg.wait_for_timeout(120); check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'CS 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); zc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/cs/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    check('읽은 레슨' in zc and '/23' in zc, '허브 「공용」 칸에 CS 카드 · 읽은 레슨 n/23 (%s)' % zc[-60:])
+    zerr=errors[z0:]; check(not zerr, 'CS 교과서 pageerror 0 (%s)' % (zerr[:2] or 'OK'))
+    # ===== [LLM 기초 교과서 v2.32.0] — 설계 specs/llm-course.md (사용자 「1번진행」 11/7 · 레슨은 서브 에이전트가 동시에, Opus 검수)
+    print('[LLM 기초 교과서 v2.32.0]'); z0=len(errors); ZB='file://'+os.path.join(ROOT,'courses/llm/index.html')
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(ZB); pg.wait_for_timeout(900); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
+    zh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, chs:document.querySelectorAll('.bk-ch').length})")
+    check(zh['book'] and zh['steps']==2 and zh['ls']==20 and zh['soon']==0 and zh['chs']==5, 'LLM 기초 교과서 홈: 시작하기 2 · 열린 레슨 20 · 준비 중 0 · 챕터 5 (%s)' % zh)
+    pg.evaluate("UI.go('lesson',{lessonId:'N0',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()>=1 and '파이썬 교과서' in pg.inner_text('.bk-prereq'), 'N0 1쪽: 「먼저 꼭」 파이썬 교과서')
+    for bid in ['NB1','NB2','NB3','NB4']:
+        pg.evaluate("UI.go('lesson',{lessonId:'%s',page:0})" % bid); pg.wait_for_timeout(250); check(pg.locator('.bk-task').count()>=1 and pg.locator('.bk-ans').count()>=1 and pg.evaluate("document.querySelector('.bk-art h1').textContent").startswith('🛠 만들어 보기: '), 'LLM 기초 %s: 만들어 보기 문제 + 예시 답' % bid)
+    pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','softmax'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=1 and pg.inner_text('.tb-title')=='LLM 도감', 'LLM 도감: softmax 검색')
+    pg.set_viewport_size({'width':390,'height':800}); zlp=[('SETUP',i) for i in range(2)]+[(l, p) for l, p in pg.evaluate("LESSONS.flatMap(l=>{ const n=(BOOK.lessonPages&&BOOK.lessonPages[l.id]||l.pages||[]).length; return Array.from({length:n+1},(_,i)=>[l.id,i]); })")]
+    for lp in zlp: pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp); pg.wait_for_timeout(120); check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'LLM 기초 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); zc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/llm/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    check('읽은 레슨' in zc and '/20' in zc, '허브 「공용」 칸에 LLM 기초 카드 · 읽은 레슨 n/20 (%s)' % zc[-60:])
+    zerr=errors[z0:]; check(not zerr, 'LLM 기초 교과서 pageerror 0 (%s)' % (zerr[:2] or 'OK'))
     # ===== [HTTP·API·SDK 교과서 v2.27.0] D15 — curl · requests · F12 로 남의 API, 설계 specs/http-api-course.md (사용자 「ㄱ」 11/7)
     print('[HTTP·API·SDK 교과서 v2.27.0]'); h0=len(errors); APB='file://'+os.path.join(ROOT,'courses/api/index.html')
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(APB); pg.wait_for_timeout(900); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
