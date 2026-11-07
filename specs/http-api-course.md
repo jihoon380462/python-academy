@@ -121,7 +121,7 @@ HTTP  요청 줄 · 헤더 · 본문 / 상태 코드 · 헤더 · 본문  ← �
 
 1. ✅ **v2.27.0** `courses/api/` 뼈대(content.js · book.js · course.json · index.html) + 허브 카드 + `check_book` 의 `'api'` 검사 + regress 절 + **시작하기 + 챕터 1(H0~H4 · HB1)**. 응답 예는 httpbin 을 로컬로 띄워 실제로 받은 모양(작업 환경에서 공개 API 가 막혀 있었음). ✅ **v2.27.1 챕터 2(H5~H9 · HB2)**.
 2. ✅ 웹 교과서 챕터 6 바꾸기 — 사용자 「일단 웹만」 으로 웹 v2.26.0 에서 먼저 함(그래서 v2.26.0~v2.27.0 사이 HTTP 설명이 잠시 없었음).
-3. 챕터 3(H10~H12 · HB3) — CI 에 `fastapi` 설치 + `TestClient` 검사.
+3. ✅ **v2.28.0** 챕터 3(H10~H12 · HB3) — CI(ci.yml check_book 단계)에 `fastapi` · `httpx` 설치 + `TestClient` 검사.
 4. 챕터 4(H13~H16 · HB4) — SDK 검사(검사 때 서버 띄우기) · PyGithub 는 ☐(토큰 필요).
 5. 단계마다: 공식 문서(requests · FastAPI · GitHub REST · Open-Meteo)로 대조 · 폰 390/PC QA(`tools/qa_screens.py api`) · 문서(site-intent 코스 표 · TODO · CHANGELOG · HANDOFF).
 

@@ -255,10 +255,130 @@ for attempt in range(1, 5):
   summary: ['문서의 여덟 칸 — 엔드포인트 · 파라미터 · 응답 예부터', '{username} 같은 칸은 내가 채운다', 'OpenAPI 는 기계도 읽는 문서(Swagger UI · /docs)'] },
 { id: 'HB2', ch: 2, boss: true, title: '보스: 내 GitHub 저장소 보고서', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 2 종합. 환경 변수의 토큰 + Session(헤더 세 줄) + GET /user/repos?per_page=100 을 Link 의 next 가 없을 때까지, 언어별 개수 · 별 많은 순 3개 · 최근 push 3개 · 남은 한도, 한도가 0 이면 reset 까지 몇 분 기다릴지. 보고서 만드는 부분은 저장소 목록을 인자로 받는 함수.' },
 // ================= 챕터 3 내가 API 만들기 =================
-{ id: 'H10', ch: 3, n: 10, title: 'FastAPI 첫 서버', mode: 'text', draft: true, tutorSummary: '설치 fastapi[standard], @app.get, fastapi dev main.py, 브라우저 · curl · requests 로 부르기, /docs.', pages: TODO('첫 서버 · 요청 기록 · /docs'), summary: ['@app.get("/hello")', 'fastapi dev main.py', '/docs 에 문서가 저절로'] },
-{ id: 'H11', ch: 3, n: 11, title: '입력 받기: 경로 · 쿼리 · 본문', mode: 'text', draft: true, tutorSummary: '경로 파라미터 /todos/{todo_id}: int, 쿼리 기본값, Pydantic BaseModel 본문, 422 응답 읽기.', pages: TODO('경로 · 쿼리 · Pydantic · 422'), summary: ['타입 힌트가 검사가 된다', '본문은 BaseModel', '틀리면 422'] },
-{ id: 'H12', ch: 3, n: 12, title: '상태 코드와 저장', mode: 'text', draft: true, tutorSummary: 'status_code=201 · HTTPException(404) · 204, sqlite3 로 저장, CORSMiddleware.', pages: TODO('201 · 404 · 204 · SQLite · CORS'), summary: ['만들면 201, 없으면 404', 'SQLite 로 껐다 켜도 남게', 'CORS 는 서버가 허락'] },
-{ id: 'HB3', ch: 3, boss: true, title: '보스: 할 일 API', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '챕터 3 종합. CRUD + SQLite + 상태 코드 + 입력 검사 + CORS, 웹 교과서 할 일 앱을 이 API 로.' },
+{ id: 'H10', ch: 3, n: 10, title: 'FastAPI 첫 서버', mode: 'text', tutorSummary: '서버 = 요청을 기다렸다가 응답을 돌려주는 프로그램. python -m pip install "fastapi[standard]", app = FastAPI(), @app.get("/hello") 함수가 dict 를 돌려주면 JSON, fastapi dev main.py → http://127.0.0.1:8000(저장하면 다시 켜짐, Ctrl+C 로 끔). 터미널의 요청 기록 한 줄, 없는 주소 404 · 다른 메서드 405. /docs 는 OpenAPI 문서 화면(Try it out), TestClient 로 서버를 안 켜고 시험.',
+  pages: [
+    { title: '서버 = 기다렸다가 대답하는 프로그램', html: `<p>지금까지는 남의 서버에 <b>물었어요</b>. 이제 내가 <b>대답하는 쪽</b>이 돼요. 파이썬에서는 <b>FastAPI</b> 로 함수 하나가 API 하나가 돼요.</p>
+<div class="bk-step-box"><b>① 설치(한 번)</b><br>VS Code 터미널에서 <code>python -m pip install "fastapi[standard]"</code> — 큰따옴표까지 그대로(대괄호를 셸이 다르게 읽지 않게).</div>
+<div class="bk-step-box"><b>② main.py</b><br>아래 예제를 <code>api-study/main.py</code> 로 저장.</div>
+<div class="bk-step-box"><b>③ 켜기</b><br>같은 폴더에서 <code>fastapi dev main.py</code> → 「<code>http://127.0.0.1:8000</code>」 이 보이면 켜진 거예요. 브라우저로 <code>http://127.0.0.1:8000/hello</code> → <code>{"message":"안녕하세요"}</code>. 끄기는 터미널에서 <kbd>Ctrl</kbd>+<kbd>C</kbd>.</div>
+<table class="kb"><tbody><tr><td><code>app = FastAPI()</code></td><td>서버 하나</td></tr><tr><td><code>@app.get("/hello")</code></td><td>「<code>GET /hello</code> 요청이 오면 아래 함수를 불러」(파이썬 교과서의 데코레이터)</td></tr><tr><td><code>return {…}</code></td><td>딕셔너리 · 리스트를 돌려주면 FastAPI 가 <b>JSON</b> 으로 바꾸고 <code>Content-Type</code> 까지 붙여요</td></tr><tr><td><code>fastapi dev</code></td><td>개발용 — 파일을 저장하면 서버가 <b>저절로 다시 켜져요</b></td></tr></tbody></table>
+<div class="bk-warn"><b>내 서버는 내 PC 에서만.</b> <code>127.0.0.1</code> 은 「이 컴퓨터 자신」 이라 다른 기기는 못 들어와요(기본값). <code>--host 0.0.0.0</code> 으로 열면 같은 와이파이의 다른 기기도 들어와요 — 연습 중에는 쓰지 않아요.</div>`,
+      example: { label: '예제 — main.py 로 저장하고 fastapi dev main.py', shell: 'from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get("/hello")\ndef hello():\n    return {"message": "안녕하세요"}' } },
+    { title: '요청 기록 읽기 · curl · requests 로 부르기', html: `<p>서버를 켠 터미널에는 요청이 올 때마다 한 줄씩 찍혀요 — 내 서버의 Network 탭이에요.</p>
+<pre class="code">INFO:     127.0.0.1:52344 - "GET /hello HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52344 - "GET /hi HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52351 - "POST /hello HTTP/1.1" 405 Method Not Allowed</pre>
+<table class="kb"><tbody><tr><td>누가(주소 · 포트)</td><td>요청 줄</td><td>상태 코드</td></tr></tbody></table>
+<table class="kb"><tbody><tr><td>없는 주소</td><td><b>404</b> <code>{"detail": "Not Found"}</code></td></tr><tr><td>주소는 있는데 메서드가 다름</td><td><b>405</b> <code>{"detail": "Method Not Allowed"}</code></td></tr><tr><td>함수 안에서 에러</td><td><b>500</b> — 터미널에 파이썬 트레이스백이 찍혀요(원인은 거기서)</td></tr></tbody></table>
+<p>다른 터미널(서버 터미널은 켜 둔 채)에서 챕터 1·2 의 도구로 그대로 불러요: <code>curl -i http://127.0.0.1:8000/hello</code> · <code>requests.get("http://127.0.0.1:8000/hello", timeout=10)</code>. 이번엔 <b>양쪽 끝이 다 내 것</b>이라, 요청이 서버 기록에 찍히는 걸 동시에 볼 수 있어요.</p>`,
+      example: { label: '예제 명령 — 서버를 켠 채 다른 터미널에서', shell: 'curl -i http://127.0.0.1:8000/hello\ncurl -i http://127.0.0.1:8000/hi\ncurl -i -X POST http://127.0.0.1:8000/hello' } },
+    { title: '/docs 와 TestClient', html: `<p>서버를 켜고 <code>http://127.0.0.1:8000/docs</code> 를 열어 봐요. 내가 쓴 적 없는 <b>API 문서 화면</b>이 있어요 — 레슨 9 의 <b>OpenAPI</b> 를 FastAPI 가 함수들을 보고 저절로 만든 거예요(날것은 <code>/openapi.json</code>). 엔드포인트를 펴고 <b>Try it out → Execute</b> 를 누르면 그 자리에서 불러 보고 응답 · curl 명령까지 보여 줘요.</p>
+<p>서버를 켜지 않고 <b>코드로 시험</b>할 수도 있어요. <code>TestClient</code> 는 requests 와 똑같이 생겼지만, 네트워크 없이 내 <code>app</code> 을 바로 불러요. 이 교과서의 서버 문제는 이걸로 확인해요(<code>python -m pip install httpx</code> 가 필요한데 <code>fastapi[standard]</code> 에 들어 있어요).</p>
+<pre class="code">from fastapi.testclient import TestClient
+
+client = TestClient(app)
+res = client.get("/hello")
+print(res.status_code, res.json())</pre>`,
+      example: { code: 'from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\n\napp = FastAPI()\n\n\n@app.get("/hello")\ndef hello():\n    return {"message": "안녕하세요"}\n\n\nclient = TestClient(app)\nres = client.get("/hello")\nprint(res.status_code, res.json())\nprint(client.get("/hi").status_code, client.post("/hello").status_code)\nprint(list(client.get("/openapi.json").json()["paths"]))', label: '예제 코드 — 서버를 안 켜고 실행(fastapi 설치 뒤)' } },
+  ],
+  summary: ['@app.get("/hello") 함수가 dict 를 돌려주면 JSON', 'fastapi dev main.py → 127.0.0.1:8000 · Ctrl+C', '/docs 는 저절로 생긴 문서 · TestClient 로 서버 없이 시험'] },
+{ id: 'H11', ch: 3, n: 11, title: '입력 받기: 경로 · 쿼리 · 본문', mode: 'text', tutorSummary: '경로 파라미터 /todos/{todo_id} + 함수 인자 todo_id: int — 글자를 주면 422. 경로에 없는 인자는 쿼리(done: bool | None = None, limit: int = 10, true · 1 · yes 는 True). 본문은 Pydantic BaseModel(text: str = Field(min_length=1)), model_dump(). 빠진 칸 · 틀린 타입 · 규칙 위반은 FastAPI 가 알아서 422 + detail 목록(type · loc · msg · input).',
+  pages: [
+    { title: '경로 파라미터와 쿼리 파라미터', html: `<pre class="code">@app.get("/todos/{todo_id}")
+# 주소의 {todo_id} 칸 = 함수 인자, 타입은 int
+def get_todo(todo_id: int):
+    …
+
+@app.get("/todos")
+# 주소에 없는 인자 = 쿼리
+def list_todos(done: bool | None = None, limit: int = 10):
+    …</pre>
+<table class="kb"><tbody><tr><td><code>GET /todos/3</code></td><td><code>todo_id</code> 에 숫자 <b>3</b>(글자 <code>"3"</code> 이 아니라) — 타입 힌트대로 바꿔 줘요</td></tr><tr><td><code>GET /todos/abc</code></td><td><b>422</b> — 숫자가 아니라서 함수를 부르지도 않아요</td></tr><tr><td><code>GET /todos?done=true&amp;limit=3</code></td><td><code>done=True</code> · <code>limit=3</code>(<code>true</code> · <code>1</code> · <code>yes</code> 는 모두 True)</td></tr><tr><td><code>GET /todos</code></td><td>기본값 — <code>done=None</code> · <code>limit=10</code></td></tr></tbody></table>
+<p>타입 힌트가 곧 <b>검사</b>예요. 함수 안에서 「숫자인가?」 를 직접 확인할 필요가 없어요. <code>/docs</code> 에도 각 칸의 타입 · 기본값이 그대로 나와요.</p>`,
+      example: { code: 'from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\n\napp = FastAPI()\n\n\n@app.get("/todos/{todo_id}")\ndef get_todo(todo_id: int):\n    return {"todo_id": todo_id, "type": type(todo_id).__name__}\n\n\n@app.get("/todos")\ndef list_todos(done: bool | None = None, limit: int = 10):\n    return {"done": done, "limit": limit}\n\n\nclient = TestClient(app)\nprint(client.get("/todos/3").json())\nprint(client.get("/todos/abc").status_code)\nprint(client.get("/todos?done=true&limit=3").json())\nprint(client.get("/todos").json())', label: '예제 코드 — 서버를 안 켜고 실행' } },
+    { title: '본문: Pydantic 모델', html: `<p>POST · PUT · PATCH 의 <b>JSON 본문</b>은 모양을 <b>클래스</b>로 적어요(Pydantic — FastAPI 에 같이 깔려요).</p>
+<pre class="code">from pydantic import BaseModel, Field
+
+class TodoIn(BaseModel):
+    # 꼭 있어야 하고 1~100글자
+    text: str = Field(min_length=1, max_length=100)
+    # 없으면 False
+    done: bool = False
+
+@app.post("/todos", status_code=201)
+# 인자 타입이 모델이면 = 본문
+def create_todo(todo: TodoIn):
+    return {"id": 1, **todo.model_dump()}</pre>
+<table class="kb"><tbody><tr><td><code>todo.text</code> · <code>todo.done</code></td><td>검사를 통과한 값 — 함수 안에서는 늘 믿고 써요</td></tr><tr><td><code>todo.model_dump()</code></td><td>딕셔너리로</td></tr><tr><td><code>Field(min_length=…, max_length=…)</code> · <code>Field(ge=0, le=10)</code></td><td>글자 수 · 숫자 범위 규칙</td></tr></tbody></table>
+<p>본문이 빠졌거나 · <code>text</code> 가 없거나 · 빈 글자거나 · <code>done</code> 에 <code>"몰라"</code> 를 주면 함수는 불리지 않고 <b>422</b> 가 가요.</p>`,
+      example: { code: 'from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\nfrom pydantic import BaseModel, Field\n\napp = FastAPI()\n\n\nclass TodoIn(BaseModel):\n    text: str = Field(min_length=1, max_length=100)\n    done: bool = False\n\n\n@app.post("/todos", status_code=201)\ndef create_todo(todo: TodoIn):\n    return {"id": 1, **todo.model_dump()}\n\n\nclient = TestClient(app)\nres = client.post("/todos", json={"text": "장보기"})\nprint(res.status_code, res.json())\nprint(client.post("/todos", json={"text": ""}).status_code)\nprint(client.post("/todos", json={"done": "몰라"}).status_code)', label: '예제 코드 — 서버를 안 켜고 실행' } },
+    { title: '422 응답 읽기', html: `<p>FastAPI 의 422 는 <b>무엇이 · 어디서 · 왜</b> 틀렸는지 목록으로 알려 줘요.</p>
+<pre class="code">{"detail": [
+  {"type": "missing", "loc": ["body", "text"], "msg": "Field required", "input": {}},
+  {"type": "int_parsing", "loc": ["path", "todo_id"],
+   "msg": "Input should be a valid integer, unable to parse string as an integer", "input": "abc"}
+]}</pre>
+<table class="kb"><tbody><tr><td><code>loc</code></td><td><b>어디</b> — <code>["body", "text"]</code> 본문의 text 칸 · <code>["path", "todo_id"]</code> 경로 · <code>["query", "limit"]</code> 쿼리</td></tr><tr><td><code>type</code></td><td><b>무엇</b> — <code>missing</code> 빠짐 · <code>int_parsing</code> 숫자가 아님 · <code>string_too_short</code> 너무 짧음 · <code>bool_parsing</code></td></tr><tr><td><code>msg</code> · <code>input</code></td><td>사람이 읽을 설명 · 실제로 받은 값</td></tr></tbody></table>
+<p>API 를 <b>쓰는 쪽</b>(챕터 2 의 나, 챕터 4 의 SDK)은 이 목록을 읽어 「text 칸이 빠졌어요」 처럼 알려 주면 돼요. 이게 레슨 2 표의 「422 — 값이 규칙에 안 맞음」 의 실제 모습이에요.</p>`,
+      example: { code: 'from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\nfrom pydantic import BaseModel\n\napp = FastAPI()\n\n\nclass TodoIn(BaseModel):\n    text: str\n\n\n@app.post("/todos")\ndef create_todo(todo: TodoIn):\n    return todo\n\n\nclient = TestClient(app)\nfor err in client.post("/todos", json={}).json()["detail"]:\n    print(err["type"], "/".join(err["loc"]), "-", err["msg"])', label: '예제 코드 — 서버를 안 켜고 실행' } },
+  ],
+  summary: ['/todos/{todo_id} + todo_id: int — 타입 힌트가 검사', '경로에 없는 인자는 쿼리(기본값)', '본문은 BaseModel — 틀리면 422 + detail(loc · type · msg)'] },
+{ id: 'H12', ch: 3, n: 12, title: '상태 코드와 저장', mode: 'text', tutorSummary: '만들면 @app.post(…, status_code=201), 없으면 raise HTTPException(status_code=404, detail=…), 지우면 status_code=204 + Response(status_code=204). 메모리(리스트)는 서버를 끄면 사라짐 → sqlite3(파일 todos.db, CREATE TABLE IF NOT EXISTS, lastrowid, row_factory = sqlite3.Row, ? 자리표시). CORS: 웹 페이지(127.0.0.1:5500)에서 부르면 막힘 → CORSMiddleware(allow_origins=[그 주소]).',
+  pages: [
+    { title: '알맞은 상태 코드 돌려주기', html: `<pre class="code">from fastapi import HTTPException, Response
+
+# 만들었으면 201
+@app.post("/todos", status_code=201)
+def create_todo(todo: TodoIn): …
+
+@app.get("/todos/{todo_id}")
+def get_todo(todo_id: int):
+    if todo_id not in todos:
+        # 없으면 404
+        raise HTTPException(status_code=404, detail="할 일이 없어요")
+    return todos[todo_id]
+
+@app.delete("/todos/{todo_id}", status_code=204)
+def delete_todo(todo_id: int):
+    …
+    # 지웠으면 204(본문 없음)
+    return Response(status_code=204)</pre>
+<table class="kb"><tbody><tr><td><code>raise HTTPException(…)</code></td><td>함수를 바로 멈추고 그 상태 코드 + <code>{"detail": "할 일이 없어요"}</code> 를 보내요(파이썬 교과서의 raise 와 같음)</td></tr><tr><td>아무것도 안 정하면</td><td>200 — 만들었는데 200 이면 쓰는 쪽이 「만들어졌나?」 헷갈려요</td></tr><tr><td>지운 걸 또 지우면</td><td>404 — DELETE 는 멱등(지워진 상태는 같음)</td></tr></tbody></table>`,
+      example: { code: 'from fastapi import FastAPI, HTTPException, Response\nfrom fastapi.testclient import TestClient\n\napp = FastAPI()\ntodos = {1: {"id": 1, "text": "장보기", "done": False}}\n\n\n@app.get("/todos/{todo_id}")\ndef get_todo(todo_id: int):\n    if todo_id not in todos:\n        raise HTTPException(status_code=404, detail="할 일이 없어요")\n    return todos[todo_id]\n\n\n@app.delete("/todos/{todo_id}", status_code=204)\ndef delete_todo(todo_id: int):\n    if todos.pop(todo_id, None) is None:\n        raise HTTPException(status_code=404, detail="할 일이 없어요")\n    return Response(status_code=204)\n\n\nclient = TestClient(app)\nprint(client.get("/todos/1").status_code, client.get("/todos/9").json())\nprint(client.delete("/todos/1").status_code, client.delete("/todos/1").status_code)', label: '예제 코드 — 서버를 안 켜고 실행' } },
+    { title: 'SQLite 로 저장: 껐다 켜도 남게', html: `<p>딕셔너리 · 리스트에 넣으면 <b>서버를 끄는 순간 사라져요</b>(<code>fastapi dev</code> 는 저장할 때마다 다시 켜서 더 자주 사라져요). 파일로 저장하는 데이터베이스 <b>SQLite</b>(SQL 교과서)를 파이썬 <code>sqlite3</code> 로 써요 — 따로 설치할 것 없어요.</p>
+<pre class="code">import sqlite3
+
+def db():
+    # 파일 하나가 데이터베이스
+    con = sqlite3.connect("todos.db")
+    # 줄을 dict(row) 로 바꿀 수 있게
+    con.row_factory = sqlite3.Row
+    con.execute("CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY, text TEXT NOT NULL, done INTEGER NOT NULL DEFAULT 0)")
+    return con
+
+# 끝나면 저장(commit)
+with db() as con:
+    cur = con.execute("INSERT INTO todos (text) VALUES (?)", (todo.text,))
+    # 새로 생긴 id
+    new_id = cur.lastrowid</pre>
+<table class="kb"><tbody><tr><td><code>?</code> 자리표시</td><td>값은 늘 <code>?</code> 로 넘겨요 — f-string 으로 SQL 에 끼우면 사용자 글이 SQL 명령이 될 수 있어요(SQL 교과서 · SQL 주입)</td></tr><tr><td><code>done INTEGER</code></td><td>SQLite 에는 참거짓이 없어서 0 · 1 — 돌려줄 때 <code>bool(row["done"])</code></td></tr><tr><td><code>.gitignore</code> 에 <code>todos.db</code></td><td>데이터 파일은 보통 Git 에 안 올려요</td></tr></tbody></table>`,
+      example: { code: 'import sqlite3\n\nfrom fastapi import FastAPI\nfrom fastapi.testclient import TestClient\nfrom pydantic import BaseModel\n\n\ndef db():\n    con = sqlite3.connect("todos.db")\n    con.row_factory = sqlite3.Row\n    con.execute("CREATE TABLE IF NOT EXISTS todos (id INTEGER PRIMARY KEY, text TEXT NOT NULL, done INTEGER NOT NULL DEFAULT 0)")\n    return con\n\n\napp = FastAPI()\n\n\nclass TodoIn(BaseModel):\n    text: str\n\n\n@app.post("/todos", status_code=201)\ndef create_todo(todo: TodoIn):\n    with db() as con:\n        cur = con.execute("INSERT INTO todos (text) VALUES (?)", (todo.text,))\n    return {"id": cur.lastrowid, "text": todo.text, "done": False}\n\n\n@app.get("/todos")\ndef list_todos():\n    with db() as con:\n        rows = con.execute("SELECT * FROM todos ORDER BY id").fetchall()\n    return [{**dict(r), "done": bool(r["done"])} for r in rows]\n\n\nclient = TestClient(app)\nclient.post("/todos", json={"text": "장보기"})\nclient.post("/todos", json={"text": "운동"})\nprint(client.get("/todos").json())', label: '예제 코드 — 같은 폴더에 todos.db 가 생겨요' } },
+    { title: 'CORS 켜기: 내 웹 화면에서 부르기', html: `<p>웹 교과서로 만든 화면(Live Server <code>http://127.0.0.1:5500</code>)에서 내 API(<code>http://127.0.0.1:8000</code>)를 fetch 하면, 포트가 달라서 <b>다른 출처</b>예요. 레슨 4 의 그 CORS 에러가 Console 창에 떠요 — 이번엔 서버가 내 것이니 <b>직접 고쳐요</b>.</p>
+<pre class="code">from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    # 이 출처의 페이지만 허락
+    allow_origins=["http://127.0.0.1:5500"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)</pre>
+<table class="kb"><tbody><tr><td>허락한 출처에서 온 요청</td><td>응답에 <code>access-control-allow-origin: http://127.0.0.1:5500</code></td></tr><tr><td>다른 출처</td><td>그 헤더가 없음 → 브라우저가 막음(curl · 파이썬은 여전히 돼요)</td></tr><tr><td><code>allow_origins=["*"]</code></td><td>아무 페이지나 — 공개 API 라면 괜찮지만, 로그인이 있는 API 에는 쓰지 않아요</td></tr></tbody></table>
+<p>POST · PATCH 처럼 JSON 을 보내는 요청은 브라우저가 먼저 <code>OPTIONS</code>(「보내도 돼요?」) 요청을 하나 더 보내요 — 서버 기록에 <code>OPTIONS /todos 200</code> 이 보여도 정상이에요.</p>`,
+      example: { code: 'from fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom fastapi.testclient import TestClient\n\napp = FastAPI()\napp.add_middleware(CORSMiddleware, allow_origins=["http://127.0.0.1:5500"], allow_methods=["*"], allow_headers=["*"])\n\n\n@app.get("/hello")\ndef hello():\n    return {"message": "안녕하세요"}\n\n\nclient = TestClient(app)\nfor origin in ["http://127.0.0.1:5500", "http://evil.example"]:\n    res = client.get("/hello", headers={"Origin": origin})\n    print(origin, "→", res.headers.get("access-control-allow-origin"))', label: '예제 코드 — 서버를 안 켜고 실행' } },
+  ],
+  summary: ['만들면 201 · 없으면 HTTPException(404) · 지우면 204', 'sqlite3 로 파일에 — 값은 늘 ? 자리표시', 'CORSMiddleware 로 내 화면의 출처만 허락'] },
+{ id: 'HB3', ch: 3, boss: true, title: '보스: 할 일 API', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 3 종합. GET/POST /todos · GET/PATCH/DELETE /todos/{id} + SQLite + 201 · 404 · 204 · 422 + Pydantic(TodoIn · TodoPatch 의 None 칸) + CORS. 웹 교과서의 할 일 앱이 localStorage 대신 이 API 를 쓰게(같은 화면이 서버와 대화).' },
 // ================= 챕터 4 SDK =================
 { id: 'H13', ch: 4, n: 13, title: 'SDK 란: requests 코드 vs SDK 코드', mode: 'text', draft: true, tutorSummary: '같은 일을 requests 와 PyGithub 로 나란히, SDK 가 숨겨 준 것, SDK 의 모양, 공식 vs 커뮤니티.', pages: TODO('requests vs PyGithub · SDK 의 모양'), summary: ['SDK = 클라이언트 · 메서드 · 결과 객체 · 예외', 'SDK 가 주소 · 페이지 · 에러를 숨긴다', '없으면 HTTP 로'] },
 { id: 'H14', ch: 4, n: 14, title: '내 SDK 만들기 1: 클래스로 감싸기', mode: 'text', draft: true, tutorSummary: 'class TodoClient, Session, 메서드 하나 = 엔드포인트 하나, 내 예외(TodoNotFound · ValidationError · APIError).', pages: TODO('TodoClient · 메서드 · 내 예외'), summary: ['메서드 하나 = 엔드포인트 하나', '404 → TodoNotFound', '그 밖 → APIError'] },
