@@ -353,23 +353,422 @@ and 7    =                   111   → 7 (8 로 나눈 나머지)</pre>
   summary: ['and 고르기 · or 켜기 · xor 뒤집기 · xor rax, rax 는 0', 'shl ×2 · shr ÷2 · 음수는 sar', 'and rax, 1 홀짝 · xor al, 0x20 대소문자'] },
 { id: 'RB1', ch: 1, boss: true, title: '만들어 보기: 계산 결과 알림', mode: 'text',
   tutorSummary: '챕터 1 묶기 — calc.asm: 두 수(r8 · r9)의 합 · 차 · 곱을 r12 · r13 · r14 에, 제목은 write, 합은 종료 코드로. 갈래(점프)는 아직 없으니 메시지는 계산으로 고름: 같은 길이 메시지 두 줄을 나란히 두고, 100 - 합 을 shr 63 해서 0/1(넘었나), and 1 로 홀짝, 그 수 × 한 줄 길이를 주소에 더해 write. syscall 은 rcx · r11 을 망가뜨림.', pages: [], summary: [] },
-{ id: 'R5', ch: 2, n: 5, title: '비교와 점프: cmp · jmp · je · jl', mode: 'text', draft: true,
-  tutorSummary: '라벨과 jmp. cmp a, b 는 빼 보고 플래그(ZF SF CF OF)만 남김. je jne jl jle jg jge(부호 있음), jb ja(부호 없음). if/else 모양.',
-  pages: ASM_TODO('라벨과 jmp · cmp 와 플래그 · 조건 점프 표 · if/else 모양'), summary: ['cmp 는 빼 보고 플래그만', 'je · jne · jl · jg 로 갈래', '부호 없으면 jb · ja'] },
-{ id: 'R6', ch: 2, n: 6, title: '반복 만들기', mode: 'text', draft: true,
-  tutorSummary: '카운터 + dec + jnz, cmp + jl 로 while 모양. 1~n 합, 거듭제곱. loop(rcx) 은 있다는 것만. 끝 조건이 틀리면 안 끝남 → Ctrl+C.',
-  pages: ASM_TODO('카운터 반복 · while 모양 · 1~n 합 · loop 명령 · 끝나지 않는 반복'), summary: ['dec + jnz 로 n 번', 'cmp + jl 로 조건 반복', '안 끝나면 Ctrl+C'] },
-{ id: 'R7', ch: 2, n: 7, title: '메모리와 주소: [ ]', mode: 'text', draft: true,
-  tutorSummary: 'db dw dd dq · .bss 의 resb resq. mov rax, [num] 읽기 · mov [num], rax 쓰기 · byte qword 크기. lea rsi, [msg] 는 주소 자체. default rel.',
-  pages: ASM_TODO('db/dq · resb · [이름] 읽고 쓰기 · 크기 · lea · default rel'), summary: ['[이름] 은 그 주소의 값', 'lea 는 주소 자체', '크기는 byte · qword'] },
-{ id: 'R8', ch: 2, n: 8, title: '배열과 문자열', mode: 'text', draft: true,
-  tutorSummary: 'arr dq 3, 1, 4 와 [arr + rcx*8]. 합 · 최댓값. 문자열은 바이트 배열, 0 으로 끝남, 길이 세기, 한 글자씩 대문자로.',
-  pages: ASM_TODO('배열 주소 계산 · 합과 최댓값 · 0 으로 끝나는 문자열 · 글자 바꾸기'), summary: ['[arr + rcx*8] 로 칸', '문자열은 바이트 배열', '0 을 만날 때까지 세기'] },
-{ id: 'R9', ch: 2, n: 9, title: '입력 받기: read 시스템 콜', mode: 'text', draft: true,
-  tutorSummary: 'read(rax=0), rdi=0 stdin, 버퍼 resb 64, 돌려준 길이 rax. 받은 글자 되돌려 찍기. 글자 숫자 → 정수(빼기 문자 0, × 10), 정수 → 10진 글자(나눗셈 반복, 거꾸로).',
-  pages: ASM_TODO('read · 버퍼 · echo · 글자 → 정수 · 정수 → 10진 글자'), summary: ['read 는 rax=0, 받은 길이는 rax', "글자 - '0' 이 숫자", '정수는 10 으로 나눠 거꾸로 글자로'] },
-{ id: 'RB2', ch: 2, boss: true, title: '만들어 보기: 숫자를 출력하는 프로그램', mode: 'text', draft: true,
-  tutorSummary: '챕터 2 묶기 — 정수를 10진 글자로 바꿔 write, 한 줄 입력을 거꾸로 출력.', pages: [], summary: [] },
+{ id: 'R5', ch: 2, n: 5, title: '비교와 점프: cmp · jmp · je · jl', mode: 'text',
+  tutorSummary: '라벨(줄 맨 앞 이름:)과 jmp(무조건 건너뛰기). cmp a, b 는 a - b 를 해 보고 결과는 버리고 플래그(ZF SF CF OF)만 남김 — 바로 다음 조건 점프가 플래그를 봄. je jne jl jle jg jge(부호 있음), jb jbe ja jae(부호 없음), jz = je · jnz = jne. -1 은 부호 없게 보면 가장 큰 수. if/else 는 「반대 조건으로 else 로 점프 → if 쪽 → jmp 끝」. cmp 5, rax 는 에러, mov 는 플래그를 안 바꿈.',
+  terms: { '라벨': '코드의 한 자리에 붙인 이름(줄 맨 앞에 이름:). 점프할 곳이 돼요', '플래그': 'cmp · add · dec 같은 명령이 결과를 보고 남기는 1비트짜리 표시(ZF · SF · CF · OF). 조건 점프가 이걸 보고 갈지 말지 정해요' },
+  pages: [
+    { title: '라벨과 jmp: 무조건 건너뛰기', html: `<p>지금까지의 프로그램은 위에서 아래로 한 줄씩 실행됐어요. CPU 는 늘 「다음 줄」 을 실행해요. <code>jmp</code>(jump) 는 「다음 줄 말고 저기로 가」 예요.</p>
+<p>「저기」 는 [[라벨]]로 정해요. 줄 맨 앞(들여쓰기 없이)에 이름과 <code>:</code> 를 쓰면 그 자리에 이름이 붙어요. 늘 쓰던 <code>_start:</code> 도 라벨이에요. 이름은 영어 글자 · 숫자 · <code>_</code> 로, 숫자로 시작하면 안 돼요.</p>
+<pre class="code">    mov rdi, 1          ; 종료 코드 1
+    jmp done            ; done: 이 붙은 줄로 가요
+    mov rdi, 99         ; 건너뜀 — 실행되지 않아요
+done:
+    mov rax, 60         ; 여기부터 다시 한 줄씩</pre>
+<p>예제를 <code>jump.asm</code> 으로 저장해 빌드하고 <code>./jump; echo $?</code> 로 실행하면 종료 코드가 99 가 아니라 1 이에요. <code>mov rdi, 99</code> 를 건너뛰었으니까요.</p>
+<p>파이썬에는 이런 「아무 데로나 가기」 가 없어요. 대신 <code>if</code> · <code>while</code> · <code>for</code> 가 있죠. 어셈블리에는 그런 문장이 없어서, <b>점프로 if 와 반복을 직접 만들어요</b>. 이 레슨에서 if 를, [[레슨:R6]] 에서 반복을 만들어요.</p>`,
+      example: { echoExit: true, code: `section .text
+global _start
+_start:
+    mov rdi, 1          ; 종료 코드 1
+    jmp done            ; done 으로 바로 건너뛰어요
+    mov rdi, 99         ; 이 줄은 실행되지 않아요
+done:
+    mov rax, 60         ; exit
+    syscall` } },
+    { title: 'cmp 와 플래그 · je · jne', html: `<p><code>cmp a, b</code> 는 <b>a − b 를 계산해 보고, 결과는 버려요</b>. 대신 결과가 어땠는지를 [[플래그]]에 남겨요. 플래그는 CPU 안에 있는 1비트짜리 표시예요.</p>
+<table class="kb"><tbody><tr><td><b>ZF</b>(Zero)</td><td>결과가 0 이면 1 → a 와 b 가 같아요</td></tr><tr><td><b>SF</b>(Sign)</td><td>결과가 음수면 1</td></tr><tr><td><b>CF</b>(Carry)</td><td>부호 없는 수로 빼다가 「빌려 왔으면」 1 → 부호 없이 a &lt; b</td></tr><tr><td><b>OF</b>(Overflow)</td><td>부호 있는 수로 계산이 넘쳤으면 1</td></tr></tbody></table>
+<pre>cmp rax, 5        (rax = 5)
+  5 − 5 = 0   → 결과는 버리고 플래그만
+  ZF = 1        0 이 나왔어요 (같아요)
+  SF = 0        음수가 아니에요
+  CF = 0        빌려 오지 않았어요</pre>
+<p>바로 다음의 <b>조건 점프</b>가 플래그를 보고 갈지 말지 정해요. <code>je 라벨</code>(jump if equal)은 ZF = 1 이면, <code>jne</code>(not equal)는 ZF = 0 이면 점프해요. 점프하지 않으면 그냥 다음 줄로 가요.</p>
+<p>예제는 rax 가 5 일 때만 <code>mov rdi, 1</code> 까지 와요. 실행하면 종료 코드가 1 이에요. <code>mov rax, 5</code> 를 <code>mov rax, 6</code> 으로 바꾸면 <code>jne</code> 가 점프해서 0 이 나와요.</p>
+<ul><li><code>cmp</code> 의 앞쪽은 레지스터여야 해요(메모리도 되는데 [[레슨:R7]] 에서). <code>cmp 5, rax</code> 는 nasm 에러예요.</li><li><code>add</code> · <code>sub</code> · <code>dec</code> · <code>and</code> 같은 계산도 플래그를 바꿔요. 그래서 <code>and rax, 1</code>([[레슨:R4]] 의 홀짝) 바로 뒤에 <code>jz</code>(0 이면 점프 — <code>je</code> 와 같은 명령) · <code>jnz</code>(0 이 아니면) 를 쓸 수 있어요.</li><li><code>mov</code> 는 플래그를 안 바꿔요. 그래서 <code>cmp</code> 와 점프 사이에 <code>mov</code> 는 끼워도 돼요.</li></ul>`,
+      example: { echoExit: true, code: `section .text
+global _start
+_start:
+    mov rax, 5
+    mov rdi, 0          ; 기본은 0
+    cmp rax, 5          ; 5 - 5 = 0 → ZF = 1
+    jne done            ; 같지 않으면(ZF = 0) done 으로
+    mov rdi, 1          ; 같을 때만 여기까지 와요
+done:
+    mov rax, 60
+    syscall` } },
+    { title: '조건 점프 표: jl · jg · jb · ja', html: `<p><code>cmp a, b</code> 바로 다음에 쓰는 조건 점프예요. 「a 가 b 보다 어떤가」 로 읽어요.</p>
+<table class="kb"><tbody><tr><td><b>명령</b></td><td><b>점프하는 때</b></td><td><b>파이썬</b></td></tr><tr><td><code>je</code> · <code>jne</code></td><td>같다 · 다르다</td><td><code>==</code> · <code>!=</code></td></tr><tr><td><code>jl</code> · <code>jle</code></td><td>작다 · 작거나 같다 (less) — 부호 있음</td><td><code>&lt;</code> · <code>&lt;=</code></td></tr><tr><td><code>jg</code> · <code>jge</code></td><td>크다 · 크거나 같다 (greater) — 부호 있음</td><td><code>&gt;</code> · <code>&gt;=</code></td></tr><tr><td><code>jb</code> · <code>jbe</code></td><td>작다 · 작거나 같다 (below) — 부호 없음</td><td></td></tr><tr><td><code>ja</code> · <code>jae</code></td><td>크다 · 크거나 같다 (above) — 부호 없음</td><td></td></tr><tr><td><code>jz</code> · <code>jnz</code></td><td>결과가 0 · 0 아님 (<code>je</code> · <code>jne</code> 와 같은 명령)</td><td></td></tr></tbody></table>
+<p>왜 두 벌일까요? 64비트 안의 비트는 똑같아도 <b>보는 방법</b>이 둘이라서예요. −1 은 2의 보수로 <code>0xFFFFFFFFFFFFFFFF</code>([[레슨:R3]])예요. 부호 있게 보면 −1, 부호 없게 보면 <b>가장 큰 수</b>예요. <code>cmp</code> 는 똑같이 빼 보기만 하고, <b>어떤 점프를 고르느냐</b>로 「어떻게 볼지」 정해요.</p>
+<p>외우는 법: <b>less · greater 는 부호 있음</b>, <b>below · above 는 부호 없음</b>. 음수가 나올 수 있는 값이면 <code>jl</code> · <code>jg</code> 쪽을 써요.</p>
+<p>예제는 −1 과 1 을 비교해요. 실행하면 종료 코드가 1 이에요(<code>jl</code> 은 −1 &lt; 1 이라 점프). <code>jl</code> 을 <code>jb</code> 로 바꾸고 다시 실행하면 2 예요 — 부호 없이 보면 −1 이 1 보다 커서 점프하지 않아요.</p>`,
+      example: { echoExit: true, code: `section .text
+global _start
+_start:
+    mov rax, -1
+    mov rbx, 1
+    cmp rax, rbx        ; -1 과 1 을 비교
+    jl  less            ; 부호 있게: -1 < 1 → 점프
+    mov rdi, 2          ; 점프하지 않으면 2
+    jmp done
+less:
+    mov rdi, 1          ; 점프하면 1
+done:
+    mov rax, 60
+    syscall` } },
+    { title: 'if / else 모양 만들기', html: `<p>파이썬의 if / else 를 점프로 바꿔 볼게요.</p>
+<pre class="code">a = 17
+b = 42
+if a &gt; b:
+    print("a 가 커요")
+else:
+    print("b 가 커요")</pre>
+<p>어셈블리는 늘 이 모양이에요.</p>
+<pre>    cmp a, b
+    j(반대 조건) else_part   ; 조건이 거짓이면 else 로
+    … if 쪽 …
+    jmp end_if               ; else 를 건너뛰기
+else_part:
+    … else 쪽 …
+end_if:
+    … 이어서 …</pre>
+<ol><li><b>반대 조건</b>으로 점프해요. 「a &gt; b 면 if 쪽」 이니 그 반대 「a &lt;= b 면 else 로」 → <code>jle</code>. 조건이 맞으면 점프하지 않고 아래의 if 쪽으로 흘러가요.</li><li>if 쪽 끝의 <code>jmp</code> 를 잊지 마세요. 빼먹으면 if 쪽을 실행한 뒤 else 쪽까지 이어서 실행해요.</li><li>갈래가 셋(<code>elif</code>)이면 <code>cmp</code> 와 점프를 한 번 더 써요 — 「만들어 보기」 에서.</li></ol>
+<p>예제는 두 갈래 모두 「무엇을 찍을지」(<code>rsi</code> · <code>rdx</code>)만 정하고, <code>write</code> 는 <code>print:</code> 에서 한 번 불러요. 실행하면 <code>b 가 커요</code> 가 나와요. <code>mov rax, 17</code> 을 <code>mov rax, 50</code> 으로 바꾸면 <code>a 가 커요</code>.</p>`,
+      example: { code: `section .data
+msg_a   db "a 가 커요", 10
+len_a   equ $ - msg_a
+msg_b   db "b 가 커요", 10
+len_b   equ $ - msg_b
+
+section .text
+global _start
+_start:
+    mov rax, 17         ; a
+    mov rbx, 42         ; b
+    cmp rax, rbx
+    jle else_part       ; a > b 의 반대(a <= b)면 else 로
+    mov rsi, msg_a      ; if 쪽: "a 가 커요"
+    mov rdx, len_a
+    jmp print           ; else 쪽을 건너뛰어요
+else_part:
+    mov rsi, msg_b      ; else 쪽: "b 가 커요"
+    mov rdx, len_b
+print:
+    mov rax, 1          ; write
+    mov rdi, 1          ; stdout
+    syscall
+    mov rax, 60         ; exit
+    mov rdi, 0
+    syscall` } },
+  ],
+  summary: ['cmp a, b 는 a − b 를 해 보고 결과는 버리고 플래그(ZF · SF · CF · OF)만 남겨요 — 바로 다음 점프가 그걸 봐요', 'je · jne · jl · jle · jg · jge 는 부호 있음, jb · ja 는 부호 없음(−1 이 가장 큰 수)', 'if / else = 반대 조건으로 else 로 점프 → if 쪽 → jmp 로 끝으로'] },
+{ id: 'R6', ch: 2, n: 6, title: '반복 만들기', mode: 'text',
+  tutorSummary: '카운터 반복: mov rbx, n → 몸통 → dec rbx → jnz 위로(dec 가 ZF 를 바꿈). while 모양: 몸통 → inc/계산 → cmp → jl 위로(do-while), 0 번일 수 있으면 위에서 cmp + jge 끝. 1~n 합(add rdi, rcx · dec rcx · jnz), 거듭제곱(imul). loop 명령 = dec rcx + jnz(rcx 만, 잘 안 씀). syscall 은 rcx · r11 을 바꾸고 결과를 rax 에 넣음 → 반복 안에서 write 하면 카운터는 rbx, rax 는 매번 다시. 끝 조건이 틀리면 안 끝남 → Ctrl+C(종료 코드 130), timeout 3 ./prog.',
+  pages: [
+    { title: '카운터 반복: dec · jnz', html: `<p>파이썬의 <code>for _ in range(3):</code> 처럼 「n 번 하기」 는 <b>카운터</b>로 만들어요. 레지스터에 n 을 넣고, 한 번 돌 때마다 1 씩 줄이고, 0 이 아니면 위로 점프해요.</p>
+<pre>    mov rbx, 3      ; 카운터
+again:              ; ← 여기로 돌아와요
+    … 몸통 …
+    dec rbx         ; 1 줄이기 — 0 이 되면 ZF = 1
+    jnz again       ; 0 이 아니면(ZF = 0) 다시</pre>
+<p><code>dec</code> 도 계산이라 [[플래그]]를 바꿔요([[레슨:R5]]). 그래서 <code>cmp</code> 없이 바로 <code>jnz</code> 를 쓸 수 있어요. 따라가 보면:</p>
+<table class="kb"><tbody><tr><td>rbx = 3</td><td>몸통 → <code>dec</code> → 2 · ZF = 0 → 점프</td></tr><tr><td>rbx = 2</td><td>몸통 → <code>dec</code> → 1 · ZF = 0 → 점프</td></tr><tr><td>rbx = 1</td><td>몸통 → <code>dec</code> → 0 · ZF = 1 → 점프 안 함, 아래로</td></tr></tbody></table>
+<p>몸통이 정확히 3 번 돌아요. 실행하면 「야호」 가 세 줄 나와요.</p>
+<div class="bk-warn"><b><code>syscall</code> 은 <code>rcx</code> · <code>r11</code> 을 바꾸고 결과를 <code>rax</code> 에 넣어요</b> — 그래서 반복 안에서 <code>write</code> 를 부를 때는 카운터를 <code>rcx</code> 가 아닌 <code>rbx</code> 같은 레지스터에 두고, <code>mov rax, 1</code> 도 반복 <b>안에서</b> 매번 다시 넣어요(첫 <code>write</code> 가 끝나면 <code>rax</code> 는 쓴 바이트 수예요).</div>`,
+      example: { code: `section .data
+msg     db "야호", 10
+len     equ $ - msg
+
+section .text
+global _start
+_start:
+    mov rbx, 3          ; 카운터: 3 번
+again:
+    mov rax, 1          ; write (syscall 이 rax 를 바꾸니 매번 다시)
+    mov rdi, 1
+    mov rsi, msg
+    mov rdx, len
+    syscall
+    dec rbx             ; 3 → 2 → 1 → 0
+    jnz again           ; 0 이 아니면 again 으로
+    mov rax, 60
+    mov rdi, 0
+    syscall` } },
+    { title: 'while 모양: cmp · jl', html: `<p>몇 번 돌지 미리 모를 때는 <code>cmp</code> + 조건 점프로 「조건이 맞는 동안」 돌려요. 1 을 계속 두 배 해서 100 을 넘을 때까지 몇 번 걸리는지 세 볼게요.</p>
+<pre class="code">x = 1
+count = 0
+while True:
+    x = x * 2
+    count += 1
+    if not (x &lt; 100):
+        break</pre>
+<p>어셈블리에서는 몸통 <b>맨 아래</b>에서 검사하고, 조건이 맞으면 위로 점프해요. <code>cmp rax, 100</code> → <code>jl grow</code> 가 「rax &lt; 100 이면 또」 예요. 두 배는 <code>shl rax, 1</code>([[레슨:R4]]).</p>
+<p>실행하면 종료 코드가 7 이에요. 1 → 2 → 4 → 8 → 16 → 32 → 64 → 128, 일곱 번 만에 100 을 넘었어요.</p>
+<p>아래에서 검사하면 몸통이 <b>적어도 한 번</b>은 돌아요. 처음부터 조건이 거짓일 수도 있는 진짜 <code>while</code> 은 <b>위에서</b> 검사해요. 이때는 반대 조건으로 빠져나가요([[레슨:R5]] 의 if 와 같은 요령).</p>
+<pre>    mov rbx, 0
+check:
+    cmp rbx, 5
+    jge done        ; while rbx &lt; 5 의 반대(rbx &gt;= 5)면 끝
+    … 몸통 …
+    inc rbx
+    jmp check       ; 다시 검사하러
+done:</pre>`,
+      example: { echoExit: true, code: `section .text
+global _start
+_start:
+    mov rax, 1          ; 값
+    mov rdi, 0          ; 몇 번 두 배 했나
+grow:
+    shl rax, 1          ; rax × 2
+    inc rdi             ; 횟수 + 1
+    cmp rax, 100
+    jl  grow            ; 아직 100 보다 작으면 또
+    mov rax, 60         ; 종료 코드 = rdi
+    syscall` } },
+    { title: '1~n 합 · 거듭제곱', html: `<p>1 부터 10 까지 더하기예요. 카운터 <code>rcx</code> 를 10 에서 1 까지 줄이면서 그 값을 합에 더해요. 더하는 순서만 거꾸로(10 + 9 + … + 1)고 합은 같아요.</p>
+<pre class="code">total = 0
+for i in range(10, 0, -1):
+    total += i</pre>
+<p>실행하면 종료 코드가 55 예요. 이 반복 안에는 <code>syscall</code> 이 없어서 <code>rcx</code> 를 카운터로 써도 괜찮아요.</p>
+<p><b>거듭제곱</b>도 같은 모양이에요. 3⁴ 이면 「1 에 3 을 4 번 곱하기」.</p>
+<pre class="code">    mov rax, 1          ; 결과
+    mov rbx, 3          ; 밑
+    mov rcx, 4          ; 4 번
+power:
+    imul rax, rbx       ; rax = rax × 3
+    dec rcx
+    jnz power           ; rax = 81</pre>
+<div class="bk-warn"><b>종료 코드는 0~255 까지예요</b> — 1~23 의 합(276)부터는 256 으로 나눈 나머지만 보여요([[레슨:R1]]). 큰 결과를 10진 숫자로 찍는 법은 [[레슨:R9]] 에서 만들어요. 그 전까지는 「맞으면 메시지 찍기」([[레슨:R5]] 의 <code>cmp</code>)로 확인해요.</div>`,
+      example: { echoExit: true, code: `section .text
+global _start
+_start:
+    mov rcx, 10         ; n = 10 (10, 9, …, 1 을 더해요)
+    mov rdi, 0          ; 합
+sum:
+    add rdi, rcx        ; 합 += rcx
+    dec rcx
+    jnz sum             ; rcx 가 0 이 될 때까지
+    mov rax, 60         ; 종료 코드 = 합
+    syscall` } },
+    { title: 'loop 명령(rcx)과 syscall', html: `<p>「<code>dec rcx</code> + <code>jnz</code>」 를 한 명령으로 줄인 <code>loop 라벨</code> 도 있어요. <b><code>rcx</code> 만</b> 카운터로 쓸 수 있어요.</p>
+<pre>    mov rcx, 5
+again:
+    … 몸통 …
+    loop again      ; rcx − 1, 0 이 아니면 again 으로</pre>
+<p>실행하면 5 + 4 + 3 + 2 + 1 이라 종료 코드가 15 예요.</p>
+<p>있다는 것만 알아 두세요. 요즘 CPU 에서는 <code>dec</code> + <code>jnz</code> 가 더 빨라서 컴파일러(gcc)는 <code>loop</code> 를 거의 안 써요. 이 교과서도 앞으로 <code>dec</code> + <code>jnz</code> · <code>cmp</code> + 점프를 써요.</p>
+<p>그리고 <code>loop</code> 몸통에 <code>syscall</code> 을 넣으면 안 끝나요. <code>syscall</code> 이 돌아올 때 이 레지스터들을 바꾸거든요.</p>
+<table class="kb"><tbody><tr><td><code>rax</code></td><td>결과(<code>write</code> 면 쓴 바이트 수)</td></tr><tr><td><code>rcx</code></td><td><code>syscall</code> 명령이 「돌아올 주소」 를 적어 두는 데 써서 망가져요</td></tr><tr><td><code>r11</code></td><td>플래그를 맡겨 두는 데 써서 망가져요</td></tr><tr><td>나머지</td><td>그대로(<code>rbx</code> · <code>rdi</code> · <code>rsi</code> · <code>rdx</code> · <code>r12</code> …)</td></tr></tbody></table>
+<p><code>rcx</code> 가 0 이 될 일이 없으니 반복이 끝나지 않아요. 그래서 출력하는 반복의 카운터는 <code>rbx</code> 에 두어요.</p>`,
+      example: { echoExit: true, code: `section .text
+global _start
+_start:
+    mov rcx, 5          ; loop 는 rcx 를 카운터로 써요
+    mov rdi, 0
+again:
+    add rdi, rcx        ; 5 + 4 + 3 + 2 + 1
+    loop again          ; rcx - 1, 0 이 아니면 again 으로
+    mov rax, 60         ; 종료 코드 = 15
+    syscall` } },
+    { title: '끝나지 않는 반복 → Ctrl+C', html: `<p>끝 조건이 틀리면 반복이 영원히 돌아요. 화면이 멈춘 것처럼 보이거나, 같은 글자가 끝없이 쏟아져요.</p>
+<div class="bk-warn"><b>끝나지 않는 프로그램은 VM 이 망가진 게 아니에요</b> — 그 터미널에서 <kbd>Ctrl</kbd>+<kbd>C</kbd> 를 누르면 그 프로그램만 멈춰요. 그다음 <code>echo $?</code> 는 130(Ctrl+C 로 멈춤)이에요. VM 도, 다른 터미널도 멀쩡해요. [[레슨:R2]] 의 <code>Segmentation fault</code> 처럼 이것도 그 프로그램 하나의 문제예요.</div>
+<p>자주 하는 실수 세 가지예요.</p>
+<pre>; ① 카운터를 줄이는 걸 빼먹음 — rbx 는 영원히 3
+    mov rbx, 3
+again:
+    … 몸통 …
+    cmp rbx, 0
+    jne again           ; dec rbx 가 없어요
+
+; ② 카운터를 넣는 줄이 라벨 아래 — 돌 때마다 다시 3
+again:
+    mov rbx, 3
+    … 몸통 …
+    dec rbx
+    jnz again
+
+; ③ 몸통에 syscall 이 있는데 카운터가 rcx — syscall 이 rcx 를 바꿔요
+    mov rcx, 3
+again:
+    … write …
+    syscall
+    dec rcx
+    jnz again</pre>
+<p>처음 돌려 보는 반복은 <code>timeout 3 ./prog</code> 로 실행해도 좋아요. 3초가 지나도 안 끝나면 알아서 멈추고, <code>echo $?</code> 가 124 예요.</p>`,
+      example: { label: '예제 명령 — 우분투 터미널에서(끝나지 않는 forever.asm)', shell: 'nasm -f elf64 forever.asm -o forever.o\nld forever.o -o forever\n./forever\n# 안 끝나면 Ctrl+C\necho $?\ntimeout 3 ./forever\necho $?' } },
+  ],
+  summary: ['n 번 반복 = mov rbx, n → 몸통 → dec rbx → jnz 위로 (dec 가 ZF 를 바꿔요)', 'while 모양 = cmp + jl 로 위로(아래에서 검사), 0 번일 수 있으면 위에서 cmp + jge 로 빠져나가기', 'syscall 은 rcx · r11 · rax 를 바꿔요 — 안 끝나면 Ctrl+C'] },
+{ id: 'R7', ch: 2, n: 7, title: '메모리와 주소: [ ]', mode: 'text',
+  tutorSummary: 'section .data 의 db(1) dw(2) dd(4) dq(8) 바이트, .bss 의 resb resq(처음엔 0). 이름 = 주소, [이름] = 그 주소의 값: mov rax, [num] 읽기 · mov [num], rax 쓰기, 메모리 → 메모리는 안 됨. 크기를 모르면 operation size not specified → byte · word · dword · qword. lea rsi, [msg] = 주소 자체(메모리를 안 읽음). default rel = [이름] 을 rip(다음 명령 주소) 기준 거리로 — 어디에 올려도 맞고 gcc(PIE)에서도 링크됨. 이제부터 맨 위 default rel + lea rsi, [msg].',
+  terms: { '주소': '메모리의 바이트마다 붙은 번호. 라벨 이름(msg · num)은 그 자리의 주소예요', 'rip': '「다음에 실행할 명령의 주소」 를 가진 특별한 레지스터. 점프는 사실 rip 를 바꾸는 일이에요' },
+  pages: [
+    { title: '자리 만들기: db · dq · resb · resq', html: `<p>레지스터는 16개뿐이라 값을 오래 · 많이 두려면 <b>메모리</b>를 써요. 메모리는 바이트가 한 줄로 늘어선 긴 띠이고, 바이트마다 번호([[주소]])가 있어요. <code>section .data</code> 에 이름을 붙여 자리를 만들어요. [[레슨:R2]] 의 <code>msg db "…"</code> 도 그거였어요.</p>
+<table class="kb"><tbody><tr><td><code>db</code></td><td>1바이트씩 (byte) — 글자 · 작은 수</td><td><code>small db 7</code> · <code>name db "kim", 10</code></td></tr><tr><td><code>dw</code></td><td>2바이트 (word)</td><td><code>mid dw 300</code></td></tr><tr><td><code>dd</code></td><td>4바이트 (double word)</td><td><code>big dd 70000</code></td></tr><tr><td><code>dq</code></td><td>8바이트 (quad word) — 64비트 레지스터 하나만큼</td><td><code>age dq 30</code></td></tr></tbody></table>
+<p>처음 값이 필요 없는 자리는 <code>section .bss</code> 에 크기만 잡아요. <code>buf resb 16</code> 은 「16바이트」, <code>count resq 1</code> 은 「8바이트짜리 하나」 예요. 실행하면 전부 0 으로 시작하고, 실행 파일에는 크기만 적혀서 파일이 커지지 않아요.</p>
+<pre>주소 0x402000 →
+ small  mid     big            age
+ [07]   [2C 01] [70 11 01 00]  [1E 00 00 00 00 00 00 00]  [6B 69 6D 0A] …
+  7      300     70000          30                         k  i  m  \\n</pre>
+<p>여러 바이트짜리 수는 <b>작은 쪽 바이트가 앞</b>에 놓여요(300 = 0x012C → <code>2C 01</code>, 리틀 엔디언). <code>gdb</code> 로 메모리를 들여다볼 때([[레슨:R16]]) 다시 봐요. 이 자리들이 프로세스 메모리 지도의 「데이터」 칸이에요 — <a href="../os/#lesson/K10" target="_blank" rel="noopener">운영체제 교과서 「가상 메모리」 ↗</a>.</p>
+<p>예제 맨 위의 <code>default rel</code> 은 5쪽에서 설명해요. 우선 따라 쓰세요. 실행하면 <code>age</code> 자리의 값을 읽어서 종료 코드가 30 이에요. 읽는 법은 다음 쪽에서.</p>`,
+      example: { echoExit: true, code: `default rel                 ; 주소를 rip 기준으로 (5쪽)
+
+section .data
+small   db 7                ; 1바이트
+mid     dw 300              ; 2바이트
+big     dd 70000            ; 4바이트
+age     dq 30               ; 8바이트
+name    db "kim", 10        ; 1바이트씩 4개
+
+section .bss
+buf     resb 16             ; 16바이트 자리 (처음엔 0)
+count   resq 1              ; 8바이트 하나
+
+section .text
+global _start
+_start:
+    mov rdi, [age]          ; age 자리의 값 30 (다음 쪽)
+    mov rax, 60
+    syscall` } },
+    { title: '읽기 · 쓰기: mov rax, [num]', html: `<p>어셈블리에서 <b>이름은 주소</b>예요. <code>x</code> 는 「0x402000 번지」 같은 숫자일 뿐이에요. 그 주소에 <b>들어 있는 값</b>을 말하려면 대괄호를 씌워요.</p>
+<table class="kb"><tbody><tr><td><code>mov rax, [x]</code></td><td>읽기 — x 번지에서 8바이트를 읽어 rax 에</td></tr><tr><td><code>mov [y], rax</code></td><td>쓰기 — rax 의 8바이트를 y 번지에</td></tr><tr><td><code>add rax, [x]</code></td><td>계산에도 바로 써요 — rax += (x 번지의 값)</td></tr><tr><td><code>add [y], rax</code></td><td>메모리 쪽에 더하기도 돼요 — (y 번지의 값) += rax</td></tr></tbody></table>
+<p>파이썬의 <code>y = x + 5</code> 는 이렇게 돼요: 읽기 → 계산 → 쓰기.</p>
+<pre>        메모리                        레지스터
+x  → [ 10 ] ── mov rax, [x] ──→  rax = 10
+                                  add rax, 5   → rax = 15
+y  → [ 15 ] ←── mov [y], rax ──</pre>
+<p>실행하면 종료 코드가 15 예요.</p>
+<div class="bk-warn"><b>메모리 → 메모리는 한 번에 안 돼요</b> — <code>mov [y], [x]</code> 는 nasm 에러(invalid combination of opcode and operands)예요. 한 명령에 <code>[ ]</code> 는 하나만. 레지스터를 거쳐서 두 줄로 옮겨요.</div>`,
+      example: { echoExit: true, code: `default rel
+
+section .data
+x       dq 10
+
+section .bss
+y       resq 1
+
+section .text
+global _start
+_start:
+    mov rax, [x]            ; 읽기: rax = 10
+    add rax, 5              ; rax = 15
+    mov [y], rax            ; 쓰기: y 자리에 15
+    mov rdi, [y]            ; 다시 읽어서 종료 코드로
+    mov rax, 60
+    syscall` } },
+    { title: '크기 정하기: byte · qword', html: `<p><code>[ ]</code> 는 「어디서부터」 만 알려 줘요. <b>몇 바이트</b>를 읽고 쓸지는 다른 쪽(레지스터)의 크기로 정해져요.</p>
+<table class="kb"><tbody><tr><td><code>mov rax, [n]</code></td><td>rax 가 8바이트라 8바이트</td></tr><tr><td><code>mov al, [n]</code></td><td>al 이 1바이트라 1바이트([[레슨:R1]] 의 작은 이름)</td></tr><tr><td><code>mov [n], 5</code></td><td>5 는 크기가 없어서 nasm 이 몰라요 → <code>error: operation size not specified</code></td></tr></tbody></table>
+<p>숫자를 메모리에 바로 넣을 때는 크기를 붙여요.</p>
+<table class="kb"><tbody><tr><td><code>byte</code></td><td>1바이트</td><td><code>mov byte [letter], 'A'</code></td></tr><tr><td><code>word</code></td><td>2바이트</td><td><code>mov word [w], 300</code></td></tr><tr><td><code>dword</code></td><td>4바이트</td><td><code>mov dword [d], 70000</code></td></tr><tr><td><code>qword</code></td><td>8바이트</td><td><code>mov qword [total], 7</code></td></tr></tbody></table>
+<p><code>db</code> 로 만든 1바이트 자리를 <code>rax</code> 로 읽으면 뒤에 붙은 이웃 7바이트까지 딸려 와요. <b>만든 크기대로</b> 읽고 쓰세요. <code>[nums + 2]</code> 는 「nums 에서 2바이트 뒤」 예요(배열은 [[레슨:R8]] 에서).</p>
+<p>예제는 1바이트 30 을 <code>al</code> 로 읽어(<code>rax</code> 를 먼저 0 으로) 8바이트 자리 total(7)에 더해요. 실행하면 종료 코드가 37 이에요.</p>`,
+      example: { echoExit: true, code: `default rel
+
+section .data
+nums    db 10, 20, 30       ; 1바이트씩 3개
+
+section .bss
+total   resq 1              ; 8바이트
+
+section .text
+global _start
+_start:
+    mov qword [total], 7    ; 크기를 말해야 해요: 8바이트에 7
+    mov rax, 0
+    mov al, [nums + 2]      ; al 이 1바이트라 1바이트만: 30
+    add [total], rax        ; rax 가 8바이트라 8바이트로: 37
+    add byte [nums], 1      ; nums 첫 칸 10 → 11 (1바이트)
+    mov rdi, [total]
+    mov rax, 60
+    syscall` } },
+    { title: 'lea rsi, [msg]: 주소 자체', html: `<p><code>write</code> 에는 글자가 <b>어디 있는지</b>(주소)를 줘야 해요. 값이 아니라요. 그럴 때 쓰는 게 <code>lea</code>(load effective address)예요. <code>[ ]</code> 안의 주소를 <b>계산만 하고 메모리는 읽지 않아요</b>.</p>
+<pre>           주소          메모리
+msg  →  0x402000  :  [h] [e] [l] [l] [o] [\\n]
+
+mov al, [msg]    → al  = 'h'         그 주소에 있는 값
+lea rsi, [msg]   → rsi = 0x402000    주소 그 자체</pre>
+<p>[[레슨:R2]] 에서는 <code>mov rsi, msg</code> 로 주소를 넣었어요. 이제부터는 <code>lea rsi, [msg]</code> 로 써요. 왜 바꾸는지는 다음 쪽에서.</p>
+<p>예제는 먼저 <code>mov byte [msg], 'J'</code> 로 첫 바이트를 바꾸고(<b>값</b>을 고침), <code>lea rsi, [msg]</code> 로 <b>주소</b>를 넘겨 찍어요. 실행하면 <code>Jello</code> 가 나와요. <code>section .data</code> 는 실행 중에 고칠 수 있는 자리라서 돼요.</p>`,
+      example: { code: `default rel
+
+section .data
+msg     db "hello", 10
+len     equ $ - msg
+
+section .text
+global _start
+_start:
+    mov byte [msg], 'J'     ; 값 바꾸기: 첫 바이트 'h' → 'J'
+    mov rax, 1              ; write
+    mov rdi, 1
+    lea rsi, [msg]          ; 주소 자체를 rsi 에
+    mov rdx, len
+    syscall
+    mov rax, 60
+    mov rdi, 0
+    syscall` } },
+    { title: 'default rel: rip 기준 주소', html: `<p>CPU 에는 「다음에 실행할 명령의 주소」 를 가진 [[rip]] 라는 레지스터가 있어요. 맨 위의 <code>default rel</code> 은 nasm 에게 「<code>[msg]</code> 를 <b>rip 에서 얼마나 떨어졌나</b>로 적어 줘」 라는 뜻이에요. 그러면 프로그램이 메모리의 어느 주소에 올라가도 거리는 같으니 늘 맞아요.</p>
+<p>없으면 nasm 은 <code>0x402000</code> 같은 주소를 명령 안에 통째로 박아요. <code>ld</code> 로 만든 작은 프로그램은 그래도 돌지만, 실행할 때마다 주소가 바뀌는 프로그램(gcc 의 기본, PIE)에서는 링크부터 실패해요(<code>relocation R_X86_64_32S … can not be used when making a PIE object</code>).</p>
+<pre>objdump -d -M intel prog   (빌드한 실행 파일 읽기)
+  48 b8 00 20 40 00 00 00 00 00   movabs rax,0x402000       ← mov rax, msg
+  48 8d 1d ef 0f 00 00            lea    rbx,[rip+0xfef]   ← lea rbx, [msg]</pre>
+<p>실행 파일을 읽는 <code>objdump</code> 는 [[레슨:R15]] 에서 배워요. 두 줄 모두 결국 같은 주소예요. 예제가 그걸 <code>cmp</code> 로 확인해요 — 실행하면 <code>같은 주소</code> 가 나와요.</p>
+<div class="bk-step-box"><b>이제부터의 약속</b><br>파일 맨 위에 <code>default rel</code> 한 줄, 주소는 <code>lea rsi, [msg]</code>, 값은 <code>mov rax, [num]</code>. 다음 레슨부터 늘 이 모양이에요.</div>`,
+      example: { code: `default rel                 ; 이 파일의 [이름] 은 rip 기준
+
+section .data
+msg     db "같은 주소", 10
+len     equ $ - msg
+
+section .text
+global _start
+_start:
+    mov rax, msg            ; 레슨 2 방식: 주소를 숫자로 통째로
+    lea rbx, [msg]          ; 새 방식: rip 에서의 거리로 계산
+    cmp rax, rbx
+    jne done                ; 다르면 아무것도 안 찍고 끝
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [msg]
+    mov rdx, len
+    syscall
+done:
+    mov rax, 60
+    mov rdi, 0
+    syscall` } },
+  ],
+  summary: ['db 1 · dw 2 · dd 4 · dq 8 바이트(.data), resb · resq 는 크기만(.bss, 처음엔 0)', '이름 = 주소, [이름] = 그 주소의 값 — 숫자를 넣을 땐 byte · qword 로 크기를', 'lea rsi, [msg] 는 주소 자체 · 맨 위에 default rel(rip 기준)'] },
+{ id: 'R8', ch: 2, n: 8, title: '배열과 문자열', mode: 'text',
+  tutorSummary: "배열 arr dq 3, 1, 4 — 칸 i 는 시작 주소 + i×8. lea rbx, [arr] 후 [rbx + rcx*8](크기 1·2·4·8). 칸 수 n equ ($ - arr) / 8. 합은 add rdi, [rbx + rcx*8] 반복, 최댓값은 0번 칸에서 시작해 cmp + jle 로 건너뛰기. 문자열은 1바이트 배열 [rbx + rcx], 끝에 0(널 문자) — cmp byte [rbx + rcx], 0 까지 세면 길이. mov al, [rbx + rcx] 로 읽고 'a'~'z' 면 sub al, 32 해서 mov [rbx + rcx], al. syscall 은 rcx · r11 을 바꿈. [arr + rcx*8] 은 ld 에선 되지만 PIE 에선 링크 에러라 lea 먼저.",
+  terms: { "배열": "같은 크기의 값을 메모리에 빈틈없이 이어 둔 것. i 번 칸은 시작 주소 + i × 크기", "널 문자": "값이 0 인 바이트. 문자열의 끝 표시로 써서, 0 을 만날 때까지 세면 길이가 된다" },
+  pages: [
+    { title: "배열 dq 3, 1, 4 · [rbx + rcx*8]", html: `<p>파이썬 리스트 <code>[3, 1, 4, 1, 5]</code> 를 어셈블리로 만들면 <code>dq</code> 로 8바이트 값을 <b>빈틈없이 이어</b> 두는 거예요. 같은 크기의 칸이 줄지어 있는 이 모양이 [[배열]]이에요. 이름 <code>arr</code> 은 [[레슨:R7]] 에서처럼 <b>맨 앞 칸의 주소</b>예요.</p>\n<pre class="code">arr dq 3, 1, 4, 1, 5\n\n주소     arr+0   arr+8   arr+16  arr+24  arr+32\n값         3       1       4       1       5\n칸 번호    0       1       2       3       4</pre>\n<p>칸 번호 <code>i</code> 의 자리는 <b>시작 주소 + i × 8</b> 이에요. 이 계산을 대괄호 안에 그대로 써요.</p>\n<pre class="code">lea rbx, [arr]          ; rbx = 시작 주소\nmov rcx, 2              ; 2번 칸\nmov rax, [rbx + rcx*8]  ; 시작 + 16 바이트 자리 → rax = 4</pre>\n<table class="kb"><tbody><tr><td><code>[기준 + 번호*크기 + 수]</code></td><td>대괄호 안에서 CPU 가 주소를 계산해요. 기준 · 번호는 레지스터, 크기는 <b>1 · 2 · 4 · 8</b> 중 하나, 수는 고정된 숫자</td></tr><tr><td><code>[rbx + rcx*8]</code></td><td><code>dq</code>(8바이트) 배열의 rcx 번 칸</td></tr><tr><td><code>[rbx + 8]</code></td><td>1번 칸(번호가 정해져 있으면 숫자로)</td></tr><tr><td><code>[rbx + rcx]</code></td><td><code>db</code>(1바이트) 배열 — 문자열(3쪽)</td></tr></tbody></table>\n<p>칸 수는 nasm 이 세게 해요. <code>n equ ($ - arr) / 8</code> — [[레슨:R2]] 의 <code>$ - msg</code> 는 바이트 수라서 8 로 나누면 칸 수예요. 예제는 2번 칸(4)에 칸 수(5)를 더해 종료 코드로 보여 줘요. 실행하면 <code>9</code>.</p>\n<div class="bk-warn"><b>크기를 빼먹으면 엉뚱한 값</b> — <code>dq</code> 배열에서 <code>[rbx + rcx]</code> 라고 쓰면 1바이트씩만 옮겨 가서, 칸과 칸 사이의 바이트가 섞인 값을 읽어요. 에러도 안 나요. <code>dq</code> 면 <code>*8</code>, <code>dd</code> 면 <code>*4</code>.</div>\n<p class="muted small"><code>[arr + rcx*8]</code> 처럼 이름에 바로 번호를 붙여도 <code>ld</code> 로 만드는 이 교과서의 프로그램에서는 돌아가요. 다만 <code>default rel</code> 의 rip 기준 주소에는 번호 레지스터를 붙일 수 없어서, nasm 이 그 줄만 옛날식 절대 주소로 바꿔요. 그런 코드는 gcc 의 기본 빌드(PIE)에서 링크 에러가 나요. 그래서 이 교과서는 <code>lea</code> 로 시작 주소를 먼저 레지스터에 넣어요.</p>`,
+      example: { code: `default rel\nsection .data\narr dq 3, 1, 4, 1, 5\nn   equ ($ - arr) / 8       ; 칸 수 = 바이트 수 ÷ 8 = 5\n\nsection .text\nglobal _start\n_start:\n    lea rbx, [arr]          ; rbx = 배열이 시작하는 주소\n    mov rcx, 2              ; 2번 칸(0번부터 셈)\n    mov rdi, [rbx + rcx*8]  ; 시작 + 2×8 바이트 자리의 값 = 4\n    add rdi, n              ; 4 + 칸 수 5\n    mov rax, 60\n    syscall`, echoExit: true } },
+    { title: "합과 최댓값: 칸을 하나씩 돌기", html: `<p>배열 전체를 다루려면 [[레슨:R6]] 의 반복으로 칸 번호 <code>rcx</code> 를 0, 1, 2 … 로 올려요. <b>합</b>은 칸 값을 하나씩 더하면 돼요. <code>add</code> 는 메모리의 값을 바로 더할 수 있어요.</p>\n<pre class="code">    lea rbx, [arr]\n    mov rdi, 0              ; 합\n    mov rcx, 0              ; 칸 번호\n.loop:\n    cmp rcx, n\n    jge .done               ; 칸 번호가 n 이 되면 끝\n    add rdi, [rbx + rcx*8]  ; 합 += arr[rcx]\n    inc rcx\n    jmp .loop\n.done:</pre>\n<p><b>최댓값</b>은 파이썬으로 이렇게 찾죠.</p>\n<pre class="code">best = arr[0]\nfor i in range(1, n):\n    if arr[i] &gt; best:\n        best = arr[i]</pre>\n<p>예제가 같은 모양이에요. <code>rdi</code> 가 <code>best</code>, <code>rcx</code> 가 <code>i</code> 예요. 「더 크지 않으면(<code>jle</code>) 바꾸는 줄을 건너뛴다」 로 if 를 만들어요([[레슨:R5]]). 실행하면 <code>41</code>.</p>\n<ul><li>처음 값은 <b>0 이 아니라 0번 칸</b>으로 둬요. 0 으로 시작하면 값이 전부 음수인 배열에서 답이 0 이 돼요</li><li>값에 음수가 있을 수 있으니 부호 있는 비교 <code>jle</code> · <code>jg</code> 를 써요(<code>jbe</code> · <code>ja</code> 는 부호 없음)</li></ul>`,
+      example: { code: `default rel\nsection .data\narr dq 27, 8, 41, 15, 33\nn   equ ($ - arr) / 8\n\nsection .text\nglobal _start\n_start:\n    lea rbx, [arr]\n    mov rdi, [rbx]          ; 지금까지 가장 큰 값 = 0번 칸\n    mov rcx, 1              ; 1번 칸부터 비교\n.loop:\n    cmp rcx, n\n    jge .done               ; 칸을 다 봤으면 끝\n    mov rax, [rbx + rcx*8]\n    cmp rax, rdi\n    jle .skip               ; 더 크지 않으면 건너뜀\n    mov rdi, rax            ; 더 크면 바꿔 둠\n.skip:\n    inc rcx\n    jmp .loop\n.done:\n    mov rax, 60             ; rdi = 가장 큰 값\n    syscall`, echoExit: true } },
+    { title: "문자열 db \"…\", 0 · 0 바이트까지 세기", html: `<p>문자열은 <b>1바이트 칸의 배열</b>이에요. 영어 · 숫자 · 기호는 한 글자가 1바이트(아스키 번호)라서 칸 번호에 <code>*1</code> 이 붙고, 그래서 생략해 <code>[rbx + rcx]</code> 로 써요.</p>\n<pre class="code">msg db "Hello, asm!", 10, 0\n\n칸 번호   0   1    2    3    4   …   10  11  12\n글자      H   e    l    l    o   …   !   줄  끝\n바이트    72  101  108  108  111 …   33  10  0</pre>\n<p>길이를 아는 방법은 두 가지예요.</p>\n<table class="kb"><tbody><tr><td><code>len equ $ - msg</code></td><td>nasm 이 <b>빌드할 때</b> 세요([[레슨:R2]]). 코드에 적힌 글자에만 쓸 수 있어요</td></tr><tr><td>끝에 <code>0</code> 바이트</td><td>프로그램이 <b>실행 중에</b> 0 을 만날 때까지 세요. 입력처럼 밖에서 온 글자, C 의 문자열([[레슨:R13]] · [[레슨:R14]])이 이 방식이에요</td></tr></tbody></table>\n<p>끝 표시로 쓰는 값 0 의 바이트를 [[널 문자]]라고 해요. 세는 반복은 이래요. 대괄호만 있고 레지스터가 없어 크기를 모르니 <code>byte</code> 를 붙여요([[레슨:R7]]).</p>\n<pre class="code">    mov rcx, 0\n.count:\n    cmp byte [rbx + rcx], 0 ; 이 칸이 0 이면 끝\n    je .done\n    inc rcx\n    jmp .count\n.done:                      ; rcx = 길이(0 은 안 셈)</pre>\n<p>예제는 센 길이만큼 <code>write</code> 하고 그 길이를 종료 코드로 돌려줘요. 실행하면 <code>Hello, asm!</code> 다음 줄에 <code>12</code>(줄바꿈까지 12바이트).</p>\n<div class="bk-warn"><b><code>syscall</code> 은 <code>rcx</code> 와 <code>r11</code> 을 바꿔요</b> — 커널에 다녀오면서 두 레지스터를 덮어써요. 그래서 예제는 길이를 <code>syscall</code> 전에 <code>r12</code> 로 옮겨 둬요. 반복 중에 <code>syscall</code> 을 부르면 카운터도 <code>rcx</code> 말고 <code>rbx</code> · <code>r12</code> 같은 데 두세요.</div>`,
+      example: { code: `default rel\nsection .data\nmsg db "Hello, asm!", 10, 0     ; 끝에 0 바이트 하나\n\nsection .text\nglobal _start\n_start:\n    lea rbx, [msg]\n    mov rcx, 0              ; 글자 수\n.count:\n    cmp byte [rbx + rcx], 0 ; 0 바이트면 끝\n    je .done\n    inc rcx\n    jmp .count\n.done:\n    mov r12, rcx            ; 길이를 따로 둠(syscall 이 rcx 를 바꿔요)\n    mov rax, 1              ; write(1, msg, 길이)\n    mov rdi, 1\n    mov rsi, rbx\n    mov rdx, r12\n    syscall\n    mov rax, 60\n    mov rdi, r12            ; 종료 코드 = 길이\n    syscall`, echoExit: true } },
+    { title: "한 글자씩 바꾸기: mov al · 'a' ~ 'z'", html: `<p>글자 하나는 1바이트라서 <code>rax</code> 의 맨 아래 1바이트 이름 <code>al</code>([[레슨:R1]])로 읽고 써요.</p>\n<pre class="code">mov al, [rbx + rcx]     ; 읽기 — al 이 1바이트라 크기를 알아요\nmov [rbx + rcx], al     ; 제자리에 쓰기</pre>\n<p>nasm 에서 <code>'a'</code> 는 그 글자의 번호(97)예요. 소문자는 <code>'a'</code>~<code>'z'</code> 사이에 있으니 「<code>'a'</code> 보다 작거나 <code>'z'</code> 보다 크면 건너뛴다」 로 골라요. 글자 번호는 부호가 없는 수라 <code>jb</code> · <code>ja</code> 를 써요.</p>\n<table class="kb"><tbody><tr><td><code>'A'</code> 65 ~ <code>'Z'</code> 90</td><td><code>'a'</code> 97 ~ <code>'z'</code> 122</td></tr><tr><td colspan="2">소문자 − 32 = 대문자. 32 는 <code>0x20</code>, 비트 하나라서 [[레슨:R4]] 의 <code>xor al, 0x20</code> 은 대 ↔ 소를 뒤집어요</td></tr></tbody></table>\n<p>예제는 0 바이트를 만날 때까지 한 글자씩 보고, 소문자만 <code>sub al, 32</code> 로 바꿔 제자리에 써요. 끝나면 <code>rcx</code> 가 곧 길이라서 그대로 <code>write</code> 해요. 실행하면 <code>HELLO, ASM 2026!</code>.</p>\n<ul><li><code>section .data</code> 의 글자는 실행 중에 바꿔 쓸 수 있어요. <code>section .text</code>(코드)는 못 써요 — 쓰면 Segmentation fault</li><li>한글은 UTF-8 로 한 글자가 3바이트이고 바이트 번호가 128 이상이라 <code>'z'</code> 보다 커서 그대로 남아요</li></ul>`,
+      example: { code: `default rel\nsection .data\nmsg db "Hello, asm 2026!", 10, 0\n\nsection .text\nglobal _start\n_start:\n    lea rbx, [msg]\n    mov rcx, 0\n.next:\n    mov al, [rbx + rcx]     ; 한 글자(1바이트) 읽기\n    cmp al, 0\n    je .print               ; 0 이면 끝\n    cmp al, 'a'\n    jb .keep                ; 'a' 보다 작으면 그대로\n    cmp al, 'z'\n    ja .keep                ; 'z' 보다 크면 그대로\n    sub al, 32              ; 소문자 → 대문자('a' 97 → 'A' 65)\n    mov [rbx + rcx], al     ; 바꾼 글자를 제자리에 쓰기\n.keep:\n    inc rcx\n    jmp .next\n.print:\n    mov rax, 1\n    mov rdi, 1\n    mov rsi, rbx\n    mov rdx, rcx            ; 센 길이만큼\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall` } },
+  ],
+  summary: ["배열은 같은 크기 칸을 이어 둔 것 — lea rbx, [arr] 하고 i 번 칸은 [rbx + rcx*8](dq) · [rbx + rcx](db)", "합 · 최댓값은 rcx 로 칸을 하나씩 돌며 add · cmp(최댓값은 0번 칸에서 시작)", "문자열은 바이트 배열 — 0 바이트까지 세면 길이, mov al 로 읽어 바꾸고 제자리에 쓰기"] },
+{ id: 'R9', ch: 2, n: 9, title: '입력 받기: read 시스템 콜', mode: 'text',
+  tutorSummary: "read: rax=0, rdi=0(표준 입력), rsi=버퍼(section .bss 의 buf resb 64, lea rsi, [buf]), rdx=최대 바이트 → rax 에 받은 수(줄바꿈 포함, 0 이면 입력 끝 Ctrl+D). echo 는 mov rdx, rax 를 mov rax, 1 보다 먼저. 끝 줄바꿈 빼기 cmp byte [rbx + rax - 1], 10. 글자 → 정수: movzx rdx, byte [rbx + rcx], '0'~'9' 사이인지 jb/ja, sub rdx, '0', imul rax, 10, add rax, rdx. 정수 → 글자: sub rsp, 32 버퍼, 끝에 줄바꿈, xor edx, edx · div rcx(10) 의 나머지 + '0' 을 dec rsi 하며 뒤에서부터, test rax, rax · jnz. 음수는 test/jns · neg 하고 끝에 '-'. 이 덩어리(rdi 입력, rax rcx rdx rsi rdi r8 r11 바뀜)가 레슨 11 에서 print_int 함수가 됨.",
+  terms: { "버퍼": "읽거나 쓸 바이트를 잠깐 담아 두는 메모리 칸. read 는 받은 글자를 여기에 넣는다", "표준 입력": "번호 0 의 입력 통로(stdin). 보통 키보드, 파이프나 < 로 바꿀 수 있다" },
+  pages: [
+    { title: "read 시스템 콜 · 버퍼 resb 64", html: `<p>[[레슨:R2]] 의 <code>write</code> 가 「여기 있는 바이트를 1번(화면)에 써 줘」 였다면, <code>read</code> 는 반대로 「0번에서 바이트를 받아 여기에 담아 줘」 예요. 0번은 [[표준 입력]], 보통 키보드예요(<a href="../os/#lesson/K15" target="_blank" rel="noopener">운영체제 교과서 「파일 디스크립터와 버퍼」 ↗</a>).</p>\n<table class="kb"><tbody><tr><td><code>rax</code></td><td><b>0</b> — read 의 번호(write 는 1, exit 은 60)</td></tr><tr><td><code>rdi</code></td><td><b>0</b> — 어디서 받나(표준 입력)</td></tr><tr><td><code>rsi</code></td><td>받은 바이트를 담을 [[버퍼]]의 주소 — <code>lea rsi, [buf]</code></td></tr><tr><td><code>rdx</code></td><td>최대 몇 바이트까지 — 버퍼 크기</td></tr><tr><td>돌아오면 <code>rax</code></td><td>실제로 받은 바이트 수. <b>0</b> 이면 입력 끝(<kbd>Ctrl</kbd>+<kbd>D</kbd>), 음수면 에러</td></tr></tbody></table>\n<p>버퍼는 처음 값이 필요 없으니 [[레슨:R7]] 의 <code>section .bss</code> 에 <code>buf resb 64</code> 로 만들어요. 파이썬의 <code>os.read(0, 64)</code> 와 같은 부탁이에요.</p>\n<p>실행하면 프로그램이 <b>멈춰서 기다려요</b>. 터미널에 <code>hello</code> 를 치고 <kbd>Enter</kbd> 를 누르면 그때 read 가 돌아와요. 받은 바이트는 <b>줄바꿈까지</b> 6개라서, 예제의 입력으로 실행하면 종료 코드가 <code>6</code> 이에요. 매번 치기 싫으면 <code>echo hello | ./read1; echo $?</code> 처럼 파이프로 넣어도 돼요.</p>\n<p>끝의 줄바꿈을 빼고 싶으면 마지막 바이트(받은 수 − 1 번 칸)가 10 인지 보고 길이에서 1 을 빼요.</p>\n<pre class="code">    lea rbx, [buf]\n    cmp byte [rbx + rax - 1], 10    ; 마지막 글자가 줄바꿈?\n    jne .keep\n    dec rax                         ; 그러면 하나 덜 셈\n.keep:</pre>\n<div class="bk-warn"><b>버퍼보다 길게 치면</b> — 64바이트까지만 받고, 남은 글자는 터미널에 그대로 남아 있다가 프로그램이 끝난 뒤 <b>bash 가 명령으로 읽어요</b>(「command not found」 가 뜨기도 해요). 버퍼를 넉넉히 잡거나, 다음 쪽처럼 끝까지 반복해서 받아요.</div>`,
+      example: { code: `default rel\nsection .bss\nbuf resb 64                 ; 받은 글자를 담을 64바이트\n\nsection .text\nglobal _start\n_start:\n    mov rax, 0              ; read 는 0번\n    mov rdi, 0              ; 0 = 표준 입력(키보드)\n    lea rsi, [buf]          ; 여기에 담아 줘\n    mov rdx, 64             ; 최대 64바이트까지\n    syscall                 ; 돌아오면 rax = 실제로 받은 바이트 수\n    mov rdi, rax\n    mov rax, 60             ; 받은 바이트 수를 종료 코드로\n    syscall`, stdin: "hello\n", echoExit: true } },
+    { title: "받은 그대로 찍기: read → write", html: `<p>받은 바이트를 그대로 <code>write</code> 하면 들어온 것을 되돌려 찍는 프로그램이 돼요. 이때 순서가 중요해요. read 가 돌려준 길이는 <code>rax</code> 에 있는데, write 를 부르려면 <code>rax</code> 에 1 을 넣어야 하니까요.</p>\n<pre class="code">    mov rdx, rax            ; ① 받은 길이를 먼저 옮기고\n    mov rax, 1              ; ② 그다음에 write 번호</pre>\n<p>순서를 바꾸면 <code>rdx</code> 에 1 이 들어가 한 글자만 찍혀요. 레지스터는 덮어쓰면 그만이라 「아직 쓸 값이 들어 있나」 를 늘 따져요.</p>\n<p>예제는 read 가 0(입력 끝)을 돌려줄 때까지 반복해요. 리눅스의 <code>cat</code> 이 하는 일이에요.</p>\n<ul><li>터미널에서는 한 줄 칠 때마다(<kbd>Enter</kbd>) read 가 한 번 돌아와 그 줄을 찍어요. 끝내려면 빈 줄에서 <kbd>Ctrl</kbd>+<kbd>D</kbd></li><li><code>./echo1 &lt; memo.txt</code> 처럼 파일을 넣으면 64바이트씩 나눠 받아 전부 찍어요</li><li>바이트를 그대로 옮기기만 하니 한글도 그대로 나와요</li></ul>\n<p>예제의 두 줄 입력으로 실행하면 <code>첫 줄</code> 과 <code>second line</code> 이 그대로 나와요.</p>`,
+      example: { code: `default rel\nsection .bss\nbuf resb 64\n\nsection .text\nglobal _start\n_start:\n.again:\n    mov rax, 0              ; read(0, buf, 64)\n    mov rdi, 0\n    lea rsi, [buf]\n    mov rdx, 64\n    syscall\n    cmp rax, 0\n    jle .end                ; 0 = 입력 끝(Ctrl+D), 음수 = 에러\n    mov rdx, rax            ; 받은 만큼만 — rax 를 바꾸기 전에 옮겨 둬요\n    mov rax, 1              ; write(1, buf, 받은 수)\n    mov rdi, 1\n    lea rsi, [buf]\n    syscall\n    jmp .again              ; 다음 줄 받으러\n.end:\n    mov rax, 60\n    mov rdi, 0\n    syscall`, stdin: "첫 줄\nsecond line\n" } },
+    { title: "글자 → 정수: - '0' 하고 × 10", html: `<p>키보드로 <code>472</code> 를 치면 read 가 받는 건 수 472 가 아니라 글자 세 개 <code>'4'</code> <code>'7'</code> <code>'2'</code>, 바이트로 52 · 55 · 50 이에요. 숫자 글자의 번호는 <code>'0'</code>(48)부터 차례라서 <b>글자 − <code>'0'</code></b> 이 그 자리의 숫자예요.</p>\n<p>파이썬으로는 이렇게 만들죠.</p>\n<pre class="code">n = 0\nfor c in "472":\n    n = n * 10 + (ord(c) - ord("0"))</pre>\n<table class="kb"><tbody><tr><td>처음</td><td>n = 0</td></tr><tr><td><code>'4'</code></td><td>0 × 10 + 4 = 4</td></tr><tr><td><code>'7'</code></td><td>4 × 10 + 7 = 47</td></tr><tr><td><code>'2'</code></td><td>47 × 10 + 2 = 472</td></tr><tr><td>줄바꿈(10)</td><td>숫자 글자가 아니니 끝</td></tr></tbody></table>\n<p>어셈블리로는 새 명령 하나가 필요해요. <code>movzx rdx, byte [rbx + rcx]</code> 는 <b>1바이트를 읽어 64비트 레지스터에 넣고 위는 0 으로 채워요</b>. <code>mov rdx, [rbx + rcx]</code> 는 8바이트를 읽어 버리고, <code>mov dl, …</code> 는 위쪽에 남은 값이 그대로라서 더하기에 못 써요.</p>\n<pre class="code">    movzx rdx, byte [rbx + rcx] ; 글자 1바이트 → rdx\n    cmp rdx, '0'\n    jb .done                ; '0' 보다 작거나\n    cmp rdx, '9'\n    ja .done                ; '9' 보다 크면 숫자가 아님 → 끝\n    sub rdx, '0'            ; 글자 → 숫자\n    imul rax, 10            ; 지금까지 × 10\n    add rax, rdx            ; + 이번 자리</pre>\n<p>예제는 받은 수를 두 배 해서 종료 코드로 보여 줘요. 입력 <code>123</code> 으로 실행하면 <code>246</code>. 종료 코드는 255 까지라 더 큰 수는 못 봐요 — 그래서 다음 쪽에서 수를 글자로 찍어요.</p>`,
+      example: { code: `default rel\nsection .bss\nbuf resb 64\n\nsection .text\nglobal _start\n_start:\n    mov rax, 0              ; read(0, buf, 64)\n    mov rdi, 0\n    lea rsi, [buf]\n    mov rdx, 64\n    syscall\n\n    lea rbx, [buf]\n    mov rax, 0              ; 지금까지 만든 수\n    mov rcx, 0              ; 몇 번째 글자\n.digit:\n    movzx rdx, byte [rbx + rcx] ; 글자 1바이트 → rdx(위는 0 으로)\n    cmp rdx, '0'\n    jb .done                ; 숫자 글자가 아니면 끝\n    cmp rdx, '9'\n    ja .done\n    sub rdx, '0'            ; '7'(55) - '0'(48) = 7\n    imul rax, 10            ; 지금까지 × 10\n    add rax, rdx            ; + 이번 자리\n    inc rcx\n    jmp .digit\n.done:\n    mov rdi, rax\n    add rdi, rdi            ; 두 배로 해서\n    mov rax, 60             ; 종료 코드로 보기\n    syscall`, stdin: "123\n", echoExit: true } },
+    { title: "정수 → 글자: div 10 · 뒤에서부터 채우기", html: `<p>이번엔 반대로 수 472 를 글자 <code>"472"</code> 로 바꿔요. 10 으로 나눈 <b>나머지</b>가 맨 끝 자리예요.</p>\n<table class="kb"><tbody><tr><td>472 ÷ 10</td><td>몫 47, 나머지 <b>2</b></td></tr><tr><td>47 ÷ 10</td><td>몫 4, 나머지 <b>7</b></td></tr><tr><td>4 ÷ 10</td><td>몫 0, 나머지 <b>4</b> → 몫이 0 이니 끝</td></tr></tbody></table>\n<p>자리가 <b>끝에서부터</b> 나오니까, 버퍼도 <b>뒤에서부터 앞으로</b> 채워요. 맨 끝엔 줄바꿈을 미리 넣어 둬요.</p>\n<pre class="code">버퍼 32바이트                           rsp+31\n[ … 빈칸 … ][ '4' ][ '7' ][ '2' ][ 줄바꿈 ]\n              ↑ 다 채운 뒤의 rsi\nwrite(1, rsi, 글자 수 4)</pre>\n<p>새로 쓰는 명령이에요.</p>\n<table class="kb"><tbody><tr><td><code>xor edx, edx</code><br><code>div rcx</code></td><td>[[레슨:R3]] 의 <code>idiv</code> 의 부호 없는 짝. <code>rdx:rax</code> 를 <code>rcx</code>(10)로 나눠 몫은 <code>rax</code>, 나머지는 <code>rdx</code>. 나누기 전에 <code>rdx</code> 를 0 으로(<code>edx</code> 에 쓰면 위 32비트도 0 — [[레슨:R1]])</td></tr><tr><td><code>add dl, '0'</code></td><td>나머지(0~9)에 48 을 더해 글자로. <code>dl</code> 은 <code>rdx</code> 의 맨 아래 1바이트</td></tr><tr><td><code>dec rsi</code><br><code>mov [rsi], dl</code></td><td>한 칸 앞으로 가서 글자 쓰기</td></tr><tr><td><code>test rax, rax</code></td><td><code>and</code> 해 보고 결과는 버리고 <b>플래그만</b>(<code>cmp</code> 의 and 판). 자기 자신과 하면 「0 인가 · 음수인가」 를 봐요. 이어서 <code>jnz</code> 는 「0 이 아니면」</td></tr><tr><td><code>sub rsp, 32</code><br><code>add rsp, 32</code></td><td>버퍼 자리 빌리기 · 돌려주기. <code>rsp</code> 는 스택이라는 메모리의 꼭대기 주소예요([[레슨:R10]] 에서 자세히). 지금은 「32바이트 빈 버퍼가 생기고, 끝나면 돌려준다」 로 충분해요</td></tr></tbody></table>\n<p>나누기를 <b>먼저 하고 나서</b> 몫을 검사해서, 0 도 <code>"0"</code> 한 글자로 찍혀요. 예제는 472 를 찍어요. 실행하면 <code>472</code> — 이제 255 보다 큰 수도 보여요.</p>`,
+      example: { code: `section .text\nglobal _start\n_start:\n    mov rdi, 472            ; 출력할 수\n    sub rsp, 32             ; 글자 버퍼 32바이트(스택)\n    mov rax, rdi\n    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움\n    mov byte [rsi], 10      ; 맨 끝은 줄바꿈\n    mov r8, 1               ; 지금까지 글자 수\n    mov rcx, 10\n.digits:\n    xor edx, edx\n    div rcx                 ; rax = 몫, rdx = 나머지(0~9)\n    add dl, '0'\n    dec rsi\n    mov [rsi], dl\n    inc r8\n    test rax, rax\n    jnz .digits             ; 몫이 0 이 될 때까지\n    mov rax, 1              ; write(1, rsi, r8)\n    mov rdx, r8\n    mov rdi, 1\n    syscall\n    add rsp, 32             ; 빌린 32바이트 돌려주기\n    mov rax, 60\n    mov rdi, 0\n    syscall` } },
+    { title: "test · neg 로 음수까지: 숫자 출력 완성", html: `<p>음수는 부호를 떼고 찍은 뒤 앞에 <code>-</code> 를 붙여요. 앞 쪽 코드에 두 군데만 더해요.</p>\n<ol><li>나누기 전에: <code>test rax, rax</code> → <code>jns</code>(부호 플래그가 꺼져 있으면, 곧 0 이상이면 건너뜀) → 음수면 <code>neg rax</code> 로 양수로</li><li>자리를 다 채운 뒤: 원래 수는 아직 <code>rdi</code> 에 있으니 <code>test rdi, rdi</code> 로 다시 보고, 음수였으면 한 칸 더 앞에 <code>'-'</code></li></ol>\n<p>이렇게 완성한 덩어리가 이 교과서의 <b>숫자 출력 코드</b>예요. 숫자를 <code>rdi</code> 에 넣고 이 덩어리를 지나가면 10진 글자 + 줄바꿈이 찍혀요. 앞으로 숫자를 찍을 땐 예제의 「숫자 출력」 부터 「여기까지」 를 그대로 복사해 써요.</p>\n<table class="kb"><tbody><tr><td>넣는 것</td><td><code>rdi</code> = 찍을 수(음수도 돼요)</td></tr><tr><td>바뀌는 레지스터</td><td><code>rax rcx rdx rsi rdi r8 r11</code>(<code>r11</code> 은 <code>syscall</code> 이 바꿔요)</td></tr><tr><td>안 바뀌는 레지스터</td><td><code>rbx rbp r12 r13 r14 r15</code> — 반복 카운터 · 배열 주소는 여기에</td></tr></tbody></table>\n<p>예제는 배열의 세 수를 반복하며 찍어요. 칸 번호를 <code>rcx</code> 가 아니라 <code>r12</code> 에 둔 게 그 때문이에요. 실행하면 <code>0</code>, <code>1234567</code>, <code>-42</code> 가 한 줄씩 나와요.</p>\n<div class="bk-warn"><b>한 프로그램에 한 번만 붙여요</b> — 덩어리 안의 <code>.digits</code> · <code>.write</code> 라벨이 두 번 나오면 nasm 이 「redefined」 에러를 내요. 여러 수를 찍을 땐 예제처럼 반복 안에 하나만 두고 <code>rdi</code> 만 바꿔요.</div>\n<p>같은 코드를 이곳저곳에서 쓰고 싶어지죠. [[레슨:R11]] 에서는 이 덩어리 앞에 이름 <code>print_int:</code> 를, 끝에 <code>ret</code> 를 붙여 <b>함수</b>로 만들고 <code>call print_int</code> 로 어디서든 불러요. 덩어리 속 코드는 한 글자도 안 바뀌어요.</p>`,
+      example: { code: `default rel\nsection .data\nnums dq 0, 1234567, -42\n\nsection .text\nglobal _start\n_start:\n    lea rbx, [nums]         ; rbx · r12 는 아래 덩어리가 안 건드려요\n    mov r12, 0              ; 몇 번째 칸\n.next:\n    mov rdi, [rbx + r12*8]  ; 출력할 수를 rdi 에\n    ; ---- 숫자 출력: rdi 를 10진 글자 + 줄바꿈으로 (레슨 11 에서 함수 print_int 가 돼요) ----\n    sub rsp, 32             ; 글자 버퍼 32바이트(스택)\n    mov rax, rdi\n    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움\n    mov byte [rsi], 10      ; 맨 끝은 줄바꿈\n    mov r8, 1               ; 지금까지 글자 수\n    mov rcx, 10\n    test rax, rax\n    jns .digits\n    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'\n.digits:\n    xor edx, edx\n    div rcx                 ; rax = 몫, rdx = 나머지(0~9)\n    add dl, '0'\n    dec rsi\n    mov [rsi], dl\n    inc r8\n    test rax, rax\n    jnz .digits\n    test rdi, rdi\n    jns .write\n    dec rsi\n    mov byte [rsi], '-'\n    inc r8\n.write:\n    mov rax, 1              ; write(1, rsi, r8)\n    mov rdx, r8\n    mov rdi, 1\n    syscall\n    add rsp, 32\n    ; ---- 여기까지 (rax rcx rdx rsi rdi r8 r11 이 바뀜) ----\n    inc r12\n    cmp r12, 3\n    jl .next\n    mov rax, 60\n    mov rdi, 0\n    syscall` } },
+  ],
+  summary: ["read 는 rax=0 · rdi=0 · rsi=버퍼 · rdx=최대 — 받은 바이트 수(줄바꿈 포함)가 rax, 0 이면 입력 끝", "글자 → 정수: movzx 로 한 바이트, - '0', 지금까지 × 10 + 이번 자리", "정수 → 글자: div 10 의 나머지 + '0' 을 버퍼 뒤에서부터, 음수는 neg 하고 '-' — 이 덩어리가 레슨 11 의 print_int"] },
+{ id: 'RB2', ch: 2, boss: true, title: '만들어 보기: 숫자를 출력하는 프로그램', mode: 'text',
+  tutorSummary: "챕터 2 묶기 — 레슨 9 의 숫자 출력 덩어리(rdi → 10진 글자 + 줄바꿈, rax rcx rdx rsi rdi r8 r11 바뀜)를 반복 안에 두고 rbx · r12 · r13 으로 배열을 돌며 누적 합 찍기, read 한 줄을 다른 버퍼에 거꾸로 복사해 출력(줄바꿈 제외, 영어·숫자만), '-' 가 붙을 수 있는 두 정수를 읽어 합 · 차 · 곱을 resq 3 에 저장하고 한 줄씩 출력. 이 덩어리가 레슨 11 의 print_int 함수가 됨.", pages: [], summary: [] },
 { id: 'R10', ch: 3, n: 10, title: '스택: push · pop · rsp', mode: 'text', draft: true,
   tutorSummary: '스택은 아래로 자라는 메모리, rsp 가 꼭대기. push = sub rsp, 8 + 저장, pop 은 반대. 값 맡기기, 뒤집기.',
   pages: ASM_TODO('스택 그림 · push/pop · rsp · 값 맡기기 · 뒤집기'), summary: ['rsp 가 꼭대기, 아래로 자람', 'push 는 sub rsp, 8 + 저장', '나중에 넣은 것이 먼저 나옴'] },
