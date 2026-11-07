@@ -56,7 +56,10 @@ for (const id of courses()) {
   const cfgCourse = (c.CONFIG.COURSES || []).find(x => x.id === id); if (cfgCourse && cfgCourse.ready && !cfgCourse.book) { /* v2.10.1: 교과서 코스의 lessons = 열린 레슨 수(허브 「읽은 레슨 n/m」) — check_book 이 검사. 파이썬은 레슨 전부가 열려 있어 그대로 */ if (cfgCourse.total !== c.PROBLEMS.length) err(`${id}: CONFIG.COURSES total ${cfgCourse.total} ≠ 실제 문제 수 ${c.PROBLEMS.length} (core/config.js 갱신)`); if (cfgCourse.lessons !== c.LESSONS.length) err(`${id}: CONFIG.COURSES lessons ${cfgCourse.lessons} ≠ 실제 레슨 수 ${c.LESSONS.length}`); }
   // v2.7.0 코스별 추가 규칙(tools/validate/<코스>.mjs 가 있으면 그 파일의 default(c, { err, warn }) 를 부름)
   { const extra = path.join(ROOT, 'tools/validate', id + '.mjs'); if (fs.existsSync(extra)) { const m = await import('file://' + extra); await m.default(c, { err: (x) => err(`${id}: ${x}`), warn: (x) => warn(`${id}: ${x}`) }); } }
-  for (const l of c.LESSONS) if (l.practical && !c.PROBLEMS.some(p => p.lesson === l.id && p.project)) err(`${id}: 실전 레슨 ${l.id} 에 project 문제가 없음`);
+  { /* v2.38.0: 교과서 코스는 book.js 의 「만들어 보기」 가 실전 문제 — 옛 project 문제가 없어도 됨. 준비 중(draft) 레슨은 건너뜀 */
+    const bookFile = path.join(ROOT, 'courses', id, 'book.js'); const bookSrc = fs.existsSync(bookFile) ? fs.readFileSync(bookFile, 'utf8') : '';
+    const hasBookTasks = (lid) => new RegExp('\\n\\s*' + lid + ': \\[\\s*\\n\\s*\\{').test(bookSrc);
+    for (const l of c.LESSONS) if (l.practical && !l.draft && !c.PROBLEMS.some(p => p.lesson === l.id && p.project) && !hasBookTasks(l.id)) err(`${id}: 실전 레슨 ${l.id} 에 project 문제(또는 교과서 「만들어 보기」)가 없음`); }
   for (const p of c.PROBLEMS) if (p.boss) { const tests = p.type === 'bug' ? p.bug.tests : p.tests; if (tests && tests.length < 5) err(`${id}/${p.id}: 보스 테스트 5개 미만`); }
   totals.lessons += c.LESSONS.length; totals.problems += c.PROBLEMS.length;
   console.log(`✓ ${id}: 레슨 ${c.LESSONS.length} · 문제 ${c.PROBLEMS.length}${(c.DRILLS || []).length ? ` · 타자 연습 ${c.DRILLS.length}` : ""} · 가이드 ${Object.keys(c.GUIDES).length}`);
