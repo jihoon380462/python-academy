@@ -38,7 +38,7 @@ with sync_playwright() as p:
     check('이어서 하기' in (r['today'] or '') and r['stats']==0 and '오늘의 도전' not in (r['today'] or ''), '이어서 하기 상자(v2.17.1: 문제집 코스(수학)를 시작하기 전엔 「오늘 n/5 문제·복습」 줄 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
     hb=pg.evaluate("(()=>{ const t=(id)=>{ const a=document.querySelector(`a.hc[href*=\"courses/${id}/\"]`); return a? a.innerText.replace(/\\n/g,' ') : ''; }; return {py:t('python'), tg:t('terminal-git'), al:t('algo'), lead:(document.querySelector('.hub-lead')||{}).textContent||''}; })()")
-    check('읽은 레슨' in hb['py'] and '남은 문제' not in hb['py'] and '/45' in hb['py'], '허브 파이썬 카드: 교과서 · 읽은 레슨 n/45 (문제 수 없음) (%s)' % hb['py'][:80])
+    check('읽은 레슨' in hb['py'] and '남은 문제' not in hb['py'] and '/48' in hb['py'], '허브 파이썬 카드: 교과서 · 읽은 레슨 n/48 (문제 수 없음) (%s)' % hb['py'][:80])
     check('Git Bash' in hb['tg'] and '읽은 레슨' in hb['tg'] and '/20' in hb['tg'] and 'Git 편' in hb['tg'] and '시뮬레이터' not in hb['tg'] and '준비 중 ·' not in hb['tg'], '허브 터미널 카드: Git Bash 교과서 · 읽은 레슨 n/20 · 명령어 편 + Git 편 (%s)' % hb['tg'][:90])
     check('교과서' in hb['lead'] and 'Git Bash' in hb['lead'] and 'GitHub' in hb['lead'] and '계정은 필요 없' not in hb['lead'] and '가입' in hb['lead'], '허브 안내 문구: 교과서 코스(GitHub 포함)는 내 컴퓨터에서 · 「계정 필요 없음」 대신 「가입 없음」(v2.17.1)')
     check('읽은 레슨' in hb['al'] and '/36' in hb['al'] and '남은 문제' not in hb['al'] and '알고리즘' in hb['lead'] and '알고리즘·수학' not in pg.inner_text('.hub-today'), '허브 알고리즘 카드: 교과서 · 읽은 레슨 n/32 · 안내 문구에 알고리즘 (v2.15.0) (%s)' % hb['al'][:80])

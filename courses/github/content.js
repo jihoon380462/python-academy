@@ -119,7 +119,7 @@ git push</pre>
 <p>입력과 출력을 보여 줄 때는 <code>\`\`\`text</code> 블록이 깔끔해요. 백틱(<code>\`</code>)은 키보드 숫자 1 왼쪽 키예요(한글 상태면 영어로 바꾸고).</p>` + GH_DATE, example: { code: '## 실행 방법\n\n```bash\npython todo.py\n```\n\n## 명령\n\n| 명령 | 하는 일 |\n| --- | --- |\n| `add 우유` | 할 일 추가 |\n| `list` | 목록 보기 |\n\n## 할 일\n\n- [x] 추가 기능\n- [ ] 마감일 기능', label: '예제 — 코드 블록 · 표 · 체크박스' } },
     { title: '좋은 README 의 순서', html: `<p>처음 온 사람이 <b>30초 안에</b> 「이게 뭐고, 어떻게 돌리나」 를 알게 하는 게 목표예요. 이 순서면 거의 다 돼요.</p>
 <ol><li><b>제목 + 한 줄 소개</b> — 무엇을 하는 프로그램인가</li><li><b>화면/예시</b> — 실행 결과 한 덩이(<code>\`\`\`text</code>) 또는 스크린숏</li><li><b>준비물</b> — Python 3.12 이상 같은 것</li><li><b>설치·실행</b> — 복사해서 바로 칠 수 있는 명령</li><li><b>사용법</b> — 명령·입력 형식(표가 좋아요)</li><li><b>라이선스</b> — 「MIT License」 한 줄</li></ol>
-<p>남의 README 를 많이 보는 게 제일 빨리 늘어요. GitHub 첫 화면 위 검색에서 관심 있는 주제를 찾아 별(⭐)이 많은 저장소의 README 를 읽어 보세요.</p>`, example: { code: '# todo-cli\n\n터미널에서 쓰는 할 일 관리 프로그램 — 파이썬 교과서 레슨 30(실전 3: 할 일 관리 앱)으로 만들었어요.\n\n## 화면\n\n```text\n> add 우유 사기\n추가: 우유 사기\n> list\n1. [ ] 우유 사기\n```\n\n## 준비물\n\n- Python 3.12 이상\n\n## 실행\n\n```bash\ngit clone https://github.com/내아이디/todo-cli.git\ncd todo-cli\npython todo.py\n```\n\n## 사용법\n\n| 명령 | 하는 일 |\n| --- | --- |\n| `add 할일` | 추가 |\n| `list` | 목록 |\n\n## 라이선스\n\nMIT License', label: '예제 — README 틀(내 프로젝트 이름으로 바꿔서)' } },
+<p>남의 README 를 많이 보는 게 제일 빨리 늘어요. GitHub 첫 화면 위 검색에서 관심 있는 주제를 찾아 별(⭐)이 많은 저장소의 README 를 읽어 보세요.</p>`, example: { code: '# todo-cli\n\n터미널에서 쓰는 할 일 관리 프로그램 — 파이썬 교과서 레슨 41(실전 3: 할 일 관리 앱)으로 만들었어요.\n\n## 화면\n\n```text\n> add 우유 사기\n추가: 우유 사기\n> list\n1. [ ] 우유 사기\n```\n\n## 준비물\n\n- Python 3.12 이상\n\n## 실행\n\n```bash\ngit clone https://github.com/내아이디/todo-cli.git\ncd todo-cli\npython todo.py\n```\n\n## 사용법\n\n| 명령 | 하는 일 |\n| --- | --- |\n| `add 할일` | 추가 |\n| `list` | 목록 |\n\n## 라이선스\n\nMIT License', label: '예제 — README 틀(내 프로젝트 이름으로 바꿔서)' } },
   ],
   summary: ['# 제목 · - 목록 · **굵게** · [링크](주소)', '```python 코드 블록 · | 표 | · - [ ] 체크박스', '좋은 README: 무엇 → 화면 → 준비물 → 실행 → 사용법 → 라이선스'] },
 { id: 'GB1', ch: 1, boss: true, title: '보스: 내 파이썬 프로젝트 공개', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 1 종합. 파이썬 교과서에서 만든 프로그램 하나를 README·.gitignore·LICENSE 갖춘 공개 저장소로. 의미 있는 커밋 3개, noreply 이메일.' },
@@ -235,7 +235,7 @@ git push</pre>
   pages: [
     { title: '이슈 쓰기: 재현 방법 · 기대 · 실제', html: `<p><b>이슈</b>는 저장소의 할 일·버그·아이디어 글이에요. 혼자 쓰는 저장소에서도 「다음에 할 것」 메모장으로 좋아요.</p>
 <div class="bk-step-box"><b>만들기</b><br>저장소 <b>Issues</b> 탭 → <b>New issue</b>(템플릿이 있으면 고르는 화면이 나와요 — 빈 글로 쓰려면 <b>Open a blank issue</b>) → 제목 · 설명 → <b>Submit new issue</b>. 이슈에도 번호가 붙어요(<code>#3</code>).</div>
-<p>버그 이슈는 남이 <b>그대로 따라 해서 같은 버그를 볼 수 있게</b> 써요(파이썬 교과서 레슨 35 「디버깅 사고법」 과 같은 생각):</p>
+<p>버그 이슈는 남이 <b>그대로 따라 해서 같은 버그를 볼 수 있게</b> 써요(파이썬 교과서 레슨 47 「디버깅 사고법」 과 같은 생각):</p>
 <pre>## 재현 방법
 1. python todo.py
 2. 아무것도 안 치고 Enter
@@ -353,7 +353,7 @@ GitHub 의 컴퓨터(runner, ubuntu)를 하나 빌려
 끝 코드 0 → 초록 ✓   ·   에러(0 아님) → 빨간 ✗</pre>
 <table class="kb"><tbody><tr><td><b>workflow</b>(워크플로)</td><td>자동 실행 하나의 설명 파일. <code>.github/workflows/</code> 폴더의 <code>.yml</code></td></tr><tr><td><b>job</b></td><td>한 컴퓨터에서 차례로 하는 일 묶음</td></tr><tr><td><b>step</b></td><td>job 안의 한 단계 — 남이 만든 동작(<code>uses:</code>) 또는 명령(<code>run:</code>)</td></tr><tr><td><b>runner</b></td><td>그 일을 해 주는 GitHub 의 컴퓨터</td></tr><tr><td><b>끝 코드</b></td><td>프로그램이 끝나며 남기는 숫자. 0 = 성공, 그 밖 = 실패(3쪽에서 직접 봐요)</td></tr></tbody></table>
 <div class="bk-warn"><b>공개 저장소는 무료</b>예요. 비공개 저장소는 한 달 무료 시간이 정해져 있어요 — 연습은 공개 저장소로.</div>` },
-    { title: 'test.yml 한 줄씩', html: `<p>파이썬 교과서 레슨 34 「테스트 작성」 처럼 <code>assert</code> 로 쓴 <code>test_todo.py</code> 가 있다고 해요(실패하면 에러로 끝나는 파일). 저장소에 <code>.github/workflows/test.yml</code> 을 만들어요 — 폴더 이름의 점(<code>.github</code>)과 철자가 정확해야 GitHub 이 찾아요.</p>
+    { title: 'test.yml 한 줄씩', html: `<p>파이썬 교과서 레슨 46 「테스트 작성」 처럼 <code>assert</code> 로 쓴 <code>test_todo.py</code> 가 있다고 해요(실패하면 에러로 끝나는 파일). 저장소에 <code>.github/workflows/test.yml</code> 을 만들어요 — 폴더 이름의 점(<code>.github</code>)과 철자가 정확해야 GitHub 이 찾아요.</p>
 <pre>name: test
 on: [push, pull_request]
 jobs:
@@ -368,7 +368,7 @@ jobs:
 <table class="kb"><tbody><tr><td><code>name: test</code></td><td>Actions 탭에 보일 이름</td></tr><tr><td><code>on: [push, pull_request]</code></td><td>언제 — push 할 때, PR 이 열리거나 바뀔 때</td></tr><tr><td><code>jobs:</code> → <code>test:</code></td><td>job 이름(레슨 15 의 보호 규칙에서 이 이름을 골라요)</td></tr><tr><td><code>runs-on: ubuntu-latest</code></td><td>GitHub 이 빌려줄 컴퓨터 종류(리눅스)</td></tr><tr><td><code>uses: actions/checkout@v7</code></td><td>저장소 파일 받기 — 거의 모든 워크플로의 첫 단계</td></tr><tr><td><code>uses: actions/setup-python@v7</code> + <code>with:</code></td><td>파이썬 3.13 준비</td></tr><tr><td><code>run: python test_todo.py</code></td><td>내 테스트 실행. pytest 를 쓰면 <code>run: pip install pytest</code> 다음 <code>run: python -m pytest</code></td></tr></tbody></table>
 <div class="bk-warn"><b>YAML 은 들여쓰기가 문법이에요</b> — 빈칸 두 칸씩, <kbd>Tab</kbd> 은 안 돼요(VS Code 는 .yml 에서 Tab 을 빈칸으로 바꿔 줘요). <code>-</code> 뒤에 빈칸 하나. 틀리면 Actions 탭에 「Invalid workflow file」 이 떠요.</div>` + GH_DATE },
     { title: 'Actions 탭에서 결과 읽기: 빨간 ✗ 를 만나면', html: `<p>push 하고 저장소 <b>Actions</b> 탭을 열면 실행 목록이 있어요. 노란 ● = 도는 중, 초록 ✓ = 성공, 빨간 ✗ = 실패. 커밋 목록·PR 에도 같은 표시가 붙어요.</p>
-<div class="bk-step-box"><b>실패 원인 찾기</b><br>빨간 실행을 누름 → 왼쪽 job 이름(<code>test</code>) → 빨간 ✗ 가 붙은 단계(<code>Run python test_todo.py</code>)를 펼침 → <b>맨 아래 줄부터</b> 읽어요. 파이썬 교과서 레슨 35 「디버깅 사고법」 의 트레이스백 읽기와 똑같아요:<pre class="code">  File "test_todo.py", line 7, in test_add
+<div class="bk-step-box"><b>실패 원인 찾기</b><br>빨간 실행을 누름 → 왼쪽 job 이름(<code>test</code>) → 빨간 ✗ 가 붙은 단계(<code>Run python test_todo.py</code>)를 펼침 → <b>맨 아래 줄부터</b> 읽어요. 파이썬 교과서 레슨 47 「디버깅 사고법」 의 트레이스백 읽기와 똑같아요:<pre class="code">  File "test_todo.py", line 7, in test_add
     assert add([], "우유") == ["우유"]
 AssertionError
 Error: Process completed with exit code 1.</pre></div>
