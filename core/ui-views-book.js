@@ -159,7 +159,7 @@
     }));
     return _dex;
   };
-  const dexBuiltins = () => (BOOK.builtins || []).map(b => ({ ...b, hay: (b.name + ' ' + b.desc + ' ' + b.code + ' 내장 함수').toLowerCase() }));
+  const dexBuiltins = () => (BOOK.builtins || []).map(b => ({ ...b, hay: (b.name + ' ' + b.desc + ' ' + (b.code || '') + ' 내장 함수').toLowerCase() }));
   Views.dogam = (root, { back = null, restore = false } = {}) => {
     const all = dexEntries(); const bis = dexBuiltins(); const chs = [...new Set(all.map(e => e.ch))];
     const st = UI._dex = UI._dex || { q: '', ch: 'all', y: 0 }; if (!restore) st.y = 0;
@@ -174,7 +174,7 @@
       $('#dexN').textContent = terms.length || st.ch !== 'all' ? `${hit.length + bhit.length}개 찾음` : '';
       let last = null; let html = '';
       if (bhit.length) { html += `<h2 class="bk-dex-l"><span class="bk-ch-n">🧰</span>${M.builtinsName} <span class="muted small">· ${M.builtinsSub}</span></h2>`; bhit.forEach(e => { const [bl, bp] = String(e.ref || '').split('/'); const bL = bl && Content.lesson(bl);
-        html += `<article class="card bk-dex-e bi"><div class="bk-dex-h"><h3><code class="bk-syn">${esc(e.name)}</code></h3>${bL ? `<button class="lnk bk-dex-go" data-l="${bl}" data-p="${+bp || 0}">레슨 ${esc(String(bL.n ?? ''))} · ${(+bp || 0) + 1}쪽 ›</button>` : ''}</div><p class="bk-dex-d">${esc(e.desc)}</p>${codeBox(e.code, '예제')}${e.output != null ? `<div class="bk-io">${e.input ? `<div><div class="lbl">입력</div><pre class="code">${esc(e.input)}</pre></div>` : ''}<div><div class="lbl">결과</div><pre class="code">${esc(e.output)}</pre></div></div>` : ''}</article>`; }); }
+        html += `<article class="card bk-dex-e bi"><div class="bk-dex-h"><h3><code class="bk-syn">${esc(e.name)}</code></h3>${bL ? `<button class="lnk bk-dex-go" data-l="${bl}" data-p="${+bp || 0}">레슨 ${esc(String(bL.n ?? ''))} · ${(+bp || 0) + 1}쪽 ›</button>` : ''}</div><p class="bk-dex-d">${esc(e.desc)}</p>${e.code ? codeBox(e.code, '예제') : '' /* v2.22.1: 단축키·메뉴처럼 붙여 넣을 게 없는 항목은 📋 상자 없이 */}${e.output != null ? `<div class="bk-io">${e.input ? `<div><div class="lbl">입력</div><pre class="code">${esc(e.input)}</pre></div>` : ''}<div><div class="lbl">결과</div><pre class="code">${esc(e.output)}</pre></div></div>` : ''}</article>`; }); }
       hit.forEach(e => { if (e.lid !== last) { html += `<h2 class="bk-dex-l"><span class="bk-ch-n">${esc(String(e.n ?? ''))}</span>${esc(e.lesson)} <span class="muted small">· ${esc(chName(e.ch))}</span></h2>`; last = e.lid; }
         html += `<article class="card bk-dex-e"><div class="bk-dex-h"><h3>${esc(e.name)}</h3><button class="lnk bk-dex-go" data-l="${e.lid}" data-p="${e.pg}">레슨 ${esc(String(e.n ?? ''))} · ${e.pg + 1}쪽 ›</button></div>${e.desc ? `<p class="bk-dex-d">${esc(e.desc)}</p>` : ''}${codeBox(e.code, '예제')}</article>`; });
       $('#dexList').innerHTML = html || `<div class="card muted">「${esc(st.q)}」 는 도감에 없어요. 다른 말로 찾아보거나(예: ${M.dexAlt}), ${M.dexDocs} 를 찾아보세요.</div>`;
