@@ -1239,7 +1239,7 @@ PROBLEMS.push(
 );
 // --- v2.2.20: 실전 5·6 (챕터 7 주제를 쓰는 프로젝트) ---
 LESSONS.push(
-{ id: 'X5', ch: 6, n: 37, practical: true, title: '실전 5: 일기장 통계', mode: 'text',
+{ id: 'X5', ch: 7, n: 37, practical: true, title: '실전 5: 일기장 통계', mode: 'text',
   tutorSummary: '실전 프로젝트 5. diary.txt(# YYYY-MM-DD 줄 아래 본문)를 정규식으로 날짜별로 나누고, 날짜별 글자 수·요일, 한글 단어 빈도 TOP 3, 주(월요일 시작)별 편수, 빠진 날짜를 datetime으로 계산. 저장은 report.txt.',
   terms: {},
   pages:[
@@ -1263,7 +1263,7 @@ LESSONS.push(
       example:{ code:`top = [("수학", 3), ("공부", 2), ("농구", 1)]\nwith open("report.txt", "w", encoding="utf-8") as f:\n    f.write("단어 TOP: " + ", ".join(w for w, n in top) + "\\n")\nwith open("report.txt", encoding="utf-8") as f:\n    print(f.read())`, trace:true } },
   ],
   summary: ['re.split 로 "# 날짜" 기준 나누기 (flags=re.M)', 're.findall(r"[가-힣]{2,}") 로 한글 단어, dict 로 세기', '주 시작 = d - timedelta(days=d.weekday()), 빠진 날은 하루씩 더하며 확인'] },
-{ id: 'X6', ch: 6, n: 38, practical: true, title: '실전 6: 비밀번호 검사기·생성기', mode: 'text',
+{ id: 'X6', ch: 7, n: 38, practical: true, title: '실전 6: 비밀번호 검사기·생성기', mode: 'text',
   tutorSummary: "실전 프로젝트 6. 규칙 목록 RULES = [(이름, 검사 함수)] 5개(길이 8+, 숫자, 소문자, 대문자, 특수문자 !@#$%)로 check(pw)가 (점수, 부족목록)을 돌려준다. 등급은 한 줄 조건식을 이어 쓰고, common.txt(흔한 비밀번호)에 있으면 경고. generate(n, seed)는 random.seed → string 모듈의 종류별 1개 → 나머지 n-4개 → shuffle → join. 테스트 명령은 assert 로 튜플째 비교.",
   terms: {},
   pages:[

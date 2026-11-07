@@ -403,7 +403,8 @@ requests.get(url, headers={"Authorization": f"Bearer {key}"})</pre>또는 <code>
     ],
     W10: [
       { title: 'Network 탭으로 요청 읽기', text: '아무 사이트(예: 이 아카데미)를 연 채 F12 → <b>Network</b> → 새로고침. ① 맨 위 요청(문서)의 <b>상태 코드</b> ② <b>Type</b> 이 <code>script</code> 인 요청 하나의 주소 ③ 일부러 없는 주소(<code>…/없는페이지</code>)를 열었을 때의 상태 코드를 확인하세요.', needs: [['F12 Network', 'W10/0', '요청 목록'], ['200 · 304 · 404', 'W10/1', '상태 코드']],
-        answer: '① 200 (또는 캐시면 304)\n② 예: …/core/config.js?v=…\n③ 404', noRun: true },
+        answer: '① 200 (또는 캐시면 304)\n② 예: …/core/config.js?v=…\n③ 404', noRun: true,
+        checks: [{ text: '맨 위 요청(문서)의 Status 가 200(또는 304)' }, { text: 'Type 이 script 인 줄을 눌러 Headers 의 Request URL 을 봤어요' }, { text: '없는 주소를 열었을 때 맨 위 요청의 Status 가 404' }] },
       { title: 'JSON 읽고 쓰기', text: '아래 JSON 글자를 <code>JSON.parse</code> 로 객체로 만들어, <code>name</code> 과 <code>tags</code> 의 개수를 <code>카페라테 · 태그 2개</code> 처럼 <code>id="out"</code> 에 보이고, <code>price</code> 를 5000 으로 바꾼 객체를 <code>JSON.stringify</code> 로 다시 글자로 만들어 <code>id="json"</code> 에 보이세요.<pre class="code">{"name": "카페라테", "price": 4500, "tags": ["커피", "우유"]}</pre>', needs: [['JSON.parse · JSON.stringify', 'W10/2', '글자 ↔ 객체'], ['.length', 'W7/1', '배열 길이']],
         answer: WH('JSON', '  <p id="out"></p>\n  <pre id="json"></pre>', '', 'const text = \'{"name": "카페라테", "price": 4500, "tags": ["커피", "우유"]}\';\nconst item = JSON.parse(text);\ndocument.querySelector("#out").textContent = `${item.name} · 태그 ${item.tags.length}개`;\nitem.price = 5000;\ndocument.querySelector("#json").textContent = JSON.stringify(item);'),
         checks: [{ text: '「카페라테 · 태그 2개」', sel: '#out', equals: '카페라테 · 태그 2개' }, { text: 'price 가 5000 인 JSON 글자', sel: '#json', contains: '"price":5000' }] },

@@ -519,3 +519,11 @@ body{word-break:keep-all;overflow-wrap:break-word}
 /* E-S6 40줄 넘는 코드 상자는 상자 안에서 위아래로 */
 .bk-code.tall pre.code{max-height:min(60vh,480px);overflow:auto}
 .bk-need code.bk-syn,.bk-dex-h code{max-width:100%}
+
+/* v2.22.5 N15 E-U3 리눅스 「세 겹 그림」: 글자 그림(한글 폭 때문에 세로줄이 어긋남) → 상자 세 겹 */
+.bk-layers{display:flex;flex-direction:column;gap:4px;margin:12px 0;max-width:560px}
+.bk-layer{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border:1px solid var(--border);border-left-width:5px;border-radius:8px;background:var(--surface2)}
+.bk-layer span{color:var(--muted);font-size:.92em}.bk-layer span::before{content:'← '}
+.bk-layer.g{border-left-color:#e95420}.bk-layer.v{border-left-color:var(--primary)}.bk-layer.h{border-left-color:var(--muted)}
+/* v2.22.5 N15 E-T6 첫 쪽의 꺼진 「← 이전」 이 배경에 묻히던 것 — 점선 테두리 */
+.bk-nav .btn:disabled{opacity:.6;border-style:dashed}

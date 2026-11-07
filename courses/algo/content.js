@@ -1122,7 +1122,7 @@ PROBLEMS.push(
 // === 실전 5·6 (v2.2.23) — 챕터 6 주제(문자열·시뮬레이션·비트)를 쓰는 프로젝트. 실전 챕터 5에 추가
 // =====================================================================
 LESSONS.push(
-{ id: 'E5', ch: 5, n: 29, practical: true, title: '실전 5: 텍스트 검색 엔진', mode: 'text',
+{ id: 'E5', ch: 6, n: 29, practical: true, title: '실전 5: 텍스트 검색 엔진', mode: 'text',
   tutorSummary: '실전 프로젝트 5. 문서 여러 줄을 받아 ① 역색인(단어 → 문서 번호 집합) ② AND 검색(집합 교집합) ③ 아나그램 단어 찾기(정렬 키) ④ 자동완성(접두사, 문서 수 많은 순 5개). 변수 index 로 표 시각화. 단어 정리: lower + strip(".,!?").',
   terms: { '역색인': '단어마다 "그 단어가 나오는 문서 번호들"을 적어 둔 표. 검색 엔진의 심장' },
   pages: [
@@ -1134,7 +1134,7 @@ LESSONS.push(
       example: { code: 'def words_of(text):\n    out = []\n    for w in text.lower().split():\n        w = w.strip(".,!?\\"\'()")\n        if w:\n            out.append(w)\n    return out\n\nprint(words_of(\'"Hello," said the (Cat) ... !\'))\nindex = {"the": {1, 2, 3}, "cat": {1, 3}, "dog": {2}}\nhit = None\nfor w in ["the", "cat"]:\n    s = index.get(w, set())\n    hit = s if hit is None else hit & s\n    print(w, "→", sorted(hit))\nif hit:\n    docs = sorted(hit)\n    text = ", ".join(str(n) for n in docs)\n    print("문서 " + text)\nelse:\n    print("없음")', visualize: { kind: 'table', var: 'index' }, trace: true } },
   ],
   summary: ['단어 정리(lower·strip) → 역색인 {단어: 문서 집합}', '검색 = 집합 교집합, 아나그램 = 정렬 키, 자동완성 = startswith', '출력 순서(사전순·오름차순·없음)를 먼저 정한다'] },
-{ id: 'E6', ch: 5, n: 30, practical: true, title: '실전 6: 로봇 청소기 시뮬레이션', mode: 'text',
+{ id: 'E6', ch: 6, n: 30, practical: true, title: '실전 6: 로봇 청소기 시뮬레이션', mode: 'text',
   tutorSummary: '실전 프로젝트 6. 격자(S 시작, # 벽, * 먼지)에서 ① 명령(F/R/L) 따라가며 먼지 청소 ② BFS로 도달 가능 칸·먼지 ③ 가장 가까운 먼지부터 반복 청소(자동: 매번 BFS, 거리 같으면 작은 (r, c)) ④ 청소 뒤 지도. 변수 grid/visited/pos 로 격자 시각화.',
   terms: {},
   pages: [

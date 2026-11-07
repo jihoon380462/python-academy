@@ -170,7 +170,7 @@ $ cat hello.txt
       { title: '긴 글은 편집기로: notepad · code', html: `<p>한두 줄은 <code>echo</code> 로 충분하지만 긴 글은 편집기가 편해요. 터미널에서 파일 이름을 주고 편집기를 열 수 있어요.</p>
 <table class="kb"><tbody><tr><td><code>notepad memo.txt</code></td><td>Windows <b>메모장</b>으로 열기. 고치고 <kbd>Ctrl</kbd>+<kbd>S</kbd> 저장 → 닫으면 터미널로 돌아와요</td></tr><tr><td><code>code memo.txt</code></td><td><b>VS Code</b> 로 열기 (VS Code 설치 때 「PATH에 추가」 가 켜져 있어야 해요)</td></tr><tr><td><code>code .</code></td><td>지금 폴더를 VS Code 로 통째로 열기 — 프로젝트를 열 때 제일 많이 써요</td></tr></tbody></table>
 <p>편집기에서 저장한 뒤 터미널에서 <code>cat memo.txt</code> 를 치면 바뀐 내용이 보여요. 같은 파일을 두 곳에서 보고 있는 거예요.</p>
-<p class="muted small"><code>code: command not found</code> 가 나오면 VS Code 를 연 뒤 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → <code>Shell Command: Install 'code' command in PATH</code>(Mac), Windows 는 VS Code 를 다시 설치하며 「PATH에 추가」 를 켜고 Git Bash 를 새로 여세요. Mac 에서 메모장 대신은 <code>open -e memo.txt</code>.</p>`, example: { shell: 'cd ~/terminal-study/play\nnotepad memo.txt\ncat memo.txt\ncode .' } },
+<p>💡 <code>code: command not found</code> 가 나오면 VS Code 를 연 뒤 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → <code>Shell Command: Install 'code' command in PATH</code>(Mac), Windows 는 VS Code 를 다시 설치하며 「PATH에 추가」 를 켜고 Git Bash 를 새로 여세요. Mac 에서 메모장 대신은 <code>open -e memo.txt</code>.</p>`, example: { shell: 'cd ~/terminal-study/play\nnotepad memo.txt\ncat memo.txt\ncode .' } },
     ],
     T4: [
       { title: '와일드카드 *: 이름 여러 개를 한 번에', html: `<p><code>*</code> 는 「<b>아무 글자나, 몇 글자든</b>」 이라는 뜻이에요. 명령이 돌기 전에 bash 가 <code>*</code> 를 실제 이름들로 바꿔 줘요.</p>

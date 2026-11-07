@@ -17,16 +17,10 @@ const LESSONS = [
     { title: '리눅스 · 우분투 · VirtualBox: 세 겹 그림', html: `<p><b>리눅스</b>는 원래 <b>커널</b>의 이름이에요. 커널은 CPU·메모리·디스크 같은 하드웨어와 프로그램 사이에서 「누가 언제 무엇을 쓸지」 정하는 관리자예요. Windows 에도 커널이 있지만, 그건 Windows 와 한 몸이라 따로 부르지 않을 뿐이에요.</p>
 <p>커널만으로는 화면도 프로그램도 없어요. 그래서 리눅스 커널에 <b>데스크톱 화면 · 터미널 · 프로그램 설치 도구</b>를 묶어서 나눠 주는데, 이 묶음을 <b>배포판</b>이라고 해요. <b>우분투(Ubuntu)</b>는 가장 많이 쓰는 배포판 중 하나예요. 이 교과서는 <b>Ubuntu 26.04 LTS</b>(2026년 4월 출시, 2031년 4월까지 보안 업데이트)를 써요. LTS 는 「오래 지원하는 판」 이라는 뜻이에요.</p>
 <p>우분투를 내 PC 에 바로 깔면 Windows 를 지우거나 나눠야 해요. 그래서 <b>VirtualBox</b> 라는 프로그램으로 Windows 안에 <b>가상의 컴퓨터(가상 머신, VM)</b>를 하나 만들고, 그 안에 우분투를 설치해요.</p>
-<pre class="code">┌─────────────────────────────┐
-│ Ubuntu 26.04 (게스트)          │  ← 이 교과서에서 쓰는 리눅스
-├─────────────────────────────┤
-│ VirtualBox (가상의 컴퓨터)     │  ← Windows 의 프로그램 하나
-├─────────────────────────────┤
-│ Windows 11 (호스트)            │  ← 지금 쓰는 내 PC
-└─────────────────────────────┘</pre>
+<div class="bk-layers" role="img" aria-label="위에서부터 Ubuntu(게스트) · VirtualBox · Windows(호스트) 세 겹"><div class="bk-layer g"><b>Ubuntu 26.04 (게스트)</b><span>이 교과서에서 쓰는 리눅스</span></div><div class="bk-layer v"><b>VirtualBox (가상의 컴퓨터)</b><span>Windows 의 프로그램 하나</span></div><div class="bk-layer h"><b>Windows 11 (호스트)</b><span>지금 쓰는 내 PC</span></div></div>
 <p>바깥의 진짜 PC(Windows)를 <b>호스트</b>, 안의 가상 PC(우분투)를 <b>게스트</b>라고 불러요. 게스트 안에서 무엇을 지우든 호스트 Windows 는 그대로예요.</p>` + LX_DATE },
     { title: '왜 가상 머신에서 배우나', html: `<p>가상 머신으로 배우면 좋은 점이 셋 있어요.</p>
-<table class="kb"><tbody><tr><td><b>망가져도 돼요</b></td><td>권한을 잘못 바꾸거나 중요한 파일을 지워도 Windows 는 멀쩡해요. 최악이면 VM 을 지우고 다시 만들면 끝이에요.</td></tr><tr><td><b>스냅샷</b></td><td>「지금 상태」 를 사진처럼 찍어 두고, 실험이 꼬이면 1분 만에 그 순간으로 되돌려요(레슨 4).</td></tr><tr><td><b>다음 교과서의 연습장</b></td><td>운영체제 교과서(프로세스·메모리)와 어셈블리어 교과서(<code>nasm</code>·<code>gdb</code>)를 이 우분투에서 해요.</td></tr></tbody></table>
+<table class="kb"><tbody><tr><td><b>망가져도 돼요</b></td><td>권한을 잘못 바꾸거나 중요한 파일을 지워도 Windows 는 멀쩡해요. 최악이면 VM 을 지우고 다시 만들면 끝이에요.</td></tr><tr><td><b>스냅샷</b></td><td>「지금 상태」 를 사진처럼 찍어 두고, 실험이 꼬이면 1분 만에 그 순간으로 되돌려요(레슨 4).</td></tr><tr><td><b>다음 교과서의 연습장</b></td><td>앞으로 만들 운영체제 교과서(프로세스·메모리)와 어셈블리어 교과서(<code>nasm</code>·<code>gdb</code>)를 이 우분투에서 해요.</td></tr></tbody></table>
 <p>Windows 에는 리눅스를 터미널로만 쓰는 <b>WSL</b> 도 있어요. 이 교과서는 VirtualBox 를 써요. 우분투의 <b>데스크톱 화면</b>까지 있는 「통째로 한 대」 를 다뤄야 부팅·서비스·네트워크까지 볼 수 있기 때문이에요. 둘은 한 PC 에서 같이 쓰기 까다로울 수 있는데, 그 얘기는 레슨 1 의 🐢 에서 해요.</p>
 <p>터미널 명령(<code>pwd</code> · <code>ls</code> · <code>cd</code> · 파이프)은 이미 <a href="../terminal-git/#lesson/T0" target="_blank" rel="noopener">터미널·Git 교과서 ↗</a> 에서 배운 그대로예요. 우분투의 터미널도 Git Bash 와 같은 <b>bash</b> 라서, 이 교과서는 그걸 다시 가르치지 않고 <b>리눅스를 관리하며 쓰는 법</b>에 집중해요.</p>` + LX_DATE },
     { title: '이 교과서 쓰는 법: 창 나란히 · 오른쪽 Ctrl', html: `<p>VM 창과 이 사이트를 <b>나란히</b> 두면 편해요. Windows 에서 창을 고르고 <kbd>Win</kbd>+<kbd>←</kbd> 를 누르면 왼쪽 절반, 다른 창에서 <kbd>Win</kbd>+<kbd>→</kbd> 를 누르면 오른쪽 절반을 차지해요.</p>
@@ -191,7 +185,7 @@ chmod go-r secret.txt # 그룹·남의 읽기 빼기</pre>
 <pre class="code">#!/bin/bash
 echo "안녕하세요, $1"
 date +%F</pre>
-<ul><li>첫 줄 <code>#!/bin/bash</code>(셔뱅)는 「이 파일은 bash 로 돌려 줘」 라는 표시예요.</li><li><code>$1</code> 은 실행할 때 붙인 <b>첫 번째 말</b>(인자). <code>./hello.sh 우분투</code> → <code>안녕하세요, 우분투</code>.</li><li>만든 파일은 실행 권한이 없어요(<code>644</code>). <code>chmod +x hello.sh</code> 로 붙여요.</li><li>실행은 <code>./hello.sh</code> — 「지금 폴더(<code>.</code>)의 hello.sh」. 왜 <code>./</code> 가 필요한지는 다음 쪽.</li></ul>
+<ul><li>첫 줄 <code>#!/bin/bash</code>(셔뱅)는 「이 파일은 bash 로 돌려 줘」 라는 표시예요.</li><li><code>$1</code> 은 실행할 때 붙인 <b>첫 번째 말</b>(인자). <code>./hello.sh 우분투</code> → <code>안녕하세요, 우분투</code>.</li><li><b>안 주면 기본값</b>: <code>\${1:-.}</code> 은 「<code>$1</code> 이 비어 있으면 <code>.</code>(지금 폴더)」. 이름 있는 값도 같아요 — <code>LIMIT="\${LIMIT:-90}"</code> 은 「<code>LIMIT</code> 을 안 주면 90」.</li><li><b>이름으로 값 넘기기</b>: 명령 앞에 <code>이름=값</code> 을 붙이면 그 명령 안에서만 그 값이에요. <code>LIMIT=0 ./check.sh</code> → 스크립트 안의 <code>$LIMIT</code> 이 0. 순서가 상관없는 설정값이나, cron 처럼 인자를 붙이기 번거로운 곳에서 편해요.</li><li>만든 파일은 실행 권한이 없어요(<code>644</code>). <code>chmod +x hello.sh</code> 로 붙여요.</li><li>실행은 <code>./hello.sh</code> — 「지금 폴더(<code>.</code>)의 hello.sh」. 왜 <code>./</code> 가 필요한지는 다음 쪽.</li></ul>
 <p>Windows 에서 만든 파일이면 <code>/bin/bash^M: bad interpreter</code> 가 날 수 있어요. 줄 끝이 CRLF 라서예요(레슨 5) — 우분투에서 <code>sed -i 's/\\r$//' hello.sh</code> 로 고쳐요.</p>` + LX_DATE, example: { shell: "mkdir -p ~/linux-study/script && cd ~/linux-study/script\nprintf '#!/bin/bash\\necho \"안녕하세요, $1\"\\n' > hello.sh\nchmod +x hello.sh\n./hello.sh 우분투\ncd ~" } },
     { title: 'PATH 와 ~/bin: 어디서나 이름만으로', html: `<p><code>ls</code> 는 <code>./</code> 없이 되는데 내 스크립트는 왜 <code>./</code> 가 필요할까요? bash 는 이름만 친 명령을 <b><code>PATH</code> 에 적힌 폴더들에서만</b> 찾기 때문이에요.</p>
 <pre class="code">echo $PATH
