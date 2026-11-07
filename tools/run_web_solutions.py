@@ -31,8 +31,10 @@ JS = """async () => {
       // 미리보기 iframe 은 sandbox 라 localStorage 가 막혀 있음 → 검사 때만 메모리 localStorage 로 대신(실제 브라우저·Live Server 에서는 진짜가 동작)
       let html = t.answer.replace('<head>', '<head><script>try{localStorage.getItem("x")}catch(e){var S={};Object.defineProperty(window,"localStorage",{configurable:true,value:{getItem:function(k){return Object.prototype.hasOwnProperty.call(S,k)?S[k]:null},setItem:function(k,v){S[k]=String(v)},removeItem:function(k){delete S[k]},clear:function(){S={}}}})}<\\/script>');
       if (t.mock) { const m = '<script>(function(){var M=' + JSON.stringify(t.mock) + ';var f=window.fetch;window.fetch=function(u,o){var s=String(u&&u.url||u);for(var k in M){if(s.indexOf(k)>=0){var st=(o&&o.method&&String(o.method).toUpperCase()==="POST")?201:200;var b=JSON.stringify(M[k]);return new Promise(function(r){setTimeout(function(){r(new Response(b,{status:st,headers:{"Content-Type":"application/json"}}))},30)})}}return f.apply(this,arguments)}})();<\\/script>'; html = html.replace('<head>', '<head>' + m); }
-      const r = await run({ html }, t.checks);
-      bk.push({ id: `${lid}#${i + 1} ${t.title}`, ready: r.ready, errs: r.errs, bad: r.res.filter(x => !x.ok).map(x => `${x.text} (지금: ${x.got})`) });
+      // v2.25.3 웹 챕터 4(JS 언어): { text, console: true | '기대 출력' } — console.log 를 모아 io[0].output(또는 그 글)과 줄 그대로 비교
+      const cc = t.checks.filter(c => c.console !== undefined); const r = await run({ html }, t.checks.filter(c => c.console === undefined));
+      const got = r.logs.join('\\n').trim(); const cbad = cc.filter(c => got !== String(c.console === true ? ((t.io || [])[0] || {}).output : c.console).trim()).map(c => `${c.text} (지금: ${r.logs.join(' / ').slice(0, 240)})`);
+      bk.push({ id: `${lid}#${i + 1} ${t.title}`, ready: r.ready, errs: r.errs, bad: r.res.filter(x => !x.ok).map(x => `${x.text} (지금: ${x.got})`).concat(cbad) });
     }
     for (const [lid, pgs] of Object.entries(BOOK.lessonPages || {})) for (const [i, pg] of pgs.entries()) {
       const c = pg.example && pg.example.code; if (!c || !/^\\s*</.test(c)) continue;

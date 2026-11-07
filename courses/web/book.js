@@ -6,6 +6,10 @@
 //   noRun = 검사 안 함(파이썬 requests·GitHub 배포처럼 사이트 밖에서 하는 것)
 // 검증: python3 tools/run_web_solutions.py — 예시 답을 미리보기 iframe 에 넣고 checks 전부 ✓ 인지(CI 의 regress 단계)
 const WH = (title, body, css, js) => `<!DOCTYPE html>\n<html lang="ko">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>${title}</title>${css ? `\n  <style>\n${css}\n  </style>` : ''}\n</head>\n<body>\n${body}${js ? `\n<script>\n${js}\n</script>` : ''}\n</body>\n</html>`;
+// v2.25.3 챕터 4(JS 언어 — Console 에서): 화면 없는 예시 답 · 「Console 에 이렇게 나오면 성공」 · Console 출력 검사(run_web_solutions 가 console.log 를 모아 io[0].output 과 줄 그대로 비교)
+const WJ = (title, js) => WH(title, '  <h1>F12 → Console 을 보세요</h1>', '', js);
+const CONSOLE_OUT = 'Console 에 이렇게 나오면 성공';
+const CK = [{ text: 'Console 에 나온 글이 위와 줄마다 똑같아요', console: true }];
 const TODOS3 = [{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }, { userId: 1, id: 2, title: 'quis ut nam facilis et officia qui', completed: false }, { userId: 1, id: 3, title: 'fugiat veniam minus', completed: false }];
 const MENU_JSON = [{ id: 1, name: '아메리카노', price: 4000 }, { id: 2, name: '카페라테', price: 4500 }, { id: 3, name: '크루아상', price: 3500 }];
 const BOOK = {
@@ -20,6 +24,7 @@ const BOOK = {
     copyToast: '📋 복사했어요. VS Code 의 파일에 붙여 넣고 저장(Ctrl+S) — Live Server 가 브라우저를 새로고침해요', exampleLabel: '예제 — VS Code 의 index.html 에 붙여 넣고 저장 → Go Live',
     makeIntro: 'VS Code 에서 공부 폴더(<code>web-study</code>)에 문제마다 새 폴더나 파일(예: <code>{file}</code>)을 만들고 직접 짜 보세요. <b>Go Live</b> 로 브라우저에 띄워 「브라우저에서 확인할 것」 을 하나씩 확인해요.',
     makeIntroBy: { // v2.22.4 N15 E-W2: 브라우저 과제가 아닌 레슨은 첫 안내도 그 과제에 맞게
+      ...Object.fromEntries(['W7B', 'W7C', 'W7D', 'W7E', 'W7F', 'W7G', 'WB4'].map(k => [k, 'VS Code 에서 공부 폴더에 html 파일(예: <code>{file}</code>)을 만들고 body 맨 아래 <code>&lt;script&gt;</code> 안에 짜요. Go Live 로 띄운 뒤 <b>F12 → Console</b> 에 나온 글이 아래 「Console 에 이렇게 나오면 성공」 과 줄마다 같으면 성공이에요. 「이 코드를 복사해서 고쳐 보세요」 가 있으면 그 코드를 script 안에 붙여 넣고 시작해요.'])), // v2.25.3 Console 레슨
       W12: 'VS Code 에서 파이썬 파일(예: <code>lesson12_1.py</code>)을 만들고 <code>requests</code> 로 직접 짜 보세요(설치는 이 레슨 1쪽). 터미널에 나온 글이 아래 「결과」 와 같은 모양이면 성공이에요.',
       W13: '내 GitHub 계정과 Git Bash 를 같이 열어 두고 해요. 쪽마다 따라 한 순서대로 올리고, 주소창에 내 사이트 주소를 넣어 화면이 뜨면 성공이에요.' },
     makeTailBy: { W12: '막히면 「필요한 문법」을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답을 펴 보세요. 예시 답과 달라도 같은 결과가 나오면 맞아요.', W13: '막히면 「필요한 문법」을 눌러 그 쪽 설명을 다시 따라 해 보세요.' },
@@ -331,6 +336,164 @@ footer { grid-area: foot; }
       { title: '배열 메서드: map · filter · join', html: `<table class="kb"><tbody><tr><td><code>arr.map(x =&gt; x * 2)</code></td><td>하나하나 바꾼 <b>새 배열</b>(파이썬 <code>[x * 2 for x in arr]</code>)</td></tr><tr><td><code>arr.filter(x =&gt; x &gt; 0)</code></td><td>조건에 맞는 것만(<code>[x for x in arr if x &gt; 0]</code>)</td></tr><tr><td><code>arr.join(", ")</code></td><td>글자로 이어 붙이기(<code>", ".join(arr)</code> — 순서가 반대!)</td></tr><tr><td><code>arr.reduce((s, x) =&gt; s + x, 0)</code></td><td>합계(<code>sum(arr)</code>)</td></tr><tr><td><code>arr.includes(x)</code> · <code>arr.indexOf(x)</code></td><td><code>x in arr</code> · 위치</td></tr></tbody></table>
 <p><code>x =&gt; x * 2</code> 는 <b>화살표 함수</b> — 파이썬 <code>lambda x: x * 2</code>. 레슨 24 의 「배열 → 화면 그리기」 에서 map + join 을 계속 써요.</p>`, example: { code: '<script>\n  const prices = [4000, 4500, 3500, 6000];\n  console.log(prices.map(p => p + 500));\n  console.log(prices.filter(p => p >= 4500));\n  console.log(prices.reduce((s, p) => s + p, 0));\n  console.log(["a", "b", "c"].join(" - "));\n</script>' } },
     ],
+    W7B: [ // v2.25.3 챕터 4 JS 언어(specs/web-course.md) — 화면 없이 Console 에서
+      { title: 'const 와 let — 그리고 쓰지 않는 var', html: `<pre class="code">const shop = "동네 카페";   // 다시 넣을 일 없는 이름 — 기본은 const
+let cups = 0;              // 바뀌는 값만 let
+cups = cups + 2;
+cups += 1;                 // 3</pre>
+<table class="kb"><tbody><tr><td><code>const</code></td><td>다시 <code>=</code> 로 넣으면 <code>TypeError: Assignment to constant variable.</code> — 실수로 덮어쓰는 걸 막아 줘요</td></tr><tr><td><code>let</code></td><td>나중에 바뀌는 값(개수 · 합계 · 상태)</td></tr><tr><td><code>var</code></td><td>옛날 방식. 블록 <code>{ }</code> 밖으로 새어 나오고, 만들기 전에 써도 에러 없이 <code>undefined</code> — <b>쓰지 않아요</b></td></tr></tbody></table>
+<p><b>파이썬과 다른 점</b>: ① 처음 만들 때 <code>const</code> · <code>let</code> 을 꼭 붙여요. ② <code>if</code> · <code>for</code> 의 <code>{ }</code> 안에서 만든 이름은 <b>그 밖에서 안 보여요</b>(블록 범위) — 파이썬은 보여요. ③ <code>const</code> 배열 · 객체도 <b>안의 내용</b>은 바꿀 수 있어요(<code>push</code>). 이름이 가리키는 상자가 안 바뀔 뿐이에요.</p>
+<p>줄 끝의 <code>;</code> 는 빠져도 대부분 돌지만, 붙이는 습관이 안전해요.</p>`,
+        example: { code: '<script>\n  const shop = "동네 카페";\n  let cups = 0;\n  cups = cups + 2;\n  cups += 1;\n  console.log(shop, cups);\n  const menu = ["아메리카노"];\n  menu.push("카페라테");\n  console.log(menu.length);\n  if (cups > 0) {\n    const msg = "주문 있음";\n    console.log(msg);\n  }\n  // console.log(msg);  ← 여기서는 ReferenceError: msg is not defined\n</script>', label: '예제 — html 파일의 body 맨 아래에 붙이고 F12 → Console 에서 보기' } },
+      { title: '타입: 숫자 · 글자 · 참거짓 · null · undefined', html: `<table class="kb"><tbody><tr><td><b>number</b></td><td>정수와 실수가 <b>하나</b>예요. <code>7 / 2</code> 는 <code>3.5</code>(파이썬 <code>//</code> 는 <code>Math.floor(7 / 2)</code>), 나머지 <code>7 % 2</code>. <code>0.1 + 0.2</code> 는 <code>0.30000000000000004</code>(파이썬도 같아요 — 컴퓨터의 실수 한계)</td></tr><tr><td><b>string</b></td><td><code>"…"</code> · <code>'…'</code> · <code>\`…\`</code>(백틱 — 안에 <code>\${값}</code>)</td></tr><tr><td><b>boolean</b></td><td><code>true</code> · <code>false</code> — <b>소문자</b>(파이썬 <code>True</code>)</td></tr><tr><td><b>null</b></td><td>「일부러 비워 둠」(파이썬 <code>None</code>)</td></tr><tr><td><b>undefined</b></td><td>「아직 값이 없음」 — 값을 안 넣은 <code>let x;</code>, 없는 속성 <code>obj.없는거</code></td></tr></tbody></table>
+<p><code>typeof 값</code> 이 타입 이름을 글자로 알려 줘요. 배열 · 객체 · <code>null</code> 은 모두 <code>"object"</code> 라고 나와요(<code>null</code> 은 오래된 실수). 배열인지는 <code>Array.isArray(값)</code>.</p>`,
+        example: { code: '<script>\n  console.log(typeof 4500, typeof "4500", typeof true);\n  console.log(typeof null, typeof undefined, typeof [1, 2]);\n  console.log(7 / 2, Math.floor(7 / 2), 7 % 2);\n  console.log(0.1 + 0.2);\n  let x;\n  console.log(x);\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: '바꾸기: 글자 ↔ 숫자의 함정', html: `<pre class="code">"3" + 1    // "31"  ← + 는 하나라도 글자면 「이어 붙이기」
+"3" - 1    // 2     ← 빼기 · 곱하기는 숫자로 바꿔 계산
+"3" * "2"  // 6</pre>
+<p>파이썬은 <code>"3" + 1</code> 에서 에러를 내 주지만, JS 는 <b>말없이</b> 이어 붙여요. 그래서 직접 바꿔요.</p>
+<table class="kb"><tbody><tr><td><code>Number("3")</code></td><td><code>3</code> · <code>Number("3a")</code> 는 <code>NaN</code>(숫자 아님)</td></tr><tr><td><code>parseInt("4500원")</code> · <code>parseFloat("2.5kg")</code></td><td>앞에서부터 읽을 수 있는 데까지 — <code>4500</code> · <code>2.5</code></td></tr><tr><td><code>String(3)</code></td><td><code>"3"</code></td></tr><tr><td><code>Number.isNaN(x)</code></td><td>NaN 인지(<code>NaN === NaN</code> 은 <b>false</b>라서 이걸로 봐요)</td></tr></tbody></table>
+<p>폼 입력 칸의 값(<code>input.value</code>)은 숫자 칸이어도 <b>늘 글자</b>예요 — 레슨 23 에서 계속 <code>Number()</code> 를 써요.</p>`,
+        example: { code: '<script>\n  const cups = "2";\n  console.log(cups + 1);\n  console.log(Number(cups) + 1);\n  console.log(parseInt("4500원"), Number("4500원"));\n  console.log(Number.isNaN(Number("abc")));\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+    ],
+    W7C: [
+      { title: '=== 만 쓰기', html: `<p><code>==</code>(등호 둘)은 비교하기 전에 <b>타입을 멋대로 바꿔요</b>. 그래서 이상한 결과가 나와요.</p>
+<table class="kb"><tbody><tr><th>식</th><th><code>==</code></th><th><code>===</code></th></tr><tr><td><code>"1" 와 1</code></td><td>true</td><td>false</td></tr><tr><td><code>0 과 ""</code></td><td>true</td><td>false</td></tr><tr><td><code>"0" 과 false</code></td><td>true</td><td>false</td></tr><tr><td><code>null 과 undefined</code></td><td>true</td><td>false</td></tr></tbody></table>
+<p><b>늘 <code>===</code> 와 <code>!==</code></b>(등호 셋)만 써요 — 타입까지 같아야 참. 파이썬의 <code>==</code> 는 이쪽과 같아요(<code>"1" == 1</code> 은 False).</p>
+<p>또 하나: 배열 · 객체는 <b>같은 상자인지</b>를 비교해요. <code>[1] === [1]</code> 은 false(파이썬은 True). 내용을 비교하려면 <code>JSON.stringify(a) === JSON.stringify(b)</code> 처럼 글자로 바꾸거나 하나씩.</p>`,
+        example: { code: '<script>\n  console.log("1" == 1, "1" === 1);\n  console.log(0 == "", 0 === "");\n  console.log([1] === [1]);\n  console.log(JSON.stringify([1]) === JSON.stringify([1]));\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: '참 같은 값 · 거짓 같은 값', html: `<p><code>if (값)</code> 처럼 참거짓 자리에 다른 값을 쓰면, 아래 <b>여섯 개만 거짓</b>이고 나머지는 전부 참이에요.</p>
+<pre class="code">false   0   ""   null   undefined   NaN</pre>
+<table class="kb"><tbody><tr><td><code>"0"</code> · <code>"false"</code> · <code>" "</code></td><td><b>참</b> — 글자가 들어 있으니까</td></tr><tr><td><code>[]</code> · <code>{}</code></td><td><b>참!</b> 파이썬은 빈 리스트가 거짓인데 JS 는 참이에요. 비었는지는 <code>arr.length === 0</code></td></tr></tbody></table>
+<pre class="code">if (name) { … }             // name 이 "" · null · undefined 가 아닐 때
+if (cart.length === 0) { … } // 장바구니가 비었을 때 — if (!cart) 로는 안 돼요</pre>
+<p>어떤 값이 참인지 보고 싶으면 <code>Boolean(값)</code>.</p>`,
+        example: { code: '<script>\n  console.log(Boolean(""), Boolean("0"), Boolean([]));\n  const cart = [];\n  if (cart) { console.log("빈 배열도 참"); }\n  if (cart.length === 0) { console.log("장바구니가 비었어요"); }\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: '짧은 조건: && · || · ?? · ? : · switch', html: `<table class="kb"><tbody><tr><td><code>a || b</code></td><td>a 가 참 같으면 a, 아니면 b — 기본값에 쓰지만 <code>0</code> · <code>""</code> 도 b 로 바뀌는 함정</td></tr><tr><td><code>a ?? b</code></td><td>a 가 <b>null · undefined 일 때만</b> b — 0 · "" 은 그대로(음량 0 · 빈 메모를 지켜요)</td></tr><tr><td><code>a &amp;&amp; b</code></td><td>a 가 참 같을 때만 b 를 봐요 — <code>user &amp;&amp; user.name</code></td></tr><tr><td><code>user?.name</code></td><td>user 가 없으면 에러 대신 undefined</td></tr><tr><td><code>조건 ? A : B</code></td><td>참이면 A, 아니면 B(파이썬 <code>A if 조건 else B</code>)</td></tr></tbody></table>
+<pre class="code">switch (size) {
+  case "S": price = 4000; break;   // break 가 없으면 아래 case 까지 내려가요
+  case "L": price = 5000; break;
+  default:  price = 4500;
+}</pre>`,
+        example: { code: '<script>\n  const volume = 0;\n  console.log(volume || 50, volume ?? 50);\n  const age = 20;\n  console.log(age >= 19 ? "성인" : "청소년");\n  const user = null;\n  console.log(user?.name);\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+    ],
+    W7D: [
+      { title: 'for 세 가지', html: `<table class="kb"><tbody><tr><th>JavaScript</th><th>파이썬</th><th>무엇</th></tr><tr><td><code>for (let i = 0; i &lt; 3; i++)</code></td><td><code>for i in range(3)</code></td><td>번호로 — 시작; 조건; 한 번 돈 뒤 할 일</td></tr><tr><td><code>for (const x of arr)</code></td><td><code>for x in arr</code></td><td>배열 · 글자의 <b>값</b></td></tr><tr><td><code>for (const key in obj)</code></td><td><code>for key in d</code></td><td>객체의 <b>키</b></td></tr></tbody></table>
+<p><b>of 와 in 헷갈림</b>: 배열에 <code>in</code> 을 쓰면 값이 아니라 번호가 <b>글자</b>(<code>"0"</code>, <code>"1"</code>)로 나와요. 외우기: 배열은 <b>of</b>, 객체는 <b>in</b>.</p>
+<p><code>i++</code> 는 <code>i += 1</code> 과 같아요. 번호와 값이 같이 필요하면 <code>for (const [i, x] of arr.entries())</code>(파이썬 <code>enumerate</code>).</p>`,
+        example: { code: '<script>\n  for (let i = 1; i <= 3; i++) { console.log("번호", i); }\n  for (const name of ["라테", "모카"]) { console.log(name); }\n  const prices = { 아메리카노: 4000, 카페라테: 4500 };\n  for (const key in prices) { console.log(key, prices[key]); }\n  for (const [i, x] of ["가", "나"].entries()) { console.log(i, x); }\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: 'while · break · continue', html: `<pre class="code">let money = 10000;
+let cups = 0;
+while (money >= 4500) {    // 조건이 참인 동안 계속
+  money -= 4500;
+  cups++;
+}
+// cups 2 · money 1000</pre>
+<table class="kb"><tbody><tr><td><code>break</code></td><td>반복을 <b>바로 끝내요</b></td></tr><tr><td><code>continue</code></td><td>이번 차례만 건너뛰고 <b>다음 차례로</b></td></tr></tbody></table>
+<p>조건이 영원히 참이면(<b>무한 반복</b>) 브라우저 탭이 멈춰요. 그럴 땐 탭을 닫고(작업 관리자 <kbd>Shift</kbd>+<kbd>Esc</kbd> 에서 그 탭 끝내기) 코드를 고쳐 다시 열어요. while 안에서 조건에 쓰는 값이 <b>바뀌는지</b> 먼저 확인해요.</p>`,
+        example: { code: '<script>\n  let money = 10000;\n  let cups = 0;\n  while (money >= 4500) {\n    money -= 4500;\n    cups++;\n  }\n  console.log("잔", cups, "남은 돈", money);\n  for (const n of [3, -1, 5, 0, 8]) {\n    if (n < 0) continue;\n    if (n === 0) break;\n    console.log(n);\n  }\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: '중첩 반복과 forEach', html: `<pre class="code">for (let dan = 2; dan &lt;= 3; dan++) {     // 바깥이 한 번 돌 때
+  for (let i = 1; i &lt;= 9; i++) {         // 안쪽은 끝까지 다 돌아요
+    console.log(\`\${dan} x \${i} = \${dan * i}\`);
+  }
+}</pre>
+<p>글자를 여러 번 이어 붙일 땐 반복 대신 <code>"*".repeat(3)</code> → <code>"***"</code>(파이썬 <code>"*" * 3</code>).</p>
+<p>배열을 하나씩 처리할 땐 메서드도 써요: <code>arr.forEach((x, i) =&gt; console.log(i, x))</code>. 함수를 넘기는 이 모양은 레슨 18(함수) · 19(map · filter)에서 자세히.</p>
+<p>객체의 키와 값을 같이: <code>for (const [k, v] of Object.entries(obj))</code>(파이썬 <code>d.items()</code>).</p>`,
+        example: { code: '<script>\n  for (let row = 1; row <= 3; row++) {\n    console.log("*".repeat(row));\n  }\n  ["아메리카노", "카페라테"].forEach((x, i) => console.log(i + 1, x));\n  for (const [k, v] of Object.entries({ S: 4000, L: 5000 })) {\n    console.log(k, v);\n  }\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+    ],
+    W7E: [
+      { title: 'function · 기본값 · return', html: `<pre class="code">function greet(name, suffix = "님") {   // suffix 를 안 주면 "님"
+  return \`\${name}\${suffix}, 어서 오세요\`;
+}
+greet("지훈");         // "지훈님, 어서 오세요"
+greet("지훈", "씨");   // "지훈씨, 어서 오세요"</pre>
+<table class="kb"><tbody><tr><td><code>return</code> 이 없으면</td><td><code>undefined</code> 를 돌려줘요(파이썬 None)</td></tr><tr><td>인자를 <b>덜</b> 주면</td><td>에러 없이 그 매개변수가 <code>undefined</code> — 파이썬은 에러예요. 계산이 <code>NaN</code> 으로 번지면 여기를 의심</td></tr><tr><td>인자를 <b>더</b> 주면</td><td>남는 건 무시</td></tr></tbody></table>
+<p><code>function</code> 으로 만든 함수는 파일 <b>아래에</b> 있어도 위에서 부를 수 있어요. 다음 쪽의 <code>const 이름 = () =&gt; …</code> 는 만든 줄 <b>아래에서만</b>.</p>`,
+        example: { code: '<script>\n  function greet(name, suffix = "님") {\n    return `${name}${suffix}, 어서 오세요`;\n  }\n  console.log(greet("지훈"));\n  console.log(greet("지훈", "씨"));\n  function add(a, b) { return a + b; }\n  console.log(add(1));\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: '화살표 함수와 콜백', html: `<pre class="code">const add = (a, b) =&gt; a + b;          // 한 줄이면 return 생략
+const double = x =&gt; x * 2;             // 매개변수 하나면 괄호 생략
+const total = (arr) =&gt; {               // 중괄호를 쓰면 return 을 꼭
+  let s = 0;
+  for (const x of arr) s += x;
+  return s;
+};</pre>
+<p>JS 에서 함수는 <b>값</b>이에요. 변수에 담고, <b>다른 함수에 넘길</b> 수 있어요. 넘겨진 함수를 <b>콜백</b>(나중에 불러 줘)이라고 해요.</p>
+<pre class="code">setTimeout(() =&gt; console.log("1초 지났어요"), 1000);   // 1초 뒤에 불러 줘
+button.addEventListener("click", () =&gt; { … });         // 누르면 불러 줘(레슨 21)
+[3, 1, 2].map(x =&gt; x * 10);                           // 하나하나 불러 줘(레슨 19)</pre>
+<p>객체를 바로 돌려줄 땐 괄호로 감싸요: <code>() =&gt; ({ name: "라테" })</code> — 안 그러면 중괄호를 함수 몸통으로 읽어요.</p>`,
+        example: { code: '<script>\n  const add = (a, b) => a + b;\n  const double = x => x * 2;\n  console.log(add(2, 3), double(4));\n  function repeat(n, fn) {\n    for (let i = 1; i <= n; i++) fn(i);\n  }\n  repeat(3, i => console.log("콜백", i));\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: '범위와 클로저: 기억하는 함수', html: `<p>함수 안에서 만든 변수는 <b>밖에서 안 보여요</b>. 반대로 안쪽 함수는 <b>바깥의 변수를 볼 수 있어요</b>. 그래서 「함수를 돌려주는 함수」 를 만들면, 돌려받은 함수가 바깥 변수를 <b>계속 기억</b>해요 — 이걸 <b>클로저</b>라고 해요.</p>
+<pre class="code">function makeCounter() {
+  let count = 0;               // 밖에서는 못 건드려요
+  return () =&gt; {
+    count += 1;                // 그래도 이 함수는 기억해요
+    return count;
+  };
+}
+const next = makeCounter();
+next();   // 1
+next();   // 2
+const other = makeCounter();   // 따로 세는 새 카운터
+other();  // 1</pre>
+<p>파이썬에서 안쪽 함수가 바깥 변수를 바꾸려면 <code>nonlocal</code> 이 필요하지만 JS 는 그냥 돼요. 버튼마다 따로 세기, 설정 기억하기에 써요.</p>`,
+        example: { code: '<script>\n  function makeCounter() {\n    let count = 0;\n    return () => {\n      count += 1;\n      return count;\n    };\n  }\n  const next = makeCounter();\n  console.log(next(), next());\n  const other = makeCounter();\n  console.log(other());\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+    ],
+    W7F: [
+      { title: '배열 다루기', html: `<table class="kb"><tbody><tr><td><code>push(x)</code> · <code>pop()</code></td><td>끝에 넣기 · 끝에서 빼기(파이썬 append · pop)</td></tr><tr><td><code>unshift(x)</code> · <code>shift()</code></td><td>앞에 넣기 · 앞에서 빼기</td></tr><tr><td><code>slice(1, 3)</code></td><td>1~2번 <b>복사</b> — 원본 그대로(파이썬 <code>a[1:3]</code>)</td></tr><tr><td><code>splice(1, 1)</code></td><td>1번부터 1개를 <b>원본에서 잘라 냄</b></td></tr><tr><td><code>includes(x)</code> · <code>indexOf(x)</code></td><td>있는지 · 몇 번째(없으면 -1)</td></tr><tr><td><code>find(m =&gt; m.price &gt; 4000)</code></td><td>조건에 맞는 <b>첫 하나</b>(없으면 undefined) · <code>findIndex</code> 는 그 번호</td></tr><tr><td><code>some(…)</code> · <code>every(…)</code></td><td>하나라도 · 전부(파이썬 any · all)</td></tr></tbody></table>
+<pre class="code">[10, 9, 1].sort()                  // [1, 10, 9]  ← 글자 순서로 정렬하는 함정!
+[10, 9, 1].sort((a, b) =&gt; a - b)   // [1, 9, 10]  ← 숫자는 비교 함수를 꼭
+                                   // b - a 면 큰 것부터</pre>
+<p><code>sort</code> 는 <b>원본을 바꿔요</b>. 원본을 두려면 <code>[...arr].sort(…)</code>(복사한 뒤 정렬).</p>`,
+        example: { code: '<script>\n  const nums = [10, 9, 1];\n  console.log(nums.slice().sort().join(", "));\n  console.log(nums.slice().sort((a, b) => a - b).join(", "));\n  const menu = [{ name: "아메리카노", price: 4000 }, { name: "카페라테", price: 4500 }];\n  console.log(menu.find(m => m.price > 4000).name);\n  console.log(menu.some(m => m.price > 5000), menu.every(m => m.price >= 4000));\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: 'map · filter · reduce 제대로', html: `<pre class="code">const menu = [{ name: "아메리카노", price: 4000 }, { name: "카페라테", price: 4500 }, { name: "치즈케이크", price: 6000 }];
+
+menu.map(m =&gt; m.name)                       // ["아메리카노", "카페라테", "치즈케이크"]
+menu.filter(m =&gt; m.price &gt;= 4500)           // 카페라테 · 치즈케이크 두 개
+menu.reduce((sum, m) =&gt; sum + m.price, 0)  // 14500
+menu.filter(m =&gt; m.price &lt; 5000).map(m =&gt; m.name).join(", ")   // 이어 쓰기</pre>
+<p><code>reduce((모은 값, 하나) =&gt; 새 모은 값, 처음 값)</code> — 하나씩 보며 값을 모아 가요. 처음 값을 객체로 주면 <b>묶어 세기</b>도 돼요.</p>
+<pre class="code">["커피", "빵", "커피"].reduce((acc, t) =&gt; {
+  acc[t] = (acc[t] ?? 0) + 1;
+  return acc;
+}, {})                                       // { 커피: 2, 빵: 1 }</pre>
+<p>map · filter 는 <b>새 배열</b>을 만들고 원본은 그대로예요.</p>`,
+        example: { code: '<script>\n  const menu = [{ name: "아메리카노", price: 4000 }, { name: "카페라테", price: 4500 }, { name: "치즈케이크", price: 6000 }];\n  console.log(menu.map(m => m.name).join(", "));\n  console.log(menu.reduce((sum, m) => sum + m.price, 0));\n  const count = ["커피", "빵", "커피"].reduce((acc, t) => {\n    acc[t] = (acc[t] ?? 0) + 1;\n    return acc;\n  }, {});\n  console.log(JSON.stringify(count));\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: '객체 · 구조 분해 · 펼치기 · JSON', html: `<table class="kb"><tbody><tr><td><code>item.price</code> · <code>item["price"]</code> · <code>item[key]</code></td><td>점은 이름이 정해져 있을 때, 괄호는 이름이 변수에 있을 때</td></tr><tr><td><code>item.size = "L"</code> · <code>delete item.size</code></td><td>키 넣기 · 빼기</td></tr><tr><td><code>Object.keys</code> · <code>values</code> · <code>entries</code></td><td>키 배열 · 값 배열 · [키, 값] 배열</td></tr><tr><td><code>const { name, price } = item;</code></td><td><b>구조 분해</b> — 꺼내서 같은 이름의 변수로</td></tr><tr><td><code>const [first, second] = arr;</code></td><td>배열도</td></tr><tr><td><code>[...a, x]</code> · <code>{ ...item, price: 5000 }</code></td><td><b>펼치기</b> — 복사본을 만들며 더하거나 바꾸기(원본은 그대로)</td></tr><tr><td><code>JSON.stringify(obj)</code> · <code>JSON.parse(text)</code></td><td>객체 → 글자 · 글자 → 객체. 저장(레슨 24)과 서버와 주고받을 때</td></tr></tbody></table>
+<p>Console 창에 배열 · 객체를 그대로 찍으면 <code>(3) [1, 2, 3]</code> · <code>{name: '라테'}</code> 모양으로 펼쳐 볼 수 있어요. 한 줄 글자로 보고 싶으면 <code>JSON.stringify</code>.</p>`,
+        example: { code: '<script>\n  const item = { name: "카페라테", price: 4500 };\n  const { name, price } = item;\n  console.log(name, price);\n  const big = { ...item, size: "L", price: 5000 };\n  console.log(JSON.stringify(big));\n  console.log(item.price);\n  console.log(Object.keys(big).join(", "));\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+    ],
+    W7G: [
+      { title: '글자 다루기', html: `<table class="kb"><tbody><tr><td><code>s.length</code></td><td>글자 수(파이썬 <code>len(s)</code>)</td></tr><tr><td><code>trim()</code></td><td>앞뒤 공백 지우기(<code>strip</code>)</td></tr><tr><td><code>toUpperCase()</code> · <code>toLowerCase()</code></td><td>대문자 · 소문자</td></tr><tr><td><code>includes</code> · <code>startsWith</code> · <code>endsWith</code></td><td>들어 있는지 · 시작 · 끝</td></tr><tr><td><code>slice(0, 3)</code> · <code>at(-1)</code></td><td><code>s[0:3]</code> · <code>s[-1]</code></td></tr><tr><td><code>split(",")</code> · <code>arr.join(",")</code></td><td>나누기 · 잇기</td></tr><tr><td><code>replaceAll("a", "b")</code></td><td>전부 바꾸기(<code>replace</code> 는 <b>첫 하나만</b>)</td></tr><tr><td><code>padStart(4, "0")</code> · <code>padEnd</code></td><td><code>"42"</code> → <code>"0042"</code>(주문 번호 · 시각 맞추기)</td></tr></tbody></table>
+<p>글자는 <b>바뀌지 않아요</b>. 메서드는 언제나 <b>새 글자</b>를 돌려주니 결과를 변수에 받아요: <code>name = name.trim();</code></p>`,
+        example: { code: '<script>\n  let name = "  지훈 ";\n  name = name.trim();\n  console.log(`[${name}]`, name.length);\n  console.log("a,b,c".split(",").join(" / "));\n  console.log("라테-라테".replace("라테", "모카"), "라테-라테".replaceAll("라테", "모카"));\n  console.log(String(42).padStart(4, "0"));\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: '숫자와 Math', html: `<table class="kb"><tbody><tr><td><code>Math.round(2.5)</code> · <code>floor</code> · <code>ceil</code></td><td>반올림 · 내림 · 올림</td></tr><tr><td><code>Math.max(3, 9, 4)</code> · <code>Math.max(...arr)</code></td><td>가장 큰 값(배열은 펼쳐서)</td></tr><tr><td><code>(2.456).toFixed(1)</code></td><td><code>"2.5"</code> — <b>글자</b>가 돼요(보여 줄 때만)</td></tr><tr><td><code>(4500).toLocaleString("ko-KR")</code></td><td><code>"4,500"</code> — 세 자리 쉼표</td></tr><tr><td><code>Math.floor(Math.random() * 6) + 1</code></td><td>1~6 주사위(<code>random()</code> 은 0 이상 1 미만)</td></tr><tr><td><code>Number.isInteger(x)</code></td><td>정수인지</td></tr></tbody></table>
+<p>계산 중에 <code>NaN</code> 이 하나 끼면 결과가 전부 <code>NaN</code> 이 돼요. NaN 이 보이면 거꾸로 올라가며 <b>처음 NaN 이 생긴 줄</b>(대개 글자 → 숫자 바꾸기 실패)을 찾아요.</p>`,
+        example: { code: '<script>\n  console.log(Math.round(2.5), Math.floor(2.9), Math.ceil(2.1));\n  console.log(Math.max(...[4000, 6000, 3500]));\n  console.log((2.456).toFixed(1), (123456).toLocaleString("ko-KR"));\n  console.log(Number("abc") * 3);\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+      { title: '에러 다루기와 class', html: `<pre class="code">try {
+  const data = JSON.parse("{망가진 글자");     // 여기서 에러가 나면
+  console.log(data);                          // 이 줄은 건너뛰고
+} catch (e) {
+  console.log("읽을 수 없어요:", e.message);   // 여기로(파이썬 except)
+}
+function pay(amount) {
+  if (amount &lt;= 0) throw new Error("금액은 0보다 커야 해요");   // 파이썬 raise
+  return amount;
+}</pre>
+<pre class="code">class MenuItem {
+  constructor(name, price) {   // 파이썬 __init__(self, name, price)
+    this.name = name;          // self.name → this.name
+    this.price = price;
+  }
+  label() {                    // 메서드에 self 를 안 써요
+    return \`\${this.name} \${this.price.toLocaleString("ko-KR")}원\`;
+  }
+}
+const latte = new MenuItem("카페라테", 4500);   // new 를 꼭
+latte.label();                                   // "카페라테 4,500원"</pre>`,
+        example: { code: '<script>\n  try {\n    JSON.parse("{망가진 글자");\n  } catch (e) {\n    console.log("읽을 수 없어요");\n  }\n  class MenuItem {\n    constructor(name, price) {\n      this.name = name;\n      this.price = price;\n    }\n    label() {\n      return `${this.name} ${this.price.toLocaleString("ko-KR")}원`;\n    }\n  }\n  console.log(new MenuItem("카페라테", 4500).label());\n</script>', label: '예제 — F12 → Console 에서 보기' } },
+    ],
     W8: [
       { title: '요소 찾기와 바꾸기', html: `<p><b>DOM</b> 은 브라우저가 HTML 을 읽어 만든 <b>요소 나무</b>예요(F12 Elements 에 보이는 것). JS 는 이 나무에서 요소를 찾아 바꿔요.</p>
 <table class="kb"><tbody><tr><td><code>document.querySelector("#title")</code></td><td>CSS 선택자로 <b>첫 번째</b> 하나 찾기(없으면 <code>null</code>)</td></tr><tr><td><code>document.querySelectorAll(".item")</code></td><td>전부 찾기(<code>for … of</code> 로 돌기)</td></tr><tr><td><code>el.textContent = "새 글"</code></td><td>글자 바꾸기</td></tr><tr><td><code>el.innerHTML = "&lt;b&gt;굵게&lt;/b&gt;"</code></td><td>HTML 로 바꾸기(사용자 입력을 넣을 땐 위험 — textContent 로)</td></tr><tr><td><code>el.style.color = "red"</code></td><td>그 요소의 CSS 하나</td></tr><tr><td><code>el.classList.add("on")</code> · <code>remove</code> · <code>toggle</code></td><td>class 넣기·빼기·켜고 끄기 — 모양은 CSS 에 두고 JS 는 class 만 바꾸는 게 깔끔해요</td></tr><tr><td><code>input.value</code></td><td>입력칸의 글자(늘 <b>문자열</b> — 숫자는 <code>Number(…)</code>)</td></tr></tbody></table>
@@ -605,6 +768,67 @@ requests.get(url, headers={"Authorization": f"Bearer {key}"})</pre>또는 <code>
       { title: 'map · filter 로 할인 목록', text: '<code>menu = [{name:"아메리카노",price:4000},{name:"카페라테",price:4500},{name:"치즈케이크",price:6000}]</code> 에서 4500원 <b>이상</b>만 골라(filter) 10% 할인한 값으로 <code>이름 가격원</code> 글자를 만들어(map) <code>, </code> 로 이어(join) <code>id="sale"</code> 에 보이게.', needs: [['filter', 'W7/2', '골라내기'], ['map', 'W7/2', '바꾸기'], ['join', 'W7/2', '이어 붙이기']],
         answer: WH('할인', '  <p id="sale"></p>', '', 'const menu = [{ name: "아메리카노", price: 4000 }, { name: "카페라테", price: 4500 }, { name: "치즈케이크", price: 6000 }];\nconst text = menu.filter(m => m.price >= 4500).map(m => `${m.name} ${m.price * 0.9}원`).join(", ");\ndocument.querySelector("#sale").textContent = text;'),
         checks: [{ text: '「카페라테 4050원, 치즈케이크 5400원」', sel: '#sale', equals: '카페라테 4050원, 치즈케이크 5400원' }] },
+    ],
+    W7B: [
+      { title: '타입 맞히기', text: '아래 일곱 값의 <code>typeof</code> 를 먼저 종이에 적어 보고, 한 줄에 하나씩 Console 에 찍어 확인하는 코드를 쓰세요: <code>4500</code> · <code>"4500"</code> · <code>true</code> · <code>null</code> · <code>undefined</code> · <code>[1, 2]</code> · <code>{ a: 1 }</code>.', needs: [['typeof', 'W7B/1', '타입 이름'], ['console.log', 'W7/0', 'Console 출력']],
+        answer: WJ('타입', 'const values = [4500, "4500", true, null, undefined, [1, 2], { a: 1 }];\nfor (const v of values) {\n  console.log(typeof v);\n}'), io: [{ output: 'number\nstring\nboolean\nobject\nundefined\nobject\nobject' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '「23잔」 고치기', text: '폼 입력 칸에서 온 값은 글자예요. 아래 코드는 <code>총 23잔</code> 이 나와요. <code>총 5잔</code> 과 <code>합계 22500원</code>(5잔 × 4500원)이 나오게 고치세요.', needs: [['Number("2")', 'W7B/2', '글자 → 숫자'], ['parseInt("4500원")', 'W7B/2', '앞에서부터 숫자만'], ['`${…}`', 'W7/1', '글자 안에 값']],
+        given: 'const cups = "2";        // 입력 칸에서 온 글자\nconst more = "3";\nconst price = "4500원";\nconst total = cups + more;\nconsole.log(`총 ${total}잔`);',
+        answer: WJ('잔 수', 'const cups = "2";\nconst more = "3";\nconst price = "4500원";\nconst total = Number(cups) + Number(more);\nconsole.log(`총 ${total}잔`);\nconsole.log(`합계 ${total * parseInt(price)}원`);'), io: [{ output: '총 5잔\n합계 22500원' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: 'var 없애기', text: '옛날 방식으로 쓴 아래 코드를 <code>const</code> · <code>let</code> 으로 고치세요 — 바뀌는 값만 <code>let</code>. 출력은 그대로 나와야 해요.', needs: [['const · let', 'W7B/0', '기본은 const, 바뀌면 let']],
+        given: 'var shop = "동네 카페";\nvar count = 0;\nvar menu = ["아메리카노", "카페라테"];\nfor (var i = 0; i < menu.length; i++) {\n  count = count + 1;\n}\nconsole.log(shop, count);',
+        answer: WJ('const let', 'const shop = "동네 카페";\nlet count = 0;\nconst menu = ["아메리카노", "카페라테"];\nfor (let i = 0; i < menu.length; i++) {\n  count = count + 1;\n}\nconsole.log(shop, count);'), io: [{ output: '동네 카페 2' }], outLabel: CONSOLE_OUT,
+        checks: [CK[0], { text: 'var 가 하나도 없어요', sel: 'script', js: '!/\\bvar\\b/.test([...document.scripts].pop().textContent)' }, { text: 'shop · menu 는 const', sel: 'script', js: '/const\\s+shop/.test([...document.scripts].pop().textContent) && /const\\s+menu/.test([...document.scripts].pop().textContent)' }] },
+    ],
+    W7C: [
+      { title: '요금 정하기', text: '사람마다 요금을 정해 <code>이름 요금원</code> 으로 찍으세요. 규칙: 65세 이상은 0원, 13세 이하는 5000원, 나머지는 10000원. 회원이면 거기서 1000원 더 할인(0원 아래로는 안 내려감).<pre class="code">const people = [\n  { name: "민수", age: 8, member: false },\n  { name: "지훈", age: 30, member: true },\n  { name: "할머니", age: 70, member: true },\n  { name: "수진", age: 20, member: false },\n];</pre>', needs: [['if · else if · else', 'W7/1', '조건'], ['조건 ? A : B', 'W7C/2', '짧은 조건'], ['Math.max(0, …)', 'W7G/1', '0 아래로 안 내려가게']],
+        answer: WJ('요금', 'const people = [\n  { name: "민수", age: 8, member: false },\n  { name: "지훈", age: 30, member: true },\n  { name: "할머니", age: 70, member: true },\n  { name: "수진", age: 20, member: false },\n];\nfor (const p of people) {\n  let fee;\n  if (p.age >= 65) {\n    fee = 0;\n  } else if (p.age <= 13) {\n    fee = 5000;\n  } else {\n    fee = 10000;\n  }\n  const final = p.member ? Math.max(0, fee - 1000) : fee;\n  console.log(`${p.name} ${final}원`);\n}'), io: [{ output: '민수 5000원\n지훈 9000원\n할머니 0원\n수진 10000원' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '기본값: ?? 와 || 고르기', text: '설정 <code>{ volume: 0, nickname: "", theme: null }</code> 을 화면에 보여 줄 값으로 바꾸세요. 음량은 <b>0 도 올바른 값</b>이라 그대로, 별명이 비었으면 <code>손님</code>, 테마가 없으면 <code>light</code>. 각 줄에 알맞은 것(<code>??</code> 또는 <code>||</code>)을 골라요.', needs: [['a ?? b', 'W7C/2', 'null · undefined 일 때만'], ['a || b', 'W7C/2', '거짓 같은 값이면']],
+        answer: WJ('기본값', 'const settings = { volume: 0, nickname: "", theme: null };\nconsole.log("음량", settings.volume ?? 50);\nconsole.log("이름", settings.nickname || "손님");\nconsole.log("테마", settings.theme ?? "light");'), io: [{ output: '음량 0\n이름 손님\n테마 light' }], outLabel: CONSOLE_OUT,
+        checks: [CK[0], { text: '?? 를 썼어요', sel: 'script', js: '[...document.scripts].pop().textContent.includes("??")' }] },
+      { title: '== 함정 고치기', text: '아래 코드는 빈 칸 <code>""</code> 과 <code>"0"</code> 까지 「0 이에요」 라고 해요. 숫자 0 만 「0 이에요」 가 되게 고치세요.', needs: [['===', 'W7C/0', '타입까지 같아야 참']],
+        given: 'const inputs = ["", "0", 0, null];\nfor (const x of inputs) {\n  if (x == 0) {\n    console.log(JSON.stringify(x), "→ 0 이에요");\n  } else {\n    console.log(JSON.stringify(x), "→ 0 아니에요");\n  }\n}',
+        answer: WJ('===', 'const inputs = ["", "0", 0, null];\nfor (const x of inputs) {\n  if (x === 0) {\n    console.log(JSON.stringify(x), "→ 0 이에요");\n  } else {\n    console.log(JSON.stringify(x), "→ 0 아니에요");\n  }\n}'), io: [{ output: '"" → 0 아니에요\n"0" → 0 아니에요\n0 → 0 이에요\nnull → 0 아니에요' }], outLabel: CONSOLE_OUT,
+        checks: [CK[0], { text: '== · != 가 없어요(=== · !== 만)', sel: 'script', js: '!/[^=!]==[^=]|!=[^=]/.test([...document.scripts].pop().textContent)' }] },
+    ],
+    W7D: [
+      { title: '구구단 7단', text: '<code>for</code> 로 7단을 <code>7 x 1 = 7</code> 모양으로 9줄 찍으세요.', needs: [['for (let i = 1; i <= 9; i++)', 'W7D/0', '번호로 반복'], ['`${…}`', 'W7/1', '글자 안에 값']],
+        answer: WJ('7단', 'for (let i = 1; i <= 9; i++) {\n  console.log(`7 x ${i} = ${7 * i}`);\n}'), io: [{ output: '7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '별 계단과 거꾸로 계단', text: '별 1개부터 4개까지 늘어나는 계단을 찍고, 이어서 3개부터 1개까지 줄어드는 계단을 찍으세요.', needs: [['"*".repeat(n)', 'W7D/2', '글자 여러 번'], ['i--', 'W7D/0', '거꾸로 세기 — i -= 1']],
+        answer: WJ('계단', 'for (let i = 1; i <= 4; i++) {\n  console.log("*".repeat(i));\n}\nfor (let i = 3; i >= 1; i--) {\n  console.log("*".repeat(i));\n}'), io: [{ output: '*\n**\n***\n****\n***\n**\n*' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '목표 금액까지 모으기', text: '한 주에 15000원씩 모아요. 처음 0원에서 <b>100000원 이상이 될 때까지</b> 몇 주 걸리는지 <code>while</code> 로 세어 <code>7주 105000원</code> 모양으로 찍으세요. 그 다음, 메뉴 객체 <code>{ 아메리카노: 4000, 카페라테: 4500 }</code> 를 <code>for … in</code> 으로 돌며 <code>아메리카노 4000원</code> 모양으로 찍으세요.', needs: [['while (조건)', 'W7D/1', '조건이 참인 동안'], ['for (const key in obj)', 'W7D/0', '객체의 키']],
+        answer: WJ('모으기', 'let money = 0;\nlet weeks = 0;\nwhile (money < 100000) {\n  money += 15000;\n  weeks++;\n}\nconsole.log(`${weeks}주 ${money}원`);\nconst menu = { 아메리카노: 4000, 카페라테: 4500 };\nfor (const name in menu) {\n  console.log(`${name} ${menu[name]}원`);\n}'), io: [{ output: '7주 105000원\n아메리카노 4000원\n카페라테 4500원' }], outLabel: CONSOLE_OUT,
+        checks: [CK[0], { text: 'while 을 썼어요', sel: 'script', js: '/while\\s*\\(/.test([...document.scripts].pop().textContent)' }] },
+    ],
+    W7E: [
+      { title: '할인 함수', text: '가격과 할인율(안 주면 0.1)을 받아 <b>반올림한</b> 할인 가격을 돌려주는 함수 <code>discount</code> 를 만들고, <code>discount(4500)</code> · <code>discount(6000, 0.2)</code> · <code>discount(3500, 0)</code> 을 찍으세요.', needs: [['function 이름(a, b = 기본값)', 'W7E/0', '기본값'], ['return', 'W7E/0', '돌려주기'], ['Math.round', 'W7G/1', '반올림']],
+        answer: WJ('할인', 'function discount(price, rate = 0.1) {\n  return Math.round(price * (1 - rate));\n}\nconsole.log(discount(4500));\nconsole.log(discount(6000, 0.2));\nconsole.log(discount(3500, 0));'), io: [{ output: '4050\n4800\n3500' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '콜백 받는 repeat', text: '<code>repeat(n, fn)</code> 을 만드세요: 1 부터 n 까지 번호를 <code>fn</code> 에 넘기며 부르는 함수. 그리고 <code>repeat(3, …)</code> 으로 <code>1번째 잔</code> ~ <code>3번째 잔</code> 을, <code>repeat(2, …)</code> 으로 <code>☕</code> · <code>☕☕</code> 를 찍으세요(화살표 함수를 넘겨서).', needs: [['(a, b) => …', 'W7E/1', '화살표 함수'], ['fn(i)', 'W7E/1', '넘겨받은 함수 부르기(콜백)']],
+        answer: WJ('repeat', 'function repeat(n, fn) {\n  for (let i = 1; i <= n; i++) {\n    fn(i);\n  }\n}\nrepeat(3, i => console.log(`${i}번째 잔`));\nrepeat(2, i => console.log("☕".repeat(i)));'), io: [{ output: '1번째 잔\n2번째 잔\n3번째 잔\n☕\n☕☕' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '쿠폰 도장 카운터', text: '<code>makeStamp(goal)</code> 을 만드세요. 돌려받은 함수를 부를 때마다 도장이 하나 늘어 <code>도장 1/3</code> 처럼 돌려주고, goal 에 닿으면 <code>🎉 무료 음료!</code> 를 돌려주며 0 으로 돌아가요. 카드 둘은 <b>따로</b> 세요.<pre class="code">const a = makeStamp(3);\nconst b = makeStamp(2);\nconsole.log(a()); console.log(a()); console.log(b());\nconsole.log(a()); console.log(b()); console.log(a());</pre>', needs: [['return () => { count += 1; … }', 'W7E/2', '클로저 — 바깥 변수를 기억']],
+        answer: WJ('도장', 'function makeStamp(goal) {\n  let count = 0;\n  return () => {\n    count += 1;\n    if (count === goal) {\n      count = 0;\n      return "🎉 무료 음료!";\n    }\n    return `도장 ${count}/${goal}`;\n  };\n}\nconst a = makeStamp(3);\nconst b = makeStamp(2);\nconsole.log(a()); console.log(a()); console.log(b());\nconsole.log(a()); console.log(b()); console.log(a());'), io: [{ output: '도장 1/3\n도장 2/3\n도장 1/2\n🎉 무료 음료!\n🎉 무료 음료!\n도장 1/3' }], outLabel: CONSOLE_OUT, checks: CK },
+    ],
+    W7F: [
+      { title: '메뉴 통계', text: '아래 메뉴로 세 줄을 찍으세요: 가장 비싼 메뉴, 커피의 평균 가격, 5000원 이하 메뉴 이름들(쉼표로).<pre class="code">const menu = [\n  { name: "아메리카노", price: 4000, type: "커피" },\n  { name: "카페라테", price: 4500, type: "커피" },\n  { name: "바닐라라테", price: 5000, type: "커피" },\n  { name: "크루아상", price: 3500, type: "빵" },\n  { name: "치즈케이크", price: 6000, type: "빵" },\n];</pre>', needs: [['reduce', 'W7F/1', '값 모으기'], ['filter · map · join', 'W7F/1', '고르고 바꾸고 잇기'], ['sort((a, b) => b - a)', 'W7F/0', '큰 것부터']],
+        answer: WJ('통계', 'const menu = [\n  { name: "아메리카노", price: 4000, type: "커피" },\n  { name: "카페라테", price: 4500, type: "커피" },\n  { name: "바닐라라테", price: 5000, type: "커피" },\n  { name: "크루아상", price: 3500, type: "빵" },\n  { name: "치즈케이크", price: 6000, type: "빵" },\n];\nconst best = [...menu].sort((a, b) => b.price - a.price)[0];\nconsole.log(`가장 비싼 메뉴: ${best.name} ${best.price}원`);\nconst coffee = menu.filter(m => m.type === "커피");\nconst avg = coffee.reduce((s, m) => s + m.price, 0) / coffee.length;\nconsole.log(`커피 평균: ${avg}원`);\nconsole.log(`5000원 이하: ${menu.filter(m => m.price <= 5000).map(m => m.name).join(", ")}`);'), io: [{ output: '가장 비싼 메뉴: 치즈케이크 6000원\n커피 평균: 4500원\n5000원 이하: 아메리카노, 카페라테, 바닐라라테, 크루아상' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '가격 올린 새 배열', text: '메뉴 세 개의 가격을 300원씩 올린 <b>새 배열</b>을 만들어 <code>이름 가격</code> 을 쉼표로 이어 찍고, 원본의 첫 가격이 <b>그대로</b>인지도 찍으세요. 객체를 고칠 때 원본을 건드리지 않게 펼치기로.<pre class="code">const menu = [\n  { name: "아메리카노", price: 4000 },\n  { name: "카페라테", price: 4500 },\n  { name: "크루아상", price: 3500 },\n];</pre>', needs: [['{ ...m, price: … }', 'W7F/2', '펼치기로 복사본'], ['map', 'W7F/1', '새 배열']],
+        answer: WJ('가격 올리기', 'const menu = [\n  { name: "아메리카노", price: 4000 },\n  { name: "카페라테", price: 4500 },\n  { name: "크루아상", price: 3500 },\n];\nconst raised = menu.map(m => ({ ...m, price: m.price + 300 }));\nconsole.log(raised.map(m => `${m.name} ${m.price}`).join(", "));\nconsole.log("원본 첫 가격:", menu[0].price);'), io: [{ output: '아메리카노 4300, 카페라테 4800, 크루아상 3800\n원본 첫 가격: 4000' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '종류별로 묶기', text: '첫 문제의 메뉴 다섯 개를 <code>reduce</code> 로 종류별 <b>개수와 합계</b>를 모은 객체로 만든 뒤, <code>Object.entries</code> 와 구조 분해로 <code>커피 3개 13500원</code> 모양으로 찍으세요.', needs: [['reduce((acc, m) => …, {})', 'W7F/1', '객체로 묶어 모으기'], ['Object.entries', 'W7F/2', '[키, 값] 배열'], ['const [k, v] = …', 'W7F/2', '구조 분해']],
+        answer: WJ('묶기', 'const menu = [\n  { name: "아메리카노", price: 4000, type: "커피" },\n  { name: "카페라테", price: 4500, type: "커피" },\n  { name: "바닐라라테", price: 5000, type: "커피" },\n  { name: "크루아상", price: 3500, type: "빵" },\n  { name: "치즈케이크", price: 6000, type: "빵" },\n];\nconst groups = menu.reduce((acc, m) => {\n  acc[m.type] = acc[m.type] ?? { count: 0, sum: 0 };\n  acc[m.type].count += 1;\n  acc[m.type].sum += m.price;\n  return acc;\n}, {});\nfor (const [type, { count, sum }] of Object.entries(groups)) {\n  console.log(`${type} ${count}개 ${sum}원`);\n}'), io: [{ output: '커피 3개 13500원\n빵 2개 9500원' }], outLabel: CONSOLE_OUT, checks: CK },
+    ],
+    W7G: [
+      { title: '영수증 한 장', text: '주문 <code>[["아메리카노", 2, 4000], ["크루아상", 1, 3500]]</code>(이름 · 개수 · 값)으로 영수증을 찍으세요: 줄마다 <code>아메리카노 x2 = 8,000원</code>, 끝에 <code>합계 11,500원</code>, 마지막 줄은 주문 번호 42 를 네 자리로 <code>주문번호 0042</code>.', needs: [['toLocaleString("ko-KR")', 'W7G/1', '세 자리 쉼표'], ['padStart(4, "0")', 'W7G/0', '앞을 0 으로 채우기'], ['const [a, b, c] = …', 'W7F/2', '배열 구조 분해']],
+        answer: WJ('영수증', 'const order = [["아메리카노", 2, 4000], ["크루아상", 1, 3500]];\nlet total = 0;\nfor (const [name, qty, price] of order) {\n  const sum = qty * price;\n  total += sum;\n  console.log(`${name} x${qty} = ${sum.toLocaleString("ko-KR")}원`);\n}\nconsole.log(`합계 ${total.toLocaleString("ko-KR")}원`);\nconsole.log(`주문번호 ${String(42).padStart(4, "0")}`);'), io: [{ output: '아메리카노 x2 = 8,000원\n크루아상 x1 = 3,500원\n합계 11,500원\n주문번호 0042' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '잘못된 입력은 에러로', text: '글자를 받아 앞뒤 공백을 지우고 숫자로 바꾸되, <b>0 보다 큰 정수가 아니면</b> <code>잘못된 금액: "입력"</code> 에러를 던지는 <code>parseAmount</code> 를 만드세요. <code>[" 4500 ", "abc", "-100", "3000"]</code> 을 차례로 넣어, 되면 숫자를, 안 되면 <code>에러 → 메시지</code> 를 찍어요.', needs: [['throw new Error("…")', 'W7G/2', '에러 던지기'], ['try { } catch (e) { }', 'W7G/2', '에러 잡기 · e.message'], ['trim()', 'W7G/0', '앞뒤 공백'], ['Number.isInteger', 'W7G/1', '정수인지']],
+        answer: WJ('에러', 'function parseAmount(text) {\n  const n = Number(text.trim());\n  if (!Number.isInteger(n) || n <= 0) {\n    throw new Error(`잘못된 금액: "${text}"`);\n  }\n  return n;\n}\nfor (const text of [" 4500 ", "abc", "-100", "3000"]) {\n  try {\n    console.log(parseAmount(text));\n  } catch (e) {\n    console.log("에러 →", e.message);\n  }\n}'), io: [{ output: '4500\n에러 → 잘못된 금액: "abc"\n에러 → 잘못된 금액: "-100"\n3000' }], outLabel: CONSOLE_OUT, checks: CK },
+      { title: '메뉴 class', text: '<code>class MenuItem</code> 을 만드세요: <code>constructor(name, price)</code>, <code>label()</code> 은 <code>카페라테 4,500원</code>, <code>sale(rate)</code> 는 할인한(반올림) 가격의 <b>새 MenuItem</b> 을 돌려줘요. 카페라테 4500원의 label 과 10% 할인한 것의 label 을 찍으세요.', needs: [['class · constructor · this', 'W7G/2', '클래스'], ['new', 'W7G/2', '만들기'], ['Math.round', 'W7G/1', '반올림']],
+        answer: WJ('class', 'class MenuItem {\n  constructor(name, price) {\n    this.name = name;\n    this.price = price;\n  }\n  label() {\n    return `${this.name} ${this.price.toLocaleString("ko-KR")}원`;\n  }\n  sale(rate) {\n    return new MenuItem(this.name, Math.round(this.price * (1 - rate)));\n  }\n}\nconst latte = new MenuItem("카페라테", 4500);\nconsole.log(latte.label());\nconsole.log(latte.sale(0.1).label());'), io: [{ output: '카페라테 4,500원\n카페라테 4,050원' }], outLabel: CONSOLE_OUT, checks: CK },
+    ],
+    WB4: [ // v2.25.3 챕터 4 만들어 보기 — 화면 없이 JS 만
+      { title: '🏠 Console 가계부', text: '화면 없이 JS 만으로 가계부를 만드세요. <code>class Ledger</code> 에 <code>add(t)</code>(금액이 0 보다 큰 정수가 아니면 에러) · <code>total()</code> · <code>byCategory()</code> · <code>biggest()</code> · <code>byMonth()</code> 를 두고, 아래 거래를 하나씩 넣어요(잘못된 것은 <code>try/catch</code> 로 건너뛰며 경고 한 줄). 그다음 다섯 줄 — 건너뛴 경고 · 총 지출 · 분류별 · 가장 큰 지출 · 달별(달마다 한 줄)을 아래 모양 그대로 찍어요. 금액은 <code>toLocaleString("ko-KR")</code>.<pre class="code">const data = [\n  { date: "2026-10-03", memo: "점심", amount: 9000, cat: "식비" },\n  { date: "2026-10-05", memo: "교통카드 충전", amount: 30000, cat: "교통" },\n  { date: "2026-10-12", memo: "책", amount: 15000, cat: "공부" },\n  { date: "2026-10-20", memo: "저녁", amount: 12000, cat: "식비" },\n  { date: "2026-11-02", memo: "커피", amount: 4500, cat: "식비" },\n  { date: "2026-11-04", memo: "강의", amount: 50000, cat: "공부" },\n  { date: "2026-11-06", memo: "환불?", amount: -3000, cat: "식비" },\n];</pre>', needs: [['class · constructor · this', 'W7G/2', '가계부 틀'], ['throw · try/catch', 'W7G/2', '잘못된 금액'], ['reduce', 'W7F/1', '합계 · 묶기'], ['Object.entries · 구조 분해', 'W7F/2', '분류별 · 달별 찍기'], ['slice(0, 7)', 'W7G/0', '"2026-10-03" → "2026-10"'], ['toLocaleString("ko-KR")', 'W7G/1', '세 자리 쉼표']],
+        answer: WJ('가계부', 'const data = [\n  { date: "2026-10-03", memo: "점심", amount: 9000, cat: "식비" },\n  { date: "2026-10-05", memo: "교통카드 충전", amount: 30000, cat: "교통" },\n  { date: "2026-10-12", memo: "책", amount: 15000, cat: "공부" },\n  { date: "2026-10-20", memo: "저녁", amount: 12000, cat: "식비" },\n  { date: "2026-11-02", memo: "커피", amount: 4500, cat: "식비" },\n  { date: "2026-11-04", memo: "강의", amount: 50000, cat: "공부" },\n  { date: "2026-11-06", memo: "환불?", amount: -3000, cat: "식비" },\n];\nconst won = (n) => `${n.toLocaleString("ko-KR")}원`;\n\nclass Ledger {\n  constructor() {\n    this.items = [];\n  }\n  add(t) {\n    if (!Number.isInteger(t.amount) || t.amount <= 0) {\n      throw new Error(`${t.date} 금액이 잘못됐어요 (${t.amount})`);\n    }\n    this.items.push(t);\n  }\n  total() {\n    return this.items.reduce((s, t) => s + t.amount, 0);\n  }\n  groupBy(keyOf) {\n    return this.items.reduce((acc, t) => {\n      const k = keyOf(t);\n      acc[k] = (acc[k] ?? 0) + t.amount;\n      return acc;\n    }, {});\n  }\n  byCategory() {\n    return this.groupBy(t => t.cat);\n  }\n  byMonth() {\n    return this.groupBy(t => t.date.slice(0, 7));\n  }\n  biggest() {\n    return [...this.items].sort((a, b) => b.amount - a.amount)[0];\n  }\n}\n\nconst book = new Ledger();\nfor (const t of data) {\n  try {\n    book.add(t);\n  } catch (e) {\n    console.log("⚠ 건너뜀:", e.message);\n  }\n}\nconsole.log(`총 지출 ${won(book.total())}`);\nconsole.log(`분류별: ${Object.entries(book.byCategory()).map(([c, s]) => `${c} ${won(s)}`).join(" · ")}`);\nconst big = book.biggest();\nconsole.log(`가장 큰 지출: ${big.date} ${big.memo} ${won(big.amount)}`);\nfor (const [month, sum] of Object.entries(book.byMonth())) {\n  console.log(`${month}: ${won(sum)}`);\n}'),
+        io: [{ output: '⚠ 건너뜀: 2026-11-06 금액이 잘못됐어요 (-3000)\n총 지출 120,500원\n분류별: 식비 25,500원 · 교통 30,000원 · 공부 65,000원\n가장 큰 지출: 2026-11-04 강의 50,000원\n2026-10: 66,000원\n2026-11: 54,500원' }], outLabel: CONSOLE_OUT,
+        checks: [CK[0], { text: 'class Ledger 를 썼어요', sel: 'script', js: '/class\\s+Ledger/.test([...document.scripts].pop().textContent)' }, { text: '잘못된 금액은 throw 로', sel: 'script', js: '/throw\\s+new\\s+Error/.test([...document.scripts].pop().textContent)' }] },
     ],
     W8: [
       { title: '좋아요 버튼', text: '<code>♥ 좋아요</code> 버튼을 누를 때마다 옆의 숫자(<code>id="likes"</code>, 처음 0)가 1씩 늘고, 버튼에 <code>on</code> class 가 켜지게(빨간색은 CSS 로).', needs: [['addEventListener("click")', 'W8/1', '클릭'], ['textContent', 'W8/0', '글자 바꾸기'], ['classList.add', 'W8/0', 'class 켜기']],

@@ -109,7 +109,7 @@ const Web = {
 function __academyBridge(cfg) {
   var TOKEN = cfg.token; var P = window.parent; var pendingNet = 0;
   function send(m) { m.__web = TOKEN; try { P.postMessage(m, '*'); } catch (e) {} }
-  function fmt(a) { try { if (typeof a === 'string') return a; if (a instanceof Error) return a.name + ': ' + a.message; if (a && a.nodeType === 1) return '<' + a.tagName.toLowerCase() + (a.id ? ' id="' + a.id + '"' : '') + '>'; if (a === undefined) return 'undefined'; if (typeof a === 'function') return 'function ' + (a.name || ''); var s = JSON.stringify(a); return s === undefined ? String(a) : s; } catch (e) { return String(a); } }
+  function fmt(a) { try { if (typeof a === 'string') return a; if (typeof a === 'number' || typeof a === 'boolean' || a === null) return String(a); /* v2.25.3: NaN 이 JSON 의 null 로 찍히던 것 */ if (a instanceof Error) return a.name + ': ' + a.message; if (a && a.nodeType === 1) return '<' + a.tagName.toLowerCase() + (a.id ? ' id="' + a.id + '"' : '') + '>'; if (a === undefined) return 'undefined'; if (typeof a === 'function') return 'function ' + (a.name || ''); var s = JSON.stringify(a); return s === undefined ? String(a) : s; } catch (e) { return String(a); } }
   ['log', 'info', 'warn', 'error', 'debug'].forEach(function (k) { var o = console[k]; console[k] = function () { var args = Array.prototype.slice.call(arguments); send({ t: 'console', level: k, text: args.map(fmt).join(' ') }); try { o && o.apply(console, args); } catch (e) {} }; });
   window.alert = function (m) { send({ t: 'console', level: 'alert', text: String(m) }); };
   window.confirm = function (m) { send({ t: 'console', level: 'alert', text: 'confirm: ' + m + ' → 확인(true)' }); return true; };
