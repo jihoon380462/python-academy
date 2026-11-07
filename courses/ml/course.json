@@ -1,0 +1,1 @@
+{"id": "ml", "name": "AI·머신러닝 기초", "icon": "🧠", "desc": "선형 회귀 · 경사하강 · k-NN · 로지스틱 회귀 · 결정 트리 · 평가 지표 · k-평균을 numpy 와 scikit-learn 으로 직접 만드는 교과서", "runner": "python", "mapColor": "#00695c", "mascotGear": null}

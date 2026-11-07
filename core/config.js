@@ -2,11 +2,11 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.32.0',
+  APP_VERSION: '2.33.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
-  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+[A-Z]?([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', vim: '^(V|VB)\\d+(P\\d+)?$', github: '^(G|GB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+[A-Z]?(P\\d+)?$', api: '^(H|HB)\\d+(P\\d+)?$', linux: '^(U|UB)\\d+(P\\d+)?$', os: '^(K|KB)\\d+(P\\d+)?$', asm: '^(R|RB)\\d+(P\\d+)?$', cs: '^(C|CB)\\d+(P\\d+)?$', llm: '^(N|NB)\\d+(P\\d+)?$' },
+  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+[A-Z]?([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', vim: '^(V|VB)\\d+(P\\d+)?$', github: '^(G|GB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+[A-Z]?(P\\d+)?$', api: '^(H|HB)\\d+(P\\d+)?$', linux: '^(U|UB)\\d+(P\\d+)?$', os: '^(K|KB)\\d+(P\\d+)?$', asm: '^(R|RB)\\d+(P\\d+)?$', cs: '^(C|CB)\\d+(P\\d+)?$', llm: '^(N|NB)\\d+(P\\d+)?$', debug: '^(D|DB)\\d+(P\\d+)?$', data: '^(P|PB)\\d+(P\\d+)?$', oop: '^(O|OB)\\d+(P\\d+)?$', ml: '^(I|IB)\\d+(P\\d+)?$', ai: '^(Z|ZB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
     { id: 'python', short: '파이썬', name: '파이썬', icon: '🐍', desc: '문법 설명을 읽고 VS Code 에서 직접 만들어 보는 파이썬 교과서', path: 'courses/python/', color: '#2bb673', ready: true, lessons: 58, book: true /* v2.10.1: 교과서 코스 — 허브 카드는 문제 수 대신 「읽은 레슨」(lessons = 열린 레슨 수, check_book 이 맞는지 검사) */ },
     { id: 'algo', short: '알고리즘', name: '알고리즘·자료구조', icon: '🧭', desc: '그림으로 돌아가는 모습을 보며 읽고, VS Code 에서 직접 풀어 보는 알고리즘 교과서 — 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, lessons: 36, book: true, bookNote: '그림으로 보기 · 모의고사 15문제' /* v2.15.0 N5: 교과서 */ },
@@ -22,6 +22,11 @@ const CONFIG = {
     { id: 'llm', short: 'LLM', name: 'LLM 기초', icon: '🤖', desc: '다음 글자 맞히기부터 어텐션까지 — numpy 로 아주 작은 언어 모델을 직접 만들어 보는 교과서', path: 'courses/llm/', color: '#8e24aa', ready: true, book: true, space: true, bookNote: '공용 — 아주 작은 언어 모델을 직접', lessons: 20 /* v2.32.0 LLM 기초 교과서(T11) 완성 — 20 전부(레슨은 서브 에이전트 4개가 동시에, Opus 검수) */ },
     { id: 'web', short: '웹', name: '웹', icon: '🌐', desc: 'VS Code 와 브라우저로 화면을 만드는 웹 교과서', path: 'courses/web/', color: '#8e24aa', ready: true, book: true, bookNote: 'HTML · CSS · JavaScript 를 제대로 — 혼자 화면을 끝까지', lessons: 34 /* v2.26.0 웹 교과서 완성 — 34레슨 전부(specs/web-course.md) */ },
     { id: 'api', short: 'HTTP·API', name: 'HTTP·API·SDK', icon: '🔌', desc: 'curl 과 requests 로 남의 API 를 부르고, 내 API 서버와 그 SDK 까지 만드는 교과서', path: 'courses/api/', color: '#00897b', ready: true, book: true, bookNote: '남의 API 부르기 → 내 API 만들기 → 내 SDK 만들기', lessons: 21 /* v2.28.1 HTTP·API·SDK 교과서 완성 — 21 전부(specs/http-api-course.md) */ },
+    { id: 'debug', short: '디버깅', name: '디버깅·테스트', icon: '🐞', desc: '트레이스백 · 범위 좁히기 · 디버거 · pytest · TDD · 회귀 테스트를 내 VS Code 에서 직접 해 보는 교과서', path: 'courses/debug/', color: '#e65100', ready: true, book: true, bookNote: '파이썬 다음 — 버그 잡기와 테스트 습관', lessons: 0 /* v2.33.0 디버깅·테스트 교과서 */ },
+    { id: 'data', short: '데이터', name: '데이터 분석', icon: '📊', desc: 'pandas 로 표 데이터를 읽고 정리 · 요약하고 matplotlib 로 그려 분석 보고서까지 쓰는 교과서', path: 'courses/data/', color: '#0277bd', ready: true, book: true, bookNote: '파이썬 다음 — pandas · matplotlib', lessons: 0 /* v2.33.0 데이터 분석 교과서 */ },
+    { id: 'oop', short: '설계', name: '객체지향·설계', icon: '🧱', desc: '캡슐화 · 합성 · 다형성 · 설계 원칙 · 디자인 패턴 · 리팩터링으로 고치기 쉬운 파이썬 코드를 짜는 교과서', path: 'courses/oop/', color: '#5d4037', ready: true, book: true, bookNote: '파이썬 다음 — 클래스를 나누는 법', lessons: 0 /* v2.33.0 객체지향·설계 교과서 */ },
+    { id: 'ml', short: '머신러닝', name: 'AI·머신러닝 기초', icon: '🧠', desc: '선형 회귀 · 경사하강 · k-NN · 로지스틱 회귀 · 결정 트리 · 평가 지표 · k-평균을 numpy 와 scikit-learn 으로 직접 만드는 교과서', path: 'courses/ml/', color: '#00695c', ready: true, book: true, bookNote: '파이썬 다음 — numpy · scikit-learn', lessons: 0 /* v2.33.0 AI·머신러닝 기초 교과서 */ },
+    { id: 'ai', short: 'AI 협업', name: 'AI와 협업', icon: '🤝', desc: '좋은 요청 · 단계 나누기 · AI 코드 검증 · 환각 알아보기 · 개인정보 · 저작권까지 AI 도구와 일하는 법을 익히는 교과서', path: 'courses/ai/', color: '#ad1457', ready: true, book: true, bookNote: '파이썬 다음 — AI 도구 잘 쓰기', lessons: 0 /* v2.33.0 AI와 협업 교과서 */ },
   ],
 
   // --- 외부 라이브러리 (버전 고정) ---

@@ -1,0 +1,1 @@
+{"id": "data", "name": "데이터 분석", "icon": "📊", "desc": "pandas 로 표 데이터를 읽고 정리 · 요약하고 matplotlib 로 그려 분석 보고서까지 쓰는 교과서", "runner": "python", "mapColor": "#0277bd", "mascotGear": null}
