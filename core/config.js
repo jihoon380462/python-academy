@@ -2,13 +2,13 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.36.0',
+  APP_VERSION: '2.37.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
   COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+[A-Z]?([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', vim: '^(V|VB)\\d+(P\\d+)?$', github: '^(G|GB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+[A-Z]?(P\\d+)?$', api: '^(H|HB)\\d+(P\\d+)?$', linux: '^(U|UB)\\d+(P\\d+)?$', os: '^(K|KB)\\d+(P\\d+)?$', asm: '^(R|RB)\\d+(P\\d+)?$', cs: '^(C|CB)\\d+(P\\d+)?$', llm: '^(N|NB)\\d+(P\\d+)?$', debug: '^(D|DB)\\d+(P\\d+)?$', data: '^(P|PB)\\d+(P\\d+)?$', oop: '^(O|OB)\\d+(P\\d+)?$', ml: '^(I|IB)\\d+(P\\d+)?$', ai: '^(Z|ZB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
-    { id: 'python', short: '파이썬', name: '파이썬', icon: '🐍', desc: '문법 설명을 읽고 VS Code 에서 직접 만들어 보는 파이썬 교과서', path: 'courses/python/', color: '#2bb673', ready: true, lessons: 66, book: true /* v2.10.1: 교과서 코스 — 허브 카드는 문제 수 대신 「읽은 레슨」(lessons = 열린 레슨 수, check_book 이 맞는지 검사) */ },
+    { id: 'python', short: '파이썬', name: '파이썬', icon: '🐍', desc: '문법 설명을 읽고 VS Code 에서 직접 만들어 보는 파이썬 교과서', path: 'courses/python/', color: '#2bb673', ready: true, lessons: 67, book: true /* v2.10.1: 교과서 코스 — 허브 카드는 문제 수 대신 「읽은 레슨」(lessons = 열린 레슨 수, check_book 이 맞는지 검사) */ },
     { id: 'algo', short: '알고리즘', name: '알고리즘·자료구조', icon: '🧭', desc: '그림으로 돌아가는 모습을 보며 읽고, VS Code 에서 직접 풀어 보는 알고리즘 교과서 — 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, lessons: 36, book: true, bookNote: '그림으로 보기 · 모의고사 15문제' /* v2.15.0 N5: 교과서 */ },
     { id: 'terminal-git', short: '터미널·Git', name: '터미널·Git', icon: '🎧', desc: 'Git Bash 에서 직접 쳐 보는 터미널·Git 교과서', path: 'courses/terminal-git/', color: '#607d8b', ready: true, book: true, bookNote: '명령어 편 + Git 편 · 실제 GitHub 까지', lessons: 20 /* v2.10.0 명령어 편 T0~T5·TB1 + v2.12.0 Git 편 T6~TB3 */ },
     { id: 'github', short: 'GitHub', name: 'GitHub', icon: '🐙', desc: '내 진짜 GitHub 계정으로 저장소·Pull Request·Actions·Pages — 협업하고 공개하는 교과서', path: 'courses/github/', color: '#8250df', ready: true, book: true, lessons: 22, bookNote: '터미널·Git 다음 · PR·Actions·Pages 까지 내 계정으로' /* v2.16.0 N6 설계 specs/github-course.md — 챕터 1 부터 */ },

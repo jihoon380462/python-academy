@@ -15,7 +15,7 @@
 
 | 코스 | 모드 | 연습 도구 | 허브 카드에 보이는 것 | 정상 동작 |
 | --- | --- | --- | --- | --- |
-| 파이썬 `courses/python/` | **교과서**(v2.9.0~) | 사용자 PC 의 **VS Code + 파이썬** | 📖 교과서 · 읽은 레슨 n/66(v2.30.0 완성 · v2.36.0 무거운 레슨 나누기) | 브라우저에서 파이썬을 **실행하지 않는다**(Pyodide 안 받음). 예제는 📋 복사 → VS Code 에서 실행 |
+| 파이썬 `courses/python/` | **교과서**(v2.9.0~) | 사용자 PC 의 **VS Code + 파이썬** | 📖 교과서 · 읽은 레슨 n/67(v2.30.0 완성 · v2.36.0 무거운 레슨 나누기) | 브라우저에서 파이썬을 **실행하지 않는다**(Pyodide 안 받음). 예제는 📋 복사 → VS Code 에서 실행 |
 | 터미널·Git `courses/terminal-git/` | **교과서**(v2.10.0 명령어 편 · v2.12.0 Git 편) — T0~T16·TB1~TB3 전부 | 사용자 PC 의 **Git Bash**(진짜 터미널·진짜 git) | 📖 교과서 · 읽은 레슨 n/20 · 명령어 편 + Git 편 · 실제 GitHub 까지 | Git 의 push·pull·clone 연습은 「가짜 GitHub」 = 연습 폴더 안의 `remote.git`(bare 저장소)로 하는 게 **정상**. 실제 GitHub 는 T16(계정·New repository·첫 push 브라우저 로그인·PR) — 사이트가 검사하지 않음 |
 | SQL `courses/sql/` | **교과서**(v2.13.0~) — S0~S13 · 보스 SB1~SB3 | 사용자 PC 의 **DB Browser for SQLite** + 연습 DB `cafe.db`(사이트에서 받음 · `courses/sql/cafe.db`), 레슨 13 은 VS Code 파이썬 `sqlite3` | 📖 교과서 · 읽은 레슨 n/17 | 「만들어 보기」 결과는 표로 보임(DB Browser 결과 칸처럼). 데이터를 바꾸는 문제(레슨 8~)는 **Write Changes** 를 눌러야 저장 — 경고 상자가 있는 게 정상. |
 | 웹 `courses/web/` | **교과서**(v2.14.0~, v2.26.0 34레슨 완성 — `specs/web-course.md`): 화면만(HTML · CSS · JS) 6챕터, W0~W13 + 끼워 넣은 W2B · W4B … · 만들어 보기 WB0~WB4. JS 언어 챕터(4)는 Console 에서 | 사용자 PC 의 **VS Code + Live Server 확장 + 크롬/엣지(F12)**, 레슨 28 은 GitHub Pages(내 계정) | 📖 교과서 · 읽은 레슨 n/34 | 「만들어 보기」 는 「브라우저에서 확인할 것」 체크 목록(☐) — 사이트가 채점하지 않음(정상). 예시 답은 파일 전체. |
