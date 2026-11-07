@@ -7,6 +7,15 @@
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
 
+## v2.25.2 — 2026-11-07 (Opus: 웹 교과서 챕터 3 — CSS 배치)
+
+- 📖 **웹 교과서 챕터 3 「CSS 배치 — 어디에」 완성**(D16):
+  - 레슨 11 **레이아웃: grid** — `display: grid` · `fr` · `repeat()` · `gap`, 미디어 쿼리 없는 반응형 `repeat(auto-fill, minmax(160px, 1fr))` · `aspect-ratio` · `object-fit: cover`, `grid-column: span 2` · `grid-template-areas`(폰에서 그림만 바꿔 쌓기), flex 와 grid 고르기. 만들어 보기 3(사진 갤러리 · 오늘의 추천은 두 칸 · 페이지 판 짜기).
+  - 레슨 12 **position: 겹치고 붙이기** — static · relative · absolute · fixed · sticky, 배지 · 붙는 머리 막대(`scroll-margin-top`) · 위로 가기 버튼, z-index 와 흔한 실수 4가지. 만들어 보기 3(NEW 배지 · 스크롤해도 붙어 있는 메뉴 · 위로 가기 버튼 — 실제로 스크롤해서 자동 확인).
+  - **만들어 보기: 내 소개 페이지 키움** — 사진 갤러리 구역(grid) · 붙는 머리 막대(sticky) · 주 색 CSS 변수 `--main` 을 더해 확인할 것 7 → 10개.
+- 허브 카드 웹 n/25.
+- 🛠 내부: regress 웹 절 열린 25 · 준비 중 9 · 폰 390 7쪽 추가.
+
 ## v2.25.1 — 2026-11-07 (Opus: 웹 교과서 챕터 2 — CSS 기본)
 
 - 📖 **웹 교과서 챕터 2 「CSS 기본 — 모양」 완성**(D16 · [`specs/web-course.md`](specs/web-course.md)) — 새 레슨 4개(각 3쪽 + 만들어 보기):
