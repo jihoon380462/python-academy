@@ -27,7 +27,7 @@ HTTP  요청 줄 · 헤더 · 본문 / 상태 코드 · 헤더 · 본문  ← �
 <p>이 교과서의 순서도 이 세 겹을 따라가요.</p>
 <ol><li><b>챕터 1</b> — HTTP 를 날것으로 보기(<code>curl -v</code> · 상태 코드 · 헤더 · JSON · 브라우저 Network)</li><li><b>챕터 2</b> — 남의 API 를 파이썬 <code>requests</code> 로 제대로 쓰기(REST · 인증 · 페이지 · 재시도 · 문서)</li><li><b>챕터 3</b> — 내 API 서버를 만들기(FastAPI)</li><li><b>챕터 4</b> — 내 API 의 SDK 를 만들기 — 서버 · SDK · 프로그램이 다 내 것</li></ol>` },
     { title: '준비: curl 과 requests', html: `<p>두 가지 도구로 API 를 불러요. <b>curl</b> 은 터미널에서 HTTP 를 날것으로 보는 명령, <b>requests</b> 는 파이썬에서 API 를 부르는 라이브러리예요.</p>
-<table class="kb"><tbody><tr><td><code>curl --version</code></td><td>Windows 10 · 11 에는 처음부터 있어요. 맨 앞에 <code>curl 8.x …</code> 가 나오면 준비 끝</td></tr><tr><td><code>python -m pip install requests</code></td><td>VS Code 터미널에서 한 번. <code>Successfully installed requests-…</code> 또는 <code>Requirement already satisfied</code></td></tr></tbody></table>
+<table class="kb"><tbody><tr><td><code>curl --version</code></td><td>Windows 10 · 11 에는 처음부터 있어요. 맨 앞에 <code>curl 8.x …</code> 가 나오면 준비 끝</td></tr><tr><td><code>python -m pip install requests</code></td><td>VS Code 터미널에서 한 번. <code>Successfully installed requests-…</code> 또는 <code>Requirement already satisfied</code>. 프로젝트마다 나눠 깔려면 <a href="../python/#lesson/L16D" target="_blank" rel="noopener">파이썬 교과서 「pip 와 가상 환경」 ↗</a></td></tr></tbody></table>
 <div class="bk-warn"><b>VS Code 의 기본 터미널(PowerShell)에서는 <code>curl.exe</code> 로 쳐요.</b> PowerShell 의 <code>curl</code> 은 다른 명령(<code>Invoke-WebRequest</code>)의 별명이라 <code>-v</code> · <code>-i</code> 가 안 돼요. 이 교과서의 명령은 Git Bash 기준이고, PowerShell 이면 <code>curl</code> 자리에 <code>curl.exe</code>.</div>
 <p>첫 요청 — <b>httpbin.org</b> 는 받은 요청을 그대로 되돌려 주는 연습용 서버예요(가입 없음).</p>`,
       example: { label: '예제 명령 — Git Bash(PowerShell 은 curl.exe)', shell: 'curl https://httpbin.org/get\n\n# 파이썬으로 같은 일 — VS Code 의 hello_api.py 로 저장해 실행\n# import requests\n# res = requests.get("https://httpbin.org/get", timeout=10)\n# print(res.status_code)\n# print(res.json()["url"])' } },
@@ -260,7 +260,7 @@ for attempt in range(1, 5):
 <div class="bk-step-box"><b>① 설치(한 번)</b><br>VS Code 터미널에서 <code>python -m pip install "fastapi[standard]"</code> — 큰따옴표까지 그대로(대괄호를 셸이 다르게 읽지 않게).</div>
 <div class="bk-step-box"><b>② main.py</b><br>아래 예제를 <code>api-study/main.py</code> 로 저장.</div>
 <div class="bk-step-box"><b>③ 켜기</b><br>같은 폴더에서 <code>fastapi dev main.py</code> → 「<code>http://127.0.0.1:8000</code>」 이 보이면 켜진 거예요. 브라우저로 <code>http://127.0.0.1:8000/hello</code> → <code>{"message":"안녕하세요"}</code>. 끄기는 터미널에서 <kbd>Ctrl</kbd>+<kbd>C</kbd>.</div>
-<table class="kb"><tbody><tr><td><code>app = FastAPI()</code></td><td>서버 하나</td></tr><tr><td><code>@app.get("/hello")</code></td><td>「<code>GET /hello</code> 요청이 오면 아래 함수를 불러」(파이썬 교과서의 데코레이터)</td></tr><tr><td><code>return {…}</code></td><td>딕셔너리 · 리스트를 돌려주면 FastAPI 가 <b>JSON</b> 으로 바꾸고 <code>Content-Type</code> 까지 붙여요</td></tr><tr><td><code>fastapi dev</code></td><td>개발용 — 파일을 저장하면 서버가 <b>저절로 다시 켜져요</b></td></tr></tbody></table>
+<table class="kb"><tbody><tr><td><code>app = FastAPI()</code></td><td>서버 하나</td></tr><tr><td><code>@app.get("/hello")</code></td><td>「<code>GET /hello</code> 요청이 오면 아래 함수를 불러」(<a href="../python/#lesson/L18D" target="_blank" rel="noopener">파이썬 교과서 「데코레이터」 ↗</a>)</td></tr><tr><td><code>return {…}</code></td><td>딕셔너리 · 리스트를 돌려주면 FastAPI 가 <b>JSON</b> 으로 바꾸고 <code>Content-Type</code> 까지 붙여요</td></tr><tr><td><code>fastapi dev</code></td><td>개발용 — 파일을 저장하면 서버가 <b>저절로 다시 켜져요</b></td></tr></tbody></table>
 <div class="bk-warn"><b>내 서버는 내 PC 에서만.</b> <code>127.0.0.1</code> 은 「이 컴퓨터 자신」 이라 다른 기기는 못 들어와요(기본값). <code>--host 0.0.0.0</code> 으로 열면 같은 와이파이의 다른 기기도 들어와요 — 연습 중에는 쓰지 않아요.</div>`,
       example: { label: '예제 — main.py 로 저장하고 fastapi dev main.py', shell: 'from fastapi import FastAPI\n\napp = FastAPI()\n\n\n@app.get("/hello")\ndef hello():\n    return {"message": "안녕하세요"}' } },
     { title: '요청 기록 읽기 · curl · requests 로 부르기', html: `<p>서버를 켠 터미널에는 요청이 올 때마다 한 줄씩 찍혀요 — 내 서버의 Network 탭이에요.</p>
@@ -293,7 +293,7 @@ def get_todo(todo_id: int):
 def list_todos(done: bool | None = None, limit: int = 10):
     …</pre>
 <table class="kb"><tbody><tr><td><code>GET /todos/3</code></td><td><code>todo_id</code> 에 숫자 <b>3</b>(글자 <code>"3"</code> 이 아니라) — 타입 힌트대로 바꿔 줘요</td></tr><tr><td><code>GET /todos/abc</code></td><td><b>422</b> — 숫자가 아니라서 함수를 부르지도 않아요</td></tr><tr><td><code>GET /todos?done=true&amp;limit=3</code></td><td><code>done=True</code> · <code>limit=3</code>(<code>true</code> · <code>1</code> · <code>yes</code> 는 모두 True)</td></tr><tr><td><code>GET /todos</code></td><td>기본값 — <code>done=None</code> · <code>limit=10</code></td></tr></tbody></table>
-<p>타입 힌트가 곧 <b>검사</b>예요. 함수 안에서 「숫자인가?」 를 직접 확인할 필요가 없어요. <code>/docs</code> 에도 각 칸의 타입 · 기본값이 그대로 나와요.</p>`,
+<p>타입 힌트(<a href="../python/#lesson/L18E" target="_blank" rel="noopener">파이썬 교과서 「타입 힌트」 ↗</a>)가 FastAPI 에서는 곧 <b>검사</b>예요. 함수 안에서 「숫자인가?」 를 직접 확인할 필요가 없어요. <code>/docs</code> 에도 각 칸의 타입 · 기본값이 그대로 나와요.</p>`,
       example: { code: 'from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\n\napp = FastAPI()\n\n\n@app.get("/todos/{todo_id}")\ndef get_todo(todo_id: int):\n    return {"todo_id": todo_id, "type": type(todo_id).__name__}\n\n\n@app.get("/todos")\ndef list_todos(done: bool | None = None, limit: int = 10):\n    return {"done": done, "limit": limit}\n\n\nclient = TestClient(app)\nprint(client.get("/todos/3").json())\nprint(client.get("/todos/abc").status_code)\nprint(client.get("/todos?done=true&limit=3").json())\nprint(client.get("/todos").json())', label: '예제 코드 — 서버를 안 켜고 실행' } },
     { title: '본문: Pydantic 모델', html: `<p>POST · PUT · PATCH 의 <b>JSON 본문</b>은 모양을 <b>클래스</b>로 적어요(Pydantic — FastAPI 에 같이 깔려요).</p>
 <pre class="code">from pydantic import BaseModel, Field
@@ -342,7 +342,7 @@ def delete_todo(todo_id: int):
     …
     # 지웠으면 204(본문 없음)
     return Response(status_code=204)</pre>
-<table class="kb"><tbody><tr><td><code>raise HTTPException(…)</code></td><td>함수를 바로 멈추고 그 상태 코드 + <code>{"detail": "할 일이 없어요"}</code> 를 보내요(파이썬 교과서의 raise 와 같음)</td></tr><tr><td>아무것도 안 정하면</td><td>200 — 만들었는데 200 이면 쓰는 쪽이 「만들어졌나?」 헷갈려요</td></tr><tr><td>지운 걸 또 지우면</td><td>404 — DELETE 는 멱등(지워진 상태는 같음)</td></tr></tbody></table>`,
+<table class="kb"><tbody><tr><td><code>raise HTTPException(…)</code></td><td>함수를 바로 멈추고 그 상태 코드 + <code>{"detail": "할 일이 없어요"}</code> 를 보내요(<a href="../python/#lesson/L15C" target="_blank" rel="noopener">파이썬 교과서 「내 예외 만들기: raise」 ↗</a> 와 같음)</td></tr><tr><td>아무것도 안 정하면</td><td>200 — 만들었는데 200 이면 쓰는 쪽이 「만들어졌나?」 헷갈려요</td></tr><tr><td>지운 걸 또 지우면</td><td>404 — DELETE 는 멱등(지워진 상태는 같음)</td></tr></tbody></table>`,
       example: { code: 'from fastapi import FastAPI, HTTPException, Response\nfrom fastapi.testclient import TestClient\n\napp = FastAPI()\ntodos = {1: {"id": 1, "text": "장보기", "done": False}}\n\n\n@app.get("/todos/{todo_id}")\ndef get_todo(todo_id: int):\n    if todo_id not in todos:\n        raise HTTPException(status_code=404, detail="할 일이 없어요")\n    return todos[todo_id]\n\n\n@app.delete("/todos/{todo_id}", status_code=204)\ndef delete_todo(todo_id: int):\n    if todos.pop(todo_id, None) is None:\n        raise HTTPException(status_code=404, detail="할 일이 없어요")\n    return Response(status_code=204)\n\n\nclient = TestClient(app)\nprint(client.get("/todos/1").status_code, client.get("/todos/9").json())\nprint(client.delete("/todos/1").status_code, client.delete("/todos/1").status_code)', label: '예제 코드 — 서버를 안 켜고 실행' } },
     { title: 'SQLite 로 저장: 껐다 켜도 남게', html: `<p>딕셔너리 · 리스트에 넣으면 <b>서버를 끄는 순간 사라져요</b>(<code>fastapi dev</code> 는 저장할 때마다 다시 켜서 더 자주 사라져요). 파일로 저장하는 데이터베이스 <b>SQLite</b>(SQL 교과서)를 파이썬 <code>sqlite3</code> 로 써요 — 따로 설치할 것 없어요.</p>
 <pre class="code">import sqlite3
@@ -447,7 +447,7 @@ client = TodoClient("http://127.0.0.1:8000")</pre>
     def delete(self, todo_id):
         self._request("DELETE", f"/todos/{todo_id}")</pre>
 <table class="kb"><tbody><tr><td><code>_request</code></td><td>주소 붙이기 · timeout · 상태 코드 처리를 <b>한 곳</b>에서. 이름 앞 <code>_</code> 는 「안에서만 쓰는 것」 이라는 약속</td></tr><tr><td><code>update(…, *, text=None, done=None)</code></td><td><code>*</code> 뒤는 이름을 꼭 써서 부르기(<code>update(3, done=True)</code>) · 보낸 칸만 본문에 — API 의 PATCH 와 맞춤</td></tr><tr><td>쓰는 쪽</td><td><code>client.create("장보기")</code> · <code>client.update(1, done=True)</code> — 주소 · 메서드 · JSON 이 안 보여요</td></tr></tbody></table>` },
-    { title: '에러를 내 예외로', html: `<p>쓰는 사람이 상태 코드 숫자를 외우지 않게, <b>내 예외 클래스</b>로 바꿔 던져요(파이썬 교과서의 예외 만들기).</p>
+    { title: '에러를 내 예외로', html: `<p>쓰는 사람이 상태 코드 숫자를 외우지 않게, <b>내 예외 클래스</b>로 바꿔 던져요(<a href="../python/#lesson/L15C" target="_blank" rel="noopener">파이썬 교과서 「내 예외 만들기: raise」 ↗</a>).</p>
 <pre class="code">class TodoError(Exception):          # 이 SDK 의 모든 에러의 부모
     pass
 
@@ -505,7 +505,7 @@ SAFE = {"GET", "PUT", "PATCH", "DELETE"}            # 다시 보내도 되는 �
 
 for todo in client.iter_all():               # 쓰는 쪽
     print(todo["text"])</pre>
-<table class="kb"><tbody><tr><td><code>yield</code></td><td>값을 <b>하나 내보내고 거기서 잠깐 멈추는</b> 함수(제너레이터) — <code>for</code> 가 다음 값을 달라고 할 때 이어서 돌아요(파이썬 교과서의 제너레이터)</td></tr><tr><td>필요할 때만 요청</td><td>처음 몇 개만 보고 <code>break</code> 하면 뒤쪽 요청은 아예 안 보내요 — PyGithub 의 <code>get_repos()</code> 가 바로 이렇게 동작</td></tr><tr><td>전부 리스트로</td><td><code>list(client.iter_all())</code></td></tr></tbody></table>` },
+<table class="kb"><tbody><tr><td><code>yield</code></td><td>값을 <b>하나 내보내고 거기서 잠깐 멈추는</b> 함수(제너레이터) — <code>for</code> 가 다음 값을 달라고 할 때 이어서 돌아요(<a href="../python/#lesson/L18C" target="_blank" rel="noopener">파이썬 교과서 「반복자와 제너레이터」 ↗</a>)</td></tr><tr><td>필요할 때만 요청</td><td>처음 몇 개만 보고 <code>break</code> 하면 뒤쪽 요청은 아예 안 보내요 — PyGithub 의 <code>get_repos()</code> 가 바로 이렇게 동작</td></tr><tr><td>전부 리스트로</td><td><code>list(client.iter_all())</code></td></tr></tbody></table>` },
     { title: '결과는 dataclass · 타입 힌트 · docstring', html: `<pre class="code">from dataclasses import dataclass
 
 @dataclass
@@ -518,7 +518,7 @@ class Todo:
     def get(self, todo_id: int) -> Todo:
         """id 로 할 일 하나를 가져와요. 없으면 TodoNotFound."""
         return Todo(**self._request("GET", f"/todos/{todo_id}"))</pre>
-<table class="kb"><tbody><tr><td><code>@dataclass</code></td><td>칸만 적으면 <code>__init__</code> · 보기 좋은 출력(<code>Todo(id=1, text='장보기', done=False)</code>) · <code>==</code> 비교를 만들어 줘요</td></tr><tr><td><code>Todo(**data)</code></td><td>응답 딕셔너리를 그대로 객체로 — <code>todo.text</code> 로 쓰고 VS Code 가 자동 완성</td></tr><tr><td>타입 힌트 <code>-&gt; Todo</code></td><td>무엇을 돌려주는지 — 에디터가 미리 알려 줌</td></tr><tr><td>docstring <code>"""…"""</code></td><td>VS Code 에서 메서드에 마우스를 올리면 이 설명이 떠요 — SDK 의 문서</td></tr></tbody></table>
+<table class="kb"><tbody><tr><td><code>@dataclass</code></td><td>(<a href="../python/#lesson/L15B" target="_blank" rel="noopener">파이썬 교과서 「클래스 3」 ↗</a>) 칸만 적으면 <code>__init__</code> · 보기 좋은 출력(<code>Todo(id=1, text='장보기', done=False)</code>) · <code>==</code> 비교를 만들어 줘요</td></tr><tr><td><code>Todo(**data)</code></td><td>응답 딕셔너리를 그대로 객체로 — <code>todo.text</code> 로 쓰고 VS Code 가 자동 완성</td></tr><tr><td>타입 힌트 <code>-&gt; Todo</code></td><td>무엇을 돌려주는지 — 에디터가 미리 알려 줌</td></tr><tr><td>docstring <code>"""…"""</code></td><td>VS Code 에서 메서드에 마우스를 올리면 이 설명이 떠요 — SDK 의 문서</td></tr></tbody></table>
 <p>이게 레슨 13 의 「결과는 객체」 를 내 SDK 에 넣은 거예요.</p>`,
       example: { code: 'from dataclasses import dataclass\n\n\n@dataclass\nclass Todo:\n    """할 일 하나."""\n    id: int\n    text: str\n    done: bool = False\n\n\ndata = {"id": 1, "text": "장보기", "done": False}\ntodo = Todo(**data)\nprint(todo)\nprint(todo.text, todo == Todo(1, "장보기"))', label: '예제 코드 — 인터넷 없이 돌아요' } },
   ],
@@ -550,7 +550,7 @@ version = "0.1.0"
 description = "할 일 API 의 파이썬 SDK"
 requires-python = ">=3.10"
 dependencies = ["requests>=2.31"]</pre>
-<p><code>todo-sdk</code> 폴더에서 <code>python -m pip install -e .</code>(<code>-e</code> = 고치면 바로 반영) 하면 <b>어느 폴더에서나</b> <code>import todo_sdk</code> 가 돼요. 확인은 다른 폴더에서 아래 한 줄.</p>
+<p><code>todo-sdk</code> 폴더에서 <code>python -m pip install -e .</code>(<code>-e</code> = 고치면 바로 반영 · 가상 환경 안에서 하는 게 좋아요 — <a href="../python/#lesson/L16D" target="_blank" rel="noopener">파이썬 교과서 「pip 와 가상 환경」 ↗</a>) 하면 <b>어느 폴더에서나</b> <code>import todo_sdk</code> 가 돼요. 확인은 다른 폴더에서 아래 한 줄.</p>
 <pre class="code">python -c "import todo_sdk; print(todo_sdk.__version__)"</pre>` },
     { title: '버전 · README · 나눠 주기', html: `<table class="kb"><tbody><tr><td><code>0.1.0</code> → <code>0.2.0</code></td><td>기능을 더함(<code>iter_all</code> 추가)</td></tr><tr><td><code>0.2.0</code> → <code>0.2.1</code></td><td>고치기만(버그)</td></tr><tr><td><code>1.0.0</code></td><td>「이제 모양을 함부로 안 바꿀게요」 약속 — 그 뒤 쓰는 사람 코드가 깨지는 변경이면 2.0.0</td></tr></tbody></table>
 <p>버전을 올릴 땐 <code>pyproject.toml</code> 의 <code>version</code> 과 <code>__version__</code> 을 같이 바꾸고, <code>CHANGELOG.md</code> 에 바뀐 점을 적어요(이 아카데미의 CHANGELOG 처럼).</p>
