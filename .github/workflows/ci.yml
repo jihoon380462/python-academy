@@ -1,11 +1,14 @@
 name: PR Check
 # main 으로 가는 PR 마다: 스키마 검사 + 교과서 검사(check_book — 예시 답 실제 실행) + 정답 코드 CPython 실행 + 브라우저 회귀(Playwright).
 # main 의 브랜치 보호 규칙에서 "verify" 체크를 필수로 걸면, 이 잡이 초록이 아닌 PR 은 병합할 수 없다 (specs/workflow.md 8절).
+# v2.39.0 CI 줄이기: 한 줄로 서 있던 단계를 작업 셋(content · regress · web)으로 나눠 동시에 돌리고, 맨 끝 verify 가 셋을 모아요.
+#   content — check_book 을 교과서마다 동시에(tools/check_book_par.mjs, CPU 수만큼) · pip 캐시
+#   regress — 고정 대기를 REGRESS_WAIT_SCALE 로 줄임(tools/regress.py 맨 위 설명)
 on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-# TODO F0 ③: 같은 PR 에 연달아 푸시하면 이전 검사는 취소하고 마지막 것만 돈다
+# 같은 PR 에 연달아 푸시하면 이전 검사는 취소하고 마지막 것만 돈다
 concurrency:
   group: verify-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -13,7 +16,7 @@ concurrency:
 env:
   PYTHONUNBUFFERED: '1'
 jobs:
-  verify:
+  content:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -24,24 +27,65 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: tools/requirements-ci.txt
       - name: validate_content
         run: node tools/validate_content.mjs
       - name: check_level (난이도 래칫 게이트, DESIGN 14-2절)
         run: node tools/check_level.mjs --gate
       - name: check_nesting (괄호 지옥 — 함수 호출 3겹 이상 줄 0개, v2.8.2)
         run: node tools/check_nesting.mjs
-      - name: check_book (파이썬 교과서 — 필요한 문법 링크·예시 답 실행, v2.9.0)
+      - name: 설치(nasm · 파이썬 패키지)
         run: |
           sudo apt-get install -y -qq nasm  # v2.31.0~ 어셈블리어 교과서: 예시 답 · 예제를 nasm · ld · gcc 로 진짜 빌드 · 실행(tools/asm_book_run.py)
-          pip install --quiet fastapi httpx requests numpy pytest pandas matplotlib scikit-learn  # v2.32.0~ LLM 기초: numpy · v2.33.0~ 디버깅(pytest) · 데이터 분석(pandas · matplotlib) · 머신러닝(scikit-learn)  # v2.28.0~ HTTP·API·SDK 교과서: FastAPI 예제·예시 답을 TestClient 로 실제 실행, 챕터 4 SDK 는 requests 를 import(인터넷 API 는 안 부름)
-          node tools/check_book.mjs
+          pip install --quiet -r tools/requirements-ci.txt  # LLM(numpy) · 디버깅(pytest) · 데이터 분석(pandas · matplotlib) · 머신러닝(scikit-learn) · HTTP·API·SDK(fastapi · httpx · requests)
+      - name: check_book (교과서 19개 — 필요한 문법 링크 · 예시 답 실행, 교과서마다 동시에)
+        run: node tools/check_book_par.mjs
       - name: run_solutions
         run: node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
-      # v2.19.0 N13: test_shell · run_shell_solutions · run_sql_solutions 는 옛 문제집 화면(가짜 셸·SQL 채점)용이라 archive/classic/tools 로 옮김
+  regress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: tools/requirements-regress.txt
       - name: regress (Playwright)
+        env:
+          REGRESS_WAIT_SCALE: '0.25'  # 고정 대기를 1/4 로(로컬에서 0.1 까지 실패 0 확인, v2.39.0)
         run: |
-          pip install --quiet playwright pillow
-          # 브라우저는 러너에 깔린 /usr/bin/google-chrome 을 쓴다(regress.py·run_web_solutions.py 의 executable_path) — playwright install --with-deps 는 쓰지 않는 브라우저+apt 글꼴을 받느라 1.5~14분 걸려서 뺌 (TODO F0)
+          pip install --quiet -r tools/requirements-regress.txt
+          # 브라우저는 러너에 깔린 /usr/bin/google-chrome 을 쓴다(regress.py 의 executable_path) — playwright install --with-deps 는 쓰지 않는 브라우저+apt 글꼴을 받느라 느림
           test -x /usr/bin/google-chrome
           python3 tools/regress.py
-          python3 tools/run_web_solutions.py # 웹 교과서: 만들어 보기 예시 답을 미리보기(tools/web-preview.js)에 넣고 checks 전부 ✓ 인지 (Playwright)
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: tools/requirements-regress.txt
+      - name: run_web_solutions (웹 교과서 — 예시 답을 미리보기에 넣고 checks 전부 ✓ 인지)
+        run: |
+          pip install --quiet -r tools/requirements-regress.txt
+          test -x /usr/bin/google-chrome
+          python3 tools/run_web_solutions.py
+  # 브랜치 보호의 필수 체크 이름은 「verify」 — 앞 셋이 모두 성공일 때만 초록.
+  # if: always() 가 없으면 앞이 실패할 때 verify 가 「건너뜀」 이 되는데, 필수 체크는 건너뜀을 통과로 칠 수 있어서 꼭 돌려 결과를 확인해요.
+  verify:
+    needs: [content, regress, web]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: 셋 다 성공인가
+        run: |
+          echo "content=${{ needs.content.result }} regress=${{ needs.regress.result }} web=${{ needs.web.result }}"
+          test "${{ needs.content.result }}" = success
+          test "${{ needs.regress.result }}" = success
+          test "${{ needs.web.result }}" = success

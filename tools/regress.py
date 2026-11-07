@@ -4,6 +4,27 @@
 #   v2.19.0 N13: 옛 문제집 화면(채점·XP·뱃지·복습 …) 검사는 그 화면과 함께 archive/classic/tools/regress.py
 import json, os, sys, time
 from playwright.sync_api import sync_playwright
+# v2.39.0 CI 줄이기: 고정 대기(wait_for_timeout 253곳)를 한 곳에서 줄여요. REGRESS_WAIT_SCALE(기본 1 = 예전 그대로)을 곱하고,
+# 짧아진 대신 「화면을 두 번 다시 그릴 때까지」(requestAnimationFrame 두 번)는 늘 기다리고, 글자를 친 직후엔 0.15초를 꼭 기다려요. CI 는 이 값을 낮춰 씀(.github/workflows/ci.yml).
+_WAIT_SCALE=float(os.environ.get('REGRESS_WAIT_SCALE','1'))
+if _WAIT_SCALE!=1:
+    from playwright.sync_api import Page as _Page
+    _orig_wait=_Page.wait_for_timeout
+    def _fast_wait(self, ms):
+        try: self.evaluate("()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))")
+        except Exception: pass
+        return _orig_wait(self, max(15, ms*_WAIT_SCALE))
+    _Page.wait_for_timeout=_fast_wait
+    # 글자를 친 직후에는 0.15초를 꼭 기다려요 — 도감 검색처럼 「치고 0.12초 뒤 다시 그리기」 예약 동작이 끝나게
+    from playwright.sync_api import Locator as _Loc
+    def _after_typing(cls, name):
+        f=getattr(cls, name)
+        def g(self, *a, **k):
+            r=f(self, *a, **k); pg_=self if isinstance(self, _Page) else self.page; _orig_wait(pg_, 150); return r
+        setattr(cls, name, g)
+    for _c in (_Page, _Loc):
+        for _n in ('fill', 'type', 'press'):
+            if hasattr(_c, _n): _after_typing(_c, _n)
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); HUB='file://'+os.path.join(ROOT,'index.html'); BOOKURL='file://'+os.path.join(ROOT,'courses/python/index.html')  # v2.9.0: 파이썬은 교과서 모드가 기본 — 예전 문제집 화면(엔진 회귀)은 ?classic=1
 SHOT=os.path.join(ROOT,'tools/.out/shots'); os.makedirs(SHOT,exist_ok=True)
 V1={"v":1,"nick":"테스터","mascotColor":1,"onboarded":True,"xp":385,"badges":["first_run","first_clear"],"badgeDates":{"first_run":"2026-10-20"},"stats":{"runs":12},

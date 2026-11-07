@@ -1,0 +1,9 @@
+# CI content 작업(check_book)에 쓰는 파이썬 패키지 — v2.39.0, actions/setup-python 의 pip 캐시 열쇠
+fastapi
+httpx
+requests
+numpy
+pytest
+pandas
+matplotlib
+scikit-learn
