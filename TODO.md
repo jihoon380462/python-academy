@@ -101,7 +101,7 @@
 
 | # | 코스 | 상태 |
 | --- | --- | --- |
-| W→ | **웹 교과서 크게 다시 만들기**(D15 · D16) — 6챕터 34레슨(HTML · CSS 기본 · CSS 배치 · JS 언어 · 브라우저와 DOM · 더 단단한 화면) | 설계 ✅ → [`specs/web-course.md`](specs/web-course.md) · **v2.25.0 ✅ 목차 뼈대 + 챕터 1**(W2B · WB0 레시피) · 다음 v2.25.1 챕터 2(W4B~W4E) → 챕터 3 → 4(+ Console 검사) → 5 → v2.26.0 챕터 6 |
+| W→ | **웹 교과서 크게 다시 만들기**(D15 · D16) — 6챕터 34레슨(HTML · CSS 기본 · CSS 배치 · JS 언어 · 브라우저와 DOM · 더 단단한 화면) | 설계 ✅ → [`specs/web-course.md`](specs/web-course.md) · **v2.25.0 ✅ 목차 뼈대 + 챕터 1**(W2B · WB0 레시피) · **v2.25.1 ✅ 챕터 2**(W4B~W4E) · 다음 v2.25.2 챕터 3(W5B grid · W5C position · WB1 키우기) → 4(+ Console 검사) → 5 → v2.26.0 챕터 6 |
 | T12 | **HTTP · API · SDK**(새 · D15) — HTTP(curl·F12) → API(requests · REST · 인증 · 페이지/한도) → 내 API(FastAPI) → 내 SDK(클래스 · 패키지), 레슨 17 + 만들어 보기 4 | 설계 ✅ → [`specs/http-api-course.md`](specs/http-api-course.md) · 구현 순서: 챕터 1·2 → 웹 챕터 3 바꾸기 → 챕터 3 → 챕터 4 |
 | T3 | 디버깅·테스트 | 예정 — 설계 전 |
 | T4 | 데이터 분석 | 예정 — 설계 전 |

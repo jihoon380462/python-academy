@@ -7,6 +7,17 @@
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
 
+## v2.25.1 — 2026-11-07 (Opus: 웹 교과서 챕터 2 — CSS 기본)
+
+- 📖 **웹 교과서 챕터 2 「CSS 기본 — 모양」 완성**(D16 · [`specs/web-course.md`](specs/web-course.md)) — 새 레슨 4개(각 3쪽 + 만들어 보기):
+  - 레슨 6 **누가 이기나: 우선순위 · 상속 · 순서** — 구체성 점수(id · class · 태그 칸)와 나중 규칙, 상속되는 속성/안 되는 속성 · `font: inherit`, F12 Styles 의 줄 그어진 규칙 · ⚠, `!important` 대신 선택자 고치기. 만들어 보기 「왜 안 바뀌지? 세 가지 고치기」 · 「상속으로 한 번에」.
+  - 레슨 7 **크기와 단위** — px · % · rem · em(겹치면 커지는 함정) · vw · vh, `max-width` · `img { max-width: 100% }` · `border-box`, `min()` · `max()` · `clamp()`. 만들어 보기 3(읽기 좋은 글 상자 · 화면 따라 크는 제목 · em 함정 고치기).
+  - 레슨 8 **꾸미기: 배경 · 테두리 · 그림자 · 변수** — 배경 그림 · `cover` · 그라데이션 덮개 · rgba, `border-radius` · `box-shadow` · `opacity` · `outline`, **CSS 변수**(`:root` · `var()` · 다크 모드 맛보기 · 웹 글꼴). 만들어 보기 「버튼 3종을 변수로」(변수 한 줄을 바꾸면 따라 바뀌는지까지 자동 확인) · 「사진 위 글자 배너」.
+  - 레슨 9 **상태에 따라: 가상 클래스 · 전환 · 애니메이션** — `:hover` · `:focus-visible` · `:nth-child` · `:not()`, `::before` · `::after`, `transition` · `transform`, `@keyframes` · `animation` · `prefers-reduced-motion`. 만들어 보기 3(떠오르는 카드 · 줄무늬 표와 필수 표시 · 로딩 빙글이).
+  - 레슨 5(CSS 첫 레슨)에서 「자세히는 레슨 6 · 단위는 레슨 7」 로 이어 줌.
+- 허브 카드 웹 n/23(34 중 열린 레슨).
+- 🛠 내부: 만들어 보기 10문제 전부 run_web_solutions 자동 확인(계산된 스타일 · 가상 요소 · 스타일시트 규칙 · 변수 바꿔 보기), regress 웹 절 열린 23 · 준비 중 11 · 폰 390 8쪽 추가.
+
 ## v2.25.0 — 2026-11-07 (Opus: 웹 교과서를 34레슨으로 — 목차 뼈대 + 챕터 1)
 
 - 📖 **웹 교과서를 크게 다시**(사용자 「HTML-CSS-JS 를 설명 몇 쪽으로 충분히 처리 가능한 거야?」 → 「1」, D16): 설계 [`specs/web-course.md`](specs/web-course.md) — 챕터 6개(HTML 뼈대 · CSS 기본 · CSS 배치 · JavaScript 언어(Console 에서) · 브라우저와 DOM · 더 단단한 화면), 설명 레슨 29 + 만들어 보기 5 = 34.
