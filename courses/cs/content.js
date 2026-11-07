@@ -226,7 +226,7 @@ print(mine.decode())` } },
 <p>반대도 있어요. 엑셀이 만든 CSV 는 cp949 로 저장되는 일이 많아서, UTF-8 로 읽으면 첫 바이트부터 멈춰요. 파일을 <code>"rb"</code> 로 열면 글자로 바꾸지 않은 <b>바이트 그대로</b>를 읽을 수 있어요.</p>
 <pre>excel = "이름,점수".encode("cp949")\nwith open("scores.csv", "wb") as f:\n    f.write(excel)\nwith open("scores.csv", "rb") as f:\n    data = f.read()          # 바이트 그대로\nprint(data.hex(" "))         # c0 cc b8 a7 2c c1 a1 bc f6\nprint(data.decode("cp949"))  # 이름,점수 — 맞는 규칙이면 멀쩡</pre>
 <div class="bk-warn"><b>깨진 글자를 저장하면 못 되살려요</b> — 화면의 <code>�</code> 는 「못 읽은 바이트를 버렸다」 는 뜻이에요. 깨진 채로 다시 저장하면 원래 바이트가 사라져요. 깨져 보이면 <b>파일은 그대로 두고, 읽는 규칙(encoding)만 바꿔서</b> 다시 열어요.</div>
-<p>파이썬에서 파일을 열 때 늘 <code>encoding="utf-8"</code> 을 적는 이유가 이거예요. Windows 의 기본이 cp949 라 빼먹으면 Windows 에서만 깨져요. 자세한 함정은 <a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩 · JSON」 ↗</a> 에 있어요.</p>`,
+<p>파이썬에서 파일을 열 때 늘 <code>encoding="utf-8"</code> 을 적는 이유가 이거예요. 파이썬 3.14 이하의 Windows 는 기본이 cp949 라 빼먹으면 Windows 에서만 깨지고(3.15 부터는 기본이 utf-8), cp949 로 저장된 파일은 어느 버전에서든 맞춰 읽어야 해요. 자세한 함정은 <a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩 · JSON」 ↗</a> 에 있어요.</p>`,
       example: { code: `data = "안녕".encode("utf-8")
 print(data.hex(" "))
 print(data.decode("cp949", errors="replace"))
