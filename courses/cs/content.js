@@ -465,23 +465,982 @@ print("다시 읽기:", n, "샘플 ÷", rate, "=", n / rate, "초")` } },
   summary: ['픽셀 = (R, G, B) 세 숫자, "#ff8800" 은 16진 두 자리씩', '이미지 용량 = 가로 × 세로 × 3바이트 — 그래서 압축(무손실 · 손실)', '소리는 1초에 44100 번 잰 16비트 숫자 — wave 로 저장'] },
 { id: 'CB1', ch: 1, boss: true, title: '만들어 보기: 나만의 인코더', mode: 'text',
   tutorSummary: '챕터 1 묶기 — 글자 → UTF-8 바이트 → 16진 · 2진 덤프 → 다시 글자, 바이트 수 · 글자 수 비교 표(utf-8 · utf-16 · cp949), 명령(enc · dec · bin · count · 끝)으로 도는 인코더 프로그램. ord · f"U+{cp:04X}" · encode · hex(" ") · f"{b:08b}" · bytes.fromhex · decode · UnicodeDecodeError.', pages: [], summary: [] },
-{ id: 'C5', ch: 2, n: 5, title: '논리 게이트', mode: 'text', draft: true,
-  tutorSummary: 'AND · OR · NOT · XOR 진리표, 파이썬 함수로 게이트, NAND 하나로 다 만들기.',
-  pages: CS_TODO('진리표 · 함수로 게이트 · NAND'), summary: ["게이트는 0/1 을 받아 0/1", "진리표로 모든 경우", "NAND 하나로 다 만든다"] },
-{ id: 'C6', ch: 2, n: 6, title: '덧셈기: 게이트로 더하기', mode: 'text', draft: true,
-  tutorSummary: '반가산기(합 XOR, 올림 AND), 전가산기, 8비트 덧셈기 · 넘침, 뺄셈은 2의 보수 + 덧셈기.',
-  pages: CS_TODO('반가산기 · 전가산기 · 8비트 덧셈기'), summary: ["합은 XOR, 올림은 AND", "전가산기를 줄줄이", "뺄셈 = 2의 보수 더하기"] },
-{ id: 'C7', ch: 2, n: 7, title: 'CPU 가 명령을 실행하는 법', mode: 'text', draft: true,
-  tutorSummary: '명령 = 숫자, 가져오기 → 해석 → 실행, 프로그램 카운터 · 레지스터, 장난감 CPU(LOAD ADD SUB JMP JZ PRINT HALT)를 파이썬으로.',
-  pages: CS_TODO('fetch-decode-execute · PC · 레지스터 · 장난감 CPU'), summary: ["명령도 메모리의 숫자", "가져오기 → 해석 → 실행", "PC 가 다음 명령을 가리킴"] },
-{ id: 'C8', ch: 2, n: 8, title: '메모리 계층과 캐시', mode: 'text', draft: true,
-  tutorSummary: '레지스터 · 캐시 · RAM · SSD 속도 차이, 지역성, 캐시 흉내(적중 · 실패, LRU), lru_cache.',
-  pages: CS_TODO('속도 표 · 지역성 · 캐시 흉내'), summary: ["가까울수록 빠르고 작다", "지역성 덕에 캐시가 맞힌다", "적중률이 속도를 정한다"] },
-{ id: 'C9', ch: 2, n: 9, title: '컴파일러와 인터프리터', mode: 'text', draft: true,
-  tutorSummary: '기계어로 가는 두 길, 파이썬 바이트코드(dis.dis), C 는 미리 기계어, JIT 이름, 빠르기 차이(timeit).',
-  pages: CS_TODO('컴파일 vs 인터프리트 · dis · 작은 인터프리터'), summary: ["컴파일은 미리, 인터프리트는 그때그때", "파이썬은 바이트코드로", "dis 로 바이트코드 보기"] },
-{ id: 'CB2', ch: 2, boss: true, title: '만들어 보기: 장난감 CPU 시뮬레이터', mode: 'text', draft: true,
-  tutorSummary: '챕터 2 묶기 — 명령 8개 · 레지스터 4개 · 메모리 32칸 CPU 를 만들고 곱하기 프로그램을 돌리며 단계마다 상태 출력.', pages: [], summary: [] },
+{ id: 'C5', ch: 2, n: 5, title: '논리 게이트', mode: 'text',
+  tutorSummary: '게이트 = 0/1(전기 신호)을 받아 정해진 규칙으로 0/1 을 내는 작은 회로, 트랜지스터 몇 개로 만든다. AND 둘 다 · OR 하나라도 · XOR 서로 다르면 · NOT 거꾸로 — 진리표로 모든 경우. 파이썬에선 0/1 에 a & b · a | b · a ^ b · 1 - a(~a 는 -2 가 나와서 안 됨, 2의 보수). 게이트를 함수(def AND(a, b))로 옮기고 결과를 다른 게이트에 넣어 이으면 큰 회로 — XOR = AND(OR, NOT(AND)). NAND(NOT AND) 하나로 NOT(NAND(a, a)) · AND · OR 를 전부 만든다(만능 게이트, NAND 플래시). 정수에 & | ^ 를 쓰면 자리마다 동시에 — 게이트를 나란히 놓은 것(골라내기 & 0b1111 · 켜기 | · 뒤집기 ^).',
+  terms: { '게이트': '0/1 신호를 받아 정해진 규칙대로 0/1 을 내는 작은 회로. 트랜지스터 몇 개로 만들어요', '트랜지스터': '전기로 켜고 끄는 아주 작은 스위치. 요즘 CPU 에는 수십억 개가 들어 있어요', '진리표': '입력이 될 수 있는 모든 경우와 그때의 출력을 적은 표', 'NAND': 'NOT AND — AND 의 결과를 뒤집은 게이트. 이것 하나로 모든 게이트를 만들 수 있어요' },
+  pages: [
+    { title: 'a & b · a | b · a ^ b — 진리표', html: `<p>CPU 안은 아주 작은 스위치인 [[트랜지스터]] 수십억 개로 되어 있어요. 전기가 흐르면 <b>1</b>, 안 흐르면 <b>0</b> — [[레슨:C1]] 의 비트가 바로 이 전기 신호예요. 트랜지스터 몇 개를 묶어 「0/1 을 받아 정해진 규칙대로 0/1 을 내는」 작은 회로를 만들면, 그게 [[게이트]]예요.</p>
+<p>기본 게이트는 넷이에요. 입력이 될 수 있는 경우를 빠짐없이 적은 표를 [[진리표]]라고 해요. 입력이 둘이면 경우는 00 · 01 · 10 · 11 네 가지예요.</p>
+<pre> a  b │ AND  OR  XOR
+ 0  0 │  0    0    0
+ 0  1 │  0    1    1
+ 1  0 │  0    1    1
+ 1  1 │  1    1    0
+
+ a │ NOT
+ 0 │  1
+ 1 │  0</pre>
+<table class="kb"><tbody><tr><th>게이트</th><th>말로 하면</th><th>파이썬(0/1 에서)</th></tr>
+<tr><td>AND</td><td>둘 <b>다</b> 1 이면 1</td><td><code>a &amp; b</code></td></tr>
+<tr><td>OR</td><td><b>하나라도</b> 1 이면 1</td><td><code>a | b</code></td></tr>
+<tr><td>XOR</td><td><b>서로 다르면</b> 1</td><td><code>a ^ b</code></td></tr>
+<tr><td>NOT</td><td>거꾸로</td><td><code>1 - a</code></td></tr></tbody></table>
+<p>생활 속에도 있어요. 「안전띠를 매고 <b>그리고</b> 문이 닫혀야 출발」 은 AND, 「현관 <b>또는</b> 베란다 센서가 울리면 경보」 는 OR 예요. 계단 위아래 스위치로 켜고 끄는 전등은 XOR — 어느 쪽 스위치든 하나를 바꾸면 불이 바뀌어요.</p>
+<div class="bk-warn"><b>NOT 은 ~a 가 아니에요</b> — 파이썬의 <code>~1</code> 은 <code>-2</code> 예요. <code>~</code> 는 정수의 비트를 전부 뒤집고, 맨 앞 비트가 1 이 된 수를 2의 보수로 음수로 읽기 때문이에요([[레슨:C3]]). 0/1 하나만 뒤집을 때는 <code>1 - a</code> 나 <code>a ^ 1</code> 을 써요.</div>`,
+      example: { code: `print(" a  b │ AND  OR  XOR")
+for a in (0, 1):
+    for b in (0, 1):
+        print(f" {a}  {b} │  {a & b}    {a | b}    {a ^ b}")
+
+print()
+print(" a │ NOT")
+for a in (0, 1):
+    print(f" {a} │  {1 - a}")
+
+print()
+print("~1 =", ~1, "   1 - 1 =", 1 - 1, "   1 ^ 1 =", 1 ^ 1)` } },
+    { title: 'def AND(a, b): — 함수로 게이트', html: `<p>게이트는 「규칙」 이라서 파이썬 함수로 그대로 옮길 수 있어요. 이번엔 기호 없이 if 로 규칙만 적어 볼게요. 파이썬의 <code>and</code> · <code>or</code> · <code>not</code> 은 이미 쓰는 낱말이라, 회로 그림처럼 함수 이름을 대문자로 지었어요.</p>
+<pre>def AND(a, b):
+    if a == 1 and b == 1:
+        return 1
+    return 0
+
+def OR(a, b):
+    if a == 1 or b == 1:
+        return 1
+    return 0
+
+def NOT(a):
+    if a == 1:
+        return 0
+    return 1
+
+print(AND(1, 0), OR(1, 0), NOT(1))   # 0 1 0</pre>
+<p>진짜 회로에서는 한 게이트의 출력 선을 다른 게이트의 입력에 이어요. 함수로는 <b>한 함수의 결과를 다른 함수에 넣는 것</b>이 그거예요. XOR 를 AND · OR · NOT 으로 만들어 볼게요. XOR 는 「하나라도 1」 <b>그리고</b> 「둘 다 1 은 아님」 이에요.</p>
+<pre>a, b ──► OR  ──────────┐
+                       ├──► AND ──► XOR
+a, b ──► AND ──► NOT ──┘</pre>
+<pre>def XOR(a, b):
+    either = OR(a, b)      # 하나라도 1
+    both = AND(a, b)       # 둘 다 1
+    return AND(either, NOT(both))</pre>
+<p>작은 게이트를 이어 큰 회로를 만들고, 큰 회로를 이어 더 큰 회로를 만들어요. 다음 레슨의 덧셈기도, 그다음의 CPU 도 결국 이렇게 이은 거예요. 예제는 만든 XOR 가 <code>a ^ b</code> 와 네 경우 모두 같은지 확인해요.</p>`,
+      example: { code: `def AND(a, b):
+    if a == 1 and b == 1:
+        return 1
+    return 0
+
+def OR(a, b):
+    if a == 1 or b == 1:
+        return 1
+    return 0
+
+def NOT(a):
+    if a == 1:
+        return 0
+    return 1
+
+def XOR(a, b):
+    either = OR(a, b)
+    both = AND(a, b)
+    return AND(either, NOT(both))
+
+print(" a  b │ XOR │ a ^ b 와 같나")
+for a in (0, 1):
+    for b in (0, 1):
+        print(f" {a}  {b} │  {XOR(a, b)}  │ {XOR(a, b) == a ^ b}")` } },
+    { title: 'NAND(a, a) — NAND 하나로 다 만들기', html: `<p>[[NAND]] 는 「NOT AND」 — AND 의 결과를 뒤집은 게이트예요. 둘 다 1 일 때만 0 이에요.</p>
+<pre> a  b │ NAND
+ 0  0 │  1
+ 0  1 │  1
+ 1  0 │  1
+ 1  1 │  0</pre>
+<p>놀라운 점이 있어요. NAND <b>한 가지만</b> 있으면 다른 게이트를 전부 만들 수 있어요.</p>
+<ul><li><b>NOT</b> — 같은 신호를 두 입력에 다 넣어요. <code>NAND(a, a)</code> 는 a 가 1 이면 0, 0 이면 1</li>
+<li><b>AND</b> — NAND 를 한 번 더 뒤집어요. <code>NOT(NAND(a, b))</code></li>
+<li><b>OR</b> — 「둘 다 0 은 아님」 이에요. 둘을 먼저 뒤집고 NAND 해요. <code>NAND(NOT(a), NOT(b))</code></li></ul>
+<pre>def NAND(a, b):
+    return 1 - (a &amp; b)
+
+def NOT(a):
+    return NAND(a, a)
+
+def AND(a, b):
+    return NOT(NAND(a, b))
+
+def OR(a, b):
+    return NAND(NOT(a), NOT(b))
+
+print(NOT(0), AND(1, 1), OR(0, 1))   # 1 1 1</pre>
+<p>그래서 칩 공장은 NAND(그리고 짝꿍인 NOR) 를 작고 빠르게 만드는 데 힘을 쏟아요. 한 가지 블록만 잘 만들면 그걸로 뭐든 쌓을 수 있으니까요. SSD 에 쓰는 「NAND 플래시」 메모리도 저장 칸을 NAND 게이트 모양으로 이어서 붙은 이름이에요.</p>
+<p>XOR 도 NAND 4개로 만들 수 있어요. 만들어 보기에서 직접 해 봐요.</p>`,
+      example: { code: `def NAND(a, b):
+    return 1 - (a & b)
+
+def NOT(a):
+    return NAND(a, a)
+
+def AND(a, b):
+    return NOT(NAND(a, b))
+
+def OR(a, b):
+    return NAND(NOT(a), NOT(b))
+
+print(" a  b │ NAND  AND  OR")
+for a in (0, 1):
+    for b in (0, 1):
+        print(f" {a}  {b} │  {NAND(a, b)}     {AND(a, b)}    {OR(a, b)}")
+
+ok = True
+for a in (0, 1):
+    if NOT(a) != 1 - a:
+        ok = False
+    for b in (0, 1):
+        if AND(a, b) != a & b or OR(a, b) != a | b:
+            ok = False
+print("NAND 로 만든 NOT · AND · OR 가 진짜와 같나:", ok)` } },
+    { title: '8개를 한꺼번에: 0b1100 & 0b1010', html: `<p>지금까지는 비트 하나씩이었어요. CPU 는 게이트를 <b>나란히</b> 놓고 여러 비트를 한 번에 계산해요. 64비트 CPU 라면 AND 게이트 64개가 나란히 있어서 64자리를 동시에 해요.</p>
+<p>파이썬의 <code>&amp;</code> · <code>|</code> · <code>^</code> 를 정수에 쓰면 <b>자리마다</b> 따로 계산해요. 같은 자리끼리 위아래로 보면 돼요.</p>
+<pre>    1100        1100        1100
+  &amp; 1010      | 1010      ^ 1010
+  ──────      ──────      ──────
+    1000        1110        0110</pre>
+<pre>a = 0b1100
+b = 0b1010
+print(format(a &amp; b, "04b"))   # 1000
+print(format(a | b, "04b"))   # 1110
+print(format(a ^ b, "04b"))   # 0110</pre>
+<p><code>0b1100</code> 은 2진수로 적은 12 예요. <code>format(x, "04b")</code> 는 x 를 2진수 4자리로 보여 줘요([[레슨:C1]] 의 <code>bin</code> 과 비슷한데, 앞의 0b 없이 0 을 채워 자리를 맞춰요). 이런 「비트 묶음 계산」 은 이렇게 써요.</p>
+<ul><li><b>골라내기</b> — <code>x &amp; 0b1111</code> 은 아래 4비트만 남겨요. 나머지 자리는 0 과 AND 라서 0 이 돼요</li>
+<li><b>켜기</b> — <code>x | 0b0001</code> 은 맨 오른쪽 비트를 1 로 만들어요</li>
+<li><b>뒤집기</b> — <code>x ^ 0b1111</code> 은 아래 4비트를 뒤집어요. 1 과 XOR 하면 뒤집히고, 0 과 하면 그대로예요</li></ul>
+<p>비트 연산을 문제 풀이에 쓰는 법은 <a href="../algo/#lesson/A17" target="_blank" rel="noopener">알고리즘 교과서 「비트 연산」 ↗</a>, 같은 일을 하는 진짜 CPU 명령(<code>and</code> · <code>or</code> · <code>xor</code>)은 <a href="../asm/#lesson/R4" target="_blank" rel="noopener">어셈블리어 교과서 「비트 연산」 ↗</a> 에서 봐요.</p>`,
+      example: { code: `a = 0b1100
+b = 0b1010
+print("a     ", format(a, "04b"))
+print("b     ", format(b, "04b"))
+print("a & b ", format(a & b, "04b"))
+print("a | b ", format(a | b, "04b"))
+print("a ^ b ", format(a ^ b, "04b"))
+
+x = 0b10110110
+print()
+print("x          ", format(x, "08b"))
+print("x & 0b1111 ", format(x & 0b1111, "08b"), "← 아래 4비트만")
+print("x | 0b0001 ", format(x | 0b0001, "08b"), "← 맨 오른쪽 켜기")
+print("x ^ 0b1111 ", format(x ^ 0b1111, "08b"), "← 아래 4비트 뒤집기")` } },
+  ],
+  summary: ['게이트는 0/1 을 받아 0/1 을 내는 회로 — AND 둘 다 · OR 하나라도 · XOR 서로 다르면 · NOT 거꾸로', '게이트의 출력을 다른 게이트에 이어 큰 회로를 만든다 — NAND 하나로 전부 만들 수 있다', '정수의 & | ^ 는 자리마다 동시에 — 게이트를 나란히 놓은 것'] },
+{ id: 'C6', ch: 2, n: 6, title: '덧셈기: 게이트로 더하기', mode: 'text',
+  tutorSummary: '2진 한 자리 더하기 1 + 1 = 10 — 합 자리는 XOR, 올림은 AND 라서 게이트 두 개가 반가산기 half_add(a, b) → (합, 올림). 오른쪽에서 올라온 올림까지 셋을 더하는 전가산기 full_add(a, b, c) = 반가산기 두 개 + OR(올림 둘). 전가산기 8개를 오른쪽 끝 자리부터 올림을 넘겨 가며 줄줄이 이으면 8비트 덧셈기 add8(x, y) — to_bits(format(n, "08b")) · from_bits(int(글자, 2)). 마지막 올림이 1 이면 넘침(200 + 100 → 44, 8비트만 남음) — 파이썬 int 는 안 넘치지만 CPU 레지스터는 칸 수가 정해져 있다. 뺄셈은 x + NOT(y) + 1(2의 보수) — 같은 덧셈기에 뒤집는 게이트와 첫 올림 1 만 더하면 된다. 이게 CPU 안의 계산 장치(ALU)의 뼈대.',
+  terms: { '반가산기': '2진수 한 자리 두 개를 더해 합과 올림을 내는 회로. XOR 하나 + AND 하나', '전가산기': '한 자리 두 개와 아래 자리에서 올라온 올림까지 셋을 더하는 회로. 반가산기 둘 + OR 하나', '올림': '한 자리에서 넘쳐 바로 윗자리로 넘기는 1. 영어로 carry', '넘침': '결과가 정해진 비트 수(8비트면 0~255)를 넘는 것. 넘친 윗자리는 버려져요. 영어로 overflow', 'ALU': 'CPU 안의 계산 장치(Arithmetic Logic Unit). 덧셈기 · 게이트 묶음으로 더하기 · 빼기 · AND · OR 를 해요' },
+  pages: [
+    { title: 'half_add(a, b): 합은 XOR · 올림은 AND', html: `<p>2진수 한 자리끼리 더하면 경우가 넷이에요. 1 + 1 은 2 인데, 2진수로 2 는 <code>10</code> — 이 자리는 0 이고 윗자리로 <b>1 을 올려요</b>([[올림]]).</p>
+<pre> a + b │ 올림  합 │ 10진
+ 0 + 0 │  0    0  │  0
+ 0 + 1 │  0    1  │  1
+ 1 + 0 │  0    1  │  1
+ 1 + 1 │  1    0  │  2</pre>
+<p>표를 [[레슨:C5]] 의 진리표와 견줘 보세요. <b>합</b> 칸은 XOR(서로 다르면 1)와 똑같고, <b>올림</b> 칸은 AND(둘 다 1 이면 1)와 똑같아요. 그래서 게이트 두 개면 한 자리 덧셈 회로가 돼요. 이걸 [[반가산기]]라고 해요.</p>
+<pre>a ─┬──► XOR ──► 합
+b ─┼──►
+   └──► AND ──► 올림</pre>
+<pre>def half_add(a, b):
+    return a ^ b, a &amp; b       # (합, 올림)
+
+print(half_add(1, 1))   # (0, 1)</pre>
+<p>함수 하나가 값 두 개를 돌려줘요(<code>return 합, 올림</code>). 받을 때는 <code>s, c = half_add(1, 1)</code> 처럼 나눠 받아요. 「반」 이라는 이름이 붙은 건 <b>아래 자리에서 올라온 올림</b>을 못 받아서예요. 그건 다음 쪽의 전가산기가 해요.</p>`,
+      example: { code: `def half_add(a, b):
+    s = a ^ b      # 합 = XOR
+    c = a & b      # 올림 = AND
+    return s, c
+
+print(" a + b │ 올림  합 │ 10진")
+for a in (0, 1):
+    for b in (0, 1):
+        s, c = half_add(a, b)
+        print(f" {a} + {b} │  {c}    {s}  │  {c * 2 + s}")` } },
+    { title: 'full_add(a, b, c) — 올림까지 셋', html: `<p>여러 자리 수를 더할 때, 둘째 자리부터는 <b>셋</b>을 더해요. a 자리, b 자리, 그리고 오른쪽 자리에서 올라온 올림 c. 이걸 하는 회로가 [[전가산기]]예요. 반가산기 두 개와 OR 하나로 만들어요.</p>
+<ol><li>반가산기로 <code>a + b</code> → 합 s1, 올림 c1</li>
+<li>반가산기로 <code>s1 + c</code> → 최종 합 s, 올림 c2</li>
+<li>올림은 c1 이나 c2 중 하나라도 1 이면 1 → <code>OR(c1, c2)</code> (둘이 동시에 1 이 되는 일은 없어요)</li></ol>
+<pre>a, b ──► 반가산기① ── s1 ──►┐
+             │                반가산기② ──► 합 s
+             c1         c ──►┘     │
+             │                     c2
+             └──────► OR ◄─────────┘
+                      │
+                      ▼
+                     올림</pre>
+<pre>def full_add(a, b, c):
+    s1, c1 = half_add(a, b)
+    s, c2 = half_add(s1, c)
+    return s, c1 | c2
+
+print(full_add(1, 1, 1))   # (1, 1)</pre>
+<p>1 + 1 + 1 = 3 = 2진수 <code>11</code> 이라서 합 1, 올림 1 이에요. 예제는 입력 8가지를 모두 찍고, <code>올림 × 2 + 합</code> 이 정말 <code>a + b + c</code> 와 같은지 확인해요.</p>`,
+      example: { code: `def half_add(a, b):
+    return a ^ b, a & b
+
+def full_add(a, b, c):
+    s1, c1 = half_add(a, b)
+    s, c2 = half_add(s1, c)
+    return s, c1 | c2
+
+print(" a b c │ 올림 합 │ 맞나")
+for a in (0, 1):
+    for b in (0, 1):
+        for c in (0, 1):
+            s, carry = full_add(a, b, c)
+            ok = carry * 2 + s == a + b + c
+            print(f" {a} {b} {c} │  {carry}    {s} │ {ok}")` } },
+    { title: 'add8(x, y) — 전가산기 8개를 줄줄이', html: `<p>8비트 수 두 개를 더하려면 전가산기 8개를 한 줄로 놓아요. 맨 오른쪽 자리부터 더하고, 거기서 나온 올림을 <b>바로 왼쪽 전가산기</b>에 넘겨요. 손으로 하는 세로셈과 똑같아요.</p>
+<pre> 올림   1 1 0 0 1 0 0 0
+        0 1 1 0 0 1 0 0    100
+      + 0 0 1 1 0 1 1 1     55
+      ─────────────────
+        1 0 0 1 1 0 1 1    155</pre>
+<p>파이썬으로는 수를 비트 리스트로 바꿔서 해요. <code>format(n, "08b")</code> 로 2진수 8자리 글자를 만들고([[레슨:C1]]), 글자 하나씩 숫자로 바꿔요. 되돌릴 때는 <code>int(글자, 2)</code> 예요.</p>
+<pre>def add8(x, y):
+    a = to_bits(x)
+    b = to_bits(y)
+    out = [0] * 8
+    carry = 0
+    for i in range(7, -1, -1):      # 오른쪽 끝(7번)부터 왼쪽으로
+        out[i], carry = full_add(a[i], b[i], carry)
+    return from_bits(out), carry</pre>
+<p>올림이 왼쪽으로 한 칸씩 퍼져 가서 「줄줄이 올림 덧셈기」 라고 불러요. 진짜 CPU 는 올림을 미리 내다보는 더 빠른 회로를 쓰지만, 하는 일은 같아요.</p>
+<p><b>[[넘침]]</b> — 맨 왼쪽 전가산기에서도 올림이 나오면 8비트에 담을 자리가 없어요. 200 + 100 = 300 인데, 8비트에는 <code>300 - 256 = 44</code> 만 남고 마지막 올림 1 은 버려져요. 파이썬의 int 는 알아서 커져서 안 넘치지만, CPU 의 레지스터는 칸 수(8 · 32 · 64비트)가 정해져 있어서 넘쳐요. <a href="../asm/#lesson/R3" target="_blank" rel="noopener">어셈블리어 교과서 「계산: add · sub」 ↗</a> 의 「넘침」 쪽에서 64비트 CPU 가 정말 그렇게 잘라 내는 걸 봐요.</p>`,
+      example: { code: `def XOR(a, b):
+    return a ^ b
+
+def AND(a, b):
+    return a & b
+
+def OR(a, b):
+    return a | b
+
+def half_add(a, b):
+    return XOR(a, b), AND(a, b)
+
+def full_add(a, b, c):
+    s1, c1 = half_add(a, b)
+    s, c2 = half_add(s1, c)
+    return s, OR(c1, c2)
+
+def to_bits(n):
+    return [int(ch) for ch in format(n, "08b")]   # 왼쪽이 큰 자리
+
+def from_bits(bits):
+    text = ""
+    for b in bits:
+        text += str(b)
+    return int(text, 2)
+
+def add8(x, y, show=False):
+    a = to_bits(x)
+    b = to_bits(y)
+    out = [0] * 8
+    carry = 0
+    for i in range(7, -1, -1):
+        old = carry
+        out[i], carry = full_add(a[i], b[i], carry)
+        if show:
+            print(f"  오른쪽 {8 - i}번째 자리: {a[i]} + {b[i]} + 올림 {old} → 합 {out[i]}, 올림 {carry}")
+    return from_bits(out), carry
+
+result, carry = add8(100, 55, show=True)
+print("100 + 55 =", result, " 마지막 올림", carry)
+print()
+result, carry = add8(200, 100)
+print("200 + 100 =", result, " 마지막 올림", carry, "← 넘침! 300 - 256 = 44 만 남음")` } },
+    { title: '뺄셈 x − y = x + (y 뒤집기) + 1', html: `<p>빼기 회로를 따로 만들 필요가 없어요. [[레슨:C3]] 의 2의 보수가 「−y = y 의 비트를 다 뒤집고 + 1」 이었죠. 그러니까</p>
+<pre>x − y  =  x + (−y)  =  x + (y 를 뒤집은 것) + 1</pre>
+<p>비트 뒤집기는 NOT 게이트 8개, 「+ 1」 은 맨 오른쪽 전가산기에 넣는 첫 올림을 0 대신 <b>1</b> 로 주면 끝이에요. 덧셈기 하나로 더하기와 빼기를 다 해요. 8비트 뒤집기는 [[레슨:C5]] 에서 본 <code>^</code> 로 <code>y ^ 0b11111111</code> 이에요.</p>
+<pre>  9 − 4:   9 + (4 뒤집은 것 251) + 1 = 261 → 8비트만 남기면   5
+  4 − 9:   4 + (9 뒤집은 것 246) + 1 = 251 → 부호 있는 수로 읽으면 −5</pre>
+<p>251 은 맨 왼쪽 비트가 1 이라서, 「부호 있는 8비트」 로 읽으면 <code>251 - 256 = -5</code> 예요. CPU 는 같은 비트를 내놓고, 그걸 부호 없는 수(251)로 읽을지 부호 있는 수(−5)로 읽을지는 프로그램이 정해요.</p>
+<p>CPU 안에는 이렇게 덧셈기 · 게이트 묶음을 모아 둔 계산 장치 [[ALU]] 가 있어요. 「더해라 · 빼라 · AND 해라」 신호에 따라 회로 일부를 켜고 꺼요. 다음 레슨에서 CPU 가 이 ALU 에게 일을 시키는 법을 봐요.</p>`,
+      example: { code: `for x, y in [(9, 4), (4, 9), (100, 1)]:
+    flipped = y ^ 0b11111111      # 8비트 뒤집기 (NOT 8개)
+    total = x + flipped + 1
+    result = total % 256          # 8비트만 남기기
+    if result >= 128:
+        signed = result - 256
+    else:
+        signed = result
+    print(f"{x} - {y}: {format(x, '08b')} + {format(flipped, '08b')} + 1 → {format(result, '08b')} = {result} (부호 있게 읽으면 {signed})")` } },
+  ],
+  summary: ['한 자리 더하기: 합은 XOR, 올림은 AND — 반가산기', '전가산기(올림까지 셋)를 8개 줄줄이 이으면 8비트 덧셈기, 마지막 올림은 넘침', '뺄셈 = 뒤집고 + 1 을 더하기 — 같은 덧셈기로'] },
+{ id: 'C7', ch: 2, n: 7, title: 'CPU 가 명령을 실행하는 법', mode: 'text',
+  tutorSummary: '명령도 숫자 — 프로그램은 메모리 칸에 든 숫자들이고, 데이터도 같은 메모리에 있다(CPU 는 PC 가 가리키는 칸만 명령으로 읽음). 이 교과서의 장난감 CPU: 명령 7개(0 HALT · 1 LOAD r, 주소(r = mem[주소]) · 2 ADD r, s · 3 SUB r, s · 4 JMP 주소 · 5 JZ r, 주소(r 이 0 이면 점프) · 6 PRINT r), 레지스터 R0~R3, 메모리 16칸. 명령 한 칸 = 4자리 10진수 [명령 번호][레지스터][두 자리] — 1014 = LOAD R0, 14, 해석은 word // 1000 · word // 100 % 10 · word % 100. CPU 는 가져오기(word = mem[pc], pc += 1) → 해석(decode) → 실행을 끝없이 반복, 프로그램 카운터(PC)는 다음 명령의 칸 번호, 점프는 PC 를 바꾸는 것. run(mem) 은 while True + if/elif 로 HALT 까지. 글자 명령(LOAD R0, 14)을 숫자로 바꾸는 게 어셈블러(assemble). 진짜 CPU(x86-64)는 명령 수천 개 · 레지스터 rax~r15 · 명령은 바이트(mov rax, 60 → b8 3c 00 00 00) · 1초에 수십억 번 — 어셈블리어 교과서. CB2 에서 이 CPU 를 명령 8개(7 STORE) · 메모리 32칸으로 키운다.',
+  terms: { '레지스터': 'CPU 안에 있는 아주 빠른 작은 칸 몇 개. 계산할 값을 여기에 올려놓고 해요', '프로그램 카운터': '다음에 가져올 명령이 메모리 몇 번 칸에 있는지 가리키는 레지스터. 줄여서 PC', '명령어 집합': '그 CPU 가 알아듣는 명령의 목록과 숫자 모양. CPU 종류마다 달라요(x86-64 · ARM …)', '어셈블러': '글자로 적은 명령(어셈블리어)을 CPU 가 읽는 숫자(기계어)로 바꾸는 프로그램', '클록': 'CPU 가 한 걸음씩 움직이게 박자를 맞추는 신호. 3 GHz 면 1초에 30억 번' },
+  pages: [
+    { title: '명령도 숫자: 1014 = LOAD R0, 14', html: `<p>메모리는 번호 붙은 칸들이고, 칸마다 숫자가 하나씩 들어 있어요. 놀랍게도 <b>프로그램도 그 칸에 든 숫자</b>예요. CPU 는 칸에서 숫자를 꺼내 「아, 이건 더하라는 뜻」 하고 알아들어요. 어떤 숫자가 어떤 명령인지 정한 약속을 [[명령어 집합]]이라고 해요.</p>
+<p>이 교과서의 <b>장난감 CPU</b> 를 정해 볼게요. 계산할 값을 올려놓는 [[레지스터]]는 R0 · R1 · R2 · R3 네 개, 메모리는 0~15번 16칸, 명령은 7개예요.</p>
+<table class="kb"><tbody><tr><th>번호</th><th>명령</th><th>모양</th><th>하는 일</th></tr>
+<tr><td>0</td><td>HALT</td><td><code>HALT</code></td><td>멈추기</td></tr>
+<tr><td>1</td><td>LOAD</td><td><code>LOAD R0, 14</code></td><td>메모리 14번 칸의 값을 R0 에</td></tr>
+<tr><td>2</td><td>ADD</td><td><code>ADD R0, R1</code></td><td>R0 = R0 + R1</td></tr>
+<tr><td>3</td><td>SUB</td><td><code>SUB R0, R1</code></td><td>R0 = R0 − R1</td></tr>
+<tr><td>4</td><td>JMP</td><td><code>JMP 2</code></td><td>다음엔 2번 칸 명령으로</td></tr>
+<tr><td>5</td><td>JZ</td><td><code>JZ R0, 6</code></td><td>R0 이 0 이면 6번 칸으로, 아니면 그냥 다음</td></tr>
+<tr><td>6</td><td>PRINT</td><td><code>PRINT R0</code></td><td>R0 의 값을 화면에</td></tr></tbody></table>
+<p>명령 하나는 <b>4자리 숫자 하나</b>로 적어요. 천의 자리가 명령 번호, 백의 자리가 레지스터, 끝 두 자리가 칸 번호(또는 둘째 레지스터)예요.</p>
+<pre> 1014  →  1 │ 0 │ 14  →  LOAD R0, 14
+ 5006  →  5 │ 0 │ 06  →  JZ R0, 6
+ 3001  →  3 │ 0 │ 01  →  SUB R0, R1
+ 6000  →  6 │ 0 │ 00  →  PRINT R0</pre>
+<p>숫자를 자리별로 쪼개는 건 몫(<code>//</code>)과 나머지(<code>%</code>)예요.</p>
+<pre>word = 1014
+print(word // 1000)       # 1  — 명령 번호
+print(word // 100 % 10)   # 0  — 레지스터
+print(word % 100)         # 14 — 칸 번호</pre>
+<p>예제는 「3, 2, 1 을 세는」 프로그램이 들어 있는 메모리 16칸을 읽어 명령으로 풀어 봐요. 14번 · 15번 칸의 3 · 1 은 명령이 아니라 <b>데이터</b>예요. CPU 는 숫자만 봐서는 명령인지 데이터인지 몰라요. 다음 쪽의 PC 가 가리키는 칸을 명령으로 읽을 뿐이에요. 진짜 CPU 는 10진 자리 대신 2진 비트를 잘라서 같은 일을 해요([[레슨:C1]]).</p>`,
+      example: { code: `NAMES = ["HALT", "LOAD", "ADD", "SUB", "JMP", "JZ", "PRINT"]
+
+def decode(word):
+    op = word // 1000          # 천의 자리: 명령 번호
+    r = word // 100 % 10       # 백의 자리: 레지스터
+    x = word % 100             # 끝 두 자리: 주소나 레지스터
+    return op, r, x
+
+def show(word):
+    op, r, x = decode(word)
+    name = NAMES[op]
+    if op == 0:
+        return name
+    if op == 4:
+        return f"{name} {x}"
+    if op == 6:
+        return f"{name} R{r}"
+    if op in (2, 3):
+        return f"{name} R{r}, R{x}"
+    return f"{name} R{r}, {x}"
+
+mem = [1014, 1115, 5006, 6000, 3001, 4002, 0, 0,
+       0, 0, 0, 0, 0, 0, 3, 1]
+
+print("칸  숫자  뜻")
+for addr in range(7):
+    print(f"{addr:>2}  {mem[addr]:>4}  {show(mem[addr])}")
+print(" …  (7~13번 칸은 비어 있음)")
+print(f"14  {mem[14]:>4}  데이터 — 셀 시작 수")
+print(f"15  {mem[15]:>4}  데이터 — 1 씩 빼려고")` } },
+    { title: 'word = mem[pc] — 가져오기 · 해석 · 실행', html: `<p>CPU 가 하는 일은 딱 세 가지를 <b>끝없이</b> 되풀이하는 거예요.</p>
+<ol><li><b>가져오기</b>(fetch) — [[프로그램 카운터]](PC)가 가리키는 칸의 숫자를 꺼내요. 그리고 PC 를 1 늘려 다음 칸을 가리켜요</li>
+<li><b>해석</b>(decode) — 숫자를 쪼개 무슨 명령인지, 어느 레지스터 · 칸인지 알아내요</li>
+<li><b>실행</b>(execute) — 레지스터 값을 바꾸거나([[레슨:C6]] 의 덧셈기 · ALU 가 여기서 일해요), 화면에 찍거나, PC 를 바꿔요</li></ol>
+<pre>        ┌──────────────────────────────┐
+        ▼                              │
+  ① 가져오기 word = mem[pc]; pc += 1   │
+        ▼                              │
+  ② 해석    op, r, x = decode(word)    │
+        ▼                              │
+  ③ 실행    레지스터 · PC 바꾸기 ───────┘</pre>
+<p><b>점프는 PC 를 바꾸는 것</b>이에요. <code>JMP 2</code> 는 「pc = 2」 일 뿐이고, 다음 가져오기가 2번 칸에서 일어나요. 반복문(<code>while</code>)도 if 도, CPU 에서는 전부 이 점프로 돼요.</p>
+<p>3, 2, 1 프로그램의 처음 몇 단계를 손으로 따라가 볼게요. R0 은 셀 수, R1 은 1 이에요.</p>
+<table class="kb"><tbody><tr><th>PC</th><th>가져온 숫자</th><th>명령</th><th>실행 뒤</th></tr>
+<tr><td>0</td><td>1014</td><td>LOAD R0, 14</td><td>R0 = 3</td></tr>
+<tr><td>1</td><td>1115</td><td>LOAD R1, 15</td><td>R1 = 1</td></tr>
+<tr><td>2</td><td>5006</td><td>JZ R0, 6</td><td>R0 은 3 — 점프 안 함</td></tr>
+<tr><td>3</td><td>6000</td><td>PRINT R0</td><td>화면에 3</td></tr>
+<tr><td>4</td><td>3001</td><td>SUB R0, R1</td><td>R0 = 2</td></tr>
+<tr><td>5</td><td>4002</td><td>JMP 2</td><td>PC = 2 — 다시 JZ 로</td></tr></tbody></table>
+<p>진짜 CPU 는 이 한 바퀴를 [[클록]]에 맞춰 1초에 수십억 번 돌아요. 예제는 한 바퀴를 하는 <code>step(pc)</code> 함수를 만들어 8번만 불러 봐요.</p>`,
+      example: { code: `NAMES = ["HALT", "LOAD", "ADD", "SUB", "JMP", "JZ", "PRINT"]
+
+def decode(word):
+    op = word // 1000          # 천의 자리: 명령 번호
+    r = word // 100 % 10       # 백의 자리: 레지스터
+    x = word % 100             # 끝 두 자리: 주소나 레지스터
+    return op, r, x
+
+def show(word):
+    op, r, x = decode(word)
+    name = NAMES[op]
+    if op == 0:
+        return name
+    if op == 4:
+        return f"{name} {x}"
+    if op == 6:
+        return f"{name} R{r}"
+    if op in (2, 3):
+        return f"{name} R{r}, R{x}"
+    return f"{name} R{r}, {x}"
+
+mem = [1014, 1115, 5006, 6000, 3001, 4002, 0, 0,
+       0, 0, 0, 0, 0, 0, 3, 1]
+reg = [0, 0, 0, 0]
+
+def step(pc):
+    word = mem[pc]             # ① 가져오기
+    pc = pc + 1
+    op, r, x = decode(word)    # ② 해석
+    if op == 1:                # ③ 실행
+        reg[r] = mem[x]
+    elif op == 3:
+        reg[r] = reg[r] - reg[x]
+    elif op == 4:
+        pc = x
+    elif op == 5:
+        if reg[r] == 0:
+            pc = x
+    elif op == 6:
+        print("   화면 →", reg[r])
+    print(f"{show(word):<12} 다음 PC={pc}  R={reg}")
+    return pc
+
+pc = 0
+for n in range(8):
+    pc = step(pc)` } },
+    { title: 'run(mem): while True: 로 HALT 까지', html: `<p>한 바퀴(<code>step</code>)를 <code>while True:</code> 안에 넣고, HALT 를 만나면 <code>break</code> 로 멈추면 CPU 가 완성돼요. 명령 7개가 if · elif 7갈래예요.</p>
+<pre>def run(mem):
+    reg = [0, 0, 0, 0]
+    pc = 0
+    while True:
+        word = mem[pc]             # ① 가져오기
+        pc = pc + 1
+        op, r, x = decode(word)    # ② 해석
+        if op == 0:                # ③ 실행 — HALT
+            break
+        elif op == 1:              # LOAD r, 주소
+            reg[r] = mem[x]
+        elif op == 2:              # ADD r, s
+            reg[r] = reg[r] + reg[x]
+        elif op == 3:              # SUB r, s
+            reg[r] = reg[r] - reg[x]
+        elif op == 4:              # JMP 주소
+            pc = x
+        elif op == 5:              # JZ r, 주소
+            if reg[r] == 0:
+                pc = x
+        elif op == 6:              # PRINT r
+            print(reg[r])</pre>
+<p>3, 2, 1 프로그램을 넣고 <code>run(mem)</code> 을 부르면 3 · 2 · 1 을 찍고 멈춰요. 셀 수를 바꾸고 싶으면 프로그램(0~6번 칸)은 그대로 두고 <b>데이터 칸(14번)만</b> 바꾸면 돼요. 예제는 <code>trace=True</code> 로 한 단계마다 명령 · PC · 레지스터도 찍어요.</p>
+<div class="bk-warn"><b>끝나지 않는 프로그램</b> — HALT 에 닿지 못하면(예: <code>JMP 0</code> 만 계속) while True 가 영원히 돌아요. VS Code 터미널에서 <b>Ctrl+C</b> 로 멈춰요. 진짜 CPU 도 똑같이 멈추지 않아요. [[레슨:CB2]] 에서는 「최대 단계」 를 둬서 막아요.</div>`,
+      example: { code: `NAMES = ["HALT", "LOAD", "ADD", "SUB", "JMP", "JZ", "PRINT"]
+
+def decode(word):
+    op = word // 1000          # 천의 자리: 명령 번호
+    r = word // 100 % 10       # 백의 자리: 레지스터
+    x = word % 100             # 끝 두 자리: 주소나 레지스터
+    return op, r, x
+
+def show(word):
+    op, r, x = decode(word)
+    name = NAMES[op]
+    if op == 0:
+        return name
+    if op == 4:
+        return f"{name} {x}"
+    if op == 6:
+        return f"{name} R{r}"
+    if op in (2, 3):
+        return f"{name} R{r}, R{x}"
+    return f"{name} R{r}, {x}"
+
+def run(mem, trace=False):
+    reg = [0, 0, 0, 0]
+    pc = 0
+    while True:
+        word = mem[pc]             # ① 가져오기
+        if trace:
+            print(f"   PC={pc:>2}  {show(word):<12} 실행 전 R={reg}")
+        pc = pc + 1
+        op, r, x = decode(word)    # ② 해석
+        if op == 0:                # ③ 실행 — HALT
+            break
+        elif op == 1:              # LOAD r, 주소
+            reg[r] = mem[x]
+        elif op == 2:              # ADD r, s
+            reg[r] = reg[r] + reg[x]
+        elif op == 3:              # SUB r, s
+            reg[r] = reg[r] - reg[x]
+        elif op == 4:              # JMP 주소
+            pc = x
+        elif op == 5:              # JZ r, 주소
+            if reg[r] == 0:
+                pc = x
+        elif op == 6:              # PRINT r
+            print(reg[r])
+
+mem = [1014, 1115, 5006, 6000, 3001, 4002, 0, 0,
+       0, 0, 0, 0, 0, 0, 3, 1]
+
+print("— 그냥 실행")
+run(mem)
+
+print("— 한 단계씩 보기 (셀 수를 2 로)")
+mem[14] = 2
+run(mem, trace=True)` } },
+    { title: '진짜 CPU: mov rax, 60 · 어셈블러', html: `<p>1014 같은 숫자를 직접 적기는 힘들어요. 그래서 사람은 <code>LOAD R0, 14</code> 처럼 <b>글자로</b> 적고, 그걸 숫자로 바꾸는 프로그램을 써요. 이 프로그램이 [[어셈블러]]고, 글자로 적은 명령이 <b>어셈블리어</b>예요.</p>
+<pre>OPS = {"HALT": 0, "LOAD": 1, "ADD": 2, "SUB": 3, "JMP": 4, "JZ": 5, "PRINT": 6}
+
+def assemble(line):
+    parts = line.replace(",", " ").split()    # "LOAD R0, 14" → ["LOAD", "R0", "14"]
+    name = parts[0]
+    nums = []
+    for p in parts[1:]:
+        n = p.replace("R", "")                # "R0" → "0", "14" → "14"
+        nums.append(int(n))
+    if name == "JMP":
+        nums = [0] + nums                     # JMP 는 레지스터 자리가 비어요
+    nums = nums + [0, 0]                      # 모자라는 자리는 0
+    return OPS[name] * 1000 + nums[0] * 100 + nums[1]
+
+print(assemble("LOAD R0, 14"))   # 1014
+print(assemble("JMP 2"))         # 4002</pre>
+<p>모르는 이름(<code>"MOVE R0, 1"</code>)을 넣으면 <code>OPS[name]</code> 에서 KeyError 가 나요. 진짜 어셈블러는 번역하기 전에 <code>if name not in OPS:</code> 로 검사해서 「몇 번째 줄: 모르는 명령」 이라고 알려 줘요.</p>
+<p>진짜 CPU 도 원리는 같아요. 다만 크기가 달라요.</p>
+<table class="kb"><tbody><tr><th></th><th>장난감 CPU</th><th>진짜 CPU (x86-64)</th></tr>
+<tr><td>명령</td><td>7개</td><td>수천 개(mov · add · cmp · jmp · call …)</td></tr>
+<tr><td>레지스터</td><td>R0~R3</td><td>rax · rbx … r15 16개(칸마다 64비트)</td></tr>
+<tr><td>명령 모양</td><td>10진 4자리 숫자</td><td>바이트 1~15개 — <code>mov rax, 60</code> → <code>b8 3c 00 00 00</code></td></tr>
+<tr><td>빠르기</td><td>파이썬 while 한 바퀴</td><td>1초에 수십억 번, 여러 명령을 겹쳐서</td></tr></tbody></table>
+<p>진짜 레지스터와 명령은 어셈블리어 교과서에서 우분투 VM 으로 직접 돌려 봐요.</p>
+<ul><li><a href="../asm/#lesson/R0" target="_blank" rel="noopener">어셈블리어 교과서 「어셈블리어란」 ↗</a> — 기계어 바이트와 어셈블러(nasm)</li>
+<li><a href="../asm/#lesson/R1" target="_blank" rel="noopener">「레지스터와 mov」 ↗</a> — rax … r15, LOAD 에 해당하는 mov</li>
+<li><a href="../asm/#lesson/R5" target="_blank" rel="noopener">「비교와 점프」 ↗</a> · <a href="../asm/#lesson/R6" target="_blank" rel="noopener">「반복 만들기」 ↗</a> — JMP · JZ 에 해당하는 jmp · je, 1~n 합</li></ul>
+<details class="lp-more"><summary>💡 더 알아보기</summary><p>진짜 CPU 는 공장 줄처럼 일해요. 한 명령을 실행하는 동안 다음 명령을 해석하고, 그다음 명령을 가져와요(파이프라인). 점프가 어디로 갈지 미리 짐작해서 가져오기도 해요. 그래서 한 바퀴씩 도는 장난감보다 훨씬 빨라요.</p></details>`,
+      example: { code: `OPS = {"HALT": 0, "LOAD": 1, "ADD": 2, "SUB": 3, "JMP": 4, "JZ": 5, "PRINT": 6}
+
+def assemble(line):
+    parts = line.replace(",", " ").split()
+    name = parts[0]
+    nums = []
+    for p in parts[1:]:
+        n = p.replace("R", "")
+        nums.append(int(n))
+    if name == "JMP":
+        nums = [0] + nums
+    nums = nums + [0, 0]
+    return OPS[name] * 1000 + nums[0] * 100 + nums[1]
+
+NAMES = ["HALT", "LOAD", "ADD", "SUB", "JMP", "JZ", "PRINT"]
+
+def decode(word):
+    op = word // 1000          # 천의 자리: 명령 번호
+    r = word // 100 % 10       # 백의 자리: 레지스터
+    x = word % 100             # 끝 두 자리: 주소나 레지스터
+    return op, r, x
+
+def show(word):
+    op, r, x = decode(word)
+    name = NAMES[op]
+    if op == 0:
+        return name
+    if op == 4:
+        return f"{name} {x}"
+    if op == 6:
+        return f"{name} R{r}"
+    if op in (2, 3):
+        return f"{name} R{r}, R{x}"
+    return f"{name} R{r}, {x}"
+
+def run(mem, trace=False):
+    reg = [0, 0, 0, 0]
+    pc = 0
+    while True:
+        word = mem[pc]             # ① 가져오기
+        if trace:
+            print(f"   PC={pc:>2}  {show(word):<12} 실행 전 R={reg}")
+        pc = pc + 1
+        op, r, x = decode(word)    # ② 해석
+        if op == 0:                # ③ 실행 — HALT
+            break
+        elif op == 1:              # LOAD r, 주소
+            reg[r] = mem[x]
+        elif op == 2:              # ADD r, s
+            reg[r] = reg[r] + reg[x]
+        elif op == 3:              # SUB r, s
+            reg[r] = reg[r] - reg[x]
+        elif op == 4:              # JMP 주소
+            pc = x
+        elif op == 5:              # JZ r, 주소
+            if reg[r] == 0:
+                pc = x
+        elif op == 6:              # PRINT r
+            print(reg[r])
+
+program = [
+    "LOAD R0, 14",
+    "LOAD R1, 15",
+    "ADD R0, R1",
+    "PRINT R0",
+    "HALT",
+]
+mem = [0] * 16
+for addr, line in enumerate(program):
+    mem[addr] = assemble(line)
+    print(f"{addr:>2}  {line:<12} → {mem[addr]}")
+mem[14] = 5
+mem[15] = 7
+print("메모리:", mem)
+print("실행 결과:")
+run(mem)` } },
+  ],
+  summary: ['프로그램도 메모리의 숫자 — 1014 = LOAD R0, 14 (명령 번호 · 레지스터 · 칸)', 'CPU 는 가져오기 → 해석 → 실행을 끝없이, PC 가 다음 칸을 가리키고 점프는 PC 를 바꾼다', '글자 명령을 숫자로 바꾸는 게 어셈블러 — 진짜 CPU 는 어셈블리어 교과서'] },
+{ id: 'C8', ch: 2, n: 8, title: '메모리 계층과 캐시', mode: 'text',
+  tutorSummary: '가까울수록 빠르고 작다 — 레지스터(0.3 ns) · L1 캐시(1 ns) · L2(4 ns) · L3(15 ns) · RAM(100 ns) · SSD(100 µs) · HDD(10 ms), 1 클록을 1초로 늘리면 RAM 5분 · SSD 4일 · HDD 1년. CPU 는 RAM 을 기다리지 않으려고 캐시(작고 빠른 사본)를 둔다. 맞히면 적중(hit), 없으면 실패(miss) → RAM 에서 블록(캐시 라인, 보통 64바이트)을 통째로 가져온다. 캐시가 잘 맞는 이유는 지역성: 시간(방금 쓴 건 곧 또 — 반복문의 변수) · 공간(옆 칸을 곧 — 리스트를 차례로). 꽉 차면 LRU(가장 오래 안 쓴 것)를 버린다 — 파이썬 흉내 simulate(blocks, size) 로 적중 세기. functools.lru_cache 는 같은 생각으로 함수 결과를 기억(cache_info). 2차원 배열은 줄 단위로 붙어 있어서 a[r][c] 를 행 순서로 돌면 적중, 열 순서면 실패투성이 — 파이썬 리스트로 시간을 재면 차이가 잘 안 보이니 개념만(C · numpy 에서 큼).',
+  terms: { '캐시': 'CPU 가까이 둔 작고 빠른 메모리. 자주 쓰는 RAM 내용의 사본을 담아 둬요', '적중': '찾는 값이 캐시에 있어서 바로 쓰는 것. 영어로 hit. 없으면 실패(miss)', '캐시 라인': '캐시가 RAM 에서 한 번에 가져오는 덩어리. 보통 64바이트. 이 레슨에서는 「블록」 이라고도 불러요', '지역성': '프로그램이 방금 쓴 것(시간)과 그 옆(공간)을 곧 또 쓰는 성질. 캐시가 잘 맞는 이유', 'LRU': 'Least Recently Used — 캐시가 꽉 찼을 때 가장 오래 안 쓴 것부터 버리는 방법' },
+  pages: [
+    { title: 'RAM 100 ns · SSD 100 µs — 속도 표', html: `<p>[[레슨:C7]] 의 CPU 는 명령마다 메모리를 읽었어요. 그런데 진짜 RAM 은 CPU 보다 <b>수백 배 느려요</b>. 그래서 컴퓨터는 저장하는 곳을 층층이 둬요. 위로 갈수록 빠르고, 작고, 비싸요.</p>
+<table class="kb"><tbody><tr><th>어디</th><th>크기(대략)</th><th>한 번 읽기(대략)</th><th>1 클록 = 1초로 늘리면</th></tr>
+<tr><td>레지스터</td><td>수백 바이트</td><td>0.3 ns</td><td>1초</td></tr>
+<tr><td>L1 캐시</td><td>32~64 KB</td><td>1 ns</td><td>3초</td></tr>
+<tr><td>L2 캐시</td><td>1~2 MB</td><td>4 ns</td><td>13초</td></tr>
+<tr><td>L3 캐시</td><td>수십 MB</td><td>15 ns</td><td>50초</td></tr>
+<tr><td>RAM</td><td>8~32 GB</td><td>100 ns</td><td>약 6분</td></tr>
+<tr><td>SSD</td><td>0.5~2 TB</td><td>100 µs</td><td>약 4일</td></tr>
+<tr><td>HDD</td><td>몇 TB</td><td>10 ms</td><td>약 1년</td></tr></tbody></table>
+<p>ns(나노초)는 10억분의 1초, µs(마이크로초)는 100만분의 1초, ms 는 1000분의 1초예요. 숫자는 컴퓨터마다 다른 <b>대략</b>이에요. 중요한 건 <b>몇 배씩 차이 나는지</b>예요.</p>
+<p>오른쪽 칸이 「사람 시간」 비유예요. CPU 가 한 박자(약 0.3 ns)를 1초로 느낀다면, RAM 에서 값 하나 가져오는 데 6분을 멍하니 기다리고, SSD 는 나흘, HDD 는 1년이에요. 그래서 CPU 바로 옆에 [[캐시]]를 둬요. 자주 쓰는 RAM 내용의 <b>사본</b>을 담아 두는 작고 빠른 메모리예요.</p>
+<ul><li>L1 · L2 · L3 은 CPU 칩 안에 있어요. 숫자가 작을수록 가깝고 빠르고 작아요</li>
+<li>RAM 은 전원을 끄면 지워져요. SSD · HDD 는 남아요 — 그래서 파일은 SSD 에, 실행 중인 프로그램은 RAM 에 있어요</li></ul>
+<p>예제는 표의 「사람 시간」 을 직접 계산해요. <code>ns / 0.3</code> 이 「한 박자가 1초일 때 몇 초」 예요.</p>`,
+      example: { code: `levels = [
+    ("레지스터", 0.3),
+    ("L1 캐시", 1),
+    ("L2 캐시", 4),
+    ("L3 캐시", 15),
+    ("RAM", 100),
+    ("SSD", 100_000),
+    ("HDD", 10_000_000),
+]
+for name, ns in levels:
+    sec = ns / 0.3                # 한 박자(0.3 ns)를 1초로 늘리면
+    print(f"{name:<8} {ns:>12,} ns → 사람 시간 {sec:>12,.0f}초")` } },
+    { title: 'block = addr // 64 — 지역성', html: `<p>캐시는 작아요. 그런데도 잘 맞히는 건 프로그램에 버릇이 있어서예요. 이 버릇을 [[지역성]]이라고 해요.</p>
+<ul><li><b>시간 지역성</b> — 방금 쓴 것은 곧 또 써요. 반복문의 <code>total</code> · <code>i</code> 는 한 바퀴마다 다시 써요</li>
+<li><b>공간 지역성</b> — 방금 쓴 것의 <b>옆 칸</b>을 곧 써요. 리스트를 0번 · 1번 · 2번 … 차례로 읽는 게 그래요</li></ul>
+<p>공간 지역성을 살리려고, 캐시는 값 하나만 가져오지 않고 그 둘레를 <b>덩어리째</b> 가져와요. 이 덩어리가 [[캐시 라인]](이 레슨에서는 「블록」)이고 보통 64바이트예요. 주소를 64 로 나눈 몫이 블록 번호예요. 같은 블록에 있으면 한 번에 같이 들어와요.</p>
+<pre>주소 1024 ~ 1087  →  블록 16   (1024 // 64 = 16)
+주소 1088 ~ 1151  →  블록 17</pre>
+<p>4바이트 정수가 1024번지부터 줄지어 있는 배열을 차례로 읽으면, 정수 16개가 한 블록이에요. 첫 정수는 캐시에 없어서 실패(miss) — 블록을 통째로 가져와요. 나머지 15개는 이미 와 있어서 [[적중]](hit)이에요. 예제는 정수 20개를 읽으며 어느 게 실패인지 찍어요.</p>`,
+      example: { code: `BLOCK = 64          # 캐시 라인 크기(바이트)
+start = 1024        # 배열이 시작하는 주소
+seen = set()        # 이미 가져온 블록들(캐시가 아주 크다고 칠게요)
+hits = 0
+for i in range(20):
+    addr = start + 4 * i            # 정수 하나 = 4바이트
+    block = addr // BLOCK
+    if block in seen:
+        hits += 1
+        result = "적중"
+    else:
+        seen.add(block)
+        result = "실패 → 블록을 통째로 가져옴"
+    print(f"a[{i:>2}] 주소 {addr}  블록 {block}  {result}")
+print(f"적중 {hits} / 20 = {hits / 20:.0%}")` } },
+    { title: 'if block in cache: — 적중 · 실패 세기', html: `<p>캐시가 꽉 차면 무언가를 버려야 새 블록을 넣을 수 있어요. 흔한 방법이 [[LRU]] — <b>가장 오래 안 쓴 것</b>부터 버려요(시간 지역성: 오래 안 쓴 건 앞으로도 안 쓸 것 같으니까). 리스트로 흉내 내 볼게요. 앞쪽이 오래된 것, 뒤쪽이 방금 쓴 것이에요.</p>
+<pre>def simulate(blocks, size):
+    cache = []                    # 앞쪽 = 오래 안 쓴 것, 뒤쪽 = 방금 쓴 것
+    hits = 0
+    for block in blocks:
+        if block in cache:        # 적중
+            hits += 1
+            cache.remove(block)
+            cache.append(block)   # 방금 썼으니 맨 뒤로
+        else:                     # 실패 — RAM 에서 가져오기
+            if len(cache) == size:
+                cache.pop(0)      # 꽉 찼으면 가장 오래 안 쓴 것 버리기
+            cache.append(block)
+    return hits
+
+print(simulate([1, 2, 1, 3, 1, 2], 2))   # 2</pre>
+<ol><li><code>block in cache</code> 면 적중 — 세고, 그 블록을 맨 뒤로 옮겨요(방금 썼으니까)</li>
+<li>아니면 실패 — 꽉 찼으면 맨 앞(가장 오래 안 쓴 것)을 <code>pop(0)</code> 으로 버리고, 새 블록을 맨 뒤에 넣어요</li></ol>
+<p>적중률(적중 ÷ 전체)이 속도를 정해요. 적중률 95% 와 90% 는 비슷해 보이지만, 실패가 5% 에서 10% 로 <b>두 배</b>예요. 실패 하나가 적중 백 번만큼 느리니 큰 차이예요.</p>
+<p>파이썬에도 같은 생각의 도구가 있어요. 함수 위에 <code>@functools.lru_cache</code> 를 붙이면, 같은 인자로 부른 결과를 기억해 두었다가 다시 계산하지 않고 돌려줘요. 꽉 차면 LRU 로 버려요. <code>@</code> 는 <a href="../python/#lesson/L18D" target="_blank" rel="noopener">파이썬 교과서 「데코레이터」 ↗</a> 예요.</p>
+<pre>import functools
+
+@functools.lru_cache(maxsize=2)
+def square(n):
+    print("  계산", n)
+    return n * n
+
+for n in [2, 3, 2, 4, 3]:
+    print(n, "→", square(n))
+print(square.cache_info())</pre>
+<p>2 는 두 번째부터 「계산」 없이 나와요. 4 를 넣을 때 칸이 둘뿐이라 가장 오래 안 쓴 3 을 버려서, 마지막 3 은 다시 계산해요. <code>cache_info()</code> 는 적중(hits) · 실패(misses) 수를 알려 줘요.</p>`,
+      example: { code: `def simulate(blocks, size):
+    cache = []                    # 앞쪽 = 오래 안 쓴 것, 뒤쪽 = 방금 쓴 것
+    hits = 0
+    for block in blocks:
+        if block in cache:        # 적중
+            hits += 1
+            cache.remove(block)
+            cache.append(block)   # 방금 썼으니 맨 뒤로
+        else:                     # 실패 — RAM 에서 가져오기
+            if len(cache) == size:
+                cache.pop(0)      # 꽉 찼으면 가장 오래 안 쓴 것 버리기
+            cache.append(block)
+    return hits
+
+blocks = [1, 2, 3, 1, 4, 1, 2, 5, 1, 2]
+for size in [2, 3, 4]:
+    hits = simulate(blocks, size)
+    print(f"캐시 {size}칸: 적중 {hits} / {len(blocks)} = {hits / len(blocks):.0%}")
+
+import functools
+
+@functools.lru_cache(maxsize=2)
+def square(n):
+    print("  계산", n)
+    return n * n
+
+print()
+for n in [2, 3, 2, 4, 3]:
+    print(n, "→", square(n))
+print(square.cache_info())` } },
+    { title: '행 순서 vs 열 순서: a[r][c] 의 주소', html: `<p>2차원 배열(표)은 메모리에서 <b>한 줄로</b> 놓여요. 0행을 다 놓고, 그다음 1행 … 이렇게요. 그래서 <code>a[r][c]</code> 의 주소는 <code>시작 + (r × 열 수 + c) × 4</code> 예요(정수 하나 4바이트).</p>
+<pre>16 × 16 표, 정수 4바이트 → 한 행 = 64바이트 = 블록 하나
+
+행 순서 a[0][0] a[0][1] … a[0][15] a[1][0] …   → 같은 블록을 16번씩
+열 순서 a[0][0] a[1][0] … a[15][0] a[0][1] …   → 매번 다른 블록</pre>
+<p>행 순서로 돌면 블록 하나를 가져와 16칸을 다 써요. 열 순서로 돌면 한 칸 쓰고 다음 행(다른 블록)으로 가요. 캐시가 4블록뿐이면 16행을 도는 동안 처음 블록은 이미 버려져서 <b>매번 실패</b>예요. 같은 계산인데 도는 순서만 바꿔서 적중률이 94% 와 0% 로 갈려요.</p>
+<pre>for r in range(16):          # 행 순서 — 빠름
+    for c in range(16):
+        total += a[r][c]
+
+for c in range(16):          # 열 순서 — 캐시 실패투성이
+    for r in range(16):
+        total += a[r][c]</pre>
+<div class="bk-warn"><b>파이썬으로 시간을 재 보면 차이가 잘 안 보여요</b> — 파이썬 리스트는 숫자 자체가 아니라 「숫자가 있는 곳」 을 담고, 한 줄 한 줄 처리하는 데 드는 시간이 훨씬 커서 캐시 효과가 묻혀요. 잴 때마다 들쭉날쭉하기도 해요. 이 쪽은 <b>개념</b>만 가져가세요. C 나 numpy 처럼 숫자가 진짜로 붙어 있는 배열에서는 몇 배씩 차이 나요.</div>`,
+      example: { code: `def simulate(blocks, size):
+    cache = []                    # 앞쪽 = 오래 안 쓴 것, 뒤쪽 = 방금 쓴 것
+    hits = 0
+    for block in blocks:
+        if block in cache:        # 적중
+            hits += 1
+            cache.remove(block)
+            cache.append(block)   # 방금 썼으니 맨 뒤로
+        else:                     # 실패 — RAM 에서 가져오기
+            if len(cache) == size:
+                cache.pop(0)      # 꽉 찼으면 가장 오래 안 쓴 것 버리기
+            cache.append(block)
+    return hits
+
+ROWS = COLS = 16
+start = 0
+
+def address(r, c):
+    return start + (r * COLS + c) * 4
+
+row_order = []
+for r in range(ROWS):
+    for c in range(COLS):
+        row_order.append(address(r, c) // 64)
+
+col_order = []
+for c in range(COLS):
+    for r in range(ROWS):
+        col_order.append(address(r, c) // 64)
+
+print("행 순서 처음 블록들:", row_order[:20])
+print("열 순서 처음 블록들:", col_order[:20])
+for name, blocks in [("행 순서", row_order), ("열 순서", col_order)]:
+    hits = simulate(blocks, 4)
+    print(f"{name}: 적중 {hits} / {len(blocks)} = {hits / len(blocks):.1%}")` } },
+  ],
+  summary: ['가까울수록 빠르고 작다 — 레지스터 · 캐시 · RAM · SSD 는 수백~수십만 배 차이', '지역성(방금 쓴 것 · 옆 칸) 덕분에 작은 캐시가 잘 맞고, 블록을 통째로 가져온다', '적중률이 속도를 정한다 — 꽉 차면 LRU, 배열은 붙어 있는 순서대로 돌기'] },
+{ id: 'C9', ch: 2, n: 9, title: '컴파일러와 인터프리터', mode: 'text',
+  tutorSummary: 'CPU 는 기계어만 읽으니 사람 말(코드)을 바꾸는 길이 둘 — 컴파일러는 실행 전에 통째로 미리 번역(C · Rust · Go → 실행 파일, 실행은 빠르고 문법 에러는 실행 전에), 인터프리터는 실행하면서 한 줄씩 그때그때(셸 · 계산기). 파이썬은 둘을 섞음: 먼저 파일 전체를 바이트코드로 컴파일(그래서 SyntaxError 는 한 줄도 실행 전에, compile · exec, __pycache__ 의 .pyc), 그다음 파이썬 가상 머신이 바이트코드를 하나씩 — dis.dis(함수) · dis.get_instructions 로 LOAD_FAST · BINARY_OP + · RETURN_VALUE(버전마다 조금 다름). C 는 gcc 가 미리 기계어로(lea eax, [rdi+rsi] · ret, 어셈블리어 교과서 gcc -S). 장난감 컴파일러: "7 + 5 - 2" → C7 장난감 CPU 숫자. JIT 는 실행하면서 자주 도는 부분만 기계어로(PyPy · 자바스크립트 V8 · 자바). 그래서 빠르기가 다름 — timeit 으로 for 더하기 vs sum()(C 로 짠 내장) 비교, 숫자는 컴퓨터 · 실행마다 다름.',
+  terms: { '컴파일러': '프로그램 전체를 실행하기 전에 미리 기계어(또는 다른 말)로 번역해 두는 프로그램. 예: C 의 gcc', '인터프리터': '프로그램을 실행하면서 한 줄(한 명령)씩 그때그때 읽고 처리하는 프로그램', '바이트코드': '파이썬이 내 코드를 먼저 바꿔 두는 중간 명령. CPU 가 아니라 파이썬 가상 머신이 읽어요', 'JIT': 'Just-In-Time 컴파일 — 실행하는 도중에 자주 도는 부분을 골라 기계어로 바꿔 빠르게 하는 방법' },
+  pages: [
+    { title: '미리 번역 vs 그때그때: compile · exec', html: `<p>CPU 는 [[레슨:C7]] 에서 본 것처럼 기계어 숫자만 읽어요. 그래서 사람이 쓴 코드를 기계어로 바꾸는 길이 둘 있어요.</p>
+<table class="kb"><tbody><tr><th></th><th>컴파일러</th><th>인터프리터</th></tr>
+<tr><td>언제 바꾸나</td><td>실행 <b>전에</b> 통째로</td><td>실행<b>하면서</b> 한 줄씩</td></tr>
+<tr><td>비유</td><td>책 한 권을 미리 번역해 둔 번역서</td><td>옆에서 한 문장씩 통역</td></tr>
+<tr><td>결과물</td><td>실행 파일(.exe) — 다음엔 번역 없이 바로</td><td>따로 없음 — 실행할 때마다 다시</td></tr>
+<tr><td>문법 실수</td><td>실행 전에 다 찾아 줌</td><td>그 줄에 가서야 앎</td></tr>
+<tr><td>예</td><td>C · C++ · Rust · Go</td><td>셸(터미널 명령), 계산기</td></tr></tbody></table>
+<p>[[컴파일러]]로 만든 실행 파일은 CPU 가 바로 읽어서 빨라요. 대신 고칠 때마다 다시 번역해야 하고, Windows 용 .exe 는 맥에서 안 돌아요. [[인터프리터]]는 바로 고쳐 바로 돌리기 편하지만, 실행할 때마다 읽고 해석하느라 느려요.</p>
+<p><b>파이썬은 둘을 섞어요.</b> 먼저 파일 전체를 [[바이트코드]]라는 중간 명령으로 <b>컴파일</b>하고, 그다음 파이썬 가상 머신(인터프리터)이 바이트코드를 하나씩 실행해요. 그래서 이런 일이 생겨요.</p>
+<ul><li>세 번째 줄에 괄호를 안 닫으면(<code>SyntaxError</code>) — 첫 줄도 실행 안 되고 바로 에러. 실행 전에 통째로 번역하다 걸려서예요</li>
+<li>세 번째 줄에 없는 변수를 쓰면(<code>NameError</code>) — 앞 두 줄은 실행되고 그 줄에서 에러. 번역은 됐고, 실행하다 걸려서예요</li></ul>
+<p>파이썬의 <code>compile(글자, 파일 이름, "exec")</code> 이 바로 그 「바이트코드로 번역」 이고, <code>exec(…)</code> 가 실행이에요. 예제로 두 경우를 견줘 봐요. 한 번 번역한 바이트코드는 <code>__pycache__</code> 폴더의 <code>.pyc</code> 파일로 남겨 두기도 해요(import 한 모듈).</p>`,
+      example: { code: `run_error = 'print("하나")\\nprint("둘")\\nprint(없는변수)'
+syntax_error = 'print("하나")\\nprint("둘")\\nprint("셋"'
+
+for name, src in [("실행 중 에러", run_error), ("문법 에러", syntax_error)]:
+    print("---", name)
+    try:
+        code = compile(src, "test.py", "exec")   # ① 통째로 바이트코드로
+        print("(번역 성공 — 이제 실행)")
+        exec(code)                                # ② 하나씩 실행
+    except SyntaxError as e:
+        print("SyntaxError — 번역에서 걸려서 한 줄도 실행 안 됨:", e.msg)
+    except NameError as e:
+        print("NameError — 실행하다 걸림, 앞 두 줄은 이미 실행됨:", e)` } },
+    { title: 'dis.dis(add) — 파이썬 바이트코드 보기', html: `<p>파이썬이 만든 바이트코드는 <code>dis</code> 모듈로 볼 수 있어요(disassemble, 「숫자를 글자 명령으로 풀기」).</p>
+<pre>import dis
+
+def add(a, b):
+    return a + b
+
+dis.dis(add)</pre>
+<p>파이썬 3.12 에서는 이렇게 나와요.</p>
+<pre>  3           0 RESUME                   0
+
+  4           2 LOAD_FAST                0 (a)
+              4 LOAD_FAST                1 (b)
+              6 BINARY_OP                0 (+)
+             10 RETURN_VALUE</pre>
+<ul><li><code>LOAD_FAST a</code> · <code>LOAD_FAST b</code> — a 와 b 를 꺼내 올려놓기. [[레슨:C7]] 장난감 CPU 의 LOAD 같은 거예요</li>
+<li><code>BINARY_OP +</code> — 올려놓은 둘을 더하기. ADD 예요</li>
+<li><code>RETURN_VALUE</code> — 결과를 돌려주기</li>
+<li>왼쪽의 4 는 내 코드의 줄 번호, 0 · 2 · 4 … 는 바이트코드 안의 위치(장난감 CPU 의 칸 번호 같은 것)예요. <code>RESUME</code> 은 파이썬이 안에서 쓰는 준비 명령이라 넘어가요</li></ul>
+<p>장난감 CPU 와 다른 점은, 레지스터 R0 · R1 대신 <b>스택</b>(접시 쌓기)에 값을 쌓았다가 위에서부터 꺼내 계산한다는 거예요. 그래도 「명령 하나씩 가져와 실행」 은 똑같아요. 파이썬 가상 머신은 C 로 짠 커다란 <code>while</code> + 갈래 — 우리가 만든 <code>run</code> 과 같은 모양이에요.</p>
+<p>명령을 하나씩 꺼내 쓰고 싶으면 <code>dis.get_instructions(함수)</code> 예요. 명령마다 <code>opname</code>(이름) · <code>argrepr</code>(읽기 좋은 인자)가 있어요.</p>
+<div class="bk-warn"><b>버전마다 조금 달라요</b> — 바이트코드는 파이썬 내부 약속이라 버전이 바뀌면 달라져요. 3.13 은 <code>LOAD_FAST_LOAD_FAST (a, b)</code> 처럼 둘을 한 명령으로 합치고, 위치 숫자는 안 보여 줘요. 내 화면이 위와 조금 달라도 괜찮아요. <code>BINARY_OP</code> 는 3.11 부터 같아요.</div>`,
+      example: { code: `import dis
+import sys
+
+def add(a, b):
+    return a + b
+
+print("파이썬", sys.version.split()[0])
+dis.dis(add)
+
+print()
+print("명령 하나씩:")
+for ins in dis.get_instructions(add):
+    print(" ", ins.opname, ins.argrepr)
+
+def area(w, h):
+    return w * h + 10
+
+print()
+print("w * h + 10 의 계산 명령만:")
+for ins in dis.get_instructions(area):
+    if ins.opname == "BINARY_OP":
+        print(" ", ins.opname, ins.argrepr)` } },
+    { title: 'gcc 는 미리 기계어로 · 내 작은 컴파일러', html: `<p>C 는 [[컴파일러]] 언어예요. <code>gcc</code> 가 실행 전에 C 코드를 CPU 의 기계어로 통째로 바꿔 실행 파일을 만들어요.</p>
+<pre>int add(int a, int b) {
+    return a + b;
+}</pre>
+<p><code>gcc -O2 -S</code> 로 어떤 명령이 됐는지 보면 x86-64 에서는 단 두 줄이에요(인자 a · b 는 레지스터 rdi · rsi 로 들어와요).</p>
+<pre>add:
+    lea  eax, [rdi+rsi]    ; eax = a + b
+    ret                    ; 돌아가기  — 기계어로는 8d 04 37 c3, 4바이트</pre>
+<p>파이썬 바이트코드처럼 「누가 하나씩 읽어 줄」 필요 없이 CPU 가 바로 읽어요. 직접 해 보는 건 <a href="../asm/#lesson/R15" target="_blank" rel="noopener">어셈블리어 교과서 「C 가 어떻게 바뀌나: gcc -S · objdump -d」 ↗</a> 에서 우분투로 해요.</p>
+<p>컴파일러가 하는 일을 작게 흉내 내 볼게요. <code>"7 + 5 - 2"</code> 같은 글자를 [[레슨:C7]] 장난감 CPU 의 기계어 숫자로 <b>미리</b> 바꿔 메모리에 담아요. 숫자들은 메모리 끝 칸부터 넣고, 명령은 0번 칸부터 넣어요.</p>
+<pre>"7 + 5 - 2"  →  LOAD R0, 15   (15번 칸 = 7)
+                LOAD R1, 14   (14번 칸 = 5)
+                ADD R0, R1
+                LOAD R1, 13   (13번 칸 = 2)
+                SUB R0, R1
+                PRINT R0
+                HALT</pre>
+<p>한 번 번역해 두면 그 숫자들(실행 파일)은 몇 번이든 번역 없이 바로 돌릴 수 있어요. 이게 컴파일러가 빠른 이유예요.</p>
+<p><b>[[JIT]]</b> — 둘의 중간도 있어요. 처음엔 인터프리터처럼 돌다가, <b>자주 도는 부분</b>을 실행 도중에 기계어로 바꿔 빠르게 해요. 이름만 알아 두세요: PyPy(빠른 파이썬), 크롬의 자바스크립트(V8), 자바. 파이썬 3.13 에도 실험용 JIT 가 들어갔어요(기본은 꺼져 있어요).</p>`,
+      example: { code: `def compile_expr(text):
+    # "7 + 5 - 2" → 장난감 CPU(C7) 기계어가 든 메모리 16칸
+    tokens = text.split()
+    nums = tokens[0::2]          # ["7", "5", "2"]
+    ops = tokens[1::2]           # ["+", "-"]
+    mem = [0] * 16
+    code = []
+    slot = 15                    # 숫자는 끝 칸부터
+    mem[slot] = int(nums[0])
+    code.append(1000 + slot)     # LOAD R0, 칸
+    for op, n in zip(ops, nums[1:]):
+        slot -= 1
+        mem[slot] = int(n)
+        code.append(1100 + slot) # LOAD R1, 칸
+        if op == "+":
+            code.append(2001)    # ADD R0, R1
+        else:
+            code.append(3001)    # SUB R0, R1
+    code.append(6000)            # PRINT R0
+    code.append(0)               # HALT
+    for addr, word in enumerate(code):
+        mem[addr] = word
+    return mem
+
+NAMES = ["HALT", "LOAD", "ADD", "SUB", "JMP", "JZ", "PRINT"]
+
+def decode(word):
+    op = word // 1000          # 천의 자리: 명령 번호
+    r = word // 100 % 10       # 백의 자리: 레지스터
+    x = word % 100             # 끝 두 자리: 주소나 레지스터
+    return op, r, x
+
+def run(mem):
+    reg = [0, 0, 0, 0]
+    pc = 0
+    while True:
+        word = mem[pc]             # ① 가져오기
+        pc = pc + 1
+        op, r, x = decode(word)    # ② 해석
+        if op == 0:                # ③ 실행 — HALT
+            break
+        elif op == 1:              # LOAD r, 주소
+            reg[r] = mem[x]
+        elif op == 2:              # ADD r, s
+            reg[r] = reg[r] + reg[x]
+        elif op == 3:              # SUB r, s
+            reg[r] = reg[r] - reg[x]
+        elif op == 4:              # JMP 주소
+            pc = x
+        elif op == 5:              # JZ r, 주소
+            if reg[r] == 0:
+                pc = x
+        elif op == 6:              # PRINT r
+            print(reg[r])
+
+mem = compile_expr("7 + 5 - 2")
+print("번역 결과(기계어):", mem)
+print("실행:")
+run(mem)
+run(mem)
+print("다른 식:")
+run(compile_expr("10 + 20 + 30 - 1"))` } },
+    { title: 'timeit 으로 빠르기 재기: for vs sum()', html: `<p>그래서 언어마다, 같은 언어에서도 쓰는 방법마다 빠르기가 달라요. 파이썬의 <code>timeit</code> 모듈로 재 봐요. <code>timeit.timeit(함수, number=20)</code> 은 함수를 20번 돌린 시간(초)을 돌려줘요.</p>
+<pre>import timeit
+
+def loop_sum():
+    total = 0
+    for i in range(100_000):
+        total += i
+    return total
+
+def builtin_sum():
+    return sum(range(100_000))
+
+print(timeit.timeit(loop_sum, number=20))
+print(timeit.timeit(builtin_sum, number=20))</pre>
+<p>어느 PC 에서 한 번 잰 예예요. <b>숫자는 컴퓨터마다, 잴 때마다 달라요.</b></p>
+<pre>for 로 더하기: 0.053초 (20번)
+sum() 으로:    0.021초 (20번)</pre>
+<ul><li><b>for 로 더하기</b> — 한 바퀴마다 바이트코드 여러 개(값 꺼내기 · 더하기 · 저장 · 다음 i)를 파이썬 가상 머신이 하나씩 읽고 처리해요</li>
+<li><b>sum()</b> — 파이썬에 들어 있는 함수라 <b>C 로 짜서 미리 기계어로 컴파일</b>되어 있어요. 반복이 기계어 안에서 돌아요</li></ul>
+<p>그래서 파이썬에서는 「직접 for 를 돌리기보다 들어 있는 함수(<code>sum</code> · <code>sorted</code> · <code>join</code>)를 쓰기」 가 보통 더 빨라요. 숫자 계산을 많이 하는 numpy 가 빠른 것도 속이 C 로 컴파일되어 있어서예요. 같은 일을 C 로 짜면 보통 이것보다도 몇십 배 빨라요.</p>
+<div class="bk-warn"><b>시간은 늘 들쭉날쭉</b> — 다른 프로그램 · 전원 설정 · 캐시([[레슨:C8]]) 때문에 잴 때마다 달라요. 비교할 때는 같은 PC 에서 여러 번 재고, 「몇 배 차이」 를 보세요.</div>`,
+      example: { code: `import timeit
+
+def loop_sum():
+    total = 0
+    for i in range(100_000):
+        total += i
+    return total
+
+def builtin_sum():
+    return sum(range(100_000))
+
+print("답이 같나:", loop_sum() == builtin_sum())
+t1 = timeit.timeit(loop_sum, number=20)
+t2 = timeit.timeit(builtin_sum, number=20)
+print(f"for 로 더하기: {t1:.3f}초 (20번)")
+print(f"sum() 으로:    {t2:.3f}초 (20번)")
+print(f"sum() 이 약 {t1 / t2:.1f}배 빨라요 — 숫자는 컴퓨터 · 실행마다 달라요")` } },
+  ],
+  summary: ['컴파일러는 미리 통째로, 인터프리터는 실행하며 한 줄씩 — 파이썬은 바이트코드로 컴파일한 뒤 하나씩 실행', 'dis 로 바이트코드(LOAD_FAST · BINARY_OP)를 본다 — 장난감 CPU 의 LOAD · ADD 와 같은 생각', '그래서 빠르기가 다르다 — C 로 컴파일된 sum() 이 for 보다 빠름, timeit 숫자는 매번 달라요'] },
+{ id: 'CB2', ch: 2, boss: true, title: '만들어 보기: 장난감 CPU 시뮬레이터', mode: 'text',
+  tutorSummary: '챕터 2 묶기 — C7 의 장난감 CPU 를 그대로 키운다: 명령 8개(0 HALT · 1 LOAD r, 칸 · 2 ADD r, s · 3 SUB r, s · 4 JMP 칸 · 5 JZ r, 칸 · 6 PRINT r · 7 STORE r, 칸 = mem[칸] = r), 레지스터 R0~R3, 메모리 32칸, 명령 = 4자리 10진수(7231 = STORE R2, 31). ① run(mem) 이 가져오기 → 해석 → 실행을 하며 단계마다 「단계 · PC · 명령 · 레지스터」 를 찍고 HALT 에서 단계 수 ② 어셈블러(assemble)로 글자 프로그램 목록을 숫자로 — 곱하기 a × b 는 더하기를 b 번(JZ · ADD · SUB · JMP), 결과를 STORE 로 31번 칸에 ③ 최대 단계(max_steps)로 끝나지 않는 반복 막기, PC · 칸이 메모리 밖이거나 모르는 명령이면 멈추고 알리기 ④ 입력으로 프로그램과 DATA 줄을 받아 먼저 다 번역(모르는 명령이면 실행 안 함 — C9 의 컴파일러)하고 실행.',
+  pages: [], summary: [] },
 { id: 'C10', ch: 3, n: 10, title: '운영체제가 하는 일', mode: 'text',
   tutorSummary: '운영체제(커널) = 프로그램들과 하드웨어 사이의 관리자: CPU 차례 · 메모리 칸 · 파일 · 장치. 프로그램 = 디스크의 파일, 프로세스 = 실행 중인 것(PID, os.getpid · os.getppid, subprocess 로 자식 프로세스). 프로그램은 하드웨어를 직접 못 만지고 커널에게 부탁(시스템 콜) — open() · print() 도 속에서는 os.open · os.write. 맛보기만 — 자세히는 운영체제 교과서 K0 · K6 · K10 · K16.',
   terms: { '커널': '운영체제의 한가운데. CPU · 메모리 · 디스크 · 장치를 직접 다루고 프로그램들에게 나눠 주는 관리자 프로그램', '프로세스': '실행 중인 프로그램 하나. 같은 프로그램 파일을 두 번 켜면 프로세스가 둘', 'PID': '프로세스 번호(Process ID). 운영체제가 프로세스마다 붙여 주는 번호로, 켤 때마다 달라요', '시스템 콜': '프로그램이 운영체제(커널)에게 「이것 좀 해 주세요」 하고 부탁하는 정해진 창구. 파일 열기 · 쓰기 · 프로그램 켜기 같은 일' },
