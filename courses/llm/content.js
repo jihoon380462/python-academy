@@ -93,20 +93,741 @@ const LESSONS = [
   pages: LLM_TODO('W · softmax · probs - onehot · 학습'), summary: ["W 한 장이 모델", "기울기는 probs - onehot", "학습하면 세기 모델에 가까워짐"] },
 { id: 'NB2', ch: 2, boss: true, title: '만들어 보기: 학습하는 바이그램', mode: 'text', draft: true,
   tutorSummary: '챕터 2 묶기 — data.txt 로 W 를 경사하강으로 학습, 손실 표, 세기 모델과 비교, 글 짓기.', pages: [], summary: [] },
-{ id: 'N9', ch: 3, n: 9, title: '앞 글자 여러 개 보기: 문맥', mode: 'text', draft: true,
-  tutorSummary: '바이그램의 한계, 앞 3글자 임베딩을 이어 붙여 MLP(tanh), 손으로 미분하는 길.',
-  pages: LLM_TODO('문맥 창 · MLP · tanh · 역전파 맛보기'), summary: ["한 글자로는 부족", "앞 몇 글자를 이어 붙인다", "층마다 거꾸로 미분"] },
-{ id: 'N10', ch: 3, n: 10, title: '어텐션: 어디를 볼지 고르기', mode: 'text', draft: true,
-  tutorSummary: '평균 → 가중 평균, q · k 내적 → 소프트맥스 → v 가중 합, 마스크(-inf).',
-  pages: LLM_TODO('가중 평균 · q·k · 마스크'), summary: ["어텐션 = 가중 평균", "점수는 q 와 k 의 내적", "마스크로 미래를 가린다"] },
-{ id: 'N11', ch: 3, n: 11, title: '셀프 어텐션 Q · K · V', mode: 'text', draft: true,
-  tutorSummary: '입력 × Wq · Wk · Wv, softmax(QKᵀ/√d) V 모양, 멀티 헤드 이름만.',
-  pages: LLM_TODO('Q·K·V · 모양 · √d'), summary: ["입력에서 Q · K · V 를 만든다", "softmax(QKᵀ/√d) V", "모양(shape)을 따라간다"] },
-{ id: 'N12', ch: 3, n: 12, title: '트랜스포머 블록 한 층', mode: 'text', draft: true,
-  tutorSummary: '위치 임베딩, 어텐션 + 잔차 + 정규화 + MLP, 쌓기 = GPT, 순전파만.',
-  pages: LLM_TODO('위치 · 잔차 · 정규화 · 블록'), summary: ["위치 정보를 더한다", "어텐션 + MLP + 잔차", "블록을 쌓으면 GPT"] },
-{ id: 'NB3', ch: 3, boss: true, title: '만들어 보기: 미니 트랜스포머 순전파', mode: 'text', draft: true,
-  tutorSummary: '챕터 3 묶기 — 정해진 작은 가중치로 문장의 자리마다 다음 글자 확률 상위 3개, 마스크 확인.', pages: [], summary: [] },
+{ id: 'N9', ch: 3, n: 9, title: '앞 글자 여러 개 보기: 문맥', mode: 'text',
+  tutorSummary: '바이그램은 바로 앞 한 글자만 봐서 「고」 다음이 프 · 양 · 빈칸 중 무엇인지 못 고른다 — 앞 3글자 「가 고」 를 보면 「프」 로 확실. 세기 표로 앞 3글자를 하면 어휘³ 칸이라 너무 크고 대부분 0 → 신경망으로. 문맥 창: for i in range(len(ids) - 3): X.append(ids[i:i + 3]) · Y.append(ids[i + 3]) — 글자 L개면 문제 L-3개, 맨 앞 3글자는 정답 자리로 못 씀. 문맥 MLP 순전파: E[X] (N, 3, d) → .reshape(N, 3 * d) → @ W1 + b1 → np.tanh (N, H) → @ W2 + b2 → 로짓 (N, V) → softmax → 정답 확률의 -log 평균. tanh 는 -1~1 로 누르는 휘어진 함수 — 없으면 두 층이 행렬 한 장(W1 @ W2)과 같다. 역전파: 끝에서부터 dlogits = probs - onehot, y = x @ W 이면 dW = x.T @ dy · dx = dy @ W.T, h = tanh(a) 이면 da = dh * (1 - h ** 2). 기울기 모양 = 가중치 모양. 수치 기울기((올림 - 내림) / 2eps)와 같으면 맞다. 학습 고리는 챕터 4(N13 · N14).',
+  terms: { '문맥': '다음 글자를 맞힐 때 보는 앞 글자들. 이 교과서의 MLP 는 앞 3글자를 본다', 'MLP': '행렬 곱 → 휘는 함수(tanh) → 행렬 곱 처럼 층을 쌓은 가장 기본적인 신경망. 가운데 층을 은닉층이라고 한다', '역전파': '손실에서 시작해 층을 거꾸로 거슬러 가며 가중치마다 기울기를 구하는 방법. 곱셈 · tanh 마다 규칙이 한 줄씩 있다' },
+  pages: [
+    { title: 'text[i - 3:i] == "가 고" · 한 글자로는 부족', html: `<p>바이그램([[레슨:N2]] · [[레슨:N8]])은 <b>바로 앞 한 글자</b>만 보고 다음 글자를 맞혀요. 그런데 한 글자만으로는 모자랄 때가 많아요. 짧은 글에서 「고」 다음에 무엇이 오는지 세어 봐요.</p>
+<pre>for i in range(3, len(text)):
+    if text[i - 1] == "고":        # 바로 앞 한 글자
+        one[text[i]] += 1
+    if text[i - 3:i] == "가 고":   # 앞 세 글자
+        three[text[i]] += 1</pre>
+<table class="kb"><tbody><tr><th>앞에서 본 것</th><th>다음 글자 횟수</th></tr><tr><td><code>"고"</code> 한 글자</td><td>프 2 · 양 2 · 빈칸 2 — 셋이 똑같아서 못 골라요</td></tr><tr><td><code>"가 고"</code> 세 글자</td><td>프 2 — 「배가 고프다」 로 확실해요</td></tr></tbody></table>
+<p>「먹<b>고</b> 」, 「<b>고</b>양이」, 「배가 <b>고</b>프다」 의 고는 모두 같은 글자라서, 앞 한 글자만 보면 셋을 구별할 수 없어요. 앞을 더 보면 헷갈림이 확 줄어요. 다음 글자를 맞힐 때 보는 앞 글자들을 [[문맥]]이라고 해요.</p>
+<p>그럼 세기 표를 「앞 3글자 → 다음 글자」 로 늘리면 될까요? 학습 글의 어휘는 130개쯤이라 앞 3글자 조합만 이만큼이에요.</p>
+<pre>print(130 ** 3)   # 2197000</pre>
+<p>칸이 2백만 개가 넘는데 학습 글은 800글자쯤이라, 거의 모든 칸이 0 이에요. 한 번도 못 본 조합은 아예 못 맞혀요. 그래서 세기 대신 <b>신경망</b>을 써요. 글자마다 벡터([[레슨:N6]])를 꺼내 이어 붙여 넣으면, 비슷한 글자는 비슷한 벡터라서 처음 보는 조합도 그럴듯하게 맞힐 수 있어요.</p>`,
+      example: { code: `from collections import Counter
+
+text = "배가 고프면 집에 간다. 고양이는 밥을 먹고 잠을 잔다. 나도 밥을 먹고 숙제를 한다. 배가 고프다. 고양이가 운다."
+
+one = Counter()
+three = Counter()
+for i in range(3, len(text)):
+    if text[i - 1] == "고":
+        one[text[i]] += 1
+    if text[i - 3:i] == "가 고":
+        three[text[i]] += 1
+
+print("'고' 다음:", dict(one))
+print("'가 고' 다음:", dict(three))
+print("앞 3글자 조합 수:", 130 ** 3)` } },
+    { title: 'X.append(ids[i:i + 3]) · 문맥 창 만들기', html: `<p>글을 번호로 바꾼 뒤([[레슨:N1]]), <b>3글자짜리 창</b>을 한 칸씩 밀며 「문맥 3글자 → 정답 1글자」 짝을 만들어요. 바이그램에서 (앞 글자, 다음 글자) 짝을 만든 것과 같은데, 앞을 3글자로 늘린 거예요.</p>
+<pre>X, Y = [], []
+for i in range(len(ids) - 3):
+    X.append(ids[i:i + 3])   # 문맥: i, i+1, i+2 번째
+    Y.append(ids[i + 3])     # 정답: 바로 다음 글자</pre>
+<p>「나는 밥을 먹는다.」 로 만들면 이렇게 돼요(예제 출력).</p>
+<pre>'나는 ' → '밥'
+'는 밥' → '을'
+'밥을 ' → '먹'
+…
+'먹는다' → '.'</pre>
+<ul><li>글자가 L 개면 문제는 <code>L - 3</code> 개예요. 맨 앞 3글자는 앞에 3글자가 없어서 정답 자리로 못 써요. 큰 모델은 글 앞에 「시작」 표시를 채워 넣어서 첫 글자도 맞혀 봐요</li><li>numpy 로 바꾸면 <code>X</code> 는 모양 <code>(N, 3)</code>, <code>Y</code> 는 <code>(N,)</code> — 문제 N 개, 문제마다 번호 3개와 정답 1개예요</li><li>창을 3 이 아니라 5 · 10 으로 늘리면 더 멀리 봐요. 그만큼 입력이 길어지는데, 이 문제는 다음 레슨의 어텐션이 풀어요</li></ul>`,
+      example: { code: `import numpy as np
+
+text = "나는 밥을 먹는다."
+chars = sorted(set(text))
+stoi = {ch: i for i, ch in enumerate(chars)}
+itos = {i: ch for ch, i in stoi.items()}
+ids = [stoi[ch] for ch in text]
+print("번호:", ids)
+
+X, Y = [], []
+for i in range(len(ids) - 3):
+    X.append(ids[i:i + 3])
+    Y.append(ids[i + 3])
+
+print(len(ids), "글자 →", len(X), "문제")
+for x, y in zip(X, Y):
+    ctx = "".join(itos[j] for j in x)
+    print(x, "→", y, "   ", repr(ctx), "→", repr(itos[y]))
+
+X = np.array(X)
+Y = np.array(Y)
+print("X 모양", X.shape, "· Y 모양", Y.shape)` } },
+    { title: 'E[X].reshape(N, 3 * d) → np.tanh → 로짓', html: `<p>이제 문맥 3글자를 다음 글자 점수(로짓)로 바꾸는 [[MLP]] 를 만들어요. 한 줄씩, 모양(shape)을 따라가요. 글자 하나는 <code>d = 8</code> 칸 벡터, 은닉층은 <code>H = 32</code> 칸이에요.</p>
+<table class="kb"><tbody><tr><th>단계</th><th>코드</th><th>모양</th></tr>
+<tr><td>문맥 번호</td><td><code>X</code></td><td>(N, 3)</td></tr>
+<tr><td>임베딩 꺼내기</td><td><code>emb = E[X]</code></td><td>(N, 3, d)</td></tr>
+<tr><td>옆으로 이어 붙이기</td><td><code>x = emb.reshape(N, 3 * d)</code></td><td>(N, 24)</td></tr>
+<tr><td>은닉층</td><td><code>h = np.tanh(x @ W1 + b1)</code></td><td>(N, 24) @ (24, 32) → (N, 32)</td></tr>
+<tr><td>로짓</td><td><code>logits = h @ W2 + b2</code></td><td>(N, 32) @ (32, V) → (N, V)</td></tr>
+<tr><td>확률</td><td><code>probs = softmax(logits)</code></td><td>(N, V) — 줄마다 합 1</td></tr></tbody></table>
+<ul><li><code>E[X]</code> — [[레슨:N6]] 의 <code>E[idx]</code> 를 번호 표 통째로 해요. 번호마다 줄을 꺼내서 (N, 3) 이 (N, 3, d) 가 돼요</li><li><code>.reshape(N, 3 * d)</code> — 글자 세 개의 벡터 8칸 × 3 을 <b>옆으로 이어</b> 24칸 한 줄로 만들어요. 그래서 「몇 번째 글자였는지」 가 칸 자리로 남아요</li><li>손실은 [[레슨:N4]] 그대로 — 정답 글자 확률의 <code>-log</code> 평균이에요</li></ul>
+<p><b>tanh 는 왜 넣나요?</b> <code>np.tanh</code> 는 어떤 수든 -1 과 1 사이로 눌러 주는 <b>휘어진</b> 함수예요.</p>
+<pre>import numpy as np
+
+a = np.array([-3.0, -1.0, 0.0, 1.0, 3.0])
+t = np.tanh(a)
+print(np.round(t, 3))   # [-0.995 -0.762  0.     0.762  0.995]</pre>
+<p>tanh 가 없으면 <code>x @ W1 @ W2</code> 는 <code>x @ (W1 @ W2)</code> 와 같아서, 두 층이 행렬 한 장과 똑같아져요. 중간에 한 번 휘어 줘야 「앞이 『가 고』 일 때만 『프』」 같은 <b>조합</b>을 배울 수 있어요.</p>
+<div class="bk-warn"><b>아직 학습 전이에요</b> — 가중치가 무작위라 손실이 「모든 글자를 똑같은 확률로」 찍을 때(<code>log(V)</code>)와 비슷하거나 더 나빠요. 이 모델을 학습시키는 건 챕터 4([[레슨:N14]])예요.</div>`,
+      example: { code: `import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+text = "나는 밥을 먹는다. 나는 물을 마신다. 나는 책을 읽는다."
+chars = sorted(set(text))
+stoi = {ch: i for i, ch in enumerate(chars)}
+V = len(chars)
+ids = [stoi[ch] for ch in text]
+n = len(ids) - 3
+X = np.array([ids[i:i + 3] for i in range(n)])
+Y = np.array([ids[i + 3] for i in range(n)])
+N = len(X)
+
+d, H = 8, 32
+rng = np.random.default_rng(0)
+E = rng.normal(0, 1, (V, d))
+W1 = rng.normal(0, 0.2, (3 * d, H))
+b1 = np.zeros(H)
+W2 = rng.normal(0, 0.1, (H, V))
+b2 = np.zeros(V)
+
+emb = E[X]
+x = emb.reshape(N, 3 * d)
+h = np.tanh(x @ W1 + b1)
+logits = h @ W2 + b2
+probs = softmax(logits)
+
+print("X       ", X.shape)
+print("E[X]    ", emb.shape)
+print("이어 붙임", x.shape)
+print("은닉 h   ", h.shape)
+print("로짓     ", logits.shape)
+print(f"h 는 {h.min():.3f} ~ {h.max():.3f} 사이")
+
+p_right = probs[np.arange(N), Y]
+loss = -np.log(p_right).mean()
+print(f"손실 {loss:.3f} · 모두 같은 확률이면 {np.log(V):.3f}")
+count = E.size + W1.size + b1.size + W2.size + b2.size
+print("가중치 수", count)` } },
+    { title: 'dW = x.T @ dy · 역전파 맛보기', html: `<p>학습하려면 가중치마다 기울기가 필요해요([[레슨:N7]]). 수치로 재면 가중치 하나마다 순전파를 한 번씩 더 해야 해서, 가중치가 수천 개면 너무 느려요. 그래서 손실에서 출발해 <b>뒤에서부터 거꾸로</b> 한 층씩 기울기를 넘겨 줘요. 이걸 [[역전파]]라고 해요.</p>
+<table class="kb"><tbody><tr><th>순전파에서 한 일</th><th>역전파 한 줄</th></tr>
+<tr><td><code>p = softmax(logits)</code> · 손실</td><td><code>dlogits = p - onehot</code>([[레슨:N8]] 그대로)</td></tr>
+<tr><td><code>y = x @ W</code></td><td><code>dW = x.T @ dy</code> · <code>dx = dy @ W.T</code></td></tr>
+<tr><td><code>h = np.tanh(a)</code></td><td><code>da = dh * (1 - h ** 2)</code></td></tr>
+<tr><td><code>y = x + b</code></td><td><code>db = dy.sum(axis=0)</code></td></tr></tbody></table>
+<p>작은 2층 망(입력 4칸 → 은닉 3칸 → 글자 5개)에서 해 봐요. 순전파의 중간값(<code>h</code>)을 남겨 두었다가 거꾸로 써요.</p>
+<pre>dlogits = p - onehot       # (1, 5)
+dW2 = h.T @ dlogits        # (3, 1) @ (1, 5) → (3, 5)
+dh = dlogits @ W2.T        # (1, 5) @ (5, 3) → (1, 3)
+da = dh * (1 - h ** 2)     # tanh 의 미분
+dW1 = x.T @ da             # (4, 1) @ (1, 3) → (4, 3)</pre>
+<ul><li><b>기울기의 모양 = 가중치의 모양</b>이에요. dW2 는 W2 처럼 (3, 5). 어디에 <code>.T</code> 를 붙일지 헷갈리면 모양이 맞게 붙이면 돼요</li><li><code>1 - h ** 2</code> 는 tanh 의 기울기예요. h 가 ±1 에 가까우면(꽉 눌렸으면) 기울기가 0 에 가까워져요</li><li>맞게 구했는지는 수치 기울기 <code>(올렸을 때 - 내렸을 때) / (2 * eps)</code> 와 비교해서 확인해요. 예제는 두 칸을 비교하고, 기울기 반대로 한 걸음 가서 손실이 줄어드는 것까지 봐요</li></ul>
+<div class="bk-warn"><b>손으로 미분하는 건 문맥 MLP 까지</b> — 이 교과서에서 학습까지 하는 모델은 이 MLP 예요(챕터 4 [[레슨:N14]]). 다음 레슨부터의 어텐션 · 트랜스포머는 <b>순전파만</b> 만들어요. 큰 모델도 같은 규칙으로 학습하는데, PyTorch 같은 도구가 이 규칙을 자동으로 적용해 줘요(자동 미분).</div>`,
+      example: { code: `import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+rng = np.random.default_rng(0)
+x = rng.normal(0, 1, (1, 4))
+W1 = rng.normal(0, 0.5, (4, 3))
+W2 = rng.normal(0, 0.5, (3, 5))
+y = 2
+
+def loss_of(W1, W2):
+    h = np.tanh(x @ W1)
+    p = softmax(h @ W2)
+    return -np.log(p[0, y])
+
+a = x @ W1
+h = np.tanh(a)
+logits = h @ W2
+p = softmax(logits)
+loss = -np.log(p[0, y])
+
+onehot = np.zeros((1, 5))
+onehot[0, y] = 1
+dlogits = p - onehot
+dW2 = h.T @ dlogits
+dh = dlogits @ W2.T
+da = dh * (1 - h ** 2)
+dW1 = x.T @ da
+
+print(f"손실 {loss:.4f}")
+print("dW2 모양", dW2.shape, "· dW1 모양", dW1.shape)
+
+eps = 1e-5
+for name, W, dW, i, j in [("W2", W2, dW2, 1, 2), ("W1", W1, dW1, 0, 0)]:
+    old = W[i, j]
+    W[i, j] = old + eps
+    up = loss_of(W1, W2)
+    W[i, j] = old - eps
+    down = loss_of(W1, W2)
+    W[i, j] = old
+    num = (up - down) / (2 * eps)
+    print(f"{name}[{i}, {j}] 손으로 {dW[i, j]:.4f} · 수치로 {num:.4f}")
+
+W1 -= 0.5 * dW1
+W2 -= 0.5 * dW2
+print(f"한 걸음 뒤 손실 {loss_of(W1, W2):.4f}")` } },
+  ],
+  summary: ['한 글자로는 부족 — 앞 3글자 창으로 (문맥, 정답) 짝을 만든다', 'E[X] 를 이어 붙여 tanh 은닉층 → 로짓 (N, V)', '역전파는 뒤에서부터 — dW = x.T @ dy, 기울기 모양 = 가중치 모양'] },
+{ id: 'N10', ch: 3, n: 10, title: '어텐션: 어디를 볼지 고르기', mode: 'text',
+  tutorSummary: '문맥 MLP 는 앞 3글자를 이어 붙여서 더 멀리 보려면 입력이 계속 길어진다. 다른 길: 앞 글자들의 벡터를 섞어 하나로 — 가장 쉬운 섞기는 평균, 비율을 정하면 가중 평균 w @ v ((T,) @ (T, d) → (d,), w 의 합은 1). 어텐션: 질문 q 와 열쇠 k 의 내적(닮을수록 큼) = 점수 k @ q (T,), softmax 로 비율 w, 값 v 를 w @ v 로 섞는다. 글 전체에서는 자리마다 질문 — 점수 행렬 x @ x.T (T, T). 자리 t 는 0..t 만 봐야 함(뒤는 정답이라 반칙): np.tril(np.ones((T, T))) 를 줄 합으로 나누면 앞만 평균, 점수로 하려면 mask = np.triu(np.ones((T, T), dtype=bool), k=1) 자리를 -np.inf 로 → exp(-inf) = 0 이라 softmax 뒤 비율 0. 점수가 모두 0 이면 앞만 평균과 같다. 이번 레슨은 글자 벡터 x 를 q · k · v 로 그대로 씀 — 따로 만드는 건 N11.',
+  terms: { '어텐션': '자리마다 「다른 자리를 얼마나 볼지」 점수를 매기고, 그 비율로 값들을 섞는 가중 평균. 점수는 질문(q)과 열쇠(k)의 내적', '마스크': '뒤쪽(아직 안 온) 자리의 점수를 -inf 로 바꿔, 소프트맥스 뒤 비율이 0 이 되게 가리는 것' },
+  pages: [
+    { title: 'w @ v · 평균 → 가중 평균', html: `<p>문맥 MLP([[레슨:N9]])는 앞 3글자를 이어 붙였어요. 더 멀리(앞 100글자) 보려면 입력이 100글자만큼 길어지고, 「어느 글자가 중요한지」 도 자리로만 알아요. 다른 생각을 해 봐요. 앞 글자들의 벡터를 <b>섞어서 한 줄</b>로 만드는 거예요. 가장 쉬운 섞기는 평균이에요.</p>
+<pre>import numpy as np
+
+v = np.array([[1.0, 0.0], [0.0, 1.0], [4.0, 4.0]])   # 글자 3개의 벡터 (3, 2)
+avg = v.mean(axis=0)
+print(np.round(avg, 3))   # [1.667 1.667]
+w = np.array([0.1, 0.1, 0.8])                          # 비율 — 합이 1
+print(w @ v)              # [3.3 3.3]</pre>
+<table class="kb"><tbody><tr><th>계산</th><th>모양</th><th>뜻</th></tr>
+<tr><td><code>v.mean(axis=0)</code></td><td>(3, 2) → (2,)</td><td>셋을 똑같이 1/3 씩</td></tr>
+<tr><td><code>w @ v</code></td><td>(3,) @ (3, 2) → (2,)</td><td>0.1 · 0.1 · 0.8 씩 — 셋째를 많이</td></tr></tbody></table>
+<p><code>w @ v</code> 는 <code>0.1 * v[0] + 0.1 * v[1] + 0.8 * v[2]</code> 예요. 비율의 합이 1 이면 이것도 평균의 한 가지라서 <b>가중 평균</b>이라고 해요. 평균은 비율이 모두 1/3 인 가중 평균이에요.</p>
+<p>그럼 비율은 누가 정할까요? 고정해 두면 안 돼요. 「이를 닦<b>고</b>」 에서는 앞의 「닦」 을, 「공원에 <b>가</b>」 에서는 「공원」 을 많이 봐야 하죠. 비율을 <b>그때그때 계산</b>하는 것이 [[어텐션]]이에요.</p>`,
+      example: { code: `import numpy as np
+
+v = np.array([[1.0, 0.0], [0.0, 1.0], [4.0, 4.0]])
+avg = v.mean(axis=0)
+print("평균      ", np.round(avg, 3))
+
+same = np.ones(3) / 3
+print("1/3 씩     ", np.round(same @ v, 3))
+
+w = np.array([0.1, 0.1, 0.8])
+total = w.sum()
+print(f"비율 합      {total:.3f}")
+print("가중 평균  ", np.round(w @ v, 3))
+print("손으로     ", np.round(0.1 * v[0] + 0.1 * v[1] + 0.8 * v[2], 3))` } },
+    { title: 'k @ q → softmax → w @ v', html: `<p>비율은 이렇게 정해요. 자리마다 세 가지를 생각해요.</p>
+<table class="kb"><tbody><tr><th>이름</th><th>뜻</th></tr>
+<tr><td><b>q</b> 질문(query)</td><td>「나는 지금 이런 걸 찾아요」</td></tr>
+<tr><td><b>k</b> 열쇠(key)</td><td>「나는 이런 글자예요」 — 자리마다 하나</td></tr>
+<tr><td><b>v</b> 값(value)</td><td>「나를 보면 이걸 줄게요」 — 자리마다 하나</td></tr></tbody></table>
+<p>질문과 열쇠가 <b>닮을수록</b> 그 자리의 값을 많이 가져와요. 닮은 정도는 내적이에요 — 방향이 같으면 크고, 다르면 0 이나 음수예요(<a href="../math/#lesson/M5_dot" target="_blank" rel="noopener">수학 공간 「같은 방향을 보고 있나 — 내적」 ↗</a>). 점수를 softmax([[레슨:N5]])로 비율로 바꿔서 섞어요.</p>
+<pre>import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+k = np.array([[1.0, 0.0], [0.0, 1.0], [0.7, 0.7]])     # 열쇠 (T, d)
+v = np.array([[10.0, 0.0], [0.0, 10.0], [5.0, 5.0]])   # 값 (T, d)
+q = np.array([2.0, 0.0])                               # 질문 (d,)
+scores = k @ q
+print(scores)              # [2.  0.  1.4]
+w = softmax(scores)
+print(np.round(w, 3))      # [0.594 0.08  0.326]
+out = w @ v
+print(np.round(out, 3))    # [7.567 2.433]</pre>
+<table class="kb"><tbody><tr><th>단계</th><th>코드</th><th>모양 (T=3, d=2)</th></tr>
+<tr><td>점수</td><td><code>scores = k @ q</code></td><td>(3, 2) @ (2,) → (3,)</td></tr>
+<tr><td>비율</td><td><code>w = softmax(scores)</code></td><td>(3,) — 합 1</td></tr>
+<tr><td>섞기</td><td><code>out = w @ v</code></td><td>(3,) @ (3, 2) → (2,)</td></tr></tbody></table>
+<p>질문 <code>[2, 0]</code> 은 첫째 열쇠 <code>[1, 0]</code> 과 방향이 같아서 첫째를 가장 많이(0.594) 봐요. 예제처럼 질문을 <code>[0, 2]</code> 로 바꾸면 이번엔 둘째를 가장 많이 봐요. <b>질문이 바뀌면 보는 곳이 바뀌어요</b> — 「어디를 볼지 고르기」 예요.</p>`,
+      example: { code: `import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+k = np.array([[1.0, 0.0], [0.0, 1.0], [0.7, 0.7]])
+v = np.array([[10.0, 0.0], [0.0, 10.0], [5.0, 5.0]])
+
+for q in [np.array([2.0, 0.0]), np.array([0.0, 2.0])]:
+    scores = k @ q
+    w = softmax(scores)
+    out = w @ v
+    print("질문", q, "→ 점수", np.round(scores, 3))
+    best = w.argmax()
+    print("   비율", np.round(w, 3), "· 가장 많이 보는 자리", best)
+    print("   결과", np.round(out, 3))` } },
+    { title: 'np.tril(np.ones((T, T))) · 앞 글자만 평균', html: `<p>글 하나에서는 <b>자리마다</b> 이걸 해요. 그런데 규칙이 하나 있어요. 자리 t 에서 다음 글자를 맞힐 때는 <b>0 ~ t 자리만</b> 볼 수 있어요. t+1 자리는 바로 그 정답이라서, 보면 반칙이에요.</p>
+<p>먼저 비율을 「앞 글자들 똑같이」 로 해 봐요. 아래 삼각형(<code>np.tril</code>)에 1 을 채우고, 줄마다 합으로 나누면 돼요.</p>
+<pre>import numpy as np
+
+T = 4
+tri = np.tril(np.ones((T, T)))
+w = tri / tri.sum(axis=1, keepdims=True)
+print(np.round(w, 3))</pre>
+<pre>[[1.    0.    0.    0.   ]
+ [0.5   0.5   0.    0.   ]
+ [0.333 0.333 0.333 0.   ]
+ [0.25  0.25  0.25  0.25 ]]</pre>
+<p>줄 t 가 「자리 t 가 각 자리를 보는 비율」 이에요. 자리 0 은 자기만, 자리 3 은 넷을 1/4 씩 — 오른쪽 위는 모두 0 이라 뒤를 안 봐요. 이 비율 표 하나를 글자 벡터에 곱하면 <b>모든 자리의 평균이 한 번에</b> 나와요.</p>
+<table class="kb"><tbody><tr><th>계산</th><th>모양</th></tr>
+<tr><td><code>w</code></td><td>(T, T) — 줄마다 합 1</td></tr>
+<tr><td><code>x</code> 글자 벡터</td><td>(T, d)</td></tr>
+<tr><td><code>out = w @ x</code></td><td>(T, T) @ (T, d) → (T, d) — 줄 t = x[0] ~ x[t] 의 평균</td></tr></tbody></table>
+<p>행렬 곱은 <code>(a, b) @ (b, c) → (a, c)</code> — 가운데 수가 같아야 하고, 바깥 두 수가 결과 모양이에요(<a href="../math/#lesson/M5_compose" target="_blank" rel="noopener">수학 공간 「연달아 변형하기 — 행렬 곱」 ↗</a>).</p>`,
+      example: { code: `import numpy as np
+
+T = 4
+x = np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [3.0, 3.0]])
+tri = np.tril(np.ones((T, T)))
+w = tri / tri.sum(axis=1, keepdims=True)
+print("비율 w")
+print(np.round(w, 3))
+
+out = w @ x
+print("w @ x", w.shape, "@", x.shape, "→", out.shape)
+print(np.round(out, 3))
+first3 = x[:3].mean(axis=0)
+print("자리 2 = 앞 3개 평균:", np.round(first3, 3))` } },
+    { title: 'scores[mask] = -np.inf · 미래 가리기', html: `<p>이번엔 비율을 점수로 정해요. 자리마다 질문을 하나씩 하니까 점수도 표가 돼요. 이번 레슨에서는 글자 벡터 <code>x</code> 를 질문 · 열쇠 · 값으로 <b>그대로</b> 써요(따로 만드는 건 [[레슨:N11]]).</p>
+<pre>scores = x @ x.T                                  # (T, d) @ (d, T) → (T, T)
+mask = np.triu(np.ones((T, T), dtype=bool), k=1)  # 대각선 위쪽만 True
+scores[mask] = -np.inf                            # 뒤쪽 자리 가리기
+w = softmax(scores)                               # 줄마다 비율 (T, T)
+out = w @ x                                       # (T, T) @ (T, d) → (T, d)</pre>
+<ul><li><code>scores[t, j]</code> 는 「자리 t 의 질문 · 자리 j 의 열쇠」 내적이에요</li><li><code>np.triu(…, k=1)</code> 은 대각선 <b>바로 위부터</b> 오른쪽 위 삼각형이에요. 자리 t 보다 뒤인 j 가 모두 True</li><li>그 자리를 <code>-np.inf</code>(음의 무한대)로 바꾸면, softmax 의 <code>exp</code> 가 0 을 줘서 비율이 정확히 0 이 돼요. 이게 [[마스크]]예요</li></ul>
+<pre>import numpy as np
+
+print(np.exp(-np.inf))   # 0.0</pre>
+<p>점수를 모두 0 으로 두고 마스크를 씌우면, 앞 쪽의 「앞 글자만 평균」 과 <b>똑같은</b> 비율이 나와요(예제 마지막 줄). 어텐션은 그 평균을 「점수로 비율을 정하는」 것으로 바꾼 거예요.</p>
+<div class="bk-warn"><b>-inf 대신 0 으로 가리면 안 돼요</b> — 점수 0 은 「보통」 이라 exp(0) = 1 만큼 봐요. 꼭 <code>-np.inf</code>(또는 아주 큰 음수)로 바꿔야 비율이 0 이 돼요. 대각선(자기 자신)은 늘 남아 있어서 줄 전체가 -inf 가 되지는 않아요.</div>`,
+      example: { code: `import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+T = 4
+x = np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [3.0, 3.0]])
+
+scores = x @ x.T
+mask = np.triu(np.ones((T, T), dtype=bool), k=1)
+print("마스크(True = 가림)")
+print(mask)
+scores[mask] = -np.inf
+w = softmax(scores)
+print("비율 w")
+print(np.round(w, 3))
+out = w @ x
+print("결과", out.shape)
+print(np.round(out, 3))
+
+zero = np.zeros((T, T))
+zero[mask] = -np.inf
+tri = np.tril(np.ones((T, T)))
+avg = tri / tri.sum(axis=1, keepdims=True)
+wz = softmax(zero)
+print("점수 0 + 마스크 = 앞만 평균?", np.allclose(wz, avg))` } },
+  ],
+  summary: ['어텐션 = 비율을 그때그때 정하는 가중 평균 w @ v', '점수는 질문 q 와 열쇠 k 의 내적 → softmax 로 비율', '뒤쪽 자리는 -inf 마스크로 가려 비율 0 — 앞만 본다'] },
+{ id: 'N11', ch: 3, n: 11, title: '셀프 어텐션 Q · K · V', mode: 'text',
+  tutorSummary: 'N10 처럼 글자 벡터 x 를 질문 · 열쇠 · 값으로 그대로 쓰면 자기 자신과 가장 닮아 자기만 보고, 「찾는 것」 과 「나는 이런 것」 이 같아야 한다. 그래서 가중치 세 장: q = x @ Wq · k = x @ Wk · v = x @ Wv ((T, d) @ (d, dk) → (T, dk)), 가중치는 학습으로 정해진다. 코드에서는 소문자 q · k · v(V 는 어휘 크기). 점수 q @ k.T 는 (T, T), 내적은 dk 칸을 더한 것이라 dk 가 크면 점수가 √dk 배쯤 퍼진다 → softmax 가 한 자리만 1 이 되어 버림 → np.sqrt(dk) 로 나눈다. 셀프 어텐션 = softmax(q @ k.T / √dk + 마스크) @ v: (T, d) → q·k·v (T, dk) → 점수 (T, T) → 비율 (T, T) 줄마다 합 1 → 결과 (T, dk). (a, b) @ (b, c) → (a, c), 모양이 헷갈리면 줄마다 .shape. 멀티 헤드는 이름만: 작은 머리 여러 개를 따로 해서 np.concatenate(axis=-1) 로 이어 붙이고 @ Wo. 같은 입력에서 Q·K·V 를 다 만들어서 「셀프」.',
+  terms: { '셀프 어텐션': '한 글 안의 자리들이 서로를 보는 어텐션. 같은 입력 x 에서 질문 · 열쇠 · 값을 모두 만든다', '멀티 헤드': '셀프 어텐션을 작은 것(머리) 여러 개로 따로 하고, 결과를 옆으로 이어 붙이는 것. 머리마다 다른 관계를 볼 수 있다' },
+  pages: [
+    { title: 'q = x @ Wq · k = x @ Wk · v = x @ Wv', html: `<p>[[레슨:N10]] 에서는 글자 벡터 <code>x</code> 를 질문 · 열쇠 · 값으로 <b>그대로</b> 썼어요. 그러면 두 가지가 곤란해요.</p>
+<ul><li>내적은 자기 자신과 가장 큰 경우가 많아서, 자리마다 <b>자기만</b> 보기 쉬워요(N10 마지막 예제의 마지막 줄 <code>[0. 0. 0. 1.]</code>)</li><li>「내가 찾는 것」 과 「나는 이런 글자」 가 늘 같아야 해요. 「조사는 앞의 받침 있는 글자를 찾는다」 처럼 찾는 것과 가진 것이 다를 수 없어요</li></ul>
+<p>그래서 <code>x</code> 에 <b>서로 다른 가중치 세 장</b>을 곱해 역할마다 벡터를 따로 만들어요. 같은 입력에서 셋을 다 만들어 서로를 보니까 [[셀프 어텐션]]이라고 해요.</p>
+<table class="kb"><tbody><tr><th>이름</th><th>코드</th><th>모양 (T=4, d=8, dk=4)</th></tr>
+<tr><td>질문 Q</td><td><code>q = x @ Wq</code></td><td>(4, 8) @ (8, 4) → (4, 4)</td></tr>
+<tr><td>열쇠 K</td><td><code>k = x @ Wk</code></td><td>(4, 8) @ (8, 4) → (4, 4)</td></tr>
+<tr><td>값 V</td><td><code>v = x @ Wv</code></td><td>(4, 8) @ (8, 4) → (4, 4)</td></tr></tbody></table>
+<ul><li><code>Wq · Wk · Wv</code> 는 학습으로 정해지는 가중치예요. 학습하면서 「무엇을 찾을지 · 무엇이라고 알릴지 · 무엇을 건넬지」 를 스스로 배워요. 여기서는 seed 고정 무작위 값이에요</li><li><code>dk</code> 는 질문 · 열쇠 벡터의 칸 수예요. <code>d</code> 와 같아도 되고 작아도 돼요</li><li>식에서는 대문자 Q · K · V 로 쓰는데, 코드에서는 <b>소문자</b> <code>q, k, v</code> 로 써요. 대문자 <code>V</code> 는 이미 어휘 크기로 쓰고 있어서요</li></ul>`,
+      example: { code: `import numpy as np
+
+T, d, dk = 4, 8, 4
+rng = np.random.default_rng(0)
+x = rng.normal(0, 1, (T, d))
+Wq = rng.normal(0, 0.5, (d, dk))
+Wk = rng.normal(0, 0.5, (d, dk))
+Wv = rng.normal(0, 0.5, (d, dk))
+
+q = x @ Wq
+k = x @ Wk
+v = x @ Wv
+print("x", x.shape, "@ Wq", Wq.shape, "→ q", q.shape)
+print("k", k.shape, "· v", v.shape)
+
+same = x @ x.T
+print("x 그대로: 줄마다 가장 큰 점수 자리", same.argmax(axis=1))
+qk = q @ k.T
+print("q · k 따로: 줄마다 가장 큰 점수 자리", qk.argmax(axis=1))` } },
+    { title: 'q @ k.T / np.sqrt(dk) · 왜 √dk 로 나누나', html: `<p>모든 자리의 질문과 모든 자리의 열쇠를 한 번에 내적하면 점수 표가 나와요.</p>
+<table class="kb"><tbody><tr><th>계산</th><th>모양</th></tr>
+<tr><td><code>k.T</code></td><td>(T, dk) → (dk, T) — 줄과 칸을 바꿈</td></tr>
+<tr><td><code>q @ k.T</code></td><td>(T, dk) @ (dk, T) → (T, T)</td></tr></tbody></table>
+<p>그런데 내적은 dk 칸을 곱해 <b>더한</b> 것이라, 칸이 많을수록 점수가 커져요(대략 √dk 배로 퍼져요). 점수가 크면 softmax 가 한 자리에만 거의 1 을 줘요.</p>
+<pre>import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+small = np.array([1.0, 2.0, 3.0])
+p = softmax(small)
+print(np.round(p, 3))    # [0.09  0.245 0.665]
+p4 = softmax(small * 4)
+print(np.round(p4, 3))   # [0.    0.018 0.982]</pre>
+<p>점수가 4배가 됐을 뿐인데 한 자리만 보게 됐어요. 그러면 다른 자리는 거의 못 보고, 학습할 때 기울기도 0 에 가까워져요. 그래서 점수를 <code>np.sqrt(dk)</code> 로 나눠 크기를 맞춰요. 예제는 dk 를 1 · 4 · 16 으로 바꿔 가며 점수가 퍼진 정도(표준편차)를 재요 — 나누면 dk 와 상관없이 1 근처예요.</p>`,
+      example: { code: `import numpy as np
+
+rng = np.random.default_rng(0)
+T = 8
+for dk in [1, 4, 16]:
+    q = rng.normal(0, 1, (T, dk))
+    k = rng.normal(0, 1, (T, dk))
+    scores = q @ k.T
+    scaled = scores / np.sqrt(dk)
+    print(f"dk={dk:2d} 점수 퍼짐 {scores.std():.2f} → 나누면 {scaled.std():.2f}")` } },
+    { title: 'softmax(q @ k.T / √dk + 마스크) @ v', html: `<p>셀프 어텐션을 함수 하나로 묶어요. N10 의 마스크까지 넣으면 끝이에요.</p>
+<pre>def self_attention(x, Wq, Wk, Wv):
+    T = len(x)
+    q = x @ Wq
+    k = x @ Wk
+    v = x @ Wv
+    dk = k.shape[-1]
+    scores = q @ k.T / np.sqrt(dk)
+    mask = np.triu(np.ones((T, T), dtype=bool), k=1)
+    scores[mask] = -np.inf
+    w = softmax(scores)
+    return w @ v, w</pre>
+<table class="kb"><tbody><tr><th>단계</th><th>코드</th><th>모양 (T=5, d=8, dk=4)</th></tr>
+<tr><td>입력</td><td><code>x</code></td><td>(5, 8)</td></tr>
+<tr><td>질문 · 열쇠 · 값</td><td><code>x @ Wq</code> …</td><td>(5, 8) @ (8, 4) → (5, 4)</td></tr>
+<tr><td>점수</td><td><code>q @ k.T / np.sqrt(dk)</code></td><td>(5, 4) @ (4, 5) → (5, 5)</td></tr>
+<tr><td>마스크</td><td><code>scores[mask] = -np.inf</code></td><td>(5, 5)</td></tr>
+<tr><td>비율</td><td><code>w = softmax(scores)</code></td><td>(5, 5) — 줄마다 합 1</td></tr>
+<tr><td>결과</td><td><code>w @ v</code></td><td>(5, 5) @ (5, 4) → (5, 4)</td></tr></tbody></table>
+<p>모양만 따라가면 안 헷갈려요. 행렬 곱 <code>(a, b) @ (b, c) → (a, c)</code> 는 <b>가운데 수가 같아야</b> 해요. 에러 <code>matmul: Input operand 1 has a mismatch</code> 가 나면 줄마다 <code>print(q.shape)</code> 를 찍어 보고 <code>.T</code> 가 빠졌는지 봐요.</p>
+<p>예제는 비율 표 <code>w</code> 를 찍어요. 오른쪽 위는 0(마스크), 줄마다 합은 1 이고, 이번엔 자리마다 <b>여러 자리를 나눠서</b> 봐요.</p>`,
+      example: { code: `import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+def self_attention(x, Wq, Wk, Wv):
+    T = len(x)
+    q = x @ Wq
+    k = x @ Wk
+    v = x @ Wv
+    dk = k.shape[-1]
+    scores = q @ k.T / np.sqrt(dk)
+    mask = np.triu(np.ones((T, T), dtype=bool), k=1)
+    scores[mask] = -np.inf
+    w = softmax(scores)
+    return w @ v, w
+
+T, d, dk = 5, 8, 4
+rng = np.random.default_rng(0)
+x = rng.normal(0, 1, (T, d))
+Wq = rng.normal(0, 0.5, (d, dk))
+Wk = rng.normal(0, 0.5, (d, dk))
+Wv = rng.normal(0, 0.5, (d, dk))
+
+out, w = self_attention(x, Wq, Wk, Wv)
+print("입력", x.shape, "→ 결과", out.shape)
+print("비율 w (줄 = 보는 자리, 칸 = 보이는 자리)")
+print(np.round(w, 2))
+rows = w.sum(axis=1)
+print("줄마다 합", np.round(rows, 3))` } },
+    { title: 'np.concatenate(…, axis=-1) · 멀티 헤드', html: `<p>실제 모델은 셀프 어텐션을 <b>여러 개</b> 따로 해요. 하나하나를 머리(head)라고 하고, 이걸 [[멀티 헤드]] 어텐션이라고 해요. 이 교과서는 이름과 모양만 봐요.</p>
+<pre>h1, _ = self_attention(x, Wq1, Wk1, Wv1)   # (T, 4)
+h2, _ = self_attention(x, Wq2, Wk2, Wv2)   # (T, 4)
+both = np.concatenate([h1, h2], axis=-1)   # (T, 8) — 옆으로 이어 붙임
+out = both @ Wo                            # (T, 8) @ (8, 8) → (T, 8)</pre>
+<ul><li>머리마다 가중치가 달라서 <b>다른 관계</b>를 볼 수 있어요. 한 머리는 바로 앞 글자, 다른 머리는 띄어쓰기 뒤 첫 글자를 보는 식이에요(학습하면서 저절로 나뉘어요)</li><li>머리 칸 수 × 머리 수 = d 로 맞추는 게 보통이에요. d=8 을 머리 2개 × 4칸으로</li><li>마지막 <code>@ Wo</code> 는 이어 붙인 것을 다시 섞는 가중치예요. 결과가 입력과 같은 (T, d) 라서 다음 층에 그대로 넣을 수 있어요</li></ul>
+<p>GPT-2 의 가장 작은 모델은 머리가 12개예요. 다음 레슨과 만들어 보기는 간단하게 <b>머리 하나</b>로 해요.</p>`,
+      example: { code: `import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+def self_attention(x, Wq, Wk, Wv):
+    T = len(x)
+    q = x @ Wq
+    k = x @ Wk
+    v = x @ Wv
+    dk = k.shape[-1]
+    scores = q @ k.T / np.sqrt(dk)
+    mask = np.triu(np.ones((T, T), dtype=bool), k=1)
+    scores[mask] = -np.inf
+    w = softmax(scores)
+    return w @ v, w
+
+T, d, dk = 5, 8, 4
+rng = np.random.default_rng(0)
+x = rng.normal(0, 1, (T, d))
+heads = []
+for name in ["머리 1", "머리 2"]:
+    Wq = rng.normal(0, 0.5, (d, dk))
+    Wk = rng.normal(0, 0.5, (d, dk))
+    Wv = rng.normal(0, 0.5, (d, dk))
+    h, w = self_attention(x, Wq, Wk, Wv)
+    print(name, h.shape, "· 마지막 자리가 보는 비율", np.round(w[-1], 2))
+    heads.append(h)
+
+both = np.concatenate(heads, axis=-1)
+Wo = rng.normal(0, 0.5, (d, d))
+out = both @ Wo
+print("이어 붙임", both.shape, "→ @ Wo →", out.shape)` } },
+  ],
+  summary: ['x 에 Wq · Wk · Wv 를 곱해 질문 · 열쇠 · 값을 따로 만든다', 'softmax(q @ k.T / √dk + 마스크) @ v — √dk 로 나눠 한쪽 쏠림을 막는다', '모양: (T, d) → 점수 (T, T) → 결과 (T, dk), 머리 여러 개는 이어 붙인다'] },
+{ id: 'N12', ch: 3, n: 12, title: '트랜스포머 블록 한 층', mode: 'text',
+  tutorSummary: '어텐션은 가중 평균이라 순서를 모른다 — 「가나다」 와 「나가다」 의 마지막 자리 결과가 똑같다. 그래서 자리 번호마다 벡터 한 줄(위치 임베딩 P, (T_MAX, d))을 글자 임베딩에 더한다: x = E[ids] + P[:T] (T, d). T_MAX 가 한 번에 보는 최대 길이(문맥 길이). 잔차 x = x + f(x): 원래 값에 고친 만큼만 더해서 정보가 남고 깊어도 학습이 잘 된다. 레이어 정규화: 자리마다 칸들의 평균 0 · 표준편차 1 ((x - mu) / np.sqrt(var + 1e-5), 진짜는 학습되는 γ · β 도 곱하고 더함). 블록: x = x + attention(layer_norm(x)) → x = x + mlp(layer_norm(x)), MLP 는 자리마다 따로 (T, d) @ (d, 4d) → tanh → @ (4d, d). 어텐션 = 자리끼리 주고받기, MLP = 자리마다 곱씹기. 블록은 (T, d) → (T, d) 라 몇 층이든 쌓는다. 가중치는 층마다 딕셔너리 하나(make_layer). 끝에 layer_norm → @ Wout (d, V) → 로짓 (T, V) → softmax = 자리마다 다음 글자 확률, 마스크 덕에 T 개 문제를 한 번에 반칙 없이. GPT-2 small: 12층 · d 768 · 머리 12 · 문맥 1024 · 어휘 50257 · 약 1억 2천만 개. 여기서는 순전파만 — 무작위 가중치라 엉뚱, 학습은 자동 미분(PyTorch), 이 교과서는 문맥 MLP 로 학습(N13 · N14).',
+  terms: { '위치 임베딩': '자리 번호마다 벡터 한 줄. 글자 임베딩에 더해서 「몇 번째 자리인지」 를 알려 준다', '잔차 연결': 'x = x + f(x) 처럼 원래 값에 고친 만큼만 더하는 것. 층을 많이 쌓아도 원래 정보와 기울기가 잘 지나간다', '레이어 정규화': '자리마다 벡터 칸들의 평균을 0, 표준편차를 1 로 맞추는 것. 층을 지나며 값이 너무 커지거나 작아지지 않게 한다', '트랜스포머': '어텐션과 MLP 를 잔차 · 정규화로 묶은 블록을 여러 층 쌓은 모델. GPT 가 이 구조다' },
+  pages: [
+    { title: 'x = E[ids] + P[:T] · 위치 임베딩', html: `<p>어텐션은 가중 평균이에요. 평균은 <b>섞는 순서와 상관없어서</b>, 어텐션만으로는 글자 순서를 몰라요. 「가나다」 와 「나가다」 에서 마지막 자리 「다」 는 둘 다 {가, 나, 다} 를 보니까 결과가 똑같아요(예제 첫 줄 <code>True</code>). 「개가 사람을 문다」 와 「사람이 개를 문다」 를 구별 못 하면 큰일이죠.</p>
+<p>그래서 <b>자리 번호마다</b> 벡터를 한 줄씩 두고 글자 임베딩에 더해요. 이게 [[위치 임베딩]]이에요.</p>
+<pre>E = rng.normal(0, 1, (V, d))       # 글자마다 한 줄
+P = rng.normal(0, 1, (T_MAX, d))   # 자리마다 한 줄
+x = E[ids] + P[:T]                 # 같은 글자라도 자리가 다르면 다른 벡터</pre>
+<table class="kb"><tbody><tr><th>계산</th><th>모양 (T=3, d=8, T_MAX=8)</th></tr>
+<tr><td><code>E[ids]</code></td><td>(V, d) 에서 3줄 → (3, 8)</td></tr>
+<tr><td><code>P[:T]</code></td><td>(8, 8) 에서 앞 3줄 → (3, 8)</td></tr>
+<tr><td><code>E[ids] + P[:T]</code></td><td>(3, 8) + (3, 8) → (3, 8)</td></tr></tbody></table>
+<ul><li><code>T_MAX</code> 는 한 번에 볼 수 있는 가장 긴 글이에요(<b>문맥 길이</b>). P 가 그만큼만 있어서 더 긴 글은 앞을 잘라 넣어요. 큰 모델이 말하는 「문맥 창 몇만 토큰」 이 바로 이 수예요</li><li>P 도 E 처럼 학습되는 표예요(GPT 방식). 처음 트랜스포머 논문은 sin · cos 로 만든 고정 값을 썼어요</li></ul>`,
+      example: { code: `import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+def attention(x, Wq, Wk, Wv):
+    T = len(x)
+    q = x @ Wq
+    k = x @ Wk
+    v = x @ Wv
+    scores = q @ k.T / np.sqrt(k.shape[-1])
+    mask = np.triu(np.ones((T, T), dtype=bool), k=1)
+    scores[mask] = -np.inf
+    return softmax(scores) @ v
+
+chars = ["가", "나", "다"]
+stoi = {ch: i for i, ch in enumerate(chars)}
+V, d, T_MAX = 3, 8, 8
+rng = np.random.default_rng(0)
+E = rng.normal(0, 1, (V, d))
+P = rng.normal(0, 1, (T_MAX, d))
+Wq = rng.normal(0, 0.5, (d, d))
+Wk = rng.normal(0, 0.5, (d, d))
+Wv = rng.normal(0, 0.5, (d, d))
+
+a = [stoi[ch] for ch in "가나다"]
+b = [stoi[ch] for ch in "나가다"]
+out_a = attention(E[a], Wq, Wk, Wv)
+out_b = attention(E[b], Wq, Wk, Wv)
+print("위치 없이: 마지막 자리 같음?", np.allclose(out_a[-1], out_b[-1]))
+
+T = len(a)
+x_a = E[a] + P[:T]
+x_b = E[b] + P[:T]
+print("x 모양", x_a.shape)
+out_a = attention(x_a, Wq, Wk, Wv)
+out_b = attention(x_b, Wq, Wk, Wv)
+print("위치 더하면: 마지막 자리 같음?", np.allclose(out_a[-1], out_b[-1]))` } },
+    { title: 'x = x + attention(layer_norm(x))', html: `<p>어텐션 한 번으로 끝나지 않고 여러 층을 쌓으려면, 두 가지 장치가 필요해요.</p>
+<p><b>1. 잔차 연결</b> — 어텐션 결과로 x 를 <b>바꿔 치우지 않고 더해요</b>: <code>x = x + attention(…)</code>. 원래 글자 정보가 그대로 남고, 어텐션은 「고칠 만큼」 만 더해요. 층이 많아도 <code>x</code> 가 곧장 지나가는 길이 있어서 학습이 잘 돼요. 이걸 [[잔차 연결]]이라고 해요.</p>
+<p><b>2. 레이어 정규화</b> — 층을 지날수록 값이 점점 커지거나 작아지면 softmax · tanh 가 한쪽으로 쏠려요. 그래서 들어가기 전에 <b>자리마다</b> 칸들을 평균 0, 표준편차 1 로 맞춰요. 이게 [[레이어 정규화]]예요.</p>
+<pre>import numpy as np
+
+def layer_norm(x):
+    mu = x.mean(axis=-1, keepdims=True)
+    var = x.var(axis=-1, keepdims=True)
+    return (x - mu) / np.sqrt(var + 1e-5)
+
+x = np.array([[1.0, 2.0, 3.0, 4.0], [10.0, 0.0, 10.0, 0.0]])
+y = layer_norm(x)
+print(np.round(y, 3))</pre>
+<pre>[[-1.342 -0.447  0.447  1.342]
+ [ 1.    -1.     1.    -1.   ]]</pre>
+<ul><li><code>axis=-1</code> 은 「마지막 축(칸) 방향」 — 줄(자리)마다 따로 평균을 내요. 모양은 (T, d) 그대로예요</li><li><code>1e-5</code> 는 분산이 0 일 때 0 으로 나누지 않게 더하는 아주 작은 수예요</li><li>진짜 모델은 결과에 학습되는 γ(곱) · β(더하기)를 한 번 더 적용해요. 처음 값이 1 과 0 이라 여기서는 뺐어요</li></ul>`,
+      example: { code: `import numpy as np
+
+def layer_norm(x):
+    mu = x.mean(axis=-1, keepdims=True)
+    var = x.var(axis=-1, keepdims=True)
+    return (x - mu) / np.sqrt(var + 1e-5)
+
+x = np.array([[1.0, 2.0, 3.0, 4.0], [10.0, 0.0, 10.0, 0.0]])
+y = layer_norm(x)
+print(np.round(y, 3))
+mean = np.round(y.mean(axis=-1), 3) + 0.0
+std = np.round(y.std(axis=-1), 3)
+print("줄마다 평균", mean, "· 표준편차", std)
+
+change = np.array([[0.1, -0.1, 0.0, 0.2], [0.0, 0.3, 0.0, -0.3]])
+res = x + change
+print("잔차: 원래 + 고칠 만큼")
+print(res)` } },
+    { title: 'def block(x, w): · 어텐션 + MLP', html: `<p>트랜스포머의 블록 한 층은 이 두 줄이에요.</p>
+<pre>def block(x, w):
+    x = x + attention(layer_norm(x), w)   # 자리끼리 정보를 주고받고
+    x = x + mlp(layer_norm(x), w)         # 자리마다 받은 걸 곱씹어요
+    return x
+
+def mlp(x, w):
+    h = np.tanh(x @ w["W1"])   # (T, d) @ (d, 4d) → (T, 4d)
+    return h @ w["W2"]         # (T, 4d) @ (4d, d) → (T, d)</pre>
+<ul><li><b>어텐션</b>은 자리끼리 보는 일, <b>MLP</b> 는 자리마다 <b>따로</b> 하는 일이에요. MLP 는 [[레슨:N9]] 의 은닉층과 같은 모양(행렬 곱 → tanh → 행렬 곱)이에요. 보통 가운데 칸을 4배(4d)로 넓혀요</li><li>두 줄 다 「정규화 → 계산 → 잔차로 더하기」 예요</li><li>층마다 가중치가 따로라서, 한 층의 가중치를 딕셔너리 하나에 담아요: <code>w["Wq"]</code> · <code>w["W1"]</code> …</li></ul>
+<table class="kb"><tbody><tr><th>단계</th><th>모양 (T=5, d=8)</th></tr>
+<tr><td>들어오는 x</td><td>(5, 8)</td></tr>
+<tr><td><code>attention(layer_norm(x), w)</code></td><td>(5, 8) → 비율 (5, 5) → (5, 8)</td></tr>
+<tr><td><code>mlp(layer_norm(x), w)</code></td><td>(5, 8) → (5, 32) → (5, 8)</td></tr>
+<tr><td>나가는 x</td><td>(5, 8) — 들어온 모양 그대로</td></tr></tbody></table>
+<p>나가는 모양이 들어온 모양과 같아서, 블록을 <b>몇 층이든</b> 이어 쌓을 수 있어요. 진짜 GPT 는 tanh 대신 비슷하게 생긴 GELU 를 쓰고, 머리 여러 개 · 출력 가중치(Wo)도 있지만 뼈대는 같아요.</p>`,
+      example: { code: `import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+def layer_norm(x):
+    mu = x.mean(axis=-1, keepdims=True)
+    var = x.var(axis=-1, keepdims=True)
+    return (x - mu) / np.sqrt(var + 1e-5)
+
+def attention(x, w):
+    T = len(x)
+    q = x @ w["Wq"]
+    k = x @ w["Wk"]
+    v = x @ w["Wv"]
+    scores = q @ k.T / np.sqrt(k.shape[-1])
+    mask = np.triu(np.ones((T, T), dtype=bool), k=1)
+    scores[mask] = -np.inf
+    return softmax(scores) @ v
+
+def mlp(x, w):
+    h = np.tanh(x @ w["W1"])
+    return h @ w["W2"]
+
+def block(x, w):
+    x = x + attention(layer_norm(x), w)
+    x = x + mlp(layer_norm(x), w)
+    return x
+
+T, d = 5, 8
+rng = np.random.default_rng(0)
+w = {
+    "Wq": rng.normal(0, d ** -0.5, (d, d)),
+    "Wk": rng.normal(0, d ** -0.5, (d, d)),
+    "Wv": rng.normal(0, d ** -0.5, (d, d)),
+    "W1": rng.normal(0, d ** -0.5, (d, 4 * d)),
+    "W2": rng.normal(0, (4 * d) ** -0.5, (4 * d, d)),
+}
+for name, W in w.items():
+    print(name, W.shape)
+
+x = rng.normal(0, 1, (T, d))
+y = block(x, w)
+print("블록:", x.shape, "→", y.shape)
+y2 = block(y, w)
+print("한 번 더:", y.shape, "→", y2.shape)` } },
+    { title: 'layer_norm(x) @ Wout · 쌓기 = GPT', html: `<p>이제 전부 이어요. 글자 번호가 들어가서 <b>자리마다 다음 글자 확률</b>이 나와요.</p>
+<pre>def forward(ids):
+    T = len(ids)
+    x = E[ids] + P[:T]          # (T, d)
+    for w in layers:            # 블록을 층 수만큼
+        x = block(x, w)         # (T, d) → (T, d)
+    x = layer_norm(x)
+    logits = x @ Wout           # (T, d) @ (d, V) → (T, V)
+    return softmax(logits)      # 줄 t = 자리 t 다음 글자 확률</pre>
+<ul><li>한 번 순전파로 <b>T 개의 문제</b>를 한꺼번에 풀어요. 줄 0 은 「첫 글자 다음」, 줄 1 은 「두 글자 다음」 …</li><li>마스크 덕에 줄 t 는 0 ~ t 자리만 봐서 반칙이 없어요. 그래서 학습할 때도 T 개를 동시에 맞혀 볼 수 있어요</li><li>확률이 큰 글자 몇 개를 보려면 <code>np.argsort(-p)[:3]</code> — 마이너스를 붙여서 <b>큰 것부터</b> 줄 세운 번호의 앞 3개예요(예제는 1등만 찍어요)</li><li>마지막 줄(자리 T-1)의 확률에서 뽑아([[레슨:N3]]) 글 뒤에 붙이고 다시 넣으면 글이 이어져요 — GPT 가 글을 쓰는 방법이에요</li></ul>
+<p>이렇게 블록을 쌓은 모델이 [[트랜스포머]]이고, GPT 가 이 구조예요. 크기만 달라요.</p>
+<table class="kb"><tbody><tr><th></th><th>이 교과서</th><th>GPT-2 가장 작은 것</th></tr>
+<tr><td>층(블록) 수</td><td>2</td><td>12</td></tr><tr><td>벡터 칸 수 d</td><td>8 ~ 16</td><td>768</td></tr><tr><td>머리 수</td><td>1</td><td>12</td></tr><tr><td>문맥 길이 T_MAX</td><td>8</td><td>1024</td></tr><tr><td>어휘 V</td><td>글자 수십 ~ 130</td><td>50257 토큰</td></tr><tr><td>가중치 수</td><td>수천</td><td>약 1억 2천만</td></tr></tbody></table>
+<div class="bk-warn"><b>순전파만 만들어요</b> — 가중치가 무작위라 확률이 엉뚱해요. 이 구조가 「어떻게 자리마다 앞을 보며 확률을 내는지」 를 보는 거예요. 학습은 [[레슨:N9]] 의 역전파 규칙을 층마다 적용하는 같은 고리인데, 손으로 쓰기엔 너무 길어서 실제로는 PyTorch 같은 자동 미분 도구가 해요. 이 교과서는 챕터 4 에서 문맥 MLP 로 학습 고리를 끝까지 만들어요([[레슨:N13]] · [[레슨:N14]]).</div>`,
+      example: { code: `import numpy as np
+
+def softmax(z):
+    z = z - z.max(axis=-1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=-1, keepdims=True)
+
+def layer_norm(x):
+    mu = x.mean(axis=-1, keepdims=True)
+    var = x.var(axis=-1, keepdims=True)
+    return (x - mu) / np.sqrt(var + 1e-5)
+
+def attention(x, w):
+    T = len(x)
+    q = x @ w["Wq"]
+    k = x @ w["Wk"]
+    v = x @ w["Wv"]
+    scores = q @ k.T / np.sqrt(k.shape[-1])
+    mask = np.triu(np.ones((T, T), dtype=bool), k=1)
+    scores[mask] = -np.inf
+    return softmax(scores) @ v
+
+def mlp(x, w):
+    h = np.tanh(x @ w["W1"])
+    return h @ w["W2"]
+
+def block(x, w):
+    x = x + attention(layer_norm(x), w)
+    x = x + mlp(layer_norm(x), w)
+    return x
+
+text = "나는 밥을 먹는다. 나는 물을 마신다."
+chars = sorted(set(text))
+stoi = {ch: i for i, ch in enumerate(chars)}
+itos = {i: ch for ch, i in stoi.items()}
+V = len(chars)
+
+d, T_MAX = 8, 8
+rng = np.random.default_rng(0)
+E = rng.normal(0, 1, (V, d))
+P = rng.normal(0, 1, (T_MAX, d))
+
+def make_layer():
+    return {
+        "Wq": rng.normal(0, d ** -0.5, (d, d)),
+        "Wk": rng.normal(0, d ** -0.5, (d, d)),
+        "Wv": rng.normal(0, d ** -0.5, (d, d)),
+        "W1": rng.normal(0, d ** -0.5, (d, 4 * d)),
+        "W2": rng.normal(0, (4 * d) ** -0.5, (4 * d, d)),
+    }
+
+layers = [make_layer(), make_layer()]
+Wout = rng.normal(0, d ** -0.5, (d, V))
+
+def forward(ids):
+    T = len(ids)
+    x = E[ids] + P[:T]
+    for w in layers:
+        x = block(x, w)
+    x = layer_norm(x)
+    logits = x @ Wout
+    return softmax(logits)
+
+ids = [stoi[ch] for ch in "나는 밥을"]
+probs = forward(ids)
+print("어휘", V, "· 넣은 글자", len(ids), "→ 확률", probs.shape)
+for t in range(len(ids)):
+    best = int(probs[t].argmax())
+    seen = "".join(itos[i] for i in ids[:t + 1])
+    print(repr(seen), "다음 →", repr(itos[best]), f"{probs[t, best]:.3f}")` } },
+  ],
+  summary: ['위치 임베딩 P[:T] 를 더해 순서를 알린다', '블록 = x + 어텐션(정규화(x)) → x + MLP(정규화(x)), 모양은 (T, d) 그대로', '블록을 쌓고 @ Wout 하면 자리마다 다음 글자 확률 — GPT 의 뼈대'] },
+{ id: 'NB3', ch: 3, boss: true, title: '만들어 보기: 미니 트랜스포머 순전파', mode: 'text',
+  tutorSummary: '챕터 3 묶기 — data.txt 로 어휘(V = 130), rng = np.random.default_rng(0) 로 정해진 순서대로 가중치(E (V, 16) · P (8, 16) · 층마다 Wq · Wk · Wv (16, 16) · W1 (16, 64) · W2 (64, 16) 2층 · Wout (16, V)), 문장 「고양이는 밥을」(7글자)을 넣어 위치 임베딩 → 블록 2층(x + 어텐션(정규화) · x + MLP(정규화)) → 정규화 → @ Wout → softmax 로 자리마다 다음 글자 확률 상위 3개(np.argsort(-p)[:3]). 학습 안 한 무작위 가중치라 예측은 엉뚱 — 구조가 도는지 본다. 마스크 확인: 뒤 글자(밥 → 물)를 바꾸면 앞 자리 0~4 의 확률은 그대로(np.allclose), 바꾼 자리부터만 달라진다. 마스크를 빼면 앞 자리도 달라진다 = 미래를 엿봄.', pages: [], summary: [] },
 { id: 'N13', ch: 4, n: 13, title: '학습 고리 만들기', mode: 'text', draft: true,
   tutorSummary: '학습 · 검증 나누기 · 배치, 순전파 → 손실 → 역전파 → 갱신, 과적합 보기.',
   pages: LLM_TODO('배치 · 학습/검증 · 학습 고리'), summary: ["학습과 검증을 나눈다", "배치로 조금씩", "검증 손실로 외우기를 본다"] },

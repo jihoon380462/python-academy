@@ -12,23 +12,459 @@ const CHAPTERS = [
 ];
 const CS_TODO = (t) => [{ title: '준비 중', html: `<p>TODO: ${t}</p>` }]; // v2.32.0 뼈대: 아직 안 채운 레슨 — draft:true 라 목차에 「준비 중」
 const LESSONS = [
-{ id: 'C0', ch: 0, n: 0, title: '컴퓨터는 무엇을 하나', mode: 'text', draft: true,
-  tutorSummary: '입력 → 처리 → 저장 → 출력. 층 그림: 앱 → 파이썬 → 운영체제 → CPU · 메모리 → 회로. 모든 건 숫자.',
-  pages: CS_TODO('입력·처리·저장·출력 · 층 그림 · 모든 건 숫자'), summary: ["컴퓨터는 입력 → 처리 → 저장 → 출력", "층마다 아래 층을 써요", "모든 건 숫자"] },
-{ id: 'C1', ch: 1, n: 1, title: '비트와 바이트 · 2진수 · 16진수', mode: 'text', draft: true,
-  tutorSummary: '비트 · 바이트 · 2진수, bin · hex · int(글자, 16), KB · KiB, bytes · bytearray.',
-  pages: CS_TODO('비트·바이트 · bin/hex · 용량 단위 · bytes'), summary: ["8비트 = 1바이트", "bin · hex · int(…, 16)", "bytes 는 0~255 의 줄"] },
-{ id: 'C2', ch: 1, n: 2, title: '글자를 숫자로: ASCII · 유니코드 · UTF-8', mode: 'text', draft: true,
-  tutorSummary: 'ASCII · ord · chr, 유니코드 코드 포인트, UTF-8 은 1~4바이트("가".encode()), 깨진 글자(cp949 vs utf-8).',
-  pages: CS_TODO('ASCII · 코드 포인트 · UTF-8 규칙 · 깨진 글자'), summary: ["ord · chr 로 글자 ↔ 번호", "UTF-8 은 글자마다 1~4바이트", "깨진 글자는 인코딩이 달라서"] },
-{ id: 'C3', ch: 1, n: 3, title: '음수와 소수', mode: 'text', draft: true,
-  tutorSummary: '2의 보수(int.to_bytes signed), 부동소수점 0.1 + 0.2 · 부호 · 지수 · 가수(struct.pack), 돈은 정수나 decimal.',
-  pages: CS_TODO('2의 보수 · 부동소수점 모양 · 돈 계산'), summary: ["음수는 2의 보수", "0.1 + 0.2 는 딱 0.3 이 아님", "돈은 정수(원)나 decimal"] },
-{ id: 'C4', ch: 1, n: 4, title: '그림과 소리도 숫자', mode: 'text', draft: true,
-  tutorSummary: '픽셀 · RGB(#ff8800), 이미지 크기 계산 · 압축, 소리 샘플링 · 비트 깊이(wave).',
-  pages: CS_TODO('RGB · 이미지 용량 · 샘플링'), summary: ["픽셀 = RGB 세 숫자", "용량 = 가로 × 세로 × 3바이트", "소리는 초마다 수만 번 잰 숫자"] },
-{ id: 'CB1', ch: 1, boss: true, title: '만들어 보기: 나만의 인코더', mode: 'text', draft: true,
-  tutorSummary: '챕터 1 묶기 — 글자 → UTF-8 바이트 → 16진 · 2진 덤프 → 다시 글자, 바이트 수 · 글자 수 비교.', pages: [], summary: [] },
+{ id: 'C0', ch: 0, n: 0, title: '컴퓨터는 무엇을 하나', mode: 'text',
+  tutorSummary: '컴퓨터가 하는 일은 입력 → 처리 → 저장 → 출력(input · 계산 · 파일 · print). 저장은 메모리(빠르고 끄면 지워짐)와 저장 장치(SSD, 꺼도 남음) 두 가지. 층 그림: 앱 → 파이썬 → 운영체제 → CPU · 메모리 → 회로, 층마다 바로 아래 층만 쓴다(platform.system · os.cpu_count 로 아래 층 물어보기). 모든 건 숫자 — ord("A") 65, chr(66) "B", 색은 세 숫자, 소리는 잰 숫자의 줄. 이 교과서의 길: 숫자 → 회로 · CPU → 운영체제 → 네트워크 → 보안.',
+  terms: { 'CPU': '중앙 처리 장치. 명령을 하나씩 아주 빨리 실행해 계산하는 부품', '메모리': 'RAM. 실행 중인 프로그램과 값이 잠깐 머무는 곳. 빠르지만 전원을 끄면 지워진다', '저장 장치': 'SSD · 하드 디스크. 파일이 있는 곳. 메모리보다 느리지만 크고, 전원을 꺼도 남는다', '운영체제': 'Windows · macOS · 리눅스처럼 프로그램들과 하드웨어 사이에서 CPU · 메모리 · 파일 · 화면을 나눠 주는 관리자 프로그램' },
+  pages: [
+    { title: '입력 → 처리 → 저장 → 출력', html: `<p>컴퓨터가 하는 일은 크게 넷이에요. <b>받고(입력) → 계산하고(처리) → 남기고(저장) → 보여 줘요(출력)</b>. 지금까지 짠 파이썬 코드도 전부 이 넷의 조합이에요.</p>
+<table class="kb"><tbody><tr><th>단계</th><th>파이썬에서</th><th>맡는 부품</th></tr>
+<tr><td>입력</td><td><code>input()</code></td><td>키보드 · 마우스 · 마이크 · 카메라</td></tr>
+<tr><td>처리</td><td><code>+</code> · <code>if</code> · 함수</td><td>[[CPU]]</td></tr>
+<tr><td>저장</td><td>변수 · <code>open(…, "w")</code></td><td>[[메모리]](잠깐) · [[저장 장치]](오래)</td></tr>
+<tr><td>출력</td><td><code>print()</code></td><td>화면 · 스피커 · 프린터</td></tr></tbody></table>
+<pre>name = input("이름: ")              # 입력 — 키보드\ngreeting = "안녕, " + name + "!"    # 처리 — CPU\nwith open("memo.txt", "w", encoding="utf-8") as f:\n    f.write(greeting)                # 저장 — SSD 의 파일\nprint(greeting)                      # 출력 — 화면</pre>
+<p><b>저장이 두 가지</b>인 게 중요해요.</p>
+<ul><li>변수 <code>greeting</code> 은 메모리에 있어요. 아주 빠르지만, 프로그램이 끝나거나 전원을 끄면 사라져요</li><li><code>memo.txt</code> 는 저장 장치(SSD)에 있어요. 메모리보다 느리지만 크고, 컴퓨터를 꺼도 남아요</li></ul>
+<p>그래서 프로그램은 실행할 때 파일을 메모리로 읽어 와서 계산하고, 남길 것만 다시 파일로 써요. 둘이 얼마나 빠르기가 다른지는 [[레슨:C8]] 에서 숫자로 봐요.</p>`,
+      example: { code: `name = input("이름: ")
+greeting = "안녕, " + name + "!"
+with open("memo.txt", "w", encoding="utf-8") as f:
+    f.write(greeting)
+print(greeting)
+
+with open("memo.txt", encoding="utf-8") as f:
+    print("파일에 남은 것:", f.read())`, stdin: '민수' } },
+    { title: '층 그림: 앱 → 파이썬 → 운영체제 → CPU', html: `<p><code>print("Hi")</code> 한 줄이 화면에 글자를 띄우기까지 여러 층이 차례로 일을 넘겨요. 층마다 <b>바로 아래 층만</b> 알면 돼요. 파이썬 코드를 짤 때 CPU 회로를 몰라도 되는 이유예요.</p>
+<table class="kb"><tbody><tr><th>층</th><th>하는 일</th><th>이 교과서</th></tr>
+<tr><td>앱</td><td>내 .py 파일 · 브라우저 · 게임</td><td>지금까지 짠 것</td></tr>
+<tr><td>파이썬</td><td>내 코드를 읽고 한 줄씩 실행</td><td>[[레슨:C9]]</td></tr>
+<tr><td>[[운영체제]]</td><td>Windows · macOS — 프로그램들에게 CPU · 메모리 · 파일 · 화면을 나눠 줌</td><td>[[레슨:C10]] · [[레슨:C11]]</td></tr>
+<tr><td>CPU · 메모리</td><td>명령을 하나씩 실행 · 값을 잠깐 보관</td><td>[[레슨:C7]] · [[레슨:C8]]</td></tr>
+<tr><td>회로</td><td>0 과 1 전기 신호를 게이트로 계산</td><td>[[레슨:C5]] · [[레슨:C6]]</td></tr></tbody></table>
+<p>이 층들은 컴퓨터 한 대 안의 이야기예요. 다른 컴퓨터와 숫자를 주고받는 <b>네트워크</b>([[레슨:C12]])와, 그 숫자를 지키는 <b>보안</b>([[레슨:C16]])은 그 옆으로 이어져요.</p>
+<p>같은 .py 파일이 Windows 에서도 Mac 에서도 돌아가는 건 파이썬과 운영체제가 아래 층의 차이를 가려 주기 때문이에요. 반대로 일부러 아래 층을 물어볼 수도 있어요.</p>
+<pre>import os\nimport platform\n\nprint(platform.system())    # 운영체제 이름 — 예: Windows\nprint(platform.release())   # 운영체제 판 — 예: 11\nprint(platform.machine())   # CPU 종류 — 예: AMD64\nprint(os.cpu_count())       # CPU 코어 수 — 예: 8</pre>
+<p>이 네 줄은 컴퓨터마다 다르게 나와요. 만들어 보기에서 내 컴퓨터로 찍어 봐요. 아래 예제는 층마다 함수 하나로 흉내 낸 거예요. 위 층이 아래 층 함수를 부르며 일을 넘겨요.</p>`,
+      example: { code: `def circuit(bits):
+    print("      회로: 전기 신호", bits)
+
+def cpu(n):
+    print("    CPU: 숫자", n, "처리")
+    circuit(f"{n:08b}")
+
+def operating_system(text):
+    print("  운영체제: 화면에", text, "그리기")
+    for ch in text:
+        cpu(ord(ch))
+
+def python(code):
+    print("파이썬:", code, "실행")
+    operating_system("Hi")
+
+python('print("Hi")')` } },
+    { title: '모든 건 숫자 — ord("A") 는 65', html: `<p>컴퓨터 안에는 0 과 1 뿐이에요. 그래서 글자 · 그림 · 소리 · 프로그램까지 <b>전부 숫자로 바꿔서</b> 담아요. 「무엇을 어떤 숫자로」 규칙만 정하면 돼요.</p>
+<pre>print(ord("A"))     # 65 — 글자 → 번호\nprint(chr(66))      # B — 번호 → 글자\nprint(ord("가"))    # 44032\norange = (255, 136, 0)                    # 주황색 = 빨강 · 초록 · 파랑 세 숫자\nsound = [0, 12539, 23170, 30273, 32767]   # 소리 = 1초에 수만 번 잰 높이</pre>
+<p><code>ord</code> 는 글자의 번호를, <code>chr</code> 는 번호의 글자를 알려 줘요. 서로 거꾸로예요.</p>
+<table class="kb"><tbody><tr><th>무엇</th><th>숫자로 바꾸는 규칙</th><th>레슨</th></tr>
+<tr><td>개수 · 크기</td><td>2진수 · 바이트</td><td>[[레슨:C1]]</td></tr>
+<tr><td>글자</td><td>ASCII · 유니코드 · UTF-8</td><td>[[레슨:C2]]</td></tr>
+<tr><td>음수 · 소수</td><td>2의 보수 · 부동소수점</td><td>[[레슨:C3]]</td></tr>
+<tr><td>그림 · 소리</td><td>픽셀의 RGB · 소리 샘플</td><td>[[레슨:C4]]</td></tr>
+<tr><td>프로그램</td><td>명령도 숫자 — 장난감 CPU</td><td>[[레슨:C7]]</td></tr></tbody></table>
+<p>이 교과서는 이 길을 따라가요: <b>숫자</b>(챕터 1) → 그 숫자를 계산하는 <b>회로와 CPU</b>(챕터 2) → 프로그램들을 관리하는 <b>운영체제</b>(챕터 3) → 숫자를 다른 컴퓨터로 보내는 <b>네트워크</b>(챕터 4) → 숫자를 지키는 <b>보안</b>(챕터 5). 말로만 하지 않고, 작은 파이썬 코드로 <b>직접 흉내 내며</b> 봐요.</p>`,
+      example: { code: `word = "Hi 가"
+for ch in word:
+    print(ch, "→", ord(ch))
+
+secret = [67, 83]
+text = ""
+for n in secret:
+    text += chr(n)
+print(text)
+
+b = "가".encode()
+print(list(b))` } },
+  ],
+  summary: ['컴퓨터는 입력 → 처리 → 저장 → 출력, 저장은 메모리(잠깐)와 저장 장치(오래)', '앱 → 파이썬 → 운영체제 → CPU · 메모리 → 회로, 층마다 바로 아래 층만 쓴다', '모든 건 숫자 — ord("A") 는 65, chr(66) 은 "B"'] },
+{ id: 'C1', ch: 1, n: 1, title: '비트와 바이트 · 2진수 · 16진수', mode: 'text',
+  tutorSummary: '비트 = 0/1 스위치 하나, n비트는 2**n 가지, 8비트 = 1바이트 = 0~255. 2진수 자리 값 1 · 2 · 4 · 8. bin(13) "0b1101", hex(255) "0xff", int("1101", 2), int("ff", 16), f"{n:08b}" · f"{n:02x}". 16진수 1자리 = 4비트, 1바이트 = 16진수 2자리. KB = 1000, KiB = 1024 — 1TB 디스크가 탐색기에서 931GB. bytes([72, 105]) 는 0~255 의 줄(못 바꿈), .hex(" ") · bytes.fromhex, bytearray 는 바꿀 수 있음, 256 이상은 ValueError. 수학은 수학 공간 M1_binary.',
+  terms: { '비트': '0 또는 1 하나를 담는 가장 작은 칸. 전기가 흐르나 안 흐르나 스위치 하나', '바이트': '비트 8개 묶음. 0~255(256 가지)를 담는다. 파일 · 메모리 크기를 세는 단위', '16진수': '0~9 와 a~f(10~15)로 세는 수. 1자리가 2진수 4자리라 1바이트를 딱 2자리로 적는다' },
+  pages: [
+    { title: '비트 · 바이트 — 8비트는 256 가지', html: `<p>컴퓨터 안의 가장 작은 칸은 [[비트]]예요. 전기가 흐르면 1, 안 흐르면 0 — 스위치 하나예요. 하나로는 두 가지(0, 1)뿐이지만 여러 개를 나란히 놓으면 <b>하나 더할 때마다 경우가 두 배</b>가 돼요.</p>
+<pre>print(2 ** 1)    # 2 — 0, 1\nprint(2 ** 2)    # 4 — 00, 01, 10, 11\nprint(2 ** 8)    # 256 — 비트 8개\nprint(2 ** 16)   # 65536</pre>
+<p>비트 8개를 묶은 것이 [[바이트]]예요. 1바이트는 <code>00000000</code> 부터 <code>11111111</code> 까지, 10진수로 <b>0~255</b>(256 가지)를 담아요. 파일 크기 · 메모리 크기는 다 바이트로 세요.</p>
+<p>2진수는 10진수와 세는 법이 같아요. 10진수는 자리 값이 1 · 10 · 100 …(10배씩), 2진수는 자리 값이 1 · 2 · 4 · 8 …(2배씩)이에요. 1 이 있는 자리 값만 더하면 10진수가 돼요.</p>
+<pre>2진수     1    0    1    1\n자리 값   8    4    2    1\n          8 +  0 +  2 +  1  = 11</pre>
+<p>2진법 · 16진법 자체의 수학(나머지로 바꾸기 · 자리 값)은 <a href="../math/#lesson/M1_binary" target="_blank" rel="noopener">수학 공간 「0과 1로 세기」 ↗</a> 에 자세히 있어요. 이 교과서는 컴퓨터가 그 숫자를 <b>어떻게 담고 쓰는지</b>를 봐요.</p>`,
+      example: { code: `for bits in [1, 2, 4, 8, 16, 32]:
+    print(bits, "비트 →", 2 ** bits, "가지")
+
+digits = "1011"
+total = 0
+for i in range(len(digits)):
+    place = 2 ** (len(digits) - 1 - i)
+    total += int(digits[i]) * place
+    print(digits[i], "×", place)
+print("=", total)` } },
+    { title: 'bin · hex · int("ff", 16)', html: `<p>파이썬은 2진수 · 16진수로 바꾸는 함수를 갖고 있어요.</p>
+<pre>print(bin(13))          # 0b1101\nprint(hex(255))         # 0xff\nprint(int("1101", 2))   # 13\nprint(int("ff", 16))    # 255\nprint(0b1101, 0xff)     # 13 255</pre>
+<ul><li><code>0b</code> 는 「2진수예요」, <code>0x</code> 는 「16진수예요」 표시. 코드에 <code>0b1101</code> · <code>0xff</code> 처럼 바로 적어도 돼요</li><li><code>int(글자, 2)</code> · <code>int(글자, 16)</code> — 뒤의 숫자가 「몇 진수로 읽을까」 예요</li></ul>
+<p>[[16진수]]는 0~9 다음에 a(10) · b · c · d · e · f(15)를 써요. 16 = 2⁴ 라서 <b>2진수 4자리 = 16진수 1자리</b>, 그래서 <b>1바이트 = 16진수 딱 2자리</b>예요. <code>11111111</code> 보다 <code>ff</code> 가 짧고 읽기 쉬워서, 바이트를 보여 줄 때는 거의 늘 16진수를 써요.</p>
+<pre>print(f"{13:08b}")   # 00001101 — 8자리 2진수, 빈 앞자리는 0\nprint(f"{10:02x}")   # 0a — 2자리 16진수\nprint(f"{255:X}")    # FF — 대문자 16진수</pre>
+<p>f-string 의 <code>:</code> 뒤에 <code>b</code>(2진) · <code>x</code>(16진)를 쓰고, 그 앞 숫자는 자릿수예요. <code>0b</code> · <code>0x</code> 표시 없이 숫자만 나와서 표를 찍기 좋아요.</p>`,
+      example: { code: `print("10진  2진수      16진")
+for n in [0, 1, 2, 3, 7, 8, 9, 10, 15, 16, 128, 255]:
+    print(f"{n:>4}  {n:08b}  {n:02x}")
+
+print(bin(13), hex(255))
+print(int("1101", 2), int("ff", 16), int("FF", 16))` } },
+    { title: 'KB 는 1000 · KiB 는 1024', html: `<p>바이트가 많아지면 단위를 붙여요. 그런데 단위가 <b>두 가지</b>라 헷갈려요.</p>
+<table class="kb"><tbody><tr><th>10진 단위</th><th>바이트</th><th>2진 단위</th><th>바이트</th></tr>
+<tr><td>KB(킬로바이트)</td><td>1000</td><td>KiB(키비바이트)</td><td>1024 = 2¹⁰</td></tr>
+<tr><td>MB</td><td>1000²</td><td>MiB</td><td>1024² = 2²⁰</td></tr>
+<tr><td>GB</td><td>1000³</td><td>GiB</td><td>1024³ = 2³⁰</td></tr>
+<tr><td>TB</td><td>1000⁴</td><td>TiB</td><td>1024⁴ = 2⁴⁰</td></tr></tbody></table>
+<p>메모리는 2진수 주소로 만들어서 1024 단위가 딱 맞고, 디스크 회사는 1000 단위로 팔아요. Windows 탐색기는 1024 로 나누면서 이름은 「KB · GB」 라고 적어요. 그래서 <b>1TB SSD 가 탐색기에서는 931GB</b> 로 보여요. 없어진 게 아니라 단위가 달라요.</p>
+<pre>print(10 ** 12 / 2 ** 30)   # 931.3225746154785</pre>
+<ul><li>인터넷 속도는 <b>비트</b>로 세요(소문자 b). 100Mbps = 초당 1억 비트 = 초당 12.5MB(바이트)</li><li>아래 예제의 <code>human(n)</code> 은 1024 로 나눌 수 있는 동안 계속 나누면서 단위를 하나씩 올려요</li></ul>`,
+      example: { code: `def human(n):
+    units = ["B", "KiB", "MiB", "GiB", "TiB"]
+    i = 0
+    while n >= 1024 and i < len(units) - 1:
+        n = n / 1024
+        i += 1
+    return f"{n:.1f} {units[i]}"
+
+print(human(500))
+print(human(2048))
+print(human(5_000_000))
+print(human(10 ** 12))
+print(100_000_000 / 8 / 1_000_000, "MB/s")` } },
+    { title: 'bytes([72, 105]) · bytearray', html: `<p>파이썬에서 바이트를 담는 그릇이 <code>bytes</code> 예요. <b>0~255 숫자의 줄</b>이에요. 앞에 <code>b</code> 를 붙인 글자로 적을 수도 있어요.</p>
+<pre>data = bytes([72, 105, 33])\nprint(data)            # b'Hi!'\nprint(list(data))      # [72, 105, 33]\nprint(data[0])         # 72 — 한 칸은 숫자\nprint(data[0:2])       # b'Hi' — 자르면 bytes\nprint(len(data))       # 3\nprint(data.hex(" "))   # 48 69 21</pre>
+<ul><li><code>print</code> 는 글자로 읽히는 숫자(32~126)는 글자로, 나머지는 <code>&#92;x</code> + 16진 두 자리로 보여 줘요. <code>bytes([0, 200])</code> 은 <code>b'&#92;x00&#92;xc8'</code>. 속은 그냥 숫자예요</li><li><code>for b in data:</code> 로 돌면 한 칸씩 <b>숫자</b>가 나와요</li><li><code>bytes.fromhex("48 69 21")</code> 은 거꾸로 16진 글자 → bytes</li><li>256 이상은 못 넣어요: <code>bytes([256])</code> 은 <code>ValueError: bytes must be in range(0, 256)</code></li></ul>
+<p><code>bytes</code> 는 문자열처럼 <b>못 바꿔요</b>. 한 칸씩 고치거나 붙이려면 <code>bytearray</code> 를 써요.</p>
+<pre>buf = bytearray(b"Hi!")\nbuf[0] = 104           # 104 는 h\nbuf.append(63)         # 63 은 ?\nprint(buf)             # bytearray(b'hi!?')\nprint(bytes(buf))      # b'hi!?'</pre>
+<p>파일 · 네트워크 · 그림 · 소리는 결국 전부 이런 바이트의 줄이에요. 다음 레슨부터 그 줄을 글자 · 음수 · 색 · 소리로 읽는 규칙을 봐요.</p>`,
+      example: { code: `data = bytes([72, 105, 33])
+print(data, list(data), data.hex(" "))
+for b in data:
+    print(b, f"{b:08b}", chr(b))
+
+print(bytes.fromhex("48 69 21"))
+print(bytes([0, 200]))
+try:
+    bytes([256])
+except ValueError as e:
+    print("ValueError:", e)
+
+buf = bytearray(data)
+buf[0] = 104
+buf.append(63)
+print(buf)` } },
+  ],
+  summary: ['8비트 = 1바이트 = 0~255, n비트는 2 ** n 가지', 'bin · hex · int("ff", 16) · f"{n:08b}" — 1바이트는 16진수 2자리', 'KB 는 1000, KiB 는 1024 · bytes 는 0~255 숫자의 줄(bytearray 는 고칠 수 있음)'] },
+{ id: 'C2', ch: 1, n: 2, title: '글자를 숫자로: ASCII · 유니코드 · UTF-8', mode: 'text',
+  tutorSummary: 'ASCII 는 영어 · 숫자 · 기호 128개 표(A 65, a 97, 0 48, 대소문자 32 차이), ord · chr. 유니코드는 세상 모든 글자에 번호(코드 포인트, U+AC00 = 가, f"U+{cp:04X}"), 한글은 가~힣 가나다 순. UTF-8 은 코드 포인트를 1~4바이트로 바꾸는 규칙(0xxxxxxx / 110xxxxx 10xxxxxx / 1110xxxx 10xxxxxx 10xxxxxx / 11110xxx …) — "가".encode() 는 ea b0 80, len 1 vs 3, decode 로 거꾸로. 깨진 글자: utf-8 바이트를 cp949 로 읽으면 깨지고(errors="replace" 는 �), cp949 파일을 utf-8 로 읽으면 UnicodeDecodeError. 깨진 채 저장하면 못 되살림 — 파일은 그대로 두고 encoding 만 바꿔 다시 읽기. 파이썬 교과서 L17B.',
+  terms: { 'ASCII': '영어 대소문자 · 숫자 · 기호 · 조종 글자 128개(0~127)에 번호를 붙인 1960년대 미국 표. 7비트', '유니코드': '세상 모든 글자에 번호 하나씩(코드 포인트)을 붙인 표. U+AC00 처럼 16진수로 적는다', 'UTF-8': '유니코드 번호를 1~4바이트로 바꾸는 규칙. 영어는 1바이트(ASCII 그대로), 한글은 3바이트. 지금의 기본', 'cp949': '한국 Windows 의 옛 기본 인코딩. 한글 한 글자를 2바이트로. 엑셀 CSV 가 자주 이걸로 저장된다' },
+  pages: [
+    { title: 'ord("A") 는 65 — ASCII 표', html: `<p>글자도 숫자로 저장해요. 「A 는 65, B 는 66 …」 처럼 <b>글자마다 번호를 정한 표</b>만 있으면 돼요. 1960년대 미국에서 만든 표가 [[ASCII]](아스키)예요. 영어 대소문자 · 숫자 · 기호 · 띄어쓰기까지 128개(0~127)라 7비트면 충분해요.</p>
+<pre>print(ord("A"))       # 65\nprint(ord("a"))       # 97\nprint(ord("0"))       # 48\nprint(ord(" "))       # 32\nprint(chr(66))        # B\nprint(chr(65 + 32))   # a</pre>
+<ul><li><code>ord(글자)</code> → 번호, <code>chr(번호)</code> → 글자. 서로 거꾸로예요</li><li>대문자와 소문자는 딱 <b>32</b> 차이예요. 2진수로는 한 비트(<code>0100000</code>)만 달라요</li><li>숫자 글자 <code>"7"</code> 의 번호는 7 이 아니라 55 예요. <code>ord("7") - ord("0")</code> → 7. <code>int("7")</code> 이 속에서 하는 일이 이거예요</li><li>0~31 은 화면에 안 보이는 「조종 글자」 예요. 줄바꿈 <code>"&#92;n"</code> 은 10, 탭 <code>"&#92;t"</code> 은 9</li></ul>
+<p>예제는 눈에 보이는 ASCII 글자(32~126)를 16개씩 표로 찍어요. 왼쪽 숫자가 그 줄 첫 글자의 번호예요.</p>`,
+      example: { code: `for start in [32, 48, 64, 80, 96, 112]:
+    row = []
+    for n in range(start, start + 16):
+        if n < 127:
+            row.append(chr(n))
+    print(start, " ".join(row))
+
+print(ord("7") - ord("0"))
+print(ord("\\n"), ord("\\t"))` } },
+    { title: 'U+AC00 — 유니코드 코드 포인트', html: `<p>ASCII 에는 한글이 없어요. 나라마다 자기 표를 따로 만들다 보니(한국은 [[cp949]], 일본은 Shift-JIS …) 여러 나라 글자를 한 파일에 섞을 수가 없었어요. 그래서 <b>세상 모든 글자에 번호 하나씩</b>을 주기로 한 표가 [[유니코드]]예요. 그 번호를 <b>코드 포인트</b>라고 하고 <code>U+</code> 뒤에 16진수로 적어요.</p>
+<pre>cp = ord("가")\nprint(cp)               # 44032\nprint(hex(cp))          # 0xac00\nprint(f"U+{cp:04X}")    # U+AC00\nprint(chr(cp + 1))      # 각\nprint("&#92;uac00")          # 가 — 코드 포인트로 글자 적기</pre>
+<table class="kb"><tbody><tr><th>글자</th><th>코드 포인트</th><th>10진</th></tr>
+<tr><td>A</td><td>U+0041</td><td>65 — ASCII 와 같은 번호</td></tr>
+<tr><td>é</td><td>U+00E9</td><td>233</td></tr>
+<tr><td>가</td><td>U+AC00</td><td>44032 — 한글 첫 글자</td></tr>
+<tr><td>힣</td><td>U+D7A3</td><td>55203 — 한글 마지막 글자</td></tr>
+<tr><td>😀</td><td>U+1F600</td><td>128512</td></tr></tbody></table>
+<p>한글 「가」~「힣」 11172 글자는 <b>가나다 순으로 줄지어</b> 번호가 붙어 있어요. 그래서 <code>"가" &lt;= ch &lt;= "힣"</code> 으로 한글인지 알 수 있고, <code>sorted</code> 가 한글을 가나다 순으로 줄 세워요. 유니코드의 자리는 <code>U+10FFFF</code> 까지, 110만 개가 넘어요.</p>
+<details class="lp-more"><summary>💡 더 알아보기</summary><p>한글 번호는 식으로 정해져 있어요: (초성 × 21 + 중성) × 28 + 종성 + 44032. 「한」 은 ㅎ(18) · ㅏ(0) · ㄴ(4) 라서 (18 × 21 + 0) × 28 + 4 + 44032 = 54620 = <code>U+D55C</code>.</p></details>`,
+      example: { code: `for ch in ["A", "é", "가", "각", "힣", "😀"]:
+    cp = ord(ch)
+    print(ch, f"U+{cp:04X}", cp)
+
+print("가" <= "한" <= "힣", "가" <= "A" <= "힣")
+print(sorted(["다", "가", "나"]))
+print("\\uac00\\ud55c")` } },
+    { title: '"가".encode() · UTF-8 은 1~4바이트', html: `<p>코드 포인트는 번호일 뿐이에요. 파일에 저장하거나 네트워크로 보내려면 <b>바이트</b>로 바꿔야 해요. 번호를 바이트로 바꾸는 규칙을 인코딩이라고 하고, 지금 거의 모든 곳(웹 · VS Code · 파이썬 소스 파일)의 기본이 [[UTF-8]]이에요.</p>
+<pre>b = "가".encode()         # 괄호를 비우면 "utf-8"\nprint(b)                  # b'&#92;xea&#92;xb0&#92;x80'\nprint(b.hex(" "))         # ea b0 80\nprint(len("가"), len(b))  # 1 3 — 글자 1개, 바이트 3개\nprint(b.decode())         # 가 — 바이트 → 글자</pre>
+<p>UTF-8 은 번호 크기에 따라 <b>1~4바이트</b>를 써요. 첫 바이트의 앞쪽 비트가 「나까지 몇 바이트짜리야」 를 알려 주고, 이어지는 바이트는 늘 <code>10</code> 으로 시작해요.</p>
+<table class="kb"><tbody><tr><th>코드 포인트</th><th>바이트</th><th>비트 모양(x 에 번호를 채움)</th></tr>
+<tr><td>U+0000 ~ U+007F</td><td>1</td><td><code>0xxxxxxx</code> — ASCII 와 똑같음</td></tr>
+<tr><td>U+0080 ~ U+07FF</td><td>2</td><td><code>110xxxxx 10xxxxxx</code></td></tr>
+<tr><td>U+0800 ~ U+FFFF</td><td>3</td><td><code>1110xxxx 10xxxxxx 10xxxxxx</code> — 한글</td></tr>
+<tr><td>U+10000 ~ U+10FFFF</td><td>4</td><td><code>11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</code> — 이모지</td></tr></tbody></table>
+<p>「가」(U+AC00)를 손으로 바꿔 봐요. 3바이트 칸이라 x 자리가 4 + 6 + 6 = 16개예요. 번호를 16자리 2진수로 적고 4 · 6 · 6 자리로 잘라 앞에 <code>1110</code> · <code>10</code> · <code>10</code> 을 붙여요.</p>
+<pre>cp = ord("가")\nbits = f"{cp:016b}"\nprint(bits)                    # 1010110000000000\nparts = ["1110" + bits[:4], "10" + bits[4:10], "10" + bits[10:]]\nprint(parts)                   # ['11101010', '10110000', '10000000']\nfor p in parts:\n    print(f"{int(p, 2):02x}")  # ea, b0, 80</pre>
+<p>규칙대로 만든 <code>ea b0 80</code> 이 <code>"가".encode()</code> 와 똑같아요. 영어는 1바이트 그대로라 <b>ASCII 파일은 그대로 UTF-8 파일</b>이기도 해요. 옛 파일과 잘 맞아서 UTF-8 이 널리 퍼졌어요.</p>`,
+      example: { code: `for ch in ["A", "é", "가", "😀"]:
+    b = ch.encode()
+    print(ch, len(b), "바이트", b.hex(" "))
+
+cp = ord("가")
+bits = f"{cp:016b}"
+parts = ["1110" + bits[:4], "10" + bits[4:10], "10" + bits[10:]]
+print(parts)
+mine = bytes([int(p, 2) for p in parts])
+print(mine, mine == "가".encode())
+print(mine.decode())` } },
+    { title: '깨진 글자 — utf-8 을 cp949 로 읽으면', html: `<p>같은 바이트도 <b>어떤 규칙으로 읽느냐</b>에 따라 다른 글자가 돼요. 쓴 규칙과 읽는 규칙이 다르면 글자가 깨져요. 한국 Windows 의 옛 기본 규칙이 [[cp949]](한글 한 글자 2바이트)라서 자주 만나요.</p>
+<pre>data = "안녕".encode("utf-8")\nprint(data.hex(" "))                            # ec 95 88 eb 85 95\nprint(data.decode("cp949", errors="replace"))   # �븞�뀞\nprint(data.decode("utf-8"))                     # 안녕</pre>
+<ul><li>cp949 는 「두 바이트씩 한 글자」 로 끊어 읽어서 엉뚱한 글자와 <code>�</code>(못 읽은 자리)가 나와요</li><li><code>errors="replace"</code> 가 없으면 <code>UnicodeDecodeError</code> 로 멈춰요</li></ul>
+<p>반대도 있어요. 엑셀이 만든 CSV 는 cp949 로 저장되는 일이 많아서, UTF-8 로 읽으면 첫 바이트부터 멈춰요. 파일을 <code>"rb"</code> 로 열면 글자로 바꾸지 않은 <b>바이트 그대로</b>를 읽을 수 있어요.</p>
+<pre>excel = "이름,점수".encode("cp949")\nwith open("scores.csv", "wb") as f:\n    f.write(excel)\nwith open("scores.csv", "rb") as f:\n    data = f.read()          # 바이트 그대로\nprint(data.hex(" "))         # c0 cc b8 a7 2c c1 a1 bc f6\nprint(data.decode("cp949"))  # 이름,점수 — 맞는 규칙이면 멀쩡</pre>
+<div class="bk-warn"><b>깨진 글자를 저장하면 못 되살려요</b> — 화면의 <code>�</code> 는 「못 읽은 바이트를 버렸다」 는 뜻이에요. 깨진 채로 다시 저장하면 원래 바이트가 사라져요. 깨져 보이면 <b>파일은 그대로 두고, 읽는 규칙(encoding)만 바꿔서</b> 다시 열어요.</div>
+<p>파이썬에서 파일을 열 때 늘 <code>encoding="utf-8"</code> 을 적는 이유가 이거예요. Windows 의 기본이 cp949 라 빼먹으면 Windows 에서만 깨져요. 자세한 함정은 <a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩 · JSON」 ↗</a> 에 있어요.</p>`,
+      example: { code: `data = "안녕".encode("utf-8")
+print(data.hex(" "))
+print(data.decode("cp949", errors="replace"))
+
+excel = "이름,점수".encode("cp949")
+with open("scores.csv", "wb") as f:
+    f.write(excel)
+with open("scores.csv", "rb") as f:
+    raw = f.read()
+try:
+    print(raw.decode("utf-8"))
+except UnicodeDecodeError as e:
+    print("UnicodeDecodeError:", e)
+print(raw.decode("cp949"))
+
+for enc in ["utf-8", "cp949"]:
+    b = "안녕".encode(enc)
+    print(enc, len(b), "바이트")` } },
+  ],
+  summary: ['ord · chr 로 글자 ↔ 번호, ASCII 는 128개 · 유니코드는 모든 글자(U+AC00 = 가)', 'UTF-8 은 글자마다 1~4바이트 — "가".encode() 는 ea b0 80', '깨진 글자는 쓴 규칙과 읽은 규칙이 달라서 — 파일은 두고 encoding 만 바꿔 읽기'] },
+{ id: 'C3', ch: 1, n: 3, title: '음수와 소수', mode: 'text',
+  tutorSummary: '8비트 음수는 2의 보수: -n 은 256 - n(= -n % 256), 비트를 뒤집고 1 더하기, 맨 앞 비트 1 = 음수, -128~127, 덧셈 회로 그대로 뺄셈. n.to_bytes(1, "big", signed=True) · int.from_bytes(…, signed=True), 칸을 넘으면 넘침(127 + 1 → -128). 0.1 + 0.2 는 0.30000000000000004 — 0.1 은 2진수로 끝없는 수라 잘려 담김, math.isclose · round. float 는 64비트 IEEE 754: 부호 1 · 지수 11(+1023) · 가수 52, struct.pack(">d", x) 로 비트 보기, -6.25 = -1.5625 × 2². 돈은 가장 작은 단위의 정수(원 · 센트)나 Decimal("0.1")(글자로!), quantize(ROUND_HALF_UP). 수학은 수학 공간 M1_float.',
+  terms: { '2의 보수': '음수를 비트로 적는 방법. 8비트에서 -n 은 256 - n. 비트를 모두 뒤집고 1 을 더해도 같다. 덧셈 회로로 뺄셈까지 할 수 있다', '넘침': '정해진 비트 칸보다 큰 값이 되어 넘친 자리가 버려지는 것. 8비트 부호 있는 수에서 127 + 1 이 -128 이 된다(overflow)', '부동소수점': '소수를 「1.xxx × 2^지수」 모양으로 담는 방법. 파이썬 float 는 64비트(부호 1 · 지수 11 · 가수 52)' },
+  pages: [
+    { title: '음수는 2의 보수 · signed=True', html: `<p>바이트 하나는 0~255 예요. 음수는 어떻게 담을까요? 컴퓨터는 [[2의 보수]]라는 방법을 써요. 8비트에서 <b>-n 은 256 - n</b> 으로 적어요.</p>
+<pre>print(256 - 1)             # 255 — -1 은 11111111\nprint(f"{256 - 5:08b}")    # 11111011 — -5\nprint(f"{-5 % 256:08b}")   # 11111011 — % 256 도 같은 일</pre>
+<table class="kb"><tbody><tr><th>비트</th><th>부호 없이(0~255)</th><th>2의 보수(-128~127)</th></tr>
+<tr><td><code>00000000</code></td><td>0</td><td>0</td></tr>
+<tr><td><code>00000001</code></td><td>1</td><td>1</td></tr>
+<tr><td><code>01111111</code></td><td>127</td><td>127 — 가장 큰 수</td></tr>
+<tr><td><code>10000000</code></td><td>128</td><td>-128 — 가장 작은 수</td></tr>
+<tr><td><code>11111011</code></td><td>251</td><td>-5</td></tr>
+<tr><td><code>11111111</code></td><td>255</td><td>-1</td></tr></tbody></table>
+<ul><li>맨 앞 비트가 1 이면 음수예요</li><li>손으로 바꾸는 법: <b>비트를 모두 뒤집고 1 을 더해요</b>. 5 = <code>00000101</code> → 뒤집기 <code>11111010</code> → +1 → <code>11111011</code></li><li>좋은 점: 음수도 <b>보통 덧셈 그대로</b> 더해요. <code>00000101</code>(5) + <code>11111011</code>(-5) = <code>1 00000000</code> → 넘친 9번째 비트를 버리면 0. 그래서 CPU 는 뺄셈 회로를 따로 안 만들고 덧셈기로 빼요([[레슨:C6]])</li></ul>
+<p>파이썬은 <code>to_bytes</code> · <code>int.from_bytes</code> 에 <code>signed=True</code> 를 주면 2의 보수로 바꿔요. <code>"big"</code> 은 큰 자리 바이트부터 적는 순서예요(1바이트면 상관없어요).</p>
+<pre>print((-5).to_bytes(1, "big", signed=True))            # b'&#92;xfb'\nprint(int.from_bytes(b"&#92;xfb", "big", signed=True))   # -5\nprint(int.from_bytes(b"&#92;xfb", "big"))                # 251 — signed 가 없으면</pre>
+<p>파이썬의 int 는 크기 제한이 없지만, 파일 · 네트워크 · CPU 안에서는 8 · 16 · 32 · 64비트처럼 칸이 정해져 있어요. 칸을 넘으면 [[넘침]]이 생겨요. 8비트에서 127 + 1 은 128 이 아니라 -128 이 돼요.</p>`,
+      example: { code: `for n in [0, 1, 5, 127, -1, -5, -128]:
+    b = n.to_bytes(1, "big", signed=True)
+    print(f"{n:>5}  {b[0]:08b}  {b.hex()}")
+
+try:
+    (128).to_bytes(1, "big", signed=True)
+except OverflowError as e:
+    print("OverflowError:", e)
+
+x = 127
+raw = bytes([(x + 1) % 256])
+print(x, "+ 1 =", int.from_bytes(raw, "big", signed=True))` } },
+    { title: '0.1 + 0.2 == 0.3 은 False', html: `<pre>print(0.1 + 0.2)          # 0.30000000000000004\nprint(0.1 + 0.2 == 0.3)   # False\nprint(f"{0.1:.20f}")      # 0.10000000000000000555</pre>
+<p>10진수로 1/3 을 적으면 0.3333… 끝이 없죠. 2진수에서는 <b>0.1 이 그래요</b>. 0.0001100110011… 이 끝없이 이어져요. 컴퓨터는 정해진 칸(64비트)에서 잘라 담으니, 0.1 은 사실 「0.1 에 아주 가까운 수」 예요. 그런 수끼리 더하면 작은 오차가 드러나요.</p>
+<ul><li>2진수로 딱 떨어지는 수(0.5 · 0.25 · 0.75 …, 분모가 2 · 4 · 8 …)는 오차가 없어요. <code>0.5 + 0.25 == 0.75</code> 는 True</li><li>그래서 float 는 <code>==</code> 대신 「충분히 가까운가」 로 비교해요: <code>math.isclose(0.1 + 0.2, 0.3)</code> 은 True</li><li>보여 줄 때는 반올림해요: <code>round(0.1 + 0.2, 2)</code> 는 0.3</li></ul>
+<p>예제의 아래쪽은 0.1 을 2진 소수로 바꿔요. 2를 곱해서 1 을 넘으면 그 자리가 1 이에요(10진 소수를 10 곱해 가며 한 자리씩 꺼내는 것과 같아요). <code>0011</code> 이 끝없이 되풀이돼요.</p>
+<p>왜 끝이 없는지, float 점들이 얼마나 촘촘한지는 <a href="../math/#lesson/M1_float" target="_blank" rel="noopener">수학 공간 「컴퓨터가 소수를 못 담는 이유」 ↗</a> 에서 그림으로 볼 수 있어요.</p>`,
+      example: { code: `import math
+
+print(0.1 + 0.2, 0.1 + 0.2 == 0.3)
+print(f"{0.1:.20f}")
+print(0.5 + 0.25 == 0.75)
+print(math.isclose(0.1 + 0.2, 0.3), round(0.1 + 0.2, 2))
+
+total = 0
+for i in range(10):
+    total += 0.1
+print("0.1 을 10번:", total)
+
+x = 0.1
+digits = ""
+for i in range(24):
+    x = x * 2
+    if x >= 1:
+        digits += "1"
+        x = x - 1
+    else:
+        digits += "0"
+print("0.1 = 0." + digits + "…(2진)")` } },
+    { title: 'struct.pack 으로 float 비트 보기', html: `<p>파이썬의 float 는 64비트 [[부동소수점]](IEEE 754 라는 국제 규칙)이에요. 10진수의 「1.5 × 10³」 처럼, <b>2진수로 「1.xxx × 2^지수」</b> 모양으로 담아요. 64칸을 셋으로 나눠 써요.</p>
+<table class="kb"><tbody><tr><th>칸</th><th>비트 수</th><th>담는 것</th></tr>
+<tr><td>부호</td><td>1</td><td>0 = 양수, 1 = 음수</td></tr>
+<tr><td>지수</td><td>11</td><td>지수 + 1023 (음수 지수도 담으려고 1023 을 더해 둠)</td></tr>
+<tr><td>가수</td><td>52</td><td>「1.」 뒤의 2진 숫자들</td></tr></tbody></table>
+<p><code>struct.pack("&gt;d", x)</code> 는 float 를 그 8바이트로 바꿔 줘요. <code>d</code> 는 64비트 float, <code>&gt;</code> 는 큰 자리부터예요. 그 바이트를 정수로 읽어 64자리 2진수로 찍으면 칸이 보여요.</p>
+<pre>import struct\n\nraw = struct.pack("&gt;d", -6.25)\nprint(raw.hex())        # c019000000000000\nn = int.from_bytes(raw, "big")\nbits = f"{n:064b}"\nprint(bits[0], bits[1:12], bits[12:20])   # 1 10000000001 10010000</pre>
+<table class="kb"><tbody><tr><th>칸</th><th>비트</th><th>뜻</th></tr>
+<tr><td>부호</td><td><code>1</code></td><td>음수</td></tr>
+<tr><td>지수</td><td><code>10000000001</code> = 1025</td><td>1025 - 1023 = 2 → × 2²</td></tr>
+<tr><td>가수</td><td><code>1001000…</code></td><td>1.1001(2진) = 1 + 1/2 + 1/16 = 1.5625</td></tr></tbody></table>
+<p>모으면 -1 × 1.5625 × 4 = <b>-6.25</b>. 가수가 52비트뿐이라 10진수로 15~16자리까지만 정확해요. 그보다 긴 수는 잘려요. <code>0.1 + 0.2</code> 의 오차가 17번째 자리에 나온 이유예요.</p>
+<pre>print(2 ** 53 + 1.0)   # 9007199254740992.0 — 더한 1 이 사라졌어요</pre>`,
+      example: { code: `import struct
+
+def float_bits(x):
+    raw = struct.pack(">d", x)
+    n = int.from_bytes(raw, "big")
+    bits = f"{n:064b}"
+    return bits[0], bits[1:12], bits[12:]
+
+for x in [1.0, -6.25, 0.1]:
+    s, e, m = float_bits(x)
+    print(x, "부호", s, "지수", e, "=", int(e, 2) - 1023, "가수", m[:12] + "…")
+
+print(2 ** 53 + 1.0)` } },
+    { title: '돈은 정수(원) · Decimal("0.1")', html: `<p>돈 계산에서 0.30000000000000004 는 곤란해요. 방법이 두 가지 있어요.</p>
+<ol><li><b>가장 작은 단위의 정수로</b> 세요. 원은 원래 정수, 달러는 센트(1/100 달러)로. 정수 덧셈에는 오차가 없어요</li><li><b><code>decimal</code> 모듈</b>로 10진수 그대로 계산해요. 꼭 <b>글자로</b> 만들어요. <code>Decimal(0.1)</code> 은 이미 틀린 float 를 그대로 옮겨 와요</li></ol>
+<pre>from decimal import Decimal\n\nprint(Decimal("0.1") + Decimal("0.2"))   # 0.3\nprint(Decimal("0.1") + Decimal("0.2") == Decimal("0.3"))   # True\nprint(Decimal(0.1))   # 0.1000000000000000055511151231257827021181583404541015625</pre>
+<pre>prices = [19.99, 5.01, 0.1, 0.2]   # 달러\nprint(sum(prices))                 # 25.299999999999997\ncents = [1999, 501, 10, 20]        # 센트\ntotal = sum(cents)\nprint(total // 100, total % 100)   # 25 30 — 25달러 30센트</pre>
+<ul><li>나누기 · 이자처럼 가장 작은 단위 밑으로 떨어지면 <b>언제 · 어떻게 반올림할지</b>를 정해야 해요. <code>quantize(Decimal("1"), rounding=ROUND_HALF_UP)</code> 는 「1 의 자리까지, 5 이상 올림」</li><li>파이썬의 <code>round(2.5)</code> 는 3 이 아니라 2 예요(짝수 쪽으로). 돈은 규칙을 직접 정하는 quantize 가 안전해요</li><li>float 는 과학 계산 · 그래픽 · 게임처럼 「아주 조금 틀려도 되고 빨라야 하는」 곳에 써요</li></ul>`,
+      example: { code: `from decimal import Decimal, ROUND_HALF_UP
+
+prices = [19.99, 5.01, 0.1, 0.2]
+print("float:", sum(prices))
+
+cents = [1999, 501, 10, 20]
+total = sum(cents)
+print("센트:", total, "→", total // 100, "달러", total % 100, "센트")
+
+d = [Decimal("19.99"), Decimal("5.01"), Decimal("0.1"), Decimal("0.2")]
+print("Decimal:", sum(d))
+
+each = Decimal("10000") / 3
+print("1만 원을 셋이:", each)
+won = each.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+print("원 단위로:", won)
+print(round(2.5), round(3.5))` } },
+  ],
+  summary: ['음수는 2의 보수 — 8비트에서 -n 은 256 - n, signed=True', '0.1 + 0.2 는 딱 0.3 이 아님 — float 는 부호 · 지수 · 가수 64비트', '돈은 정수(원 · 센트)나 Decimal("글자")'] },
+{ id: 'C4', ch: 1, n: 4, title: '그림과 소리도 숫자', mode: 'text',
+  tutorSummary: '픽셀 = 빨강 · 초록 · 파랑 세 숫자(0~255, 3바이트), 색 코드 "#ff8800" 은 16진 두 자리씩(int(code[1:3], 16)), 밝기 = 0.299R + 0.587G + 0.114B. 이미지 용량 = 가로 × 세로 × 3바이트(1920×1080 은 약 5.9MiB), 압축: 무손실(PNG · zip — 되풀이 줄이기, RLE, zlib)과 손실(JPG · MP3). 흑백 그림 = 밝기 숫자의 2차원 리스트 img[y][x], 밝기를 글자 " .:-=+*#%@" 로 찍기. 소리 = 1초에 44100 번 잰 16비트 숫자(샘플링 빈도 · 비트 깊이), math.sin 으로 440Hz, wave 모듈로 .wav 저장(머리말 44바이트 + 샘플 × 2바이트), to_bytes(2, "little", signed=True).',
+  terms: { '픽셀': '화면 · 그림을 이루는 아주 작은 점 하나. 보통 빨강 · 초록 · 파랑 세 숫자(각 0~255)로 색을 정한다', '압축': '같은 내용을 더 적은 바이트로 적는 것. 풀면 똑같아지는 무손실(PNG · zip)과, 덜 중요한 부분을 버리는 손실(JPG · MP3)이 있다', 'RLE': '같은 값이 몇 번 이어지는지 세어 적는 가장 쉬운 압축(run-length encoding). 흰 점 12개 → (흰, 12)', '샘플': '소리의 높이(공기 압력)를 한 번 잰 숫자. 1초에 몇 번 재나가 샘플링 빈도, 몇 비트로 적나가 비트 깊이' },
+  pages: [
+    { title: '픽셀 = RGB · "#ff8800"', html: `<p>화면은 아주 작은 점, [[픽셀]]이 바둑판처럼 모인 거예요. 픽셀 하나는 빛의 세 가지 색 <b>빨강(R) · 초록(G) · 파랑(B)</b> 을 얼마나 켤지 0~255 숫자 셋으로 정해요. 한 색에 1바이트씩, 픽셀 하나에 3바이트예요.</p>
+<table class="kb"><tbody><tr><th>색</th><th>(R, G, B)</th><th>색 코드</th></tr>
+<tr><td>검정</td><td>(0, 0, 0)</td><td><code>#000000</code> — 다 끔</td></tr>
+<tr><td>흰색</td><td>(255, 255, 255)</td><td><code>#ffffff</code> — 다 켬</td></tr>
+<tr><td>빨강</td><td>(255, 0, 0)</td><td><code>#ff0000</code></td></tr>
+<tr><td>주황</td><td>(255, 136, 0)</td><td><code>#ff8800</code></td></tr>
+<tr><td>회색</td><td>(128, 128, 128)</td><td><code>#808080</code> — 셋이 같으면 회색</td></tr></tbody></table>
+<p>웹 · 그림 프로그램의 색 코드 <code>#ff8800</code> 은 세 바이트를 16진수 두 자리씩 붙여 쓴 거예요([[레슨:C1]]).</p>
+<pre>code = "#ff8800"\nr = int(code[1:3], 16)\ng = int(code[3:5], 16)\nb = int(code[5:7], 16)\nprint(r, g, b)                      # 255 136 0\nprint(f"#{r:02x}{g:02x}{b:02x}")    # #ff8800</pre>
+<p>빛이라서 셋 다 켜면 흰색이에요(물감과 반대). 사람 눈은 초록을 가장 밝게 느껴서, 색을 <b>밝기 하나</b>로 줄일 때는 <code>0.299 × R + 0.587 × G + 0.114 × B</code> 로 섞어요. 흑백 사진이 이렇게 만들어져요.</p>`,
+      example: { code: `colors = {"검정": "#000000", "흰색": "#ffffff", "주황": "#ff8800", "하늘": "#87ceeb"}
+for name, code in colors.items():
+    r = int(code[1:3], 16)
+    g = int(code[3:5], 16)
+    b = int(code[5:7], 16)
+    gray = round(0.299 * r + 0.587 * g + 0.114 * b)
+    print(name, code, (r, g, b), "밝기", gray)
+
+r, g, b = 255, 136, 0
+print(f"#{r:02x}{g:02x}{b:02x}")` } },
+    { title: '가로 × 세로 × 3 — 이미지 용량 · 압축', html: `<pre>w, h = 1920, 1080\nsize = w * h * 3\nprint(size)                       # 6220800\nprint(round(size / 2 ** 20, 1))   # 5.9 — MiB</pre>
+<p>Full HD 화면 한 장이 약 6MB 예요. 1초에 60장이면 356MiB, 2시간 영화면 2.4TiB 가 넘어요. 휴대폰 사진(4000 × 3000)은 한 장에 34MiB 인데 실제 jpg 파일은 3~5MB 쯤이죠. <b>[[압축]]</b> 덕분이에요.</p>
+<ul><li><b>무손실 압축</b>(PNG · zip): 되풀이를 줄여 적어요. 흰 점 1000개를 「흰색 × 1000」 으로. 풀면 원래와 <b>똑같아요</b>. 글 · 프로그램 · 스크린숏에 써요</li><li><b>손실 압축</b>(JPG · MP3 · 동영상): 사람 눈 · 귀가 잘 못 느끼는 부분을 버려요. 훨씬 작아지지만 원래대로 못 돌아가요. 사진 · 음악 · 영상에 써요</li></ul>
+<p>되풀이 줄이기의 가장 쉬운 꼴이 같은 값이 몇 번 이어지나 세기, [[RLE]]예요. 파이썬에 든 <code>zlib</code>(zip · PNG 가 쓰는 방식)으로 진짜 압축도 해 볼 수 있어요. 같은 값만 이어진 흰 그림은 아주 작아지고, <code>zlib.decompress</code> 로 풀면 원래와 똑같아요.</p>`,
+      example: { code: `import zlib
+
+row = [255] * 12 + [0] * 3 + [255] * 5
+runs = []
+for v in row:
+    if runs and runs[-1][0] == v:
+        runs[-1][1] += 1
+    else:
+        runs.append([v, 1])
+print(len(row), "칸 →", runs)
+
+white = bytes([255, 255, 255]) * 10000
+small = zlib.compress(white)
+print("흰 픽셀 1만 개:", len(white), "→", len(small), "바이트")
+print("풀면 똑같나:", zlib.decompress(small) == white)
+
+w, h = 4000, 3000
+print("휴대폰 사진:", w * h * 3, "바이트 =", round(w * h * 3 / 2 ** 20, 1), "MiB")` } },
+    { title: '흑백 그림 = 숫자 표 img[y][x]', html: `<p>흑백 그림은 픽셀마다 밝기 숫자 하나(0 = 검정 ~ 255 = 흰색)예요. 그러니 그림은 그냥 <b>숫자 표</b>, 파이썬으로는 리스트의 리스트예요.</p>
+<pre>img = [\n    [0, 0, 255, 0, 0],\n    [0, 255, 255, 255, 0],\n    [255, 255, 255, 255, 255],\n]\nprint(len(img[0]), "×", len(img))   # 5 × 3 — 가로 × 세로\nprint(img[1][2])                    # 255 — 1번 줄의 2번 칸</pre>
+<ul><li>좌표는 <code>img[y][x]</code> — 줄(세로 위치)이 먼저, 칸(가로 위치)이 나중이에요</li><li>그림 프로그램 대부분이 <b>왼쪽 위가 (0, 0)</b> 이고, 아래로 갈수록 y 가 커져요(수학 그래프와 반대)</li><li>색 그림은 칸마다 숫자 하나 대신 <code>(R, G, B)</code> 세 개가 들어 있어요</li></ul>
+<p>밝기를 글자로 바꿔 찍으면 터미널에서 그림이 보여요. 비어 보이는 글자부터 꽉 찬 글자까지 늘어놓은 줄 <code>" .:-=+*#%@"</code>(10글자)에서, 밝기 0~255 를 0~9 번 글자로 골라요: <code>chars[v * 9 // 255]</code>. 어두운 바탕의 터미널에서는 밝은 곳이 꽉 찬 글자로 보여요.</p>`,
+      example: { code: `img = [
+    [0,   0,   200, 200, 200, 200, 0,   0],
+    [0,   200, 0,   0,   0,   0,   200, 0],
+    [200, 0,   255, 0,   0,   255, 0,   200],
+    [200, 0,   0,   0,   0,   0,   0,   200],
+    [200, 0,   255, 0,   0,   255, 0,   200],
+    [200, 0,   0,   255, 255, 0,   0,   200],
+    [0,   200, 0,   0,   0,   0,   200, 0],
+    [0,   0,   200, 200, 200, 200, 0,   0],
+]
+chars = " .:-=+*#%@"
+for row in img:
+    line = ""
+    for v in row:
+        line += chars[v * 9 // 255] * 2
+    print(line)
+
+print("0번 ~ 9번 글자:", repr(chars))` } },
+    { title: 'wave 로 1초 삐 — 샘플링 · 비트 깊이', html: `<p>소리는 공기가 떨리는 거예요. 마이크는 그 떨림(공기 압력)을 <b>1초에 수만 번 재서 숫자로</b> 적어요. 한 번 잰 값이 [[샘플]], 1초에 몇 번 재나가 <b>샘플링 빈도</b>, 한 번을 몇 비트로 적나가 <b>비트 깊이</b>예요.</p>
+<table class="kb"><tbody><tr><th>무엇</th><th>음악 CD · 보통 wav</th><th>옛 전화</th></tr>
+<tr><td>샘플링 빈도</td><td>1초에 44100 번(44.1kHz)</td><td>1초에 8000 번</td></tr>
+<tr><td>비트 깊이</td><td>16비트(-32768 ~ 32767)</td><td>8비트</td></tr>
+<tr><td>채널</td><td>2(왼쪽 · 오른쪽)</td><td>1</td></tr>
+<tr><td>1분 용량</td><td>44100 × 2바이트 × 2 × 60 ≈ 10.6MB</td><td>8000 × 1 × 1 × 60 = 480KB</td></tr></tbody></table>
+<p>「라」 음(440Hz)은 1초에 440번 떨려요. <code>math.sin</code> 으로 그 떨림을 샘플마다 계산하면 -1 ~ 1 사이 값이 나오고, 16비트 정수로 늘려서 저장해요.</p>
+<pre>import math\n\nfor i in range(4):\n    t = i / 44100                         # i 번째 샘플의 시각(초)\n    v = math.sin(2 * math.pi * 440 * t)   # -1 ~ 1\n    print(i, round(v * 32767))</pre>
+<p>예제는 이 샘플 44100개를 <code>wave</code> 모듈로 <code>beep.wav</code> 에 저장해요. 샘플 하나는 [[레슨:C3]] 의 <code>to_bytes(2, "little", signed=True)</code> 로 2바이트가 돼요(wav 는 작은 자리 바이트부터 적어요, <code>"little"</code>). 파일 크기는 머리말 44바이트 + 44100 × 2바이트예요.</p>
+<p>VS Code 왼쪽 탐색기에서 <code>beep.wav</code> 를 오른쪽 클릭 → 「파일 탐색기에 표시」 → 더블 클릭하면 1초 동안 「삐—」 소리가 나요(소리를 줄이고 들어 보세요). <code>FREQ</code> 를 바꿔 다시 돌리면 음 높이가 바뀌어요.</p>
+<p>다시 읽을 때는 <code>wave.open("beep.wav", "rb")</code> 로 열고 <code>w.getnframes()</code>(샘플 수) · <code>w.getframerate()</code>(1초에 몇 번)를 물어봐요. 둘을 나누면 길이(초)예요.</p>`,
+      example: { code: `import math
+import os
+import wave
+
+RATE = 44100      # 1초에 44100 번
+FREQ = 440        # 「라」 — 1초에 440 번 떨림
+samples = []
+for i in range(RATE):
+    t = i / RATE
+    v = math.sin(2 * math.pi * FREQ * t)
+    samples.append(round(v * 0.3 * 32767))   # 0.3 = 소리 크기 30%
+
+data = bytearray()
+for s in samples:
+    data += s.to_bytes(2, "little", signed=True)
+
+with wave.open("beep.wav", "wb") as w:
+    w.setnchannels(1)       # 채널 1개(모노)
+    w.setsampwidth(2)       # 샘플 하나 2바이트 = 16비트
+    w.setframerate(RATE)
+    w.writeframes(data)
+
+print("샘플", len(samples), "개 · 앞 4개:", samples[:4])
+print("beep.wav", os.path.getsize("beep.wav"), "바이트")
+
+with wave.open("beep.wav", "rb") as w:
+    n = w.getnframes()
+    rate = w.getframerate()
+print("다시 읽기:", n, "샘플 ÷", rate, "=", n / rate, "초")` } },
+  ],
+  summary: ['픽셀 = (R, G, B) 세 숫자, "#ff8800" 은 16진 두 자리씩', '이미지 용량 = 가로 × 세로 × 3바이트 — 그래서 압축(무손실 · 손실)', '소리는 1초에 44100 번 잰 16비트 숫자 — wave 로 저장'] },
+{ id: 'CB1', ch: 1, boss: true, title: '만들어 보기: 나만의 인코더', mode: 'text',
+  tutorSummary: '챕터 1 묶기 — 글자 → UTF-8 바이트 → 16진 · 2진 덤프 → 다시 글자, 바이트 수 · 글자 수 비교 표(utf-8 · utf-16 · cp949), 명령(enc · dec · bin · count · 끝)으로 도는 인코더 프로그램. ord · f"U+{cp:04X}" · encode · hex(" ") · f"{b:08b}" · bytes.fromhex · decode · UnicodeDecodeError.', pages: [], summary: [] },
 { id: 'C5', ch: 2, n: 5, title: '논리 게이트', mode: 'text', draft: true,
   tutorSummary: 'AND · OR · NOT · XOR 진리표, 파이썬 함수로 게이트, NAND 하나로 다 만들기.',
   pages: CS_TODO('진리표 · 함수로 게이트 · NAND'), summary: ["게이트는 0/1 을 받아 0/1", "진리표로 모든 경우", "NAND 하나로 다 만든다"] },
