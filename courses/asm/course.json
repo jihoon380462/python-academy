@@ -1,0 +1,1 @@
+{ "id": "asm", "name": "어셈블리어", "icon": "🧩", "desc": "리눅스 교과서의 우분투 VM 에서 x86-64 NASM 으로 레지스터·시스템 콜·스택·함수를 직접 써 보고, C 와 섞어 컴파일러가 만든 코드를 읽는 교과서", "runner": "none", "mapColor": "#6d4c41", "mascotGear": "headset" }
