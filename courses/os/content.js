@@ -151,7 +151,7 @@ print("일하는 중", flush=True)
 os.kill(os.getpid(), signal.SIGINT)
 print("여기는 안 와요")</pre>
 <ul><li>처리 함수는 <code>(signum, frame)</code> 두 개를 받아요(받은 시그널 번호 · 그때 실행 중이던 자리).</li><li><code>os.kill(PID, 시그널)</code> 은 시그널을 <b>보내는</b> 함수예요. 이름과 달리 꼭 죽이는 건 아니에요. 여기서는 연습으로 <b>나에게</b> Ctrl+C 를 보냈어요 — 터미널에서 직접 <kbd>Ctrl</kbd>+<kbd>C</kbd> 를 눌러도 똑같아요.</li><li>실행하면 <code>일하는 중</code> 다음에 <code>정리 중… 저장하고 끝낼게요</code> 가 나오고 끝나요. 「여기는 안 와요」 는 안 나와요.</li></ul>
-<p>파이썬은 처리 함수를 안 걸어도 SIGINT 를 <code>KeyboardInterrupt</code> 예외로 바꿔 줘요(Ctrl+C 를 누르면 보이던 그 빨간 글). <code>signal.signal</code> 은 그걸 내가 정한 동작으로 바꾸는 거예요.</p>` + OS_DATE,
+<p>파이썬은 처리 함수를 안 걸어도 SIGINT 를 <code>KeyboardInterrupt</code> 예외로 바꿔 줘요(Ctrl+C 를 누르면 보이던 그 빨간 글). <code>signal.signal</code> 은 그걸 내가 정한 동작으로 바꾸는 거예요. 처리 함수 없이 받고 싶으면 <code>try: … except KeyboardInterrupt:</code> 로 그 예외를 잡아도 돼요.</p>` + OS_DATE,
       example: { code: 'import os, signal, sys\ndef on_int(signum, frame):\n    print("정리 중… 저장하고 끝낼게요")\n    sys.exit(0)\nsignal.signal(signal.SIGINT, on_int)\nprint("일하는 중", flush=True)\nos.kill(os.getpid(), signal.SIGINT)\nprint("여기는 안 와요")' } },
     { title: '자식에게 SIGTERM 보내기 · SIG_IGN 과 SIG_DFL', html: `<p>부모는 자식의 PID 를 알아서 시그널을 보낼 수 있어요. 시그널로 끝난 자식은 종료 코드가 <b>음수</b>로 나와요(<code>-15</code> = SIGTERM 으로 끝남).</p>
 <pre class="code">import os, signal, time
@@ -223,12 +223,200 @@ os.wait()</pre>
 
 { id: 'KB1', ch: 1, boss: true, title: '보스: 내 미니 셸 1단계', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 1 종합. mysh.py: 한 줄 읽기 → 빈 줄 건너뛰기 · exit · cd(os.chdir, 셸이 직접) → fork · 자식은 SIG_DFL 로 되돌리고 execvp(없으면 127) · 부모는 waitpid 로 종료 코드, 0 이 아니면 [종료 코드 n]. 셸은 SIGINT 무시. 터미널일 때만 프롬프트.' },
 
-// ================= 챕터 2 CPU 나눠 쓰기와 동기화 (다음 업데이트) =================
-{ id: 'K6', ch: 2, n: 6, title: '스케줄링: 누가 먼저 CPU 를 쓰나', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '문맥 교환 · 준비 큐 · FCFS · SJF · 라운드 로빈(간트 차트 그림) · 리눅스 EEVDF · nice.' },
-{ id: 'K7', ch: 2, n: 7, title: '스레드: 한 프로세스 안의 여러 일꾼', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'threading.Thread · start · join · 주소 공간 공유 · GIL 맛보기.' },
-{ id: 'K8', ch: 2, n: 8, title: '경쟁 상태와 락', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '읽고-더하고-쓰기 사이에 틈 → 늘 틀림 → threading.Lock · with lock.' },
-{ id: 'K9', ch: 2, n: 9, title: '교착 상태와 기다리는 줄', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '락 두 개 반대 순서 → 교착(그림) · 같은 순서 · timeout · queue.Queue 생산자-소비자.' },
-{ id: 'KB2', ch: 2, boss: true, draft: true, title: '보스: 다운로드 대기열', mode: 'text', pages: [], summary: [], tutorSummary: '일꾼 스레드 3개가 가짜 다운로드 12개를 나눠 처리 · 진행 n/12 를 락으로 · Ctrl+C 로 깔끔하게.' },
+// ================= 챕터 2 CPU 나눠 쓰기와 동기화 =================
+{ id: 'K6', ch: 2, n: 6, title: '스케줄링: 누가 먼저 CPU 를 쓰나', mode: 'text', tutorSummary: 'CPU 코어 하나는 한 번에 하나만 — 커널이 아주 짧게 번갈아 줘서 동시에 도는 것처럼 보임(문맥 교환, /proc/self/status 의 voluntary_ctxt_switches). FCFS · SJF · 라운드 로빈 간트 차트와 평균 대기 시간. 리눅스는 EEVDF(커널 6.6~): 공평하게 + nice 로 몫 조절(nice -n 10 · renice · os.nice).',
+  pages: [
+    { title: '문맥 교환: 번갈아 쓰니까 동시에 도는 것처럼', html: `<p>CPU 코어 하나는 한 번에 <b>한 가지 일</b>만 해요(<code>nproc</code> 이 코어 수 — VM 은 4). 그런데 프로세스는 수백 개예요. 커널은 코어를 아주 짧게(수 밀리초) 이 프로세스 저 프로세스에 번갈아 줘서, 사람 눈에는 <b>동시에 도는 것처럼</b> 보이게 해요.</p>
+<ul><li><b>준비 큐</b>: CPU 를 쓸 차례를 기다리는 프로세스들의 줄(상태 R). 무언가를 기다리며 자는 프로세스(상태 S)는 줄에 없어요.</li><li><b>문맥 교환</b>: 지금 하던 프로세스의 자리(어디까지 했는지 · 레지스터 값)를 저장하고 다음 프로세스의 자리를 불러오는 일. 공짜가 아니라서 너무 자주 하면 손해예요.</li><li><b>스케줄러</b>: 줄에서 다음에 누구를 고를지 정하는 커널의 부분 — 이 레슨의 주인공.</li></ul>
+<p><code>/proc/self/status</code> 의 <code>voluntary_ctxt_switches</code> 는 「스스로 CPU 를 내놓은 횟수」(잠들기 · 입력 기다리기), <code>nonvoluntary_ctxt_switches</code> 는 「차례가 끝나 빼앗긴 횟수」 예요.</p>
+<pre class="code">import time
+def switches():
+    d = {}
+    with open("/proc/self/status") as f:
+        for line in f:
+            key, value = line.split(":", 1)
+            d[key] = int(value) if value.strip().isdigit() else value.strip()
+    return d["voluntary_ctxt_switches"]
+a = switches()
+time.sleep(0.1)
+b = switches()
+print("잠들면 스스로 내놓은 횟수가 늘었나요?", b > a)</pre>` + OS_DATE,
+      example: { code: 'import time\ndef switches():\n    d = {}\n    with open("/proc/self/status") as f:\n        for line in f:\n            key, value = line.split(":", 1)\n            d[key] = int(value) if value.strip().isdigit() else value.strip()\n    return d["voluntary_ctxt_switches"]\na = switches()\ntime.sleep(0.1)\nb = switches()\nprint("잠들면 스스로 내놓은 횟수가 늘었나요?", b > a)' } },
+    { title: '간트 차트: 먼저 온 순 · 짧은 것 먼저 · 번갈아', figure: { kind: 'gantt', jobs: [{ n: 'A', at: 0, bt: 5 }, { n: 'B', at: 1, bt: 3 }, { n: 'C', at: 2, bt: 1 }, { n: 'D', at: 3, bt: 2 }], height: 230, mheight: 245, note: '같은 작업 4개를 세 가지 방법으로' },
+      params: [{ id: 'q', label: '번갈아 쓰는 시간 q', min: 1, max: 6, step: 1, default: 2 }],
+      observe: ['평균 대기가 가장 작은 줄은 어느 것인가요? 왜 그럴까요?', 'q 를 1 → 6 으로 키우면 「번갈아」 줄은 어느 줄과 똑같아지나요?', '짧은 것 먼저(SJF)에서 A 처럼 긴 작업 뒤에 짧은 작업이 계속 오면 어떻게 될까요?'],
+      html: `<p>위 그림은 <b>간트 차트</b>예요. 가로가 시간, 칸 하나가 「그 시간에 CPU 를 쓴 작업」 이에요. 작업은 A(0에 와서 5만큼) · B(1, 3) · C(2, 1) · D(3, 2).</p>
+<table class="kb"><tbody><tr><td><b>먼저 온 순</b> (FCFS)</td><td>줄 선 순서대로 끝까지. 간단하지만 긴 작업 뒤의 짧은 작업이 오래 기다려요</td></tr><tr><td><b>짧은 것 먼저</b> (SJF)</td><td>기다리는 것 중 가장 짧은 것부터. 평균 대기가 가장 작아요. 하지만 실제 커널은 「얼마나 걸릴지」 를 미리 모르고, 긴 작업은 짧은 게 계속 오면 굶을 수 있어요</td></tr><tr><td><b>번갈아</b> (라운드 로빈, RR)</td><td>q 만큼씩 돌아가며. 다 못 끝내면 줄 맨 뒤로. 모두가 금방 차례를 받아서 화면이 멈추지 않아요(대화형 프로그램에 좋아요)</td></tr></tbody></table>
+<p><b>대기 시간</b> = 끝난 시각 − 온 시각 − 실행 시간(일은 안 하고 줄만 선 시간). q 가 너무 작으면 문맥 교환이 많아져 손해, 너무 크면 먼저 온 순과 같아져요.</p>
+<p>코드로 옮기면: 먼저 온 순은 <code>t = max(t, at) + bt</code>(앞 작업이 끝난 때와 이 작업이 온 때 중 늦은 때부터 시작). 번갈아는 줄(<code>from collections import deque</code>)을 두고 <code>line.popleft()</code> 로 앞에서 꺼내 q 만큼 하고, 남았으면 <code>line.append(name)</code> 로 뒤에 넣어요.</p>` + OS_DATE },
+    { title: '리눅스의 스케줄러와 nice', html: `<p>리눅스는 위의 어느 하나도 그대로 쓰지 않아요. 지금 커널(6.6~)의 기본 스케줄러는 <b>EEVDF</b> 예요. 아주 거칠게 말하면 <b>「지금까지 덜 받은 프로세스에게 먼저, 그중 마감이 이른 것부터」</b> — 번갈아 주되 공평하게 맞춰 가는 방식이에요.</p>
+<p>공평의 「몫」 은 <b>nice 값</b>으로 조절해요. <b>-20(가장 많이) ~ 19(가장 적게)</b>, 기본은 0. 「nice(착하다)」 가 클수록 남에게 양보해요.</p>
+<table class="kb"><tbody><tr><td><code>nice -n 10 python3 busy.py &amp;</code></td><td>nice 10 으로 실행(양보하는 쪽)</td></tr><tr><td><code>ps -o pid,ni,cmd</code></td><td>NI 칸이 nice 값</td></tr><tr><td><code>renice -n 15 -p PID</code></td><td>도는 중에 바꾸기. 값을 <b>낮추는</b>(더 달라는) 건 <code>sudo</code> 가 필요해요</td></tr><tr><td><code>os.nice(5)</code></td><td>파이썬에서 내 nice 를 5 올리고 새 값을 돌려줘요. <code>os.nice(0)</code> 은 지금 값 보기</td></tr></tbody></table>
+<pre class="code">import os
+before = os.nice(0)
+after = os.nice(5)
+print("nice 가 5 올랐나요?", after - before == 5)</pre>
+<p>CPU 가 남으면 nice 와 상관없이 다 받아요. 차이는 <b>서로 다툴 때</b>만 보여요 — 「만들어 보기」 에서 코어 하나에 둘을 묶어 직접 봐요.</p>` + OS_DATE,
+      example: { code: 'import os\nbefore = os.nice(0)\nafter = os.nice(5)\nprint("nice 가 5 올랐나요?", after - before == 5)' } },
+  ],
+  summary: ['코어 하나는 한 번에 하나 — 커널이 번갈아 줌(문맥 교환 · 준비 큐)', '간트 차트: FCFS · SJF(평균 대기 최소 · 굶음) · 라운드 로빈(q) — 대기 = 끝 − 도착 − 실행', '리눅스 EEVDF: 공평하게 + nice(-20~19, 기본 0) 로 몫 조절 · nice -n · renice · os.nice'] },
+
+{ id: 'K7', ch: 2, n: 7, title: '스레드: 한 프로세스 안의 여러 일꾼', mode: 'text', tutorSummary: '스레드 = 한 프로세스 안의 여러 일꾼, 메모리를 같이 씀(fork 와 반대). threading.Thread(target=함수, args=(…)) · start() · join(). /proc/self/status 의 Threads. CPython 의 GIL: 파이썬 코드는 한 번에 한 스레드만 → 기다리기(sleep·입출력)는 겹쳐서 빨라지고 계산은 안 빨라짐.',
+  pages: [
+    { title: '프로세스 vs 스레드: 메모리를 같이 써요', html: `<p>레슨 2 에서 <code>fork</code> 한 자식은 메모리가 <b>복사본</b>이라 money 를 바꿔도 부모는 그대로였어요. <b>스레드</b>는 반대예요. 한 프로세스 안에서 일꾼을 여럿 두는 것이라 <b>메모리를 같이 써요</b>.</p>
+<pre class="code">import threading
+money = 100
+def spend():
+    global money
+    money -= 30
+t = threading.Thread(target=spend)
+t.start()
+t.join()
+print("main 이 본 money:", money)</pre>
+<p>실행하면 <code>main 이 본 money: 70</code> — 일꾼이 바꾼 값이 그대로 보여요.</p>
+<table class="kb"><tbody><tr><td></td><td><b>프로세스(fork)</b> · <b>스레드</b></td></tr><tr><td>메모리</td><td>따로(복사본) · <b>같이</b></td></tr><tr><td>만들기</td><td>무거움(통째 복사) · 가벼움</td></tr><tr><td>하나가 죽으면</td><td>나머지는 멀쩡 · 프로세스 전체가 같이 위험</td></tr><tr><td>주고받기</td><td>종료 코드 · 파이프 · 파일 · 그냥 변수(대신 조심 — 레슨 8)</td></tr></tbody></table>` + OS_DATE,
+      example: { code: 'import threading\nmoney = 100\ndef spend():\n    global money\n    money -= 30\nt = threading.Thread(target=spend)\nt.start()\nt.join()\nprint("main 이 본 money:", money)' } },
+    { title: 'threading.Thread · start · join · Threads:', html: `<table class="kb"><tbody><tr><td><code>t = threading.Thread(target=함수, args=(값,))</code></td><td>일꾼 만들기(아직 안 움직여요). <code>args</code> 는 튜플 — 값이 하나면 <code>(값,)</code></td></tr><tr><td><code>t.start()</code></td><td>일 시작 — 이 줄은 바로 돌아오고, 일꾼은 옆에서 따로 돌아요</td></tr><tr><td><code>t.join()</code></td><td>그 일꾼이 끝날 때까지 기다리기(프로세스의 <code>waitpid</code> 같은 것)</td></tr></tbody></table>
+<p>일꾼이 도는 동안 <code>/proc/self/status</code> 의 <code>Threads:</code> 를 보면 늘어나 있어요. 처음부터 있던 <b>메인 스레드</b> 하나 + 내가 만든 수예요.</p>
+<pre class="code">import threading
+def threads():
+    with open("/proc/self/status") as f:
+        for line in f:
+            if line.startswith("Threads:"):
+                return int(line.split()[1])
+go = threading.Event()
+workers = [threading.Thread(target=go.wait) for _ in range(3)]
+for t in workers:
+    t.start()
+print("일하는 중 Threads:", threads())
+go.set()
+for t in workers:
+    t.join()
+print("끝난 뒤 Threads:", threads())</pre>
+<p><code>threading.Event()</code> 는 「신호 깃발」 — <code>go.wait()</code> 는 깃발이 올라갈 때까지 기다리고 <code>go.set()</code> 이 깃발을 올려요. 실행하면 <code>일하는 중 Threads: 4</code>, <code>끝난 뒤 Threads: 1</code>. 터미널에서는 <code>ps -o pid,nlwp,cmd</code> 의 NLWP 칸(스레드 수)으로도 봐요.</p>` + OS_DATE,
+      example: { code: 'import threading\ndef threads():\n    with open("/proc/self/status") as f:\n        for line in f:\n            if line.startswith("Threads:"):\n                return int(line.split()[1])\ngo = threading.Event()\nworkers = [threading.Thread(target=go.wait) for _ in range(3)]\nfor t in workers:\n    t.start()\nprint("일하는 중 Threads:", threads())\ngo.set()\nfor t in workers:\n    t.join()\nprint("끝난 뒤 Threads:", threads())' } },
+    { title: 'GIL 맛보기: 기다리기는 겹치고, 계산은 번갈아', html: `<p>보통 쓰는 파이썬(CPython)에는 <b>GIL</b>(전역 인터프리터 락)이 있어요. <b>파이썬 코드는 한 번에 한 스레드만</b> 실행돼요. 그래서 효과가 둘로 갈려요.</p>
+<ul><li><b>기다리는 일</b>(<code>time.sleep</code> · 파일 · 네트워크)은 기다리는 동안 GIL 을 내놓아서 <b>겹쳐서</b> 돌아요 → 스레드로 빨라져요.</li><li><b>계산만 하는 일</b>(큰 반복문)은 서로 번갈아 돌 뿐이라 스레드를 늘려도 <b>안 빨라져요</b>. 계산을 나누려면 프로세스를 여럿(<code>multiprocessing</code>) 써요.</li></ul>
+<pre class="code">import threading, time
+start = time.time()
+workers = [threading.Thread(target=time.sleep, args=(1,)) for _ in range(5)]
+for t in workers:
+    t.start()
+for t in workers:
+    t.join()
+took = time.time() - start
+print("1초짜리 다섯 개가 약 1초에 끝났나요?", 0.9 &lt;= took &lt; 1.6)</pre>
+<p>하나씩 했으면 5초인데 1초 남짓이에요. 다운로드 여러 개를 동시에 받는 프로그램이 스레드를 쓰는 이유예요(「만들어 보기: 다운로드 대기열」).</p>
+<p class="muted small">파이썬 3.13 부터 GIL 이 없는 판(따로 설치하는 <code>python3.13t</code>)도 시험 중이에요. 우분투의 기본 <code>python3</code> 는 GIL 이 있는 판이에요.</p>` + OS_DATE,
+      example: { code: 'import threading, time\nstart = time.time()\nworkers = [threading.Thread(target=time.sleep, args=(1,)) for _ in range(5)]\nfor t in workers:\n    t.start()\nfor t in workers:\n    t.join()\ntook = time.time() - start\nprint("1초짜리 다섯 개가 약 1초에 끝났나요?", 0.9 <= took < 1.6)' } },
+  ],
+  summary: ['스레드 = 한 프로세스 안의 일꾼 — 메모리를 같이 씀(fork 는 복사본)', 'threading.Thread(target=함수, args=(값,)) · start() · join() · Threads: 칸 · threading.Event', 'GIL: 기다리기(sleep·입출력)는 겹쳐서 빨라짐, 계산은 안 빨라짐(→ multiprocessing)'] },
+
+{ id: 'K8', ch: 2, n: 8, title: '경쟁 상태와 락', mode: 'text', tutorSummary: '같은 변수를 두 스레드가 읽기 → 더하기 → 쓰기 하면 사이에 끼어들어 한쪽 결과가 덮임(경쟁 상태). 일부러 time.sleep(0) 틈을 넣으면 매번 보임(200 대신 100 남짓). threading.Lock + with lock: 으로 그 세 단계를 한 번에(임계 구역) → 늘 200. 락 구간은 짧게.',
+  pages: [
+    { title: '읽고 → 더하고 → 쓰기 사이에 끼어들면', html: `<p>통장 잔액 <code>balance</code> 를 일꾼 둘이 1원씩 100번 올려요. 200원이 돼야 하죠. 그런데 「1 올리기」 는 사실 세 단계예요: <b>① 읽기 → ② 더하기 → ③ 쓰기</b>.</p>
+<table class="kb"><tbody><tr><td>T1</td><td>① 잔액 5 를 읽음</td></tr><tr><td>T2</td><td>① 잔액 5 를 읽음 (T1 이 쓰기 전에 끼어듦)</td></tr><tr><td>T1</td><td>② ③ 6 을 씀</td></tr><tr><td>T2</td><td>② ③ 6 을 씀 → <b>T1 의 1원이 사라짐</b></td></tr></tbody></table>
+<p>이게 <b>경쟁 상태</b>(race condition)예요. 누가 먼저 하느냐에 따라 결과가 달라지는 버그라서, 어쩌다 한 번 틀리고 다시 하면 맞는 <b>가장 잡기 어려운 버그</b> 중 하나예요.</p>
+<p>파이썬에서는 GIL 때문에 이 끼어들기가 잘 안 일어나서 보기 어려워요. 그래서 읽기와 쓰기 사이에 <code>time.sleep(0)</code>(「잠깐 차례를 넘김」)을 넣어 <b>일부러 틈</b>을 만들어요. 그러면 매번 틀려요.</p>
+<pre class="code">import threading, time
+balance = 0
+def deposit():
+    global balance
+    for _ in range(100):
+        now = balance
+        time.sleep(0)
+        balance = now + 1
+workers = [threading.Thread(target=deposit) for _ in range(2)]
+for t in workers:
+    t.start()
+for t in workers:
+    t.join()
+print("잔액:", balance, "(200 이어야 해요)")</pre>
+<p>실행할 때마다 200 대신 <b>100 남짓</b>이 나와요. 숫자는 매번 조금씩 달라요.</p>` + OS_DATE,
+      example: { code: 'import threading, time\nbalance = 0\ndef deposit():\n    global balance\n    for _ in range(100):\n        now = balance\n        time.sleep(0)\n        balance = now + 1\nworkers = [threading.Thread(target=deposit) for _ in range(2)]\nfor t in workers:\n    t.start()\nfor t in workers:\n    t.join()\nprint("잔액:", balance, "(200 이어야 해요)")' } },
+    { title: 'threading.Lock · with lock: 으로 한 번에', html: `<p><b>락</b>(Lock, 자물쇠)은 「이 구간은 한 번에 한 일꾼만」 이라는 약속이에요. 먼저 잠근 일꾼이 풀 때까지 다른 일꾼은 앞에서 기다려요. 락으로 지키는 구간을 <b>임계 구역</b>이라고 해요.</p>
+<pre class="code">import threading, time
+balance = 0
+lock = threading.Lock()
+def deposit():
+    global balance
+    for _ in range(100):
+        with lock:
+            now = balance
+            time.sleep(0)
+            balance = now + 1
+workers = [threading.Thread(target=deposit) for _ in range(2)]
+for t in workers:
+    t.start()
+for t in workers:
+    t.join()
+print("잔액:", balance)</pre>
+<ul><li><code>with lock:</code> 은 들어갈 때 <code>lock.acquire()</code>(잠그기), 나올 때 <code>lock.release()</code>(풀기)를 해 줘요. 안에서 에러가 나도 풀어 줘서 <code>with</code> 를 쓰는 게 안전해요.</li><li>틈(<code>sleep(0)</code>)이 그대로 있어도 다른 일꾼은 락 앞에서 기다리니까 끼어들 수 없어요. 실행하면 늘 <code>잔액: 200</code>.</li></ul>` + OS_DATE,
+      example: { code: 'import threading, time\nbalance = 0\nlock = threading.Lock()\ndef deposit():\n    global balance\n    for _ in range(100):\n        with lock:\n            now = balance\n            time.sleep(0)\n            balance = now + 1\nworkers = [threading.Thread(target=deposit) for _ in range(2)]\nfor t in workers:\n    t.start()\nfor t in workers:\n    t.join()\nprint("잔액:", balance)' } },
+    { title: '임계 구역은 짧게 · 한 줄이어도 한 번이 아니에요', html: `<ul><li><b>락은 짧게</b>: 락 안에서 오래 걸리는 일(다운로드 · 큰 계산 · <code>sleep</code>)을 하면 다른 일꾼이 모두 줄 서서 기다려 스레드를 쓴 의미가 없어져요. 「공유 변수를 읽고 쓰는 몇 줄」 만 감싸요.</li><li><b>한 줄이어도 안전하지 않아요</b>: <code>balance += 1</code> 도 안에서는 읽기 · 더하기 · 쓰기 여러 단계예요. <code>dis</code> 모듈로 보면 파이썬이 실제로 하는 작은 명령들이 보여요.</li><li><b>같이 쓰는 것만 지켜요</b>: 일꾼마다 자기 지역 변수는 락이 필요 없어요. 결과를 모을 때 <code>results.append(값)</code> 처럼 공유 목록에 넣는 곳은 짧게 락으로(또는 다음 레슨의 <code>queue.Queue</code>).</li></ul>
+<pre class="code">import dis
+dis.dis("balance += 1")</pre>
+<p>출력에 <code>LOAD_NAME</code>(읽기) · <code>BINARY_OP</code>(더하기) · <code>STORE_NAME</code>(쓰기)이 따로 있어요. 그 사이 어디서든 다른 스레드로 차례가 넘어갈 수 있어요.</p>` + OS_DATE,
+      example: { code: 'import dis\ndis.dis("balance += 1")' } },
+  ],
+  summary: ['경쟁 상태: 읽기 → 더하기 → 쓰기 사이에 끼어들면 한쪽이 덮임(어쩌다 틀리는 버그)', 'lock = threading.Lock() · with lock: 으로 임계 구역을 한 번에 한 일꾼만', '락은 짧게 · += 도 여러 단계(dis) · 공유하는 것만 지키기'] },
+
+{ id: 'K9', ch: 2, n: 9, title: '교착 상태와 기다리는 줄', mode: 'text', tutorSummary: '교착 상태: 락 둘을 서로 반대 순서로 잡으면 서로 놓기를 영원히 기다림(그림). 조건 넷(한 번에 하나 · 쥔 채 기다림 · 못 빼앗음 · 빙 둘러 기다림) 중 하나를 깨면 됨 — 락은 늘 같은 순서로. lock.acquire(timeout=초) 로 알아채기. queue.Queue: put · get 이 락과 기다림을 대신(생산자-소비자), 끝 신호 None.',
+  pages: [
+    { title: '교착 상태: 서로 놓기를 기다리며', figure: { kind: 'deadlock', height: 230, mheight: 250, note: '「한 걸음」 을 눌러 진행' },
+      params: [{ id: 'same', label: '락 잡는 순서 (0 반대 · 1 같음)', min: 0, max: 1, step: 1, default: 0 }],
+      observe: ['반대 순서(0)에서 몇 걸음째에 둘 다 멈추나요?', '같은 순서(1)로 바꾸면 T2 는 무엇을 기다리나요? 그 기다림은 언젠가 끝나나요?', '락이 셋(A·B·C)이면 「늘 같은 순서」 를 어떻게 정하면 될까요?'],
+      html: `<p>일꾼 T1 은 <b>A 다음 B</b>, T2 는 <b>B 다음 A</b> 를 잡아야 일을 할 수 있어요. T1 이 A 를, T2 가 B 를 잡은 순간 둘 다 상대가 쥔 락을 기다려요. 아무도 놓지 않으니 <b>영원히</b> 멈춰요. 이게 <b>교착 상태</b>(deadlock)예요.</p>
+<p>교착은 네 조건이 <b>모두</b> 맞을 때만 생겨요. 하나만 깨면 안 생겨요.</p>
+<table class="kb"><tbody><tr><td>① 한 번에 하나</td><td>락은 한 일꾼만 쥘 수 있어요(락의 본분이라 못 깸)</td></tr><tr><td>② 쥔 채 기다림</td><td>A 를 쥔 채 B 를 기다려요</td></tr><tr><td>③ 못 빼앗음</td><td>남의 락을 억지로 뺏을 수 없어요</td></tr><tr><td>④ 빙 둘러 기다림</td><td>T1 → T2 → T1 로 기다림이 고리가 돼요 — <b>늘 같은 순서로 잡으면 고리가 안 생겨요</b></td></tr></tbody></table>` + OS_DATE },
+    { title: 'acquire(timeout=…) 로 알아채고, 같은 순서로 고치기', html: `<p><code>lock.acquire(timeout=0.5)</code> 는 0.5초 기다려도 못 잡으면 <code>False</code> 를 돌려줘요. 영원히 멈추는 대신 「교착인가 봐」 를 알아챌 수 있어요(②를 깨는 방법 — 못 잡으면 쥔 걸 놓고 물러나요).</p>
+<pre class="code">import threading
+A, B = threading.Lock(), threading.Lock()
+both_hold = threading.Barrier(2)
+stuck = []
+def worker(first, second):
+    with first:
+        both_hold.wait()
+        if second.acquire(timeout=0.5):
+            second.release()
+        else:
+            stuck.append(True)
+t1 = threading.Thread(target=worker, args=(A, B))
+t2 = threading.Thread(target=worker, args=(B, A))
+t1.start(); t2.start(); t1.join(); t2.join()
+print("교착이 있었나요?", len(stuck) &gt; 0)</pre>
+<p><code>threading.Barrier(2)</code> 는 「둘 다 여기 올 때까지 기다리기」 — 둘 다 첫 락을 쥔 다음에 두 번째를 시도하게 해서 교착을 <b>매번</b> 일으켜요. 실행하면 <code>교착이 있었나요? True</code>.</p>
+<p><b>고치기</b>: T2 의 <code>args=(B, A)</code> 를 <code>(A, B)</code> 로 — 둘 다 A 먼저. 그러면 T2 는 A 앞에서 기다리다가 T1 이 다 쓰고 놓으면 들어가요(그림의 「같은 순서」).</p>` + OS_DATE,
+      example: { code: 'import threading\nA, B = threading.Lock(), threading.Lock()\nboth_hold = threading.Barrier(2)\nstuck = []\ndef worker(first, second):\n    with first:\n        both_hold.wait()\n        if second.acquire(timeout=0.5):\n            second.release()\n        else:\n            stuck.append(True)\nt1 = threading.Thread(target=worker, args=(A, B))\nt2 = threading.Thread(target=worker, args=(B, A))\nt1.start(); t2.start(); t1.join(); t2.join()\nprint("교착이 있었나요?", len(stuck) > 0)' } },
+    { title: 'queue.Queue: 생산자와 소비자', html: `<p>일을 만드는 쪽(<b>생산자</b>)과 처리하는 쪽(<b>소비자</b>)을 나누면 편해요. 그 사이의 줄이 <code>queue.Queue</code> 예요. 안에 락과 「비었으면 기다리기」 가 다 들어 있어서 <b>내가 락을 안 써도</b> 안전해요.</p>
+<table class="kb"><tbody><tr><td><code>q.put(값)</code></td><td>줄 끝에 넣기</td></tr><tr><td><code>q.get()</code></td><td>줄 앞에서 꺼내기 — 비어 있으면 들어올 때까지 <b>기다려요</b></td></tr><tr><td><code>None</code> 끝 신호</td><td>소비자 수만큼 <code>q.put(None)</code> 을 넣어 「이제 그만」 을 알려요</td></tr></tbody></table>
+<pre class="code">import threading, queue
+q = queue.Queue()
+done = []
+lock = threading.Lock()
+def consumer():
+    while True:
+        n = q.get()
+        if n is None:
+            break
+        with lock:
+            done.append(n * 10)
+workers = [threading.Thread(target=consumer) for _ in range(2)]
+for t in workers:
+    t.start()
+for n in range(1, 6):
+    q.put(n)
+for _ in workers:
+    q.put(None)
+for t in workers:
+    t.join()
+print(sorted(done))</pre>
+<p>누가 어떤 일을 맡을지는 매번 달라서 결과를 <code>sorted</code> 로 정렬해 찍어요. 실행하면 <code>[10, 20, 30, 40, 50]</code>.</p>` + OS_DATE,
+      example: { code: 'import threading, queue\nq = queue.Queue()\ndone = []\nlock = threading.Lock()\ndef consumer():\n    while True:\n        n = q.get()\n        if n is None:\n            break\n        with lock:\n            done.append(n * 10)\nworkers = [threading.Thread(target=consumer) for _ in range(2)]\nfor t in workers:\n    t.start()\nfor n in range(1, 6):\n    q.put(n)\nfor _ in workers:\n    q.put(None)\nfor t in workers:\n    t.join()\nprint(sorted(done))' } },
+  ],
+  summary: ['교착 = 서로 쥔 락을 기다리며 영원히 멈춤 — 네 조건 중 하나만 깨면 됨', '늘 같은 순서로 잡기 · lock.acquire(timeout=초) 로 알아채기 · threading.Barrier 로 재현', 'queue.Queue: put · get(비면 기다림) · 끝 신호 None — 락을 대신'] },
+
+{ id: 'KB2', ch: 2, boss: true, title: '보스: 다운로드 대기열', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 2 종합. 가짜 다운로드 12개(time.sleep)를 queue.Queue 에 넣고 일꾼 스레드 3개가 나눠 처리. 진행 수는 락으로, 일꾼별 처리 수를 모아 합계 12. 걸린 시간이 하나씩 할 때의 1/3 정도. Ctrl+C 로 깔끔하게 멈추기.' },
 // ================= 챕터 3 메모리 (다음 업데이트) =================
 { id: 'K10', ch: 3, n: 10, title: '가상 메모리: 프로세스마다 자기만의 주소', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '코드·데이터·힙·스택 · /proc/self/maps · copy-on-write.' },
 { id: 'K11', ch: 3, n: 11, title: '페이지와 페이지 폴트', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '4096바이트 페이지 · 페이지 표 · 페이지 폴트 · VmRSS.' },
