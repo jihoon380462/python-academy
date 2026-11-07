@@ -304,7 +304,7 @@ git push</pre><code>origin</code> = 내 fork(push 하는 곳), <code>upstream</c
   summary: ['Fork → Create fork = 내 계정으로 복사', 'origin = 내 fork, upstream = 원래 — fetch upstream · merge · push, 웹은 Sync fork', '첫 기여: first-contributions 의 Contributors.md'] },
 { id: 'G12', ch: 3, n: 12, title: 'GitHub Pages 두 가지 방법', mode: 'text', tutorSummary: 'Settings → Code, planning, and automation → Pages → Build and deployment → Source: Deploy from a branch(Branch main · /(root) → Save) 또는 GitHub Actions. 주소 https://아이디.github.io/저장소/, 아이디.github.io 저장소는 루트. index.html(대소문자), 404.html, 링크는 상대 경로, 무료 계정은 공개 저장소에서만 Pages(유료로 비공개에서 켜도 사이트는 공개).',
   pages: [
-    { title: 'Deploy from a branch: 저장소의 파일을 그대로 사이트로', html: `<p><b>GitHub Pages</b> 는 저장소의 HTML 파일을 무료로 인터넷 주소에 올려 주는 기능이에요. 웹 교과서 레슨 13 에서 해 봤다면 복습이에요.</p>
+    { title: 'Deploy from a branch: 저장소의 파일을 그대로 사이트로', html: `<p><b>GitHub Pages</b> 는 저장소의 HTML 파일을 무료로 인터넷 주소에 올려 주는 기능이에요. 웹 교과서 레슨 28 에서 해 봤다면 복습이에요.</p>
 <div class="bk-step-box"><b>켜기</b><br>저장소 <b>Settings</b> → 왼쪽 「Code, planning, and automation」 의 <b>Pages</b> → 「Build and deployment」 의 「Source」 를 <b>Deploy from a branch</b> → Branch 칸에서 <b>main</b> · 폴더 <b>/ (root)</b> → <b>Save</b>.</div>
 <div class="bk-step-box"><b>기다리기</b><br>1~2분 뒤 같은 화면 위에 「Your site is live at <code>https://내아이디.github.io/저장소/</code>」 와 <b>Visit site</b>. 진행은 <b>Actions</b> 탭의 「pages build and deployment」 에서 볼 수 있어요. 그 뒤로는 main 에 push 할 때마다 저절로 다시 올라가요.</div>
 <p>첫 화면 파일(entry)은 <code>index.html</code> 이에요. 없으면 <code>index.md</code> 나 <code>README.md</code> 를 찾아요. 이름은 <b>대소문자를 가려요</b> — <code>Index.html</code> 은 안 돼요.</p>` + GH_DATE },
