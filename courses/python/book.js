@@ -26,7 +26,8 @@ const BOOK = {
 <div class="bk-step-box"><b>① 설치</b><br><a href="https://code.visualstudio.com/" target="_blank" rel="noopener">code.visualstudio.com</a> → <b>「Download for Windows」</b> → 받은 <code>VSCodeUserSetup-x64-….exe</code> 실행 → 「동의합니다」 → 다음.<br><b>「추가 작업 선택」</b> 화면에서 아래 두 칸을 켜 두면 편해요: <b>☑ "Code(으)로 열기" 작업을 Windows 탐색기 디렉터리의 상황에 맞는 메뉴에 추가</b>, <b>☑ PATH에 추가</b>(보통 이미 켜져 있어요) → 설치 → 마침.</div>
 <div class="bk-step-box"><b>② 한국어로 바꾸기 (선택)</b><br>VS Code 왼쪽 세로 줄의 네모 네 개 아이콘(<b>확장</b>, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>) → 검색 칸에 <code>Korean</code> → <b>Korean Language Pack for Visual Studio Code</b> 의 <b>Install</b> → 오른쪽 아래 <b>Change Language and Restart</b>.</div>
 <div class="bk-step-box"><b>③ 파이썬 확장 설치 — 꼭 하세요</b><br>같은 <b>확장</b> 화면 검색 칸에 <code>Python</code> → 만든 곳이 <b>Microsoft</b> 인 <b>「Python」</b> 의 <b>설치(Install)</b>. Pylance·Python Debugger 도 같이 깔려요. 이게 있어야 오른쪽 위에 ▷ 실행 버튼이 생겨요.</div>
-<div class="bk-step-box"><b>④ 어떤 파이썬을 쓸지 고르기</b><br><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → <code>Python: Select Interpreter</code>(한국어면 「Python: 인터프리터 선택」) → 1단계에서 설치한 <b>Python 3.xx</b> 를 골라요. 보통은 자동으로 잡혀서 안 해도 돼요. 지금 쓰는 파이썬은 <code>.py</code> 파일을 열었을 때 <b>오른쪽 아래 상태 표시줄</b>에 버전으로 보여요.</div>` },
+<div class="bk-step-box"><b>④ 어떤 파이썬을 쓸지 고르기</b><br><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → <code>Python: Select Interpreter</code>(한국어면 「Python: 인터프리터 선택」) → 1단계에서 설치한 <b>Python 3.xx</b> 를 골라요. 보통은 자동으로 잡혀서 안 해도 돼요. 지금 쓰는 파이썬은 <code>.py</code> 파일을 열었을 때 <b>오른쪽 아래 상태 표시줄</b>에 버전으로 보여요.</div>
+<p class="muted small">남이 만든 라이브러리(<code>requests</code> 같은 것)를 깔 때는 레슨 31 「pip 와 가상 환경」 을 보세요 — 프로젝트마다 가상 환경을 만들고 그 안에 깔아요.</p>` },
       { title: '3. 첫 파일 만들고 실행하기', html: `<div class="bk-step-box"><b>① 공부 폴더 만들기</b><br>문서나 바탕화면에 <code>python-study</code> 폴더를 하나 만들어요. 앞으로 만드는 파일은 전부 여기에 둬요.</div>
 <div class="bk-step-box"><b>② VS Code 에서 폴더 열기</b><br>VS Code 메뉴 <b>파일(File)</b> → <b>폴더 열기(Open Folder)</b> → <code>python-study</code> 선택. 「이 폴더에 있는 파일의 작성자를 신뢰합니까?」 가 뜨면 <b>「예, 작성자를 신뢰합니다」</b>.</div>
 <div class="bk-step-box"><b>③ 파일 만들기</b><br>왼쪽 <b>탐색기</b>(종이 두 장 아이콘)에서 폴더 이름 옆 <b>새 파일</b> 아이콘 → 이름을 <code>hello.py</code> 로. 끝이 꼭 <code>.py</code> 여야 파이썬 파일로 알아봐요.</div>
@@ -522,7 +523,6 @@ const BOOK = {
     ],
     B6: [
       // v2.30.0 챕터 7 보스 — 1 은 한 파일로(main(argv) 를 임시 폴더에서 차례로, 출력 비교), 2 · 3 은 진짜 패키지 · 가상 환경 · python -m memo(☐ 내 화면에서), 4 는 🏠 생활형
-      // 「합친 뒤」 줄: L15B · L15C · L16C · L16D · L17B · L18E · L19B 가 아직 「준비 중」 이라 check_book ⑥(낱말이 그 쪽에 있나)을 못 지나는 needs — 그 레슨이 들어오면 needs 에 넣고 쪽 번호를 맞추기
       { title: "메모 도구를 한 파일로",
         text: "나중에 <code>memo/</code> 패키지로 나눌 메모 도구를 먼저 <b>한 파일</b>에 만들어요. 세 부분으로 나눠 쓰세요.<ol><li><b>저장 부분</b>(나중에 <code>store.py</code>) — <code>@dataclass</code> 로 <code>Memo</code>(칸 <code>id: int</code> · <code>text: str</code>)와 내 예외 <code>MemoError</code> 를 만들고, 함수 다섯 개를 써요. <code>load(path)</code>: JSON 파일을 읽어 <code>Memo</code> 리스트로(파일이 없으면 <code>[]</code>) · <code>save(path, memos)</code>: <code>encoding=\"utf-8\"</code> 로 열고 <code>ensure_ascii=False, indent=2</code> 로 저장 · <code>add(path, text)</code>: 양끝 빈칸을 지우고, 비었으면 <code>MemoError(\"빈 메모는 저장할 수 없어요\")</code>, 번호는 마지막 번호 + 1(처음이면 1) · <code>find(path, word)</code>: 낱말이 든 메모만 · <code>remove(path, memo_id)</code>: 지운 메모를 돌려주고, 없으면 <code>MemoError(\"9번 메모가 없어요\")</code> 처럼. 매개변수와 돌려주는 값에 타입 힌트(<code>path: Path</code> · <code>-&gt; list[Memo]</code>)를 붙여요.</li><li><b>명령 줄 부분</b>(나중에 <code>cli.py</code>) — <code>main(argv)</code> 가 <code>argparse</code> 로 옵션 <code>--file</code>(기본값 <code>Path.home() / \"memos.json\"</code>)과 하위 명령 <code>add 글</code> · <code>list</code> · <code>find 낱말</code> · <code>rm 번호</code>(<code>type=int</code>)를 읽어요. 출력은 <code>1번 메모를 저장했어요: 장보기</code> · 목록 한 줄 <code>1. 장보기</code>(하나도 없으면 <code>메모가 없어요</code>, find 도 같은 모양) · <code>2번 메모를 지웠어요: 우유 사기</code>. <code>MemoError</code> 는 <code>main</code> 에서 잡아 <code>에러: 메시지</code> 를 출력하고 <code>1</code> 을, 잘 끝나면 <code>0</code> 을 돌려줘요.</li><li><b>테스트 부분</b>(나중에 <code>test_memo.py</code>) — 함수 <code>test_store(folder)</code> 안에 <code>assert</code> 를 다섯 개 넘게 써요. 없는 파일은 <code>[]</code> 인지, <code>add</code> 가 돌려준 메모가 <code>Memo(1, \"우유\")</code> 와 같은지(dataclass 라 <code>==</code> 로 칸끼리 비교돼요), 없는 번호를 지우면 <code>MemoError</code> 가 나는지.</li></ol>그다음 맨 아래에 이 시험 코드를 그대로 붙여 실행하세요. <code>tempfile.TemporaryDirectory()</code> 는 잠깐 쓰고 저절로 지워지는 빈 폴더예요. 그래서 내 진짜 메모 파일을 건드리지 않고, 터미널에 칠 명령 줄을 <code>main</code> 에 차례로 넣어 볼 수 있어요.<pre class=\"code\"># ---- 시험 실행: 임시 폴더에서 main(argv) 를 차례로 ----\nwith tempfile.TemporaryDirectory() as tmp:\n    test_store(Path(tmp))\n    print(\"테스트 통과\")\n    file = str(Path(tmp) / \"memos.json\")\n    runs = [\n        [\"add\", \"장보기\"],\n        [\"add\", \"우유 사기\"],\n        [\"add\", \"3시 치과\"],\n        [\"list\"],\n        [\"find\", \"우유\"],\n        [\"rm\", \"2\"],\n        [\"rm\", \"9\"],\n        [\"add\", \" \"],\n        [\"list\"],\n    ]\n    for argv in runs:\n        print(\"$ python -m memo\", \" \".join(f'\"{a}\"' if \" \" in a else a for a in argv))\n        code = main([\"--file\", file] + argv)\n        if code != 0:\n            print(\"끝 코드\", code)\n    print(Path(file).read_text(encoding=\"utf-8\"))</pre>",
         needs: [
@@ -544,10 +544,10 @@ const BOOK = {
         needs: [
           ["import sys","L16/0","모듈 가져오기"],
           ["def test_store(folder: Path) -> None:","L21/5","테스트 하나 = 함수 하나"],
-          // 합친 뒤: ["python -m venv .venv","L16D/0","프로젝트마다 가상 환경"],
-          // 합친 뒤: [".venv\\Scripts\\Activate.ps1   source .venv/Scripts/activate","L16D/0","켜기 — PowerShell · Git Bash"],
-          // 합친 뒤: ["from memo.store import add","L16C/0","패키지 안의 모듈에서 가져오기"],
-          // 합친 뒤: ["if __name__ == \"__main__\":","L16C/0","직접 실행할 때만 도는 자리"],
+          ["python -m venv .venv","L16D/1","프로젝트마다 가상 환경"],
+          [".venv\\Scripts\\Activate.ps1   source .venv/Scripts/activate","L16D/1","켜기 — PowerShell · Git Bash"],
+          ["from mypkg.tools import shout","L16C/2","패키지 안의 모듈에서 가져오기 — from memo.store import add 도 같은 모양"],
+          ["if __name__ == \"__main__\":","L16C/1","직접 실행할 때만 도는 자리"],
           ["sys.exit(main())","L19B/3","main 이 돌려준 수 = 끝 코드"],
         ],
         checks: [
@@ -563,7 +563,7 @@ const BOOK = {
         text: "가상 환경이 켜진 터미널에서, <code>memo</code> 폴더가 보이는 <code>memo-tool</code> 폴더에서 진짜 명령 줄로 써 보세요. 띄어쓰기가 있는 메모는 따옴표로 묶어요.<pre class=\"code\">python -m memo add \"장보기\"\npython -m memo add \"우유 사기\"\npython -m memo list\npython -m memo find 우유\npython -m memo rm 9\npython -m memo rm abc\npython -m memo -h</pre>메모는 <code>Path.home() / \"memos.json\"</code>(Windows 는 <code>C:\\Users\\내이름\\memos.json</code>)에 저장돼요. 상대 경로가 아니라서 터미널이 어느 폴더에 있든 같은 파일이에요([[레슨:L17B]] 의 「실행 위치」 함정). 연습할 때는 <code>--file test.json</code> 으로 따로 써도 돼요. 다른 폴더에서 <code>python -m memo</code> 를 치면 <code>No module named memo</code> 가 나와요 — 패키지는 지금 폴더에서 찾기 때문이에요.",
         noRun: true,
         needs: [
-          ["python -m memo add \"장보기\"","L16C/0","패키지를 프로그램처럼 실행(__main__.py)"],
+          ["python -m memo add \"장보기\"","L16C/2","패키지를 프로그램처럼 실행(__main__.py)"],
           ["type=int","L19B/1","숫자가 아니면 argparse 가 막아 줌"],
           ["python -m memo -h","L19B/1","도움말은 저절로"],
           ["ensure_ascii=False","L17B/3","파일 속 한글이 그대로"],
