@@ -293,5 +293,1183 @@ ld hello.o -o hello
         io: [{ input: "-15 4\n", output: "-11\n-19\n-60" }, { input: "123 -45\n", output: "78\n168\n-5535" }],
         answer: `default rel\nsection .bss\nbuf  resb 64\nvals resq 2                 ; 읽은 두 수\nres  resq 3                 ; 합 · 차 · 곱\n\nsection .text\nglobal _start\n_start:\n    mov rax, 0              ; read(0, buf, 64) — 예: "-15 4\\n"\n    mov rdi, 0\n    lea rsi, [buf]\n    mov rdx, 64\n    syscall\n    lea rbx, [buf]\n    mov rcx, 0              ; 몇 번째 글자\n    mov r12, 0              ; 몇 번째 수(0, 1)\n.number:\n    mov rax, 0              ; 만드는 수\n    mov r9, 0               ; 1 이면 음수\n    cmp byte [rbx + rcx], '-'\n    jne .digit\n    mov r9, 1\n    inc rcx                 ; '-' 건너뛰기\n.digit:\n    movzx rdx, byte [rbx + rcx]\n    cmp rdx, '0'\n    jb .end\n    cmp rdx, '9'\n    ja .end\n    sub rdx, '0'\n    imul rax, 10\n    add rax, rdx\n    inc rcx\n    jmp .digit\n.end:\n    cmp r9, 0\n    je .store\n    neg rax\n.store:\n    lea rsi, [vals]\n    mov [rsi + r12*8], rax\n    inc rcx                 ; 빈칸(또는 줄바꿈) 건너뛰기\n    inc r12\n    cmp r12, 2\n    jl .number\n\n    lea rsi, [vals]         ; 계산해서 res 에 저장\n    lea rdi, [res]\n    mov rax, [rsi]\n    add rax, [rsi + 8]\n    mov [rdi], rax          ; 합\n    mov rax, [rsi]\n    sub rax, [rsi + 8]\n    mov [rdi + 8], rax      ; 차\n    mov rax, [rsi]\n    imul rax, [rsi + 8]\n    mov [rdi + 16], rax     ; 곱\n\n    lea rbx, [res]\n    mov r12, 0\n.next:\n    mov rdi, [rbx + r12*8]\n    ; ---- 숫자 출력: rdi 를 10진 글자 + 줄바꿈으로 ----\n    sub rsp, 32             ; 글자 버퍼 32바이트(스택)\n    mov rax, rdi\n    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움\n    mov byte [rsi], 10      ; 맨 끝은 줄바꿈\n    mov r8, 1               ; 지금까지 글자 수\n    mov rcx, 10\n    test rax, rax\n    jns .digits\n    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'\n.digits:\n    xor edx, edx\n    div rcx                 ; rax = 몫, rdx = 나머지(0~9)\n    add dl, '0'\n    dec rsi\n    mov [rsi], dl\n    inc r8\n    test rax, rax\n    jnz .digits\n    test rdi, rdi\n    jns .write\n    dec rsi\n    mov byte [rsi], '-'\n    inc r8\n.write:\n    mov rax, 1              ; write(1, rsi, r8)\n    mov rdx, r8\n    mov rdi, 1\n    syscall\n    add rsp, 32\n    ; ---- 여기까지 ----\n    inc r12\n    cmp r12, 3\n    jl .next\n    mov rax, 60\n    mov rdi, 0\n    syscall` },
     ],
+    R10: [
+      { title: '두 레지스터 바꾸기', text: `<code>rax = 7</code>, <code>rbx = 3</code> 에서 시작해 <b>스택만 써서</b> 둘을 바꾸세요(<code>rax = 3</code>, <code>rbx = 7</code>). 확인은 종료 코드 <code>rax × 10 + rbx</code> 로 해요. 바뀌었으면 37 이에요.`, echoExit: true,
+        needs: [['push rax   push rbx   pop rax   pop rbx', 'R10/1', '나중에 넣은 것이 먼저 나와요'], ['mov rax, 60   syscall', 'R10/0', 'rdi 가 종료 코드']],
+        io: [{ output: `37` }],
+        answer: `section .text
+global _start
+_start:
+    mov rax, 7
+    mov rbx, 3
+    push rax                ; 7 을 맡김
+    push rbx                ; 3 을 맡김
+    pop rax                 ; rax = 3
+    pop rbx                 ; rbx = 7
+    mov rdi, rax
+    mov rdx, 10
+    imul rdi, rdx           ; 3 × 10
+    add rdi, rbx            ; + 7
+    mov rax, 60
+    syscall` },
+      { title: '세 값 거꾸로', text: `<code>rax = 1</code>, <code>rbx = 2</code>, <code>rcx = 3</code> 을 스택으로 거꾸로(<code>rax = 3</code> · <code>rbx = 2</code> · <code>rcx = 1</code>) 바꾼 뒤, 세 숫자를 글자로 바꿔(<code>add al, '0'</code>) <code>buf</code> 에 차례로 넣고 줄바꿈과 함께 <code>write</code> 하세요.`,
+        needs: [['push rax   push rbx   push rcx', 'R10/1', '세 개 쌓기'], ['pop rax   pop rbx   pop rcx', 'R10/1', '마지막에 넣은 3 이 rax 로']],
+        io: [{ output: `321` }],
+        answer: `default rel
+section .bss
+buf resb 4
+section .text
+global _start
+_start:
+    mov rax, 1
+    mov rbx, 2
+    mov rcx, 3
+    push rax
+    push rbx
+    push rcx
+    pop rax                 ; rax = 3
+    pop rbx                 ; rbx = 2
+    pop rcx                 ; rcx = 1
+    lea rsi, [buf]
+    add al, '0'             ; 숫자 → 글자
+    mov [rsi], al
+    add bl, '0'
+    mov [rsi + 1], bl
+    add cl, '0'
+    mov [rsi + 2], cl
+    mov byte [rsi + 3], 10
+    mov rax, 1              ; write(1, buf, 4)
+    mov rdi, 1
+    mov rdx, 4
+    syscall
+    mov rax, 60
+    mov rdi, 0
+    syscall` },
+      { title: '끝나지 않는 별 고치기', text: `별 다섯 개를 한 줄에 찍으려는 코드인데, 실행하면 별이 끝없이 나와요(<kbd>Ctrl</kbd>+<kbd>C</kbd> 로 멈춰요). 왜 그런지 찾아 두 줄을 더해 고치세요.`,
+        given: `default rel
+section .data
+star db "*"
+nl db 10
+section .text
+global _start
+_start:
+    mov rcx, 5              ; 별 다섯 개
+again:
+    mov rax, 1              ; write(1, star, 1)
+    mov rdi, 1
+    lea rsi, [star]
+    mov rdx, 1
+    syscall
+    dec rcx
+    jnz again
+    mov rax, 1              ; 줄바꿈
+    mov rdi, 1
+    lea rsi, [nl]
+    mov rdx, 1
+    syscall
+    mov rax, 60
+    mov rdi, 0
+    syscall`,
+        needs: [['push rcx   syscall   pop rcx', 'R10/2', 'syscall 은 rcx · r11 을 바꿔요']],
+        io: [{ output: `*****` }],
+        answer: `default rel
+section .data
+star db "*"
+nl db 10
+section .text
+global _start
+_start:
+    mov rcx, 5              ; 별 다섯 개
+again:
+    push rcx                ; syscall 앞에서 맡기고
+    mov rax, 1              ; write(1, star, 1)
+    mov rdi, 1
+    lea rsi, [star]
+    mov rdx, 1
+    syscall
+    pop rcx                 ; 끝나면 되찾기
+    dec rcx
+    jnz again
+    mov rax, 1              ; 줄바꿈
+    mov rdi, 1
+    lea rsi, [nl]
+    mov rdx, 1
+    syscall
+    mov rax, 60
+    mov rdi, 0
+    syscall` },
+      { title: '스택으로 한 줄 뒤집기', text: `<code>read</code> 로 한 줄(영어 · 숫자, 64바이트 안)을 받아, 끝의 줄바꿈은 빼고 글자를 하나씩 <code>push</code> 했다가 <code>pop</code> 해서 거꾸로 찍으세요. 끝에는 줄바꿈 하나.`,
+        needs: [['mov al, [rsi + rcx]   push rax', 'R10/3', '앞에서부터 쌓기'], ['pop rax   mov [rdi + rcx], al', 'R10/3', '꺼내면 거꾸로']],
+        io: [{ input: `hello\n`, output: `olleh` }, { input: `abc 123\n`, output: `321 cba` }, { input: `x\n`, output: `x` }],
+        answer: `default rel
+section .bss
+inbuf resb 64
+outbuf resb 64
+section .text
+global _start
+_start:
+    mov rax, 0              ; read(0, inbuf, 64)
+    mov rdi, 0
+    lea rsi, [inbuf]
+    mov rdx, 64
+    syscall
+    mov rbx, rax            ; rbx = 받은 바이트 수
+    cmp byte [rsi + rbx - 1], 10
+    jne no_newline
+    dec rbx                 ; 끝의 줄바꿈은 빼고 뒤집기
+no_newline:
+    xor ecx, ecx
+push_loop:
+    xor eax, eax
+    mov al, [rsi + rcx]
+    push rax
+    inc rcx
+    cmp rcx, rbx
+    jl push_loop
+    lea rdi, [outbuf]
+    xor ecx, ecx
+pop_loop:
+    pop rax
+    mov [rdi + rcx], al
+    inc rcx
+    cmp rcx, rbx
+    jl pop_loop
+    mov byte [rdi + rcx], 10
+    mov rax, 1              ; write(1, outbuf, rbx + 1)
+    mov rsi, rdi
+    mov rdi, 1
+    mov rdx, rbx
+    inc rdx
+    syscall
+    mov rax, 60
+    mov rdi, 0
+    syscall` },
+    ],
+    R11: [
+      { title: 'print_int 로 제곱 다섯 줄', text: `<code>square</code> 함수(<code>rdi</code> 를 받아 제곱을 <code>rax</code> 로)를 만들고, 1 부터 5 까지 제곱을 <code>print_int</code> 로 한 줄씩 찍으세요. 반복 횟수를 지키는 것도 잊지 말고요. <code>print_int</code> 는 레슨 그대로 붙여 써요.`,
+        needs: [['call square   mov rdi, rax', 'R11/1', '인자 rdi, 결과 rax'], ['call print_int', 'R11/2', '숫자 한 줄 출력'], ['push rcx   call print_int   pop rcx', 'R11/3', '반복 횟수 맡기기']],
+        io: [{ output: `1
+4
+9
+16
+25` }],
+        answer: `section .text
+global _start
+_start:
+    mov rcx, 1              ; n = 1, 2, … 5
+again:
+    push rcx                ; square · print_int 가 rcx 를 바꿀 수 있으니 맡김
+    mov rdi, rcx
+    call square             ; rax = n × n
+    mov rdi, rax
+    call print_int
+    pop rcx
+    inc rcx
+    cmp rcx, 5
+    jle again
+    mov rax, 60
+    mov rdi, 0
+    syscall
+square:                     ; rax = rdi × rdi
+    mov rax, rdi
+    imul rax, rdi
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` },
+      { title: 'strlen 함수', text: `0 으로 끝나는 글자의 주소를 <code>rdi</code> 로 받아 길이(0 앞까지의 바이트 수)를 <code>rax</code> 로 돌려주는 <code>strlen</code> 을 만드세요. <code>"hello"</code> 와 <code>"어셈블리어"</code> 의 길이를 찍어요. 한글은 한 글자가 3바이트예요.`,
+        needs: [['strlen:   …   ret', 'R11/0', '함수 = ret 으로 끝나는 라벨'], ['lea rdi, [s1]   call strlen', 'R11/1', '인자는 rdi, 결과는 rax'], ['mov rdi, rax   call print_int', 'R11/2', '길이 찍기']],
+        io: [{ output: `5
+15` }],
+        answer: `default rel
+section .data
+s1 db "hello", 0
+s2 db "어셈블리어", 0
+section .text
+global _start
+_start:
+    lea rdi, [s1]
+    call strlen
+    mov rdi, rax
+    call print_int          ; 5
+    lea rdi, [s2]
+    call strlen
+    mov rdi, rax
+    call print_int          ; 15 (한글 한 글자 = 3바이트)
+    mov rax, 60
+    mov rdi, 0
+    syscall
+strlen:                     ; rax = rdi 에서 0 바이트 앞까지의 길이
+    xor eax, eax
+.next:
+    cmp byte [rdi + rax], 0
+    je .done
+    inc rax
+    jmp .next
+.done:
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` },
+      { title: '재귀 팩토리얼', text: `자기 자신을 부르는 <code>fact</code> 로 5!, 10!, 20! 을 한 줄씩 찍으세요. 20! 은 64비트에 들어가는 가장 큰 팩토리얼이에요(21! 은 넘쳐요).`,
+        needs: [['push rdi   dec rdi   call fact   pop rdi', 'R11/4', '내 n 을 맡기고 자신을 부르기'], ['imul rax, rdi', 'R11/4', 'n × (n-1)!']],
+        io: [{ output: `120
+3628800
+2432902008176640000` }],
+        answer: `section .text
+global _start
+_start:
+    mov rdi, 5
+    call fact
+    mov rdi, rax
+    call print_int
+    mov rdi, 10
+    call fact
+    mov rdi, rax
+    call print_int
+    mov rdi, 20
+    call fact
+    mov rdi, rax
+    call print_int
+    mov rax, 60
+    mov rdi, 0
+    syscall
+fact:                       ; rax = rdi!
+    cmp rdi, 1
+    jg .more
+    mov rax, 1
+    ret
+.more:
+    push rdi
+    dec rdi
+    call fact
+    pop rdi
+    imul rax, rdi
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` },
+      { title: 'Segmentation fault 고치기', text: `<code>triple(14)</code> 로 42 를 찍으려는데 <code>Segmentation fault</code> 가 나요. <code>ret</code> 이 어디로 점프하는지 생각해 보고 한 줄을 더해 고치세요.`,
+        given: `section .text
+global _start
+_start:
+    mov rdi, 14
+    call triple
+    mov rdi, rax
+    call print_int          ; 42 가 나와야 해요
+    mov rax, 60
+    mov rdi, 0
+    syscall
+triple:                     ; rax = rdi × 3
+    push rbx                ; rbx 를 쓸 거라 맡김
+    mov rbx, rdi
+    add rbx, rdi
+    add rbx, rdi
+    mov rax, rbx
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret`,
+        needs: [['push rbx   …   pop rbx   ret', 'R11/3', 'ret 앞에서 스택을 제자리로'], ['ret', 'R11/0', '꼭대기를 꺼내 점프']],
+        io: [{ output: `42` }],
+        answer: `section .text
+global _start
+_start:
+    mov rdi, 14
+    call triple
+    mov rdi, rax
+    call print_int          ; 42 가 나와야 해요
+    mov rax, 60
+    mov rdi, 0
+    syscall
+triple:                     ; rax = rdi × 3
+    push rbx                ; rbx 를 쓸 거라 맡김
+    mov rbx, rdi
+    add rbx, rdi
+    add rbx, rdi
+    mov rax, rbx
+    pop rbx                 ; ret 앞에서 꼭 되찾기
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` },
+    ],
+    R12: [
+      { title: '인자 3개: clamp(x, lo, hi)', text: `<code>clamp(x, lo, hi)</code> 를 만드세요. x 가 lo 보다 작으면 lo, hi 보다 크면 hi, 아니면 x 를 <code>rax</code> 로 돌려줘요. <code>clamp(15, 0, 10)</code> · <code>clamp(-3, 0, 10)</code> · <code>clamp(7, 0, 10)</code> 을 찍어요.`,
+        needs: [['mov rdi, 15   mov rsi, 0   mov rdx, 10   call clamp', 'R12/0', '인자 1 · 2 · 3 = rdi · rsi · rdx'], ['mov rax, rdi   …   ret', 'R12/0', '결과는 rax']],
+        io: [{ output: `10
+0
+7` }],
+        answer: `section .text
+global _start
+_start:
+    mov rdi, 15
+    mov rsi, 0
+    mov rdx, 10
+    call clamp
+    mov rdi, rax
+    call print_int          ; 10
+    mov rdi, -3
+    mov rsi, 0
+    mov rdx, 10
+    call clamp
+    mov rdi, rax
+    call print_int          ; 0
+    mov rdi, 7
+    mov rsi, 0
+    mov rdx, 10
+    call clamp
+    mov rdi, rax
+    call print_int          ; 7
+    mov rax, 60
+    mov rdi, 0
+    syscall
+clamp:                      ; clamp(x, lo, hi): x 를 lo ~ hi 안으로
+    mov rax, rdi
+    cmp rax, rsi
+    jge .not_low
+    mov rax, rsi            ; x < lo 면 lo
+.not_low:
+    cmp rax, rdx
+    jle .done
+    mov rax, rdx            ; x > hi 면 hi
+.done:
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` },
+      { title: '지역 변수 두 칸: print_hms', text: `초를 받아 시 · 분 · 초를 한 줄씩 찍는 <code>print_hms(초)</code> 를 만드세요. <code>print_int</code> 를 부르면 레지스터가 바뀌니까, 남은 초는 스택 프레임의 지역 변수(<code>[rbp - 8]</code> · <code>[rbp - 16]</code>)에 둬요. 3725 초와 86399 초를 찍어요.`,
+        needs: [['push rbp   mov rbp, rsp   sub rsp, 16', 'R12/2', '스택 프레임 만들기'], ['mov [rbp - 8], rdx   mov rax, [rbp - 8]', 'R12/2', '지역 변수에 두고 꺼내기'], ['leave   ret', 'R12/2', '프레임 정리하고 돌아가기']],
+        io: [{ output: `1
+2
+5
+23
+59
+59` }],
+        answer: `section .text
+global _start
+_start:
+    mov rdi, 3725
+    call print_hms          ; 1 시간 2 분 5 초
+    mov rdi, 86399
+    call print_hms          ; 23 시간 59 분 59 초
+    mov rax, 60
+    mov rdi, 0
+    syscall
+print_hms:                  ; print_hms(초): 시 · 분 · 초를 한 줄씩
+    push rbp
+    mov rbp, rsp
+    sub rsp, 16             ; [rbp - 8] = 남은 초, [rbp - 16] = 마지막 초
+    mov rax, rdi
+    xor edx, edx
+    mov rcx, 3600
+    div rcx                 ; rax = 시, rdx = 남은 초
+    mov [rbp - 8], rdx
+    mov rdi, rax
+    call print_int          ; 시
+    mov rax, [rbp - 8]
+    xor edx, edx
+    mov rcx, 60
+    div rcx                 ; rax = 분, rdx = 초
+    mov [rbp - 16], rdx
+    mov rdi, rax
+    call print_int          ; 분
+    mov rdi, [rbp - 16]
+    call print_int          ; 초
+    leave
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` },
+      { title: '규약 어긴 square 고치기', text: `1² + 2² + 3² = 14 를 찍어야 하는데 18 이 나와요. <code>_start</code> 는 규약대로 합계를 <code>rbx</code> 에 뒀어요. 규약을 어긴 쪽은 <code>square</code> 예요. <code>_start</code> 는 그대로 두고 <code>square</code> 만 고치세요.`,
+        given: `section .text
+global _start
+_start:
+    xor ebx, ebx            ; rbx = 합계
+    mov r12, 1              ; r12 = n
+again:
+    mov rdi, r12
+    call square
+    add rbx, rax            ; 합계 += n × n
+    inc r12
+    cmp r12, 3
+    jle again
+    mov rdi, rbx
+    call print_int          ; 1 + 4 + 9 = 14 가 나와야 해요
+    mov rax, 60
+    mov rdi, 0
+    syscall
+square:                     ; rax = rdi × rdi
+    mov rbx, rdi
+    imul rbx, rdi
+    mov rax, rbx
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret`,
+        needs: [['push rbx   …   pop rbx', 'R12/1', 'rbx 는 불리는 쪽이 지킴']],
+        io: [{ output: `14` }],
+        answer: `section .text
+global _start
+_start:
+    xor ebx, ebx            ; rbx = 합계
+    mov r12, 1              ; r12 = n
+again:
+    mov rdi, r12
+    call square
+    add rbx, rax            ; 합계 += n × n
+    inc r12
+    cmp r12, 3
+    jle again
+    mov rdi, rbx
+    call print_int          ; 1 + 4 + 9 = 14 가 나와야 해요
+    mov rax, 60
+    mov rdi, 0
+    syscall
+square:                     ; rax = rdi × rdi
+    push rbx                ; 불리는 쪽이 rbx 를 지킴
+    mov rbx, rdi
+    imul rbx, rdi
+    mov rax, rbx
+    pop rbx
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` },
+    ],
+    R13: [
+      { title: '구구단 7단', text: `<code>printf</code> 로 <code>7 x 1 = 7</code> 부터 <code>7 x 9 = 63</code> 까지 찍으세요. 단(7)과 곱하는 수는 <code>printf</code> 를 불러도 지켜지는 레지스터에 두고, push 수로 정렬을 맞춰요. 빌드는 <code>gcc -no-pie</code>.`,
+        needs: [['extern printf   global main', 'R13/0', 'C 라이브러리 쓰기 · main 에서 시작'], ['lea rdi, [fmt]   xor eax, eax   call printf', 'R13/1', '형식 주소 · 가변 인자 규칙'], ['push rbp   push rbx   push r12', 'R13/3', 'push 홀수 번 = 16바이트 정렬']],
+        io: [{ output: `7 x 1 = 7
+7 x 2 = 14
+7 x 3 = 21
+7 x 4 = 28
+7 x 5 = 35
+7 x 6 = 42
+7 x 7 = 49
+7 x 8 = 56
+7 x 9 = 63` }],
+        answer: `default rel
+section .data
+fmt db "%ld x %ld = %ld", 10, 0
+section .text
+global main
+extern printf
+main:
+    push rbp
+    push rbx
+    push r12                ; push 세 번 — 16바이트 정렬
+    mov r12, 7              ; 단
+    mov rbx, 1              ; 곱하는 수 1 ~ 9
+again:
+    lea rdi, [fmt]
+    mov rsi, r12
+    mov rdx, rbx
+    mov rcx, r12
+    imul rcx, rbx
+    xor eax, eax
+    call printf
+    inc rbx
+    cmp rbx, 9
+    jle again
+    pop r12
+    pop rbx
+    pop rbp
+    xor eax, eax
+    ret` },
+      { title: '배열을 printf 로', text: `<code>arr dq 3, 1, 4, 1, 5, 9</code> 의 칸을 <code>arr[번호] = 값</code> 모양으로 한 줄씩 찍고, 마지막 줄에 <code>합 = …</code> 을 찍으세요.`,
+        needs: [['fmt db "arr[%ld] = %ld", 10, 0', 'R13/1', '%ld 두 개 = rsi · rdx'], ['push rbp   push rbx   push r12', 'R13/3', '번호 · 합을 지켜지는 레지스터에']],
+        io: [{ output: `arr[0] = 3
+arr[1] = 1
+arr[2] = 4
+arr[3] = 1
+arr[4] = 5
+arr[5] = 9
+합 = 23` }],
+        answer: `default rel
+section .data
+arr dq 3, 1, 4, 1, 5, 9
+n equ 6
+fmt db "arr[%ld] = %ld", 10, 0
+fmt_sum db "합 = %ld", 10, 0
+section .text
+global main
+extern printf
+main:
+    push rbp
+    push rbx                ; rbx = 번호
+    push r12                ; r12 = 합
+    xor ebx, ebx
+    mov r12, 0
+again:
+    lea rax, [arr]
+    mov rdx, [rax + rbx*8]  ; 3번째 인자: arr[번호]
+    add r12, rdx
+    lea rdi, [fmt]
+    mov rsi, rbx            ; 2번째 인자: 번호
+    xor eax, eax
+    call printf
+    inc rbx
+    cmp rbx, n
+    jl again
+    lea rdi, [fmt_sum]
+    mov rsi, r12
+    xor eax, eax
+    call printf
+    pop r12
+    pop rbx
+    pop rbp
+    xor eax, eax
+    ret` },
+      { title: '글자 길이 printf', text: `글자 하나를 받아 <code>글자: 길이 바이트</code> 한 줄을 찍는 함수 <code>show</code> 를 만들고, <code>main</code> 에서 <code>"hello"</code> · <code>"안녕"</code> · <code>"x86-64"</code> 로 불러요. 길이는 C 라이브러리의 <code>strlen</code> 으로. <code>show</code> 에 들어온 순간의 정렬도 따져 봐요.`,
+        needs: [['extern printf, strlen', 'R13/2', '여럿을 한 줄에'], ['"%s: %ld 바이트", 10, 0', 'R13/1', '%s 에는 주소'], ['push rbx   …   pop rbx', 'R13/3', '들어오면 16의 배수 + 8 → push 한 번']],
+        io: [{ output: `hello: 5 바이트
+안녕: 6 바이트
+x86-64: 6 바이트` }],
+        answer: `default rel
+section .data
+s1 db "hello", 0
+s2 db "안녕", 0
+s3 db "x86-64", 0
+fmt db "%s: %ld 바이트", 10, 0
+section .text
+global main
+extern printf, strlen
+main:
+    push rbp                ; 이제 rsp 는 16의 배수
+    lea rdi, [s1]
+    call show
+    lea rdi, [s2]
+    call show
+    lea rdi, [s3]
+    call show
+    pop rbp
+    xor eax, eax
+    ret
+show:                       ; show(s): 「s: 길이 바이트」 한 줄
+    push rbx                ; 들어오면 16의 배수 + 8 → push 한 번으로 맞춤
+    mov rbx, rdi            ; s 를 지켜지는 rbx 에
+    call strlen             ; rax = 길이
+    lea rdi, [fmt]
+    mov rsi, rbx
+    mov rdx, rax
+    xor eax, eax
+    call printf
+    pop rbx
+    ret` },
+      { title: 'syscall 대신 ret 으로', text: `이 프로그램은 터미널에서 <code>./prog</code> 로 돌리면 글자가 잘 보여요. 그런데 <code>./prog | cat; echo $?</code> 이나 <code>./prog &gt; out.txt</code> 로 돌리면 글자가 사라지고 종료 코드 7 만 남아요. <code>main</code> 답게 <code>ret</code> 으로 끝내 고치세요. 종료 코드는 그대로 7 이에요.`, echoExit: true,
+        given: `default rel
+section .data
+msg db "끝까지 보여요?", 10, 0
+section .text
+global main
+extern printf
+main:
+    push rbp
+    lea rdi, [msg]
+    xor eax, eax
+    call printf
+    mov rax, 60             ; exit(7)
+    mov rdi, 7
+    syscall`,
+        needs: [['pop rbp   mov eax, 7   ret', 'R13/2', 'main 의 rax = 종료 코드'], ['printf', 'R13/2', '글자를 모아 뒀다가 내보냄(버퍼)']],
+        io: [{ output: `끝까지 보여요?
+7` }],
+        answer: `default rel
+section .data
+msg db "끝까지 보여요?", 10, 0
+section .text
+global main
+extern printf
+main:
+    push rbp
+    lea rdi, [msg]
+    xor eax, eax
+    call printf
+    pop rbp
+    mov eax, 7              ; return 7 → 종료 코드 7
+    ret` },
+    ],
+    RB3: [
+      { title: '① strlen · print_str · print_int', text: `챕터 3 의 함수 모음을 만들어요. 모두 <b>호출 규약대로</b>(인자 <code>rdi</code>, 결과 <code>rax</code>, <code>rbx</code> 를 쓰면 <code>push</code> · <code>pop</code>). 시작은 <code>global main</code>, 빌드는 <code>gcc -no-pie</code>, 끝은 <code>ret</code>.<ul><li><code>strlen(s)</code> → 0 앞까지의 바이트 수</li><li><code>print_str(s)</code> → s 와 줄바꿈을 <code>write</code></li><li><code>show_len(s)</code> → s 한 줄, 길이 한 줄(<code>print_int</code>)</li></ul><code>main</code> 에서 <code>"hello"</code> · <code>"어셈블리"</code> · 빈 글자(0 하나)로 <code>show_len</code> 을 불러요. C 라이브러리에도 <code>strlen</code> 이 있지만, <code>global</code> 을 안 붙인 라벨은 이 파일 안에서만 쓰여서 부딪치지 않아요.`,
+        needs: [['strlen:   …   ret', 'R11/0', '함수 = ret 으로 끝나는 라벨'], ['push rbx   mov rbx, rdi   …   pop rbx', 'R12/1', '부르는 동안 인자 간직하기'], ['call print_int', 'R11/2', '숫자 출력 함수'], ['global main   ret', 'R13/0', 'gcc -no-pie 로 빌드']],
+        io: [{ output: `hello
+5
+어셈블리
+12
+
+0` }],
+        answer: `default rel
+section .data
+s1 db "hello", 0
+s2 db "어셈블리", 0
+s3 db 0                     ; 빈 글자: 0 바이트 하나뿐
+nl db 10
+section .text
+global main
+main:
+    push rbp
+    lea rdi, [s1]
+    call show_len
+    lea rdi, [s2]
+    call show_len
+    lea rdi, [s3]
+    call show_len
+    pop rbp
+    xor eax, eax            ; return 0
+    ret
+show_len:                   ; show_len(s): s 한 줄, 길이 한 줄
+    push rbx
+    mov rbx, rdi            ; s 를 지켜지는 rbx 에
+    call print_str
+    mov rdi, rbx
+    call strlen
+    mov rdi, rax
+    call print_int
+    pop rbx
+    ret
+strlen:                     ; rax = 0 바이트 앞까지의 길이
+    xor eax, eax
+.next:
+    cmp byte [rdi + rax], 0
+    je .done
+    inc rax
+    jmp .next
+.done:
+    ret
+print_str:                  ; print_str(s): s 와 줄바꿈을 write
+    push rbx
+    mov rbx, rdi
+    call strlen
+    mov rdx, rax            ; write(1, s, 길이)
+    mov rsi, rbx
+    mov rdi, 1
+    mov rax, 1
+    syscall
+    mov rax, 1              ; write(1, nl, 1)
+    mov rdi, 1
+    lea rsi, [nl]
+    mov rdx, 1
+    syscall
+    pop rbx
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` },
+      { title: '② to_upper: 한 줄을 대문자로', text: `<code>to_upper(s)</code> 를 만드세요. s 의 <code>a</code>~<code>z</code> 를 <b>그 자리에서</b> <code>A</code>~<code>Z</code> 로 바꾸고, 다른 바이트(숫자 · 기호 · 한글)는 그대로 둬요. <code>main</code> 은 <code>read</code> 로 한 줄을 받아 끝의 줄바꿈을 0 으로 바꾸고, <code>to_upper</code> → ① 의 <code>print_str</code> 순서로 불러요.`,
+        needs: [['to_upper:   …   ret', 'R11/0', '함수로 만들기'], ['lea rdi, [buf]   call to_upper', 'R11/1', '인자는 rdi(글자의 주소)'], ['global main', 'R13/0', 'main 에서 시작']],
+        io: [{ input: `hello, asm!\n`, output: `HELLO, ASM!` }, { input: `Ubuntu 24.04 LTS\n`, output: `UBUNTU 24.04 LTS` }, { input: `안녕 abc\n`, output: `안녕 ABC` }],
+        answer: `default rel
+section .data
+nl db 10
+section .bss
+buf resb 256
+section .text
+global main
+main:
+    push rbp
+    mov rax, 0              ; read(0, buf, 255)
+    mov rdi, 0
+    lea rsi, [buf]
+    mov rdx, 255
+    syscall
+    mov byte [rsi + rax], 0         ; 받은 끝에 0
+    cmp byte [rsi + rax - 1], 10
+    jne .ready
+    mov byte [rsi + rax - 1], 0     ; 줄바꿈도 0 으로
+.ready:
+    lea rdi, [buf]
+    call to_upper
+    lea rdi, [buf]
+    call print_str
+    pop rbp
+    xor eax, eax
+    ret
+to_upper:                   ; to_upper(s): s 의 a~z 를 그 자리에서 A~Z 로
+.next:
+    mov al, [rdi]
+    cmp al, 0
+    je .done
+    cmp al, 'a'
+    jb .skip
+    cmp al, 'z'
+    ja .skip
+    xor al, 0x20            ; 소문자 → 대문자
+    mov [rdi], al
+.skip:
+    inc rdi
+    jmp .next
+.done:
+    ret
+strlen:                     ; rax = 0 바이트 앞까지의 길이
+    xor eax, eax
+.next:
+    cmp byte [rdi + rax], 0
+    je .done
+    inc rax
+    jmp .next
+.done:
+    ret
+print_str:                  ; print_str(s): s 와 줄바꿈을 write
+    push rbx
+    mov rbx, rdi
+    call strlen
+    mov rdx, rax
+    mov rsi, rbx
+    mov rdi, 1
+    mov rax, 1
+    syscall
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [nl]
+    mov rdx, 1
+    syscall
+    pop rbx
+    ret` },
+      { title: '③ max_of(arr, n)', text: `qword 배열의 주소와 칸 수를 받아 가장 큰 값을 돌려주는 <code>max_of(arr, n)</code> 을 만드세요(음수도 있어요, n 은 1 이상). <code>[3, -7, 12, 5]</code> · <code>[-5, -2, -9]</code> · <code>[42]</code> 로 불러 <code>print_int</code> 로 찍어요.`,
+        needs: [['lea rdi, [arr1]   mov rsi, 4   call max_of', 'R12/0', '인자 1 = rdi, 인자 2 = rsi'], ['mov rdi, rax   call print_int', 'R11/2', '결과 찍기']],
+        io: [{ output: `12
+-2
+42` }],
+        answer: `default rel
+section .data
+arr1 dq 3, -7, 12, 5
+arr2 dq -5, -2, -9
+arr3 dq 42
+section .text
+global main
+main:
+    push rbp
+    lea rdi, [arr1]
+    mov rsi, 4
+    call max_of
+    mov rdi, rax
+    call print_int          ; 12
+    lea rdi, [arr2]
+    mov rsi, 3
+    call max_of
+    mov rdi, rax
+    call print_int          ; -2
+    lea rdi, [arr3]
+    mov rsi, 1
+    call max_of
+    mov rdi, rax
+    call print_int          ; 42
+    pop rbp
+    xor eax, eax
+    ret
+max_of:                     ; max_of(arr, n): 가장 큰 값 (n 은 1 이상)
+    mov rax, [rdi]          ; 일단 0번 칸
+    mov rcx, 1
+.next:
+    cmp rcx, rsi
+    jge .done
+    mov rdx, [rdi + rcx*8]
+    cmp rdx, rax
+    jle .skip
+    mov rax, rdx            ; 더 크면 바꿈
+.skip:
+    inc rcx
+    jmp .next
+.done:
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` },
+      { title: '④ 모두 모아 printf 한 줄', text: `<code>"hello asm"</code> 을 <code>to_upper</code> 로 바꾸고, <code>strlen</code> 으로 길이를, <code>max_of</code> 로 <code>nums dq 4, 8, -15, 16, 23, -42</code> 의 최댓값을 구해 <code>printf</code> 한 번으로 찍으세요. 함수를 부르는 동안 길이 · 최댓값은 <code>rbx</code> · <code>r12</code> 에 간직하고, push 수로 정렬을 맞춰요.<br><span class="muted small">이 문제는 숫자를 <code>printf</code> 로만 찍어요. <code>write</code> 로 바로 쓰는 <code>print_int</code> 와 글자를 모아 뒀다 쓰는 <code>printf</code> 를 섞으면 나오는 순서가 뒤바뀔 수 있어요.</span>`,
+        needs: [['push rbp   push rbx   push r12', 'R13/3', 'push 세 번 = 정렬 · 지킬 레지스터 맡기기'], ['mov rbx, rax', 'R12/1', '부르는 동안 간직할 값은 rbx · r12'], ['lea rdi, [fmt]   lea rsi, [name]   mov rdx, rbx   mov rcx, r12   xor eax, eax   call printf', 'R13/1', '인자 넷: 형식 · %s · %ld · %ld']],
+        io: [{ output: `HELLO ASM / 9 글자 / 최댓값 23` }],
+        answer: `default rel
+section .data
+name db "hello asm", 0
+nums dq 4, 8, -15, 16, 23, -42
+fmt db "%s / %ld 글자 / 최댓값 %ld", 10, 0
+section .text
+global main
+extern printf
+main:
+    push rbp
+    push rbx
+    push r12                ; push 세 번 → printf 앞 rsp 가 16의 배수
+    lea rdi, [name]
+    call to_upper           ; name 이 그 자리에서 대문자로
+    lea rdi, [name]
+    call strlen
+    mov rbx, rax            ; rbx = 길이 (함수를 더 불러도 지켜짐)
+    lea rdi, [nums]
+    mov rsi, 6
+    call max_of
+    mov r12, rax            ; r12 = 최댓값
+    lea rdi, [fmt]
+    lea rsi, [name]
+    mov rdx, rbx
+    mov rcx, r12
+    xor eax, eax
+    call printf
+    pop r12
+    pop rbx
+    pop rbp
+    xor eax, eax
+    ret
+to_upper:                   ; to_upper(s): a~z → A~Z
+.next:
+    mov al, [rdi]
+    cmp al, 0
+    je .done
+    cmp al, 'a'
+    jb .skip
+    cmp al, 'z'
+    ja .skip
+    xor al, 0x20
+    mov [rdi], al
+.skip:
+    inc rdi
+    jmp .next
+.done:
+    ret
+strlen:                     ; rax = 0 바이트 앞까지의 길이
+    xor eax, eax
+.next:
+    cmp byte [rdi + rax], 0
+    je .done
+    inc rax
+    jmp .next
+.done:
+    ret
+max_of:                     ; max_of(arr, n): 가장 큰 값
+    mov rax, [rdi]
+    mov rcx, 1
+.next:
+    cmp rcx, rsi
+    jge .done
+    mov rdx, [rdi + rcx*8]
+    cmp rdx, rax
+    jle .skip
+    mov rax, rdx
+.skip:
+    inc rcx
+    jmp .next
+.done:
+    ret` },
+    ],
   },
 };

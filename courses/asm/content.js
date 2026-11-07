@@ -769,20 +769,718 @@ done:
   summary: ["read 는 rax=0 · rdi=0 · rsi=버퍼 · rdx=최대 — 받은 바이트 수(줄바꿈 포함)가 rax, 0 이면 입력 끝", "글자 → 정수: movzx 로 한 바이트, - '0', 지금까지 × 10 + 이번 자리", "정수 → 글자: div 10 의 나머지 + '0' 을 버퍼 뒤에서부터, 음수는 neg 하고 '-' — 이 덩어리가 레슨 11 의 print_int"] },
 { id: 'RB2', ch: 2, boss: true, title: '만들어 보기: 숫자를 출력하는 프로그램', mode: 'text',
   tutorSummary: "챕터 2 묶기 — 레슨 9 의 숫자 출력 덩어리(rdi → 10진 글자 + 줄바꿈, rax rcx rdx rsi rdi r8 r11 바뀜)를 반복 안에 두고 rbx · r12 · r13 으로 배열을 돌며 누적 합 찍기, read 한 줄을 다른 버퍼에 거꾸로 복사해 출력(줄바꿈 제외, 영어·숫자만), '-' 가 붙을 수 있는 두 정수를 읽어 합 · 차 · 곱을 resq 3 에 저장하고 한 줄씩 출력. 이 덩어리가 레슨 11 의 print_int 함수가 됨.", pages: [], summary: [] },
-{ id: 'R10', ch: 3, n: 10, title: '스택: push · pop · rsp', mode: 'text', draft: true,
-  tutorSummary: '스택은 아래로 자라는 메모리, rsp 가 꼭대기. push = sub rsp, 8 + 저장, pop 은 반대. 값 맡기기, 뒤집기.',
-  pages: ASM_TODO('스택 그림 · push/pop · rsp · 값 맡기기 · 뒤집기'), summary: ['rsp 가 꼭대기, 아래로 자람', 'push 는 sub rsp, 8 + 저장', '나중에 넣은 것이 먼저 나옴'] },
-{ id: 'R11', ch: 3, n: 11, title: '함수: call 과 ret', mode: 'text', draft: true,
-  tutorSummary: 'call = 돌아올 주소 push + 점프, ret = pop 해서 점프. 인자는 레지스터, 결과는 rax. 레지스터 지키기 push/pop. 재귀 팩토리얼.',
-  pages: ASM_TODO('call · ret · 인자와 결과 · 레지스터 지키기 · 재귀'), summary: ['call 은 돌아올 주소를 push', '결과는 rax', '망가뜨릴 레지스터는 push/pop'] },
-{ id: 'R12', ch: 3, n: 12, title: '호출 규약(System V AMD64)', mode: 'text', draft: true,
-  tutorSummary: '인자 rdi rsi rdx rcx r8 r9, 결과 rax. 불리는 쪽이 지킬 것 rbx rbp r12~r15. 스택 프레임 push rbp · mov rbp, rsp · sub rsp, 16 · leave. 스택 16바이트 정렬.',
-  pages: ASM_TODO('인자 순서 · 지켜야 할 레지스터 · 스택 프레임 · 16바이트 정렬'), summary: ['인자는 rdi rsi rdx rcx r8 r9', 'rbx rbp r12~r15 는 지킨다', 'call 앞 rsp 는 16의 배수'] },
-{ id: 'R13', ch: 3, n: 13, title: 'C 라이브러리 부르기: printf', mode: 'text', draft: true,
-  tutorSummary: 'extern printf · global main · gcc -no-pie. printf 는 rdi 에 형식, rsi 에 값, xor eax, eax. puts · strlen. main 의 rax 가 종료 코드. 스택 정렬.',
-  pages: ASM_TODO('extern · main · gcc -no-pie · printf 인자 · puts · 정렬 경고'), summary: ['extern printf + gcc -no-pie', 'rdi 형식, rsi 값, eax = 0', 'main 에서 push rbp 로 정렬'] },
-{ id: 'RB3', ch: 3, boss: true, title: '만들어 보기: 내 함수 모음', mode: 'text', draft: true,
-  tutorSummary: '챕터 3 묶기 — print_int · strlen · to_upper · max_of 를 규약대로 만들고 main 에서 부르기.', pages: [], summary: [] },
+{ id: 'R10', ch: 3, n: 10, title: '스택: push · pop · rsp', mode: 'text',
+  tutorSummary: '스택은 프로그램마다 있는 메모리 한 덩어리, 높은 주소에서 낮은 주소로(아래로) 자라고 rsp 가 꼭대기 주소. push rax = sub rsp, 8 + mov [rsp], rax · pop rbx = mov rbx, [rsp] + add rsp, 8 — 늘 8바이트, 나중에 넣은 것이 먼저 나옴. syscall 은 rcx · r11 을 바꾸니 반복 횟수는 push rcx / pop rcx 로 맡김. 글자를 차례로 push 했다가 pop 하면 거꾸로. push 한 만큼 pop.',
+  terms: { '스택': '프로그램마다 있는 메모리 한 덩어리. 높은 주소에서 낮은 주소 쪽으로(아래로) 쌓이고 rsp 가 꼭대기 주소를 가리킨다. 나중에 넣은 것이 먼저 나온다' },
+  pages: [
+    { title: '스택과 rsp: 아래로 자라는 메모리', html: `<p>지금까지 값은 레지스터나 <code>section .data</code> · <code>.bss</code> 의 이름 붙은 칸에 뒀어요. 프로그램에는 이름 없이 <b>잠깐 쓰는 메모리</b>도 있어요. 바로 [[스택]]이에요. 리눅스는 프로그램을 시작할 때 스택 자리를 마련하고, <code>rsp</code> 레지스터에 그 <b>꼭대기 주소</b>를 넣어 줘요(메모리 지도는 <a href="../os/#lesson/K10" target="_blank" rel="noopener">운영체제 교과서 「가상 메모리」 ↗</a>).</p>
+<pre>높은 주소
+  ┌────────┐
+  │   10   │  첫 번째 push
+  ├────────┤
+  │   20   │
+  ├────────┤
+  │   30   │  ← rsp (꼭대기 = 마지막 push)
+  └────────┘
+낮은 주소   ↓ 쌓을수록 주소가 작아져요</pre>
+<p>스택은 접시 더미처럼 <b>꼭대기에서만</b> 넣고 빼요. 특이한 점은 <b>아래로 자란다</b>는 것이에요. 하나 쌓을 때마다 <code>rsp</code> 가 8 씩 <b>작아져요</b>.</p>
+<p>예제는 처음 <code>rsp</code> 를 <code>rbx</code> 에 적어 두고, 값 세 개를 쌓은 뒤 「처음 − 지금」 을 종료 코드로 내요. 실행하면 <code>24</code> — 8바이트씩 세 번 내려갔어요.</p>
+<p class="muted small">주소 자체는 실행할 때마다 달라요(리눅스가 보안을 위해 섞어요). 그래서 주소 대신 차이를 봐요.</p>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rbx, rsp            ; 지금 꼭대기 주소를 rbx 에 적어 둠
+    push 10
+    push 20
+    push 30                 ; 세 번 push → 8바이트 × 3 만큼 아래로
+    mov rdi, rbx
+    sub rdi, rsp            ; 처음 꼭대기 - 지금 꼭대기 = 내려간 바이트 수
+    mov rax, 60
+    syscall`, echoExit: true } },
+    { title: 'push rax · pop rbx', html: `<p><code>push</code> 는 꼭대기에 하나 쌓고, <code>pop</code> 은 꼭대기에서 하나 꺼내요. 한 번에 늘 <b>8바이트</b>(64비트 레지스터 하나)예요.</p>
+<table class="kb"><tbody><tr><td><code>push rax</code></td><td><code>sub rsp, 8</code> 하고 <code>mov [rsp], rax</code> — 8 내려가서 그 자리에 저장</td></tr><tr><td><code>pop rbx</code></td><td><code>mov rbx, [rsp]</code> 하고 <code>add rsp, 8</code> — 꼭대기 값을 꺼내고 8 올라감</td></tr><tr><td><code>push 10</code></td><td>숫자도 바로 쌓을 수 있어요(8바이트로)</td></tr><tr><td><code>mov rax, [rsp + 8]</code></td><td>꺼내지 않고 읽기만 — 꼭대기 바로 위 칸(하나 먼저 넣은 값)</td></tr></tbody></table>
+<p><b>나중에 넣은 것이 먼저 나와요.</b> 예제는 5 → 7 순서로 넣고 두 번 꺼내요.</p>
+<pre>push (5)       push (7)       pop rbx        pop rcx
+│ 5 │ ← rsp    │ 5 │          │ 5 │ ← rsp    (처음 그대로)
+               │ 7 │ ← rsp    rbx = 7        rcx = 5</pre>
+<p>실행하면 <code>75</code> — 십의 자리가 먼저 꺼낸 7, 일의 자리가 나중에 꺼낸 5 예요.</p>
+<ul><li><code>push eax</code> 처럼 32비트 이름은 안 돼요. <code>nasm</code> 이 <code>error: instruction not supported in 64-bit mode</code> 라고 해요</li><li>꺼낸 칸의 값은 지워지지 않고 그냥 「빈 자리」 로 쳐요. 다음 <code>push</code> 가 덮어써요</li></ul>
+<div class="bk-warn"><b>push 한 만큼 pop</b> — 넣고 안 꺼내면 <code>rsp</code> 가 제자리로 안 돌아와요. 다음 레슨의 함수에서는 이게 바로 <code>Segmentation fault</code> 로 이어져요.</div>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rax, 5
+    push rax                ; 꼭대기에 5
+    mov rax, 7
+    push rax                ; 꼭대기에 7 (5 는 그 아래)
+    pop rbx                 ; rbx = 7 — 나중에 넣은 것이 먼저
+    pop rcx                 ; rcx = 5
+    mov rdi, rbx
+    mov rdx, 10
+    imul rdi, rdx           ; rdi = 7 × 10
+    add rdi, rcx            ; rdi = 70 + 5
+    mov rax, 60
+    syscall`, echoExit: true } },
+    { title: '값 맡기기: syscall 앞 push rcx', html: `<p>레지스터는 16개뿐이라 금방 모자라요. 레지스터를 잠깐 다른 일에 써야 할 때, 원래 값을 스택에 <b>맡겼다가</b> 되찾아요.</p>
+<p>진짜로 자주 만나는 경우가 있어요. <code>syscall</code> 은 일을 마치고 돌아올 때 <b><code>rcx</code> 와 <code>r11</code> 을 바꿔 놔요</b>. CPU 가 돌아올 자리를 거기에 적어 두거든요. 그래서 반복 횟수를 <code>rcx</code> 에 두고 반복 안에서 <code>syscall</code> 을 부르면 횟수가 엉망이 돼요.</p>
+<pre>again:
+    push rcx        ; 맡기고
+    ...             ; rcx 가 바뀌는 일(syscall)
+    pop rcx         ; 되찾기
+    dec rcx
+    jnz again</pre>
+<p>실행하면 「안녕!」 이 세 줄 나와요. <code>push rcx</code> · <code>pop rcx</code> 두 줄을 지우고 다시 빌드하면 끝나지 않고 계속 찍어요. <kbd>Ctrl</kbd>+<kbd>C</kbd> 로 멈추면 돼요([[레슨:R6]]).</p>
+<p class="muted small">맡길 때와 되찾을 때 레지스터가 달라도 돼요. <code>push rcx</code> 하고 <code>pop rdx</code> 하면 rcx 의 값이 rdx 로 가요.</p>`,
+      example: { code: `default rel
+section .data
+msg db "안녕!", 10
+len equ $ - msg
+section .text
+global _start
+_start:
+    mov rcx, 3              ; 세 번 반복
+again:
+    push rcx                ; syscall 이 rcx 를 바꾸니 스택에 맡김
+    mov rax, 1              ; write(1, msg, len)
+    mov rdi, 1
+    lea rsi, [msg]
+    mov rdx, len
+    syscall
+    pop rcx                 ; 맡긴 값 되찾기
+    dec rcx
+    jnz again
+    mov rax, 60
+    mov rdi, 0
+    syscall` } },
+    { title: '뒤집기: 쌓았다가 거꾸로 꺼내기', html: `<p>나중에 넣은 것이 먼저 나오니까, 글자를 앞에서부터 하나씩 <code>push</code> 하고 다시 <code>pop</code> 하면 <b>거꾸로</b> 나와요. 파이썬의 <code>s[::-1]</code> 을 손으로 만드는 셈이에요.</p>
+<ol><li>앞에서부터: <code>al</code> 에 글자 하나 → <code>push rax</code>. 글자 하나도 8바이트 칸 하나를 써요</li><li>다시 앞에서부터 <code>buf</code> 칸에: <code>pop rax</code> → <code>mov [rdi + rcx], al</code></li><li>끝에 줄바꿈(10)을 붙여 <code>write</code></li></ol>
+<pre>"stack" 을 push 한 뒤      pop 하는 순서
+│ s │                      k → c → a → t → s
+│ t │
+│ a │
+│ c │
+│ k │ ← rsp</pre>
+<p>실행하면 <code>kcats</code>. 넣은 횟수(5)와 꺼낸 횟수(5)가 같아서 <code>rsp</code> 도 제자리로 돌아와요.</p>
+<p class="muted small">한글은 한 글자가 3바이트라 바이트 단위로 뒤집으면 깨져요. 이 레슨의 뒤집기는 영어 · 숫자로 해요.</p>`,
+      example: { code: `default rel
+section .data
+msg db "stack"
+len equ $ - msg
+section .bss
+buf resb 16
+section .text
+global _start
+_start:
+    lea rsi, [msg]
+    xor ecx, ecx            ; rcx = 0 (몇 번째 글자)
+push_loop:
+    xor eax, eax
+    mov al, [rsi + rcx]     ; 글자 하나를 al 에
+    push rax                ; 스택에 쌓기
+    inc rcx
+    cmp rcx, len
+    jl push_loop
+    lea rdi, [buf]
+    xor ecx, ecx
+pop_loop:
+    pop rax                 ; 나중에 쌓은 글자부터 나옴
+    mov [rdi + rcx], al
+    inc rcx
+    cmp rcx, len
+    jl pop_loop
+    mov byte [rdi + rcx], 10    ; 끝에 줄바꿈
+    mov rax, 1              ; write(1, buf, len + 1)
+    mov rsi, rdi
+    mov rdi, 1
+    mov rdx, len + 1
+    syscall
+    mov rax, 60
+    mov rdi, 0
+    syscall` } },
+  ],
+  summary: ['rsp 가 꼭대기, 쌓을수록 주소가 작아짐(아래로 자람)', 'push 는 sub rsp, 8 + 저장 · pop 은 꺼내고 add rsp, 8', '나중에 넣은 것이 먼저 — 맡기기 · 뒤집기, push 한 만큼 pop'] },
+{ id: 'R11', ch: 3, n: 11, title: '함수: call 과 ret', mode: 'text',
+  tutorSummary: 'call f = 돌아올 주소(다음 명령)를 push 하고 f 로 점프, ret = 꼭대기 주소를 pop 해서 점프. 함수 = ret 으로 끝나는 라벨, _start 의 exit 아래에 둠. 인자는 rdi(둘째 rsi), 결과는 rax. 레슨 9 의 숫자 출력 코드에 print_int: 라벨과 ret → call print_int(rax rcx rdx rsi rdi r8 r11 을 바꿈). 부른 쪽 rcx 가 망가지면 push rcx / pop rcx, 함수 안 push/pop 짝이 안 맞으면 ret 이 엉뚱한 곳으로 → Segmentation fault. 재귀 팩토리얼은 push rdi · call fact · pop rdi · imul.',
+  terms: { '돌아올 주소': 'call 바로 다음 명령의 주소. call 이 스택에 넣고, ret 이 꺼내서 그리로 점프한다', '재귀': '함수가 자기 자신을 부르는 것. 부를 때마다 돌아올 주소가 스택에 하나씩 쌓인다' },
+  pages: [
+    { title: 'call 과 ret: 갔다가 돌아오기', html: `<p>파이썬의 함수처럼, 같은 코드를 여러 곳에서 불러 쓰고 싶어요. 라벨로 <code>jmp</code> 하면 갈 수는 있지만 <b>어디로 돌아와야 할지</b> 몰라요. 그래서 명령 두 개가 짝으로 있어요.</p>
+<table class="kb"><tbody><tr><td><code>call say_hi</code></td><td>다음 명령의 주소([[돌아올 주소]])를 <code>push</code> 하고 <code>say_hi</code> 로 점프</td></tr><tr><td><code>ret</code></td><td>꼭대기에서 주소를 <code>pop</code> 해서 그리로 점프</td></tr></tbody></table>
+<pre>call say_hi 하는 순간            ret 하는 순간
+  │ 돌아올 주소 │ ← rsp           그 주소를 꺼내서 점프
+  다음은 say_hi 의 첫 줄           다음은 call 바로 아랫줄</pre>
+<p>예제는 <code>say_hi</code> 를 두 번 불러요. 두 번 다 「부른 곳 바로 다음 줄」 로 돌아와서 인사가 두 줄 나와요.</p>
+<ul><li>어셈블리에서 함수는 따로 있는 게 아니라 <b><code>ret</code> 으로 끝나는 라벨</b>이에요</li><li>함수는 <code>_start</code> 의 마지막 <code>syscall</code>(exit) <b>아래</b>에 둬요. exit 이 없으면 <code>_start</code> 가 그대로 흘러 내려가 함수 몸통으로 들어가 버려요</li></ul>`,
+      example: { code: `default rel
+section .data
+hi db "안녕하세요", 10
+hi_len equ $ - hi
+section .text
+global _start
+_start:
+    call say_hi             ; say_hi 로 갔다가 바로 다음 줄로 돌아옴
+    call say_hi             ; 한 번 더
+    mov rax, 60
+    mov rdi, 0
+    syscall
+say_hi:
+    mov rax, 1              ; write(1, hi, hi_len)
+    mov rdi, 1
+    lea rsi, [hi]
+    mov rdx, hi_len
+    syscall
+    ret                     ; 스택 꼭대기의 돌아올 주소로` } },
+    { title: '인자는 rdi, 결과는 rax', html: `<p>함수에 값을 넘기고(인자) 받아 오는(결과) 방법도 약속이 있어요. 첫 인자는 <code>rdi</code>, 둘째는 <code>rsi</code> 에 넣고 부르면, 함수는 결과를 <code>rax</code> 에 넣고 <code>ret</code> 해요. 전체 순서는 [[레슨:R12]] 에서 봐요.</p>
+<table class="kb"><tbody><tr><td>파이썬</td><td><code>result = square(12)</code></td></tr><tr><td>어셈블리</td><td><code>mov rdi, 12</code> → <code>call square</code> → 결과는 <code>rax</code></td></tr></tbody></table>
+<pre>square:                 ; rax = rdi × rdi
+    mov rax, rdi
+    imul rax, rdi
+    ret</pre>
+<p>함수 위에 「무엇을 받아 무엇을 돌려주나」 를 주석 한 줄로 적어 두면 부를 때 헷갈리지 않아요. 예제는 결과를 종료 코드로 보여 줘요. 실행하면 <code>144</code>.</p>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rdi, 12             ; 인자: rdi = 12
+    call square             ; 결과: rax = 144
+    mov rdi, rax
+    mov rax, 60
+    syscall
+square:                     ; rax = rdi × rdi
+    mov rax, rdi
+    imul rax, rdi
+    ret`, echoExit: true } },
+    { title: 'print_int 를 함수로', html: `<p>[[레슨:R9]] 에서 정수를 10진 글자로 바꿔 찍는 코드를 만들었죠. 그 코드 앞에 라벨 <code>print_int:</code>, 끝에 <code>ret</code> — 이제 <code>call print_int</code> 한 줄로 어디서든 숫자를 찍어요.</p>
+<table class="kb"><tbody><tr><td>받는 것</td><td><code>rdi</code> = 찍을 정수(음수도 돼요)</td></tr><tr><td>하는 일</td><td>10진 글자 + 줄바꿈을 <code>write</code></td></tr><tr><td>바꿔 놓는 레지스터</td><td><code>rax rcx rdx rsi rdi r8 r11</code> — 부르고 나면 이 값들은 달라져 있어요</td></tr></tbody></table>
+<ul><li><code>sub rsp, 32</code> 로 스택에서 32바이트를 빌려 글자 버퍼로 쓰고, <code>ret</code> 앞의 <code>add rsp, 32</code> 로 돌려줘요. 빌린 만큼 돌려줘야 <code>ret</code> 이 돌아올 주소를 제대로 찾아요([[레슨:R10]])</li><li><code>.digits</code> · <code>.write</code> 처럼 점으로 시작하는 라벨은 바로 위 라벨(<code>print_int</code>)에 딸린 <b>지역 라벨</b>이에요. 다른 함수에 <code>.digits</code> 가 또 있어도 부딪치지 않아요</li></ul>
+<p>실행하면 0, 1234567, -42 가 한 줄씩 나와요. 앞으로 숫자를 찍는 예제는 이 함수를 그대로 붙여 써요.</p>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rdi, 0
+    call print_int
+    mov rdi, 1234567
+    call print_int
+    mov rdi, -42
+    call print_int
+    mov rax, 60
+    mov rdi, 0
+    syscall
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` } },
+    { title: '레지스터 지키기: push · pop', html: `<p>함수와 부른 쪽은 같은 레지스터를 같이 써요. 부른 쪽이 <code>rcx</code> 에 반복 횟수를 두고 <code>call print_int</code> 하면? <code>print_int</code> 는 안에서 <code>rcx</code> 를 10 으로 바꾸고, <code>syscall</code> 도 <code>rcx</code> 를 바꿔요. 돌아오면 횟수가 사라져 있어요.</p>
+<pre>    mov rcx, 1
+again:
+    mov rdi, rcx
+    call print_int      ; ← 여기서 rcx 가 망가짐
+    inc rcx
+    cmp rcx, 3
+    jle again           ; 1 만 찍고 끝나 버려요</pre>
+<p>고치는 법은 [[레슨:R10]] 의 「맡기기」 그대로예요. <b>부르기 전에 <code>push rcx</code>, 돌아와서 <code>pop rcx</code></b>. 예제를 실행하면 1, 2, 3 이 한 줄씩 나와요.</p>
+<p>반대로 <b>함수 쪽</b>이 부른 쪽의 레지스터를 지켜 줄 수도 있어요. 함수 첫 줄에 <code>push rbx</code>, <code>ret</code> 바로 앞에 <code>pop rbx</code>. 어느 레지스터를 누가 지킬지는 다음 레슨의 약속이 정해 줘요.</p>
+<div class="bk-warn"><b>ret 앞에서 스택이 제자리인지</b> — <code>ret</code> 은 꼭대기에 있는 값을 「돌아올 주소」 라고 믿고 점프해요. 함수 안에서 <code>push</code> 하고 <code>pop</code> 을 빼먹으면 엉뚱한 곳으로 점프해서 <code>Segmentation fault</code>. 함수 안의 push 와 pop 은 늘 짝을 맞춰요.</div>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rcx, 1              ; rcx = 1, 2, 3
+again:
+    push rcx                ; print_int 가 rcx 를 바꾸니 맡김
+    mov rdi, rcx
+    call print_int
+    pop rcx                 ; 되찾기
+    inc rcx
+    cmp rcx, 3
+    jle again
+    mov rax, 60
+    mov rdi, 0
+    syscall
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` } },
+    { title: '재귀: 자기를 부르는 fact', html: `<p>함수가 자기 자신을 불러도 돼요([[재귀]]). <code>call</code> 할 때마다 돌아올 주소가 스택에 하나씩 쌓이니까, 몇 겹으로 불러도 하나씩 제자리로 돌아와요.</p>
+<table class="kb"><tbody><tr><td>파이썬</td><td><code>def fact(n): return 1 if n &lt;= 1 else n * fact(n - 1)</code></td></tr><tr><td>어셈블리</td><td><code>rdi</code> ≤ 1 이면 <code>rax = 1</code>. 아니면 <code>rdi</code> 를 맡기고 <code>fact(rdi - 1)</code> 을 부른 뒤 곱하기</td></tr></tbody></table>
+<p><code>push rdi</code> 가 핵심이에요. 안쪽 <code>fact</code> 가 <code>rdi</code> 를 1 씩 줄여 가니까, 내 n 은 스택에 맡겨 뒀다가 돌아와서 꺼내 곱해요. <code>fact(3)</code> 이 가장 깊이 들어갔을 때의 스택이에요.</p>
+<pre>│ _start 로 돌아올 주소    │
+│ n = 3                    │  fact(3) 이 맡긴 것
+│ fact(3) 으로 돌아올 주소 │
+│ n = 2                    │  fact(2) 가 맡긴 것
+│ fact(2) 로 돌아올 주소   │ ← rsp   지금 fact(1): rax = 1 하고 ret</pre>
+<p>돌아오면서 2 × 1 → 3 × 2 순서로 곱해요. 실행하면 <code>120</code> 과 <code>3628800</code>.</p>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rdi, 5
+    call fact
+    mov rdi, rax
+    call print_int          ; 5! = 120
+    mov rdi, 10
+    call fact
+    mov rdi, rax
+    call print_int          ; 10! = 3628800
+    mov rax, 60
+    mov rdi, 0
+    syscall
+fact:                       ; rax = rdi! (rdi 가 1 이하면 1)
+    cmp rdi, 1
+    jg .more
+    mov rax, 1              ; 끝: 1! = 1
+    ret
+.more:
+    push rdi                ; 내 n 을 맡김
+    dec rdi
+    call fact               ; rax = (n-1)!
+    pop rdi                 ; 내 n 되찾기
+    imul rax, rdi           ; rax = n × (n-1)!
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` } },
+  ],
+  summary: ['call 은 돌아올 주소를 push 하고 점프, ret 은 pop 해서 점프', '인자는 rdi(둘째 rsi), 결과는 rax — call print_int 로 숫자 출력', '망가질 레지스터는 push/pop, 함수 안 push·pop 은 짝을 맞춤'] },
+{ id: 'R12', ch: 3, n: 12, title: '호출 규약(System V AMD64)', mode: 'text',
+  tutorSummary: '리눅스 x86-64 의 System V AMD64 규약: 인자 rdi rsi rdx rcx r8 r9(7번째부터 스택), 결과 rax. 바뀌어도 되는 것(부르는 쪽이 지킴) rax rcx rdx rsi rdi r8~r11, 그대로여야 하는 것(불리는 쪽이 지킴) rbx rbp r12~r15 · rsp. 스택 프레임 push rbp · mov rbp, rsp · sub rsp, 16 · [rbp - 8] · leave · ret. call 하는 순간 rsp 는 16의 배수 — 함수에 들어오면 16n + 8, push rbp 로 다시 16n. 시스템 콜의 4번째 인자는 r10.',
+  terms: { '호출 규약': '함수를 부르는 쪽과 불리는 쪽이 지키는 약속. 인자 레지스터의 순서, 결과 레지스터, 누가 어느 레지스터를 지킬지, 스택 정렬을 정한다', '스택 프레임': '함수 하나가 스택에서 쓰는 자기 칸. rbp 를 기준점으로 [rbp - 8] 처럼 지역 변수를 둔다' },
+  pages: [
+    { title: '인자 rdi rsi rdx rcx r8 r9', html: `<p>내가 만들고 내가 부르는 함수는 아무 레지스터나 써도 돌아가요. 하지만 남이 만든 함수(C 라이브러리의 <code>printf</code>, C 컴파일러가 만든 함수)와 섞으려면 <b>모두가 같은 약속</b>을 지켜야 해요. 그 약속이 [[호출 규약]]이고, 리눅스 x86-64 는 <b>System V AMD64</b> 규약을 써요.</p>
+<table class="kb"><tbody><tr><td>인자 1 ~ 6</td><td><code>rdi</code> · <code>rsi</code> · <code>rdx</code> · <code>rcx</code> · <code>r8</code> · <code>r9</code> (이 순서)</td></tr><tr><td>7번째부터</td><td>스택으로(이 교과서는 6개까지만)</td></tr><tr><td>결과</td><td><code>rax</code></td></tr></tbody></table>
+<p>예제의 <code>digits3(a, b, c)</code> 는 a × 100 + b × 10 + c 를 돌려줘요. 파이썬의 <code>digits3(1, 2, 3)</code> 이 어셈블리에선 <code>rdi = 1</code> · <code>rsi = 2</code> · <code>rdx = 3</code> 을 넣고 <code>call digits3</code>. 실행하면 <code>123</code> 과 <code>987</code>.</p>
+<p class="muted small">시스템 콜도 거의 같지만 4번째 인자만 <code>rcx</code> 대신 <code>r10</code> 이에요. <code>syscall</code> 이 <code>rcx</code> 를 쓰니까요([[레슨:R10]]). 이 교과서의 시스템 콜은 인자가 3개까지라 만날 일은 드물어요.</p>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rdi, 1              ; 1번째 인자 a
+    mov rsi, 2              ; 2번째 인자 b
+    mov rdx, 3              ; 3번째 인자 c
+    call digits3
+    mov rdi, rax
+    call print_int          ; 123
+    mov rdi, 9
+    mov rsi, 8
+    mov rdx, 7
+    call digits3
+    mov rdi, rax
+    call print_int          ; 987
+    mov rax, 60
+    mov rdi, 0
+    syscall
+digits3:                    ; rax = a × 100 + b × 10 + c
+    mov rax, rdi
+    mov rcx, 100
+    imul rax, rcx           ; a × 100
+    mov rcx, 10
+    imul rsi, rcx           ; b × 10
+    add rax, rsi
+    add rax, rdx
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` } },
+    { title: '지킬 레지스터: rbx rbp r12~r15', html: `<p>함수를 부르면 어떤 레지스터는 바뀌어도 되고, 어떤 건 그대로여야 해요. 규약이 둘로 나눠 놨어요.</p>
+<table class="kb"><tbody><tr><td><b>바뀌어도 되는 것</b><br>(부르는 쪽이 지킴)</td><td><code>rax rcx rdx rsi rdi r8 r9 r10 r11</code> — 함수가 마음대로 써요. 부른 뒤에도 그 값이 필요하면 <b>부르는 쪽이</b> 미리 <code>push</code> 해 둬요</td></tr><tr><td><b>그대로여야 하는 것</b><br>(불리는 쪽이 지킴)</td><td><code>rbx rbp r12 r13 r14 r15</code> 와 <code>rsp</code> — 함수가 쓰고 싶으면 <b>함수가</b> 처음에 <code>push</code>, <code>ret</code> 앞에 <code>pop</code></td></tr></tbody></table>
+<p>그래서 <b>함수를 여러 번 부르는 동안 간직할 값</b>(반복 횟수, 합계)은 <code>rbx</code> · <code>r12</code> 같은 「그대로」 쪽에 두면 편해요. [[레슨:R11]] 처럼 부를 때마다 <code>push rcx</code> · <code>pop rcx</code> 하지 않아도 돼요.</p>
+<p>예제의 <code>_start</code> 는 횟수를 <code>rbx</code> 에 두고 <code>cube</code> 와 <code>print_int</code> 를 불러요. <code>cube</code> 는 안에서 <code>rbx</code> 를 쓰지만 처음에 맡기고 끝에 돌려놔서 규약을 지켜요. <code>print_int</code> 는 <code>rbx</code> 를 아예 안 써요(첫 줄 주석). 실행하면 <code>27</code>, 8, 1 이 한 줄씩.</p>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rbx, 3              ; rbx = 3, 2, 1 — 부르는 동안 지켜지는 레지스터
+again:
+    mov rdi, rbx
+    call cube               ; rax = rbx³
+    mov rdi, rax
+    call print_int          ; print_int 도 rbx 는 안 건드림
+    dec rbx
+    jnz again
+    mov rax, 60
+    mov rdi, 0
+    syscall
+cube:                       ; rax = rdi × rdi × rdi — 안에서 rbx 를 씀
+    push rbx                ; 불린 쪽이 rbx 를 지킴
+    mov rbx, rdi
+    imul rbx, rdi
+    imul rbx, rdi
+    mov rax, rbx
+    pop rbx
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` } },
+    { title: '스택 프레임: push rbp · leave', html: `<p>레지스터만으로 모자라거나, 다른 함수를 부르는 동안 값을 안전하게 둬야 할 때 <b>지역 변수</b>를 스택에 만들어요. 함수 하나가 스택에서 쓰는 자기 칸을 [[스택 프레임]]이라고 해요. 모양은 늘 같아요.</p>
+<pre>show_sum:
+    push rbp            ; ① 부른 쪽의 rbp 를 맡기고(rbp 는 지킬 레지스터)
+    mov rbp, rsp        ; ② rbp = 내 칸의 기준점
+    sub rsp, 16         ; ③ 지역 변수 8바이트 두 칸
+    ...                 ;    [rbp - 8] · [rbp - 16] 으로 씀
+    leave               ; ④ = mov rsp, rbp 하고 pop rbp
+    ret</pre>
+<pre>        │ 돌아올 주소      │
+rbp  →  │ 맡긴 rbp         │
+        │ [rbp - 8]  = a   │
+rsp  →  │ [rbp - 16] = b   │   함수를 더 부르면 이 아래로 쌓임</pre>
+<p><code>rsp</code> 는 <code>push</code> · <code>call</code> 할 때마다 움직이지만 <code>rbp</code> 는 함수가 끝날 때까지 그대로예요. 그래서 지역 변수를 <code>[rbp - 8]</code> 처럼 늘 같은 이름으로 불러요. 끝에서 <code>leave</code> 한 줄이 <code>rsp</code> 와 <code>rbp</code> 를 처음대로 되돌려요.</p>
+<p>예제의 <code>show_sum(a, b)</code> 는 <code>print_int</code> 를 세 번 불러요. <code>print_int</code> 가 <code>rsi</code> · <code>rdi</code> 를 바꿔도 a 와 b 는 지역 변수 칸에 남아 있어요. 실행하면 20, 22, 42 가 한 줄씩.</p>
+<p class="muted small"><code>print_int</code> 의 <code>sub rsp, 32</code> 도 지역 변수(글자 버퍼)예요. <code>rbp</code> 없이 <code>rsp</code> 기준으로 쓴 간단한 모양이에요. <code>gcc</code> 가 만든 함수는 대부분 <code>push rbp</code> · <code>mov rbp, rsp</code> 로 시작해요([[레슨:R15]]).</p>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rdi, 20
+    mov rsi, 22
+    call show_sum           ; 20, 22, 42 를 한 줄씩
+    mov rax, 60
+    mov rdi, 0
+    syscall
+show_sum:                   ; show_sum(a, b): a, b, a + b 를 출력
+    push rbp                ; ① 부른 쪽의 rbp 를 맡기고
+    mov rbp, rsp            ; ② rbp = 내 칸의 기준점
+    sub rsp, 16             ; ③ 지역 변수 두 칸(8바이트 × 2)
+    mov [rbp - 8], rdi      ; a
+    mov [rbp - 16], rsi     ; b
+    call print_int          ; a (rdi 그대로)
+    mov rdi, [rbp - 16]
+    call print_int          ; b — print_int 가 rsi 를 바꿨어도 칸에는 남아 있음
+    mov rdi, [rbp - 8]
+    add rdi, [rbp - 16]
+    call print_int          ; a + b
+    leave                   ; = mov rsp, rbp + pop rbp
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` } },
+    { title: '스택 16바이트 정렬', html: `<p>규약의 마지막 약속은 <b><code>call</code> 하는 순간 <code>rsp</code> 가 16 의 배수</b>여야 한다는 거예요. C 라이브러리 함수 안에는 16바이트를 한 번에 옮기는 명령(SSE 의 <code>movaps</code> 같은)이 있어요. 그 명령은 주소가 16 의 배수가 아니면 그 자리에서 멈춰요(<code>Segmentation fault</code>).</p>
+<table class="kb"><tbody><tr><td><code>_start</code> 에 들어온 순간</td><td>16 의 배수(리눅스가 맞춰 줌)</td></tr><tr><td>함수에 들어온 순간</td><td>16 의 배수 + 8 — <code>call</code> 이 돌아올 주소 8바이트를 넣어서</td></tr><tr><td><code>push rbp</code> 뒤</td><td>다시 16 의 배수 — 스택 프레임이 <code>push rbp</code> 로 시작하면 저절로 맞아요</td></tr><tr><td><code>sub rsp, N</code></td><td>N 을 16 의 배수(16 · 32 …)로 하면 정렬이 안 깨져요</td></tr></tbody></table>
+<p>예제는 <code>rsp</code> 를 16 으로 나눈 나머지를 찍어요. <code>and rdi, 15</code> 는 아래 4비트만 고르는 것이라 16 으로 나눈 나머지와 같아요([[레슨:R4]]). 실행하면 0(<code>_start</code>), 8(<code>check</code> 에 들어온 순간), 0(<code>push rbp</code> 뒤)이 한 줄씩 나와요.</p>
+<div class="bk-warn"><b>내 함수끼리는 틀려도 돌아가요</b> — 지금까지의 함수(<code>print_int</code> · <code>fact</code>)는 정렬이 틀려도 잘 돌아요. 그래서 실수를 모르고 지나가기 쉬워요. <code>printf</code> 같은 C 라이브러리를 부르는 [[레슨:R13]] 부터는 꼭 지켜요.</div>`,
+      example: { code: `section .text
+global _start
+_start:
+    mov rdi, rsp
+    and rdi, 15             ; rsp 를 16 으로 나눈 나머지
+    call print_int          ; _start 에서: 0
+    call check
+    mov rax, 60
+    mov rdi, 0
+    syscall
+check:
+    mov rdi, rsp
+    and rdi, 15
+    push rbp                ; 8바이트 더 내려감
+    call print_int          ; 들어온 순간: 8
+    mov rdi, rsp
+    and rdi, 15
+    call print_int          ; push rbp 뒤: 0
+    pop rbp
+    ret
+; print_int: rdi 의 정수(부호 있음)를 10진 글자 + 줄바꿈으로 출력. rax rcx rdx rsi rdi r8 r11 을 씀(규약상 부르는 쪽이 지킬 레지스터)
+print_int:
+    sub rsp, 32             ; 글자 버퍼 32바이트(스택)
+    mov rax, rdi
+    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움
+    mov byte [rsi], 10      ; 맨 끝은 줄바꿈
+    mov r8, 1               ; 지금까지 글자 수
+    mov rcx, 10
+    test rax, rax
+    jns .digits
+    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'
+.digits:
+    xor edx, edx
+    div rcx                 ; rax = 몫, rdx = 나머지(0~9)
+    add dl, '0'
+    dec rsi
+    mov [rsi], dl
+    inc r8
+    test rax, rax
+    jnz .digits
+    test rdi, rdi
+    jns .write
+    dec rsi
+    mov byte [rsi], '-'
+    inc r8
+.write:
+    mov rax, 1              ; write(1, rsi, r8)
+    mov rdx, r8
+    mov rdi, 1
+    syscall
+    add rsp, 32
+    ret` } },
+  ],
+  summary: ['인자는 rdi rsi rdx rcx r8 r9, 결과는 rax', 'rbx rbp r12~r15 는 불리는 쪽이 지킨다(push … pop)', '스택 프레임 push rbp · mov rbp, rsp · leave, call 앞 rsp 는 16의 배수'] },
+{ id: 'R13', ch: 3, n: 13, title: 'C 라이브러리 부르기: printf', mode: 'text',
+  tutorSummary: 'extern puts · extern printf, strlen 으로 C 라이브러리 함수를 쓰고 global main · main: 에서 시작(C 라이브러리의 시작 코드가 main 을 call, main 은 ret 으로 끝남). 빌드 nasm -f elf64 → gcc -no-pie x.o -o x(-no-pie 가 없으면 PIE relocation 에러, GNU-stack 경고는 무해). C 글자는 0 으로 끝남(db "…", 10, 0). printf: rdi 형식 주소 · rsi rdx rcx … 값 · %ld(64비트) %d %s(주소) %c · xor eax, eax(가변 인자: al = xmm 인자 수). strlen · printf 도 결과는 rax(printf 는 찍은 바이트 수). main 의 rax = 종료 코드. printf 뒤에 syscall exit 하면 버퍼가 안 나감 → ret. main 에 들어오면 rsp 는 16n + 8 → push 를 홀수 번(push rbp · push rbx · push r12).',
+  terms: { '가변 인자': 'printf 처럼 인자 개수가 정해지지 않은 함수. 부르기 전에 al 에 「xmm 레지스터로 넘긴 실수 인자 개수」 를 넣는다(정수만이면 0)' },
+  pages: [
+    { title: 'extern · main · gcc -no-pie', html: `<p>지금까지는 C 라이브러리 없이 커널에게 직접 부탁했어요(<code>syscall</code>). 이제 C 프로그래머가 쓰는 함수(<code>puts</code> · <code>printf</code> · <code>strlen</code>)를 어셈블리에서 불러 봐요. 바뀌는 건 세 가지예요.</p>
+<table class="kb"><tbody><tr><td><code>extern puts</code></td><td>「<code>puts</code> 는 다른 곳(C 라이브러리)에 있어요」 — 링크할 때 찾아 붙여요</td></tr><tr><td><code>global main</code> · <code>main:</code></td><td><code>_start</code> 대신 <code>main</code>. C 라이브러리가 자기 <code>_start</code> 에서 준비를 마친 뒤 <code>main</code> 을 <code>call</code> 해요. 그래서 <code>main</code> 은 보통 함수처럼 <code>ret</code> 으로 끝나요</td></tr><tr><td><code>gcc -no-pie</code></td><td><code>ld</code> 대신 <code>gcc</code> 로 링크 — C 라이브러리와 시작 코드를 같이 묶어 줘요</td></tr></tbody></table>
+<p>C 의 글자는 끝에 <b>0 바이트</b>가 있어야 해요(<code>db "…", 0</code>, [[레슨:R8]]). 길이를 따로 받지 않고 0 을 만날 때까지 읽거든요. <code>puts</code> 는 글자를 찍고 줄바꿈을 알아서 붙여요. <code>main</code> 첫 줄의 <code>push rbp</code> 는 4쪽에서 설명해요.</p>
+<pre>nasm -f elf64 hello_c.asm -o hello_c.o
+gcc -no-pie hello_c.o -o hello_c
+./hello_c</pre>
+<ul class="small"><li><code>-no-pie</code> 를 빼면 <code>relocation R_X86_64_PC32 … can not be used when making a PIE object</code> 에러가 나요. 요즘 gcc 는 실행 파일을 메모리 어디에 놓아도 되게(PIE) 만드는데, 우리 코드의 <code>call printf</code> 는 그 모양이 아니라서예요</li><li>우분투 24.04 에서는 <code>missing .note.GNU-stack section implies executable stack</code> 경고가 보일 수 있어요. 실행 파일은 잘 만들어져요. 없애고 싶으면 파일 맨 끝에 <code>section .note.GNU-stack noalloc noexec nowrite progbits</code> 한 줄</li><li><code>ld</code> 로 링크하면 <code>undefined reference to puts</code> — C 라이브러리를 안 붙여서예요</li></ul>`,
+      example: { code: `default rel
+section .data
+msg db "안녕, C 라이브러리!", 0    ; C 의 문자열은 0 으로 끝나요
+section .text
+global main
+extern puts
+main:
+    push rbp                ; 스택 맞추기(4쪽)
+    lea rdi, [msg]          ; puts(msg)
+    call puts               ; 줄바꿈은 puts 가 붙여 줌
+    pop rbp
+    mov eax, 0              ; return 0 → 종료 코드 0
+    ret` } },
+    { title: 'printf: rdi 형식 · xor eax, eax', html: `<p><code>printf</code> 는 파이썬의 <code>%</code> 서식과 비슷해요. 첫 인자는 <b>형식 글자의 주소</b>, 그 뒤로 <code>%</code> 자리에 들어갈 값이 규약 순서대로([[레슨:R12]]) 들어가요.</p>
+<table class="kb"><tbody><tr><td>C</td><td><code>printf("%ld + %ld = %ld\\n", 3, 4, 7);</code></td></tr><tr><td>어셈블리</td><td><code>rdi</code> = 형식 주소 · <code>rsi</code> = 3 · <code>rdx</code> = 4 · <code>rcx</code> = 7 → <code>xor eax, eax</code> → <code>call printf</code></td></tr></tbody></table>
+<table class="kb"><tbody><tr><td><code>%ld</code></td><td>64비트 정수(C 의 <code>long</code>) — 레지스터 하나 통째로</td></tr><tr><td><code>%d</code></td><td>32비트 정수(<code>int</code>) — 아래 절반(<code>esi</code> …)만 봐요</td></tr><tr><td><code>%s</code></td><td>0 으로 끝나는 글자 — 값 대신 <b>주소</b>를 넘겨요</td></tr><tr><td><code>%c</code></td><td>글자 하나</td></tr></tbody></table>
+<p><b><code>xor eax, eax</code> 는 왜?</b> <code>printf</code> 처럼 인자 개수가 정해지지 않은 함수([[가변 인자]])는 「실수(소수) 인자를 xmm 레지스터로 몇 개 넘겼나」 를 <code>al</code> 에서 읽어요. 우리는 정수만 넘기니 0 이에요. 빼먹으면 <code>al</code> 에 남은 아무 값 때문에 가끔 이상하게 동작해요.</p>
+<p>형식 글자 끝의 <code>10</code> 은 C 의 <code>\\n</code>(줄바꿈), 마지막 <code>0</code> 은 글자의 끝 표시예요. 실행하면 <code>3 + 4 = 7</code>.</p>`,
+      example: { code: `default rel
+section .data
+fmt db "%ld + %ld = %ld", 10, 0
+section .text
+global main
+extern printf
+main:
+    push rbp
+    mov rsi, 3              ; 2번째 인자: 첫 %ld
+    mov rdx, 4              ; 3번째 인자: 둘째 %ld
+    mov rcx, rsi
+    add rcx, rdx            ; 4번째 인자: 셋째 %ld = 7
+    lea rdi, [fmt]          ; 1번째 인자: 형식 글자의 주소
+    xor eax, eax            ; 실수 인자 0개 (가변 인자 규칙)
+    call printf
+    pop rbp
+    xor eax, eax
+    ret` } },
+    { title: 'strlen · main 의 rax = 종료 코드', html: `<p>C 라이브러리 함수도 규약대로 결과를 <code>rax</code> 에 돌려줘요. <code>strlen(s)</code> 는 0 앞까지의 바이트 수를, <code>printf</code> 는 <b>찍은 바이트 수</b>를 돌려줘요. <code>extern printf, strlen</code> 처럼 한 줄에 여럿 적어도 돼요.</p>
+<p><code>main</code> 도 함수라서 <code>ret</code> 할 때의 <code>rax</code> 가 결과예요. C 라이브러리는 그 값으로 <code>exit</code> 을 불러요. 그래서 <b><code>main</code> 의 <code>rax</code> = 종료 코드</b>예요(C 의 <code>return 0;</code>). 예제는 <code>printf</code> 가 돌려준 값을 그대로 돌려줘요.</p>
+<p>실행하면 <code>assembly 는 8 바이트</code> 다음 줄에 <code>25</code> — 「assembly」 8 + 「 는 」 5(한글 3 + 빈칸 2) + 「8」 1 + 「 바이트」 10 + 줄바꿈 1 이에요.</p>
+<div class="bk-warn"><b>printf 를 썼으면 syscall 로 끝내지 말고 ret</b> — <code>printf</code> 는 글자를 바로 내보내지 않고 모아 뒀다가(버퍼) 한꺼번에 써요. <code>main</code> 에서 <code>ret</code> 하면 C 라이브러리가 남은 글자를 다 내보내고 끝내요. 하지만 <code>mov rax, 60</code> · <code>syscall</code> 로 바로 끝내면 모아 둔 글자가 사라질 수 있어요. 터미널에선 멀쩡해 보여도 <code>./prog &gt; out.txt</code> 나 <code>./prog | cat</code> 에서는 텅 비어요(<a href="../os/#lesson/K15" target="_blank" rel="noopener">운영체제 교과서 「파일 디스크립터와 버퍼」 ↗</a>).</div>`,
+      example: { code: `default rel
+section .data
+word1 db "assembly", 0
+fmt db "%s 는 %ld 바이트", 10, 0
+section .text
+global main
+extern printf, strlen
+main:
+    push rbp
+    lea rdi, [word1]
+    call strlen             ; rax = 8
+    lea rdi, [fmt]
+    lea rsi, [word1]        ; %s 자리: 글자의 주소
+    mov rdx, rax            ; %ld 자리: 길이
+    xor eax, eax
+    call printf             ; rax = 찍은 바이트 수
+    pop rbp
+    ret                     ; rax 그대로 → 종료 코드`, echoExit: true } },
+    { title: '정렬: main 에서 push 홀수 번', html: `<p>[[레슨:R12]] 의 약속은 「<code>call</code> 하는 순간 <code>rsp</code> 는 16 의 배수」 였죠. <code>main</code> 도 C 라이브러리가 <code>call</code> 한 함수라서, 들어온 순간 <code>rsp</code> 는 <b>16 의 배수 + 8</b> 이에요. 그래서 <code>main</code> 첫 줄에서 <code>push rbp</code> 를 해요.</p>
+<table class="kb"><tbody><tr><td><code>main</code> 에 들어옴</td><td>16 의 배수 + 8</td></tr><tr><td><code>push rbp</code></td><td>16 의 배수 — 여기서 <code>call printf</code> 해도 돼요</td></tr><tr><td><code>push rbx</code> 까지</td><td>16 의 배수 + 8 — 이대로 부르면 위험</td></tr><tr><td><code>push r12</code> 까지</td><td>16 의 배수 — 다시 안전</td></tr></tbody></table>
+<p>규칙 하나로 외워요. <b>함수 처음에 <code>push</code> 를 홀수 번</b>(1 · 3 · 5 번). 짝수 번이 되면 <code>sub rsp, 8</code> 을 하나 더해 맞추고, 끝에서 <code>add rsp, 8</code> 로 돌려놔요. <code>pop</code> 은 넣은 반대 순서로 해요.</p>
+<p>예제는 n 을 <code>rbx</code>, 끝 값을 <code>r12</code> 에 둬요. 둘 다 「불리는 쪽이 지킬」 레지스터라 <code>printf</code> 를 몇 번 불러도 그대로예요. 대신 <code>main</code> 도 함수라서 이 둘을 맡겼다가 돌려놔야 하고, 그러다 보니 push 가 세 번 — 마침 홀수예요. 실행하면 <code>1 의 제곱은 1</code> 부터 <code>5 의 제곱은 25</code> 까지 다섯 줄.</p>
+<div class="bk-warn"><b>정렬이 틀리면</b> — <code>printf</code> 안에서 <code>Segmentation fault</code> 가 나요. 그런데 C 라이브러리 버전이나 넘긴 값에 따라 <b>될 때도 있어서</b> 더 헷갈려요. 「내 컴퓨터에선 됐는데」 를 막으려면 늘 push 수를 세어 봐요.</div>`,
+      example: { code: `default rel
+section .data
+fmt db "%ld 의 제곱은 %ld", 10, 0
+section .text
+global main
+extern printf
+main:
+    push rbp                ; 1번 — 들어올 때 16의 배수 + 8 → 이제 16의 배수
+    push rbx                ; 2번 — 다시 + 8
+    push r12                ; 3번 — 다시 16의 배수 (홀수 번)
+    mov rbx, 1              ; rbx = n (printf 가 지켜 줌)
+    mov r12, 5              ; r12 = 끝 값
+again:
+    lea rdi, [fmt]
+    mov rsi, rbx
+    mov rdx, rbx
+    imul rdx, rbx           ; n × n
+    xor eax, eax
+    call printf
+    inc rbx
+    cmp rbx, r12
+    jle again
+    pop r12                 ; 넣은 반대 순서로
+    pop rbx
+    pop rbp
+    xor eax, eax
+    ret` } },
+  ],
+  summary: ['extern printf + global main + gcc -no-pie, 끝은 ret', 'rdi 에 형식 주소, rsi · rdx · rcx 에 값, xor eax, eax', 'main 의 rax = 종료 코드, push 를 홀수 번 해서 16바이트 정렬'] },
+{ id: 'RB3', ch: 3, boss: true, title: '만들어 보기: 내 함수 모음', mode: 'text',
+  tutorSummary: '챕터 3 묶기 — print_int · strlen · print_str · to_upper · max_of(arr, n) 를 호출 규약대로(인자 rdi rsi, 결과 rax, rbx 는 push/pop 으로 지킴) 만들고 global main 에서 차례로 부르기(gcc -no-pie, ret 으로 끝). 마지막엔 결과를 rbx · r12 에 간직하고 push 세 번으로 정렬해 printf 한 줄. write 로 찍는 함수와 printf 는 한 프로그램에서 섞지 않음(버퍼 순서).', pages: [], summary: [] },
 { id: 'R14', ch: 4, n: 14, title: 'C 에서 어셈블리 함수 부르기', mode: 'text', draft: true,
   tutorSummary: 'main.c + add.asm, C 선언 long add(long a, long b); asm 은 global add. gcc -no-pie main.c add.o. int = edi, long = rdi, 포인터 = 주소. 배열 · 문자열 넘기기.',
   pages: ASM_TODO('두 파일 · global · 선언 · 타입과 레지스터 크기 · 포인터'), summary: ['C 에서 선언, asm 에서 global', 'int 는 edi, long 은 rdi', '포인터 = 주소'] },
