@@ -49,6 +49,8 @@
   // lessonPages(v2.10.0): 레슨 쪽 통째로(content.js 에서 아직 「준비 중」인 레슨을 교과서가 채울 때)
   const basePages = (l) => (BOOK.lessonPages || {})[l.id] || l.pages || [];
   const ready = (l) => !l.draft || !!(BOOK.lessonPages || {})[l.id] || !!((BOOK.tasks || {})[l.id] || []).length;
+  // v2.22.3 검수: 만들어 보기(마지막 쪽) 끝에서 목차 대신 다음 레슨으로 — 목차 순서(챕터 → 레슨)대로, 준비 중은 건너뜀
+  const nextLesson = (id) => { const flat = (CHAPTERS || []).map(c => c.ch).flatMap(ch => lessonsOf(ch)).filter(ready); if (id === SETUP_ID) return flat[0] || null; const i = flat.findIndex(x => x.id === id); return i >= 0 ? flat[i + 1] || null : null; };
   const bookPages = (l) => basePages(l).map((pg, i) => { const key = `${l.id}/${i}`; const tt = (BOOK.titles || {})[key]; const o = (BOOK.pages || {})[key]; if (!o) return tt ? { ...pg, title: tt } : pg; let html = o.html || pg.html; (o.rep || []).forEach(([a, b]) => { html = html.split(a).join(b); }); return { ...pg, title: o.title || tt || pg.title, html, example: o.example || pg.example }; });
   const codeBox = (code, label) => `<div class="bk-code"><div class="bk-code-h"><span>${esc(label || '예제 코드')}</span><button class="btn xs bk-copy" data-code="${esc(code)}">📋 복사</button></div><pre class="code">${esc(code)}</pre></div>`;
   const bindCopy = (root) => $$('.bk-copy', root).forEach(b => b.onclick = async () => { try { await navigator.clipboard.writeText(b.dataset.code); UI.toast(M.copyToast); } catch (e) { UI.toast('복사가 막혀 있어요. 코드를 길게 눌러 선택해 복사하세요'); } });
@@ -113,7 +115,7 @@
       const rk = isSetup ? SETUP_ID + '_' + cur : l.id; const wasRead = !!(d.lessons[rk] || {}).read;
       if (isSetup) { d.lessons[rk] = { read: 1 }; } else { d.lessons[l.id] = d.lessons[l.id] || {}; d.lessons[l.id].page = cur; if (cur === total - 1) d.lessons[l.id].read = 1; }
       Store.save({ silent: wasRead || !(d.lessons[rk] || {}).read }); // v2.19.0: 레슨을 처음 다 읽었을 때만 기기 연동으로 올림(쪽 넘김은 이 기기에만)
-      const kicker = isSetup ? '🛠 시작하기' : l.boss ? `🛠 ${esc(chName(l.ch))} · 만들어 보기` : `LESSON ${String(l.n ?? '').padStart(2, '0')} <span class="muted">· ${esc(chName(l.ch))}</span>`;
+      const nxt = nextLesson(l.id); const kicker = isSetup ? '🛠 시작하기' : l.boss ? `🛠 ${esc(chName(l.ch))} · 만들어 보기` : `LESSON ${String(l.n ?? '').padStart(2, '0')} <span class="muted">· ${esc(chName(l.ch))}</span>`;
       const tabs = `<div class="bk-tabs">${pages.map((p, i) => `<button class="bk-tab ${i === cur ? 'on' : ''}" data-pg="${i}" title="${esc(p.title)}">${i + 1}</button>`).join('')}${hasMake ? `<button class="bk-tab make ${cur === pages.length ? 'on' : ''}" data-pg="${pages.length}">🛠 만들어 보기</button>` : ''}</div>`;
       let body;
       if (isMake) {
@@ -132,14 +134,14 @@
       }
       root.innerHTML = `<div class="page bk-lesson">${backBar(back)}<div class="bk-crumb"><button class="lnk" id="bkHome">☰ 목차</button><span class="muted">/</span><span>${kicker}</span><span class="grow"></span><button class="lnk" id="bkDexL">📚 ${M.dexShort}</button></div>
         <div class="lp-kicker">${isSetup ? '' : esc(l.boss ? '' : l.title)}</div>${tabs}<article class="bk-art">${body}</article>
-        <div class="bk-nav"><button class="btn" id="bkPrev" title="이전 쪽 (키보드 ←)" ${cur === 0 ? 'disabled' : ''}>← 이전</button><button class="btn accent" id="bkNext" ${cur < total - 1 ? 'title="다음 쪽 (키보드 →)"' : ''}>${cur < total - 1 ? (hasMake && cur === pages.length - 1 ? '🛠 만들어 보기 →' : '다음 →') : '☰ 목차로'}</button></div></div>`;
+        <div class="bk-nav"><button class="btn" id="bkPrev" title="이전 쪽 (키보드 ←)" ${cur === 0 ? 'disabled' : ''}>← 이전</button><button class="btn accent" id="bkNext" ${cur < total - 1 ? 'title="다음 쪽 (키보드 →)"' : ''}>${cur < total - 1 ? (hasMake && cur === pages.length - 1 ? '🛠 만들어 보기 →' : '다음 →') : (nxt ? '다음 레슨 →' : '☰ 목차로')}</button></div>${cur === total - 1 && nxt ? `<p class="bk-next-hint muted small">다음: ${nxt.boss ? '🛠 ' : `레슨 ${esc(String(nxt.n ?? ''))} `}「${esc(nxt.title)}」 · <button class="lnk" id="bkToc">☰ 목차로</button></p>` : ''}</div>`;
       UI.bindTerms(root); bindCopy(root); if (!isMake) bindViz(root, pg);
       if (!isMake && $('#bkFig', root)) MathUI.lessonFigure($('#bkFig', root), l, pg, null); if (!isMake && $('#bkFormula', root)) MathUI.formula($('#bkFormula', root), pg.formula);
       $$('.bk-prelink', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.pl, page: 0, back: { label: `레슨 ${l.n ?? ''} 「${l.title}」로 돌아가기`, view: 'lesson', params: { lessonId: l.id, page: cur, back } } }));
       bindBack(back); bindPre(root, { label: isMake ? `「${l.title}」 만들어 보기로 돌아가기` : `레슨 ${l.n ?? ''} 「${l.title}」로 돌아가기`, view: 'lesson', params: { lessonId: l.id, page: cur, back } }); $('#bkHome').onclick = () => UI.go('home'); $('#bkDexL').onclick = () => UI.go('dogam', { back: { label: isSetup ? '시작하기로 돌아가기' : `레슨 ${l.n ?? ''} 「${l.title}」로 돌아가기`, view: 'lesson', params: { lessonId: l.id, page: cur, back } } });
       $$('.bk-tab', root).forEach(b => b.onclick = () => { cur = +b.dataset.pg; render(); window.scrollTo(0, 0); });
       $('#bkPrev').onclick = () => { if (cur > 0) { cur--; render(); window.scrollTo(0, 0); } };
-      $('#bkNext').onclick = () => { if (cur < total - 1) { cur++; render(); window.scrollTo(0, 0); } else UI.go('home'); };
+      $('#bkNext').onclick = () => { if (cur < total - 1) { cur++; render(); window.scrollTo(0, 0); } else if (nxt) { UI.go('lesson', { lessonId: nxt.id, page: 0 }); window.scrollTo(0, 0); } else UI.go('home'); }; if ($('#bkToc')) $('#bkToc').onclick = () => UI.go('home');
       bkKeys = { root, prev: () => { if (cur > 0) { cur--; render(); window.scrollTo(0, 0); } }, next: () => { if (cur < total - 1) { cur++; render(); window.scrollTo(0, 0); } } }; // ← → 키(아래 전역 처리) — 마지막 쪽(만들어 보기)에서 → 는 목차로 가지 않음
       $$('.bk-need', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.nl, page: +b.dataset.np, back: { label: `만들어 보기 ${+b.dataset.ti + 1}번 문제로 돌아가기`, view: 'lesson', params: { lessonId: l.id, page: pages.length, task: +b.dataset.ti, back } } }));
       if (isMake && task != null) { const el = $(`.bk-task[data-ti="${task}"]`, root); if (el) setTimeout(() => { el.scrollIntoView({ block: 'start' }); el.classList.add('bk-flash'); }, 30); task = null; }

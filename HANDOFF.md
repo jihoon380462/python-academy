@@ -7,9 +7,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| **현재 버전** | **v2.22.2 배포**(사이트 전체 PC 검수 — 9코스 정확성 대조 + 화면). 버전별 내용은 [`CHANGELOG.md`](CHANGELOG.md) |
-| **마지막 작업** | (Opus, 11/7) **v2.22.2 사이트 전체 PC 검수** — 사용자 「리눅스만이 아니라 전부」: 9코스·허브·설정·용어집·에러 사전 1,046화면을 PC 1440(+1280/1920·라이트 표본)으로 캡처·자동 측정, 정확성은 코스별 독립 검수 에이전트 5개가 공식 문서·실행으로 대조 → 확실한 오류·위험 약 60건 수정(코스별 목록은 CHANGELOG). 공용: 용어 강조 대비 4.08 → 기준 통과, 「입력 예」 작은 글자, 그림 글자 바탕 테두리. 그 전: v2.22.1 리눅스 PC 검수 |
-| **다음 후보** | 예정 코스(TODO 「예정 코스」) 중 무엇을 다음에 — ① T2 운영체제 ② T10 어셈블리어(둘 다 리눅스 UB1 이 선수, VS Code Remote-SSH 로) ③ T1 CS ④ T11 LLM 기초 · 그 밖에 N9 수학 「상」(후순위) |
+| **현재 버전** | **v2.22.3 배포**(사이트 전체 검수 마무리 — 폰·라이트·큰 글자·링크 + UX). 버전별 내용은 [`CHANGELOG.md`](CHANGELOG.md) |
+| **마지막 작업** | (Opus, 11/7) **v2.22.3 사이트 전체 검수 마무리** — 사용자 「중간에 멈추지 말고 전체적으로」: PC(v2.22.2)에 이어 폰 390 · 라이트 · 글자 아주 크게 · 모든 링크·버튼 2,336개 · 쪽 넘김 631번 측정(대비 미달 0 · 화면 가로 넘침 0 · 깨진 링크 0). UX: 만들어 보기 끝에 **「다음 레슨 →」**(+ ☰ 목차로), 본문 폭 860 → 780px, 폰에서 키 표가 세로로 쌓임, 줄 바뀌는 코드 테두리, 라이트 테마 그림 글자 진하게. 측정·캡처 도구를 **`tools/qa_screens.py`** 로 저장소에 넣음. 그 전: v2.22.2 PC 전체 검수(정확성 약 60건) |
+| **다음 후보** | ⓪ **TODO N15 — 전체 시각 검수(눈으로 보기) 결과 반영**: 캡처를 눈으로 본 검수 결과(파이썬 · 알고+수학) 33건이 [`docs/VISUAL-REVIEW-2026-11-07.md`](docs/VISUAL-REVIEW-2026-11-07.md) 에 있다(아직 반영 안 함 — 「예시 답 보기」 가 버튼처럼 안 보임 · 입력/출력 예 짝 어긋남 · 도감 `&#91;` · 수학 본문 레슨 ID 노출 등). 「나머지 6코스 + 허브」 는 결과를 못 받아 `tools/qa_screens.py` 로 다시 캡처해 검수. 그다음 예정 코스(TODO 「예정 코스」) 중 무엇을 — ① T2 운영체제 ② T10 어셈블리어(둘 다 리눅스 UB1 이 선수, VS Code Remote-SSH 로) ③ T1 CS ④ T11 LLM 기초 · 그 밖에 N9 수학 「상」(후순위) |
 | **막힌 것** | 없음 |
 
 ## 1. 이게 뭔가
@@ -30,7 +30,7 @@
 1. `git checkout main && git pull` → 브랜치(`git checkout -b <이름>`).
 2. 고치기. 화면이 바뀌면 `core/config.js` 의 **`APP_VERSION` 을 올리고** `node tools/stamp.mjs`(모든 `?v=` · `sw.js` 미리 캐시 목록). 허브 카드의 레슨 수·문구는 `CONFIG.COURSES`(`lessons` · `bookNote` · `short`)에 손으로 — 교과서 레슨 수를 바꾸면 같은 PR 에서.
 3. 검사 전부(= CI `verify`, 명령은 `README.md` 「작업 방법」 · 설명은 `specs/site-intent.md` 7절). `python3 tools/regress.py` 끝 줄 **FAILS 0**.
-4. **QA 를 직접**: Playwright 로 휴대폰 390 · PC 1280 화면을 찍어 **눈으로** 보기(가로 넘침 · pageerror 0), 「이 시점의 초보자가 따라 할 수 있나」.
+4. **QA 를 직접**: Playwright 로 휴대폰 390 · PC 1440 화면을 찍어 **눈으로** 보기(가로 넘침 · pageerror 0), 「이 시점의 초보자가 따라 할 수 있나」. 사이트 전체(또는 코스 몇 개)는 **`python3 tools/qa_screens.py --out /tmp/qa_pc`**(PC) · `--w 390 --h 844`(폰) · `--theme light` · `--font 3` — 모든 쪽을 열어 대비·글자 크기·누를 곳·가로 넘침을 재고 캡처를 남긴다(쓰는 법은 파일 맨 위 주석, `specs/qa-team.md`).
 5. 문서: **이 파일 0절 상태판** + `CHANGELOG.md` 새 항목(+ 바뀐 규칙이면 `specs/site-intent.md`, 할 일이면 `TODO.md`).
 6. 커밋(끝에 세션 지침의 Co-Authored-By · Claude-Session 줄) → push → `gh api repos/jihoon380462/python-academy/pulls -f title=… -f head=… -f base=main -f body=…`(본문 끝에 🤖 Generated with Claude Code 줄 + 세션 주소).
 7. **사용자에게 「CI 기다리는 중」 이라고 먼저 말하고** check-run `verify` 가 success 될 때까지 기다림 → `gh api -X PUT …/pulls/<n>/merge -f merge_method=squash`.
@@ -61,7 +61,8 @@
 ## 5. 환경 메모 (작업 샌드박스)
 
 - 파이썬은 `python3` 만 있다(`python` 없음) → 검사로 돌리는 셸 과제는 `python` 을 부르지 않게.
-- 로컬 확인 서버: `cd <저장소> && python3 -m http.server 8766 --bind 127.0.0.1`. Playwright · Chromium 이 깔려 있음(`playwright install` 하지 말 것).
+- 로컬 확인 서버: `cd <저장소> && python3 -m http.server 8766 --bind 127.0.0.1`. Playwright · Chromium 이 깔려 있음(`playwright install` 하지 말 것 — 샌드박스는 패키지 설치가 막혀 있을 수 있음). `tools/qa_screens.py` 는 서버를 스스로 띄우고 `/usr/bin/google-chrome` 을 쓴다.
+- 사용자 PC 와 연결된 채팅이면 `mcp__remote-devices__*` 로 파일을 주고받을 수 있지만, 이 저장소 작업은 샌드박스의 clone(`/home/claude/python-academy`)에서 한다(새 채팅은 `add_repo` → clone → `register_repo_root`).
 - CI 의 git 은 새 버전(2.48+)이라 출력이 다를 수 있다(예: `git branch -a` 의 `origin/HEAD` 줄, `ls` 정렬은 로캘 영향 → `git ls-files` 사용).
 - 헤드리스에서는 CDN(Pyodide 등)을 못 받는 경우가 있어 regress 는 스텁으로 확인한다. 실제 실행 화면은 사용자가 브라우저에서 본다.
 
@@ -77,7 +78,8 @@
 | --- | --- |
 | `TODO.md` | 지금 할 일(1절) · 사용자 결정(3절) · **예정 코스**(공용 5 + 코스 5, 설계 전) |
 | `specs/site-intent.md` | 사이트 의도 · 코스별 정상 동작 · 자동 검사 — QA 기준 |
-| `specs/workflow.md` · `specs/qa-team.md` | 작업 규칙 · QA 채팅 지시서(QA 는 직접 플레이 → `qa-reports/` 에 PR) |
+| `specs/workflow.md` · `specs/qa-team.md` | 작업 규칙 · QA 채팅 지시서(QA 는 직접 플레이 → `qa-reports/` 에 PR, 화면 검수 도구 `tools/qa_screens.py`) |
+| `specs/linux-course.md` | 리눅스 교과서 설계(VirtualBox + 우분투 26.04, T2 운영체제 · T10 어셈블리어의 선수) |
 | `specs/github-course.md` | GitHub 교과서 설계(새 코스 설계 문서의 본보기) |
-| `docs/` | 설계 결정 · 확장 지시서(EXPANSION) · QA 기록, 끝난 기록은 `docs/archive/` |
+| `docs/` | 설계 결정 · 확장 지시서(EXPANSION) · QA 기록 · **`VISUAL-REVIEW-2026-11-07.md`(N15 할 일 표)**, 끝난 기록은 `docs/archive/` |
 | `archive/classic/` | 보관: 예전 문제집 화면(코드·그림·옛 문제·검사 도구) — `README.md` 에 무엇이 어디 있는지·되돌리는 법 |
