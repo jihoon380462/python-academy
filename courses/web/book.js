@@ -10,7 +10,6 @@ const WH = (title, body, css, js) => `<!DOCTYPE html>\n<html lang="ko">\n<head>\
 const WJ = (title, js) => WH(title, '  <h1>F12 → Console 을 보세요</h1>', '', js);
 const CONSOLE_OUT = 'Console 에 이렇게 나오면 성공';
 const CK = [{ text: 'Console 에 나온 글이 위와 줄마다 똑같아요', console: true }];
-const TODOS3 = [{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }, { userId: 1, id: 2, title: 'quis ut nam facilis et officia qui', completed: false }, { userId: 1, id: 3, title: 'fugiat veniam minus', completed: false }];
 const MENU_JSON = [{ id: 1, name: '아메리카노', price: 4000 }, { id: 2, name: '카페라테', price: 4500 }, { id: 3, name: '크루아상', price: 3500 }];
 const BOOK = {
   check: 'web',
@@ -25,22 +24,21 @@ const BOOK = {
     makeIntro: 'VS Code 에서 공부 폴더(<code>web-study</code>)에 문제마다 새 폴더나 파일(예: <code>{file}</code>)을 만들고 직접 짜 보세요. <b>Go Live</b> 로 브라우저에 띄워 「브라우저에서 확인할 것」 을 하나씩 확인해요.',
     makeIntroBy: { // v2.22.4 N15 E-W2: 브라우저 과제가 아닌 레슨은 첫 안내도 그 과제에 맞게
       ...Object.fromEntries(['W7B', 'W7C', 'W7D', 'W7E', 'W7F', 'W7G', 'WB4'].map(k => [k, 'VS Code 에서 공부 폴더에 html 파일(예: <code>{file}</code>)을 만들고 body 맨 아래 <code>&lt;script&gt;</code> 안에 짜요. Go Live 로 띄운 뒤 <b>F12 → Console</b> 에 나온 글이 아래 「Console 에 이렇게 나오면 성공」 과 줄마다 같으면 성공이에요. 「이 코드를 복사해서 고쳐 보세요」 가 있으면 그 코드를 script 안에 붙여 넣고 시작해요.'])), // v2.25.3 Console 레슨
-      W12: 'VS Code 에서 파이썬 파일(예: <code>lesson12_1.py</code>)을 만들고 <code>requests</code> 로 직접 짜 보세요(설치는 이 레슨 1쪽). 터미널에 나온 글이 아래 「결과」 와 같은 모양이면 성공이에요.',
-      W13: '내 GitHub 계정과 Git Bash 를 같이 열어 두고 해요. 쪽마다 따라 한 순서대로 올리고, 주소창에 내 사이트 주소를 넣어 화면이 뜨면 성공이에요.' },
-    makeTailBy: { W12: '막히면 「필요한 문법」을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답을 펴 보세요. 예시 답과 달라도 같은 결과가 나오면 맞아요.', W13: '막히면 「필요한 문법」을 눌러 그 쪽 설명을 다시 따라 해 보세요.' },
+      W13: 'VS Code · Go Live · F12 를 같이 열어 두고 해요. 앞의 두 문제는 F12 의 Console · Sources 로 고치고 멈춰 보는 것, 마지막 문제는 내 GitHub 계정과 Git Bash 로 올려서 주소창에 내 사이트 주소를 넣어 화면이 뜨면 성공이에요.' },
+    makeTailBy: { W13: '막히면 「필요한 문법」을 눌러 그 쪽 설명을 다시 따라 해 보세요.' },
     makeTail: '막히면 「필요한 문법」을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답(파일 전체)을 펴 보세요. 모양·글이 달라도 확인할 것이 다 되면 맞아요. 화면이 안 바뀌면 저장(Ctrl+S)했는지, F12 Console 에 빨간 에러가 있는지 먼저 봐요.',
     fileExt: '.html', prepLabel: '준비 파일 — index.html 과 같은 폴더에 이 이름으로 저장', answerLabel: '예시 답(파일 전체)', needsLabel: '필요한 문법', outLabel: '결과',
     prereq: [
       { lessons: ['W0', 'W1'], chapters: [1], ref: 'SETUP/0', btn: '시작하기 1 · VS Code·Live Server 보기',
         title: '먼저 꼭! 「🛠 시작하기」 1~2 — VS Code 로 폴더 열기 · Live Server 설치',
-        html: '이 교과서는 <b>VS Code 에서 파일을 만들고</b> <b>Live Server 의 Go Live</b> 로 브라우저에 띄워 확인해요. 파일을 더블클릭해 열어도 처음 레슨들은 보이지만, 레슨 26(fetch)부터는 <b>Live Server 없이는 동작하지 않아요</b>(<code>file://</code> 주소에서는 브라우저가 파일 읽기를 막아요). 확인: VS Code 맨 아래 오른쪽에 <b>Go Live</b> 가 보이면 준비 끝.' },
-      { lessons: ['W7', 'W7B', 'W7C', 'W7D', 'W7E', 'W7F', 'W7G', 'WB4', 'W8', 'W8B', 'W8C', 'W9', 'WB2', 'W11', 'WB3'], chapters: [4], ref: 'SETUP/2', btn: '시작하기 3 · 개발자 도구 보기',
+        html: '이 교과서는 <b>VS Code 에서 파일을 만들고</b> <b>Live Server 의 Go Live</b> 로 브라우저에 띄워 확인해요. 파일을 더블클릭해 열어도 처음 레슨들은 보이지만, 레슨 25(fetch) · 27(모듈)부터는 <b>Live Server 없이는 동작하지 않아요</b>(<code>file://</code> 주소에서는 브라우저가 파일 읽기를 막아요). 확인: VS Code 맨 아래 오른쪽에 <b>Go Live</b> 가 보이면 준비 끝.' },
+      { lessons: ['W7', 'W7B', 'W7C', 'W7D', 'W7E', 'W7F', 'W7G', 'WB4', 'W8', 'W8B', 'W8C', 'W9', 'WB2', 'W10', 'W11', 'W12', 'W13', 'WB3'], chapters: [4], ref: 'SETUP/2', btn: '시작하기 3 · 개발자 도구 보기',
         title: 'JavaScript 부터는 F12 개발자 도구의 Console 을 늘 열어 두세요',
         html: 'JS 는 틀려도 화면에 아무 말 없이 <b>그냥 안 돼요</b>. 이유는 <b>F12 → Console</b> 탭의 빨간 줄에만 나와요(예: <code>Uncaught TypeError: Cannot read properties of null</code> + 몇 번째 줄). 안 되면 먼저 Console. 그리고 저장(<kbd>Ctrl</kbd>+<kbd>S</kbd>)을 했는지.' },
-      { lessons: ['W12'], ref: 'W12/0', btn: '레슨 27 · 설치 보기',
-        title: '레슨 27 은 파이썬 + requests 설치가 필요해요',
-        html: '파이썬 교과서 「시작하기」 로 파이썬이 설치돼 있어야 하고, VS Code 터미널에서 <code>python -m pip install requests</code> 를 한 번 해야 해요(레슨 27 · 1쪽).' },
-      { lessons: ['W13'], ref: 'W13/1', btn: '레슨 28 · GitHub Pages 보기',
+      { lessons: ['W10', 'W12', 'WB3'], ref: 'SETUP/1', btn: '시작하기 2 · Live Server 보기', // v2.26.0 fetch · 모듈
+        title: '이 레슨은 Live Server(Go Live)로 열어야 해요',
+        html: '<code>fetch</code> 와 모듈(<code>type="module"</code>)은 파일을 더블클릭해 연 <code>file://</code> 주소에서는 브라우저가 막아요(Console 에 <code>CORS</code> · <code>Failed to fetch</code>). VS Code 의 <b>Go Live</b> 로 열어 주소가 <code>http://127.0.0.1:5500/…</code> 인지 확인하세요.' },
+      { lessons: ['W13'], ref: 'W13/2', btn: '레슨 28 · GitHub Pages 보기',
         title: '레슨 28 의 배포는 GitHub 계정과 Git 이 필요해요',
         html: '터미널·Git 교과서의 <b>레슨 6(이름·이메일 설정)</b>과 <b>레슨 16(GitHub 계정·첫 push)</b>을 먼저 하세요. 배포는 「GitHub 에 올린 저장소 → Settings → Pages」 로 해요.' },
     ],
@@ -53,7 +51,7 @@ const BOOK = {
 <div class="bk-step-box"><b>② VS Code 로 폴더 열기</b><br>VS Code → 메뉴 <b>파일(File) → 폴더 열기(Open Folder)</b> → <code>web-study</code> → 폴더 선택. 「이 폴더의 작성자를 신뢰합니까?」 가 뜨면 <b>예, 작성자를 신뢰합니다</b>.</div>
 <div class="bk-step-box"><b>③ 첫 파일</b><br>왼쪽 탐색기에서 폴더 이름 옆 <b>새 파일</b> 아이콘 → <code>index.html</code>. 파일 안에서 <code>!</code> 를 치고 <kbd>Tab</kbd>(또는 Enter) — VS Code 가 HTML 뼈대를 통째로 써 줘요(Emmet). <code>&lt;body&gt;</code> 와 <code>&lt;/body&gt;</code> 사이에 <code>&lt;h1&gt;안녕, 웹!&lt;/h1&gt;</code> 을 쓰고 <kbd>Ctrl</kbd>+<kbd>S</kbd>.</div>
 <p>탐색기에서 <code>index.html</code> 을 더블클릭하면 브라우저에 보여요 — 주소창이 <code>file:///C:/…/index.html</code>. 이게 가장 단순한 방법이고, 다음 쪽의 Live Server 가 더 편한 방법이에요.</p>` },
-      { title: '2. Live Server 설치와 Go Live', html: `<p>저장할 때마다 브라우저를 손으로 새로고침하기는 번거로워요. <b>Live Server</b> 확장은 내 폴더를 작은 웹 서버로 띄우고, <b>저장하면 브라우저가 저절로 새로고침</b>되게 해요. 레슨 26 의 fetch 는 이게 <b>꼭</b> 필요해요.</p>
+      { title: '2. Live Server 설치와 Go Live', html: `<p>저장할 때마다 브라우저를 손으로 새로고침하기는 번거로워요. <b>Live Server</b> 확장은 내 폴더를 작은 웹 서버로 띄우고, <b>저장하면 브라우저가 저절로 새로고침</b>되게 해요. 레슨 25 의 fetch 와 27 의 모듈은 이게 <b>꼭</b> 필요해요.</p>
 <div class="bk-step-box"><b>① 설치</b><br>VS Code 왼쪽 막대의 <b>확장(Extensions)</b> 아이콘(네모 네 개, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>) → 검색 칸에 <code>Live Server</code> → 만든 사람이 <b>Ritwick Dey</b> 인 것 → <b>Install</b>.</div>
 <div class="bk-step-box"><b>② 띄우기</b><br><code>index.html</code> 을 연 상태에서 VS Code 맨 아래 <b>오른쪽</b>의 <b>Go Live</b> 를 클릭(또는 편집기 안 마우스 오른쪽 → <b>Open with Live Server</b>). 브라우저가 <code>http://127.0.0.1:5500/index.html</code> 로 열려요.</div>
 <div class="bk-step-box"><b>③ 확인</b><br>VS Code 에서 h1 글자를 바꾸고 <kbd>Ctrl</kbd>+<kbd>S</kbd> → 브라우저가 저절로 바뀌면 성공. 끄기는 맨 아래 <b>Port : 5500</b> 을 클릭.</div>
@@ -590,44 +588,40 @@ function save() { localStorage.setItem("todos", JSON.stringify(todos)); }
 // 상태를 바꿀 때마다: save(); render();</pre>
 <p>F12 → <b>Application</b> 탭 → Local Storage 에서 저장된 값을 볼 수 있어요. JSON 은 파이썬의 <code>json.dumps</code>·<code>json.loads</code> 와 같은 일이에요.</p>` },
     ],
-    W10: [
-      { title: '요청과 응답', html: `<p>브라우저(또는 앱·파이썬)가 서버와 대화하는 약속이 <b>HTTP</b> 예요. 한 번의 대화 = <b>요청</b> 하나 + <b>응답</b> 하나.</p>
-<pre class="code">요청  GET /todos/1 HTTP/1.1          ← 메서드 + 주소
-      Host: jsonplaceholder.typicode.com
-      Accept: application/json         ← 헤더(부가 정보)
+    W10: [ // v2.26.0 챕터 6 「더 단단한 화면」(specs/web-course.md) — 옛 HTTP 레슨(요청·응답·상태 코드)은 HTTP·API·SDK 교과서로
+      { title: '줄 순서대로 끝나지 않는 코드', html: `<pre class="code">console.log("1 주문 받음");
+setTimeout(() =&gt; console.log("3 커피 나옴"), 1000);   // 1초 뒤에 불러 줘
+console.log("2 영수증 출력");</pre>
+<p>Console 창에는 <b>1 → 2 → 3</b> 순서로 나와요. <code>setTimeout</code> 은 1초를 <b>기다리지 않고</b> 「나중에 이 함수를 불러 줘」 라고 맡겨 두고 바로 다음 줄로 가요. 브라우저는 기다리는 동안 화면을 멈추면 안 되니까요(멈추면 버튼도 스크롤도 안 돼요).</p>
+<table class="kb"><tbody><tr><td><code>setTimeout(fn, 1000)</code></td><td>1초 뒤 한 번</td></tr><tr><td><code>const id = setInterval(fn, 1000)</code></td><td>1초마다 계속 — <code>clearInterval(id)</code> 로 멈춤</td></tr></tbody></table>
+<p>파일 · 서버에서 무엇을 받아 오는 일도 이렇게 「나중에 끝나는 일」 이에요. 그걸 순서대로 읽기 쉽게 쓰는 법이 다음 쪽의 <code>async</code> · <code>await</code> 예요.</p>`,
+        example: { code: '<script>\n  console.log("1 주문 받음");\n  setTimeout(() => console.log("3 커피 나옴"), 0);\n  console.log("2 영수증 출력");\n</script>', label: '예제 — F12 → Console 에서 순서 보기' } },
+      { title: 'Promise 와 async · await', html: `<p>「나중에 값을 줄게」 라는 <b>약속 상자</b>를 <b>Promise</b> 라고 해요. <code>await</code> 를 붙이면 <b>그 약속이 끝날 때까지 이 함수 안에서만</b> 기다렸다가 값을 꺼내요.</p>
+<pre class="code">const wait = (ms) =&gt; new Promise((done) =&gt; setTimeout(done, ms));   // ms 뒤에 끝나는 약속
 
-응답  HTTP/1.1 200 OK                  ← 상태 코드
-      Content-Type: application/json
-      {"userId": 1, "id": 1, "title": "delectus aut autem", "completed": false}   ← 본문</pre>
-<table class="kb"><tbody><tr><td><code>GET</code></td><td>가져오기(읽기)</td></tr><tr><td><code>POST</code></td><td>새로 만들기(본문에 데이터)</td></tr><tr><td><code>PUT</code> · <code>PATCH</code></td><td>바꾸기(통째로 · 일부만)</td></tr><tr><td><code>DELETE</code></td><td>지우기</td></tr></tbody></table>
-<p>F12 → <b>Network</b> 탭을 열고 아무 페이지나 새로고침하면, 그 페이지가 보낸 요청이 줄줄이 보여요. 하나를 누르면 Headers(요청·응답 머리) · Response(본문)를 볼 수 있어요.</p>` },
-      { title: '상태 코드', html: `<table class="kb"><tbody><tr><td><b>2xx 성공</b></td><td><code>200 OK</code> · <code>201 Created</code>(POST 로 만들어짐) · <code>204 No Content</code>(성공, 본문 없음)</td></tr><tr><td><b>3xx 다른 곳으로</b></td><td><code>301</code>·<code>302</code> 이사 감 · <code>304 Not Modified</code>(전에 받은 것 그대로 써)</td></tr><tr><td><b>4xx 내(요청한 쪽) 잘못</b></td><td><code>400</code> 요청 모양이 틀림 · <code>401</code> 로그인 필요 · <code>403</code> 권한 없음 · <code>404</code> 그런 주소 없음 · <code>429</code> 너무 자주 요청</td></tr><tr><td><b>5xx 서버 잘못</b></td><td><code>500</code> 서버 내부 오류 · <code>503</code> 잠시 못 받음(점검·과부하)</td></tr></tbody></table>
-<p>첫 숫자만 봐도 「누구 탓인지」 알 수 있어요. 4xx 면 내 주소·데이터를 고치고, 5xx 면 잠시 뒤 다시.</p>` },
-      { title: 'JSON: 데이터를 주고받는 글자 모양', html: `<p>요즘 API 는 데이터를 거의 <b>JSON</b> 으로 주고받아요. 파이썬 딕셔너리·리스트와 거의 같은 모양의 <b>글자</b>예요.</p>
-<pre class="code">{
-  "name": "카페라테",
-  "price": 4500,
-  "hot": true,
-  "tags": ["커피", "우유"],
-  "memo": null
-}</pre>
-<table class="kb"><tbody><tr><td>파이썬과 다른 점</td><td>열쇠는 꼭 <b>큰따옴표</b> · <code>true</code>/<code>false</code>/<code>null</code>(소문자) · 마지막 쉼표 금지 · 주석 없음</td></tr><tr><td>JS</td><td><code>JSON.parse(글자)</code> → 객체 · <code>JSON.stringify(객체)</code> → 글자</td></tr><tr><td>파이썬</td><td><code>json.loads</code> · <code>json.dumps</code>(파이썬 교과서 X3)</td></tr></tbody></table>
-<p>브라우저 주소창에 <a href="https://jsonplaceholder.typicode.com/todos/1" target="_blank" rel="noopener">jsonplaceholder.typicode.com/todos/1</a> 을 열면 JSON 응답을 직접 볼 수 있어요(연습용 가짜 API — 레슨 26 에서 써요).</p>` },
-    ],
-    W11: [
-      { title: 'fetch 와 await', html: `<pre class="code">async function load() {
-  const res = await fetch("menu.json");     ← 요청 보내고 응답이 올 때까지 기다림
-  const data = await res.json();            ← 본문(JSON 글자)을 객체로
-  console.log(data);
+async function make() {          // await 는 async 함수 안에서만
+  console.log("주문 받음");
+  await wait(1000);              // 1초 기다렸다가
+  console.log("커피 완성");
+}
+make();
+console.log("다음 손님");         // make 가 기다리는 동안 먼저 나와요</pre>
+<ul><li><code>async</code> 함수는 늘 Promise 를 돌려줘요. 다른 async 함수에서 <code>await make()</code> 로 끝날 때까지 기다릴 수 있어요.</li><li>기다리던 일이 실패하면 <code>try</code> / <code>catch</code>(레슨 20)로 잡아요. 안 잡으면 Console 창에 빨간 <code>Uncaught (in promise)</code>.</li><li>여러 개를 <b>동시에</b> 기다리려면 <code>await Promise.all([a(), b()])</code>.</li></ul>`,
+        example: { code: '<script>\n  const wait = (ms) => new Promise((done) => setTimeout(done, ms));\n  async function make() {\n    console.log("주문 받음");\n    await wait(100);\n    console.log("커피 완성");\n  }\n  make();\n  console.log("다음 손님");\n</script>', label: '예제 — F12 → Console 에서 순서 보기' } },
+      { title: 'menu.json 과 fetch', html: `<p>데이터를 HTML 에 직접 쓰지 않고 <b>JSON 파일</b>로 따로 두면, 메뉴가 바뀌어도 그 파일만 고치면 돼요. JSON 은 JS 객체와 거의 같은 글자 모양이에요 — 단, 키는 꼭 <b>큰따옴표</b>, 마지막 쉼표 금지, 주석 없음.</p>
+<pre class="code">async function load() {
+  const res = await fetch("menu.json");     // 파일을 달라고 하고 올 때까지 기다림
+  const menu = await res.json();            // 본문(JSON 글자)을 배열로
+  console.log(menu);
 }
 load();</pre>
-<ul><li>서버 응답은 <b>시간이 걸려요</b>. 그동안 화면이 멈추지 않게 JS 는 「나중에 줄게」 라는 <b>약속(Promise)</b>을 먼저 돌려줘요</li><li><code>await</code> = 「그 약속이 끝날 때까지 이 함수 안에서 기다려」. <code>await</code> 는 <code>async</code> 함수 안에서만 써요</li><li><code>fetch("menu.json")</code> = 같은 폴더의 파일. 다른 사이트는 전체 주소</li></ul>
-<div class="bk-warn"><b>Live Server 로 열어야 해요.</b> 파일을 더블클릭해 연 <code>file://</code> 주소에서는 브라우저가 보안 때문에 fetch 를 막아요(Console 에 <code>CORS</code>·<code>Failed to fetch</code>). 주소가 <code>http://127.0.0.1:5500/…</code> 인지 확인.</div>`, example: { code: JSON.stringify(MENU_JSON, null, 2), label: '먼저 index.html 옆에 menu.json 을 만들어 이 내용을 저장' } },
+<p><code>fetch("menu.json")</code> 은 <b>같은 폴더의 파일</b>을 가져와요. 다른 사이트 · 진짜 서버의 API 를 부르는 법(요청 · 응답 · 상태 코드 · 키)은 <b>HTTP·API·SDK 교과서</b>에서 이어서 배워요.</p>
+<div class="bk-warn"><b>Live Server 로 열어야 해요.</b> 파일을 더블클릭해 연 <code>file://</code> 주소에서는 브라우저가 보안 때문에 fetch 를 막아요(Console 에 <code>CORS</code> · <code>Failed to fetch</code>). 주소가 <code>http://127.0.0.1:5500/…</code> 인지 확인.</div>`, example: { code: JSON.stringify(MENU_JSON, null, 2), label: '먼저 index.html 옆에 menu.json 을 만들어 이 내용을 저장' } },
       { title: '불러와서 그리기 · 로딩 · 에러', html: `<pre class="code">async function load() {
   status.textContent = "불러오는 중…";
   try {
     const res = await fetch("menu.json");
-    if (!res.ok) throw new Error("HTTP " + res.status);   ← 404·500 은 에러가 아니라서 직접 확인
+    if (!res.ok) throw new Error("HTTP " + res.status);   ← 파일이 없어도(404) fetch 는 에러를 안 내서 직접 확인
     const menu = await res.json();
     list.innerHTML = menu.map(m =&gt; \`&lt;li&gt;\${m.name} \${m.price}원&lt;/li&gt;\`).join("");
     status.textContent = "";
@@ -635,53 +629,83 @@ load();</pre>
     status.textContent = "불러오지 못했어요: " + err.message;
   }
 }</pre>
-<ul><li><code>res.ok</code> = 상태 코드가 200~299. <b>fetch 는 404 여도 에러를 안 내요</b> — 그래서 <code>res.ok</code> 를 꼭 봐요</li><li><code>try … catch</code> = 파이썬 <code>try … except</code>. 인터넷이 끊기면 catch 로</li><li>F12 → Network 에서 menu.json 요청이 200 인지, 주소를 틀리게 해서 404 도 만들어 보세요</li></ul>`, example: { code: WH('메뉴', '  <h1>메뉴</h1>\n  <p id="status"></p>\n  <ul id="list"></ul>', '', 'const status = document.querySelector("#status");\nconst list = document.querySelector("#list");\nasync function load() {\n  status.textContent = "불러오는 중…";\n  try {\n    const res = await fetch("menu.json");\n    if (!res.ok) throw new Error("HTTP " + res.status);\n    const menu = await res.json();\n    list.innerHTML = menu.map(m => `<li>${m.name} ${m.price}원</li>`).join("");\n    status.textContent = "";\n  } catch (err) {\n    status.textContent = "불러오지 못했어요: " + err.message;\n  }\n}\nload();') } },
-      { title: '진짜 API: GET 과 POST', html: `<p><b>jsonplaceholder</b> 는 연습용 공개 API 예요(가입 없음). 진짜처럼 응답하지만 저장은 안 돼요.</p>
-<pre class="code">// 아래 await 는 async 함수 안(만들어 보기처럼 버튼 클릭 함수) 또는 F12 Console 에서만 돼요
-// GET — 할 일 3개
-const res = await fetch("https://jsonplaceholder.typicode.com/todos?_limit=3");
-const todos = await res.json();     // [{userId, id, title, completed}, …]
-
-// POST — 새로 만들기(본문을 JSON 으로)
-const res2 = await fetch("https://jsonplaceholder.typicode.com/todos", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ title: "새 할 일", completed: false }),
-});
-console.log(res2.status, await res2.json());   // 201 {title: "새 할 일", completed: false, id: 201}</pre>
-<p>주소 뒤 <code>?_limit=3</code> 같은 <b>쿼리 문자열</b>은 「조건」 이에요(<code>?이름=값&amp;이름=값</code>). 다른 사이트 API 를 부를 수 있는지는 그 서버가 정해요(CORS 허용) — jsonplaceholder 는 허용해요.</p>` },
+<ul><li><code>res.ok</code> = 잘 받았는지(true · false). 파일 이름을 틀리게 써서 실패 화면도 꼭 확인해 봐요.</li><li>F12 → <b>Network</b> 탭에서 menu.json 이 몇 초 걸렸는지, 성공(200)인지 볼 수 있어요.</li><li>받아 온 뒤에는 지금까지처럼 <b>상태에 넣고 render()</b>(레슨 24).</li></ul>`, example: { code: WH('메뉴', '  <h1>메뉴</h1>\n  <p id="status"></p>\n  <ul id="list"></ul>', '', 'const status = document.querySelector("#status");\nconst list = document.querySelector("#list");\nasync function load() {\n  status.textContent = "불러오는 중…";\n  try {\n    const res = await fetch("menu.json");\n    if (!res.ok) throw new Error("HTTP " + res.status);\n    const menu = await res.json();\n    list.innerHTML = menu.map(m => `<li>${m.name} ${m.price}원</li>`).join("");\n    status.textContent = "";\n  } catch (err) {\n    status.textContent = "불러오지 못했어요: " + err.message;\n  }\n}\nload();') } },
+    ],
+    W11: [
+      { title: '브라우저가 해 주는 검사', html: `<p>form 칸에 속성 몇 개만 붙이면 <b>브라우저가 검사</b>하고, 틀리면 제출을 막고 말풍선으로 알려 줘요.</p>
+<table class="kb"><tbody><tr><td><code>required</code></td><td>꼭 채우기</td></tr><tr><td><code>type="email"</code> · <code>url</code> · <code>number</code></td><td>모양 검사(이메일에 @ 등) · 폰 키보드도 맞게</td></tr><tr><td><code>min="1" max="10"</code> · <code>step</code></td><td>숫자 범위</td></tr><tr><td><code>minlength="8"</code> · <code>maxlength</code></td><td>글자 수</td></tr><tr><td><code>pattern="010-[0-9]{4}-[0-9]{4}"</code></td><td>모양 규칙(정규식) — <code>title</code> 에 예시를 쓰면 말풍선에 같이 나와요</td></tr></tbody></table>
+<pre class="code">input:user-invalid { border-color: crimson; }   /* 사용자가 건드린 뒤에 틀리면 빨간 테두리 */
+input:valid        { border-color: seagreen; }</pre>
+<p><code>:invalid</code> 는 페이지를 열자마자(아직 안 쳤는데도) 빨개져서, 요즘은 <code>:user-invalid</code> 를 써요. 브라우저 검사를 끄려면 form 에 <code>novalidate</code>.</p>
+<p class="muted small">브라우저 검사는 <b>사용자를 돕는 것</b>이에요. 진짜 서버라면 서버에서도 꼭 다시 검사해요(F12 로 얼마든지 우회할 수 있으니까요).</p>`,
+        example: { code: '<style>\n  input:user-invalid { border: 2px solid crimson; }\n  input:valid { border: 2px solid seagreen; }\n</style>\n<form>\n  <label for="email">이메일</label>\n  <input id="email" type="email" required>\n  <label for="phone">전화</label>\n  <input id="phone" required pattern="010-[0-9]{4}-[0-9]{4}" title="010-1234-5678 모양">\n  <button>보내기</button>\n</form>' } },
+      { title: 'JS 로 검사하고 알려 주기', html: `<table class="kb"><tbody><tr><td><code>form.checkValidity()</code></td><td>모든 칸이 맞는지 true · false</td></tr><tr><td><code>input.validity.valueMissing</code> · <code>typeMismatch</code> · <code>tooShort</code> · <code>patternMismatch</code></td><td>무엇이 틀렸는지</td></tr><tr><td><code>input.setCustomValidity("비밀번호가 달라요")</code></td><td>내 규칙으로 「틀림」 표시 — <code>""</code>(빈 글자)를 넣어야 풀려요</td></tr><tr><td><code>form.reportValidity()</code></td><td>틀린 칸에 말풍선 띄우기</td></tr></tbody></table>
+<pre class="code">form.addEventListener("input", () =&gt; {
+  confirm.setCustomValidity(confirm.value === pw.value ? "" : "비밀번호가 달라요");
+  send.disabled = !form.checkValidity();     // 다 맞을 때만 버튼 켜기
+});</pre>
+<p>제출 버튼을 끈 채로 두면 「왜 안 눌리지?」 하고 헤매요. 버튼 근처에 <b>무엇이 남았는지</b>(예: 「비밀번호 8자 이상」) 글로 보여 주면 친절해요.</p>` },
+      { title: '접근성: 모두가 쓸 수 있게', html: `<p>눈이 잘 안 보이는 사람(화면 읽기 프로그램), 마우스를 못 쓰는 사람(키보드만), 색을 구별하기 어려운 사람도 쓸 수 있게 만드는 것을 <b>접근성</b>이라고 해요. 대부분 지금까지 배운 HTML 을 <b>제대로</b> 쓰면 돼요.</p>
+<table class="kb"><tbody><tr><td>입력 칸마다 <code>&lt;label for&gt;</code></td><td>placeholder 는 치면 사라져서 이름표가 안 돼요</td></tr><tr><td>그림마다 <code>alt</code></td><td>꾸밈용 그림이면 <code>alt=""</code>(읽지 말라는 뜻)</td></tr><tr><td>누르는 건 <code>&lt;button&gt;</code></td><td><code>&lt;div onclick&gt;</code> 은 Tab 으로 못 가고 Enter 로 못 눌러요</td></tr><tr><td>글자 없는 버튼(×, 🗑)</td><td><code>aria-label="닫기"</code> 로 이름 붙이기</td></tr><tr><td>초점 표시</td><td><code>outline: none</code> 으로 지우지 않기(레슨 9 <code>:focus-visible</code>)</td></tr><tr><td>색 대비 4.5 : 1 이상</td><td>흰 바탕에 연회색 글씨는 안 보여요 · 색만으로 알리지 않기(빨간 테두리 + 「필수」 글)</td></tr></tbody></table>
+<p><b>스스로 해 보기</b>: 마우스를 치우고 <kbd>Tab</kbd> · <kbd>Shift</kbd>+<kbd>Tab</kbd> · <kbd>Enter</kbd> · <kbd>Space</kbd> 만으로 내 페이지를 끝까지 써 보세요. 지금 어디에 있는지 안 보이거나 못 가는 곳이 고칠 곳이에요.</p>` },
+      { title: 'Lighthouse 로 점수 받기', html: `<p>크롬 · 엣지 F12 에는 페이지를 검사해 점수를 주는 <b>Lighthouse</b> 가 들어 있어요.</p>
+<div class="bk-step-box"><b>① 열기</b><br>내 페이지를 Go Live 로 연 채 F12 → 위쪽 탭에서 <b>Lighthouse</b>(안 보이면 <b>»</b> 를 눌러서).</div>
+<div class="bk-step-box"><b>② 고르기</b><br>Categories 에서 <b>Accessibility</b>(접근성)만 체크 · Device 는 <b>Mobile</b> → <b>Analyze page load</b>.</div>
+<div class="bk-step-box"><b>③ 읽기</b><br>0~100 점과 아래에 고칠 목록이 나와요. 예: 「Image elements do not have [alt] attributes」 · 「Form elements do not have associated labels」 · 「Background and foreground colors do not have a sufficient contrast ratio」. 항목을 펴면 <b>어느 요소</b>인지 알려 줘요.</div>
+<p>90점 이상이면 기본은 지킨 거예요. 점수가 100 이어도 키보드로 직접 써 보는 건 따로 해요 — 기계가 못 잡는 것도 있어요.</p>` },
     ],
     W12: [
-      { title: 'requests 설치와 GET', html: `<p>같은 요청을 파이썬으로도 할 수 있어요. 웹 페이지 없이 데이터를 모으거나(크롤링), 서버끼리 주고받을 때 써요.</p>
-<div class="bk-step-box"><b>설치(한 번)</b><br>VS Code → 메뉴 <b>터미널 → 새 터미널</b> → <code>python -m pip install requests</code> → <code>Successfully installed requests-…</code></div>
-<pre class="code">import requests
+      { title: 'type="module" 과 export · import', html: `<p>JS 가 길어지면 <b>파일을 나눠요</b>. 나눈 파일끼리 필요한 것만 주고받는 방법이 <b>모듈</b>이에요.</p>
+<pre class="code">&lt;!-- index.html --&gt;
+&lt;script type="module" src="main.js"&gt;&lt;/script&gt;      ← type="module" 이 꼭
 
-res = requests.get("https://jsonplaceholder.typicode.com/todos/1")
-print(res.status_code)        # 200
-data = res.json()             # 딕셔너리로
-print(data["title"])</pre>
-<table class="kb"><tbody><tr><td><code>requests.get(url, params={"_limit": 3})</code></td><td>쿼리 문자열을 딕셔너리로(주소 뒤 <code>?_limit=3</code> 을 알아서 붙여 줌)</td></tr><tr><td><code>res.status_code</code> · <code>res.ok</code></td><td>상태 코드 · 200~299 인가</td></tr><tr><td><code>res.json()</code> · <code>res.text</code></td><td>JSON → 딕셔너리·리스트 · 그냥 글자</td></tr><tr><td><code>res.raise_for_status()</code></td><td>4xx·5xx 면 에러를 내기</td></tr></tbody></table>`, example: { code: 'import requests\n\nres = requests.get("https://jsonplaceholder.typicode.com/todos", params={"_limit": 3})\nprint(res.status_code)\nfor t in res.json():\n    mark = "✓" if t["completed"] else " "\n    print(f"[{mark}] {t[\'id\']}. {t[\'title\']}")', label: '예제 파이썬 — requests 설치 뒤 .py 로 실행(인터넷 필요)' } },
-      { title: 'POST 와 API 키', html: `<pre class="code">res = requests.post("https://jsonplaceholder.typicode.com/todos",
-                    json={"title": "새 할 일", "completed": False})
-print(res.status_code, res.json())     # 201 {…, 'id': 201}</pre>
-<p><code>json=</code> 에 딕셔너리를 주면 JSON 글자로 바꾸고 Content-Type 헤더까지 붙여 줘요.</p>
-<p>날씨·지도·AI 같은 진짜 API 는 대부분 <b>API 키</b>(나를 알아보는 비밀 글자)를 요구해요.</p>
-<div class="bk-warn"><b>API 키를 코드에 적지 마세요.</b> GitHub 에 올리는 순간 공개돼요(터미널·Git 교과서 레슨 10). <b>환경 변수</b>에 두고 읽어요:<pre>import os
-key = os.environ["WEATHER_KEY"]     # 실행할 그 터미널에서 미리: PowerShell $env:WEATHER_KEY="…" · 명령 프롬프트 set WEATHER_KEY=… · Git Bash export WEATHER_KEY=…
-requests.get(url, headers={"Authorization": f"Bearer {key}"})</pre>또는 <code>.env</code> 파일에 두고 <code>.gitignore</code> 에 <code>.env</code>.</div>` },
+// price.js
+export const TAX = 0.1;
+export function won(n) {
+  return \`\${n.toLocaleString("ko-KR")}원\`;
+}
+
+// main.js
+import { won, TAX } from "./price.js";              ← ./ 와 .js 까지 정확히
+console.log(won(4500));</pre>
+<ul><li><code>export</code> 를 붙인 것만 밖에서 쓸 수 있어요(파이썬은 다 보이지만 JS 모듈은 내보낸 것만).</li><li>파일에 대표 하나만 있으면 <code>export default class Store { … }</code> → <code>import Store from "./store.js";</code>(중괄호 없이).</li><li>모듈 script 는 저절로 <code>defer</code> 처럼 HTML 을 다 읽은 뒤 실행돼요.</li></ul>` },
+      { title: '파일마다 할 일 하나: store · view · main', html: `<p>할 일 앱(레슨 24)을 세 파일로 나누면 이래요.</p>
+<table class="kb"><tbody><tr><td><code>store.js</code></td><td><b>데이터</b>만 — 상태 배열 · 불러오기 · 저장 · <code>add</code> · <code>toggle</code> · <code>remove</code>. 화면(DOM)은 모름</td></tr><tr><td><code>view.js</code></td><td><b>그리기</b>만 — <code>render(todos)</code> 가 받은 배열을 화면에</td></tr><tr><td><code>main.js</code></td><td><b>잇기</b> — 이벤트를 받아 store 를 바꾸고 view 로 다시 그림</td></tr></tbody></table>
+<pre class="code">// store.js
+let todos = JSON.parse(localStorage.getItem("todos")) || [];
+const save = () =&gt; localStorage.setItem("todos", JSON.stringify(todos));
+export const all = () =&gt; todos;
+export function add(text) { todos.push({ text, done: false }); save(); }
+export function toggle(i) { todos[i].done = !todos[i].done; save(); }
+
+// main.js
+import { all, add, toggle } from "./store.js";
+import { render } from "./view.js";
+form.addEventListener("submit", (e) =&gt; { e.preventDefault(); add(input.value); render(all()); });</pre>
+<p>좋은 점: 버그가 나면 어느 파일을 볼지 알아요(데이터가 틀림 → store, 모양이 틀림 → view). <code>save</code> 처럼 export 안 한 건 밖에서 못 건드려서 안전해요.</p>` },
+      { title: '모듈의 규칙과 에러 읽기', html: `<table class="kb"><tbody><tr><td>Console 창의 빨간 <code>Access to script at 'file:///…' … blocked by CORS policy</code></td><td>파일을 더블클릭해서 열었어요 → <b>Go Live</b> 로(<code>http://127.0.0.1:5500</code>)</td></tr><tr><td><code>Failed to load module script … 404</code></td><td>import 경로가 틀림 — <code>./</code> · <code>.js</code> 빠짐, 대소문자</td></tr><tr><td><code>does not provide an export named 'wom'</code></td><td>import 한 이름이 그 파일의 export 와 다름(오타)</td></tr><tr><td><code>add is not defined</code>(버튼을 누를 때)</td><td>HTML 의 <code>onclick="add()"</code> 은 모듈 안 함수를 못 찾아요 → <code>addEventListener</code> 로</td></tr></tbody></table>
+<p>모듈 안의 변수는 <b>그 파일 안에서만</b> 보여요(전역이 아님). 그래서 F12 Console 창에서 <code>todos</code> 를 쳐도 안 보여요 — 보고 싶으면 잠깐 <code>console.log</code> 나 다음 레슨의 중단점으로.</p>`,
+        example: { code: '<button id="btn">눌러 보세요</button>\n<p id="msg"></p>\n<script type="module">\n  let count = 0;\n  document.querySelector("#btn").addEventListener("click", () => {\n    count += 1;\n    document.querySelector("#msg").textContent = `${count}번`;\n  });\n  console.log(typeof window.count);\n</script>' } },
     ],
     W13: [
-      { title: 'REST: 주소와 메서드의 약속', html: `<p><b>REST</b> 는 API 주소를 짓는 흔한 규칙이에요: 주소는 <b>무엇(명사·복수)</b>, 메서드는 <b>무엇을 할지(동사)</b>.</p>
-<table class="kb"><tbody><tr><td><code>GET /todos</code></td><td>목록</td></tr><tr><td><code>GET /todos/5</code></td><td>5번 하나</td></tr><tr><td><code>POST /todos</code></td><td>새로 만들기 → 201</td></tr><tr><td><code>PATCH /todos/5</code></td><td>5번 일부 바꾸기</td></tr><tr><td><code>DELETE /todos/5</code></td><td>5번 지우기</td></tr><tr><td><code>GET /users/1/todos</code></td><td>1번 사용자의 할 일들</td></tr></tbody></table>
-<p>❌ <code>/getTodo?id=5</code> · <code>/deleteTodo/5</code> 처럼 주소에 동사를 넣지 않아요. 이 규칙을 알면 처음 보는 API 문서도 금방 읽혀요.</p>
-<p>서버 쪽은 누가 만드나요? 파이썬이면 <b>Flask</b>·<b>FastAPI</b> 로 「이 주소로 GET 이 오면 이걸 돌려줘」 를 몇 줄로 써요 — 이 교과서 다음 단계예요.</p>` },
-      { title: 'GitHub Pages 로 내 페이지 올리기', html: `<p>HTML·CSS·JS 만으로 된 페이지(<b>정적 사이트</b>)는 GitHub Pages 에 무료로 올릴 수 있어요. 이 파이썬 아카데미도 그렇게 올라가 있어요.</p>
+      { title: 'Sources: 중단점과 한 줄씩', html: `<p><code>console.log</code> 를 여기저기 넣는 대신, 코드를 <b>원하는 줄에서 멈추고</b> 그때의 변수를 볼 수 있어요.</p>
+<div class="bk-step-box"><b>① 중단점</b><br>F12 → <b>Sources</b> → 왼쪽에서 내 <code>.js</code>(또는 html) 파일 → 멈추고 싶은 줄의 <b>줄 번호를 클릭</b>(파란 표시).</div>
+<div class="bk-step-box"><b>② 다시 실행</b><br>그 줄이 실행되게 버튼을 누르거나 새로고침 → 화면이 회색으로 「Paused in debugger」.</div>
+<div class="bk-step-box"><b>③ 보기</b><br>오른쪽 <b>Scope</b> 에 지금 변수들의 값. 코드의 변수 위에 마우스를 올려도 보여요.</div>
+<table class="kb"><tbody><tr><td><kbd>F8</kbd> Resume</td><td>다음 중단점까지 계속</td></tr><tr><td><kbd>F10</kbd> Step over</td><td>한 줄 실행</td></tr><tr><td><kbd>F11</kbd> Step into</td><td>함수 안으로 들어가기</td></tr></tbody></table>
+<p>코드에 <code>debugger;</code> 한 줄을 써 두면 F12 가 열려 있을 때 거기서 멈춰요(다 고치면 지워요).</p>` },
+      { title: 'Console 에러 읽기 · Elements 에서 고쳐 보기', html: `<p>빨간 에러 줄 오른쪽의 <code>main.js:12</code> 같은 글을 누르면 <b>그 줄</b>로 가요. 에러는 「종류: 설명」 모양이에요.</p>
+<table class="kb"><tbody><tr><td><code>TypeError: Cannot read properties of null (reading 'addEventListener')</code></td><td>querySelector 가 못 찾음 — 선택자 오타 · script 가 요소보다 먼저</td></tr><tr><td><code>TypeError: Cannot read properties of undefined (reading 'price')</code></td><td>배열 밖을 읽음(<code>i &lt;= length</code>) · 없는 키</td></tr><tr><td><code>ReferenceError: total is not defined</code></td><td>이름 오타 · <code>{ }</code> 밖에서 씀(레슨 15)</td></tr><tr><td><code>SyntaxError: Unexpected token '}'</code></td><td>괄호 · 따옴표 짝이 안 맞음 — 그 줄 <b>위</b>를 봐요</td></tr><tr><td><code>Uncaught (in promise)</code></td><td>await 한 일이 실패했는데 catch 가 없음(레슨 25)</td></tr></tbody></table>
+<p>에러는 없는데 값이 이상하면(<code>"40004500"</code> · <code>NaN</code>) 중단점으로 멈춰서 <b>값의 타입</b>을 봐요 — 글자 + 숫자(레슨 15)가 흔한 범인이에요.</p>
+<p><b>Elements</b> 에서는 글자 · 속성을 더블클릭해 바로 고쳐 보고, Styles 에서 CSS 값을 바꿔 볼 수 있어요. 새로고침하면 사라지니 마음에 들면 VS Code 로 옮겨 적어요.</p>` },
+      { title: 'GitHub Pages 로 내 페이지 올리기', html: `<p>HTML·CSS·JS 만으로 된 페이지(<b>정적 사이트</b>)는 GitHub Pages 에 무료로 올릴 수 있어요. 이 파이썬 아카데미도 그렇게 올라가 있어요. 설정 화면의 자세한 설명은 GitHub 교과서 레슨 12 에 있어요.</p>
 <div class="bk-step-box"><b>① GitHub 에 올리기</b><br>웹 폴더(예: <code>web-study/profile</code>, 첫 페이지 이름은 꼭 <code>index.html</code>)를 Git 저장소로 만들어 GitHub 에 push — 터미널·Git 교과서 레슨 7·16 그대로(<code>git init</code> → add → commit → New repository → <code>git remote add origin …</code> → <code>git push -u origin main</code>).</div>
 <div class="bk-step-box"><b>② Pages 켜기</b><br>GitHub 의 그 저장소 → 위쪽 <b>Settings</b> → 왼쪽 <b>Pages</b> → <b>Build and deployment</b> 의 Source = <b>Deploy from a branch</b> → Branch 칸에서 <b>main</b> · <b>/ (root)</b> → <b>Save</b>.</div>
 <div class="bk-step-box"><b>③ 주소 받기</b><br>1~2분 뒤 같은 화면 위에 <b>「Your site is live at https://내아이디.github.io/저장소이름/」</b> 이 떠요. 폰으로도 열어 보세요. 이후로는 고치고 commit → push 하면 몇 분 뒤 자동으로 바뀌어요.</div>
-<p class="muted small">저장소는 Public 이어야 무료로 Pages 를 쓸 수 있어요. 안 보이면 저장소의 <b>Actions</b> 탭에서 「pages build and deployment」 가 초록 ✓ 인지 봐요.</p>` },
-      { title: '정적 사이트 vs 서버가 필요한 것', html: `<table class="kb"><tbody><tr><th></th><th>정적 사이트(GitHub Pages 로 OK)</th><th>서버가 필요</th></tr><tr><td>무엇</td><td>파일을 그대로 보내 줌 — HTML·CSS·JS·이미지</td><td>요청마다 계산해서 응답 — 로그인, 게시판, 결제</td></tr><tr><td>데이터</td><td>내 브라우저(localStorage), 남의 공개 API(fetch)</td><td>서버의 데이터베이스(SQL 교과서!)</td></tr><tr><td>예</td><td>내 소개 페이지, 할 일 앱(내 폰에서만), 이 아카데미</td><td>여럿이 쓰는 게시판, 쇼핑몰</td></tr></tbody></table>
-<p>지금까지 배운 것(HTML·CSS·JS·fetch·localStorage)만으로도 꽤 많은 걸 정적 사이트로 만들 수 있어요. 여럿이 데이터를 함께 쓰는 순간 서버(파이썬 Flask + SQLite)가 필요해져요 — 파이썬·SQL·웹 교과서를 다 배운 지금, 그게 다음 한 걸음이에요.</p>` },
+<p class="muted small">저장소는 Public 이어야 무료로 Pages 를 쓸 수 있어요. 안 보이면 저장소의 <b>Actions</b> 탭에서 「pages build and deployment」 가 초록 ✓ 인지 봐요. 파일 이름의 대소문자가 다르면(<code>Main.js</code> vs <code>main.js</code>) 내 PC 에선 되는데 Pages 에선 404 가 나요.</p>` },
+      { title: '올리기 전에 · 그다음 걸음', html: `<div class="bk-warn"><b>올리기 전에 확인</b>: Public 저장소는 <b>누구나</b> 봐요. 내 전화번호 · 집 주소 · 비밀번호 · API 키가 파일이나 commit 기록에 없는지(GitHub 교과서 레슨 16). 한 번 push 한 비밀은 지워도 기록에 남아요.</div>
+<table class="kb"><tbody><tr><th></th><th>정적 사이트(GitHub Pages 로 OK)</th><th>서버가 필요</th></tr><tr><td>무엇</td><td>파일을 그대로 보내 줌 — HTML · CSS · JS · 그림 · JSON</td><td>요청마다 계산해서 응답 — 로그인, 게시판, 결제</td></tr><tr><td>데이터</td><td>내 브라우저(localStorage) · 같이 올린 JSON 파일</td><td>서버의 데이터베이스(SQL 교과서)</td></tr><tr><td>예</td><td>내 소개 페이지 · 할 일 앱(내 기기에서만) · 카페 주문 화면 · 이 아카데미</td><td>여럿이 쓰는 게시판 · 쇼핑몰</td></tr></tbody></table>
+<p>이 교과서로 <b>화면</b>은 혼자 끝까지 만들 수 있어요. 여럿이 데이터를 함께 쓰려면 서버와 대화해야 해요 — 요청 · 응답 · 남의 API · 내 API 만들기는 <b>HTTP·API·SDK 교과서</b>에서 이어서.</p>` },
     ],
   },
   tasks: {
@@ -931,36 +955,53 @@ requests.get(url, headers={"Authorization": f"Bearer {key}"})</pre>또는 <code>
         checks: [{ text: '「빨래」 추가 → 남은 일 1개', input: { sel: '#text', value: '빨래' }, submit: '#f', then: { sel: '#left', equals: '남은 일 1개' } }, { text: '글자를 누르면 done', click: '#list li span', then: { sel: '#list li.done', count: 1 } }, { text: 'localStorage 에 저장', sel: 'body', js: '(JSON.parse(localStorage.getItem("todos")) || []).length >= 1' }, { text: '「청소」 추가 → 2개 · 남은 일 1개', input: { sel: '#text', value: '청소' }, submit: '#f', then: { sel: '#list li', js: 'document.querySelectorAll("#list li").length === 2 && document.querySelector("#left").textContent === "남은 일 1개"' } }, { text: '「남은 일」 필터 → 청소만', click: '#filters [data-f="left"]', then: { sel: '#list li span', equals: '청소' } }, { text: '고른 필터 버튼에 on', sel: '#filters button.on', equals: '남은 일' }, { text: '「끝낸 일」 필터 → 빨래만', click: '#filters [data-f="done"]', then: { sel: '#list li span', equals: '빨래' } }, { text: '「전체」 → 2개', click: '#filters [data-f="all"]', then: { sel: '#list li', count: 2 } }, { text: '두 번 누르면 고치는 칸', dblclick: '#list li:nth-child(2) span', then: { sel: '#list .edit', exists: true } }, { text: '「방 청소」 로 고치고 Enter', input: { sel: '#list .edit', value: '방 청소' }, key: { sel: '#list .edit', key: 'Enter' }, then: { sel: '#list li:nth-child(2) span', equals: '방 청소' } }, { text: '「<b>굵게</b>」 를 추가해도 글자 그대로', input: { sel: '#text', value: '<b>굵게</b>' }, submit: '#f', then: { sel: '#list li', js: '!document.querySelector("#list b") && [...document.querySelectorAll("#list li span")].some(s => s.textContent === "<b>굵게</b>")' } }, { text: '× 를 누르면 지워짐(3 → 2)', click: '#list .del', then: { sel: '#list li', count: 2 } }] },
     ],
     W10: [
-      { title: 'Network 탭으로 요청 읽기', text: '아무 사이트(예: 이 아카데미)를 연 채 F12 → <b>Network</b> → 새로고침. ① 맨 위 요청(문서)의 <b>상태 코드</b> ② <b>Type</b> 이 <code>script</code> 인 요청 하나의 주소 ③ 일부러 없는 주소(<code>…/없는페이지</code>)를 열었을 때의 상태 코드를 확인하세요.', needs: [['F12 Network', 'W10/0', '요청 목록'], ['200 · 304 · 404', 'W10/1', '상태 코드']],
-        answer: '① 200 (또는 캐시면 304)\n② 예: …/core/config.js?v=…\n③ 404', noRun: true,
-        checks: [{ text: '맨 위 요청(문서)의 Status 가 200(또는 304)' }, { text: 'Type 이 script 인 줄을 눌러 Headers 의 Request URL 을 봤어요' }, { text: '없는 주소를 열었을 때 맨 위 요청의 Status 가 404' }] },
-      { title: 'JSON 읽고 쓰기', text: '아래 JSON 글자를 <code>JSON.parse</code> 로 객체로 만들어, <code>name</code> 과 <code>tags</code> 의 개수를 <code>카페라테 · 태그 2개</code> 처럼 <code>id="out"</code> 에 보이고, <code>price</code> 를 5000 으로 바꾼 객체를 <code>JSON.stringify</code> 로 다시 글자로 만들어 <code>id="json"</code> 에 보이세요.<pre class="code">{"name": "카페라테", "price": 4500, "tags": ["커피", "우유"]}</pre>', needs: [['JSON.parse · JSON.stringify', 'W10/2', '글자 ↔ 객체'], ['.length', 'W7/1', '배열 길이']],
-        answer: WH('JSON', '  <p id="out"></p>\n  <pre id="json"></pre>', '', 'const text = \'{"name": "카페라테", "price": 4500, "tags": ["커피", "우유"]}\';\nconst item = JSON.parse(text);\ndocument.querySelector("#out").textContent = `${item.name} · 태그 ${item.tags.length}개`;\nitem.price = 5000;\ndocument.querySelector("#json").textContent = JSON.stringify(item);'),
-        checks: [{ text: '「카페라테 · 태그 2개」', sel: '#out', equals: '카페라테 · 태그 2개' }, { text: 'price 가 5000 인 JSON 글자', sel: '#json', contains: '"price":5000' }] },
-    ],
-    W11: [
-      { title: 'menu.json 불러와 그리기', text: 'index.html 옆에 준비 파일 <code>menu.json</code> 을 두고, fetch 로 불러와 <code>아메리카노 4000원</code> 모양의 li 로 그리세요. 불러오는 동안 <code>불러오는 중…</code>, 실패하면 <code>불러오지 못했어요</code> 를 <code>id="status"</code> 에. <b>Live Server 로 열어야 해요.</b>', needs: [['async · await fetch', 'W11/0', '불러오기'], ['res.ok · res.json()', 'W11/1', '확인·JSON'], ['try … catch', 'W11/1', '에러'], ['map · join', 'W7/2', '그리기']],
+      { title: 'menu.json 불러와 그리기', text: 'index.html 옆에 준비 파일 <code>menu.json</code> 을 두고, fetch 로 불러와 <code>아메리카노 4000원</code> 모양의 li 로 그리세요. 불러오는 동안 <code>불러오는 중…</code>, 실패하면 <code>불러오지 못했어요</code> 를 <code>id="status"</code> 에. <b>Live Server 로 열어야 해요.</b>', needs: [['async · await fetch', 'W10/2', '불러오기'], ['res.ok · res.json()', 'W10/3', '확인 · JSON'], ['try … catch', 'W10/3', '에러'], ['map · join', 'W7F/1', '그리기']],
         prep: { name: 'menu.json', text: JSON.stringify(MENU_JSON, null, 2) }, mock: { 'menu.json': MENU_JSON },
         answer: WH('메뉴', '  <h1>메뉴</h1>\n  <p id="status"></p>\n  <ul id="list"></ul>', '', 'const status = document.querySelector("#status");\nconst list = document.querySelector("#list");\nasync function load() {\n  status.textContent = "불러오는 중…";\n  try {\n    const res = await fetch("menu.json");\n    if (!res.ok) throw new Error("HTTP " + res.status);\n    const menu = await res.json();\n    list.innerHTML = menu.map(m => `<li>${m.name} ${m.price}원</li>`).join("");\n    status.textContent = "";\n  } catch (err) {\n    status.textContent = "불러오지 못했어요";\n  }\n}\nload();'),
-        checks: [{ text: '메뉴 3개가 li 로', wait: 600, sel: '#list li', count: 3 }, { text: '첫 줄 「아메리카노 4000원」', wait: 600, sel: '#list li:first-child', equals: '아메리카노 4000원' }] },
-      { title: '공개 API 에서 할 일 3개', text: '버튼 <code>불러오기</code> 를 누르면 <code>https://jsonplaceholder.typicode.com/todos?_limit=3</code> 에서 할 일 3개를 받아, <code>1. delectus aut autem</code> 처럼 번호와 제목을 li 로 그리세요. 끝낸 일(<code>completed</code>)이면 ✓ 를 앞에.', needs: [['fetch(주소?쿼리)', 'W11/2', '공개 API'], ['addEventListener("click")', 'W8/1', '버튼'], ['조건 ? 참 : 거짓', 'W7/1', '삼항 연산자로 ✓']],
-        mock: { 'jsonplaceholder.typicode.com/todos': TODOS3 },
-        answer: WH('할 일', '  <button id="load">불러오기</button>\n  <ul id="list"></ul>', '', 'document.querySelector("#load").addEventListener("click", async () => {\n  const res = await fetch("https://jsonplaceholder.typicode.com/todos?_limit=3");\n  const todos = await res.json();\n  document.querySelector("#list").innerHTML = todos.map(t => `<li>${t.completed ? "✓ " : ""}${t.id}. ${t.title}</li>`).join("");\n});'),
-        checks: [{ text: '누르면 3개', click: '#load', wait: 600, then: { sel: '#list li', count: 3 } }, { text: '첫 줄 「1. delectus aut autem」', click: '#load', wait: 600, then: { sel: '#list li:first-child', equals: '1. delectus aut autem' } }] },
+        checks: [{ text: '메뉴 3개가 li 로', wait: 600, sel: '#list li', count: 3 }, { text: '첫 줄 「아메리카노 4000원」', wait: 600, sel: '#list li:first-child', equals: '아메리카노 4000원' }, { text: '다 불러오면 「불러오는 중…」 이 사라짐', sel: '#status', equals: '' }] },
+      { title: '1초 뒤 「저장했어요」', text: '<code>저장</code> 버튼을 누르면 <code>#msg</code> 에 바로 <code>저장 중…</code> 이 보이고, <b>1초 뒤</b> <code>저장했어요</code> 로 바뀌게 하세요. 기다리는 동안 버튼은 꺼 두고(두 번 못 누르게) 끝나면 다시 켜요. <code>wait</code> 함수와 <code>await</code> 로.', needs: [['new Promise · setTimeout', 'W10/1', 'ms 뒤에 끝나는 약속'], ['async () => { await … }', 'W10/1', '기다렸다가 다음 줄'], ['button.disabled', 'W8C/2', '버튼 끄기']],
+        answer: WH('저장', '  <button id="save">저장</button>\n  <p id="msg"></p>', '', 'const wait = (ms) => new Promise((done) => setTimeout(done, ms));\nconst btn = document.querySelector("#save");\nconst msg = document.querySelector("#msg");\nbtn.addEventListener("click", async () => {\n  btn.disabled = true;\n  msg.textContent = "저장 중…";\n  await wait(1000);\n  msg.textContent = "저장했어요";\n  btn.disabled = false;\n});'),
+        checks: [{ text: '누르면 바로 「저장 중…」 · 버튼 꺼짐', click: '#save', wait: 100, then: { sel: '#msg', js: 'document.querySelector("#msg").textContent === "저장 중…" && document.querySelector("#save").disabled' } }, { text: '1초 뒤 「저장했어요」 · 버튼 다시 켜짐', wait: 1200, sel: '#msg', js: 'document.querySelector("#msg").textContent === "저장했어요" && !document.querySelector("#save").disabled' }] },
+      { title: '커피 만들기 순서', text: '<code>make(name)</code> 을 async 함수로 만드세요: <code>name 주문 받음</code> → 0.5초 기다림 → <code>name 완성</code>. 그리고 <code>make("라테")</code> 를 <b>기다리지 않고</b> 부른 뒤 바로 <code>다음 손님</code> 을 찍고, 그다음 <code>async</code> 함수 안에서 <code>await make("모카")</code> 로 끝날 때까지 기다렸다가 <code>문 닫기</code> 를 찍으세요. Console 에 나올 순서를 먼저 맞혀 보고 돌려요.', needs: [['const wait = (ms) => new Promise(…)', 'W10/1', '기다리는 약속'], ['await make()', 'W10/1', '끝날 때까지 기다리기']],
+        answer: WJ('순서', 'const wait = (ms) => new Promise((done) => setTimeout(done, ms));\nasync function make(name) {\n  console.log(`${name} 주문 받음`);\n  await wait(500);\n  console.log(`${name} 완성`);\n}\nmake("라테");\nconsole.log("다음 손님");\nasync function close() {\n  await make("모카");\n  console.log("문 닫기");\n}\nclose();'), io: [{ output: '라테 주문 받음\n다음 손님\n모카 주문 받음\n라테 완성\n모카 완성\n문 닫기' }], outLabel: CONSOLE_OUT, checks: CK },
+    ],
+    W11: [
+      { title: '회원가입 폼', text: '회원가입 form 을 만드세요: 이메일(꼭 · 이메일 모양) · 비밀번호(꼭 · 8자 이상) · 비밀번호 확인(위와 같아야 — 다르면 <code>비밀번호가 달라요</code>). <b>다 맞을 때만</b> <code>가입</code> 버튼이 켜지고, 가입하면 <code>#done</code> 에 <code>가입 완료: 이메일</code>. 칸마다 label.', needs: [['required · type="email" · minlength', 'W11/0', '브라우저 검사'], ['setCustomValidity', 'W11/1', '내 규칙(같은지)'], ['form.checkValidity()', 'W11/1', '다 맞는지'], ['<label for>', 'W11/2', '이름표']],
+        answer: WH('가입', '  <form id="f">\n    <label for="email">이메일</label>\n    <input id="email" name="email" type="email" required>\n    <label for="pw">비밀번호(8자 이상)</label>\n    <input id="pw" name="pw" type="password" required minlength="8">\n    <label for="pw2">비밀번호 확인</label>\n    <input id="pw2" name="pw2" type="password" required>\n    <button id="send" disabled>가입</button>\n  </form>\n  <p id="done"></p>', '    input:user-invalid { border: 2px solid crimson; }', 'const form = document.querySelector("#f");\nconst pw = document.querySelector("#pw");\nconst pw2 = document.querySelector("#pw2");\nform.addEventListener("input", () => {\n  pw2.setCustomValidity(pw2.value === pw.value ? "" : "비밀번호가 달라요");\n  document.querySelector("#send").disabled = !form.checkValidity();\n});\nform.addEventListener("submit", (e) => {\n  e.preventDefault();\n  document.querySelector("#done").textContent = `가입 완료: ${form.elements.email.value}`;\n});'),
+        checks: [{ text: '처음엔 가입 버튼 꺼짐', sel: '#send', js: 'document.querySelector("#send").disabled' }, { text: '이메일 칸: 꼭 · 이메일 모양', sel: 'input[type="email"][required]', exists: true }, { text: '비밀번호 8자 이상', sel: 'input[type="password"][minlength="8"]', exists: true }, { text: '「abc」 는 이메일로 틀림', input: { sel: 'input[type="email"]', value: 'abc' }, then: { sel: 'input[type="email"]', js: '!document.querySelector("input[type=email]").checkValidity()' } }, { text: '이메일 고침', input: { sel: 'input[type="email"]', value: 'me@example.com' }, then: { sel: 'input[type="email"]', js: 'document.querySelector("input[type=email]").checkValidity()' } }, { text: '비밀번호 「12345678」', input: { sel: '#pw', value: '12345678' }, then: { sel: '#pw', js: 'document.querySelector("#pw").checkValidity()' } }, { text: '확인이 다르면 틀림 · 버튼 꺼짐', input: { sel: '#pw2', value: '1234' }, then: { sel: '#pw2', js: 'document.querySelector("#pw2").validity.customError && document.querySelector("#send").disabled' } }, { text: '확인이 같으면 버튼 켜짐', input: { sel: '#pw2', value: '12345678' }, then: { sel: '#send', js: '!document.querySelector("#send").disabled' } }, { text: '가입 → 「가입 완료: me@example.com」', submit: '#f', then: { sel: '#done', equals: '가입 완료: me@example.com' } }, { text: '입력 칸마다 label 짝', sel: 'form', js: '[...document.querySelectorAll("form input")].every(i => i.labels && i.labels.length > 0)' }] },
+      { title: '접근성 고치기', text: '아래 주문 카드는 화면 읽기 프로그램 · 키보드로 쓰기 어려워요. 다섯 군데를 고치세요: ① 사진에 설명 ② 입력 칸에 이름표 ③ <code>div</code> 로 만든 「주문」 을 진짜 버튼으로 ④ 글자 없는 <code>×</code> 버튼에 이름(<code>닫기</code>) ⑤ 연한 안내 글(<code>.note</code>)을 대비 4.5 : 1 이상의 색으로.', needs: [['alt', 'W11/2', '그림 설명'], ['<label for>', 'W11/2', '이름표'], ['<button>', 'W11/2', '누르는 건 버튼'], ['aria-label', 'W11/2', '글자 없는 버튼 이름']],
+        given: WH('주문 카드', '  <div class="card">\n    <button class="close">×</button>\n    <img src="https://picsum.photos/id/30/240/160">\n    <input id="qty" type="number" value="1" placeholder="잔 수">\n    <div class="order" onclick="alert(\'주문!\')">주문</div>\n    <p class="note">하루 지난 빵은 반값이에요</p>\n  </div>', '    .note { color: #bbbbbb; }'),
+        answer: WH('주문 카드', '  <div class="card">\n    <button class="close" aria-label="닫기">×</button>\n    <img src="https://picsum.photos/id/30/240/160" alt="김이 나는 커피 잔">\n    <label for="qty">잔 수</label>\n    <input id="qty" type="number" value="1">\n    <button class="order">주문</button>\n    <p class="note">하루 지난 빵은 반값이에요</p>\n  </div>', '    .note { color: #595959; }', 'document.querySelector(".order").addEventListener("click", () => alert("주문!"));'),
+        checks: [{ text: '① 사진에 alt 설명', sel: 'img', js: '[...document.querySelectorAll("img")].every(i => i.alt.trim())' }, { text: '② 입력 칸에 label', sel: '#qty', js: 'document.querySelector("#qty").labels.length > 0' }, { text: '③ 「주문」 이 button(onclick 달린 div 없음)', sel: 'button.order', js: '!document.querySelector("[onclick]") && document.querySelector("button.order") && document.querySelector("button.order").textContent.trim() === "주문"' }, { text: '④ × 버튼 이름 「닫기」', sel: 'button.close', attr: { name: 'aria-label', value: '닫기' } }, { text: '⑤ 안내 글 대비 4.5 : 1 이상', sel: '.note', js: '(() => { const L = (c) => { const v = c.match(/\\d+(\\.\\d+)?/g).slice(0, 3).map(x => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; }; const n = document.querySelector(".note"); let b = n, bg = "rgba(0, 0, 0, 0)"; while (b && /rgba\\(.*, 0\\)|transparent/.test(bg)) { bg = getComputedStyle(b).backgroundColor; b = b.parentElement; } if (/rgba\\(.*, 0\\)|transparent/.test(bg)) bg = "rgb(255, 255, 255)"; const a = L(getComputedStyle(n).color), c = L(bg); return (Math.max(a, c) + 0.05) / (Math.min(a, c) + 0.05) >= 4.5; })()' }] },
+      { title: '🏠 내 소개 페이지 접근성 90점', text: '챕터 3 끝 「만들어 보기: 내 소개 페이지」 를 Go Live 로 열고 F12 → Lighthouse → <b>Accessibility</b> · Mobile 로 검사하세요. 90점이 안 되면 목록대로 고치고 다시. 그다음 마우스 없이 Tab 만으로 링크 · 버튼을 끝까지 다녀 봐요.', needs: [['F12 → Lighthouse', 'W11/3', '점수 받기'], ['alt · label · 대비', 'W11/2', '흔한 고칠 것']],
+        answer: 'Lighthouse → Categories: Accessibility · Device: Mobile → Analyze page load\n예) 「Image elements do not have [alt] attributes」 → 사진에 alt\n   「Background and foreground colors do not have a sufficient contrast ratio」 → 글자색을 더 진하게\n다시 검사 → 90 이상', noRun: true,
+        checks: [{ text: 'Accessibility 점수 90 이상' }, { text: '고칠 목록의 항목을 하나 이상 고쳐 봤어요(또는 처음부터 100)' }, { text: 'Tab 만으로 모든 링크에 가 보고, 지금 어디인지 늘 보였어요' }] },
     ],
     W12: [
-      { title: '파이썬으로 할 일 보고서', text: '파이썬 <code>todos.py</code> 에서 requests 로 <code>https://jsonplaceholder.typicode.com/todos</code> 를 <code>params={"userId": 1}</code> 로 받아, 전체 개수·끝낸 개수·끝낸 비율(%)을 출력하세요.', needs: [['requests.get(url, params=…)', 'W12/0', 'GET + 쿼리'], ['res.json()', 'W12/0', '리스트로']],
-        answer: 'import requests\n\nres = requests.get("https://jsonplaceholder.typicode.com/todos", params={"userId": 1})\nres.raise_for_status()\ntodos = res.json()\ndone = sum(1 for t in todos if t["completed"])\nprint("전체", len(todos))\nprint("끝냄", done)\nprint(f"비율 {done / len(todos) * 100:.0f}%")', io: [{ output: '전체 20\n끝냄 11\n비율 55%' }], noRun: true /* 인터넷·requests 설치가 필요 — 사이트 검사 밖 */ },
+      { title: '할 일 앱을 세 파일로', text: '챕터 5 끝 「만들어 보기: 할 일 앱」 을 <code>index.html</code> · <code>store.js</code>(데이터 · 저장) · <code>view.js</code>(그리기) · <code>main.js</code>(이벤트 잇기)로 나누세요. index.html 에는 <code>&lt;script type="module" src="main.js"&gt;</code> 하나만. Go Live 로 열어 전처럼 동작하면 성공.', needs: [['<script type="module" src>', 'W12/0', '모듈로 불러오기'], ['export · import { } from "./파일.js"', 'W12/0', '주고받기'], ['store · view · main', 'W12/1', '파일마다 할 일 하나']],
+        answer: '<!-- index.html -->\n<form id="f"><input id="text"><button>추가</button></form>\n<ul id="list"></ul>\n<p id="left"></p>\n<script type="module" src="main.js"></script>\n\n// store.js\nlet todos = JSON.parse(localStorage.getItem("todos")) || [];\nconst save = () => localStorage.setItem("todos", JSON.stringify(todos));\nexport const all = () => todos;\nexport function add(text) { todos.push({ text, done: false }); save(); }\nexport function toggle(i) { todos[i].done = !todos[i].done; save(); }\nexport function remove(i) { todos.splice(i, 1); save(); }\n\n// view.js\nconst esc = (s) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;");\nexport function render(todos) {\n  document.querySelector("#list").innerHTML = todos.map((t, i) => `<li class="${t.done ? "done" : ""}" data-i="${i}"><span>${esc(t.text)}</span> <button class="del">×</button></li>`).join("");\n  document.querySelector("#left").textContent = `남은 일 ${todos.filter(t => !t.done).length}개`;\n}\n\n// main.js\nimport { all, add, toggle, remove } from "./store.js";\nimport { render } from "./view.js";\nconst input = document.querySelector("#text");\ndocument.querySelector("#f").addEventListener("submit", (e) => {\n  e.preventDefault();\n  if (!input.value.trim()) return;\n  add(input.value.trim());\n  input.value = "";\n  render(all());\n});\ndocument.querySelector("#list").addEventListener("click", (e) => {\n  const li = e.target.closest("li");\n  if (!li) return;\n  const i = Number(li.dataset.i);\n  if (e.target.closest(".del")) remove(i); else toggle(i);\n  render(all());\n});\nrender(all());', noRun: true,
+        checks: [{ text: 'index.html 에는 script type="module" 하나만' }, { text: 'Go Live 로 열었을 때 Console 에 빨간 줄이 없어요' }, { text: '추가 · 끝냄 · 지우기 · 새로고침 뒤 남기 — 전처럼 동작' }, { text: 'store.js 에는 document 가 한 번도 안 나와요(데이터만)' }] },
+      { title: 'onclick 을 addEventListener 로', text: '아래 파일은 script 를 모듈로 바꾼 뒤부터 버튼을 누르면 <code>add is not defined</code> 에러가 나요. 모듈은 그대로 두고, HTML 의 <code>onclick</code> 을 없애 <code>addEventListener</code> 로 고치세요.', needs: [['addEventListener("click")', 'W8/1', '이벤트 걸기'], ['onclick="add()"', 'W12/2', '모듈 안 함수는 못 찾음']],
+        given: WH('좋아요', '  <button id="like" onclick="add()">♥ 좋아요</button> <span id="n">0</span>\n  <script type="module">\n    let n = 0;\n    function add() {\n      n += 1;\n      document.querySelector("#n").textContent = n;\n    }\n  </script>'),
+        answer: WH('좋아요', '  <button id="like">♥ 좋아요</button> <span id="n">0</span>\n  <script type="module">\n    let n = 0;\n    function add() {\n      n += 1;\n      document.querySelector("#n").textContent = n;\n    }\n    document.querySelector("#like").addEventListener("click", add);\n  </script>'),
+        checks: [{ text: 'HTML 에 onclick 이 없어요', sel: 'button', js: '!document.querySelector("[onclick]")' }, { text: 'script 는 그대로 모듈', sel: 'script[type="module"]', exists: true }, { text: '세 번 누르면 3', click: '#like', times: 3, then: { sel: '#n', equals: '3' } }] },
     ],
     W13: [
-      { title: '🏠 내 소개 페이지를 인터넷에', text: '챕터 1 끝 「만들어 보기: 내 소개 페이지」 에서 만든 내 소개 페이지를 GitHub 저장소로 올리고 GitHub Pages 를 켜서, <code>https://내아이디.github.io/저장소이름/</code> 주소로 <b>폰에서</b> 열어 보세요.', needs: [['git init · git push', 'W13/1', '터미널·Git 교과서 레슨 7·16 의 순서'], ['Settings → Pages', 'W13/1', 'Pages 켜기'], ['index.html', 'W13/1', '첫 페이지 이름']],
+      { title: '버그 3개 찾아 고치기', text: '아래 코드는 장바구니 합계 <code>합계 8500원</code> 을 보여야 하는데 에러가 나요. F12 Console 의 에러 줄 · 중단점으로 <b>버그 세 개</b>를 하나씩 찾아 고치세요(하나 고치면 다음 것이 보여요).', needs: [['Cannot read properties of undefined', 'W13/1', '배열 밖을 읽음'], ['Cannot read properties of null', 'W13/1', '선택자 오타'], ['Number()', 'W7B/2', '글자 + 숫자'], ['중단점 · Scope', 'W13/0', '값 보기']],
+        given: WH('합계', '  <p id="total"></p>', '', 'const cart = [{ name: "아메리카노", price: "4000" }, { name: "카페라테", price: "4500" }];\nlet total = 0;\nfor (let i = 0; i <= cart.length; i++) {\n  total = total + cart[i].price;\n}\ndocument.querySelector("#totl").textContent = `합계 ${total}원`;'),
+        answer: WH('합계', '  <p id="total"></p>', '', 'const cart = [{ name: "아메리카노", price: "4000" }, { name: "카페라테", price: "4500" }];\nlet total = 0;\nfor (let i = 0; i < cart.length; i++) {\n  total = total + Number(cart[i].price);\n}\ndocument.querySelector("#total").textContent = `합계 ${total}원`;'),
+        checks: [{ text: '「합계 8500원」 이 보여요(Console 에 빨간 줄 없이)', sel: '#total', equals: '합계 8500원' }] },
+      { title: '중단점으로 멈춰 보기', text: '바로 위 문제의 고친 코드에서 <code>total = total + …</code> 줄에 중단점을 걸고 새로고침하세요. 멈출 때마다 Scope 에서 <code>i</code> 와 <code>total</code> 을 보고 <kbd>F8</kbd> 로 계속. 그다음 중단점을 지우고 코드에 <code>debugger;</code> 를 넣어 같은 곳에서 멈춰 보세요.', needs: [['줄 번호 클릭 = 중단점', 'W13/0', 'Sources'], ['debugger;', 'W13/0', '코드로 멈추기']],
+        answer: '1번째 멈춤: i = 0 · total = 0\n2번째 멈춤: i = 1 · total = 4000\nF8 → 화면에 「합계 8500원」', noRun: true,
+        checks: [{ text: '두 번 멈췄고 Scope 에서 i · total 값을 봤어요' }, { text: 'debugger; 로도 같은 곳에서 멈췄어요(다 보고 지웠어요)' }] },
+      { title: '🏠 내 소개 페이지를 인터넷에', text: '챕터 3 끝 「만들어 보기: 내 소개 페이지」 를 GitHub 저장소로 올리고 GitHub Pages 를 켜서, <code>https://내아이디.github.io/저장소이름/</code> 주소로 <b>폰에서</b> 열어 보세요. 올리기 전에 개인정보가 없는지 먼저.', needs: [['git init · git push', 'W13/2', '터미널·Git 교과서 레슨 7·16 의 순서'], ['Settings → Pages', 'W13/2', 'Pages 켜기'], ['index.html', 'W13/2', '첫 페이지 이름']],
         answer: 'cd ~/Documents/web-study/profile   (시작하기 1 에서 web-study 를 만든 곳 — 문서 폴더면 이 경로)\ngit init -b main\ngit add .\ngit commit -m "내 소개 페이지"\ngit remote add origin https://github.com/내아이디/profile.git\ngit push -u origin main\n(GitHub → Settings → Pages → Deploy from a branch → main / (root) → Save)', noRun: true },
     ],
-    WB3: [
-      { title: '카페 주문 화면', text: '<code>menu.json</code> 을 불러와 메뉴마다 <code>담기</code> 버튼이 있는 목록을 그리고, 누르면 장바구니(<code>id="cart"</code>)에 담기고 합계(<code>id="sum"</code>, <code>합계 8500원</code>)가 바뀌게. <code>주문하기</code> 버튼을 누르면 <code>https://jsonplaceholder.typicode.com/posts</code> 로 장바구니를 POST 하고 응답의 id 로 <code>주문 번호 101</code> 을 <code>id="result"</code> 에 보이세요.', needs: [['const res = await fetch("menu.json")', 'W11/1', '불러와 그리기'], ['function render() { … }', 'W9/0', '장바구니'], ['e.target.dataset.id', 'W9/1', '이벤트 위임 — 어느 메뉴의 버튼(data-id)'], ['fetch POST', 'W11/2', '주문 보내기'], ['reduce', 'W7/2', '합계']],
-        prep: { name: 'menu.json', text: JSON.stringify(MENU_JSON, null, 2) }, mock: { 'menu.json': MENU_JSON, 'jsonplaceholder.typicode.com/posts': { id: 101 } },
-        answer: WH('주문', '  <h1>카페 주문</h1>\n  <ul id="menu"></ul>\n  <h2>장바구니</h2>\n  <ul id="cart"></ul>\n  <p id="sum">합계 0원</p>\n  <button id="order">주문하기</button>\n  <p id="result"></p>', '', 'let menu = [];\nlet cart = [];\nfunction render() {\n  document.querySelector("#menu").innerHTML = menu.map(m => `<li>${m.name} ${m.price}원 <button data-id="${m.id}">담기</button></li>`).join("");\n  document.querySelector("#cart").innerHTML = cart.map(m => `<li>${m.name}</li>`).join("");\n  const sum = cart.reduce((s, m) => s + m.price, 0);\n  document.querySelector("#sum").textContent = `합계 ${sum}원`;\n}\ndocument.querySelector("#menu").addEventListener("click", (e) => {\n  const id = Number(e.target.dataset.id);\n  if (!id) return;\n  cart.push(menu.find(m => m.id === id));\n  render();\n});\ndocument.querySelector("#order").addEventListener("click", async () => {\n  const res = await fetch("https://jsonplaceholder.typicode.com/posts", {\n    method: "POST",\n    headers: { "Content-Type": "application/json" },\n    body: JSON.stringify({ items: cart.map(m => m.id) }),\n  });\n  const data = await res.json();\n  document.querySelector("#result").textContent = `주문 번호 ${data.id}`;\n});\nasync function load() {\n  const res = await fetch("menu.json");\n  menu = await res.json();\n  render();\n}\nload();'),
-        checks: [{ text: '메뉴 3개와 담기 버튼', wait: 600, sel: '#menu button', count: 3 }, { text: '아메리카노 + 카페라테 담으면 합계 8500원', wait: 600, sel: 'body', js: '(() => { document.querySelectorAll("#menu button")[0].click(); document.querySelectorAll("#menu button")[1].click(); return document.querySelector("#sum").textContent === "합계 8500원"; })()' }, { text: '주문하기 → 「주문 번호 101」', click: '#order', wait: 600, then: { sel: '#result', equals: '주문 번호 101' } }] },
+    WB3: [ // v2.26.0 챕터 6 만들어 보기 — 서버 없이(주문은 내 기기의 localStorage 에)
+      { title: '🏠 카페 주문 화면', text: '카페 주문 화면을 만드세요. ① <code>menu.json</code> 을 불러와 메뉴마다 <code>담기</code> 버튼(<code>class="add"</code> · <code>data-id</code>) ② 장바구니는 <b>메뉴별 개수</b>(<code>아메리카노 × 2</code>)와 하나 빼기 <code>−</code> 버튼(<code>data-dec</code>), 합계 <code>합계 12,500원</code>(<code>#sum</code>) ③ 주문 form(<code>#order</code>): 이름(꼭) · 전화(<code>010-1234-5678</code> 모양만) · 찾으러 올 시각(select) — 틀리면 브라우저가 막게, 장바구니가 비면 <code>주문하기</code> 버튼 꺼짐 ④ 주문하면 <code>#result</code> 에 <code>주문 번호 1 · 합계 8,500원</code>, 주문 내역(<code>#history</code>)에 한 줄 · localStorage(<code>"orders"</code>)에 저장 · 장바구니 비우기. 다 되면 덧붙여: JS 를 store · view · main 모듈로 나누고 GitHub Pages 에 올려 폰으로 주문해 봐요.', needs: [['const res = await fetch("menu.json")', 'W10/3', '불러와 그리기'], ['e.target.closest(".add")', 'W8B/1', '이벤트 위임'], ['acc[t] = (acc[t] ?? 0) + 1', 'W7F/1', '객체로 개수 세기 — cart[id] 도 같은 모양'], ['required · pattern', 'W11/0', '브라우저 검사'], ['new FormData(form)', 'W8C/1', '주문 읽기'], ['localStorage.setItem("orders", JSON.stringify(orders))', 'W9/2', '주문 내역 저장'], ['toLocaleString("ko-KR")', 'W7G/1', '금액'], ['<script type="module">', 'W12/0', '(덧붙여) 파일 나누기']],
+        prep: { name: 'menu.json', text: JSON.stringify(MENU_JSON, null, 2) }, mock: { 'menu.json': MENU_JSON },
+        answer: WH('카페 주문', '  <h1>카페 주문</h1>\n  <ul id="menu"></ul>\n  <h2>장바구니</h2>\n  <ul id="cart"></ul>\n  <p id="sum">합계 0원</p>\n  <form id="order">\n    <label for="name">이름</label>\n    <input id="name" name="name" required>\n    <label for="phone">전화</label>\n    <input id="phone" name="phone" required pattern="010-[0-9]{4}-[0-9]{4}" placeholder="010-1234-5678">\n    <label for="time">찾으러 올 시각</label>\n    <select id="time" name="time"><option>지금</option><option>10분 뒤</option><option>30분 뒤</option></select>\n    <button id="send" disabled>주문하기</button>\n  </form>\n  <p id="result"></p>\n  <h2>주문 내역</h2>\n  <ol id="history"></ol>', '    input:user-invalid { border: 2px solid crimson; }', 'const $ = (s) => document.querySelector(s);\nconst won = (n) => `${n.toLocaleString("ko-KR")}원`;\nlet menu = [];\nlet cart = {};\nlet orders = JSON.parse(localStorage.getItem("orders")) || [];\nconst itemOf = (id) => menu.find(m => m.id === Number(id));\nconst total = () => Object.entries(cart).reduce((s, [id, qty]) => s + itemOf(id).price * qty, 0);\nfunction render() {\n  $("#menu").innerHTML = menu.map(m => `<li>${m.name} ${won(m.price)} <button class="add" data-id="${m.id}">담기</button></li>`).join("");\n  $("#cart").innerHTML = Object.entries(cart).map(([id, qty]) => `<li>${itemOf(id).name} × ${qty} <button data-dec="${id}" aria-label="${itemOf(id).name} 하나 빼기">−</button></li>`).join("");\n  $("#sum").textContent = `합계 ${won(total())}`;\n  $("#history").innerHTML = orders.map(o => `<li>${o.no}번 · ${o.name} · ${o.time} · ${won(o.total)}</li>`).join("");\n  $("#send").disabled = Object.keys(cart).length === 0;\n}\n$("#menu").addEventListener("click", (e) => {\n  const b = e.target.closest(".add");\n  if (!b) return;\n  cart[b.dataset.id] = (cart[b.dataset.id] ?? 0) + 1;\n  render();\n});\n$("#cart").addEventListener("click", (e) => {\n  const b = e.target.closest("[data-dec]");\n  if (!b) return;\n  cart[b.dataset.dec] -= 1;\n  if (cart[b.dataset.dec] === 0) delete cart[b.dataset.dec];\n  render();\n});\n$("#order").addEventListener("submit", (e) => {\n  e.preventDefault();\n  const data = Object.fromEntries(new FormData(e.target));\n  const order = { no: orders.length + 1, name: data.name, time: data.time, total: total() };\n  orders.push(order);\n  localStorage.setItem("orders", JSON.stringify(orders));\n  cart = {};\n  e.target.reset();\n  $("#result").textContent = `주문 번호 ${order.no} · 합계 ${won(order.total)}`;\n  render();\n});\nasync function load() {\n  try {\n    const res = await fetch("menu.json");\n    if (!res.ok) throw new Error("HTTP " + res.status);\n    menu = await res.json();\n    render();\n  } catch (err) {\n    $("#menu").textContent = "메뉴를 불러오지 못했어요";\n  }\n}\nload();'),
+        checks: [{ text: '메뉴 3개와 담기 버튼', wait: 600, sel: '#menu .add', count: 3 }, { text: '처음엔 주문하기 꺼짐', sel: '#send', js: 'document.querySelector("#send").disabled' }, { text: '아메리카노 두 번 → 합계 8,000원', click: '#menu [data-id="1"]', times: 2, then: { sel: '#sum', equals: '합계 8,000원' } }, { text: '카페라테 → 합계 12,500원', click: '#menu [data-id="2"]', then: { sel: '#sum', equals: '합계 12,500원' } }, { text: '장바구니에 「아메리카노 × 2」', sel: '#cart li:first-child', contains: '아메리카노 × 2' }, { text: '− 로 하나 빼기 → 합계 8,500원', click: '#cart [data-dec="1"]', then: { sel: '#sum', equals: '합계 8,500원' } }, { text: '이름 없이 주문하면 막힘', submit: '#order', then: { sel: '#history', js: 'document.querySelectorAll("#history li").length === 0' } }, { text: '전화 모양이 틀리면 틀림 표시', input: { sel: '#phone', value: '1234' }, then: { sel: '#phone', js: '!document.querySelector("#phone").checkValidity()' } }, { text: '이름 「지훈」', input: { sel: '#name', value: '지훈' }, then: { sel: '#name', value: '지훈' } }, { text: '전화 고치고 주문 → 「주문 번호 1 · 합계 8,500원」', input: { sel: '#phone', value: '010-1234-5678' }, submit: '#order', then: { sel: '#result', equals: '주문 번호 1 · 합계 8,500원' } }, { text: '주문 뒤 장바구니 비고 · 내역 1줄 · 저장됨', sel: '#history', js: 'document.querySelectorAll("#cart li").length === 0 && document.querySelectorAll("#history li").length === 1 && JSON.parse(localStorage.getItem("orders")).length === 1' }, { text: '장바구니가 비면 주문하기 다시 꺼짐', sel: '#send', js: 'document.querySelector("#send").disabled' }] },
     ],
   },
 };
