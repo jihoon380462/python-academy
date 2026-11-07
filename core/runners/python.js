@@ -110,7 +110,7 @@ def _pa_vis(v, depth=0, seen=None):
 def __pa_run(code, call=None, trace=False, maxsteps=500, vis=None):
     _pt.reset()
     visnames=json.loads(vis) if vis else None
-    ns={'__name__':'__main__'}
+    ns={'__name__':'__main__','__file__':__import__('os').path.join(__import__('os').getcwd(),'main.py')}  # v2.34.0: Path(__file__).parent 예제(L17B/1)가 NameError 없이 돌게 — VS Code 처럼 「작업 폴더의 main.py」
     res={'ok':True}
     steps=[]; buf=[]; stack=[]
     class _Cap:
