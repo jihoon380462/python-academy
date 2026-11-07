@@ -226,7 +226,7 @@ print(mine.decode())` } },
 <p>반대도 있어요. 엑셀이 만든 CSV 는 cp949 로 저장되는 일이 많아서, UTF-8 로 읽으면 첫 바이트부터 멈춰요. 파일을 <code>"rb"</code> 로 열면 글자로 바꾸지 않은 <b>바이트 그대로</b>를 읽을 수 있어요.</p>
 <pre>excel = "이름,점수".encode("cp949")\nwith open("scores.csv", "wb") as f:\n    f.write(excel)\nwith open("scores.csv", "rb") as f:\n    data = f.read()          # 바이트 그대로\nprint(data.hex(" "))         # c0 cc b8 a7 2c c1 a1 bc f6\nprint(data.decode("cp949"))  # 이름,점수 — 맞는 규칙이면 멀쩡</pre>
 <div class="bk-warn"><b>깨진 글자를 저장하면 못 되살려요</b> — 화면의 <code>�</code> 는 「못 읽은 바이트를 버렸다」 는 뜻이에요. 깨진 채로 다시 저장하면 원래 바이트가 사라져요. 깨져 보이면 <b>파일은 그대로 두고, 읽는 규칙(encoding)만 바꿔서</b> 다시 열어요.</div>
-<p>파이썬에서 파일을 열 때 늘 <code>encoding="utf-8"</code> 을 적는 이유가 이거예요. 파이썬 3.14 이하의 Windows 는 기본이 cp949 라 빼먹으면 Windows 에서만 깨지고(3.15 부터는 기본이 utf-8), cp949 로 저장된 파일은 어느 버전에서든 맞춰 읽어야 해요. 자세한 함정은 <a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩 · JSON」 ↗</a> 에 있어요.</p>`,
+<p>파이썬에서 파일을 열 때 늘 <code>encoding="utf-8"</code> 을 적는 이유가 이거예요. 파이썬 3.14 이하의 Windows 는 기본이 cp949 라 빼먹으면 Windows 에서만 깨지고(3.15 부터는 기본이 utf-8), cp949 로 저장된 파일은 어느 버전에서든 맞춰 읽어야 해요. 자세한 함정은 <a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩」 ↗</a> 에 있어요.</p>`,
       example: { code: `data = "안녕".encode("utf-8")
 print(data.hex(" "))
 print(data.decode("cp949", errors="replace"))
@@ -1152,7 +1152,7 @@ print(simulate([1, 2, 1, 3, 1, 2], 2))   # 2</pre>
 <ol><li><code>block in cache</code> 면 적중 — 세고, 그 블록을 맨 뒤로 옮겨요(방금 썼으니까)</li>
 <li>아니면 실패 — 꽉 찼으면 맨 앞(가장 오래 안 쓴 것)을 <code>pop(0)</code> 으로 버리고, 새 블록을 맨 뒤에 넣어요</li></ol>
 <p>적중률(적중 ÷ 전체)이 속도를 정해요. 적중률 95% 와 90% 는 비슷해 보이지만, 실패가 5% 에서 10% 로 <b>두 배</b>예요. 실패 하나가 적중 백 번만큼 느리니 큰 차이예요.</p>
-<p>파이썬에도 같은 생각의 도구가 있어요. 함수 위에 <code>@functools.lru_cache</code> 를 붙이면, 같은 인자로 부른 결과를 기억해 두었다가 다시 계산하지 않고 돌려줘요. 꽉 차면 LRU 로 버려요. <code>@</code> 는 <a href="../python/#lesson/L18D" target="_blank" rel="noopener">파이썬 교과서 「데코레이터」 ↗</a> 예요.</p>
+<p>파이썬에도 같은 생각의 도구가 있어요. 함수 위에 <code>@functools.lru_cache</code> 를 붙이면, 같은 인자로 부른 결과를 기억해 두었다가 다시 계산하지 않고 돌려줘요. 꽉 차면 LRU 로 버려요. <code>@</code> 는 <a href="../python/#lesson/L18F" target="_blank" rel="noopener">파이썬 교과서 「데코레이터」 ↗</a> 예요.</p>
 <pre>import functools
 
 @functools.lru_cache(maxsize=2)
