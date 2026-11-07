@@ -27,7 +27,7 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
     if (dv.text && /👀|시각화|▶ 실행|입력창/.test(dv.text) && BOOK.fixPrompt) bad(`${id}: 지문에 이 앱 버튼 안내가 남음 「${(dv.text.match(/.{0,20}(👀|시각화|▶ 실행|입력창).{0,20}/) || [''])[0].replace(/<[^>]+>/g, '')}」 — BOOK.fixPrompt 로 지우거나 text 를 직접 쓰세요`);
     if (!answer) bad(`${id}: 예시 답 없음`);
     if (/(^|[^$]){{/.test(JSON.stringify(io) + '\n' + answer)) /* ${{ … }} 는 GitHub Actions 문법이라 제외 */ bad(`${id}: {{바꿔 끼우기}} 자리표시가 남음 — io·answer 를 직접 적으세요`);
-    const GHB = BOOK.check === 'github'; if (GHB && t.noRun && !(t.checks || []).length) bad(`${id}: GitHub 화면 문제인데 「확인할 것」(checks) 없음`); // v2.16.0 GitHub 교과서: 화면 문제는 checks, 명령 문제는 셸로
+    const GHB = ['github', 'linux'].includes(BOOK.check); if (GHB && t.noRun && !(t.checks || []).length) bad(`${id}: 화면에서 하는 문제인데 「확인할 것」(checks) 없음`); /* v2.21.0 리눅스 교과서도 같은 방식(화면 = ☐ · 명령 = bash) */ // v2.16.0 GitHub 교과서: 화면 문제는 checks, 명령 문제는 셸로
     if (t.noRun) return;
     if (GHB) { if (!t.setup) bad(`${id}: 명령 문제인데 준비 명령(setup) 없음`); for (const c of io) runShell(id, t, answer, c); return; }
     if (BOOK.check === 'web') { if (!(t.checks || []).length) bad(`${id}: 「브라우저에서 확인할 것」(checks) 없음`); return; } // v2.14.0 웹 교과서: 실제 검사는 tools/run_web_solutions.py(브라우저)
@@ -58,7 +58,7 @@ if (VIM) { // 교과서가 권하는 _vimrc 를 진짜 vim 이 에러 없이 읽
 for (const [k, o2] of Object.entries(BOOK.pages || {})) { const [pl, pi] = k.split('/'); const pg = (pagesOf(pl) || [])[+pi]; if (!pg) { bad(`pages ${k}: 없는 쪽`); continue; } for (const [a] of o2.rep || []) if (!pg.html.includes(a)) bad(`pages ${k}: 바꿀 글을 못 찾음 「${a.slice(0, 40)}」`); }
 for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/'); if (!(pagesOf(tl) || [])[+ti]) bad(`titles ${k}: 없는 쪽`); }
 (BOOK.builtins || []).forEach((bi, i) => { n++; const id = `내장 함수 ${bi.name}`; if (bi.ref) { const [bl, bp] = bi.ref.split('/'); if (!(pagesOf(bl) || [])[+bp]) bad(`${id}: ref ${bi.ref} 가 없는 쪽`); }
-  if (VIM || SHELL || BOOK.check === 'github') return; // 단축키·명령·Markdown 모음은 실행 결과가 없음
+  if (VIM || SHELL || ['github', 'linux'].includes(BOOK.check)) return; // 단축키·명령·Markdown 모음은 실행 결과가 없음
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: 8000, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
   ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
 // v2.15.1 사용자 「3, 4」(알고 교과서 자체 QA 에서 손으로 찾은 두 종류를 CI 로):
