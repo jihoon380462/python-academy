@@ -48,7 +48,7 @@ const BOOK = {
 <div class="bk-step-box"><b>① 설치</b><br>VS Code 왼쪽 막대의 <b>확장(Extensions)</b> 아이콘(네모 네 개, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>) → 검색 칸에 <code>Live Server</code> → 만든 사람이 <b>Ritwick Dey</b> 인 것 → <b>Install</b>.</div>
 <div class="bk-step-box"><b>② 띄우기</b><br><code>index.html</code> 을 연 상태에서 VS Code 맨 아래 <b>오른쪽</b>의 <b>Go Live</b> 를 클릭(또는 편집기 안 마우스 오른쪽 → <b>Open with Live Server</b>). 브라우저가 <code>http://127.0.0.1:5500/index.html</code> 로 열려요.</div>
 <div class="bk-step-box"><b>③ 확인</b><br>VS Code 에서 h1 글자를 바꾸고 <kbd>Ctrl</kbd>+<kbd>S</kbd> → 브라우저가 저절로 바뀌면 성공. 끄기는 맨 아래 <b>Port : 5500</b> 을 클릭.</div>
-<p class="muted small">Windows 방화벽 창이 뜨면 「개인 네트워크」 만 허용. 다른 파일(<code>about.html</code>)을 보려면 주소 끝만 바꾸거나 그 파일에서 다시 Go Live.</p>` },
+<p class="muted small">Go Live 는 쓸 때만 켜고 다 쓰면 <b>Port : 5500</b> 을 눌러 꺼요. (폰으로 보려고 설정을 바꾸면 Windows 방화벽 창이 떠요 — 그땐 「개인 네트워크」 만 허용, 레슨 6.) 다른 파일(<code>about.html</code>)을 보려면 주소 끝만 바꾸거나 그 파일에서 다시 Go Live.</p>` },
       { title: '3. 브라우저 개발자 도구 (F12)', html: `<p>크롬·엣지에서 <kbd>F12</kbd>(또는 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>, 페이지에서 마우스 오른쪽 → <b>검사</b>)를 누르면 개발자 도구가 열려요. 웹 개발의 절반은 여기서 해요.</p>
 <table class="kb"><tbody><tr><td><b>Elements</b>(요소)</td><td>지금 화면의 HTML 나무와 각 요소에 걸린 CSS. 왼쪽 위 화살표 아이콘으로 화면을 클릭하면 그 요소로. 박스 모델(margin·padding) 그림도</td></tr><tr><td><b>Console</b>(콘솔)</td><td>JS 의 <code>console.log</code> 출력과 <b>빨간 에러</b>. JS 를 바로 쳐 볼 수도 있어요</td></tr><tr><td><b>Network</b>(네트워크)</td><td>페이지가 서버와 주고받은 요청 목록 — 주소·상태 코드(200, 404)·걸린 시간(레슨 10)</td></tr><tr><td>폰 화면 아이콘(<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd>)</td><td>폰 크기로 보기 — 반응형(레슨 6) 확인</td></tr></tbody></table>
 <p>개발자 도구에서 고친 건 <b>새로고침하면 사라져요</b>. 시험해 보고, 마음에 들면 VS Code 의 파일에 옮겨 적어요.</p>` },
@@ -155,7 +155,7 @@ h1 { color: purple; font-size: 32px; }</pre>
       { title: 'viewport 와 폰에서 보기', html: `<p>폰 브라우저는 viewport 메타 태그가 없으면 페이지를 PC 폭(980px)으로 그린 다음 <b>작게 줄여</b> 보여 줘요 — 글씨가 깨알만 해져요.</p>
 <pre class="code">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</pre>
 <p>이 한 줄(VS Code 의 <code>!</code> 뼈대에 이미 있음)이 「폰의 실제 폭으로 그려라」 예요.</p>
-<p>확인: F12 → 폰 아이콘(<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd>) → 위쪽에서 기종(iPhone 등) 고르기. 또는 내 폰에서 직접: PC 와 폰이 같은 와이파이면 Live Server 주소의 <code>127.0.0.1</code> 자리에 PC 의 IP(명령 프롬프트 <code>ipconfig</code> 의 IPv4 주소)를 넣어 폰 브라우저로.</p>` },
+<p>확인: F12 → 폰 아이콘(<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>M</kbd>) → 위쪽에서 기종(iPhone 등) 고르기. 또는 내 폰에서 직접: Live Server 는 처음엔 이 PC 안(<code>127.0.0.1</code>)에서만 열려서 먼저 바꿔야 해요 — VS Code <b>파일 → 기본 설정 → 설정</b>(<kbd>Ctrl</kbd>+<kbd>,</kbd>) → 위 검색 칸에 <code>liveServer.settings.host</code> → 값을 <code>0.0.0.0</code> → 맨 아래 <b>Port : 5500</b> 을 눌러 끄고 다시 <b>Go Live</b> → Windows 방화벽 창이 뜨면 「개인 네트워크」 만 허용. 그다음 PC 와 폰이 같은 와이파이에서 <code>http://PC의IP:5500</code>(IP 는 명령 프롬프트 <code>ipconfig</code> 의 IPv4 주소). 다 보면 값을 <code>127.0.0.1</code> 로 되돌려요.</p>` },
       { title: '@media: 폭에 따라 다른 CSS', html: `<pre class="code">.cards { display: flex; gap: 16px; }
 
 @media (max-width: 600px) {       ← 화면 폭이 600px 이하일 때만
@@ -266,7 +266,8 @@ load();</pre>
 }</pre>
 <ul><li><code>res.ok</code> = 상태 코드가 200~299. <b>fetch 는 404 여도 에러를 안 내요</b> — 그래서 <code>res.ok</code> 를 꼭 봐요</li><li><code>try … catch</code> = 파이썬 <code>try … except</code>. 인터넷이 끊기면 catch 로</li><li>F12 → Network 에서 menu.json 요청이 200 인지, 주소를 틀리게 해서 404 도 만들어 보세요</li></ul>`, example: { code: WH('메뉴', '  <h1>메뉴</h1>\n  <p id="status"></p>\n  <ul id="list"></ul>', '', 'const status = document.querySelector("#status");\nconst list = document.querySelector("#list");\nasync function load() {\n  status.textContent = "불러오는 중…";\n  try {\n    const res = await fetch("menu.json");\n    if (!res.ok) throw new Error("HTTP " + res.status);\n    const menu = await res.json();\n    list.innerHTML = menu.map(m => `<li>${m.name} ${m.price}원</li>`).join("");\n    status.textContent = "";\n  } catch (err) {\n    status.textContent = "불러오지 못했어요: " + err.message;\n  }\n}\nload();') } },
       { title: '진짜 API: GET 과 POST', html: `<p><b>jsonplaceholder</b> 는 연습용 공개 API 예요(가입 없음). 진짜처럼 응답하지만 저장은 안 돼요.</p>
-<pre class="code">// GET — 할 일 3개
+<pre class="code">// 아래 await 는 async 함수 안(만들어 보기처럼 버튼 클릭 함수) 또는 F12 Console 에서만 돼요
+// GET — 할 일 3개
 const res = await fetch("https://jsonplaceholder.typicode.com/todos?_limit=3");
 const todos = await res.json();     // [{userId, id, title, completed}, …]
 
@@ -295,7 +296,7 @@ print(res.status_code, res.json())     # 201 {…, 'id': 201}</pre>
 <p><code>json=</code> 에 딕셔너리를 주면 JSON 글자로 바꾸고 Content-Type 헤더까지 붙여 줘요.</p>
 <p>날씨·지도·AI 같은 진짜 API 는 대부분 <b>API 키</b>(나를 알아보는 비밀 글자)를 요구해요.</p>
 <div class="bk-warn"><b>API 키를 코드에 적지 마세요.</b> GitHub 에 올리는 순간 공개돼요(터미널·Git 교과서 레슨 10). <b>환경 변수</b>에 두고 읽어요:<pre>import os
-key = os.environ["WEATHER_KEY"]     # 터미널에서 미리 set WEATHER_KEY=… (Git Bash: export)
+key = os.environ["WEATHER_KEY"]     # 실행할 그 터미널에서 미리: PowerShell $env:WEATHER_KEY="…" · 명령 프롬프트 set WEATHER_KEY=… · Git Bash export WEATHER_KEY=…
 requests.get(url, headers={"Authorization": f"Bearer {key}"})</pre>또는 <code>.env</code> 파일에 두고 <code>.gitignore</code> 에 <code>.env</code>.</div>` },
     ],
     W13: [
@@ -419,7 +420,7 @@ requests.get(url, headers={"Authorization": f"Bearer {key}"})</pre>또는 <code>
     ],
     W13: [
       { title: '🏠 내 소개 페이지를 인터넷에', text: '보스 WB1 에서 만든 내 소개 페이지를 GitHub 저장소로 올리고 GitHub Pages 를 켜서, <code>https://내아이디.github.io/저장소이름/</code> 주소로 <b>폰에서</b> 열어 보세요.', needs: [['git init · git push', 'W13/1', '터미널·Git 교과서 레슨 7·16 의 순서'], ['Settings → Pages', 'W13/1', 'Pages 켜기'], ['index.html', 'W13/1', '첫 페이지 이름']],
-        answer: 'cd ~/web-study/profile\ngit init -b main\ngit add .\ngit commit -m "내 소개 페이지"\ngit remote add origin https://github.com/내아이디/profile.git\ngit push -u origin main\n(GitHub → Settings → Pages → Deploy from a branch → main / (root) → Save)', noRun: true },
+        answer: 'cd ~/Documents/web-study/profile   (시작하기 1 에서 web-study 를 만든 곳 — 문서 폴더면 이 경로)\ngit init -b main\ngit add .\ngit commit -m "내 소개 페이지"\ngit remote add origin https://github.com/내아이디/profile.git\ngit push -u origin main\n(GitHub → Settings → Pages → Deploy from a branch → main / (root) → Save)', noRun: true },
     ],
     WB3: [
       { title: '카페 주문 화면', text: '<code>menu.json</code> 을 불러와 메뉴마다 <code>담기</code> 버튼이 있는 목록을 그리고, 누르면 장바구니(<code>id="cart"</code>)에 담기고 합계(<code>id="sum"</code>, <code>합계 8500원</code>)가 바뀌게. <code>주문하기</code> 버튼을 누르면 <code>https://jsonplaceholder.typicode.com/posts</code> 로 장바구니를 POST 하고 응답의 id 로 <code>주문 번호 101</code> 을 <code>id="result"</code> 에 보이세요.', needs: [['fetch menu.json', 'W11/1', '불러와 그리기'], ['상태 + render()', 'W9/0', '장바구니'], ['이벤트 위임 · data-id', 'W9/1', '어느 메뉴의 버튼'], ['fetch POST', 'W11/2', '주문 보내기'], ['reduce', 'W7/2', '합계']],

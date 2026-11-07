@@ -110,7 +110,7 @@ FROM orders WHERE ordered_at &gt;= '2026-10-01';</pre>
 <pre class="code">SELECT category, COUNT(*) AS 메뉴수, AVG(price) AS 평균가
 FROM menu
 GROUP BY category;</pre>
-<p>같은 category 끼리 한 묶음이 되고, 묶음마다 한 행이 나와요. <b>SELECT 에는 묶은 열(category)과 집계 함수만</b> 쓰는 게 규칙이에요(묶음 안에 name 이 여러 개라 무엇을 보여 줄지 정할 수 없어서).</p>
+<p>같은 category 끼리 한 묶음이 되고, 묶음마다 한 행이 나와요. <b>SELECT 에는 묶은 열(category)과 집계 함수만</b> 쓰는 게 규칙이에요(묶음 안에 name 이 여러 개라 무엇을 보여 줄지 정할 수 없어서). 다른 DB 는 이걸 어기면 에러를 내지만, <b>SQLite 는 에러 없이 묶음 안의 아무 행 값이나 보여 줘요</b> — 결과가 나왔다고 맞은 게 아니니 주의.</p>
 <p>여러 열로도 묶어요: <code>GROUP BY category, is_hot</code>.</p>`, example: { code: 'SELECT category, COUNT(*) AS 메뉴수, AVG(price) AS 평균가\nFROM menu\nGROUP BY category;' } },
       { title: 'HAVING: 묶음에 조건', html: `<table class="kb"><tbody><tr><td><code>WHERE</code></td><td>묶기 <b>전</b>, <b>행</b>에 거는 조건</td></tr><tr><td><code>HAVING</code></td><td>묶은 <b>뒤</b>, <b>묶음(집계 결과)</b>에 거는 조건</td></tr></tbody></table>
 <pre class="code">SELECT customer_id, COUNT(*) AS 횟수
@@ -284,7 +284,7 @@ ROLLBACK;    ← BEGIN 전으로 전부 되돌리기</pre>
 <p>규칙: 「같이 되어야 하는 변경」 은 한 트랜잭션으로 묶고, 하나라도 실패하면 전부 되돌린다. 은행·쇼핑몰 주문(재고 −1, 주문 +1)이 다 이렇게 돼요.</p>` },
     ],
     S13: [
-      { title: '파이썬에서 SQLite 열기', html: `<p>파이썬에는 <code>sqlite3</code> 모듈이 들어 있어서 설치 없이 바로 써요. <code>cafe.db</code> 를 <b>.py 파일과 같은 폴더</b>에 두고 VS Code 에서 실행하세요.</p>
+      { title: '파이썬에서 SQLite 열기', html: `<p>파이썬에는 <code>sqlite3</code> 모듈이 들어 있어서 설치 없이 바로 써요. <code>cafe.db</code> 를 <b>VS Code 에서 연 폴더</b>(.py 와 같은 폴더)에 두고 실행하세요. <code>connect("cafe.db")</code> 는 .py 가 있는 곳이 아니라 <b>지금 터미널의 위치</b>(VS Code 에서 연 폴더)를 기준으로 찾아요.</p>
 <pre class="code">import sqlite3
 
 conn = sqlite3.connect("cafe.db")     # 파일 열기(없으면 새로 만듦!)
@@ -294,7 +294,7 @@ for name, price in cur.fetchall():   # 결과 = 튜플들의 리스트
     print(name, price)
 conn.close()</pre>
 <table class="kb"><tbody><tr><td><code>fetchall()</code></td><td>결과 전부를 <code>[(…), (…)]</code> 리스트로</td></tr><tr><td><code>fetchone()</code></td><td>한 행만(<code>COUNT(*)</code> 같은 값 하나일 때 <code>[0]</code>)</td></tr></tbody></table>
-<div class="bk-warn"><code>connect("cafe.db")</code> 는 파일이 <b>없으면 빈 DB 를 새로 만들어요</b>. 그래서 폴더가 틀리면 에러 대신 <code>no such table: menu</code> 가 나와요 → cafe.db 가 .py 와 같은 폴더에 있는지, VS Code 에서 그 폴더를 열었는지 확인.</div>`, example: { code: 'import sqlite3\n\nconn = sqlite3.connect("cafe.db")\ncur = conn.cursor()\ncur.execute("SELECT name, price FROM menu WHERE price >= 5000")\nfor name, price in cur.fetchall():\n    print(name, price)\nconn.close()', label: '예제 파이썬 — cafe.db 와 같은 폴더의 .py 에 붙여 넣고 VS Code 에서 실행' } },
+<div class="bk-warn"><code>connect("cafe.db")</code> 는 파일이 <b>없으면 빈 DB 를 새로 만들어요</b>. 그래서 폴더가 틀리면 에러 대신 <code>no such table: menu</code> 가 나와요 → cafe.db 가 <b>VS Code 에서 연 폴더</b>에 있는지(.py 가 하위 폴더에 있어도 터미널 위치 기준), 터미널의 <code>pwd</code> 로 확인.</div>`, example: { code: 'import sqlite3\n\nconn = sqlite3.connect("cafe.db")\ncur = conn.cursor()\ncur.execute("SELECT name, price FROM menu WHERE price >= 5000")\nfor name, price in cur.fetchall():\n    print(name, price)\nconn.close()', label: '예제 파이썬 — cafe.db 와 같은 폴더의 .py 에 붙여 넣고 VS Code 에서 실행' } },
       { title: '? 로 값 넣기 (SQL 인젝션 막기)', html: `<p>사용자가 입력한 값을 SQL 에 넣을 때 <b>글자 더하기로 만들면 안 돼요</b>.</p>
 <pre class="code">name = input("메뉴: ")
 cur.execute("SELECT * FROM menu WHERE name = '" + name + "'")   # ❌ 위험</pre>

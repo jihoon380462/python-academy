@@ -39,11 +39,11 @@ const BOOK = {
       { title: '1. Vim 설치하기 (Windows, gVim 9.2)', html: `<p>Windows 용 Vim 은 창이 있는 <b>gVim</b> 과 명령줄용 <b>vim</b> 이 한 설치 프로그램에 같이 들어 있어요. 한 번만 하면 돼요.</p>
 <div class="bk-step-box"><b>① 받기</b><br>브라우저로 <a href="https://www.vim.org/download.php" target="_blank" rel="noopener">vim.org/download.php</a> → <b>MS-Windows</b> 부분의 64-bit 설치 파일 <code>gvim_9.2.xxxx_x64.exe</code> 를 받아요. (최신 빌드는 <a href="https://github.com/vim/vim-win32-installer/releases" target="_blank" rel="noopener">github.com/vim/vim-win32-installer/releases</a> 의 <b>Latest</b> 에 같은 이름으로 있어요.)<br><span class="muted small">명령 프롬프트를 쓸 줄 알면 <code>winget install vim.vim</code> 한 줄로도 돼요(그땐 ②의 화면은 안 나와요).</span></div>
 <div class="bk-step-box"><b>② 설치 — 화면별로</b><ul>
-<li>언어 고르기 → <b>English</b>(또는 한국어) → OK · 「이 앱이 디바이스를 변경…」 → <b>예</b></li>
-<li><b>License Agreement</b> → <b>I Agree</b></li>
-<li><b>Choose Components</b> — 아래 칸들이 <b>☑ 체크</b>돼 있는지 확인하고 Next:<br><code>Vim GUI and runtime files</code> · <code>Vim console program</code> · <b><code>Create .bat files</code></b>(명령 프롬프트·PowerShell 에서 <code>vim</code> 으로 열려요) · <code>Create icons for Vim</code> · <code>Add Vim Context Menu</code>(파일 우클릭 「Edit with Vim」) · <code>Create Default Config</code> · <code>Create Plugin Directories</code></li>
+<li>언어 고르기 → <b>English</b>(한국어는 없어요) → OK · 「이 앱이 디바이스를 변경…」 → <b>예</b> · 첫 안내 화면 → <b>Next</b></li>
+<li><b>License Agreement</b> → <b>I Agree</b> · 설치 대상(모든 사용자 / 나만)을 물으면 그대로 <b>Next</b></li>
+<li><b>Choose Components</b> — 기본(Typical) 그대로 두고, 명령 프롬프트·PowerShell 에서도 <code>vim</code> 을 쓰려면 <b>Command line support</b> 아래 ☑ <code>Vim launchers</code> · ☑ <code>Add to PATH</code> 를 켜요(2026년 중반 전 판은 이름이 <code>Create .bat files</code>). 오른쪽 클릭 메뉴 「Edit with Vim」 · 아이콘 · 기본 설정 파일 칸은 켜진 그대로 → <b>Next</b></li>
 <li><b>Choose _vimrc settings</b> — 세 칸 다 <b>(Default)</b> 그대로:<br>Compatibility and enhancements = <code>Vim with all enhancements (load vimrc_example.vim) (Default)</code><br>Remap a few keys for Windows = <b><code>Do not remap keys (Default)</code></b> ← 이걸 바꾸면 Ctrl+V·Ctrl+A 가 Windows 식으로 바뀌어 이 교과서의 단축키가 안 맞아요<br>Behavior of right and left buttons = <code>Right: popup menu, Left: visual mode (Default)</code></li>
-<li><b>Choose Install Location</b> → 그대로(<code>C:\\Program Files\\Vim</code>) → <b>Install</b> → <b>Close</b></li></ul></div>
+<li><b>Choose Install Location</b> → 그대로(<code>C:\\Program Files\\Vim</code>) → <b>Install</b> → <b>Finish</b></li></ul></div>
 <div class="bk-step-box"><b>③ 확인</b><br><kbd>Win</kbd> 키 → <code>gvim</code> → <b>gVim</b> 을 열고 <code>:version</code> <kbd>Enter</kbd> → 첫 줄에 <code>VIM - Vi IMproved 9.2</code> 가 보이면 성공. 닫기는 <code>:q</code>.</div>
 <details class="lp-more"><summary>Mac 이라면</summary><p>Mac 에는 터미널용 <code>vim</code> 이 처음부터 있어요(터미널에서 <code>vim</code>). 창이 있는 버전은 <a href="https://macvim.org/" target="_blank" rel="noopener">MacVim</a>. 설정 파일 이름이 <code>~/.vimrc</code>, 플러그인 폴더가 <code>~/.vim</code> 인 것만 달라요.</p></details>` },
       { title: '2. 연습 파일 열기와 준비 명령 넣는 법', html: `<p>이 교과서의 예제·문제는 홈 폴더의 <code>vim-study</code> 폴더(<code>C:\\Users\\내이름\\vim-study</code>)에서 해요. 아래 <b>준비 명령</b>이 폴더와 연습 파일 <code>play.txt</code> 를 만들고 열어 줘요.</p>
@@ -85,7 +85,7 @@ const BOOK = {
     { name: '>> · << · V >', desc: '들여쓰기 · 내어쓰기 · 고른 줄 들여쓰기', code: 'Vjj>', ref: 'V7/2' },
     { name: ':retab', desc: '탭 글자를 스페이스 4칸으로', code: ':retab', ref: 'V7/1' },
     { name: 'F5 · :!python %', desc: '저장하고 파이썬 실행(_vimrc 설정)', code: ':w\n:!python %', ref: 'V8/0' },
-    { name: 'F6 · :terminal', desc: 'input() 이 있는 프로그램을 아래 창에서 실행', code: ':terminal python %', ref: 'V8/2' },
+    { name: 'F6 · :terminal', desc: 'input() 이 있는 프로그램을 위 창(터미널)에서 실행', code: ':terminal python %', ref: 'V8/2' },
     { name: 'Ctrl+n · Ctrl+p', desc: '(입력 모드) 이미 쓴 낱말로 자동완성', code: 'stuCtrl+n', ref: 'V9/0' },
     { name: 'Ctrl+x Ctrl+f', desc: '(입력 모드) 파일 이름 자동완성', code: 'open("daCtrl+x Ctrl+f', ref: 'V9/1' },
     { name: 'K · gd · F2', desc: '(LSP) 설명 · 정의로 가기 · 이름 바꾸기', code: 'gd', ref: 'V10/3' },
@@ -213,7 +213,7 @@ const BOOK = {
       { title: '에러 난 줄로 가서 고치기', text: '<kbd>F5</kbd> 로 실행하면 <code>ZeroDivisionError</code> 와 함께 <code>line 5</code> 가 나와요. 그 줄로 <b>한 번에</b> 가서 <code>b</code> 를 <code>c</code> 로 고치고 다시 실행하세요.',
         setup: VS('v8-2.py', ['a = 10', 'b = 0', 'c = 5', 'print(a / c)', 'print(a / b)']), needs: [['5G', 'V1/2', '5번째 줄로'], ['$', 'V1/1', '줄 끝'], ['r', 'V3/0', '한 글자 바꾸기']],
         answer: '5G$hrc', io: [{ output: 'a = 10\nb = 0\nc = 5\nprint(a / c)\nprint(a / c)' }], py: { output: '2.0\n2.0' } },
-      { title: 'input() 프로그램은 F6', text: '이름을 입력받는 프로그램이에요. <kbd>F6</kbd> 으로 아래 창에서 실행하고, 창에 <code>지훈</code> 을 입력해 결과를 보세요. 다 보면 <kbd>Ctrl</kbd>+<kbd>w</kbd> <kbd>w</kbd> 로 코드 창으로 돌아와요.',
+      { title: 'input() 프로그램은 F6', text: '이름을 입력받는 프로그램이에요. <kbd>F6</kbd> 으로 위 창에서 실행하고, 창에 <code>지훈</code> 을 입력해 결과를 보세요. 다 보면 <kbd>Ctrl</kbd>+<kbd>w</kbd> <kbd>w</kbd> 로 코드 창으로 돌아와요.',
         setup: VS('v8-3.py', ['name = input("이름: ")', 'print(name + "님 안녕하세요")']), needs: [['F6', 'V8/2', ':terminal 로 실행'], ['Ctrl+w w', 'V8/2', '창 오가기']],
         answer: 'F6 → 지훈 → Enter → Ctrl+w w', io: [{ output: '이름: 지훈\n지훈님 안녕하세요' }], noRun: true /* 터미널 창 입력은 헤드리스로 못 함 */ },
     ],
@@ -253,7 +253,7 @@ const BOOK = {
       { title: '🏠 단어 세기 프로그램 고치기', text: '「사과」 가 몇 번 나오는지 세는 프로그램인데 두 가지가 틀렸어요. ① 4번째 줄이 <code>for</code> 안에 들어가 있지 않아요 ② 변수 이름 <code>count</code> 를 전부 <code>counts</code> 로 바꾸기로 했어요(<code>count.get</code> 같은 곳까지 전부, 다른 말은 그대로). 고치고 <kbd>F5</kbd>.',
         setup: VS('words.py', ['text = "사과 배 사과 귤 사과"', 'count = {}', 'for w in text.split():', 'count[w] = count.get(w, 0) + 1', 'print(count["사과"])']), needs: [['4G', 'V1/2', '4번째 줄로'], ['>>', 'V7/2', '들여쓰기'], ['\\<count\\>', 'V5/1', '단어 count 만'], ['F5', 'V8/1', '실행']],
         answer: '4G>>:%s/\\<count\\>/counts/g<Enter>', io: [{ output: 'text = "사과 배 사과 귤 사과"\ncounts = {}\nfor w in text.split():\n    counts[w] = counts.get(w, 0) + 1\nprint(counts["사과"])' }], py: { output: '3' } },
-      { title: '내 Vim 파이썬 환경 점검', text: '아래가 다 되면 Vim 으로 파이썬을 할 준비가 끝났어요. 안 되는 줄은 그 레슨으로 돌아가요.<ol><li><code>.py</code> 파일에서 <code>:</code> 뒤 Enter → 4칸 들여쓰기 (레슨 7)</li><li><kbd>Tab</kbd> 을 누르면 스페이스가 들어감 — <code>:set list</code> 로 <code>^I</code> 가 안 보임 (레슨 7)</li><li><kbd>F5</kbd> → 저장되고 결과 창 (레슨 8)</li><li><kbd>F6</kbd> → 아래 창에서 <code>input()</code> 입력 (레슨 8)</li><li><code>random.</code> 뒤에 목록이 저절로 (레슨 10)</li><li><code>"+yy</code> 로 복사한 줄을 메모장에 <kbd>Ctrl</kbd>+<kbd>V</kbd> (레슨 4)</li></ol>',
+      { title: '내 Vim 파이썬 환경 점검', text: '아래가 다 되면 Vim 으로 파이썬을 할 준비가 끝났어요. 안 되는 줄은 그 레슨으로 돌아가요.<ol><li><code>.py</code> 파일에서 <code>:</code> 뒤 Enter → 4칸 들여쓰기 (레슨 7)</li><li><kbd>Tab</kbd> 을 누르면 스페이스가 들어감 — <code>:set list</code> 로 <code>^I</code> 가 안 보임 (레슨 7)</li><li><kbd>F5</kbd> → 저장되고 결과 창 (레슨 8)</li><li><kbd>F6</kbd> → 위 창에서 <code>input()</code> 입력 (레슨 8)</li><li><code>random.</code> 뒤에 목록이 저절로 (레슨 10)</li><li><code>"+yy</code> 로 복사한 줄을 메모장에 <kbd>Ctrl</kbd>+<kbd>V</kbd> (레슨 4)</li></ol>',
         needs: [[':set filetype?', 'V7/0', 'python 인지'], [':LspStatus', 'V10/3', '언어 서버 running']],
         answer: ':set filetype?\n:set expandtab? shiftwidth?\n:LspStatus\n:echo $MYVIMRC', noRun: true },
     ],
