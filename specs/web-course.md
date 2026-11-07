@@ -123,7 +123,7 @@
 2. ✅ **v2.25.1** 챕터 2(W4B~W4E) · ✅ **v2.25.2** 챕터 3(W5B · W5C · WB1 키우기).
 3. ✅ **v2.25.3** 챕터 4(W7B~W7G · WB4) + Console 검사.
 4. ✅ **v2.25.4** 챕터 5(W8B · W8C · WB2 키우기).
-5. **v2.26.0** 챕터 6(W10~W13 · WB3 새로 — 옛 HTTP 글은 HTTP·API·SDK 교과서로 옮길 때 git 기록에서) — 웹 교과서 완성.
+5. ✅ **v2.26.0** 챕터 6(W10~W13 · WB3 새로 — 옛 HTTP 글은 HTTP·API·SDK 교과서로 옮길 때 git 기록에서) — 웹 교과서 완성.
 6. 단계마다: `check_book web` · `run_web_solutions.py` · 폰 390/PC · 라이트 QA(`tools/qa_screens.py web`) · 문서(site-intent 2절 · TODO · CHANGELOG · HANDOFF).
 
 ## 9. 정한 것과 이유 (기술적 선택 — Claude)
@@ -135,4 +135,4 @@
 | JS 언어 챕터를 Console 로 | 화면 없이 `console.log` | DOM 과 언어를 섞으면 「문법이 틀렸는지 화면 코드가 틀렸는지」 를 초보자가 못 가림. 언어를 먼저 Console 에서 다지고 챕터 5 에서 화면에 씀 |
 | 프레임워크(React 등) · TypeScript · 빌드 도구 | 이 교과서 범위 밖 | 「HTML · CSS · JS 만으로 혼자 끝까지」 가 목표. 다음 단계로 이름만 소개 |
 | `fetch` 를 웹에 남기는 범위 | 같은 폴더의 JSON 파일만 | 비동기는 JS 언어의 일, 서버와의 대화는 HTTP·API·SDK |
-| 챕터 6 을 맨 마지막에 바꿈 | 그동안 옛 HTTP 레슨이 챕터 6 자리에 남음 | 사이트에서 HTTP 내용이 비는 때가 없게(HTTP·API·SDK 교과서를 웹 다음에 만들어도) |
+| 챕터 6 을 맨 마지막에 바꿈 | 그동안 옛 HTTP 레슨이 챕터 6 자리에 남음 | 챕터 1~5 를 만드는 동안 HTTP 내용이 비지 않게. v2.26.0 부터는 HTTP·API·SDK 교과서가 나올 때까지 HTTP 설명이 사이트에 없음 — 그래서 HTTP·API·SDK 가 바로 다음 차례(HANDOFF 다음 후보 ①) |

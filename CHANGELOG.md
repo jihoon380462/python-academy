@@ -7,6 +7,18 @@
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
 
+## v2.26.0 — 2026-11-07 (Opus: 웹 교과서 완성 — 챕터 6 「더 단단한 화면」)
+
+- 📖 **웹 교과서 완성 — 6챕터 34레슨**(D15 · D16, [`specs/web-course.md`](specs/web-course.md)). 챕터 6 을 옛 「서버와 대화」(HTTP · 파이썬 requests · REST)에서 **「더 단단한 화면」** 으로 바꿈 — 웹 교과서는 화면(HTML · CSS · JavaScript)만:
+  - 레슨 25 **기다리는 코드: async · await 와 내 JSON 파일** — setTimeout 순서, Promise · async/await · Promise.all, menu.json + fetch(Live Server), 로딩 · 에러 · res.ok(4쪽). 만들어 보기 3(menu.json 그리기 · 1초 뒤 「저장했어요」 · 커피 만들기 순서 — Console).
+  - 레슨 26 **폼 검사와 접근성** — required · type · minlength · pattern · `:user-invalid`, checkValidity · setCustomValidity, 접근성(label · alt · button · aria-label · 초점 · 대비), **Lighthouse**(4쪽). 만들어 보기 3(회원가입 폼 · 접근성 다섯 군데 고치기 — 대비까지 자동 계산 · 내 소개 페이지 90점).
+  - 레슨 27 **JS 파일 나누기: 모듈** — `type="module"` · export/import · export default, store · view · main, 모듈 에러 읽기(file:// CORS · 404 · 없는 export · onclick). 만들어 보기 2(할 일 앱을 세 파일로 · onclick → addEventListener).
+  - 레슨 28 **F12 로 고치기와 배포** — Sources 중단점 · Scope · F8/F10/F11 · `debugger;`, Console 에러 다섯 가지 읽기 · Elements, GitHub Pages(그대로), 올리기 전 개인정보 확인 · 정적 사이트 vs 서버(4쪽). 만들어 보기 3(버그 3개 · 중단점 · 내 소개 페이지를 인터넷에).
+  - **만들어 보기: 카페 주문 화면** 새로 — menu.json → 메뉴별 개수 장바구니(− 빼기) → 주문 form 검사(required · pattern) → 주문 내역 localStorage, 덧붙여 모듈 · Pages(확인할 것 12개 자동). 서버로 보내기(옛 POST)는 HTTP·API·SDK 교과서에서.
+  - 「먼저 꼭」: 레슨 25 · 27 · 카페 주문에 「Live Server 로 열어야 해요」, 옛 레슨 27 requests 설치 경고는 뺌.
+- ⚠ 옛 HTTP 레슨(요청·응답 · 상태 코드 · 파이썬 requests · REST)은 사이트에서 빠지고 **HTTP·API·SDK 교과서**(다음 차례, `specs/http-api-course.md`)로 옮겨 다시 써요 — 옛 글은 git 기록(v2.25.4 까지)에 있음.
+- 🛠 내부: run_web_solutions 의 Console 문제는 1.5초 더 기다려 setTimeout · await 로 늦게 찍히는 줄까지 비교. 쓰지 않게 된 연습 API 데이터(TODOS3) 지움. regress 웹 절 = 챕터 6 이름 · 옛 HTTP 레슨 없음 · W10 경고 둘 · 폰 390 13쪽 추가.
+
 ## v2.25.4 — 2026-11-07 (Opus: 웹 교과서 챕터 5 — 브라우저와 DOM)
 
 - 📖 **웹 교과서 챕터 5 「브라우저와 DOM — 움직이게」 완성** — 이제 34레슨 전부 열림(D16):
