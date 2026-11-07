@@ -28,7 +28,7 @@ const BOOK = {
     exampleLabel: '예제 코드 — 우분투에서 nasm · ld 로 빌드해 실행',
     makeIntro: '우분투의 <code>~/asm</code> 폴더에 파일(예: <code>{file}</code>)을 만들고(VS Code Remote - SSH), <b>VS Code 터미널(= 우분투의 bash)</b>에서 빌드해 실행한 뒤 「출력 예」 와 비교해요. 빌드는 <code>nasm -f elf64 파일.asm -o 파일.o</code> → <code>ld 파일.o -o 파일</code> → <code>./파일</code>(C 와 섞거나 printf 를 쓰면 <code>ld</code> 대신 <code>gcc -no-pie</code>). 종료 코드를 보는 문제는 <code>./파일; echo $?</code>.',
     makeTail: '막히면 「필요한 명령」 을 눌러 설명을 다시 보고, 그래도 막히면 맨 아래 예시 답을 펴 보세요. 예시 답과 달라도 같은 결과가 나오면 맞아요.',
-    fileExt: '.asm', answerLabel: '예시 답', needsLabel: '필요한 명령', checkLabel: '확인 코드', outLabel: '출력 예', checksLabel: '내 화면에서 확인할 것',
+    fileExt: '.asm', prepLabel: '준비 파일 — .asm 파일과 같은 폴더에', answerLabel: '예시 답', needsLabel: '필요한 명령', checkLabel: '확인 코드', outLabel: '출력 예', checksLabel: '내 화면에서 확인할 것',
   },
   setup: {
     title: '시작하기: 우분투 VM 에서 어셈블리 빌드할 준비',
@@ -1470,6 +1470,342 @@ max_of:                     ; max_of(arr, n): 가장 큰 값
     jmp .next
 .done:
     ret` },
+    ],
+    R14: [
+      { title: '두 수 더하기 · 빼기: add 와 sub', text: '<code>calc.asm</code> 에 함수 둘 — <code>long add(long a, long b)</code>(a + b) 와 <code>long sub(long a, long b)</code>(a − b) — 을 만들고, <code>main.c</code> 가 차례로 <code>add(2, 3)</code> · <code>add(-10, 4)</code> · <code>add(5000000000, 5000000000)</code> · <code>sub(10, 3)</code> · <code>sub(3, 10)</code> 를 불러 한 줄씩 찍게 하세요. 빌드는 <code>nasm -f elf64 calc.asm -o calc.o</code> → <code>gcc -no-pie main.c calc.o -o calc</code> → <code>./calc</code>. 50억은 32비트에 안 들어가니 <code>long</code> · <code>rax</code> 로 해야 맞아요.',
+        needs: [['long add(long a, long b);', 'R14/0', 'C 쪽 선언 — main 위에'], ['global add', 'R14/0', 'asm 쪽에서 이름 내놓기'], ['gcc -no-pie main.c calc.o -o calc', 'R14/1', 'C 와 .o 를 묶기'], ['printf("%ld\\n", add(2, 3));', 'R14/0', 'long 을 10진으로 찍기']],
+        io: [{ output: '5\n-6\n10000000000\n7\n-7' }],
+        answer: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long add(long a, long b);
+long sub(long a, long b);
+
+int main(void) {
+    printf("%ld\\n", add(2, 3));
+    printf("%ld\\n", add(-10, 4));
+    printf("%ld\\n", add(5000000000, 5000000000));
+    printf("%ld\\n", sub(10, 3));
+    printf("%ld\\n", sub(3, 10));
+    return 0;
+}
+; ==== 파일: calc.asm ====
+section .text
+global add
+global sub
+add:                        ; rdi = a, rsi = b → rax = a + b
+    mov rax, rdi
+    add rax, rsi
+    ret
+sub:                        ; rdi = a, rsi = b → rax = a - b
+    mov rax, rdi
+    sub rax, rsi
+    ret` },
+      { title: '배열 합: sum(long *arr, long n)', text: '<code>long sum(long *arr, long n)</code> 을 어셈블리로 만드세요 — 배열의 앞 <code>n</code> 칸을 더해 돌려줘요. <code>main.c</code> 에서 <code>long a[5] = {3, 1, 4, 1, 5};</code> · <code>long b[3] = {1000000000000, -2, 3};</code> 를 만들고 <code>sum(a, 5)</code> · <code>sum(b, 3)</code> · <code>sum(a, 0)</code> 을 찍어요. 칸이 0개면 0 이어야 해요.',
+        needs: [['long sum(long *arr, long n);', 'R14/3', '배열 = 첫 칸의 주소'], ['add rax, [rdi + rcx*8]', 'R14/3', 'rcx 번째 칸(8바이트씩)'], ['cmp rcx, rsi   jge .done', 'R14/3', 'n 칸 다 했으면 끝'], ['long a[5] = {3, 1, 4, 1, 5};', 'R14/3', 'C 배열 만들기']],
+        io: [{ output: '14\n1000000000001\n0' }],
+        answer: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long sum(long *arr, long n);
+
+int main(void) {
+    long a[5] = {3, 1, 4, 1, 5};
+    long b[3] = {1000000000000, -2, 3};
+    printf("%ld\\n", sum(a, 5));
+    printf("%ld\\n", sum(b, 3));
+    printf("%ld\\n", sum(a, 0));
+    return 0;
+}
+; ==== 파일: sum.asm ====
+section .text
+global sum
+sum:                        ; rdi = 배열 주소, rsi = 칸 수 → rax = 합
+    xor eax, eax            ; rax = 합 0
+    xor ecx, ecx            ; rcx = 칸 번호 0
+.loop:
+    cmp rcx, rsi
+    jge .done
+    add rax, [rdi + rcx*8]
+    inc rcx
+    jmp .loop
+.done:
+    ret` },
+      { title: '문자열 거꾸로: reverse(char *s)', text: '<code>void reverse(char *s)</code> 를 어셈블리로 만드세요. 문자열을 <b>그 자리에서</b> 거꾸로 뒤집는데, 맨 끝의 줄바꿈(10)은 제자리에 둬요(줄바꿈이나 0 을 만나기 전까지만 뒤집기). <code>main.c</code> 는 <code>fgets</code> 로 한 줄씩 읽어 <code>reverse</code> 를 부르고 <code>printf("%s", line)</code> 로 찍어요. 방법: 앞 손가락 <code>rdi</code>, 끝 손가락 <code>rsi</code>(마지막 글자)를 두고 두 바이트를 바꾼 뒤 서로 한 칸씩 다가가요. 만나거나 지나치면 끝. 한글은 한 글자가 3바이트라 뒤집으면 깨지니 영어로만 해 봐요.',
+        needs: [['fgets(line, sizeof line, stdin)', 'R14/4', 'C 가 한 줄 읽기(끝이면 NULL)'], ['void reverse(char *s);', 'R14/4', '문자열 = 첫 글자의 주소'], ['mov al, [rdi]   mov [rdi], al', 'R14/4', '바이트 읽고 그 자리에 쓰기'], ['cmp rdi, rsi   jae .done', 'R14/4', '두 손가락이 만나면 끝(주소는 부호 없는 비교)']],
+        io: [{ input: 'hello\nasm and C\nracecar\n', output: 'olleh\nC dna msa\nracecar' }],
+        answer: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+void reverse(char *s);
+
+int main(void) {
+    char line[100];
+    while (fgets(line, sizeof line, stdin) != NULL) {
+        reverse(line);
+        printf("%s", line);
+    }
+    return 0;
+}
+; ==== 파일: reverse.asm ====
+section .text
+global reverse
+reverse:                    ; rdi = 문자열 주소. 줄바꿈이나 0 앞까지 뒤집기
+    mov rsi, rdi            ; rsi 로 끝 찾기
+.find:
+    mov al, [rsi]
+    cmp al, 0
+    je .found
+    cmp al, 10
+    je .found
+    inc rsi
+    jmp .find
+.found:
+    dec rsi                 ; rsi = 마지막 글자
+.swap:
+    cmp rdi, rsi
+    jae .done               ; 만나거나 지나치면 끝
+    mov al, [rdi]
+    mov dl, [rsi]
+    mov [rdi], dl
+    mov [rsi], al
+    inc rdi
+    dec rsi
+    jmp .swap
+.done:
+    ret` },
+      { title: '큰 수에서 틀리는 곱셈 고치기', text: '아래 <code>mul</code> 은 작은 수는 맞는데 <code>mul(100000, 100000)</code> 이 <code>1410065408</code>, <code>mul(-3, 5)</code> 가 <code>4294967281</code> 로 나와요. C 는 <code>long</code> 이라고 선언했는데 어셈블리는 어떤 크기의 레지스터를 쓰고 있나요? 고쳐서 <code>42</code> · <code>10000000000</code> · <code>-15</code> 가 나오게 하세요.',
+        given: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long mul(long a, long b);
+
+int main(void) {
+    printf("%ld\\n", mul(6, 7));
+    printf("%ld\\n", mul(100000, 100000));
+    printf("%ld\\n", mul(-3, 5));
+    return 0;
+}
+; ==== 파일: mul.asm ====
+section .text
+global mul
+mul:                        ; rdi = a, rsi = b → rax = a * b
+    mov eax, edi
+    imul eax, esi
+    ret`,
+        needs: [['mov rax, rdi', 'R14/2', 'long 은 64비트 이름(rdi · rax)으로'], ['mov eax, edi', 'R14/2', '32비트에 쓰면 위 32비트가 0 — 버그의 원인'], ['imul rax, rsi', 'R14/2', '64비트 곱하기']],
+        io: [{ output: '42\n10000000000\n-15' }],
+        answer: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long mul(long a, long b);
+
+int main(void) {
+    printf("%ld\\n", mul(6, 7));
+    printf("%ld\\n", mul(100000, 100000));
+    printf("%ld\\n", mul(-3, 5));
+    return 0;
+}
+; ==== 파일: mul.asm ====
+section .text
+global mul
+mul:                        ; rdi = a, rsi = b → rax = a * b
+    mov rax, rdi            ; long 이니 64비트 이름으로
+    imul rax, rsi
+    ret` },
+    ],
+    R15: [
+      { title: '내 C 를 어셈블리로: square.c', text: '<code>square.c</code> 에 <code>long square(long x) { return x * x; }</code> 한 함수만 쓰고, <code>-O0</code> 과 <code>-O2</code> 로 각각 <code>gcc -S</code> 해서 비교해 보세요. 두 번째는 <code>-o square2.s</code> 로 다른 이름에 저장해요.', noRun: true,
+        needs: [['gcc -S -O0 -masm=intel -fno-asynchronous-unwind-tables square.c', 'R15/0', 'C → 인텔 문법 .s'], ['QWORD PTR -8[rbp]', 'R15/0', '= NASM 의 qword [rbp - 8]'], ['gcc -S -O2 -masm=intel -fno-asynchronous-unwind-tables square.c -o square2.s', 'R15/2', '최적화하면']],
+        checks: [{ text: '`square.s` 에 `.globl square` 줄이 있어요(= NASM 의 `global square`)' }, { text: '`-O0` 쪽 `square:` 에 `push rbp` · `mov QWORD PTR -8[rbp], rdi` · `imul rax, rax` · `pop rbp` 가 있어요' }, { text: '`-O2` 쪽(`square2.s`)의 `square:` 는 `endbr64` 다음 `imul rdi, rdi` · `mov rax, rdi` · `ret` 세 줄뿐이에요(gcc 버전에 따라 조금 달라도 돼요)' }],
+        answer: 'cd ~/asm\n# square.c 내용: long square(long x) { return x * x; }\ngcc -S -O0 -masm=intel -fno-asynchronous-unwind-tables square.c\ngcc -S -O2 -masm=intel -fno-asynchronous-unwind-tables square.c -o square2.s\ncat square.s\ncat square2.s' },
+      { title: '어셈블리를 읽고 C 로: if', text: '어떤 C 함수 <code>long mystery(long a, long b)</code> 를 <code>gcc -S -O0 -masm=intel -fno-asynchronous-unwind-tables</code> 로 바꿨더니 이렇게 나왔어요. 읽고 <b>같은 일을 하는 C 함수</b>를 쓴 뒤, <code>main</code> 에서 <code>mystery(3, 10)</code> · <code>mystery(10, 3)</code> · <code>mystery(-5, 5)</code> 를 찍으세요. (C 파일 하나라 빌드는 <code>gcc -no-pie main.c -o main</code>.)<pre>mystery:\n    endbr64\n    push    rbp\n    mov     rbp, rsp\n    mov     QWORD PTR -8[rbp], rdi\n    mov     QWORD PTR -16[rbp], rsi\n    mov     rax, QWORD PTR -8[rbp]\n    cmp     rax, QWORD PTR -16[rbp]\n    jge     .L2\n    mov     rax, QWORD PTR -16[rbp]\n    sub     rax, QWORD PTR -8[rbp]\n    jmp     .L3\n.L2:\n    mov     rax, QWORD PTR -8[rbp]\n    sub     rax, QWORD PTR -16[rbp]\n.L3:\n    pop     rbp\n    ret</pre><code>-8[rbp]</code> 가 <code>a</code>, <code>-16[rbp]</code> 가 <code>b</code> 예요. gcc 는 <code>if</code> 의 <b>반대</b> 조건으로 건너뛰어요 — <code>jge</code> 로 건너뛰면 원래 조건은?',
+        needs: [['if (a > b) return a;', 'R15/1', 'if 는 cmp + 반대 조건 점프'], ['mov rax, QWORD PTR -8[rbp]', 'R15/0', '-O0 은 인자를 스택에 두고 꺼내 씀'], ['long mystery(long a, long b) { … }', 'R15/0', 'C 함수 정의']],
+        io: [{ output: '7\n7\n10' }],
+        answer: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long mystery(long a, long b) {
+    if (a < b)
+        return b - a;
+    return a - b;
+}
+
+int main(void) {
+    printf("%ld\\n", mystery(3, 10));
+    printf("%ld\\n", mystery(10, 3));
+    printf("%ld\\n", mystery(-5, 5));
+    return 0;
+}` },
+      { title: '어셈블리를 읽고 C 로: for', text: '이번엔 반복이 있는 <code>long mystery2(long n)</code> 이에요(같은 명령으로 만든 <code>-O0</code> 결과). 읽고 같은 일을 하는 C 를 쓴 뒤 <code>mystery2(0)</code> · <code>mystery2(4)</code> · <code>mystery2(10)</code> 을 찍으세요.<pre>mystery2:\n    endbr64\n    push    rbp\n    mov     rbp, rsp\n    mov     QWORD PTR -24[rbp], rdi\n    mov     QWORD PTR -16[rbp], 1\n    mov     QWORD PTR -8[rbp], 0\n    jmp     .L5\n.L6:\n    mov     rdx, QWORD PTR -16[rbp]\n    mov     rax, rdx\n    add     rax, rax\n    add     rax, rdx\n    mov     QWORD PTR -16[rbp], rax\n    add     QWORD PTR -8[rbp], 1\n.L5:\n    mov     rax, QWORD PTR -8[rbp]\n    cmp     rax, QWORD PTR -24[rbp]\n    jl      .L6\n    mov     rax, QWORD PTR -16[rbp]\n    pop     rbp\n    ret</pre>변수 셋: <code>-24[rbp]</code> = n, <code>-16[rbp]</code> = 결과(처음 1), <code>-8[rbp]</code> = 반복 번호(처음 0). <code>.L6</code> 의 세 줄 <code>mov rax, rdx</code> · <code>add rax, rax</code> · <code>add rax, rdx</code> 는 결과에 무엇을 곱하는 걸까요?',
+        needs: [['for (long i = 0; i < n; i++)', 'R15/1', 'for → 초기화 · jmp 검사 · 몸통 · i++ · 검사'], ['add QWORD PTR -8[rbp], 1', 'R15/1', 'i++'], ['cmp rax, QWORD PTR -24[rbp]   jl .L6', 'R15/1', '조건이 맞으면 위로']],
+        io: [{ output: '1\n81\n59049' }],
+        answer: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long mystery2(long n) {
+    long r = 1;
+    for (long i = 0; i < n; i++)
+        r = r * 3;
+    return r;
+}
+
+int main(void) {
+    printf("%ld\\n", mystery2(0));
+    printf("%ld\\n", mystery2(4));
+    printf("%ld\\n", mystery2(10));
+    return 0;
+}` },
+      { title: 'objdump 로 내 실행 파일 읽기', text: '[[레슨:R14]] 만들어 보기 1 의 <code>calc</code>(<code>add</code> · <code>sub</code>)를 <code>objdump</code> 로 열어, 내가 쓴 함수와 C 가 그것을 부르는 곳을 찾아보세요.', noRun: true,
+        needs: [['objdump -d -M intel --disassemble=add calc', 'R15/3', '함수 하나만 보기'], ['objdump -d -M intel calc | less', 'R15/3', '전부 보기'], ['objdump -d calc', 'R15/4', 'AT&T 로 보기']],
+        checks: [{ text: '`<add>:` 와 `<sub>:` 아래 명령이 내 `calc.asm` 과 같아요(`mov rax,rdi` · `add rax,rsi` · `ret`)' }, { text: '`<main>:` 안의 `call 주소 <add>` 의 주소가 `<add>:` 앞의 주소와 같아요' }, { text: '`call` 바로 앞에 `mov esi,0x3` · `mov edi,0x2` 처럼 인자를 넣는 줄이 보여요' }, { text: '`call ... <printf@plt>` 줄이 보여요' }, { text: '`-M intel` 을 빼면 같은 줄이 `mov %rdi,%rax` 처럼(순서 반대 · %) 보여요' }],
+        answer: 'objdump -d -M intel --disassemble=add calc\nobjdump -d -M intel --disassemble=sub calc\nobjdump -d -M intel calc | less      # /main 으로 찾기, q 로 나가기\nobjdump -d --disassemble=add calc' },
+    ],
+    R16: [
+      { title: 'gdb 로 레지스터 따라가기', text: '아래 <code>trace.asm</code> 을 <code>-g -F dwarf</code> 로 빌드해 gdb 에서 <code>break _start</code> → <code>run</code> 한 뒤, <code>stepi</code> 를 한 번씩 할 때마다 <code>rax</code> · <code>rbx</code> · <code>rcx</code> 가 어떻게 바뀌는지 따라가 보세요. <b>stepi 전에 값을 먼저 짐작</b>하고 확인하면 좋아요.<pre class="code">section .text\nglobal _start\n_start:\n    mov rax, 5\n    mov rbx, 3\n    add rax, rbx\n    imul rax, rax\n    mov rcx, rax\n    shr rcx, 2\n    sub rax, rcx\n    mov rdi, rax\n    mov rax, 60\n    syscall</pre>',
+        noRun: true,
+        needs: [['nasm -f elf64 -g -F dwarf trace.asm -o trace.o', 'R16/0', '줄 번호 정보 넣기'], ['break _start   run   stepi', 'R16/1', '멈추고 한 명령씩'], ['info registers rax rbx', 'R16/1', '레지스터 보기'], ['p $rax', 'R16/1', '10진으로 하나만']],
+        checks: [{ text: '`run` 직후 멈춘 줄이 `trace.asm:4` 의 `mov rax, 5` 예요(아직 실행 전)' }, { text: '`stepi` 3번 뒤(`imul` 줄에서 멈춤) `info registers rax rbx` 가 `rax 0x8 8` · `rbx 0x3 3` 이에요' }, { text: '한 번 더 `stepi` 하면 `p $rax` 가 `64`, 두 번 더 하면 `info registers rcx` 가 `0x10 16` 이에요' }, { text: '`sub` 뒤 `p $rax` 가 `48`, `continue` 하면 `exited with code 060`(8진수 = 48)이고 터미널에서 `./trace; echo $?` 도 `48` 이에요' }],
+        answer: 'nasm -f elf64 -g -F dwarf trace.asm -o trace.o\nld trace.o -o trace\ngdb ./trace\n(gdb) break _start\n(gdb) run\n(gdb) stepi            ← 3번\n(gdb) info registers rax rbx\n(gdb) stepi\n(gdb) p $rax\n(gdb) stepi            ← 2번\n(gdb) info registers rcx\n(gdb) stepi\n(gdb) p $rax\n(gdb) continue' },
+      { title: '폴트 난 줄 찾기', text: '아래 <code>strbug.asm</code> 은 <code>"hello"</code> 의 길이 5 를 종료 코드로 돌려주려는데 <code>Segmentation fault</code> 로 죽어요. 아직 고치지 말고, gdb 로 <b>어느 줄에서</b> · <b>누가 불러서</b> · <b>어떤 레지스터 값 때문에</b> 죽는지 찾아보세요.<pre class="code">default rel\n\nsection .data\nmsg:    db "hello", 0\n\nsection .text\nglobal _start\nstrlen:                     ; rdi = 0 으로 끝나는 문자열 주소 → rax = 길이\n    xor eax, eax\n.next:\n    cmp byte [rdi + rax], 0\n    je .done\n    inc rax\n    jmp .next\n.done:\n    ret\n_start:\n    mov rdi, [msg]          ; 문자열을 strlen 에게\n    call strlen\n    mov rdi, rax            ; exit(길이)\n    mov rax, 60\n    syscall</pre>',
+        noRun: true,
+        needs: [['run', 'R16/3', '폴트 난 명령에서 멈춤'], ['bt', 'R16/3', '누가 불렀나'], ['info registers rdi rax', 'R16/3', '그 줄에 쓰인 레지스터'], ['x/s &msg', 'R16/2', '메모리의 문자열 보기']],
+        checks: [{ text: '`run` 하면 `Program received signal SIGSEGV` 와 함께 11번 줄 `cmp byte [rdi + rax], 0` 에서 멈춰요(`strlen` 안)' }, { text: '`bt` 의 `#1` 이 `_start () at strbug.asm:19` — `call strlen` 바로 뒤예요' }, { text: '`info registers rdi` 의 16진 끝부분이 `6f6c6c6568` 이에요 — 68 65 6c 6c 6f 는 h e l l o 의 아스키, 주소가 아니라 글자 바이트예요' }, { text: '`x/s &msg` 는 `"hello"` — 문자열은 제자리에 잘 있어요. 범인은 18번 줄의 `mov` 예요' }],
+        answer: 'nasm -f elf64 -g -F dwarf strbug.asm -o strbug.o\nld strbug.o -o strbug\ngdb ./strbug\n(gdb) run\n(gdb) bt\n(gdb) info registers rdi rax\n(gdb) x/s &msg' },
+      { title: '폴트 고치기: 길이 5', text: '바로 앞 문제의 <code>strbug.asm</code> 을 고쳐서 <code>./strbug; echo $?</code> 가 <code>5</code> 가 되게 하세요. 한 줄만 바꾸면 돼요.',
+        given: 'default rel\n\nsection .data\nmsg:    db "hello", 0\n\nsection .text\nglobal _start\nstrlen:                     ; rdi = 0 으로 끝나는 문자열 주소 → rax = 길이\n    xor eax, eax\n.next:\n    cmp byte [rdi + rax], 0\n    je .done\n    inc rax\n    jmp .next\n.done:\n    ret\n_start:\n    mov rdi, [msg]          ; 문자열을 strlen 에게\n    call strlen\n    mov rdi, rax            ; exit(길이)\n    mov rax, 60\n    syscall',
+        needs: [['lea rdi, [msg]', 'R16/3', '값이 아니라 주소를 넘기기'], ['mov rdi, [msg]', 'R16/3', '그 자리의 8바이트(글자들)를 읽음 — 버그']],
+        echoExit: true,
+        io: [{ output: '5' }],
+        answer: 'default rel\n\nsection .data\nmsg:    db "hello", 0\n\nsection .text\nglobal _start\nstrlen:                     ; rdi = 0 으로 끝나는 문자열 주소 → rax = 길이\n    xor eax, eax\n.next:\n    cmp byte [rdi + rax], 0\n    je .done\n    inc rax\n    jmp .next\n.done:\n    ret\n_start:\n    lea rdi, [msg]          ; 고침: 문자열의 주소를\n    call strlen\n    mov rdi, rax            ; exit(길이)\n    mov rax, 60\n    syscall' },
+    ],
+    RB4: [
+      { title: '단어 세기: count_words(char *s)', text: '<b>C 와 어셈블리로 작은 <code>wc</code></b>를 만들어요. 일은 이렇게 나눠요.<ol><li><code>main.c</code>: <code>fgets</code> 로 stdin 을 한 줄씩 읽어, 줄 수를 세고 <code>count_words(line)</code> 이 돌려준 값을 더해요. 다 읽으면 <code>printf</code> 로 <code>줄: n</code> · <code>단어: n</code>. 더하기는 파이썬처럼 <code>words += count_words(line);</code></li><li><code>count.asm</code>: <code>long count_words(char *s)</code> — 0 으로 끝나는 문자열에서 <b>단어</b>(빈칸 · 줄바꿈(10) · 탭(9)이 아닌 글자가 이어진 덩어리) 수를 돌려줘요. 「지금 단어 안에 있나」 를 레지스터 하나(예: <code>rcx</code> 0/1)에 두고, 단어 밖에서 글자를 만나는 순간 하나 세요.</li></ol>빌드 · 실행은 <code>nasm -f elf64 count.asm -o count.o</code> → <code>gcc -no-pie main.c count.o -o wc</code> → <code>./wc &lt; words.txt</code>(아래 준비 파일). 빈칸이 두 개 겹쳐도, 빈 줄이어도, 한글이어도 맞게 세야 해요.',
+        prep: { name: 'words.txt', text: 'the quick brown fox\njumps over  the lazy dog\n\n안녕 어셈블리 그리고 C\n' },
+        needs: [['while (fgets(line, sizeof line, stdin) != NULL)', 'R14/4', '한 줄씩 끝까지 읽기'], ['long count_words(char *s);', 'R14/4', '문자열 = 첫 글자의 주소'], ['mov dl, [rdi]   cmp dl, 0', 'R14/4', '한 바이트 읽고 끝(0)인지'], ['gcc -no-pie main.c count.o -o wc', 'R14/1', 'C 와 묶기'], ['printf("단어: %ld\\n", words);', 'R14/0', 'long 출력']],
+        io: [{ input: 'the quick brown fox\njumps over  the lazy dog\n\n안녕 어셈블리 그리고 C\n', output: '줄: 4\n단어: 13' }, { input: '   hello    world  \n\n\tasm\tand\tC\n', output: '줄: 3\n단어: 5' }],
+        answer: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long count_words(char *s);
+
+int main(void) {
+    char line[256];
+    long lines = 0;
+    long words = 0;
+    while (fgets(line, sizeof line, stdin) != NULL) {
+        lines += 1;
+        words += count_words(line);
+    }
+    printf("줄: %ld\\n", lines);
+    printf("단어: %ld\\n", words);
+    return 0;
+}
+; ==== 파일: count.asm ====
+section .text
+global count_words
+
+count_words:                ; rdi = 0 으로 끝나는 문자열 → rax = 단어 수
+    xor eax, eax            ; rax = 단어 수
+    xor ecx, ecx            ; rcx = 1 이면 지금 단어 안
+.next:
+    mov dl, [rdi]
+    cmp dl, 0
+    je .done
+    cmp dl, ' '
+    je .gap
+    cmp dl, 10              ; 줄바꿈
+    je .gap
+    cmp dl, 9               ; 탭
+    je .gap
+    cmp rcx, 1              ; 글자 — 단어 밖에 있었으면 새 단어 시작
+    je .step
+    inc rax
+    mov rcx, 1
+    jmp .step
+.gap:
+    mov rcx, 0              ; 빈칸 — 단어 밖
+.step:
+    inc rdi
+    jmp .next
+.done:
+    ret` },
+      { title: '글자 세기 더하기: count_char(char *s, int c)', text: '<code>count.asm</code> 에 <code>long count_char(char *s, int c)</code> 를 더하세요 — 문자열에 글자 <code>c</code> 가 몇 번 나오는지 돌려줘요. <code>main.c</code> 는 줄마다 <code>count_char(line, \'e\')</code> 와 <code>count_char(line, \'o\')</code> 도 더해서 <code>e: n</code> · <code>o: n</code> 을 마지막에 찍어요. C 의 작은따옴표 <code>\'e\'</code> 는 NASM 의 <code>\'e\'</code> 처럼 그 글자의 아스키 번호(101)예요. <code>c</code> 는 <code>int</code> 라서 <code>esi</code> 로 오는데, 바이트끼리 비교할 땐 그 맨 아래 1바이트 이름 <code>sil</code> 을 써요: <code>cmp dl, sil</code>.',
+        needs: [['long count_char(char *s, int c);', 'R14/2', 'int 인자는 esi(그 맨 아래 바이트 sil)'], ['cmp dl, sil', 'R14/2', '글자 하나와 c 비교'], ['e += count_char(line, \'e\');', 'R14/4', '줄마다 더하기'], ['global count_char', 'R14/0', '두 번째 함수도 내놓기']],
+        io: [{ input: 'the quick brown fox\njumps over  the lazy dog\n\n안녕 어셈블리 그리고 C\n', output: '줄: 4\n단어: 13\ne: 3\no: 4' }, { input: 'one two three\nfour\n', output: '줄: 2\n단어: 4\ne: 3\no: 3' }],
+        answer: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long count_words(char *s);
+long count_char(char *s, int c);
+
+int main(void) {
+    char line[256];
+    long lines = 0;
+    long words = 0;
+    long e = 0;
+    long o = 0;
+    while (fgets(line, sizeof line, stdin) != NULL) {
+        lines += 1;
+        words += count_words(line);
+        e += count_char(line, 'e');
+        o += count_char(line, 'o');
+    }
+    printf("줄: %ld\\n", lines);
+    printf("단어: %ld\\n", words);
+    printf("e: %ld\\n", e);
+    printf("o: %ld\\n", o);
+    return 0;
+}
+; ==== 파일: count.asm ====
+section .text
+global count_words
+global count_char
+
+count_words:                ; rdi = 0 으로 끝나는 문자열 → rax = 단어 수
+    xor eax, eax            ; rax = 단어 수
+    xor ecx, ecx            ; rcx = 1 이면 지금 단어 안
+.next:
+    mov dl, [rdi]
+    cmp dl, 0
+    je .done
+    cmp dl, ' '
+    je .gap
+    cmp dl, 10              ; 줄바꿈
+    je .gap
+    cmp dl, 9               ; 탭
+    je .gap
+    cmp rcx, 1              ; 글자 — 단어 밖에 있었으면 새 단어 시작
+    je .step
+    inc rax
+    mov rcx, 1
+    jmp .step
+.gap:
+    mov rcx, 0              ; 빈칸 — 단어 밖
+.step:
+    inc rdi
+    jmp .next
+.done:
+    ret
+
+count_char:                 ; rdi = 문자열, esi = 찾을 글자(int) → rax = 개수
+    xor eax, eax
+.next:
+    mov dl, [rdi]
+    cmp dl, 0
+    je .done
+    cmp dl, sil             ; sil = rsi 의 맨 아래 1바이트
+    jne .step
+    inc rax
+.step:
+    inc rdi
+    jmp .next
+.done:
+    ret` },
+      { title: 'gdb 로 count_char 안 들여다보기', text: '완성한 <code>wc</code> 를 <code>-g</code> 로 다시 빌드해 1번의 <code>words.txt</code> 를 넣고 gdb 에서 <code>count_char</code> 가 불릴 때 멈추고, C 가 넘겨준 인자와 돌려받는 값을 직접 보세요.', noRun: true,
+        needs: [['gcc -g -no-pie main.c count.o -o wc', 'R16/4', '양쪽 다 -g'], ['break count_char', 'R16/4', '어셈블리 함수에서 멈추기'], ['run < words.txt', 'R16/1', '입력을 파일에서'], ['x/s $rdi', 'R16/2', '넘어온 문자열 보기'], ['finish   p $rax', 'R16/4', '돌려준 값']],
+        checks: [{ text: '`run < words.txt` 하면 `Breakpoint 1, count_char () at count.asm:…` 에서 멈춰요' }, { text: '`bt` 의 `#1` 이 `main () at main.c:…` — `e += count_char(line, \'e\');` 줄이에요' }, { text: '`info registers rsi` 가 `0x65 101`, `p/c $rsi` 가 `101 \'e\'` 예요' }, { text: '`x/s $rdi` 가 첫 줄 `"the quick brown fox\\n"` 이에요' }, { text: '`finish` 뒤 `p $rax` 가 `1`(첫 줄의 e 는 the 의 하나), 한 번 `continue` 하면 이번엔 `rsi` 가 `0x6f`(\'o\')예요' }],
+        answer: 'nasm -f elf64 -g -F dwarf count.asm -o count.o\ngcc -g -no-pie main.c count.o -o wc\ngdb ./wc\n(gdb) break count_char\n(gdb) run < words.txt\n(gdb) bt\n(gdb) info registers rdi rsi\n(gdb) p/c $rsi\n(gdb) x/s $rdi\n(gdb) finish\n(gdb) p $rax\n(gdb) continue\n(gdb) info registers rsi' },
     ],
   },
 };

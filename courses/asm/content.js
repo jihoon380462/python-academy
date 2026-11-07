@@ -6,7 +6,7 @@ const COURSE = { id: 'asm', name: '어셈블리어', runner: 'none', bench: fals
   tutorPersona: '너는 파이썬을 아는 성인에게 우분투 VM 에서 x86-64 NASM 어셈블리를 가르치는 선생님이다. 명령 하나가 레지스터·메모리를 어떻게 바꾸는지 늘 값으로 보여 주고, gdb 로 확인하게 한다.' };
 const CHAPTERS = [
   { ch: 0, name: '시작', color: '#6d4c41' },
-  { ch: 1, name: '첫 어셈블리 — 레지스터 · 시스템 콜 · 계산', color: '#4f6bed' },
+  { ch: 1, name: '첫 어셈블리', color: '#4f6bed' },
   { ch: 2, name: '흐름과 메모리', color: '#2ea043' },
   { ch: 3, name: '스택과 함수', color: '#d97706' },
   { ch: 4, name: 'C 와 어셈블리 사이', color: '#9c27b0' },
@@ -209,7 +209,7 @@ _start:
     { title: '시스템 콜: rax 에 번호 · syscall', html: `<p>내 프로그램은 화면에 직접 글자를 못 써요. 화면 · 파일 · 키보드는 커널이 관리하니까 커널에게 <b>부탁</b>해야 해요. 이 부탁이 [[시스템 콜]]이에요. 시스템 콜이 무엇이고 언제 일어나는지는 <a href="../os/#lesson/K14" target="_blank" rel="noopener">운영체제 교과서 「시스템 콜」 ↗</a> 에서 봤어요. 여기서는 그걸 <b>직접 부르는 법</b>을 배워요.</p>
 <p>x86-64 리눅스의 규칙은 이래요.</p>
 <ol><li><code>rax</code> 에 <b>무슨 부탁인지(번호)</b>를 넣어요.</li><li><code>rdi</code> · <code>rsi</code> · <code>rdx</code> 에 차례로 <b>부탁에 필요한 값(인자)</b>을 넣어요.</li><li><code>syscall</code> — 커널로 넘어가 부탁을 처리하고 돌아와요. <b>결과는 <code>rax</code></b> 에 들어 있어요.</li></ol>
-<table class="kb"><tbody><tr><td><b>부탁</b></td><td><b>rax</b></td><td><b>rdi</b></td><td><b>rsi</b></td><td><b>rdx</b></td></tr><tr><td>write(쓰기)</td><td><code>1</code></td><td>어디에(1 = 화면)</td><td>글자가 있는 주소</td><td>몇 바이트</td></tr><tr><td>exit(끝내기)</td><td><code>60</code></td><td>종료 코드</td><td>—</td><td>—</td></tr></tbody></table>
+<table class="kb"><tbody><tr><th>부탁</th><th>rax</th><th>rdi</th><th>rsi</th><th>rdx</th></tr><tr><td>write(쓰기)</td><td><code>1</code></td><td>어디에(1 = 화면)</td><td>글자가 있는 주소</td><td>몇 바이트</td></tr><tr><td>exit(끝내기)</td><td><code>60</code></td><td>종료 코드</td><td>—</td><td>—</td></tr></tbody></table>
 <p><code>write</code> 의 <code>rdi = 1</code> 은 <b>파일 디스크립터</b> 1번, 「표준 출력」 이에요. 터미널에서는 화면이죠(<a href="../os/#lesson/K15" target="_blank" rel="noopener">운영체제 교과서 「파일 디스크립터」 ↗</a>). 파이썬으로 쓰면 <code>os.write(1, b"Hello, asm!\\n")</code> 와 거의 같은 부탁이에요.</p>
 <p><code>mov rsi, msg</code> 는 <code>msg</code> 의 <b>글자가 아니라 주소</b>(자리 번호)를 rsi 에 넣어요. 커널은 그 주소부터 rdx 바이트만큼 읽어서 찍어요. 주소와 값은 [[레슨:R7]] 에서 더 자세히 봐요.</p>
 <p>번호는 외우지 않아도 돼요. 우분투의 <code>/usr/include/x86_64-linux-gnu/asm/unistd_64.h</code> 에 전부 적혀 있어요(read 0 · write 1 · exit 60).</p>
@@ -343,7 +343,7 @@ and 7    =                   111   → 7 (8 로 나눈 나머지)</pre>
 <p class="muted small">「홀수면 이걸 해라」 같은 갈래는 [[레슨:R5]] 의 비교와 점프로 만들어요. 지금은 결과를 숫자로 보기만 해요.</p>`,
       example: { code: 'section .text\nglobal _start\n_start:\n    mov rax, 1234567\n    mov rbx, rax\n    and rax, 1          ; 홀짝: 홀수면 1\n    and rbx, 7          ; 8 로 나눈 나머지 = 7\n    imul rax, 10\n    add rax, rbx        ; 1 × 10 + 7 = 17\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall', echoExit: true } },
     { title: 'xor al, 0x20 — 대문자 ↔ 소문자', html: `<p>글자도 숫자예요(아스키 번호). 영어 대문자와 소문자는 정확히 32(0x20)씩 떨어져 있고, 2진수로 보면 <b>딱 한 비트</b>(0x20 자리)만 달라요.</p>
-<table class="kb"><tbody><tr><td><b>글자</b></td><td><b>10진</b></td><td><b>16진</b></td><td><b>2진</b></td></tr><tr><td>A</td><td>65</td><td>0x41</td><td>0100 0001</td></tr><tr><td>a</td><td>97</td><td>0x61</td><td>0110 0001</td></tr><tr><td>G</td><td>71</td><td>0x47</td><td>0100 0111</td></tr><tr><td>g</td><td>103</td><td>0x67</td><td>0110 0111</td></tr></tbody></table>
+<table class="kb"><tbody><tr><th>글자</th><th>10진</th><th>16진</th><th>2진</th></tr><tr><td>A</td><td>65</td><td>0x41</td><td>0100 0001</td></tr><tr><td>a</td><td>97</td><td>0x61</td><td>0110 0001</td></tr><tr><td>G</td><td>71</td><td>0x47</td><td>0100 0111</td></tr><tr><td>g</td><td>103</td><td>0x67</td><td>0110 0111</td></tr></tbody></table>
 <table class="kb"><tbody><tr><td><code>xor al, 0x20</code></td><td>뒤집기 — 대문자 ↔ 소문자</td></tr><tr><td><code>and al, 0xDF</code></td><td>0x20 자리 끄기 — 늘 대문자 (0xDF = 1101 1111)</td></tr><tr><td><code>or al, 0x20</code></td><td>0x20 자리 켜기 — 늘 소문자</td></tr></tbody></table>
 <p>글자 하나는 1바이트라 al(rax 의 아래 8비트, [[레슨:R1]])로 다뤄요. NASM 에서 <code>'a'</code> 처럼 작은따옴표로 쓰면 그 글자의 번호(97)예요. 실행하면 <code>65</code> — 표에서 A 예요.</p>
 <div class="bk-warn"><b>영어 글자에만 돼요</b> — 숫자 1(0x31)이나 ! 에 xor 0x20 을 하면 엉뚱한 글자가 되고, 한글은 UTF-8 로 한 글자가 3바이트라 이 방법이 안 맞아요. 글자인지 먼저 확인하는 건 [[레슨:R5]] 의 비교, 문자열 전체를 바꾸는 건 [[레슨:R8]].</div>
@@ -397,7 +397,7 @@ done:
     mov rax, 60
     syscall` } },
     { title: '조건 점프 표: jl · jg · jb · ja', html: `<p><code>cmp a, b</code> 바로 다음에 쓰는 조건 점프예요. 「a 가 b 보다 어떤가」 로 읽어요.</p>
-<table class="kb"><tbody><tr><td><b>명령</b></td><td><b>점프하는 때</b></td><td><b>파이썬</b></td></tr><tr><td><code>je</code> · <code>jne</code></td><td>같다 · 다르다</td><td><code>==</code> · <code>!=</code></td></tr><tr><td><code>jl</code> · <code>jle</code></td><td>작다 · 작거나 같다 (less) — 부호 있음</td><td><code>&lt;</code> · <code>&lt;=</code></td></tr><tr><td><code>jg</code> · <code>jge</code></td><td>크다 · 크거나 같다 (greater) — 부호 있음</td><td><code>&gt;</code> · <code>&gt;=</code></td></tr><tr><td><code>jb</code> · <code>jbe</code></td><td>작다 · 작거나 같다 (below) — 부호 없음</td><td></td></tr><tr><td><code>ja</code> · <code>jae</code></td><td>크다 · 크거나 같다 (above) — 부호 없음</td><td></td></tr><tr><td><code>jz</code> · <code>jnz</code></td><td>결과가 0 · 0 아님 (<code>je</code> · <code>jne</code> 와 같은 명령)</td><td></td></tr></tbody></table>
+<table class="kb"><tbody><tr><th>명령</th><th>점프하는 때</th><th>파이썬</th></tr><tr><td><code>je</code> · <code>jne</code></td><td>같다 · 다르다</td><td><code>==</code> · <code>!=</code></td></tr><tr><td><code>jl</code> · <code>jle</code></td><td>작다 · 작거나 같다 (less) — 부호 있음</td><td><code>&lt;</code> · <code>&lt;=</code></td></tr><tr><td><code>jg</code> · <code>jge</code></td><td>크다 · 크거나 같다 (greater) — 부호 있음</td><td><code>&gt;</code> · <code>&gt;=</code></td></tr><tr><td><code>jb</code> · <code>jbe</code></td><td>작다 · 작거나 같다 (below) — 부호 없음</td><td></td></tr><tr><td><code>ja</code> · <code>jae</code></td><td>크다 · 크거나 같다 (above) — 부호 없음</td><td></td></tr><tr><td><code>jz</code> · <code>jnz</code></td><td>결과가 0 · 0 아님 (<code>je</code> · <code>jne</code> 와 같은 명령)</td><td></td></tr></tbody></table>
 <p>왜 두 벌일까요? 64비트 안의 비트는 똑같아도 <b>보는 방법</b>이 둘이라서예요. −1 은 2의 보수로 <code>0xFFFFFFFFFFFFFFFF</code>([[레슨:R3]])예요. 부호 있게 보면 −1, 부호 없게 보면 <b>가장 큰 수</b>예요. <code>cmp</code> 는 똑같이 빼 보기만 하고, <b>어떤 점프를 고르느냐</b>로 「어떻게 볼지」 정해요.</p>
 <p>외우는 법: <b>less · greater 는 부호 있음</b>, <b>below · above 는 부호 없음</b>. 음수가 나올 수 있는 값이면 <code>jl</code> · <code>jg</code> 쪽을 써요.</p>
 <p>예제는 −1 과 1 을 비교해요. 실행하면 종료 코드가 1 이에요(<code>jl</code> 은 −1 &lt; 1 이라 점프). <code>jl</code> 을 <code>jb</code> 로 바꾸고 다시 실행하면 2 예요 — 부호 없이 보면 −1 이 1 보다 커서 점프하지 않아요.</p>`,
@@ -1481,16 +1481,547 @@ again:
   summary: ['extern printf + global main + gcc -no-pie, 끝은 ret', 'rdi 에 형식 주소, rsi · rdx · rcx 에 값, xor eax, eax', 'main 의 rax = 종료 코드, push 를 홀수 번 해서 16바이트 정렬'] },
 { id: 'RB3', ch: 3, boss: true, title: '만들어 보기: 내 함수 모음', mode: 'text',
   tutorSummary: '챕터 3 묶기 — print_int · strlen · print_str · to_upper · max_of(arr, n) 를 호출 규약대로(인자 rdi rsi, 결과 rax, rbx 는 push/pop 으로 지킴) 만들고 global main 에서 차례로 부르기(gcc -no-pie, ret 으로 끝). 마지막엔 결과를 rbx · r12 에 간직하고 push 세 번으로 정렬해 printf 한 줄. write 로 찍는 함수와 printf 는 한 프로그램에서 섞지 않음(버퍼 순서).', pages: [], summary: [] },
-{ id: 'R14', ch: 4, n: 14, title: 'C 에서 어셈블리 함수 부르기', mode: 'text', draft: true,
-  tutorSummary: 'main.c + add.asm, C 선언 long add(long a, long b); asm 은 global add. gcc -no-pie main.c add.o. int = edi, long = rdi, 포인터 = 주소. 배열 · 문자열 넘기기.',
-  pages: ASM_TODO('두 파일 · global · 선언 · 타입과 레지스터 크기 · 포인터'), summary: ['C 에서 선언, asm 에서 global', 'int 는 edi, long 은 rdi', '포인터 = 주소'] },
-{ id: 'R15', ch: 4, n: 15, title: 'C 가 어떻게 바뀌나: gcc -S · objdump -d', mode: 'text', draft: true,
-  tutorSummary: 'gcc -S -O0 -masm=intel 로 C → 어셈블리, if · for · 함수의 모양. -O2 로 바뀌는 것. objdump -d -M intel. AT&T 문법 읽는 법.',
-  pages: ASM_TODO('gcc -S · -O0 과 -O2 · objdump -d · AT&T 읽기'), summary: ['gcc -S -masm=intel', '-O2 는 반복도 없앤다', 'objdump -d -M intel 로 실행 파일 읽기'] },
-{ id: 'R16', ch: 4, n: 16, title: 'gdb 로 한 줄씩', mode: 'text', draft: true,
-  tutorSummary: 'nasm -g -F dwarf, gdb ./prog, layout asm · layout regs, break _start, run, stepi, info registers, x/s · x/4gx $rsp, bt 로 폴트 찾기.',
-  pages: ASM_TODO('-g 로 빌드 · break/run/stepi · 레지스터와 메모리 보기 · 폴트 찾기'), summary: ['nasm -g -F dwarf 로 빌드', 'stepi 로 한 명령씩', 'info registers · x 로 들여다보기'] },
-{ id: 'RB4', ch: 4, boss: true, title: '만들어 보기: C 와 함께 만드는 단어 세기', mode: 'text', draft: true,
-  tutorSummary: '교과서 묶기 — C 가 입력을 읽고 어셈블리 함수가 단어 · 글자를 세고 C 가 출력, gdb 로 들여다보기.', pages: [], summary: [] },
+{ id: 'R14', ch: 4, n: 14, title: 'C 에서 어셈블리 함수 부르기', mode: 'text',
+  tutorSummary: 'main.c + add.asm 두 파일. C 쪽 선언 long add(long a, long b); · asm 쪽 global add. 빌드는 nasm -f elf64 add.asm -o add.o → gcc -no-pie main.c add.o -o prog(우분투 24.04 의 ld 는 「missing .note.GNU-stack」 경고 — 무해, section .note.GNU-stack noalloc noexec nowrite progbits 한 줄로 없앰). 에러: undefined reference to add(global 이나 add.o 빠짐). 타입 → 레지스터 크기: char = dil/sil/al, int = edi/esi/eax, long·포인터 = rdi/rsi/rax. int 를 long 으로 늘릴 땐 movsxd rax, edi. 배열 이름 = 첫 칸 주소(long *arr → [rdi + rcx*8]), 문자열 = 0 으로 끝나는 바이트의 주소(char *s). fgets(line, sizeof line, stdin) 로 C 가 한 줄 읽고 asm 이 고침. 문자열 리터럴은 고치면 폴트.',
+  terms: { '선언': 'C 에서 함수의 이름 · 인자 타입 · 돌려주는 타입만 적고 몸통은 없는 줄(long add(long a, long b);). 「이런 함수가 어딘가 있어요」 라는 약속', '포인터': '어떤 값이 있는 곳의 주소를 담는 C 의 타입. long * 는 「long 이 있는 곳의 주소」, char * 는 「글자(바이트)가 있는 곳의 주소」. 레지스터에서는 그냥 64비트 숫자' },
+  pages: [
+    { title: 'main.c 와 add.asm: 선언과 global', html: `<p>지금까지는 어셈블리 파일 하나가 프로그램 전부였어요. 이번엔 <b>C 파일</b>이 프로그램의 주인(<code>main</code>)이고, 어셈블리는 그 C 가 부르는 <b>함수 하나</b>만 맡아요. 실제로 어셈블리는 대개 이렇게 써요 — 꼭 손으로 짜야 하는 작은 부분만.</p>
+<p>C 는 처음이죠. 이 챕터에 필요한 만큼만 읽어요.</p>
+<pre class="code">#include &lt;stdio.h&gt;              // printf 를 쓰겠다는 줄(파이썬의 import 비슷)
+
+long add(long a, long b);       // 선언: 「add 라는 함수가 어딘가 있어요」
+
+int main(void) {                // 프로그램은 main 에서 시작
+    long x = add(2, 3);         // long = 64비트 정수. 변수는 타입을 먼저 적어요
+    printf("%ld\\n", x);         // %ld 자리에 x 를 10진수로
+    printf("%ld\\n", add(40, 2));
+    return 0;                   // 종료 코드 0
+}</pre>
+<table class="kb"><tbody><tr><td><code>{ }</code></td><td>블록(파이썬의 들여쓰기 대신)</td></tr><tr><td><code>;</code></td><td>문장 끝마다</td></tr><tr><td><code>//</code></td><td>주석(어셈블리의 <code>;</code>)</td></tr><tr><td><code>long x = …;</code></td><td>64비트 정수 변수 만들기</td></tr></tbody></table>
+<p>C 쪽 [[선언]] <code>long add(long a, long b);</code> 은 몸통 없이 <b>모양만</b> 적은 줄이에요. 몸통은 <code>add.asm</code> 에 있고, 그 이름을 다른 파일이 찾을 수 있게 <code>global add</code> 로 내놓아요. <code>_start</code> 를 내놓던 바로 그 <code>global</code> 이에요.</p>
+<pre class="code">section .text
+global add
+add:                        ; rdi = a, rsi = b → rax = a + b
+    mov rax, rdi
+    add rax, rsi
+    ret</pre>
+<p>C 컴파일러는 [[레슨:R12]] 의 호출 규약을 그대로 지켜요. 첫 인자는 <code>rdi</code>, 둘째는 <code>rsi</code> 에 넣고 <code>call add</code>, 돌아오면 <code>rax</code> 를 결과로 써요. 그래서 규약대로 짠 함수는 C 가 그냥 부를 수 있어요. 실행하면 <code>5</code> 와 <code>42</code> 가 한 줄씩 나와요.</p>`,
+      example: { label: '예제 코드 — main.c + add.asm, gcc -no-pie 로 묶어 실행', code: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long add(long a, long b);       // add 는 다른 파일(add.asm)에 있어요
+
+int main(void) {
+    long x = add(2, 3);
+    printf("%ld\\n", x);
+    printf("%ld\\n", add(40, 2));
+    return 0;
+}
+; ==== 파일: add.asm ====
+section .text
+global add
+add:                        ; rdi = a, rsi = b → rax = a + b
+    mov rax, rdi
+    add rax, rsi
+    ret` } },
+    { title: 'gcc -no-pie main.c add.o 로 묶기', html: `<p>두 파일은 이렇게 빌드해요. 어셈블리는 늘 하던 대로 <code>nasm</code>, 나머지는 <code>gcc</code> 한 줄이에요.</p>
+<pre class="code">nasm -f elf64 add.asm -o add.o
+gcc -no-pie main.c add.o -o prog
+./prog</pre>
+<p><code>gcc</code> 는 두 가지를 한꺼번에 해요. ① <code>main.c</code> 를 기계어(<code>main.o</code>, 따로 파일로 남기지는 않음)로 바꾸고 ② 그것을 <code>add.o</code>, C 라이브러리(<code>printf</code> 가 들어 있음), <b>시작 코드</b>와 묶어 실행 파일을 만들어요.</p>
+<pre>main.c  ──gcc──▶ (main.o) ──┐
+add.asm ──nasm─▶  add.o  ───┼──▶ prog
+C 라이브러리 · 시작 코드 ────┘</pre>
+<p>그래서 우리 파일에는 <code>_start</code> 가 없어요. 시작 코드 안의 <code>_start</code> 가 준비를 하고 <code>main</code> 을 부르고, <code>main</code> 이 돌려준 값(<code>return 0</code> → <code>eax</code>)이 종료 코드가 돼요. [[레슨:R13]] 에서 <code>main</code> 을 어셈블리로 썼을 때와 같은 구조예요.</p>
+<table class="kb"><tbody><tr><td><code>undefined reference to 'add'</code></td><td>링크하다 <code>add</code> 를 못 찾았어요. <code>add.asm</code> 에 <code>global add</code> 가 없거나, gcc 명령에 <code>add.o</code> 를 빼먹었어요</td></tr><tr><td><code>implicit declaration of function 'add'</code></td><td>C 에 선언 줄이 없어요. gcc 13 은 경고, 14 부터는 에러예요. 늘 <code>main</code> 위에 선언을 적어요</td></tr><tr><td>엉뚱한 숫자가 나옴</td><td>선언의 타입과 어셈블리가 쓰는 레지스터 크기가 달라요(다음 쪽)</td></tr></tbody></table>
+<div class="bk-warn"><b>missing .note.GNU-stack section implies executable stack</b> — 우분투 24.04 에서 <code>gcc</code> 로 nasm 의 <code>.o</code> 를 묶으면 이 경고가 두 줄 나와요. 「이 파일은 스택에서 코드를 실행해도 되는지 말이 없네요」 라는 뜻이고 <code>prog</code> 는 잘 만들어져요. 없애고 싶으면 <code>.asm</code> 파일 끝에 <code>section .note.GNU-stack noalloc noexec nowrite progbits</code> 한 줄을 붙여요(gcc 가 만든 <code>.o</code> 에는 이 표시가 저절로 들어가요 — [[레슨:R15]]).</div>`,
+      example: { label: '예제 명령 — 우분투 터미널에서', shell: 'cd ~/asm\nnasm -f elf64 add.asm -o add.o\ngcc -no-pie main.c add.o -o prog\n./prog' } },
+    { title: 'int 는 edi, long 은 rdi', html: `<p>C 의 변수에는 <b>크기</b>가 있어요. 함수는 선언에 적힌 크기만큼의 레지스터 이름을 써요 — [[레슨:R1]] 의 「같은 상자의 작은 이름」 이에요.</p>
+<table class="kb"><tbody><tr><th>C 타입</th><th>크기</th><th>인자 1 · 2</th><th>결과</th><th>printf</th></tr><tr><td><code>char</code></td><td>1바이트</td><td><code>dil</code> · <code>sil</code></td><td><code>al</code></td><td><code>%c</code></td></tr><tr><td><code>int</code></td><td>4바이트</td><td><code>edi</code> · <code>esi</code></td><td><code>eax</code></td><td><code>%d</code></td></tr><tr><td><code>long</code></td><td>8바이트</td><td><code>rdi</code> · <code>rsi</code></td><td><code>rax</code></td><td><code>%ld</code></td></tr><tr><td>[[포인터]] <code>long *</code> · <code>char *</code></td><td>8바이트</td><td><code>rdi</code> · <code>rsi</code></td><td><code>rax</code></td><td><code>%s</code>(문자열)</td></tr></tbody></table>
+<p>규약은 「<code>int</code> 인자를 받으면 <code>rdi</code> 의 위 32비트는 아무 값이나 있을 수 있다」 고 해요. 그래서 <code>int</code> 는 <code>edi</code> 만 믿고, <code>long</code> 으로 돌려줄 땐 부호를 살려 늘려야 해요.</p>
+<pre class="code">int twice(int x);           // int → edi, 결과 eax
+long widen_bad(int x);      // int 를 받아 long 으로 — 틀린 버전
+long widen(int x);          // 맞는 버전</pre>
+<pre class="code">twice:
+    mov eax, edi
+    add eax, eax
+    ret
+widen_bad:
+    mov eax, edi            ; eax 에 쓰면 위 32비트는 0
+    ret
+widen:
+    movsxd rax, edi         ; 맨 위 비트(부호)를 위 32비트에 채워 늘리기
+    ret</pre>
+<p>실행하면 <code>-42</code>, <code>4294967295</code>, <code>-1</code>. <code>int</code> 의 -1 은 <code>0xFFFFFFFF</code> 예요. <code>mov eax, edi</code> 는 위를 0 으로 채우니 64비트로 보면 <code>0x00000000FFFFFFFF</code> = 4294967295 가 되고, <code>movsxd</code> 는 위를 1 로 채워 <code>0xFFFFFFFFFFFFFFFF</code> = -1 을 지켜요. 이 교과서는 헷갈리지 않게 숫자는 거의 <code>long</code> 으로 주고받아요.</p>`,
+      example: { label: '예제 코드 — main.c + num.asm', code: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+int twice(int x);
+long widen_bad(int x);
+long widen(int x);
+
+int main(void) {
+    printf("%d\\n", twice(-21));
+    printf("%ld\\n", widen_bad(-1));
+    printf("%ld\\n", widen(-1));
+    return 0;
+}
+; ==== 파일: num.asm ====
+section .text
+global twice
+global widen_bad
+global widen
+twice:                      ; int x → edi, 결과 int → eax
+    mov eax, edi
+    add eax, eax
+    ret
+widen_bad:                  ; int 를 받아 long 으로 돌려주기(틀린 버전)
+    mov eax, edi            ; eax 에 쓰면 위 32비트는 0
+    ret
+widen:                      ; 맞는 버전
+    movsxd rax, edi         ; 부호를 살려 64비트로 늘리기
+    ret` } },
+    { title: '배열 넘기기: long *arr 는 주소', html: `<p>C 의 배열은 같은 타입의 칸이 메모리에 <b>붙어 있는</b> 것이에요. [[레슨:R8]] 의 <code>dq 3, 1, 4, 1</code> 과 똑같은 모양이에요.</p>
+<pre class="code">long nums[4] = {3, 1, 4, 1};    // long 4칸(8바이트씩)
+double_all(nums, 4);            // 배열 이름을 넘기면 = 첫 칸의 주소
+printf("%ld %ld %ld %ld\\n", nums[0], nums[1], nums[2], nums[3]);</pre>
+<p>선언은 <code>void double_all(long *arr, long n);</code> 이에요. <code>long *</code> 는 「long 이 있는 곳의 주소」([[포인터]]), <code>void</code> 는 「돌려주는 값 없음」. 레지스터에 들어오는 건 그냥 주소 숫자라서, 어셈블리에선 늘 하던 대로 <code>[rdi + rcx*8]</code> 로 칸을 읽고 써요.</p>
+<pre>rdi = nums 의 주소
+  [rdi]    [rdi+8]  [rdi+16]  [rdi+24]
+  3        1        4         1         ← 부르기 전
+  6        2        8         2         ← double_all 뒤</pre>
+<pre class="code">double_all:                 ; rdi = 배열 주소, rsi = 칸 수
+    xor ecx, ecx            ; rcx = 칸 번호 0
+.loop:
+    cmp rcx, rsi
+    jge .done
+    mov rax, [rdi + rcx*8]
+    add rax, rax
+    mov [rdi + rcx*8], rax  ; C 의 배열을 그 자리에서 고침
+    inc rcx
+    jmp .loop
+.done:
+    ret</pre>
+<p>어셈블리가 C 의 메모리를 직접 고쳤으니 <code>main</code> 이 다시 읽으면 바뀐 값이 보여요. 실행하면 <code>6 2 8 2</code>. <code>nums[0]</code> 은 파이썬처럼 0 번째 칸이에요.</p>`,
+      example: { label: '예제 코드 — main.c + arr.asm', code: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+void double_all(long *arr, long n);
+
+int main(void) {
+    long nums[4] = {3, 1, 4, 1};
+    double_all(nums, 4);
+    printf("%ld %ld %ld %ld\\n", nums[0], nums[1], nums[2], nums[3]);
+    return 0;
+}
+; ==== 파일: arr.asm ====
+section .text
+global double_all
+double_all:                 ; rdi = 배열 주소, rsi = 칸 수
+    xor ecx, ecx            ; rcx = 칸 번호 0
+.loop:
+    cmp rcx, rsi
+    jge .done
+    mov rax, [rdi + rcx*8]
+    add rax, rax
+    mov [rdi + rcx*8], rax  ; C 의 배열을 그 자리에서 고침
+    inc rcx
+    jmp .loop
+.done:
+    ret` } },
+    { title: '문자열 넘기기: char *s 와 fgets', html: `<p>C 의 문자열은 [[레슨:R8]] 의 「0 으로 끝나는 바이트 배열」 그대로예요. 함수에는 첫 글자의 주소(<code>char *s</code>)가 가요. 이번엔 C 가 <b>입력을 한 줄씩 읽어</b> 어셈블리에게 넘겨요.</p>
+<pre class="code">char line[100];                                     // 글자 100개 자리
+while (fgets(line, sizeof line, stdin) != NULL) {   // 한 줄 읽기. 입력이 끝나면 NULL
+    to_upper(line);                                 // 어셈블리가 그 자리에서 고침
+    printf("%s", line);                             // 0 까지 찍기(줄바꿈은 line 안에)
+}</pre>
+<table class="kb"><tbody><tr><td><code>while (조건) { … }</code></td><td>파이썬의 <code>while 조건:</code></td></tr><tr><td><code>fgets(line, sizeof line, stdin)</code></td><td>stdin 에서 한 줄을 <code>line</code> 에 넣고 끝에 0 을 붙여요. 줄바꿈(10)도 들어가요. 더 읽을 게 없으면 <code>NULL</code></td></tr><tr><td><code>!=</code></td><td>파이썬과 같은 「다르면」</td></tr></tbody></table>
+<pre class="code">to_upper:                   ; rdi = 0 으로 끝나는 문자열 주소
+.next:
+    mov al, [rdi]
+    cmp al, 0
+    je .done
+    cmp al, 'a'
+    jb .skip                ; 'a' 보다 작으면 그대로
+    cmp al, 'z'
+    ja .skip                ; 'z' 보다 크면 그대로(한글 바이트도 여기로)
+    sub al, 32              ; 'a'(97) → 'A'(65)
+    mov [rdi], al
+.skip:
+    inc rdi
+    jmp .next
+.done:
+    ret</pre>
+<p>입력이 <code>hello asm</code> · <code>C 와 함께</code> 두 줄이면, 실행하면 <code>HELLO ASM</code> 다음 줄에 <code>C 와 함께</code>. 한글의 바이트는 0x80 보다 커서(<code>ja</code>, 부호 없는 비교) 건드리지 않아요.</p>
+<div class="bk-warn"><b>따옴표 문자열은 고치면 폴트</b> — <code>char *s = "hello"; to_upper(s);</code> 처럼 따옴표 문자열을 바로 넘겨 고치면 <code>Segmentation fault</code> 예요. 따옴표 문자열은 「읽기만」 하는 메모리에 있어서요. 고칠 문자열은 위처럼 배열(<code>char line[100]</code>)에 담아요.</div>`,
+      example: { label: '예제 코드 — main.c + upper.asm (입력 두 줄)', stdin: 'hello asm\nC 와 함께\n', code: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+void to_upper(char *s);
+
+int main(void) {
+    char line[100];
+    while (fgets(line, sizeof line, stdin) != NULL) {
+        to_upper(line);
+        printf("%s", line);
+    }
+    return 0;
+}
+; ==== 파일: upper.asm ====
+section .text
+global to_upper
+to_upper:                   ; rdi = 0 으로 끝나는 문자열 주소
+.next:
+    mov al, [rdi]
+    cmp al, 0
+    je .done
+    cmp al, 'a'
+    jb .skip                ; 'a' 보다 작으면 그대로
+    cmp al, 'z'
+    ja .skip                ; 'z' 보다 크면 그대로(한글 바이트도 여기로)
+    sub al, 32              ; 'a'(97) → 'A'(65)
+    mov [rdi], al
+.skip:
+    inc rdi
+    jmp .next
+.done:
+    ret` } },
+  ],
+  summary: ['C 에서 선언, asm 에서 global', 'int 는 edi, long 은 rdi', '포인터 = 주소'] },
+{ id: 'R15', ch: 4, n: 15, title: 'C 가 어떻게 바뀌나: gcc -S · objdump -d', mode: 'text',
+  tutorSummary: 'gcc -S -O0 -masm=intel -fno-asynchronous-unwind-tables add.c → add.s(인텔 문법 어셈블리). -O0 은 인자를 스택(QWORD PTR -8[rbp] = qword [rbp-8])에 저장했다 다시 꺼냄, push rbp · mov rbp, rsp · pop rbp 프레임, endbr64 는 CET 표시. if (a > b) → cmp + 반대 조건 jle 로 건너뛰기, for → 초기화 · jmp 검사 · 몸통 · i++ · cmp + jle 위로. -O2: add → lea rax, [rdi+rsi], max → cmovge, 상수 인자 sum_to(100) 은 컴파일 때 5050 으로(반복 사라짐), 우분투 -O2 는 printf → __printf_chk. objdump -d -M intel prog: 주소 · 바이트 · 명령, call 401190 <add>, printf@plt(PIE 면 NASM 은 call printf wrt ..plt — 그래서 -no-pie). AT&T: 순서 반대(주는쪽, 받는쪽), %rax, $3, movq 크기 글자, -8(%rbp) = [rbp-8]. 출력은 gcc 버전에 따라 조금 다름(우분투 24.04 gcc 13.3 기준).',
+  pages: [
+    { title: 'gcc -S -O0 -masm=intel: C 를 .s 로', html: `<p>[[레슨:R14]] 에서는 어셈블리를 손으로 짰어요. 그럼 C 로 짠 함수는 <code>gcc</code> 가 어떤 어셈블리로 바꿀까요? <code>gcc -S</code> 가 그 중간 결과를 파일(<code>.s</code>)로 보여 줘요. C 함수 하나를 써 봐요.</p>
+<pre class="code">long add(long a, long b) {      // 파이썬의 def add(a, b):
+    return a + b;
+}</pre>
+<pre class="code">gcc -S -O0 -masm=intel -fno-asynchronous-unwind-tables add.c
+cat add.s</pre>
+<table class="kb"><tbody><tr><td><code>-S</code></td><td>기계어까지 가지 말고 어셈블리(<code>add.s</code>)에서 멈추기</td></tr><tr><td><code>-O0</code></td><td>최적화 안 함 — C 한 줄이 그대로 몇 줄로(읽기 쉬움)</td></tr><tr><td><code>-masm=intel</code></td><td>이 교과서의 인텔 문법으로(없으면 AT&amp;T, 5쪽)</td></tr><tr><td><code>-fno-asynchronous-unwind-tables</code></td><td><code>.cfi_…</code> 같은 디버거용 줄을 빼기</td></tr></tbody></table>
+<pre>        .file   "add.c"
+        .intel_syntax noprefix
+        .text
+        .globl  add
+        .type   add, @function
+add:
+        endbr64
+        push    rbp
+        mov     rbp, rsp
+        mov     QWORD PTR -8[rbp], rdi
+        mov     QWORD PTR -16[rbp], rsi
+        mov     rdx, QWORD PTR -8[rbp]
+        mov     rax, QWORD PTR -16[rbp]
+        add     rax, rdx
+        pop     rbp
+        ret
+        .size   add, .-add
+        .ident  "GCC: (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+        .section        .note.GNU-stack,"",@progbits
+        …(아래 몇 줄 더)</pre>
+<p class="muted small">우분투 24.04 의 gcc 13.3 으로 만든 그대로예요(탭은 빈칸으로). gcc 버전에 따라 조금씩 달라요.</p>
+<ul><li><code>.globl add</code> = NASM 의 <code>global add</code>. 점(<code>.</code>)으로 시작하는 줄은 명령이 아니라 어셈블러에게 하는 말이에요.</li><li><code>push rbp</code> · <code>mov rbp, rsp</code> · <code>pop rbp</code> 는 [[레슨:R12]] 의 스택 프레임이에요.</li><li><code>QWORD PTR -8[rbp]</code> 는 NASM 으로 <code>qword [rbp - 8]</code>. <code>-O0</code> 은 인자를 일단 스택에 저장했다가 다시 꺼내요. 느리지만 변수마다 자리가 있어 gdb 로 보기 좋아요.</li><li><code>endbr64</code> 는 「여기로 점프해 와도 돼요」 표시(보안 기능). 없어도 똑같이 돌아요.</li></ul>`,
+      example: { label: '예제 명령 — 우분투 터미널에서', shell: 'cd ~/asm\ngcc -S -O0 -masm=intel -fno-asynchronous-unwind-tables add.c\ncat add.s' } },
+    { title: 'if 와 for 는 cmp 와 점프로', html: `<p>C 의 <code>if</code> 와 <code>for</code> 가 어떻게 되는지 보면, [[레슨:R5]] · [[레슨:R6]] 에서 손으로 만든 모양과 거의 같아요.</p>
+<pre class="code">long max(long a, long b) {
+    if (a &gt; b)
+        return a;
+    return b;
+}
+
+long sum_to(long n) {
+    long s = 0;
+    for (long i = 1; i &lt;= n; i++)   // i = 1 부터, i &lt;= n 인 동안, 한 번마다 i 를 1 늘림
+        s += i;
+    return s;
+}</pre>
+<p><code>for (시작; 조건; 한 번 끝날 때마다)</code> 는 파이썬의 <code>for i in range(1, n + 1):</code> 과 같은 반복이에요. <code>i++</code> 는 <code>i += 1</code>. <code>gcc -S -O0 -masm=intel -fno-asynchronous-unwind-tables</code> 의 결과예요(함수 부분만, 오른쪽 <code>;</code> 설명은 덧붙인 것).</p>
+<pre>max:
+    endbr64
+    push    rbp
+    mov     rbp, rsp
+    mov     QWORD PTR -8[rbp], rdi    ; a
+    mov     QWORD PTR -16[rbp], rsi   ; b
+    mov     rax, QWORD PTR -8[rbp]
+    cmp     rax, QWORD PTR -16[rbp]
+    jle     .L4                       ; a &lt;= b 면 건너뛰기
+    mov     rax, QWORD PTR -8[rbp]    ; return a
+    jmp     .L5
+.L4:
+    mov     rax, QWORD PTR -16[rbp]   ; return b
+.L5:
+    pop     rbp
+    ret</pre>
+<pre>sum_to:
+    endbr64
+    push    rbp
+    mov     rbp, rsp
+    mov     QWORD PTR -24[rbp], rdi   ; n
+    mov     QWORD PTR -16[rbp], 0     ; s = 0
+    mov     QWORD PTR -8[rbp], 1      ; i = 1
+    jmp     .L7                       ; 먼저 검사로
+.L8:
+    mov     rax, QWORD PTR -8[rbp]
+    add     QWORD PTR -16[rbp], rax   ; s += i
+    add     QWORD PTR -8[rbp], 1      ; i++
+.L7:
+    mov     rax, QWORD PTR -8[rbp]
+    cmp     rax, QWORD PTR -24[rbp]
+    jle     .L8                       ; i &lt;= n 이면 위로
+    mov     rax, QWORD PTR -16[rbp]   ; return s
+    pop     rbp
+    ret</pre>
+<table class="kb"><tbody><tr><td><code>if (a &gt; b)</code></td><td><code>cmp</code> 다음에 <b>반대</b> 조건 <code>jle</code> 로 「참일 때 할 일」 을 건너뛰어요. else 쪽 끝에는 <code>jmp</code></td></tr><tr><td><code>for</code></td><td>초기화 → 아래의 검사로 <code>jmp</code> → 몸통 → <code>i++</code> → 검사 <code>cmp</code> + <code>jle</code> 로 위로. 검사를 아래에 두는 게 gcc 의 버릇이에요</td></tr><tr><td><code>.L4</code> · <code>.L7</code></td><td>gcc 가 지은 라벨 이름. 번호는 파일마다 달라요</td></tr></tbody></table>
+<p>예제는 이 두 함수를 C 로만 써서 <code>main</code> 에서 불러요. 실행하면 <code>7</code> 과 <code>5050</code>.</p>`,
+      example: { label: '예제 코드 — C 만(main.c)', code: `// ==== 파일: main.c ====
+#include <stdio.h>
+
+long max(long a, long b) {
+    if (a > b)
+        return a;
+    return b;
+}
+
+long sum_to(long n) {
+    long s = 0;
+    for (long i = 1; i <= n; i++)
+        s += i;
+    return s;
+}
+
+int main(void) {
+    printf("%ld\\n", max(3, 7));
+    printf("%ld\\n", sum_to(100));
+    return 0;
+}` } },
+    { title: '-O2: 짧아지고, 반복이 사라지기도', html: `<p><code>-O0</code> 을 <code>-O2</code>(최적화 2단계)로 바꾸면 gcc 가 열심히 줄여요. 실제 프로그램은 보통 <code>-O2</code> 로 빌드해요.</p>
+<pre class="code">gcc -S -O2 -masm=intel -fno-asynchronous-unwind-tables f.c</pre>
+<pre>add:                         max:
+    endbr64                      endbr64
+    lea     rax, [rdi+rsi]       cmp     rdi, rsi
+    ret                          mov     rax, rsi
+                                 cmovge  rax, rdi
+                                 ret</pre>
+<ul><li>스택을 안 써요. 인자는 레지스터에 둔 채로 계산해요 — 우리가 손으로 짠 것과 비슷하죠.</li><li><code>lea rax, [rdi+rsi]</code>: <code>lea</code> 는 주소 계산 모양을 <b>덧셈기</b>로도 써요. 메모리는 안 읽고 <code>rdi + rsi</code> 를 <code>rax</code> 에.</li><li><code>cmovge rax, rdi</code>: 「앞의 비교가 <code>&gt;=</code> 면 mov」. 점프 없는 if 예요.</li></ul>
+<p>더 놀라운 건 <b>값이 정해진 계산</b>이에요. <code>main</code> 에서 <code>printf("%ld\\n", sum_to(100));</code> 를 부르는 <code>sum.c</code> 를 <code>-O2</code> 로 보면:</p>
+<pre>main:
+        endbr64
+        sub     rsp, 8
+        mov     edx, 5050
+        mov     edi, 2
+        xor     eax, eax
+        lea     rsi, .LC0[rip]
+        call    __printf_chk@PLT
+        xor     eax, eax
+        add     rsp, 8
+        ret</pre>
+<p><code>sum_to</code> 를 부르지도, 반복하지도 않아요. gcc 가 <b>컴파일할 때</b> 1~100 의 합 5050 을 미리 계산해 숫자로 박아 넣었어요. (우분투의 gcc 는 <code>-O2</code> 에서 <code>printf</code> 를 안전 검사판 <code>__printf_chk</code> 로 바꿔서, 형식이 <code>rsi</code> · 값이 <code>rdx</code> 로 한 칸씩 밀렸어요.) <code>sum_to</code> 함수 자체는 남는데, 두 개씩 더하는 모양으로 바뀌어 읽기 훨씬 어려워요.</p>
+<p class="muted small">그래서 「C 가 어떻게 바뀌나」 를 공부할 땐 <code>-O0</code>, 「컴파일러가 얼마나 잘하나」 를 볼 땐 <code>-O2</code>. gdb 로 한 줄씩 볼 프로그램도 <code>-O0</code> 이 편해요.</p>`,
+      example: { label: '예제 명령 — 우분투 터미널에서', shell: 'gcc -S -O2 -masm=intel -fno-asynchronous-unwind-tables f.c\ncat f.s\ngcc -S -O2 -masm=intel -fno-asynchronous-unwind-tables sum.c\ngrep -A 10 "^main:" sum.s' } },
+    { title: 'objdump -d -M intel 로 실행 파일 읽기', html: `<p><code>gcc -S</code> 는 C 소스가 있어야 해요. 이미 만들어진 <b>실행 파일</b>은 <code>objdump -d</code>(disassemble, 기계어 → 어셈블리)로 읽어요. [[레슨:R14]] 의 <code>prog</code> 를 열어 봐요.</p>
+<pre class="code">objdump -d -M intel prog | less              # 전부(q 로 나가기)
+objdump -d -M intel --disassemble=add prog   # add 함수만</pre>
+<pre>0000000000401126 &lt;main&gt;:
+  401126:   f3 0f 1e fa             endbr64
+  40112a:   55                      push   rbp
+  40112b:   48 89 e5                mov    rbp,rsp
+  40112e:   48 83 ec 10             sub    rsp,0x10
+  401132:   be 03 00 00 00          mov    esi,0x3
+  401137:   bf 02 00 00 00          mov    edi,0x2
+  40113c:   e8 4f 00 00 00          call   401190 &lt;add&gt;
+  401141:   48 89 45 f8             mov    QWORD PTR [rbp-0x8],rax
+  …
+  40115b:   e8 d0 fe ff ff          call   401030 &lt;printf@plt&gt;
+  …
+
+0000000000401190 &lt;add&gt;:
+  401190:   48 89 f8                mov    rax,rdi
+  401193:   48 01 f0                add    rax,rsi
+  401196:   c3                      ret</pre>
+<table class="kb"><tbody><tr><td>맨 앞 <code>401190:</code></td><td>그 명령이 놓인 주소(16진)</td></tr><tr><td>가운데 <code>48 89 f8</code></td><td>진짜 기계어 바이트([[레슨:R0]] 에서 본 것). <code>--no-show-raw-insn</code> 을 붙이면 안 보여요</td></tr><tr><td>오른쪽</td><td>그 바이트를 다시 읽은 명령</td></tr></tbody></table>
+<ul><li><code>&lt;add&gt;</code> 의 세 줄은 우리가 쓴 <code>add.asm</code> 그대로예요. <code>main</code> 의 <code>call 401190 &lt;add&gt;</code> 가 바로 그 주소로 가요.</li><li><code>main</code> 은 gcc 가 <code>-O0</code> 으로 만든 코드라 <code>x</code> 를 <code>[rbp-0x8]</code> 에 저장했다 꺼내요. <code>add(2, 3)</code> 의 <code>long</code> 인자를 <code>mov edi, 0x2</code> 처럼 32비트로 넣는 것도 보여요 — 위 32비트는 저절로 0 이 되니까요([[레슨:R1]]).</li><li>목록 위쪽에는 우리가 안 쓴 <code>_start</code> 도 있어요. [[레슨:R14]] 에서 말한 C 라이브러리의 시작 코드예요.</li><li><code>printf@plt</code>: <code>printf</code> 는 공유 라이브러리(libc) 안에 있어서, 실행할 때 진짜 주소를 찾아 주는 <b>PLT</b> 라는 다리를 거쳐 불러요. gcc 의 기본(PIE)으로 묶으면 NASM 에서도 <code>call printf wrt ..plt</code> 처럼 이 다리를 적어야 해서, 이 교과서는 <code>-no-pie</code> 로 그냥 <code>call printf</code> 를 써요. 이름만 알아 두면 돼요.</li></ul>`,
+      example: { label: '예제 명령 — 우분투 터미널에서', shell: 'objdump -d -M intel prog | less\nobjdump -d -M intel --disassemble=add prog\nobjdump -d -M intel add.o' } },
+    { title: 'AT&T 문법 읽기: %rax · $3 · 순서 반대', html: `<p><code>-masm=intel</code> · <code>-M intel</code> 을 빼면 gcc · objdump · gdb 는 <b>AT&amp;T 문법</b>으로 보여 줘요. 리눅스 쪽 자료에 흔하니 읽을 줄은 알아야 해요. 같은 <code>add</code> 를 <code>gcc -S -O0 -fno-asynchronous-unwind-tables add.c</code> 로:</p>
+<pre>add:                                  ; 인텔로 쓰면
+        endbr64
+        pushq   %rbp                  ; push rbp
+        movq    %rsp, %rbp            ; mov rbp, rsp
+        movq    %rdi, -8(%rbp)        ; mov qword [rbp-8], rdi
+        movq    %rsi, -16(%rbp)       ; mov qword [rbp-16], rsi
+        movq    -8(%rbp), %rdx        ; mov rdx, [rbp-8]
+        movq    -16(%rbp), %rax       ; mov rax, [rbp-16]
+        addq    %rdx, %rax            ; add rax, rdx
+        popq    %rbp                  ; pop rbp
+        ret</pre>
+<table class="kb"><tbody><tr><td><b>순서가 반대</b></td><td><code>movq %rdi, -8(%rbp)</code> 는 「주는쪽, 받는쪽」. 인텔은 「받는쪽, 주는쪽」 — 가장 헷갈리는 차이예요</td></tr><tr><td><code>%</code></td><td>레지스터 앞에: <code>%rax</code></td></tr><tr><td><code>$</code></td><td>숫자 앞에: <code>$0x3</code> = 인텔의 <code>3</code>(objdump 의 <code>mov $0x3,%esi</code> = <code>mov esi, 3</code>)</td></tr><tr><td>끝 글자</td><td>크기: <code>q</code> 8바이트 · <code>l</code> 4 · <code>w</code> 2 · <code>b</code> 1(<code>movq</code> = <code>mov qword</code>)</td></tr><tr><td><code>-8(%rbp)</code></td><td>메모리 <code>[rbp-8]</code>. <code>(%rdi,%rax,1)</code> = <code>[rdi+rax*1]</code></td></tr></tbody></table>
+<p>gdb 도 처음엔 AT&amp;T 로 보여 줘요. 인텔로 바꾸는 법은 [[레슨:R16]] 에서.</p>`,
+      example: { label: '예제 명령 — 우분투 터미널에서', shell: 'gcc -S -O0 -fno-asynchronous-unwind-tables add.c\ncat add.s\nobjdump -d --disassemble=add prog' } },
+  ],
+  summary: ['gcc -S -masm=intel', '-O2 는 반복도 없앤다', 'objdump -d -M intel 로 실행 파일 읽기'] },
+{ id: 'R16', ch: 4, n: 16, title: 'gdb 로 한 줄씩', mode: 'text',
+  tutorSummary: 'nasm -f elf64 -g -F dwarf 로 줄 번호 정보, ld 그대로, gdb ./prog. ~/.gdbinit 에 set disassembly-flavor intel. layout asm · layout regs(TUI, Ctrl+X A 로 끄기). break _start · run · stepi(si) · nexti(ni) · continue · info registers rax · p $rax · p/x. 멈춘 줄은 아직 실행 전. 종료 코드는 8진수(exited with code 052 = 42). x/s &msg · x/4cb · x/4xb · x/3i $rip · x/4gx $rsp(_start 에서 argc 1, argv[0] 주소). 폴트: run 하면 SIGSEGV 와 그 줄, bt 로 부른 곳, 그 줄의 레지스터가 주소 같은지(작은 수 · 글자 바이트면 lea 대신 mov 를 쓴 것). C 와 섞으면 gcc -g -no-pie, break add · bt(#1 main at main.c) · finish 후 p $rax.',
+  pages: [
+    { title: 'nasm -g -F dwarf 와 gdb ./prog', html: `<p>프로그램이 이상하게 돌 때, 레지스터 값을 <b>한 명령씩</b> 직접 보면 금방 찾아요. 그 도구가 <code>gdb</code>(GNU 디버거)예요. 먼저 빌드할 때 「이 기계어는 몇 번째 줄」 표를 같이 넣어요.</p>
+<pre class="code">nasm -f elf64 -g -F dwarf step.asm -o step.o    # -g: 디버그 정보, -F dwarf: 그 모양
+ld step.o -o step
+gdb ./step</pre>
+<p><code>(gdb)</code> 가 나오면 gdb 에게 명령을 치는 곳이에요. 나갈 땐 <code>quit</code>(또는 <code>q</code>).</p>
+<div class="bk-step-box"><b>처음 한 번: 인텔 문법으로</b><br>gdb 는 기본이 AT&amp;T 문법([[레슨:R15]])이에요. 터미널에서 <code>echo 'set disassembly-flavor intel' &gt;&gt; ~/.gdbinit</code> 한 번이면, 앞으로 gdb 를 켤 때마다 인텔 문법으로 보여 줘요.</div>
+<table class="kb"><tbody><tr><td><code>layout asm</code></td><td>화면 위쪽에 명령 목록, 지금 줄에 표시</td></tr><tr><td><code>layout regs</code></td><td>레지스터 창 + 명령 창. <code>stepi</code> 할 때마다 바뀐 레지스터가 강조돼요</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>X</kbd> → <kbd>A</kbd></td><td>창 화면 끄기/켜기(<code>tui disable</code> 도 같음)</td></tr></tbody></table>
+<p>이 레슨에서 따라갈 프로그램이에요. 그냥 실행하면 <code>gdb</code> 를 찍고 종료 코드 <code>42</code> 로 끝나요.</p>`,
+      example: { label: '예제 코드 — step.asm (./step; echo $?)', echoExit: true, code: `default rel
+
+section .data
+msg:    db "gdb", 10
+len     equ $ - msg
+        db 0                ; x/s 가 여기서 멈추게(write 는 len 만큼만 써요)
+
+section .text
+global _start
+_start:
+    mov rax, 6
+    mov rbx, 7
+    imul rax, rbx           ; rax = 42
+    mov r12, rax            ; 결과를 r12 에 맡겨 둠
+    mov rax, 1              ; write(1, msg, len)
+    mov rdi, 1
+    lea rsi, [msg]
+    mov rdx, len
+    syscall
+    mov rax, 60             ; exit(r12)
+    mov rdi, r12
+    syscall` } },
+    { title: 'break _start · run · stepi', html: `<p><code>break</code> 로 멈출 곳을 정하고 <code>run</code> 으로 시작해요. 그다음 <code>stepi</code> 로 한 명령씩. 우분투에서 실제로 한 화면이에요(주소 · 경로는 컴퓨터마다 달라요).</p>
+<pre>(gdb) break _start
+Breakpoint 1 at 0x401000: file step.asm, line 11.
+(gdb) run
+Starting program: /home/me/asm/step
+
+Breakpoint 1, _start () at step.asm:11
+11          mov rax, 6
+(gdb) info registers rax rbx
+rax            0x0                 0
+rbx            0x0                 0
+(gdb) stepi
+12          mov rbx, 7
+(gdb) stepi
+13          imul rax, rbx           ; rax = 42
+(gdb) info registers rax rbx
+rax            0x6                 6
+rbx            0x7                 7
+(gdb) stepi
+14          mov r12, rax            ; 결과를 r12 에 맡겨 둠
+(gdb) p $rax
+$1 = 42
+(gdb) p/x $rax
+$2 = 0x2a
+(gdb) continue
+Continuing.
+gdb
+[Inferior 1 (process 2626) exited with code 052]</pre>
+<p>gdb 가 보여 주는 줄은 <b>이제 실행할</b> 줄이에요. 11번 줄에서 멈췄을 땐 아직 <code>mov rax, 6</code> 전이라 <code>rax</code> 가 0 이에요. <code>info registers</code> 는 16진 · 10진을 같이, <code>p $rax</code> 는 10진, <code>p/x</code> 는 16진.</p>
+<table class="kb"><tbody><tr><td><code>break _start</code> · <code>b 13</code></td><td>라벨이나 줄 번호에서 멈추기</td></tr><tr><td><code>run</code> · <code>r</code></td><td>처음부터 실행(<code>run &lt; 파일</code> 이면 입력을 그 파일에서)</td></tr><tr><td><code>stepi</code> · <code>si</code></td><td>명령 하나 실행. <code>call</code> 이면 함수 안으로 들어가요</td></tr><tr><td><code>nexti</code> · <code>ni</code></td><td>명령 하나. <code>call</code> 은 통째로 실행하고 다음 줄에서</td></tr><tr><td><code>continue</code> · <code>c</code></td><td>다음 멈출 곳(또는 끝)까지</td></tr><tr><td><code>info registers</code> · <code>i r</code></td><td>레지스터 전부, 뒤에 이름을 쓰면 그것만</td></tr></tbody></table>
+<div class="bk-warn"><b>exited with code 052 는 52 가 아니에요</b> — gdb 는 종료 코드를 <b>8진수</b>로 보여 줘요(앞의 0 이 8진 표시). 052 = 5×8 + 2 = 42, <code>echo $?</code> 의 42 와 같아요.</div>`,
+      example: { label: '예제 명령 — gdb 안에서', shell: 'gdb ./step\n(gdb) break _start\n(gdb) run\n(gdb) info registers rax rbx\n(gdb) stepi\n(gdb) stepi\n(gdb) info registers rax rbx\n(gdb) stepi\n(gdb) p $rax\n(gdb) continue\n(gdb) quit' } },
+    { title: 'x/s &msg · x/4gx $rsp', html: `<p>레지스터 말고 <b>메모리</b>는 <code>x</code>(examine)로 봐요. 모양은 <code>x/개수 형식 크기 주소</code>.</p>
+<pre>(gdb) x/s &amp;msg
+0x402000 &lt;msg&gt;:  "gdb\\n"
+(gdb) x/4cb &amp;msg
+0x402000 &lt;msg&gt;:  103 'g'  100 'd'  98 'b'  10 '\\n'
+(gdb) x/4xb &amp;msg
+0x402000 &lt;msg&gt;:  0x67  0x64  0x62  0x0a
+(gdb) x/3i $rip
+=&gt; 0x40100e &lt;_start+14&gt;:  mov    r12,rax
+   0x401011 &lt;_start+17&gt;:  mov    eax,0x1
+   0x401016 &lt;_start+22&gt;:  mov    edi,0x1
+(gdb) x/4gx $rsp
+0x7fffffffc3d0:  0x0000000000000001  0x00007fffffffcafa
+0x7fffffffc3e0:  0x0000000000000000  0x00007fffffffcb62</pre>
+<table class="kb"><tbody><tr><td><code>&amp;msg</code></td><td>라벨 <code>msg</code> 의 주소. <code>$rsp</code> · <code>$rdi</code> 처럼 레지스터 값을 주소로 써도 돼요</td></tr><tr><td><code>s</code></td><td>0 바이트까지 문자열로. 그래서 <code>step.asm</code> 은 <code>msg</code> 뒤에 <code>db 0</code> 을 뒀어요(없으면 뒤의 쓰레기도 이어서 보여요)</td></tr><tr><td><code>c</code> · <code>x</code> · <code>d</code></td><td>글자 · 16진 · 10진</td></tr><tr><td><code>b</code> · <code>g</code></td><td>크기: 1바이트 · 8바이트(qword). <code>w</code> 는 4, <code>h</code> 는 2</td></tr><tr><td><code>i</code></td><td>명령으로 읽기. <code>$rip</code> 는 다음에 실행할 명령의 주소</td></tr></tbody></table>
+<ul><li><code>x/3i</code> 를 보면 우리가 쓴 <code>mov rax, 1</code> 이 <code>mov eax,0x1</code> 이에요. 결과가 같으니 nasm 이 더 짧은 기계어로 바꿨어요(32비트에 쓰면 위가 0, [[레슨:R1]]).</li><li><code>_start</code> 에서 <code>x/4gx $rsp</code> 는 커널이 스택에 놓아 준 것을 보여 줘요([[레슨:R10]]). 맨 위 <code>1</code> 은 명령줄 낱말 수(argc), 다음은 프로그램 이름 문자열의 주소예요. <code>x/s 0x7fffffffcafa</code> 처럼 그 주소를 그대로 치면 <code>"/home/me/asm/step"</code> 이 보여요. 주소는 컴퓨터마다 달라요.</li></ul>`,
+      example: { label: '예제 명령 — gdb 안에서 (_start 에서 멈춘 뒤)', shell: '(gdb) x/s &msg\n(gdb) x/4cb &msg\n(gdb) x/4xb &msg\n(gdb) x/3i $rip\n(gdb) x/4gx $rsp' } },
+    { title: '폴트 찾기: run · bt · info registers', html: `<p><code>Segmentation fault (core dumped)</code> 는 어디서 났는지 안 알려 줘요. gdb 에서 그냥 <code>run</code> 하면 <b>폴트 난 그 명령에서</b> 멈춰요. 이 프로그램은 배열 세 칸의 합을 종료 코드로 돌려주려다 죽어요.</p>
+<pre class="code">default rel
+
+section .data
+nums:   dq 3, 1, 4
+
+section .text
+global _start
+sum3:                       ; rdi = 배열 주소 → rax = 세 수의 합
+    mov rax, [rdi]
+    add rax, [rdi + 8]
+    add rax, [rdi + 16]
+    ret
+_start:
+    mov rdi, [nums]         ; 배열을 sum3 에게
+    call sum3
+    mov rdi, rax            ; exit(합)
+    mov rax, 60
+    syscall</pre>
+<pre>(gdb) run
+Starting program: /home/me/asm/fault
+
+Program received signal SIGSEGV, Segmentation fault.
+sum3 () at fault.asm:9
+9           mov rax, [rdi]
+(gdb) bt
+#0  sum3 () at fault.asm:9
+#1  0x0000000000401018 in _start () at fault.asm:15
+(gdb) info registers rdi
+rdi            0x3                 3</pre>
+<p>읽는 순서는 늘 같아요.</p>
+<ol><li><b>멈춘 줄</b>: 9번 <code>mov rax, [rdi]</code> — 메모리를 읽다 죽었어요.</li><li><b><code>bt</code>(backtrace)</b>: 누가 불렀나. <code>#0</code> 이 지금 함수, <code>#1</code> 이 그걸 부른 곳(15번 <code>call sum3</code> 바로 뒤).</li><li><b>그 줄의 레지스터</b>: <code>rdi</code> 가 <code>3</code>. 주소라면 <code>0x402000</code> · <code>0x7fff…</code> 같은 큰 수여야 하는데, 3 은 배열의 <b>첫 값</b>이에요.</li></ol>
+<p>범인은 14번 줄이에요. <code>mov rdi, [nums]</code> 는 nums 자리의 <b>값</b>을 읽고, 주소를 넘기려면 <code>lea rdi, [nums]</code>([[레슨:R7]])여야 해요. 예제는 고친 코드예요 — 그렇게 고치고 실행하면 종료 코드는 3 + 1 + 4 = 8.</p>
+<div class="bk-step-box"><b>레지스터가 이런 모양이면</b><br><code>0x0</code> · 작은 수 → 주소 대신 값이나 빈 레지스터를 넘겼어요. <code>0x6f6c6c6568</code> 처럼 글자 바이트가 늘어선 모양 → 문자열 주소 대신 <b>문자열 내용</b>을 읽어 넣었어요(16진 두 자리씩 아스키 코드).</div>`,
+      example: { label: '예제 코드 — 고친 fault.asm (./fault; echo $?)', echoExit: true, code: `default rel
+
+section .data
+nums:   dq 3, 1, 4
+
+section .text
+global _start
+sum3:                       ; rdi = 배열 주소 → rax = 세 수의 합
+    mov rax, [rdi]
+    add rax, [rdi + 8]
+    add rax, [rdi + 16]
+    ret
+_start:
+    lea rdi, [nums]         ; 고침: 값이 아니라 주소를
+    call sum3
+    mov rdi, rax            ; exit(합)
+    mov rax, 60
+    syscall` } },
+    { title: 'C 와 함께: break add · bt · finish', html: `<p>C 와 섞은 프로그램도 똑같이 봐요. 양쪽 다 <code>-g</code> 를 붙여 빌드해요.</p>
+<pre class="code">nasm -f elf64 -g -F dwarf add.asm -o add.o
+gcc -g -no-pie main.c add.o -o prog
+gdb ./prog</pre>
+<p>[[레슨:R14]] 의 <code>main.c</code> + <code>add.asm</code> 이에요. 어셈블리 함수 이름에 <code>break</code> 를 걸면 C 가 그 함수를 부를 때마다 멈춰요.</p>
+<pre>(gdb) break add
+Breakpoint 1 at 0x401190: file add.asm, line 4.
+(gdb) run
+Starting program: /home/me/asm/prog
+…
+
+Breakpoint 1, add () at add.asm:4
+4           mov rax, rdi
+(gdb) bt
+#0  add () at add.asm:4
+#1  0x0000000000401141 in main () at main.c:6
+(gdb) info registers rdi rsi
+rdi            0x2                 2
+rsi            0x3                 3
+(gdb) finish
+Run till exit from #0  add () at add.asm:4
+0x0000000000401141 in main () at main.c:6
+6           long x = add(2, 3);
+(gdb) p $rax
+$1 = 5</pre>
+<ul><li><code>bt</code> 의 <code>#1 main () at main.c:6</code>: C 의 6번 줄 <code>long x = add(2, 3);</code> 이 불렀어요. C 와 어셈블리 줄이 한 목록에 같이 나와요.</li><li><code>info registers rdi rsi</code>: C 가 규약대로 2 와 3 을 넣어 줬는지 직접 확인.</li><li><code>finish</code>: 이 함수가 <code>ret</code> 할 때까지 실행하고 부른 쪽에서 멈춰요. 돌려준 값은 <code>p $rax</code>.</li><li><code>continue</code> 하면 다음 <code>add(40, 2)</code> 에서 다시 멈춰요. 멈춤을 지우려면 <code>delete</code>.</li></ul>
+<p class="muted small">gdb 안에서 <code>run</code> 하는 프로그램이 <code>printf</code> 로 찍은 글자는 줄바꿈이 나올 때 바로 보이지 않을 수도 있어요(출력을 모아 두었다 찍어서). 프로그램이 끝나면 다 나와요.</p>`,
+      example: { label: '예제 명령 — 우분투 터미널 · gdb 안에서', shell: 'nasm -f elf64 -g -F dwarf add.asm -o add.o\ngcc -g -no-pie main.c add.o -o prog\ngdb ./prog\n(gdb) break add\n(gdb) run\n(gdb) bt\n(gdb) info registers rdi rsi\n(gdb) finish\n(gdb) p $rax\n(gdb) continue' } },
+  ],
+  summary: ['nasm -g -F dwarf 로 빌드', 'stepi 로 한 명령씩', 'info registers · x 로 들여다보기'] },
+{ id: 'RB4', ch: 4, boss: true, title: '만들어 보기: C 와 함께 만드는 단어 세기', mode: 'text',
+  tutorSummary: '교과서 묶기 — C(main.c)가 fgets 로 stdin 을 한 줄씩 읽고(./wc < words.txt), 어셈블리(count.asm)의 count_words(char *s) 가 단어 수(빈칸 · 줄바꿈 · 탭이 아닌 글자 덩어리, 「단어 안」 표시 레지스터), count_char(char *s, int c) 가 글자 c 의 수(cmp dl, sil)를 세고, C 가 printf 로 줄 · 단어 · e · o 를 출력. gdb 로 break count_char · bt · info registers rsi(0x65 = e) · x/s $rdi · finish · p $rax.', pages: [], summary: [] },
 ];
 const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)

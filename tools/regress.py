@@ -346,7 +346,7 @@ with sync_playwright() as p:
     print('[어셈블리어 교과서 v2.31.0]'); a0=len(errors); ASB='file://'+os.path.join(ROOT,'courses/asm/index.html')
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(ASB); pg.wait_for_timeout(900); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
     ah=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length, chs:document.querySelectorAll('.bk-ch').length})")
-    check(ah['book'] and ah['steps']==2 and ah['ls']==21 and ah['soon']==0 and ah['pre']==1 and ah['chs']==5, '어셈블리어 교과서 홈: 시작하기 2 · 열린 레슨 21 · 준비 중 0 · 챕터 5 · 「먼저 꼭: 리눅스 UB1」 (%s)' % ah)
+    check(ah['book'] and ah['steps']==2 and ah['ls']==21 and ah['soon']==0 and ah['pre']==3 and ah['chs']==5, '어셈블리어 교과서 홈: 시작하기 2 · 열린 레슨 21 · 준비 중 0 · 챕터 5 · 「먼저 꼭」 챕터 0(리눅스 UB1) · 1(nasm 설치) · 3(스택 정렬) (%s)' % ah)
     pg.evaluate("UI.go('lesson',{lessonId:'R0',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==1 and '리눅스 교과서' in pg.inner_text('.bk-prereq'), 'R0 1쪽: 「먼저 꼭」 리눅스 교과서 UB1')
     pg.evaluate("UI.go('lesson',{lessonId:'R2',page:0})"); pg.wait_for_timeout(300); check('nasm' in pg.inner_text('.bk-lesson') and 'syscall' in pg.inner_text('.bk-lesson'), 'R2: nasm 설치 「먼저 꼭」 + syscall')
     pg.evaluate("UI.go('lesson',{lessonId:'R13',page:0})"); pg.wait_for_timeout(300); check('push rbp' in pg.inner_text('.bk-lesson') and 'printf' in pg.inner_text('.bk-lesson'), 'R13: printf 앞 스택 정렬(push rbp) 「먼저 꼭」')
