@@ -130,7 +130,7 @@
 | 중 ✓ | L8B/0 | 「이미 써 본 `print(x, end=" ")`」 | L12B/2(뒤) |
 | 중 ✓ | B3#4 예시 답 | `sorted(totals.items(), key=lambda kv: kv[1], reverse=True)`. L12C 는 `.sort(key=)` 를 딕셔너리 명단에만 보임 | (키, 값) 쌍 정렬은 L18. 같은 `key=` 라 옮겨 쓸 수는 있어서 상 → 중 |
 | 중 ✓ | B7#3 예시 답 | `m.groups()` | 없음(L20 은 `group(1)` 만) |
-| 중 ✓ | B7#4 예시 답 | `d.strftime('%m-%d')`. needs 는 L19/1 을 가리키지만 거기엔 없음 | B5 문제의 「더 알아보기」 접힘에 한 번. 그래서 상 → 중 |
+| 하 ✓(정정) | B7#4 예시 답 | `d.strftime('%m-%d')`. strftime 은 **L19/1 의 「더 알아보기」에 이미 있었음**(needs 가 맞게 가리킴). 처음엔 「B5 문제의 접힘」에 있다고 잘못 적었음 — 위치를 근처 id 로 어림했던 탓. 빠진 건 `%m-%d` 모양의 예 하나뿐 | L19/1 |
 | 중 ✓ | B6#1 예시 답 | `Path(...).read_text()`, `Path.home()`, `import tempfile` | 없음 |
 | 중 | B5#4 예시 답 | `for i, (name, score) in enumerate(rows, 1)`: 괄호로 겹쳐 나눠 담기 | 없음 |
 | 중 | L18D 데코레이터 | wrapper 가 `*args` 만 받음. 키워드로 부르면 TypeError. `**kwargs` 는 책 전체에 없음 | 없음 |
