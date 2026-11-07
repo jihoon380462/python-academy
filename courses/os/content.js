@@ -417,12 +417,162 @@ print(sorted(done))</pre>
   summary: ['교착 = 서로 쥔 락을 기다리며 영원히 멈춤 — 네 조건 중 하나만 깨면 됨', '늘 같은 순서로 잡기 · lock.acquire(timeout=초) 로 알아채기 · threading.Barrier 로 재현', 'queue.Queue: put · get(비면 기다림) · 끝 신호 None — 락을 대신'] },
 
 { id: 'KB2', ch: 2, boss: true, title: '보스: 다운로드 대기열', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 2 종합. 가짜 다운로드 12개(time.sleep)를 queue.Queue 에 넣고 일꾼 스레드 3개가 나눠 처리. 진행 수는 락으로, 일꾼별 처리 수를 모아 합계 12. 걸린 시간이 하나씩 할 때의 1/3 정도. Ctrl+C 로 깔끔하게 멈추기.' },
-// ================= 챕터 3 메모리 (다음 업데이트) =================
-{ id: 'K10', ch: 3, n: 10, title: '가상 메모리: 프로세스마다 자기만의 주소', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '코드·데이터·힙·스택 · /proc/self/maps · copy-on-write.' },
-{ id: 'K11', ch: 3, n: 11, title: '페이지와 페이지 폴트', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '4096바이트 페이지 · 페이지 표 · 페이지 폴트 · VmRSS.' },
-{ id: 'K12', ch: 3, n: 12, title: '페이지 교체: 자리가 모자라면 누구를 뺄까', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: 'FIFO · LRU · OPT(페이지 교체 표 그림) · 벨라디의 이상 · 스왑.' },
-{ id: 'K13', ch: 3, n: 13, title: '메모리가 모자라면', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '스왑 · vmstat · OOM killer · 메모리가 새는 프로그램 잡기.' },
-{ id: 'KB3', ch: 3, boss: true, draft: true, title: '보스: 페이지 교체 실험실', mode: 'text', pages: [], summary: [], tutorSummary: 'FIFO·LRU·OPT 폴트 수 표 + 프레임 1~6.' },
+// ================= 챕터 3 메모리 =================
+{ id: 'K10', ch: 3, n: 10, title: '가상 메모리: 프로세스마다 자기만의 주소', mode: 'text', tutorSummary: '프로세스마다 0 부터 시작하는 자기만의 주소 공간(코드 · 데이터 · 힙 · 스택 · 라이브러리). /proc/self/maps 한 줄 = 주소 범위 · 권한(r w x p) · 파일. fork 한 자식은 같은 주소를 보지만 실제 메모리는 따로 — 쓸 때만 복사(copy-on-write)라서 fork 가 빠름.',
+  pages: [
+    { title: '주소 공간: 코드 · 데이터 · 힙 · 스택', html: `<p>프로그램이 보는 메모리 주소는 <b>진짜 RAM 의 주소가 아니에요</b>. 커널은 프로세스마다 <b>자기만의 주소 공간</b>을 하나씩 만들어 줘요. 그래서 두 프로세스가 같은 주소에 값을 써도 서로 부딪히지 않아요. 이게 <b>가상 메모리</b>예요.</p>
+<div class="bk-layers" role="img" aria-label="주소 공간: 위에서부터 스택 · 라이브러리 · 힙 · 데이터 · 코드"><div class="bk-layer v"><b>스택 (stack)</b><span>함수를 부를 때마다 쌓이는 칸 — 지역 변수 · 돌아갈 자리</span></div><div class="bk-layer h"><b>라이브러리 · mmap</b><span>libc 같은 공용 코드 · 큰 덩어리 메모리</span></div><div class="bk-layer g"><b>힙 (heap)</b><span>실행 중에 필요할 때 받아 쓰는 칸</span></div><div class="bk-layer h"><b>데이터 · 코드</b><span>프로그램 파일에서 읽어 온 값과 명령</span></div></div>
+<p>파이썬의 모든 값(목록 · 딕셔너리 · 글자)은 힙과 mmap 칸 어딘가에 있어요. <code>id(값)</code> 은 CPython 에서 그 값이 있는 <b>가상 주소</b>예요.</p>
+<pre class="code">nums = [1, 2, 3]
+print("nums 가 있는 가상 주소:", hex(id(nums)))</pre>
+<p>주소 숫자는 실행할 때마다 달라요(보안을 위해 커널이 시작 위치를 섞어요 — ASLR).</p>` + OS_DATE,
+      example: { code: 'nums = [1, 2, 3]\nprint("nums 가 있는 가상 주소:", hex(id(nums)))' } },
+    { title: '/proc/self/maps: 내 주소 공간의 지도', html: `<p><code>/proc/self/maps</code> 는 내 주소 공간의 <b>지도</b>예요. 한 줄이 한 구역이에요.</p>
+<pre class="code">55d0a1c00000-55d0a1c21000 rw-p 00000000 00:00 0      [heap]
+7ffc8e3a1000-7ffc8e3c2000 rw-p 00000000 00:00 0      [stack]
+7f2b4c600000-7f2b4c628000 r--p 00000000 08:02 1835   /usr/lib/x86_64-linux-gnu/libc.so.6</pre>
+<table class="kb"><tbody><tr><td>앞 두 숫자</td><td>그 구역의 시작 · 끝 주소(16진수)</td></tr><tr><td><code>r w x p</code></td><td>읽기 · 쓰기 · 실행 · 나만 쓰는 복사본(private). 코드 칸은 <code>r-xp</code>(실행은 되고 쓰기는 안 됨), 데이터 칸은 <code>rw-p</code></td></tr><tr><td>끝</td><td>그 칸을 채운 파일(<code>/usr/bin/python3…</code> · <code>libc.so.6</code>) 또는 <code>[heap]</code> · <code>[stack]</code> 같은 이름</td></tr></tbody></table>
+<pre class="code">with open("/proc/self/maps") as f:
+    lines = f.read().splitlines()
+names = [line.split()[-1] for line in lines]
+print("[heap] 있음:", "[heap]" in names)
+print("[stack] 있음:", "[stack]" in names)
+print("실행할 수 있는 칸이 있나요?", any(line.split()[1] == "r-xp" for line in lines))</pre>
+<p>터미널에서는 <code>cat /proc/$$/maps</code>(bash 의 지도)나 <code>pmap -x $$</code>(칸마다 크기)로 봐요. 코드 칸에 쓰기가 막혀 있어서, 프로그램이 자기 명령을 실수로 덮어쓰면 <b>Segmentation fault</b>(허락 안 된 칸을 만짐)로 멈춰요.</p>` + OS_DATE,
+      example: { code: 'with open("/proc/self/maps") as f:\n    lines = f.read().splitlines()\nnames = [line.split()[-1] for line in lines]\nprint("[heap] 있음:", "[heap]" in names)\nprint("[stack] 있음:", "[stack]" in names)\nprint("실행할 수 있는 칸이 있나요?", any(line.split()[1] == "r-xp" for line in lines))' } },
+    { title: '같은 주소, 다른 메모리: 쓸 때만 복사', html: `<p>레슨 2 에서 자식이 money 를 바꿔도 부모는 그대로였죠. 그런데 자식이 보는 <b>주소</b>는 부모와 똑같아요.</p>
+<pre class="code">import os
+data = [0]
+addr = id(data)
+pid = os.fork()
+if pid == 0:
+    data[0] = 1
+    print("자식: 주소가 같나요?", id(data) == addr, "· 값", data[0], flush=True)
+    os._exit(0)
+os.waitpid(pid, 0)
+print("부모: 값", data[0])</pre>
+<p>실행하면 <code>자식: 주소가 같나요? True · 값 1</code> 다음에 <code>부모: 값 0</code>. <b>같은 가상 주소</b>가 두 프로세스에서 <b>다른 진짜 메모리</b>를 가리키는 거예요. 가상 주소를 진짜 메모리로 바꿔 주는 표(<b>페이지 표</b> — 다음 레슨)가 프로세스마다 따로 있어서 그래요.</p>
+<p><b>쓸 때만 복사</b>(copy-on-write): fork 할 때 커널은 부모의 메모리를 바로 복사하지 않아요. 둘이 같은 진짜 메모리를 「읽기 전용」 으로 같이 보다가, <b>누군가 쓰는 순간</b> 그 칸(페이지)만 복사해요. 그래서 큰 프로그램도 fork 가 아주 빨라요(셸이 명령마다 fork 해도 괜찮은 이유).</p>` + OS_DATE,
+      example: { code: 'import os\ndata = [0]\naddr = id(data)\npid = os.fork()\nif pid == 0:\n    data[0] = 1\n    print("자식: 주소가 같나요?", id(data) == addr, "· 값", data[0], flush=True)\n    os._exit(0)\nos.waitpid(pid, 0)\nprint("부모: 값", data[0])' } },
+  ],
+  summary: ['가상 메모리: 프로세스마다 자기만의 주소 공간(코드 · 데이터 · 힙 · mmap · 스택)', '/proc/self/maps 한 줄 = 주소 범위 · 권한 r w x p · 파일 또는 [heap] [stack]', 'fork 자식: 같은 주소 · 다른 진짜 메모리 — 쓸 때만 복사(copy-on-write)'] },
+
+{ id: 'K11', ch: 3, n: 11, title: '페이지와 페이지 폴트', mode: 'text', tutorSummary: '메모리는 4096바이트 페이지 단위(os.sysconf("SC_PAGE_SIZE")). 페이지 표가 가상 페이지 → 진짜 칸(프레임)을 이어 줌(TLB 는 그 빠른 메모). 처음 만지는 페이지는 페이지 폴트 → 커널이 그때 칸을 줌(minor) · 디스크에서 읽어야 하면 major. resource.getrusage(...).ru_minflt. mmap 으로 잡기만 하면 RSS 그대로, 만지면 늘어남(bytearray 는 0 으로 채워서 바로 늘어남). VSZ vs RSS.',
+  pages: [
+    { title: '페이지: 4096바이트짜리 칸', html: `<p>커널은 메모리를 한 바이트씩이 아니라 <b>페이지</b>라는 일정한 크기의 칸으로 나눠 다뤄요. x86-64 리눅스의 기본 페이지는 <b>4096바이트(4KB)</b>예요.</p>
+<ul><li><b>페이지 표</b>: 「내 가상 페이지 몇 번 → 진짜 RAM 의 칸(프레임) 몇 번」 을 적은 표. 프로세스마다 하나씩 있어요(레슨 10 의 「같은 주소, 다른 메모리」).</li><li>CPU 는 주소를 쓸 때마다 이 표를 찾아요. 매번 찾으면 느려서 최근 것을 기억해 두는 작은 칸(<b>TLB</b>)이 CPU 안에 있어요.</li></ul>
+<pre class="code">import os
+print("페이지 크기:", os.sysconf("SC_PAGE_SIZE"), "바이트")</pre>
+<p>실행하면 <code>페이지 크기: 4096 바이트</code>. 터미널에서는 <code>getconf PAGE_SIZE</code>. 그러니까 100MB 는 페이지 25,600장이에요.</p>` + OS_DATE,
+      example: { code: 'import os\nprint("페이지 크기:", os.sysconf("SC_PAGE_SIZE"), "바이트")' } },
+    { title: '페이지 폴트: 처음 만질 때 칸을 받아요', html: `<p>메모리를 「100MB 주세요」 하고 받아도, 커널은 <b>진짜 칸을 바로 주지 않아요</b>. 주소만 예약해 두고, 그 페이지를 <b>처음 만지는 순간</b> CPU 가 「표에 없어요!」 하고 커널을 불러요. 이게 <b>페이지 폴트</b>예요. 커널은 그때 빈 칸을 하나 주고 표에 적은 뒤 하던 일을 계속하게 해요(필요할 때만 준다 — demand paging).</p>
+<table class="kb"><tbody><tr><td><b>minor</b> 폴트</td><td>빈 칸만 주면 되는 것 — 빨라요</td></tr><tr><td><b>major</b> 폴트</td><td>디스크(스왑 · 파일)에서 읽어 와야 하는 것 — 수천 배 느려요</td></tr></tbody></table>
+<p><code>mmap.mmap(-1, 크기)</code> 로 메모리를 잡으면 이게 그대로 보여요. 잡기만 하면 실제 사용량(<b>RSS</b>, <code>VmRSS</code>)은 그대로고, 페이지마다 한 바이트씩 만지면 그만큼 늘어요. <code>resource.getrusage(resource.RUSAGE_SELF).ru_minflt</code> 는 지금까지의 minor 폴트 수예요. (<code>mmap.mmap(-1, 크기)</code> 의 기본은 fork 한 자식과 <b>같이 쓰는</b> 메모리예요. 나만 쓰는 메모리는 <code>flags=mmap.MAP_PRIVATE</code> — 레슨 10 의 「쓸 때만 복사」 는 이쪽이에요.)</p>
+<pre class="code">import mmap, resource
+def rss_mb():
+    with open("/proc/self/status") as f:
+        for line in f:
+            if line.startswith("VmRSS:"):
+                return int(line.split()[1]) / 1024
+def faults():
+    return resource.getrusage(resource.RUSAGE_SELF).ru_minflt
+r0 = rss_mb()
+m = mmap.mmap(-1, 50 * 1024 * 1024)
+r1, f1 = rss_mb(), faults()
+for i in range(0, len(m), 4096):
+    m[i] = 1
+r2, f2 = rss_mb(), faults()
+print("잡기만 했을 때 거의 그대로인가요?", r1 - r0 &lt; 5)
+print("다 만지니 약 50MB 늘었나요?", 45 &lt; r2 - r1 &lt; 60)
+print("페이지 폴트가 1만 번 넘게 났나요?", f2 - f1 &gt; 10000)</pre>
+<p class="muted small">파이썬의 <code>bytearray(크기)</code> 는 만들 때 0 으로 다 채워서(= 다 만져서) 바로 RSS 가 늘어요. 그래서 이 실험은 <code>mmap</code> 으로 해요.</p>` + OS_DATE,
+      example: { code: 'import mmap, resource\ndef rss_mb():\n    with open("/proc/self/status") as f:\n        for line in f:\n            if line.startswith("VmRSS:"):\n                return int(line.split()[1]) / 1024\ndef faults():\n    return resource.getrusage(resource.RUSAGE_SELF).ru_minflt\nr0 = rss_mb()\nm = mmap.mmap(-1, 50 * 1024 * 1024)\nr1, f1 = rss_mb(), faults()\nfor i in range(0, len(m), 4096):\n    m[i] = 1\nr2, f2 = rss_mb(), faults()\nprint("잡기만 했을 때 거의 그대로인가요?", r1 - r0 < 5)\nprint("다 만지니 약 50MB 늘었나요?", 45 < r2 - r1 < 60)\nprint("페이지 폴트가 1만 번 넘게 났나요?", f2 - f1 > 10000)' } },
+    { title: 'VSZ 와 RSS · /usr/bin/time -v', html: `<table class="kb"><tbody><tr><td><b>VSZ</b> (VmSize)</td><td>잡아 둔 <b>주소</b>의 합 — 아직 안 만진 것까지. 크게 보여도 걱정할 필요 없어요</td></tr><tr><td><b>RSS</b> (VmRSS)</td><td>지금 <b>진짜 RAM</b> 에 올라와 있는 양 — 이게 실제로 쓰는 메모리</td></tr></tbody></table>
+<p><code>ps -o pid,vsz,rss,cmd</code> 로 둘을 나란히 봐요(단위 KB). 파이썬 하나도 VSZ 는 수십 MB, RSS 는 10MB 남짓이에요.</p>
+<p>프로그램 하나를 처음부터 끝까지 돌리며 세려면 <code>/usr/bin/time -v</code> 를 앞에 붙여요(없으면 <code>sudo apt install time</code> — bash 의 <code>time</code> 과 다른 프로그램이라 전체 경로로).</p>
+<pre class="code">/usr/bin/time -v python3 k11.py
+…
+	Maximum resident set size (kbytes): 63188
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 14218
+…</pre>
+<p>「Maximum resident set size」 가 RSS 의 최댓값, 그 아래 두 줄이 major · minor 폴트 수예요. major 가 많으면 메모리가 모자라 디스크를 오가고 있다는 뜻(레슨 13)이에요.</p>` + OS_DATE,
+      example: { label: '예제 명령 — 우분투 터미널에서', shell: 'ps -o pid,vsz,rss,cmd\n/usr/bin/time -v python3 -c "x = b\'a\' * 50_000_000" 2>&1 | grep -E "Maximum resident|page faults"' } },
+  ],
+  summary: ['페이지 = 4096바이트 칸 · 페이지 표(가상 페이지 → 진짜 칸) · TLB', '페이지 폴트: 처음 만질 때 커널이 칸을 줌(minor) · 디스크에서 읽으면 major · ru_minflt', 'mmap 으로 잡기만 하면 RSS 그대로 · VSZ(주소) vs RSS(진짜 RAM) · /usr/bin/time -v'] },
+
+{ id: 'K12', ch: 3, n: 12, title: '페이지 교체: 자리가 모자라면 누구를 뺄까', mode: 'text', tutorSummary: 'RAM 칸(프레임)이 모자라면 한 페이지를 내보내고 새 페이지를 들임. FIFO(먼저 들어온 것) · LRU(가장 오래 안 쓴 것) · OPT(가장 늦게 쓸 것 — 미래를 알아야 해서 비교용). 교과서 참조 20개 · 프레임 3: FIFO 15 · LRU 12 · OPT 9. FIFO 는 프레임을 늘려도 폴트가 늘 수 있음(벨라디의 이상 1 2 3 4 1 2 5 1 2 3 4 5: 3칸 9 · 4칸 10). 리눅스는 LRU 흉내(최근에 썼나 표시) + 스왑.',
+  pages: [
+    { title: '페이지 교체 표: FIFO · LRU · OPT', figure: { kind: 'pagereplace', height: 250, mheight: 250, note: '같은 참조 순서를 다른 방법으로' },
+      params: [{ id: 'algo', label: '방법 (0 FIFO · 1 LRU · 2 OPT)', min: 0, max: 2, step: 1, default: 0 }, { id: 'frames', label: '프레임 수', min: 1, max: 6, step: 1, default: 3 }, { id: 'set', label: '예 (0 교과서 · 1 벨라디)', min: 0, max: 1, step: 1, default: 0 }],
+      observe: ['교과서 예 · 프레임 3에서 FIFO · LRU · OPT 의 폴트 수는 각각 몇 번인가요?', 'OPT 가 늘 가장 적은 이유는? 진짜 커널은 왜 OPT 를 못 쓸까요?', '프레임을 1 → 6 으로 늘리면 폴트는 어떻게 바뀌나요?'],
+      html: `<p>RAM 의 칸(<b>프레임</b>)은 정해져 있어요. 다 찼는데 새 페이지가 필요하면 <b>하나를 내보내야</b> 해요(내보낸 건 스왑으로 — 레슨 13). 누구를 내보낼지 정하는 게 <b>페이지 교체</b>예요. 그림의 위 줄은 프로그램이 만지는 페이지 번호 순서(<b>참조 순서</b>), 아래는 칸마다 든 페이지예요.</p>
+<table class="kb"><tbody><tr><td><b>FIFO</b></td><td>가장 <b>먼저 들어온</b> 것을 내보내요. 간단하지만 자주 쓰는 페이지도 오래됐다고 내보내요</td></tr><tr><td><b>LRU</b></td><td>가장 <b>오래 안 쓴</b> 것을 내보내요. 「요즘 안 쓴 건 앞으로도 안 쓸 것」 이라는 짐작 — 보통 잘 맞아요</td></tr><tr><td><b>OPT</b></td><td>앞으로 <b>가장 늦게 쓸</b> 것을 내보내요. 폴트가 가장 적은 최고의 방법이지만 <b>미래를 알아야</b> 해서 진짜로는 못 써요 — 다른 방법이 얼마나 잘하나 재는 잣대</td></tr></tbody></table>
+<p>코드로 OPT 를 만들 때는 칸에 든 페이지마다 <code>ref.index(page, t + 1)</code>(지금 차례 t 뒤에서 처음 다시 쓰는 자리)를 찾고, 다시 안 쓰면 <code>except ValueError:</code> 에서 「끝없이 먼 것」 으로 쳐서 가장 먼 것을 내보내요.</p>` + OS_DATE },
+    { title: '벨라디의 이상: 칸을 늘렸는데 폴트가 늘어요', html: `<p>보통은 프레임을 늘리면 폴트가 줄어요. 그런데 <b>FIFO 는 늘렸는데 오히려 늘 수 있어요</b>. 1969년에 이걸 찾은 사람의 이름을 따서 <b>벨라디의 이상</b>(Belady's anomaly)이라고 해요. 그림에서 「예」 를 1(벨라디), 방법을 0(FIFO)으로 두고 프레임을 3 → 4 로 바꿔 보세요.</p>
+<pre class="code">def fifo(ref, n):
+    frames = []
+    faults = 0
+    for page in ref:
+        if page not in frames:
+            faults += 1
+            if len(frames) == n:
+                frames.pop(0)
+            frames.append(page)
+    return faults
+ref = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]
+for n in (3, 4):
+    print(f"프레임 {n}: 폴트 {fifo(ref, n)}번")</pre>
+<p>실행하면 <code>프레임 3: 폴트 9번</code>, <code>프레임 4: 폴트 10번</code>. <code>frames.pop(0)</code> 이 「가장 먼저 들어온 것 내보내기」 예요. LRU 는 같은 목록을 「최근에 쓴 순서」 로 두면 돼요 — 이미 있는 페이지를 쓰면 <code>frames.remove(page)</code> 뒤 <code>frames.append(page)</code> 로 끝에 옮기고, 내보낼 땐 똑같이 맨 앞(<code>pop(0)</code>)이 가장 오래 안 쓴 것이에요. LRU 와 OPT 는 이런 일이 생기지 않아요(칸이 많을 때 든 페이지가 칸이 적을 때 든 페이지를 늘 다 포함해서).</p>` + OS_DATE,
+      example: { code: 'def fifo(ref, n):\n    frames = []\n    faults = 0\n    for page in ref:\n        if page not in frames:\n            faults += 1\n            if len(frames) == n:\n                frames.pop(0)\n            frames.append(page)\n    return faults\nref = [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]\nfor n in (3, 4):\n    print(f"프레임 {n}: 폴트 {fifo(ref, n)}번")' } },
+    { title: '진짜 커널은: LRU 흉내 · 스왑', html: `<p>LRU 를 정확히 하려면 메모리를 만질 때마다 「언제 썼나」 를 적어야 해서 너무 느려요. 그래서 리눅스는 <b>LRU 를 흉내</b> 내요.</p>
+<ul><li>CPU 가 페이지를 만지면 페이지 표에 <b>「최근에 썼음」 표시</b>를 켜 줘요. 커널은 가끔 이 표시를 보고 끄면서 「자주 쓰는 줄(active)」 · 「한동안 안 쓴 줄(inactive)」 을 나눠요.</li><li>자리가 모자라면 <b>안 쓴 줄 끝</b>부터 내보내요. 파일에서 읽어 온 페이지(캐시)는 그냥 버리면 되고(다시 읽으면 됨), 프로그램이 만든 데이터는 <b>스왑</b>(디스크의 대피 칸)에 써 둬요.</li></ul>
+<table class="kb"><tbody><tr><td><code>free -h</code></td><td><code>Swap:</code> 줄 — 스왑 크기와 쓰는 양</td></tr><tr><td><code>swapon --show</code></td><td>스왑이 어디 있나(우분투는 보통 스왑 <b>파일</b>)</td></tr><tr><td><code>cat /proc/sys/vm/swappiness</code></td><td>캐시 대신 데이터를 얼마나 쉽게 스왑으로 내보낼지(기본 60)</td></tr></tbody></table>` + OS_DATE,
+      example: { label: '예제 명령 — 우분투 터미널에서', shell: 'free -h\nswapon --show\ncat /proc/sys/vm/swappiness' } },
+  ],
+  summary: ['프레임이 차면 한 페이지를 내보냄 — FIFO(먼저 들어온) · LRU(오래 안 쓴) · OPT(가장 늦게 쓸, 비교용)', '교과서 예 프레임 3: FIFO 15 · LRU 12 · OPT 9 · 벨라디의 이상(FIFO 3칸 9 → 4칸 10)', '리눅스: 「최근에 썼음」 표시로 LRU 흉내 · 캐시는 버리고 데이터는 스왑 · free -h · swapon --show'] },
+
+{ id: 'K13', ch: 3, n: 13, title: '메모리가 모자라면', mode: 'text', tutorSummary: 'free -h 의 available 이 진짜 여유. vmstat 1 의 si/so(스왑 드나듦)가 계속 0 이 아니면 메모리 부족(스래싱). RAM + 스왑이 바닥나면 OOM killer 가 oom_score 가 큰 프로세스를 SIGKILL(journalctl -k). 메모리가 새는 프로그램은 VmRSS 가 계속 늘어남 → 캐시 크기 제한(collections.deque(maxlen=)).',
+  pages: [
+    { title: 'free 와 vmstat 1: 모자란지 보는 법', html: `<pre class="code">free -h
+               total        used        free      shared  buff/cache   available
+Mem:           7.7Gi       2.1Gi       3.9Gi        48Mi       1.9Gi       5.4Gi
+Swap:          4.0Gi          0B       4.0Gi</pre>
+<ul><li><b>free</b> 가 작아도 괜찮아요. 리눅스는 남는 RAM 을 파일 캐시(<b>buff/cache</b>)로 써 두고, 필요하면 바로 비워요. 진짜 여유는 <b>available</b> 이에요.</li><li><code>vmstat 1</code> 은 1초마다 한 줄씩 보여 줘요. <b>si</b>(스왑에서 들어옴) · <b>so</b>(스왑으로 나감)가 계속 0 이 아니면 RAM 이 모자라 디스크를 오가는 중이에요. 이게 심해져 일보다 들락날락에 시간을 다 쓰는 상태를 <b>스래싱</b>이라고 해요 — 화면이 거의 멈춰요.</li></ul>` + OS_DATE,
+      example: { label: '예제 명령 — 우분투 터미널에서', shell: 'free -h\nvmstat 1 5' } },
+    { title: 'OOM killer: 바닥나면 커널이 하나를 끝내요', html: `<p>RAM 과 스왑이 <b>모두</b> 바닥나면 커널은 시스템 전체가 멈추지 않게 프로세스 하나를 골라 <b>SIGKILL</b>(레슨 4 — 못 막음)로 끝내요. 이걸 <b>OOM killer</b>(Out Of Memory)라고 해요.</p>
+<ul><li>누구를 고를지는 <code>/proc/PID/oom_score</code> 의 점수로 정해요 — 메모리를 많이 쓰는 프로세스일수록 커요.</li><li>당한 프로그램은 아무 말 없이 사라져요(셸에는 <code>Killed</code>). 무슨 일이 있었는지는 커널 기록에 남아요: <code>journalctl -k | grep -i "out of memory"</code>(리눅스 교과서 레슨 11).</li><li>중요한 프로세스는 <code>/proc/PID/oom_score_adj</code> 를 낮춰(-1000 이면 절대 안 고름, <code>sudo</code> 필요) 보호할 수 있어요.</li></ul>
+<pre class="code">with open("/proc/self/oom_score") as f:
+    score = f.read().strip()
+print("내 oom_score 를 읽었나요?", score.isdigit())</pre>
+<p class="muted small">일부러 OOM 을 일으키는 실험은 VM 을 아주 느리게 만들어서 이 교과서는 하지 않아요. 해 보고 싶으면 꼭 스냅샷 뒤에.</p>` + OS_DATE,
+      example: { code: 'with open("/proc/self/oom_score") as f:\n    score = f.read().strip()\nprint("내 oom_score 를 읽었나요?", score.isdigit())' } },
+    { title: '메모리가 새는 프로그램 잡기', html: `<p>쓰고 나서 버리지 않는 값이 계속 쌓이면 RSS 가 끝없이 늘어요. 이걸 <b>메모리 누수</b>라고 해요. 파이썬은 안 쓰는 값을 알아서 치워 주지만, <b>목록 · 딕셔너리에 계속 넣기만 하면</b> 「아직 쓰는 값」 이라 못 치워요(예: 끝없이 커지는 캐시 · 기록).</p>
+<pre class="code">from collections import deque
+def rss_mb():
+    with open("/proc/self/status") as f:
+        for line in f:
+            if line.startswith("VmRSS:"):
+                return int(line.split()[1]) / 1024
+start = rss_mb()
+history = []
+for _ in range(5):
+    history.append(b"x" * (10 * 1024 * 1024))
+leak = rss_mb() - start
+history = None
+start = rss_mb()
+recent = deque(maxlen=2)
+for _ in range(5):
+    recent.append(b"x" * (10 * 1024 * 1024))
+kept = rss_mb() - start
+print("다 모으면 40MB 넘게 늘었나요?", leak &gt; 40)
+print("최근 2개만 두면 30MB 안쪽인가요?", kept &lt; 30)</pre>
+<p><code>deque(maxlen=2)</code> 는 3번째를 넣으면 가장 오래된 것을 스스로 버려요. 딕셔너리로 만든 캐시라면 딕셔너리가 넣은 순서를 기억하니까, 너무 커질 때 <code>next(iter(cache))</code>(가장 먼저 넣은 키)를 <code>del cache[key]</code> 로 지우면 같은 효과예요. 도는 프로그램이 새는지는 터미널에서 <code>watch -n 1 grep VmRSS /proc/PID/status</code> 로 1초마다 RSS 를 보면 알 수 있어요 — 일이 끝나도 숫자가 계속 오르기만 하면 의심해요.</p>` + OS_DATE,
+      example: { code: 'from collections import deque\ndef rss_mb():\n    with open("/proc/self/status") as f:\n        for line in f:\n            if line.startswith("VmRSS:"):\n                return int(line.split()[1]) / 1024\nstart = rss_mb()\nhistory = []\nfor _ in range(5):\n    history.append(b"x" * (10 * 1024 * 1024))\nleak = rss_mb() - start\nhistory = None\nstart = rss_mb()\nrecent = deque(maxlen=2)\nfor _ in range(5):\n    recent.append(b"x" * (10 * 1024 * 1024))\nkept = rss_mb() - start\nprint("다 모으면 40MB 넘게 늘었나요?", leak > 40)\nprint("최근 2개만 두면 30MB 안쪽인가요?", kept < 30)' } },
+  ],
+  summary: ['free -h 의 available 이 진짜 여유 · vmstat 1 의 si/so 가 계속이면 스래싱', 'RAM + 스왑이 바닥나면 OOM killer 가 oom_score 큰 프로세스를 SIGKILL(journalctl -k)', '누수 = 계속 넣기만 하는 목록·딕셔너리 → VmRSS 가 계속 오름 · deque(maxlen=) 로 크기 제한'] },
+
+{ id: 'KB3', ch: 3, boss: true, title: '보스: 페이지 교체 실험실', mode: 'text', pages: [], summary: [], tutorSummary: '챕터 3 종합. FIFO · LRU · OPT 를 함수로 만들어 교과서 참조 20개로 프레임 1~5 의 폴트 수 표를 찍고, 벨라디 예로 FIFO 의 이상을 확인. 브라우저 그림과 숫자가 같은지 비교.' },
 // ================= 챕터 4 시스템 콜과 파일 시스템 (다음 업데이트) =================
 { id: 'K14', ch: 4, n: 14, title: '시스템 콜: 커널에게 부탁하기', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '사용자 모드 → 커널 모드 · strace -e trace=write · strace -c · C 맛보기.' },
 { id: 'K15', ch: 4, n: 15, title: '파일 디스크립터와 버퍼', mode: 'text', draft: true, pages: [], summary: [], tutorSummary: '/proc/self/fd · 닫지 않으면 · 버퍼 · flush · os.fsync.' },

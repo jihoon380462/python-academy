@@ -195,3 +195,23 @@ Fig.kinds.deadlock = { defaultButtons: () => [{ label: '한 걸음', act: (st) =
     ['A', 'B'].forEach(L => { const holder = h1.includes(L) ? Fig.palette[0] : h2.includes(L) ? Fig.palette[1] : th.border; Fig.dot(ctx, lx, ly[L], 16, th.bg, holder); Fig.text(ctx, '락 ' + L, lx, ly[L], th.fg, 12, 'center', 'middle', true); });
     const dead = !same && st.k === 4; Fig.text(ctx, `${st.k} / 4 · ${same ? '같은 순서(A → B)' : '반대 순서(T1: A → B, T2: B → A)'}`, W / 2, 12, th.muted, 11, 'center'); const mc = dead ? th.danger : th.fg; const parts = W < 480 ? msg.split(' — ') : [msg]; parts.forEach((m, i) => Fig.text(ctx, m, W / 2, H - 14 - (parts.length - 1 - i) * 17, mc, W < 480 ? 12 : 13, 'center', 'middle', true)); /* 폰: 「 — 」 에서 두 줄로 */
     return '굵은 선 = 쥐고 있음 · 점선 = 기다림'; } };
+// 페이지 교체 표(v2.23.2): 위 = 참조 순서, 아래 = 프레임마다 든 페이지, 폴트 난 칸은 색칠. p:{algo(0 FIFO · 1 LRU · 2 OPT), frames, set(0 교과서 예 · 1 벨라디 예)}
+Fig.pageRefs = [[7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1], [1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5]];
+Fig.pageReplace = (ref, n, algo) => { const slots = Array(n).fill(null); const born = Array(n).fill(0), used = Array(n).fill(0); const steps = []; let faults = 0;
+  ref.forEach((pg, t) => { let k = slots.indexOf(pg); let fault = false;
+    if (k < 0) { fault = true; faults++; k = slots.indexOf(null);
+      if (k < 0) { if (algo === 0) k = born.indexOf(Math.min(...born)); else if (algo === 1) k = used.indexOf(Math.min(...used)); else { const next = slots.map(s => { const j = ref.indexOf(s, t + 1); return j < 0 ? Infinity : j; }); k = next.indexOf(Math.max(...next)); } }
+      slots[k] = pg; born[k] = t + 1; }
+    used[k] = t + 1; steps.push({ slots: [...slots], k, fault }); });
+  return { steps, faults }; };
+Fig.kinds.pagereplace = { draw(ctx, W, H, p, f, th) { const ref = Fig.pageRefs[Math.round(p.set || 0) ? 1 : 0]; const n = Math.max(1, Math.round(p.frames || 3)); const algo = Math.max(0, Math.min(2, Math.round(p.algo || 0))); const names = ['FIFO(먼저 들어온 것)', 'LRU(가장 오래 안 쓴 것)', 'OPT(가장 늦게 쓸 것 — 비교용)'];
+    const { steps, faults } = Fig.pageReplace(ref, n, algo); const all = [0, 1, 2].map(a => Fig.pageReplace(ref, n, a).faults);
+    const x0 = W < 480 ? 34 : 70, x1 = W - 8; const cw = (x1 - x0) / ref.length; const top = 30; const ch = Math.min(26, (H - top - 56) / (n + 1)); const fs = cw < 18 ? 10 : 12;
+    Fig.text(ctx, `${names[algo]} · 프레임 ${n}개 → 폴트 ${faults}번`, 8, 12, th.fg, W < 480 ? 11 : 13, 'left', 'middle', true);
+    Fig.text(ctx, '참조', x0 - 6, top + ch / 2, th.muted, 10, 'right');
+    ref.forEach((pg, t) => { const x = x0 + t * cw; Fig.text(ctx, String(pg), x + cw / 2, top + ch / 2, th.fg, fs, 'center', 'middle', true);
+      const s = steps[t]; for (let r = 0; r < n; r++) { const y = top + ch * (r + 1) + 4; const v = s.slots[r]; const hit = s.fault && r === s.k; ctx.fillStyle = hit ? Fig.palette[1] + 'cc' : th.surface2; ctx.fillRect(x + 1, y, cw - 2, ch - 2); if (v != null) Fig.text(ctx, String(v), x + cw / 2, y + (ch - 2) / 2, hit ? '#fff' : th.muted, fs, 'center', 'middle', hit); }
+      if (s.fault) Fig.text(ctx, 'F', x + cw / 2, top + ch * (n + 1) + 14, Fig.palette[1], 10, 'center', 'middle', true); });
+    for (let r = 0; r < n; r++) Fig.text(ctx, W < 480 ? `${r + 1}` : `프레임 ${r + 1}`, x0 - 6, top + ch * (r + 1) + 4 + (ch - 2) / 2, th.muted, 10, 'right');
+    Fig.text(ctx, `같은 프레임 수에서 — FIFO ${all[0]} · LRU ${all[1]} · OPT ${all[2]}`, 8, Math.min(H - 10, top + ch * (n + 1) + 38), th.fg, 12, 'left', 'middle', true);
+    return '빨간 칸 = 페이지 폴트(그 칸에 새로 들어옴) · F 줄 = 폴트 난 차례'; } };
