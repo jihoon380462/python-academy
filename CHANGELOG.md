@@ -7,6 +7,18 @@
 - 📝 문서만(화면 변화 없음 · 11/7 Opus): **N14 T9 리눅스 교과서 설계** `specs/linux-course.md` — 사용자 「T9 리눅스 먼저」. VirtualBox 7.2 + Ubuntu Desktop 26.04 LTS, 챕터 3(연습장 만들기 · 리눅스답게 쓰기 · 시스템 들여다보기) · 레슨 U0~U14 + 보스 UB1~UB3, 터미널·Git 교과서와 겹침 정리, 「먼저 꼭」 7개(가상화 · 🐢 Hyper-V · 메모리 6GB 최소 · 가상 디스크만 지움 · 스냅샷 · sudo · 포트 포워딩), 검사 방법(bash 자동 + ☐), 구현 전 질문 Q1~Q5 → 사용자 결정 11/7 모두 제안대로(TODO D13: 직접 설치 · 🐢 끄는 법+대가·되돌리기 · VM 8GB/CPU 4/40GB · Remote-SSH 넣음).
 - 📝 문서만(화면 변화 없음, 버전 그대로 v2.17.1 · 11/6 Opus): **`HANDOFF.md` 를 지금 기준으로 다시 씀**(상태판 · 작업 순서 9단계 · 사용자 선호 · 교과서 구조 · 문서 지도, 옛 판은 `docs/archive/HANDOFF-2026-11-06-old.md`). **`TODO.md` 예정 코스에 공용 5개**: T9 리눅스(VirtualBox + Ubuntu 26.04 LTS) · T1 CS(운영체제는 맛보기) · T2 운영체제(제대로, 우분투에서) · T10 어셈블리어(x86-64 · NASM · 우분투) · T11 LLM 기초(원리 + 아주 작은 모델) — T6 의 언어 모델 맛보기는 T11 로 합침. 0절 「지금 상태」 · N11~N14 · D10 갱신.
 
+## v2.28.1 — 2026-11-07 (Opus: HTTP·API·SDK 교과서 완성 — 챕터 4 SDK 만들기)
+
+- 📖 **HTTP·API·SDK 교과서 완성**(레슨 21 전부 — 남의 API 부르기 → 내 API 만들기 → **내 SDK 만들기**):
+  - 레슨 13 **SDK 란** — 같은 「내 저장소 목록」 을 requests 와 PyGithub 으로 나란히(SDK 가 숨긴 것 표), SDK 의 모양(클라이언트 · 자원별 메서드 · 결과 객체 · 예외 · 재시도), 공식 vs 커뮤니티 · 버전 고정 · 없으면 HTTP 로.
+  - 레슨 14 **내 SDK 1: 클래스로 감싸기** — `class TodoClient`(설정은 한 번 · `session` 을 받아 시험 가능하게) · `_request` 한 곳 · 메서드 하나 = 엔드포인트 하나 · 내 예외(`TodoNotFound` · `ValidationError` · `APIError`).
+  - 레슨 15 **내 SDK 2: 숨겨 주는 것들** — 재시도를 SDK 안에(멱등만 · `sleep` 을 받아 시험할 땐 기다리지 않게), `iter_all` 제너레이터(필요한 쪽만 요청), `@dataclass Todo` · 타입 힌트 · docstring.
+  - 레슨 16 **패키지로 묶기** — `todo_sdk/` 폴더 · `pyproject.toml` · `pip install -e .` · 버전(0.1.0 → 0.2.0 → 1.0.0) · README 빠른 시작, (선택 · 코드 읽기) LLM 회사의 공식 SDK 도 같은 모양 — 유료 키 경고.
+  - 만들어 보기 8문제 + **할 일 SDK 와 명령 줄 프로그램**(`todo add · list · done · rm`, `main(argv, client)`) — 서버 · SDK · 프로그램 세 겹이 다 내 것. SDK 문제는 FastAPI `TestClient` 를 `session` 으로 넣어 서버를 켜지 않고 실제 실행(503 두 번 뒤 성공 · POST 는 재시도 안 함 · 쪽 요청 수까지 출력으로 확인).
+  - 「먼저 꼭」 챕터 4 위: 파이썬 클래스 · 예외 레슨을 먼저.
+- 허브 카드 HTTP·API·SDK n/21.
+- 🛠 내부: CI check_book 단계에 `requests` 설치도(챕터 4 SDK 가 import). regress HTTP·API·SDK 절 완성 기준(열린 21 · 준비 중 0 · 「먼저 꼭」 넷 · 폰 390 18쪽 추가).
+
 ## v2.28.0 — 2026-11-07 (Opus: HTTP·API·SDK 교과서 챕터 3 — 내 API 만들기)
 
 - 📖 **HTTP·API·SDK 교과서 챕터 3 「내 API 만들기」 완성**(레슨 16/21) — 이제 대답하는 쪽에 서요(FastAPI):
