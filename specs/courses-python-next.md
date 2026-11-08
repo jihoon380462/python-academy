@@ -8,7 +8,7 @@
 | 코스 | id · 레슨 글자 | 레슨 | 허브 분류(v2.40.0) | 바깥 패키지(CI) |
 |---|---|---|---|---|
 | 데이터 파일 다루기: JSON · 엑셀 ✅ v2.41.0 | `files` · F / FB | 18 | 🛠 파이썬으로 만들기 | openpyxl |
-| 파이썬 업무 자동화 | `auto` · J / JB | 18 | 🛠 파이썬으로 만들기 | pypdf · python-docx · reportlab · cryptography |
+| 파이썬 업무 자동화 ✅ v2.42.0 | `auto` · J / JB | 18 | 🛠 파이썬으로 만들기 | pypdf · python-docx · reportlab · cryptography |
 | 웹 크롤링과 스크래핑 | `crawl` · Y / YB | 17 | 🛠 파이썬으로 만들기 | beautifulsoup4 |
 | pygame 으로 게임 만들기 | `game` · GM / GMB | 17 | 🛠 파이썬으로 만들기 | pygame-ce(고정 2.5.8) |
 | Flask 로 웹 서비스 만들기 | `flask` · Q / QB | 18 | 🌐 웹과 서비스(HTTP·API 다음) | flask |
@@ -134,7 +134,7 @@
   | 파이썬 L32 · L37 | 재귀 · `match` | F2 · F13 에서 쓰는 도구로만 |
   | 파이썬 X4 · B3 · X18 | 가계부 집계 · 보고서 | FB3 는 분석 논리가 아니라 **형식 사이 흐름**이 중심이에요(지저분한 엑셀 → 검사한 JSON → 엑셀 보고서 · CSV). 집계 부분은 X4 링크 |
   | 데이터 분석 P1 · P4 · P5 · P11 | pandas 읽기 · 묶기 · 합치기 · 피벗 | 이 코스는 pandas 를 쓰지 않아요. 같은 일이 나오는 쪽 끝에 한 줄로만 가리켜요: 「pandas 로도 돼요 — `pd.read_excel` · `df.to_excel` · `pd.json_normalize` · `pd.read_json(lines=True)` · `pivot_table`, 데이터 분석 교과서 P○」 |
-  | 업무 자동화 `auto` | (설계 중) | 엑셀은 이 코스만 다뤄요. `auto` 가 엑셀 · JSON 을 만지면 이 코스의 레슨 id 로 링크하기로 해요 |
+  | 업무 자동화 `auto` | ✅ v2.42.0 | 엑셀은 이 코스만 다뤄요. `auto` 가 엑셀 · JSON 을 만지면 이 코스의 레슨 id 로 링크하기로 해요 |
 
 - 다루지 않는 것(쪽 안에서 이름만): `.xls` 옛 형식 · 매크로(VBA, `.xlsm`) · 엑셀 프로그램을 직접 움직이는 `xlwings` · 비밀번호 걸린 파일 · Google Sheets API(인터넷) · YAML · XML.
 
