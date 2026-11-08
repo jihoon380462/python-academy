@@ -2316,7 +2316,7 @@ with tempfile.TemporaryDirectory() as tmp:
 { id: 'JB2', ch: 2, boss: true, title: '만들어 보기: 청구서 정리기', mode: 'text',
   tutorSummary: '만들어 보기: 청구서 정리기 — make_invoices 의 청구서 PDF 6개(스캔본 하나 · 암호 1234 하나)에서 read_invoice(PdfReader · decrypt · extract_text · 정규식)로 거래처 · 번호 · 청구일 · 금액을 뽑고(못 읽은 것은 까닭과 함께 따로, 암호는 input 으로 물어 다시), 청구일 순 모음 PDF(PdfWriter.append · 거래처 책갈피 add_outline_item · /Title), 보고서 틀(run 이 쪼개진 ${작성자})을 fill_docx 로 채운 워드 보고서(맑은 고딕 · 표 · 합계 · 못 읽은 파일), 다시 열어 assert 로 검사하는 check_outputs, csv(utf-8-sig) 까지 main(folder, out, today) 하나로', pages: [], summary: [] },
 { id: 'J8', ch: 3, n: 8, title: '템플릿으로 문서 대량 만들기', mode: 'text',
-  tutorSummary: "string.Template 으로 틀 하나 × 명단 → 사람마다 문서. 자리 $name · ${name}, 진짜 $ 는 $$, substitute(값들)는 빠지면 KeyError · safe_substitute 는 빠진 자리를 그대로 남김(사람에게 줄 글은 substitute). 한글 자리 이름은 기본으로 안 됨: 기본 idpattern 이 (?a:[_a-z][_a-z0-9]*) 라 $이름 → ValueError: Invalid placeholder in string: line 1, col 1. class KTemplate(Template): idpattern = r\"[^\\W\\d]\\w*\" 로 자식 클래스(클래스 속성, 만든 뒤 Template.idpattern = … 은 안 먹음). 한글은 뒤 말까지 이름: $이름님 → KeyError: '이름님', 영문 $name님 도 KTemplate 에선 name님 → 늘 ${이름}님. t.get_identifiers() 로 틀이 바라는 자리, t.is_valid(). f-string 은 파일 속 틀에 못 쓰고, str.format 은 {m.__dict__} 처럼 속성까지 꺼내고 CSS 중괄호에 깨짐. 명단 csv(DictReader, utf-8-sig) → 전부 검사(check: 비어 있는 칸을 모두 모아 알리고 하나도 안 만듦) → 만들기. 값 서식은 넣기 전에(f\"{n:,}\", date.fromisoformat), 파일 이름은 re.sub 로 안전하게(J1), HTML 틀은 값마다 html.escape, 워드 틀은 p.text 를 합쳐 채우고 첫 run 에 넣고 나머지 run 비우기(J7, 서식은 첫 run 을 따라감).",
+  tutorSummary: "string.Template 으로 틀 하나 × 명단 → 사람마다 문서. 자리 $name · ${name}, 진짜 $ 는 $$, substitute(값들)는 빠지면 KeyError · safe_substitute 는 빠진 자리를 그대로 남김(사람에게 줄 글은 substitute). 한글 자리 이름은 기본으로 안 됨: 기본 idpattern 이 (?a:[_a-z][_a-z0-9]*) 라 $이름 → ValueError: Invalid placeholder in string: line 1, col 1. class KTemplate(Template): idpattern = r\"[^\\W\\d]\\w*\" 로 자식 클래스(클래스 속성, 만든 뒤 Template.idpattern = … 은 안 먹음). 한글은 뒤 말까지 이름: $이름님 → KeyError: '이름님', 영문 $name님 도 KTemplate 에선 name님 → 늘 ${이름}님. t.get_identifiers() 로 틀이 바라는 자리, t.is_valid(). f-string 은 파일 속 틀에 못 쓰고, str.format 은 {m.__dict__} 처럼 속성까지 꺼내고 CSS 중괄호에 깨짐. 명단 csv(DictReader, utf-8-sig) → 전부 검사(check: 비어 있는 칸을 모두 모아 알리고 하나도 안 만듦) → 만들기. 값 서식은 넣기 전에(f\"{n:,}\", date.fromisoformat), 파일 이름은 re.sub 로 안전하게(J1), HTML 틀은 값마다 html.escape, 워드 틀은 J7 의 fill_docx(doc, values) 그대로(끊긴 자리만 이어 붙여 굵게 유지, 못 채운 자리가 남으면 저장 안 함).",
   terms: { "틀": "바꿀 자리만 비워 둔 글. 같은 모양의 글을 사람마다 만들 때 써요(템플릿)", "자리 이름": "틀 안의 $이름 · ${이름} 처럼 값이 들어갈 곳에 붙인 이름(placeholder)" },
   pages: [
     { title: "Template(\"${name}님\").substitute(…)", html: `<p>안내문 · 영수증 · 수료증처럼 <b>모양은 같고 이름 · 금액만 다른 글</b>은 [[틀]] 하나와 명단으로 한꺼번에 만들어요. 파이썬 표준의 <code>string.Template</code> 이 이 일을 해요. 틀 안의 <code>$name</code> · <code>\${name}</code> 이 값이 들어갈 [[자리 이름]]이에요.</p>
@@ -2421,7 +2421,7 @@ print(KTemplate("$m.__dict__ 님").safe_substitute(m="김하늘"))` } },
 <ol><li><b>전부 읽기</b> — <code>list(csv.DictReader(f))</code></li><li><b>전부 검사</b> — 문제를 하나도 빠짐없이 모아서 한 번에 알려요</li><li><b>문제가 없을 때만 만들기</b></li><li><b>다시 열어 확인</b></li></ol>
 <p>만들면서 검사하면, 넷째 사람에서 멈췄을 때 세 개만 만들어진 반쪽 결과가 남아요. 고쳐서 다시 돌리면 어느 게 새 것인지 헷갈리고, 메일이라면([[레슨:J10]]) 앞사람들에게 두 번 가요. 검사는 틀이 바라는 자리(<code>get_identifiers()</code>)마다 그 칸이 비었는지 봐요. 명단의 박서준은 이메일 칸이 비어 있어요.</p>
 <p><b>값 서식은 틀에 넣기 전에.</b> 틀은 글자를 끼워 넣기만 해요. <code>180000</code> → <code>180,000</code> 은 <code>f"{n:,}"</code>(복습: <a href="../python/#lesson/L9C" target="_blank" rel="noopener">파이썬 교과서 「서식 출력: 칸 맞추기 · 소수 · 쉼표」 ↗</a>), <code>"2026-10-31"</code> → 「2026년 10월 31일」 은 <code>date.fromisoformat</code>(복습: <a href="../python/#lesson/L19" target="_blank" rel="noopener">파이썬 교과서 「날짜 2: 글자 ↔ 날짜 · 비교」 ↗</a>)으로 바꿔서 넘겨요. 예제처럼 <code>prepare(row)</code> 함수로 떼고, <code>dict(row)</code> 로 복사해서 원래 줄은 그대로 둬요.</p>
-<p><b>파일 이름은 안전하게.</b> 수업 이름의 빈칸이나 이름에 섞일 수 있는 <code>/</code> · <code>:</code> 는 Windows 파일 이름에 못 쓰거나 불편해요. [[레슨:J1]] 처럼 <code>re.sub</code> 로 <code>_</code> 로 바꿔요. 예제에 <code>safe_name</code> 을 다시 적어 뒀어요.</p>
+<p><b>파일 이름은 안전하게.</b> 수업 이름의 빈칸이나 이름에 섞일 수 있는 <code>/</code> · <code>:</code> 는 Windows 파일 이름에 못 쓰거나 불편해요. [[레슨:J1]] 의 <code>safe_name</code> 을 그대로 가져와 <code>_</code> 로 바꿔요.</p>
 <p>명단이 엑셀 파일이면 읽는 부분만 바꿔요 — <a href="../files/#lesson/F7" target="_blank" rel="noopener">데이터 파일 다루기 교과서 「엑셀 읽기: 통합 문서 · 시트 · 셀」 ↗</a>. 그다음 순서는 같아요.</p>`,
       example: { code: `import csv
 import re
@@ -2444,9 +2444,10 @@ FORM = """\${이름}님, 안녕하세요. 햇살 공방이에요.
 """
 
 
-def safe_name(s):
-    """Windows 파일 이름에 못 쓰는 글자 9개와 빈칸을 _ 로"""
-    return re.sub(r'[<>:"/\\\\|?*\\s]', "_", s)
+def safe_name(text):
+    """Windows 가 못 쓰는 글자 9개와 빈칸 → _ (J1 그대로)"""
+    text = re.sub(r'[<>:"/\\\\|?*\\s]+', "_", text)
+    return text.strip("_")
 
 
 def check(rows, t):
@@ -2498,14 +2499,16 @@ with tempfile.TemporaryDirectory() as tmp:
     names = sorted(p.name for p in out.iterdir())
     print(names[:3])
     print((out / names[0]).read_text(encoding="utf-8"))`, prep: [SAMPLES_PREP] } },
-    { title: "HTML 틀은 html.escape · 워드 틀은 run 합치기", html: `<p><b>HTML 틀</b>(메일 본문 [[레슨:J9]] · 웹 페이지)에 값을 그대로 넣으면, 값 속의 <code>&lt;</code> · <code>&amp;</code> 가 태그로 읽혀서 글이 깨지거나 남이 넣은 태그가 실행돼요. 값마다 <code>html.escape</code> 를 거쳐서 넣어요(복습: <a href="../python/#lesson/X17" target="_blank" rel="noopener">파이썬 교과서 「실전 17: 내 웹 페이지」 ↗</a>). 틀 자체는 escape 하지 않아요. 틀의 태그는 진짜 태그니까요.</p>
+    { title: "HTML 틀은 html.escape · 워드 틀은 fill_docx", html: `<p><b>HTML 틀</b>(메일 본문 [[레슨:J9]] · 웹 페이지)에 값을 그대로 넣으면, 값 속의 <code>&lt;</code> · <code>&amp;</code> 가 태그로 읽혀서 글이 깨지거나 남이 넣은 태그가 실행돼요. 값마다 <code>html.escape</code> 를 거쳐서 넣어요(복습: <a href="../python/#lesson/X17" target="_blank" rel="noopener">파이썬 교과서 「실전 17: 내 웹 페이지」 ↗</a>). 틀 자체는 escape 하지 않아요. 틀의 태그는 진짜 태그니까요.</p>
 <pre>safe = {}
 for k, v in row.items():
     safe[k] = html.escape(v)    # 값만, 하나씩
 print(KTemplate(FORM).substitute(safe))</pre>
-<p><b>워드 틀</b>은 [[레슨:J7]] 에서 본 run 쪼개짐이 함정이에요. <code>make_template_docx</code> 의 <code>\${이름}</code> 은 <code>\${</code> + <code>이름}</code> 두 run 이라서 run 마다 바꾸면 자리를 못 찾아요. 문단 글자 <code>p.text</code> 를 합쳐 <code>KTemplate</code> 로 채운 뒤 첫 run 에 넣고, 나머지 run 은 비워요. 틀 파일은 그대로 두고 새 이름으로 저장해요.</p>
-<p>이 짧은 판은 문단 글자가 모두 첫 run 의 서식을 따라가요. 그래서 굵게였던 <code>\${수업}</code> 도 보통 글씨가 돼요. 만든 파일을 Word 로 열어 직접 보고, 서식을 살리는 법은 [[레슨:J7]] 을 다시 보세요.</p>`,
+<p><b>워드 틀</b>은 복습: [[레슨:J7]] 의 <code>fill_docx(doc, values)</code> 를 그대로 써요. Word 가 <code>\${이름}</code> 을 <code>\${</code> + <code>이름}</code> 두 run 으로 쪼개 두어도 <b>끊긴 자리만</b> 이어 붙여 바꾸니, 굵게였던 <code>\${수업}</code> 은 굵게 그대로 남아요. 이 레슨에서 더할 것은 둘이에요.</p>
+<ul><li>틀이 바라는 자리는 <code>KTemplate(p.text).get_identifiers()</code> 로 미리 보고, 명단의 칸과 맞춰 봐요(앞 쪽의 검사)</li><li><code>fill_docx</code> 가 돌려준 「못 채운 자리」 가 비어 있지 않으면 저장하지 않아요. <code>substitute</code> 의 <code>KeyError</code> 와 같은 몫이에요</li></ul>
+<p>사람마다 <code>Document(틀)</code> 로 새로 열고, 틀 파일은 그대로 두고 새 이름으로 저장해요([[레슨:J7]]).</p>`,
       example: { code: `import html
+import re
 import tempfile
 from pathlib import Path
 from string import Template
@@ -2529,29 +2532,66 @@ for k, v in row.items():
 print(KTemplate(FORM).substitute(safe))
 
 
-# ② 워드 틀 — 문단 글자를 합쳐 바꾼 뒤 첫 run 에 넣고 나머지 run 은 비우기
+# ② 워드 틀 — J7 의 fill_docx 그대로(끊긴 자리만 이어 붙여 바꾸기)
+def all_paragraphs(doc):
+    """본문 · 표 칸 · 머리글 · 바닥글의 문단을 모두 모아 돌려줘요."""
+    ps = list(doc.paragraphs)
+    for t in doc.tables:
+        for row in t.rows:
+            for cell in row.cells:
+                ps.extend(cell.paragraphs)
+    for s in doc.sections:
+        ps.extend(s.header.paragraphs)
+        ps.extend(s.footer.paragraphs)
+    return ps
+
+
+def is_open(s):
+    """\${ 를 열고 아직 } 로 안 닫았으면 True (끝이 $ 하나여도 열린 것으로)"""
+    if s.endswith("$"):
+        return True
+    return "\${" in s and "}" not in s.split("\${")[-1]
+
+
 def fill_paragraph(p, values):
-    if "$" not in p.text:
-        return
-    new = KTemplate(p.text).substitute(values)
-    p.runs[0].text = new
-    for r in p.runs[1:]:
-        r.text = ""
+    runs = p.runs
+    for i, r in enumerate(runs):
+        j = i + 1
+        while is_open(r.text) and j < len(runs):
+            r.text = r.text + runs[j].text    # 다음 run 글자를 끌어와 잇고
+            runs[j].text = ""                 # 끌어온 run 은 비워요
+            j += 1
+        for key, value in values.items():
+            r.text = r.text.replace("\${" + key + "}", str(value))
+
+
+def fill_docx(doc, values):
+    """doc 의 \${이름} 자리를 values 로 채우고, 못 채운 자리 이름 리스트를 돌려줘요."""
+    left = []
+    for p in all_paragraphs(doc):
+        fill_paragraph(p, values)
+        for name in re.findall(r"\\$\\{(.+?)\\}", p.text):
+            if name not in left:
+                left.append(name)
+    return left
 
 
 with tempfile.TemporaryDirectory() as tmp:
     base = Path(tmp)
     form = make_template_docx(base / "수료증_틀.docx")
     doc = Document(form)
-    print(KTemplate(doc.paragraphs[1].text).get_identifiers())
+    print(KTemplate(doc.paragraphs[1].text).get_identifiers())   # 틀이 바라는 자리
 
     values = {"이름": "김하늘", "수업": "가죽 공예", "수료일": "2026년 10월 31일"}
-    for p in doc.paragraphs:
-        fill_paragraph(p, values)
-    doc.save(base / "수료증_김하늘.docx")       # 틀은 그대로, 새 이름으로
+    left = fill_docx(doc, values)
+    print("못 채운 자리:", left)
+    if not left:
+        doc.save(base / "수료증_김하늘.docx")   # 틀은 그대로, 새 이름으로
 
-    for p in Document(base / "수료증_김하늘.docx").paragraphs:
+    out = Document(base / "수료증_김하늘.docx")
+    for p in out.paragraphs:
         print(p.style.name, "|", p.text)
+    print("굵은 run:", [r.text for r in out.paragraphs[1].runs if r.bold])
     print("틀은 그대로:", Document(form).paragraphs[2].text)`, prep: [SAMPLES_PREP] } },
   ],
   summary: ["string.Template 의 ${이름} 자리를 substitute(딕셔너리)로 채워요 — 빠진 값은 KeyError 로 알아채고, 진짜 $ 는 $$", "한글 자리 이름은 class KTemplate(Template): idpattern = r\"[^\\W\\d]\\w*\" 로 — 뒤에 붙는 말까지 이름이 되니 늘 ${이름}님 처럼 중괄호", "명단 × 틀은 먼저 전부 검사(get_identifiers 의 칸이 비었는지)하고 그다음 만들어요 — 값 서식 · 파일 이름 · html.escape 는 넣기 전에"] },
@@ -2617,7 +2657,7 @@ plain = msg.get_body(preferencelist=("plain",))
 body = plain.get_content()
 print(repr(body))
 print(msg.get_body().get_content_type())    # 고르지 않으면 html 먼저` } },
-    { title: "add_attachment(data, …, filename=…)", html: `<p>PDF · 그림 · 워드 파일은 글자 파일이 아니라서 [[바이트]](<code>bytes</code>)로 다뤄요. <code>p.read_bytes()</code> 는 파일 전체를 바이트로 읽고, <code>p.write_bytes(data)</code> 는 바이트를 파일로 써요. <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리: pathlib · shutil」 ↗</a> 의 <code>read_text</code> · <code>write_text</code> 의 바이트 판이에요. 바이트 값은 <code>b'%PDF-'</code> 처럼 앞에 <code>b</code> 가 붙어 찍혀요.</p>
+    { title: "add_attachment(data, …, filename=…)", html: `<p>PDF · 그림 · 워드 파일은 글자 파일이 아니라서 [[바이트]](<code>bytes</code>)로 다뤄요. 복습: [[레슨:J2]] 첫 쪽에서 본 <code>p.read_bytes()</code> · <code>p.write_bytes(data)</code> 로 파일을 통째로 바이트로 읽고 써요. 바이트 값은 <code>b'%PDF-'</code> 처럼 앞에 <code>b</code> 가 붙어 찍혀요.</p>
 <pre>msg.add_attachment(data, maintype="application", subtype="pdf", filename="수료증_김하늘.pdf")</pre>
 <p><code>maintype</code> · <code>subtype</code> 은 MIME 종류 <code>application/pdf</code> 를 <code>/</code> 로 나눈 두 조각이에요. <code>filename</code> 은 받는 사람에게 보일 첨부 이름이고, 한글 그대로 돼요.</p>
 <p>확장자로 종류를 알려 주는 표준 <code>mimetypes.guess_type("a.pdf")</code> 도 있어요. 그런데 Windows 에서는 PC 에 깔린 프로그램(레지스트리)에 따라 답이 달라요(<code>.hwp</code> · <code>.csv</code> 같은 것). 자동화 프로그램은 어느 PC 에서나 같게 돌아야 하니, <b>내 표</b>를 두고 표에 없으면 <code>application/octet-stream</code>(「그냥 바이트」)으로 붙여요.</p>
@@ -2667,7 +2707,7 @@ with tempfile.TemporaryDirectory() as tmp:
     { title: ".eml 로 저장 → BytesParser 로 다시 읽기", html: `<p>보내기 전에 메일을 파일로 저장해 두면 메일 앱으로 열어 눈으로 볼 수 있어요. <code>msg.as_bytes()</code> 가 메일 원문 바이트예요. <code>write_bytes</code> 로 <code>.eml</code> 파일에 쓰면, Outlook · Thunderbird · Windows 메일 같은 앱에서 두 번 눌러 열려요.</p>
 <p>다시 읽을 때는 <code>BytesParser(policy=policy.default).parse(f)</code> 예요. 파일은 바이트로 열어요 — <code>open(path, "rb")</code> 의 <code>b</code> 가 바이트예요.</p>
 <div class="bk-warn"><b>policy=policy.default 를 꼭</b> — 빼면 옛 방식(compat32)으로 읽어서 제목이 <code>=?utf-8?b?…?=</code> 그대로고, <code>get_body</code> · <code>iter_attachments</code> 가 없어요.</div>
-<p>예제는 메일 만들기를 함수 <code>make_message(sender, to, subject, body, attachments=(), html=None)</code> 하나로 묶었어요. [[레슨:J10]] 의 보내기와 [[레슨:JB3]] 의 발송기가 이 함수를 그대로 다시 써요.</p>
+<p>예제는 메일 만들기를 함수 <code>make_message(sender, to, subject, body, attachments=(), html=None)</code> 하나로 묶었어요. 보내기([[레슨:J10]]) · 발송기([[레슨:JB3]])에서도 메일은 이렇게 함수 하나로 만들어요. 거기서는 그때 필요한 모양만 남긴 <code>make_mail</code> 로 짧게 다시 적어요.</p>
 <div class="bk-warn"><b>원문(as_string)을 그대로 비교하지 마세요</b> — 제목이 <code>=?utf-8?b?…?=</code> 로 바뀌어 있고, 본문과 첨부 사이 경계 글자(<code>boundary</code>)가 만들 때마다 무작위예요. 내용이 같은 메일 두 통도 원문은 달라요. 확인은 늘 <b>다시 읽어서</b> 받는 사람 · 제목 · 본문 · 첨부 이름 · 첨부 바이트 <code>==</code> 로 해요. <code>Date</code> · <code>Message-ID</code> 머리글도 넣지 않았어요. 보낼 때 메일 서버가 붙여 주는 경우가 많아요.</div>`,
       example: { code: `import tempfile
 from email import policy
@@ -2818,7 +2858,8 @@ print("보냈어요")</pre>
 <ol><li><b>SMTP 켜기</b>: 네이버 메일(mail.naver.com) 왼쪽 아래 「환경설정」 → 위쪽 「POP3/IMAP 설정」 → 「IMAP/SMTP 설정」 탭 → 「IMAP/SMTP 사용」 칸을 「사용함」 → 맨 아래 「저장」. 같은 화면 아래에 SMTP 서버 <code>smtp.naver.com</code> 과 포트 <code>465</code> 가 적혀 있어요</li><li><b>앱 비밀번호</b>: 네이버 첫 화면의 내 이름 → 「네이버 내정보」 → 「보안설정」 → 「2단계 인증」 의 「관리」 → 아래쪽 「애플리케이션 비밀번호 관리」 → 종류 칸에서 「직접 입력」, 이름 칸에 <code>파이썬</code> → 「생성하기」 → 나온 비밀번호를 복사해요</li><li>2단계 인증을 안 켰다면 네이버 로그인 비밀번호로도 들어가져요. 하지만 그러면 진짜 비밀번호가 프로그램에 들어가니, 2단계 인증 + 앱 비밀번호를 권해요</li><li>login 아이디는 네이버 아이디(<code>@naver.com</code> 앞부분)예요</li></ol>
 <p>메뉴 이름과 자리는 서비스가 화면을 고치면서 바뀔 수 있어요(2026년 11월 기준). 안 보이면 계정 설정 화면의 검색 칸에 「앱 비밀번호」 · 「SMTP」 를 쳐 보세요.</p>
 <p>설정이 틀리면 트레이스백 마지막 줄이 이렇게 나와요.</p>
-<table class="kb"><tbody><tr><th>마지막 줄</th><th>까닭 · 고칠 곳</th></tr><tr><td><code>smtplib.SMTPAuthenticationError: (535, …)</code></td><td>아이디 · 앱 비밀번호가 틀림, 2단계 인증이나 네이버 「IMAP/SMTP 사용」 이 꺼짐</td></tr><tr><td><code>socket.gaierror: [Errno 11001] getaddrinfo failed</code></td><td>서버 이름 철자(<code>smtp.gmial.com</code>) · 인터넷 연결</td></tr><tr><td><code>ssl.SSLError: [SSL: WRONG_VERSION_NUMBER] …</code></td><td>587 에 <code>SMTP_SSL</code> 을 씀 — 465 로 바꾸거나 <code>SMTP</code> + <code>starttls()</code></td></tr><tr><td><code>TimeoutError: timed out</code></td><td>회사 · 학교 · 카페 네트워크가 465 · 587 을 막음, 또는 465 에 <code>SMTP</code> 를 씀</td></tr></tbody></table>` },
+<table class="kb"><tbody><tr><th>마지막 줄</th><th>까닭 · 고칠 곳</th></tr><tr><td><code>smtplib.SMTPAuthenticationError: (535, …)</code></td><td>아이디 · 앱 비밀번호가 틀림, 2단계 인증이나 네이버 「IMAP/SMTP 사용」 이 꺼짐</td></tr><tr><td><code>socket.gaierror: [Errno 11001] getaddrinfo failed</code></td><td>서버 이름 철자(<code>smtp.gmial.com</code>) · 인터넷 연결</td></tr><tr><td><code>ssl.SSLError: [SSL: WRONG_VERSION_NUMBER] …</code></td><td>587 에 <code>SMTP_SSL</code> 을 씀 — 465 로 바꾸거나 <code>SMTP</code> + <code>starttls()</code></td></tr><tr><td><code>TimeoutError: timed out</code></td><td>회사 · 학교 · 카페 네트워크가 465 · 587 을 막음, 또는 465 에 <code>SMTP</code> 를 씀</td></tr></tbody></table>
+<p><code>socket.gaierror</code> · <code>ssl.SSLError</code> 는 표준 모듈 <code>socket</code> · <code>ssl</code> 에 있는 에러예요. 코드에서 이 이름으로 잡거나 시험용으로 만들려면 <code>import socket</code> · <code>import ssl</code> 을 해요. <code>TimeoutError</code> 는 따로 부를 것 없이 늘 있어요.</p>` },
     { title: "os.environ.get(…) · getpass() 비밀번호", html: `<p>앱 비밀번호도 비밀번호예요. <b>코드에 적지 않아요</b>. .py 파일은 남에게 보내고 GitHub 에 올리는 파일이니까요(복습: <a href="../python/#lesson/L28" target="_blank" rel="noopener">파이썬 교과서 「환경 변수와 다른 프로그램: os · subprocess」 ↗</a>). 코드 밖에서 받는 길이 둘이에요.</p>
 <table class="kb"><tbody><tr><th>방법</th><th>코드</th><th>언제</th></tr><tr><td>환경 변수</td><td><code>os.environ.get("MAIL_PASSWORD")</code></td><td>터미널에서 <code>$env:MAIL_PASSWORD="…"</code> 로 정해 두고 여러 번 돌릴 때. 그 터미널 창에서만 살아요</td></tr><tr><td>물어보기</td><td><code>getpass("앱 비밀번호: ")</code></td><td>그때그때 쳐 넣을 때. <code>input()</code> 처럼 받지만 <b>치는 글자가 화면에 안 보여요</b></td></tr></tbody></table>
 <pre>from getpass import getpass
@@ -3023,7 +3064,7 @@ with tempfile.TemporaryDirectory() as tmp:
   ],
   summary: ["진짜 발송은 smtplib.SMTP_SSL(host, 465) 또는 SMTP(host, 587) + starttls() 에 login(아이디, 앱 비밀번호) → send_message(msg) — Gmail 은 2단계 인증 뒤 앱 비밀번호, 네이버는 환경설정에서 IMAP/SMTP 사용함","비밀번호는 코드 밖에 — os.environ.get(\"MAIL_PASSWORD\") 로 읽고 없으면 getpass() 로 물어보며, 찍지도 올리지도 않아요","보내는 함수는 서버를 인자로 받아 가짜 서버로 시험하고, 여러 명은 한 통씩 · sleep · 실패는 적고 계속 · 보낸 다음 sent.csv 에 적어 두 번 안 보내요"] },
 { id: 'JB3', ch: 3, boss: true, title: '만들어 보기: 수료증 · 안내 메일 발송기', mode: 'text',
-  tutorSummary: "만들어 보기: ROSTER_CSV 명단 → ① 명단 검사(빈 이메일 · 모양 · 겹침, 먼저 알리고 건너뛰기 또는 strict 면 멈춤) ② 사람마다 수료증 워드(틀의 쪼개진 ${이름} run 만 이어 붙여 KTemplate 로 채우기 — 굵게 유지, 남은 ${…} 검사) + reportlab PDF 판 ③ 사람마다 EmailMessage(본문 · 제목은 KTemplate, 수료증 PDF 첨부) ④ 미리 보기: outbox/ 에 .eml, 다시 읽어 받는 사람 · 첨부 이름 · 첨부 바이트 비교 ⑤ --send 는 서버를 인자로 받아 FakeSMTP 로 보내고 sent.csv 기록, 다시 돌리면 이미 보낸 사람 건너뜀, 실패 있으면 끝 코드 1 ⑥ 진짜 SMTP 로 --send --to-me 나에게 한 통(☐).", pages: [], summary: [] },
+  tutorSummary: "만들어 보기: ROSTER_CSV 명단 → ① 명단 검사(빈 이메일 · 모양 · 겹침, 먼저 알리고 건너뛰기 또는 strict 면 멈춤) ② 사람마다 수료증 워드(J7 의 fill_docx 그대로 — 쪼개진 ${이름} run 만 이어 붙여 채우기, 굵게 유지, 못 채운 자리 이름을 돌려받아 검사) + reportlab PDF 판 ③ 사람마다 EmailMessage(본문 · 제목은 KTemplate, 수료증 PDF 첨부) ④ 미리 보기: outbox/ 에 .eml, 다시 읽어 받는 사람 · 첨부 이름 · 첨부 바이트 비교 ⑤ --send 는 서버를 인자로 받아 FakeSMTP 로 보내고 sent.csv 기록, 다시 돌리면 이미 보낸 사람 건너뜀, 실패 있으면 끝 코드 1 ⑥ 진짜 SMTP 로 --send --to-me 나에게 한 통(☐).", pages: [], summary: [] },
 { id: 'J11', ch: 4, n: 11, title: '맛보기: 클립보드 · 키보드 · 마우스', mode: 'text',
   tutorSummary: '화면 자동화 맛보기. 먼저 파일 · API 길(엑셀은 files 코스 openpyxl, 웹은 api 코스 requests, 메일 J10, PDF · 워드 J5 · J6)을 찾고, 화면 자동화(클립보드 · 키보드 · 마우스)는 그 길이 없는 옛 프로그램에만 — 해상도 · 배율 · 창 위치 · 알림 창 · 한글 입력기 · 느린 PC 에 따라 깨지니 짧게, 사람이 지켜볼 때만, 예약 스크립트(J12)에는 넣지 않는다. pyperclip · pyautogui 는 이 레슨에서만 쓰는 선택 설치(python -m pip install pyperclip pyautogui), 화면 있는 PC 에서만 돈다. 클립보드: 표준 tkinter 는 root = tk.Tk(); root.withdraw(); root.clipboard_get()(비었거나 그림이면 tk.TclError) · clipboard_clear() + clipboard_append(text) + root.update() 뒤 destroy, pyperclip 은 paste() · copy(text). 프로그램 모양은 읽기 → 정리 함수(글자 → 글자, 따로 시험) → 쓰기. 엑셀 · 웹 표를 복사한 글자는 칸 사이 \\t · 줄 끝 \\r\\n · 숫자는 보이는 모양 그대로 글자("125,000") · 따옴표/줄바꿈 든 칸은 "…" 로 감쌈 → text.splitlines()(\\r\\n · \\n 다 줄 끝, 끝에 빈 줄 안 만듦) → csv.reader(lines, delimiter="\\t")(감싼 칸도 풂, split("\\t") 은 따옴표가 남음), 칸은 strip, "".join(cells) 가 빈 글자인 줄은 버림, csv.writer(f).writerows(rows) 로 utf-8-sig · newline="" 저장. 칸 안 줄바꿈(Alt+Enter)은 splitlines 가 끊어서 줄바꿈이 빠짐 → 그런 표는 엑셀에서 csv 로 저장. 전화번호: d = re.sub(r"\\D", "", s)(\\D = 숫자가 아닌 글자) → 82 로 시작하면 "0" + d[2:] → 02 로 시작하고 9 · 10자리면 d[:2]-d[2:-4]-d[-4:], 0 으로 시작하고 10 · 11자리면 d[:3]-d[3:-4]-d[-4:], 그 밖은 None(억지로 맞추지 말고 사람이 보게), int 로 바꾸면 앞 0 이 사라짐. pyautogui: FAILSAFE = True(기본, 마우스를 화면 모서리로 → 다음 동작에서 FailSafeException) · PAUSE = 0.5 · size() · position() · moveTo(x, y, duration=) · click() · write("abc")(한글 ✗) · press("enter") · hotkey("ctrl", "v") — 한글은 pyperclip.copy 후 붙여 넣기. 결과 열어 주기: webbrowser.open(주소) · os.startfile(경로)(Windows 만, Mac open · 리눅스 xdg-open 은 subprocess). 브라우저 자동화 Playwright · Selenium 은 이름만.',
   terms: { '화면 자동화': '사람 대신 프로그램이 마우스를 움직이고 키를 눌러 다른 프로그램을 다루게 하는 것. 파일 · API 길이 없을 때 쓰는 마지막 수단이에요', '클립보드': 'Ctrl+C 로 복사한 것이 잠깐 머무는 곳. Ctrl+V 로 붙여 넣어요. 모든 프로그램이 같이 써요' },
@@ -3081,7 +3122,7 @@ pyperclip.copy(new_text)</pre>
 <pre>"거래처\\t청구 번호\\t합계 금액\\r\\n햇살문구\\tINV-2026-1001\\t125,000\\r\\n"</pre>
 <ul><li>칸 사이는 탭 <code>\\t</code>, 줄 끝은 <code>\\r\\n</code>(Windows), 마지막 줄 뒤에도 줄바꿈이 붙어요</li><li>숫자 · 날짜는 <b>화면에 보이는 모양 그대로의 글자</b>예요 — <code>"125,000"</code> · <code>"2026-10-05"</code>. 계산하려면 <code>int(s.replace(",", ""))</code></li><li>칸 안에 따옴표 · 줄바꿈이 있으면 그 칸은 <code>"…"</code> 로 감싸여요</li></ul>
 <p>먼저 <code>text.splitlines()</code> 로 줄마다 나눠요. <code>split("\\n")</code> 과 달리 <code>\\r\\n</code> · <code>\\n</code> 을 다 줄 끝으로 보고, 맨 끝 줄바꿈 뒤에 빈 줄을 하나 더 만들지 않아요. 나눈 줄 리스트는 복습: <a href="../python/#lesson/L29" target="_blank" rel="noopener">파이썬 교과서 「csv 모듈 제대로」 ↗</a> 의 <code>csv.reader(f, delimiter="\\t")</code> 에 파일 대신 그대로 넣어요. <code>csv.reader</code> 는 줄 리스트도 받고, <code>"…"</code> 로 감싼 칸도 풀어 줘요.</p>
-<ul><li>빈 줄 · 탭만 있는 줄도 따라와요. 칸을 다 이어 붙인 <code>"".join(cells)</code> 가 빈 글자면 버려요</li><li>복사하다 칸 앞뒤에 빈칸이 붙기 쉬워요. <code>c.strip()</code></li><li>정리한 줄은 <code>csv.writer(f).writerows(rows)</code> 로 저장해요. 엑셀에서 열 파일이니 <code>encoding="utf-8-sig"</code> · <code>newline=""</code>(L29)</li></ul>
+<ul><li>빈 줄 · 탭만 있는 줄도 따라와요. 칸을 다 이어 붙인 <code>"".join(cells)</code> 가 빈 글자면 버려요</li><li>복사하다 칸 앞뒤에 빈칸이 붙기 쉬워요. <code>c.strip()</code></li><li>정리한 줄은 <code>csv.writer(f).writerows(rows)</code> 로 저장해요. 엑셀에서 열 파일이니 <code>encoding="utf-8-sig"</code> · <code>newline=""</code>(같은 「csv 모듈 제대로」)</li></ul>
 <div class="bk-warn"><b>split("\\t") 만으로는 모자라요</b> — 감싼 칸 <code>"주차 가능, 2층"</code> 의 따옴표가 그대로 남아요. 또 엑셀 칸 안의 줄바꿈(Alt+Enter)은 <code>splitlines()</code> 가 먼저 끊어 버려서, 칸은 하나로 다시 붙지만 줄바꿈이 빠져요(<code>"두 줄메모"</code>). 그런 칸이 많은 표는 엑셀에서 csv 로 저장해 파일로 읽는 게 나아요.</div>`,
       example: { code: `import csv
 import tempfile
@@ -3276,7 +3317,7 @@ def load_config(path):
         return tomllib.loads(text)
     except tomllib.TOMLDecodeError as e:
         raise ConfigError(f"{path.name} 의 글이 틀렸어요: {e}")</pre>
-<ul><li><code>tomllib.loads(글자)</code> 로 읽어요. 파일을 바로 읽는 <code>tomllib.load(f)</code> 도 있는데, 그땐 <code>open(path, "rb")</code>(바이트로 열기)여야 해요. 이 교과서는 <code>read_text(encoding="utf-8-sig")</code> — 옛 메모장이 파일 앞에 BOM 을 붙여 저장해도 읽혀요(L29)</li><li>파일이 없거나 글이 틀리면 내 예외 <code>ConfigError</code> 로 바꿔 던져요(<a href="../python/#lesson/L15C" target="_blank" rel="noopener">파이썬 교과서 「내 예외 만들기: raise」 ↗</a>). 부르는 쪽은 이 하나만 잡으면 돼요</li><li>없어도 되는 값은 <code>cfg.get("days", 7)</code> 처럼 기본값으로 꺼내요</li></ul>
+<ul><li><code>tomllib.loads(글자)</code> 로 읽어요. 파일을 바로 읽는 <code>tomllib.load(f)</code> 도 있는데, 그땐 <code>open(path, "rb")</code>(바이트로 열기)여야 해요. 이 교과서는 <code>read_text(encoding="utf-8-sig")</code> — 옛 메모장이 파일 앞에 BOM 을 붙여 저장해도 읽혀요(BOM 은 <a href="../python/#lesson/L29" target="_blank" rel="noopener">파이썬 교과서 「csv 모듈 제대로」 ↗</a>)</li><li>파일이 없거나 글이 틀리면 내 예외 <code>ConfigError</code> 로 바꿔 던져요(<a href="../python/#lesson/L15C" target="_blank" rel="noopener">파이썬 교과서 「내 예외 만들기: raise」 ↗</a>). 부르는 쪽은 이 하나만 잡으면 돼요</li><li>없어도 되는 값은 <code>cfg.get("days", 7)</code> 처럼 기본값으로 꺼내요</li></ul>
 <div class="bk-warn"><b>Windows 경로는 작은따옴표</b> — TOML 의 큰따옴표 글자는 파이썬처럼 <code>\\</code> 를 탈출 글자로 읽어요. <code>"C:\\Users\\me"</code> 는 <code>\\U</code>(글자 번호) 자리에 <code>sers…</code> 가 와서 <code>TOMLDecodeError: Invalid hex value (at line 2, column 18)</code>. 더 나쁜 건 <code>"D:\\new\\temp"</code> — <code>\\n</code> · <code>\\t</code> 는 맞는 탈출 글자라 <b>에러 없이</b> 줄바꿈 · 탭이 들어가요. 작은따옴표 <code>'C:\\Users\\me'</code> 는 쓴 그대로예요. 슬래시로 쓴 <code>"C:/Users/me"</code> 도 Windows 가 알아들어요.</div>
 <p>에러의 <code>at line 2, column 18</code> 은 「2번째 줄 18번째 글자」 예요. 메모장 아래 상태 표시줄의 줄 · 열로 찾아가요.</p>
 <p>예제는 TOML 글을 파이썬 글자로 적으려고 <code>r&#39;&#39;&#39;…&#39;&#39;&#39;</code> 를 써요. 따옴표 셋은 여러 줄 글자, 앞의 <code>r</code> 은 정규식에서 본 <code>r"…"</code> 처럼 <code>\\</code> 를 파이썬이 건드리지 않고 그대로 두는 표시예요. 그래야 TOML 쪽에 <code>\\</code> 가 그대로 가요.</p>`,
@@ -3346,7 +3387,7 @@ print("줄바꿈이 들어갔나:", "\\n" in value, "| 글자 수:", len(value))
 <ul><li><b>파일이 끝없이 커지지 않게</b> — [[돌려 쓰는 로그]] <code>RotatingFileHandler</code></li><li><b>에러의 트레이스백까지 남기기</b> — 터미널을 아무도 안 보니까 로그에: <code>log.exception</code></li></ul>
 <p><code>basicConfig</code> 는 한 줄로 다 정하는 지름길이었어요. 이번에는 부품을 직접 이어요.</p>
 <table class="kb"><tbody><tr><th>부품</th><th>하는 일</th></tr>
-<tr><td><code>log = logging.getLogger("weekly")</code></td><td>이름 붙은 로거(L31)</td></tr>
+<tr><td><code>log = logging.getLogger("weekly")</code></td><td>이름 붙은 로거(<a href="../python/#lesson/L31" target="_blank" rel="noopener">파이썬 교과서 「logging 맛보기」 ↗</a>)</td></tr>
 <tr><td><code>log.setLevel(logging.INFO)</code></td><td>INFO 이상만 남기기 — basicConfig 의 <code>level=</code></td></tr>
 <tr><td><code>RotatingFileHandler(path, maxBytes=1_000_000, backupCount=3, encoding="utf-8")</code></td><td>[[핸들러]]. 파일이 1MB 를 넘기 전에 <code>weekly.log</code> 를 <code>weekly.log.1</code> 로 밀고 새로 시작해요. 옛 파일은 <code>.1</code> · <code>.2</code> · <code>.3</code> 셋까지만, 더 오래된 건 지워요</td></tr>
 <tr><td><code>h.setFormatter(logging.Formatter(fmt))</code></td><td>줄 모양 — basicConfig 의 <code>format=</code></td></tr>
@@ -3577,16 +3618,17 @@ with tempfile.TemporaryDirectory() as tmp:
 if __name__ == "__main__":
     sys.exit(main())</pre>
 <ul><li>맨 바깥의 <code>except Exception:</code> — 평소에는 잡을 에러를 좁게 쓰지만, 혼자 도는 스크립트의 <b>맨 바깥 한 곳</b>만은 다 잡아 로그에 남겨요. 안 그러면 트레이스백이 아무도 안 보는 화면으로 가요</li><li><code>finally: close_log(log)</code> — 어느 길로 나가도 로그 파일을 닫아요</li><li><b>실패하면 나에게 알림</b> — 로그는 내가 열어 봐야 보여요. 실패했을 때만 [[레슨:J10]] 의 메일 보내기로 나에게 한 통 보내게 <code>notify</code> 함수를 넘겨요. 예제는 찍기만 하는 가짜를 넘겨요</li><li><code>now = datetime.now() if now is None else now</code> — 진짜로 돌 때만 지금 시각을 쓰고, 시험할 땐 <code>now</code> 를 넘겨요. 「지난 7일」 같은 계산이 늘 같은 답이 나와요. 수정 시각 읽기는 [[레슨:J1]]</li></ul>`,
-      example: { code: `import tempfile
-from samples import make_files
-import argparse
+      example: { code: `import argparse
 import logging
 import sys
+import tempfile
 import tomllib
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+
+from samples import make_files
 
 HERE = Path(__file__).parent
 LOG_FORMAT = "%(levelname)s %(message)s"   # 진짜 스크립트는 "%(asctime)s %(levelname)s %(message)s"
@@ -3658,6 +3700,8 @@ def run_lock(lock, now, stale=timedelta(hours=6)):
         yield old
     finally:
         lock.unlink(missing_ok=True)
+
+
 def recent_files(folder, now, days):
     """folder 에서 지난 days 일 안에 바뀐 파일 이름(복습: 수정 시각 — 레슨 J1)"""
     since = now - timedelta(days=days)
@@ -3924,6 +3968,6 @@ with tempfile.TemporaryDirectory() as tmp:
   ],
   summary: ["작업 스케줄러: 기본 작업 만들기 → 트리거 → 「프로그램 시작」 에 가상 환경의 pythonw.exe · 스크립트 · 시작 위치(비우면 System32 에서 돎) — 「실행」 해서 마지막 실행 결과 0x0 을 봐요", "명령으로는 schtasks /Create /SC WEEKLY /D MON /ST 09:00 /TN … /TR …(시작 위치가 없으니 전체 경로), 리눅스 · macOS 는 cron 에 sys.executable 의 절대 경로", "파이썬은 판단만: next_run(now, \"09:00\", weekdays) · 월말 calendar.monthrange · last_run.json 과 due(last, now) 로 놓친 실행 따라잡기 — while + sleep 으로 기다리지 않아요"] },
 { id: 'JB4', ch: 4, boss: true, title: '만들어 보기: 월요일 아침 자동 비서', mode: 'text',
-  tutorSummary: '만들어 보기: 월요일 아침 자동 비서', pages: [], summary: [] },
+  tutorSummary: '만들어 보기: 월요일 아침 자동 비서 weekly.py — ① config.toml(J12 의 load_config + [folders] 값을 Path 로) · next_run · due · missed · last_run.json(J13) ② 다운로드 → 날짜 폴더(J1) ③ 문서 백업 zip(JB1 을 짧게 다시, make_backup) ④ 청구서 읽기(J4) · 주간 보고서 워드(J6) ⑤ 나에게 보낼 .eml(J9) · work() ⑥ J12 의 setup_log · close_log · run_lock 그대로 — 다른 하나가 도는 중(AlreadyRunning)이면 끝 코드 0(J12 와 같음), ConfigError · 그 밖의 에러는 1, 두 번 이상 놓친 예약은 한 번에 따라잡기 ⑦ 작업 스케줄러 등록(☐) · 복습: 복사한 표 글자 정리(J11 의 clip_rows · fix_phone).', pages: [], summary: [] },
 ];
 const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)
