@@ -169,10 +169,6 @@ const BOOK = {
         needs: [['open("/proc/self/maps")', 'K10/1', '내 주소 공간의 지도'], ['line.split()[1]', 'K10/1', '권한 칸'], ['line.split()[-1]', 'K10/1', '이름 칸']],
         io: [{ output: '구역이 10개보다 많나요? True\n[heap]: True\n[stack]: True\n읽기 전용 칸: True\n실행 칸: True' }],
         answer: 'with open("/proc/self/maps") as f:\n    lines = f.read().splitlines()\nperms = [line.split()[1] for line in lines]\nnames = [line.split()[-1] for line in lines]\nprint("구역이 10개보다 많나요?", len(lines) > 10)\nprint("[heap]:", "[heap]" in names)\nprint("[stack]:", "[stack]" in names)\nprint("읽기 전용 칸:", "r--p" in perms)\nprint("실행 칸:", "r-xp" in perms)' },
-      { title: '쓸 때만 복사를 숫자로 보기', text: '50MB 를 <code>mmap</code> 으로 잡아 부모가 다 만진 뒤 fork 하세요. 이때 꼭 <code>flags=mmap.MAP_PRIVATE</code> 로 잡아요 — <code>mmap.mmap(-1, 크기)</code> 의 기본은 부모·자식이 <b>같이 쓰는</b>(SHARED) 메모리라서 자식이 쓴 값이 부모에게도 보여요(복사가 안 일어남). 자식은 <b>앞의 절반(25MB)</b>에만 쓰고, 그동안 늘어난 페이지 폴트 수를 재요. 25MB 는 페이지 6400장이니, 자식의 폴트가 6000번 넘게 났는지(= 쓸 때 그 페이지만 복사했는지) True/False 로. 부모 쪽 값은 그대로인지도 찍어요.',
-        needs: [['mmap.mmap(-1, 50 * 1024 * 1024, flags=mmap.MAP_PRIVATE)', 'K11/1', '나만 쓰는 메모리(쓸 때만 복사)'], ['resource.getrusage(resource.RUSAGE_SELF).ru_minflt', 'K11/1', '페이지 폴트 수'], ['os.fork()', 'K10/2', '같은 주소, 쓸 때만 복사']],
-        io: [{ output: '자식: 쓴 페이지만큼 폴트가 났나요? True\n부모: 값이 그대로인가요? True' }],
-        answer: 'import os, mmap, resource\ndef faults():\n    return resource.getrusage(resource.RUSAGE_SELF).ru_minflt\nm = mmap.mmap(-1, 50 * 1024 * 1024, flags=mmap.MAP_PRIVATE)\nfor i in range(0, len(m), 4096):\n    m[i] = 1\npid = os.fork()\nif pid == 0:\n    f0 = faults()\n    for i in range(0, len(m) // 2, 4096):\n        m[i] = 2\n    print("자식: 쓴 페이지만큼 폴트가 났나요?", faults() - f0 > 6000, flush=True)\n    os._exit(0)\nos.waitpid(pid, 0)\nprint("부모: 값이 그대로인가요?", m[0] == 1)' },
     ],
     K11: [
       { title: "30MB 는 페이지 몇 장?", text: "페이지 한 장은 <code>4096</code>바이트예요(레슨 1쪽). <code>1MB</code> · <code>30MB</code> · <code>300MB</code> 가 각각 페이지 몇 장인지 찍고, 마지막에 300MB 를 다 만지면 30MB 보다 처음 만질 때의 폴트가 약 몇 번 더 나는지 찍으세요(처음 만지는 페이지마다 폴트 한 번 — 레슨 2쪽).",
@@ -187,6 +183,10 @@ const BOOK = {
         needs: [['/usr/bin/time -v python3 k11.py', 'K11/2', 'RSS 최댓값 · 폴트 수'], ['sudo apt install time', 'K11/2', '없으면 설치']],
         checks: [{ text: '「Maximum resident set size」 가 30MB 판보다 300MB 판에서 약 270MB(270000 kbytes 쯤) 더 커요' }, { text: '「Minor … page faults」 가 300MB 판에서 약 7만 번 더 많아요(270MB ÷ 4KB)' }, { text: '「Major (requiring I/O) page faults」 는 둘 다 0 이거나 아주 작아요(RAM 이 넉넉하니까)' }],
         answer: '/usr/bin/time -v python3 k11.py 2>&1 | grep -E "Maximum resident|page faults"\n(30 * 1024 * 1024 → 300 * 1024 * 1024 로 고치고 다시)' },
+      { title: '쓸 때만 복사를 숫자로 보기', text: '50MB 를 <code>mmap</code> 으로 잡아 부모가 다 만진 뒤 fork 하세요. 이때 꼭 <code>flags=mmap.MAP_PRIVATE</code> 로 잡아요 — <code>mmap.mmap(-1, 크기)</code> 의 기본은 부모·자식이 <b>같이 쓰는</b>(SHARED) 메모리라서 자식이 쓴 값이 부모에게도 보여요(복사가 안 일어남). 자식은 <b>앞의 절반(25MB)</b>에만 쓰고, 그동안 늘어난 페이지 폴트 수를 재요. 25MB 는 페이지 6400장이니, 자식의 폴트가 6000번 넘게 났는지(= 쓸 때 그 페이지만 복사했는지) True/False 로. 부모 쪽 값은 그대로인지도 찍어요.',
+        needs: [['mmap.mmap(-1, 50 * 1024 * 1024, flags=mmap.MAP_PRIVATE)', 'K11/1', '나만 쓰는 메모리(쓸 때만 복사)'], ['resource.getrusage(resource.RUSAGE_SELF).ru_minflt', 'K11/1', '페이지 폴트 수'], ['os.fork()', 'K10/2', '같은 주소, 쓸 때만 복사']],
+        io: [{ output: '자식: 쓴 페이지만큼 폴트가 났나요? True\n부모: 값이 그대로인가요? True' }],
+        answer: 'import os, mmap, resource\ndef faults():\n    return resource.getrusage(resource.RUSAGE_SELF).ru_minflt\nm = mmap.mmap(-1, 50 * 1024 * 1024, flags=mmap.MAP_PRIVATE)\nfor i in range(0, len(m), 4096):\n    m[i] = 1\npid = os.fork()\nif pid == 0:\n    f0 = faults()\n    for i in range(0, len(m) // 2, 4096):\n        m[i] = 2\n    print("자식: 쓴 페이지만큼 폴트가 났나요?", faults() - f0 > 6000, flush=True)\n    os._exit(0)\nos.waitpid(pid, 0)\nprint("부모: 값이 그대로인가요?", m[0] == 1)' },
     ],
     K12: [
       { title: '그림으로 벨라디의 이상 찾기', text: '레슨 1쪽 그림에서 「예」 를 1(벨라디), 방법을 0(FIFO)으로 두고 프레임을 바꿔 가며 폴트 수를 적어 보세요.', noRun: true,

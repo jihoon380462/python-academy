@@ -187,10 +187,10 @@ sys.setrecursionlimit(10**6)</pre>([[레슨:A20]] 「입출력과 재귀 함정�
       { title: '느린 코드를 빠르게', text: '@prompt', pid: 'A1P5', needs: [['s = set(a)', 'A1/4', 'set 으로 바꾸면 in 이 O(1)'], ['for x in b:  if x in s:', 'A1/0', '한 겹 반복 = O(n)']] },
     ],
     A2: [
+      { title: '실행 취소 기록', text: '작업 <code>쓰기</code>, <code>굵게</code>, <code>색</code> 을 차례로 리스트 <code>history</code> 에 기록하고, <b>마지막 것부터</b> 하나씩 꺼내며 <code>취소: 작업</code> 을 출력하세요.', pid: 'A2P5', start: true, needs: [['history.append(act)', 'A2/0', '기록 쌓기'], ['while history:  history.pop()', 'A2/3', '마지막 것부터 되돌리기']] },
       { title: '괄호 짝 검사', text: '@prompt', pid: 'A2P2', needs: [['stack.append(ch)', 'A2/0', '맨 위에 쌓기'], ['stack.pop() != pair[ch]', 'A2/1', '맨 위와 짝이 맞는지'], ['if not stack:', 'A2/2', '꺼내기 전에 비었는지']] },
       { title: '빈 스택에서 꺼내기', text: '@prompt', pid: 'A2P3', given: true, needs: [['if not stack:  return False', 'A2/2', '비었으면 꺼내지 않기'], ['IndexError: pop from empty list', 'A2/2', '빈 리스트에서 pop 하면 나는 에러']] },
       { title: '문자열 뒤집기 (스택)', text: '@prompt', pid: 'A2P4', needs: [['while stack:  out += stack.pop()', 'A2/3', '쌓은 반대 순서로 꺼내기']] },
-      { title: '실행 취소 기록', text: '작업 <code>쓰기</code>, <code>굵게</code>, <code>색</code> 을 차례로 리스트 <code>history</code> 에 기록하고, <b>마지막 것부터</b> 하나씩 꺼내며 <code>취소: 작업</code> 을 출력하세요.', pid: 'A2P5', start: true, needs: [['history.append(act)', 'A2/0', '기록 쌓기'], ['while history:  history.pop()', 'A2/3', '마지막 것부터 되돌리기']] },
       { title: '괄호 수정 횟수', text: '@prompt', pid: 'AB4P2', needs: [['open_cnt += 1  open_cnt -= 1', 'A2/1', '스택 대신 개수만 세기'], ['(a + 1) // 2 + (b + 1) // 2', 'A2/2', '남은 짝 없는 괄호로 답 계산']] },
     ],
     A3: [
@@ -216,6 +216,7 @@ sys.setrecursionlimit(10**6)</pre>([[레슨:A20]] 「입출력과 재귀 함정�
       { title: '삽입 정렬 구현', text: '@prompt', pid: 'A5P4', needs: [['key = a[i]', 'A5/3', '끼워 넣을 값 들기'], ['while j >= 0 and a[j] > key:  a[j + 1] = a[j]', 'A5/3', '큰 값들을 한 칸씩 뒤로'], ['a[j + 1] = key', 'A5/3', '빈 자리에 내려놓기']] },
     ],
     A6: [
+      { title: '대기 번호 두 줄 합치기 · 출력 예측', predict: true, text: "<p>창구 두 곳의 대기 번호가 각각 작은 순으로 서 있어요. 두 줄을 한 줄로 합쳐요. 2쪽처럼 <b>맨 앞끼리만</b> 비교해서 작은 번호를 먼저 보내요.</p><p>돌리기 전에 출력 여섯 줄을 먼저 예상해 보고, VS Code 에서 돌려 맞았는지 확인해 보세요. 마지막 9 가 언제 들어가는지가 핵심이에요.</p>", needs: [['if left[i] <= right[j]:', 'A6/1', '맨 앞끼리 비교해 작은 것 먼저'], ['merged += left[i:]', 'A6/1', '남은 쪽은 통째로 붙이기']], io: [{ output: "1 꺼냄 → i = 0 j = 1\n2 꺼냄 → i = 1 j = 1\n4 꺼냄 → i = 2 j = 1\n6 꺼냄 → i = 2 j = 2\n7 꺼냄 → i = 2 j = 3\n완성: [1, 2, 4, 6, 7, 9]" }], answer: "left = [2, 4, 9]\nright = [1, 6, 7]\nmerged = []\ni = j = 0\nwhile i < len(left) and j < len(right):\n    if left[i] <= right[j]:\n        merged.append(left[i]); i += 1\n    else:\n        merged.append(right[j]); j += 1\n    print(merged[-1], \"꺼냄 → i =\", i, \"j =\", j)\nmerged += left[i:]\nmerged += right[j:]\nprint(\"완성:\", merged)", explain: "<p>1 · 2 · 4 · 6 · 7 은 반복 안에서 한 번씩 비교해 꺼내요. 7 을 꺼내면 <code>j</code> 가 3 이 돼서 <code>right</code> 가 끝나고 반복이 멈춰요. 그래서 9 는 <code>merged += left[i:]</code> 로 한꺼번에 붙어요. 반복 안의 <code>print</code> 는 다섯 번, 마지막 「완성」 까지 여섯 줄이에요.</p>" },
       { title: '두 정렬 리스트 합치기', text: '@prompt', pid: 'A6P2', needs: [['while i < len(left) and j < len(right):', 'A6/1', '두 줄 맨 앞 비교'], ['merged += left[i:] + right[j:]', 'A6/1', '남은 쪽 통째로 붙이기']] },
       { title: '퀵 정렬 구현', text: '@prompt', pid: 'A6P3', needs: [['pivot = a[len(a) // 2]', 'A6/2', '기준값'], ['[x for x in a if x < pivot]', 'A6/2', '작은 묶음 만들기'], ['quick(small) + same + quick(big)', 'A6/3', '나눠서 재귀']] },
     ],
@@ -225,9 +226,9 @@ sys.setrecursionlimit(10**6)</pre>([[레슨:A20]] 「입출력과 재귀 함정�
       { title: 'k번째 수', text: '@prompt', pid: 'AB4P3', needs: [['sorted(a[i - 1:j])[k - 1]', 'A6B/0', '잘라서 정렬, k번째(1부터)']] },
     ],
     A7: [
+      { title: 'x보다 작은 값의 개수', text: '@prompt', pid: 'A7P5', needs: [['bisect.bisect_left(a, x)', 'A7/3', 'x 를 끼워 넣을 왼쪽 자리 = x 미만 개수']] },
       { title: '이진 탐색 구현', text: '@prompt', pid: 'A7P3', needs: [['lo, hi = 0, len(a) - 1', 'A7/0', '찾을 범위'], ['mid = (lo + hi) // 2', 'A7/0', '가운데 보기'], ['lo = mid + 1  hi = mid - 1', 'A7/2', '반씩 줄이기, 없으면 -1']] },
       { title: '무한루프 이진 탐색', text: '@prompt', pid: 'A7P4', given: true, needs: [['lo = mid + 1', 'A7/2', 'mid 는 이미 봤으니 빼고 줄이기'], ['while lo <= hi:', 'A7/2', '범위가 비면 끝']] },
-      { title: 'x보다 작은 값의 개수', text: '@prompt', pid: 'A7P5', needs: [['bisect.bisect_left(a, x)', 'A7/3', 'x 를 끼워 넣을 왼쪽 자리 = x 미만 개수']] },
     ],
     A8: [
       { title: '중복 제거 (순서 유지)', text: '@prompt', pid: 'A8P2', needs: [['seen = set()  if x not in seen:', 'A8/1', '본 적 있는지 O(1)'], ['seen.add(x)  out.append(x)', 'A8/2', '처음 본 것만 순서대로']] },
@@ -252,6 +253,7 @@ sys.setrecursionlimit(10**6)</pre>([[레슨:A20]] 「입출력과 재귀 함정�
       { title: '끊어진 사슬', text: '@prompt', pid: 'A9P5', given: true, needs: [['new.next = a.next;  a.next = new', 'A9/2', '뒤를 먼저 잡고 앞을 바꾸기']] },
     ],
     A10: [
+      { title: '책 번호로 찾아가기 · 출력 예측', predict: true, text: "<p>도서관이 책 번호를 이진 탐색 트리에 넣어 두었어요. 번호 40 과 65 를 찾으면서 지나온 노드를 <code>path</code> 에 모아요.</p><p>돌리기 전에 출력 두 줄을 먼저 예상해 보고, VS Code 에서 돌려 맞았는지 확인해 보세요. 1쪽의 트리 그림처럼 넣는 순서대로 그려 보면 쉬워요.</p>", needs: [['node = node.left if target < node.val else node.right', 'A10/1', '작으면 왼쪽, 크면 오른쪽'], ['while node: … else:', 'A10/1', '끝까지 못 찾으면 else'], ['root = insert(root, v)', 'A10/0', '하나씩 넣어 트리 만들기']], io: [{ output: "40 찾음 | 지나온 길: [50, 30, 40]\n65 없음 | 지나온 길: [50, 70, 60]" }], answer: "class Node:\n    def __init__(self, val):\n        self.val = val; self.left = None; self.right = None\ndef insert(node, val):\n    if node is None: return Node(val)\n    if val < node.val: node.left = insert(node.left, val)\n    else: node.right = insert(node.right, val)\n    return node\nroot = None\nfor v in [50, 30, 70, 20, 40, 60]:\n    root = insert(root, v)\n\nfor target in [40, 65]:\n    node = root\n    path = []\n    while node:\n        path.append(node.val)\n        if node.val == target:\n            print(target, \"찾음 | 지나온 길:\", path); break\n        node = node.left if target < node.val else node.right\n    else:\n        print(target, \"없음 | 지나온 길:\", path)", explain: "<p>50 이 루트예요. 30 · 20 · 40 은 왼쪽, 70 · 60 은 오른쪽으로 가요. 40 은 50 → 30(40 > 30 이라 오른쪽) → 40 에서 찾아요. 65 는 50 → 70(65 < 70 이라 왼쪽) → 60 → 60 의 오른쪽이 None 이라 반복이 <code>break</code> 없이 끝나고 <code>else</code> 로 「없음」 이에요. 세 칸만 보고 끝나요.</p>" },
       { title: 'BST 삽입과 탐색', text: '@prompt', pid: 'A10P3', start: true, needs: [['if val < node.val:  node.left = insert(node.left, val)', 'A10/1', '작으면 왼쪽, 크면 오른쪽'], ['if node is None:  return False', 'A10/1', '끝까지 없으면 없음']] },
       { title: '트리의 높이', text: '@prompt', pid: 'A10P4', start: true, needs: [['1 + max(height(node.left), height(node.right))', 'A10/2', '자식 높이 중 큰 쪽 + 1'], ['if node is None:  return 0', 'A10/2', '빈 트리는 0']] },
       { title: '전위 순회', text: '@prompt', pid: 'A10P5', start: true, needs: [['print(node.val); preorder(node.left); preorder(node.right)', 'A10/3', '자신 → 왼쪽 → 오른쪽'], ['if node is None:  return', 'A10/3', '기저 조건이 맨 먼저']] },
@@ -281,15 +283,15 @@ sys.setrecursionlimit(10**6)</pre>([[레슨:A20]] 「입출력과 재귀 함정�
       { title: '힙에 무엇을 넣나', text: '다익스트라의 한 부분이에요. 힙에 무엇을 넣고, 꺼낸 것을 언제 건너뛰는지 빈칸 <code>___1___</code> · <code>___2___</code> 를 채우세요. (이 부분만으로는 실행되지 않아요 — 다 채우면 위 「다익스트라 구현」 에 넣어 돌려 보세요)', pid: 'A13P5', noRun: true, needs: [['if d > dist[u]:  continue', 'A13/2', '더 짧은 길이 이미 있으면 건너뛰기'], ['heapq.heappush(heap, (dist[v], v))', 'A13/1', '(거리, 정점) 을 넣기']] },
     ],
     A14: [
+      { title: '점화식 채우기', text: '2×n 판을 1×2, 2×1 타일로 채우는 방법 수를 구해요. 점화식의 빈칸 <code>___1___</code> 을 채워 완성하세요. 맨 위에 <code>n = int(input())</code> 를 넣으면 실행돼요.', pid: 'A14P5', answer: 'n = int(input())\ndp = [0] * (n + 1)\ndp[0] = 1\ndp[1] = 1\nfor i in range(2, n + 1):\n    dp[i] = dp[i - 1] + dp[i - 2]\nprint(dp[n])', io: [{ input: '5', output: '8' }], needs: [['dp[i] = dp[i - 1] + dp[i - 2]', 'A14/1', '마지막 타일이 세로 하나 / 가로 둘'], ['dp[0] = 1;  dp[1] = 1', 'A14/1', '시작 칸 채우기']] },
       { title: '계단 오르기', text: '@prompt', pid: 'A14P2', needs: [['dp = [0] * (n + 1)', 'A14/1', '작은 것부터 채울 표'], ['dp[i] = dp[i - 1] + dp[i - 2]', 'A14/1', '한 칸 전 + 두 칸 전']] },
       { title: '동전 거스름돈', text: '@prompt', pid: 'A14P3', needs: [['dp = [INF] * (target + 1);  dp[0] = 0', 'A14/2', '0원은 동전 0개'], ['dp[x] = min(dp[x], dp[x - c] + 1)', 'A14/2', '동전 c 하나를 마지막에 쓰면']] },
       { title: '최대 부분합', text: '@prompt', pid: 'A14P4', needs: [['cur = max(x, cur + x)', 'A14/3', '이어 붙일까, 새로 시작할까'], ['best = max(best, cur)', 'A14/3', '지금까지 최고']] },
-      { title: '점화식 채우기', text: '2×n 판을 1×2, 2×1 타일로 채우는 방법 수를 구해요. 점화식의 빈칸 <code>___1___</code> 을 채워 완성하세요. 맨 위에 <code>n = int(input())</code> 를 넣으면 실행돼요.', pid: 'A14P5', answer: 'n = int(input())\ndp = [0] * (n + 1)\ndp[0] = 1\ndp[1] = 1\nfor i in range(2, n + 1):\n    dp[i] = dp[i - 1] + dp[i - 2]\nprint(dp[n])', io: [{ input: '5', output: '8' }], needs: [['dp[i] = dp[i - 1] + dp[i - 2]', 'A14/1', '마지막 타일이 세로 하나 / 가로 둘'], ['dp[0] = 1;  dp[1] = 1', 'A14/1', '시작 칸 채우기']] },
     ],
     A15: [
+      { title: '구간 합 질의', text: '@prompt', pid: 'A15P4', needs: [['prefix[i + 1] = prefix[i] + a[i]', 'A15/4', '누적 합 미리'], ['prefix[r + 1] - prefix[l]', 'A15/4', '구간 합을 O(1)']] },
       { title: '회의실 배정', text: '@prompt', pid: 'A15P2', needs: [['sorted(meetings, key=lambda m: (m[1], m[0]))', 'A15/0', '일찍 끝나는 것부터'], ['if s >= end:  cnt += 1;  end = e', 'A15/1', '겹치지 않으면 고르기']] },
       { title: '투 포인터: 두 수의 합', text: '@prompt', pid: 'A15P3', needs: [['lo, hi = 0, len(a) - 1', 'A15/2', '양끝에서 시작'], ['if s < target:  lo += 1  else:  hi -= 1', 'A15/2', '작으면 왼쪽을, 크면 오른쪽을 안으로']] },
-      { title: '구간 합 질의', text: '@prompt', pid: 'A15P4', needs: [['prefix[i + 1] = prefix[i] + a[i]', 'A15/4', '누적 합 미리'], ['prefix[r + 1] - prefix[l]', 'A15/4', '구간 합을 O(1)']] },
       { title: '슬라이딩 윈도우', text: '@prompt', pid: 'A15P5', needs: [['win = sum(a[:k])', 'A15/3', '첫 창'], ['win += a[i] - a[i - k]', 'A15/3', '들어온 값 더하고 나간 값 빼기']] },
     ],
     AB4: [
@@ -360,8 +362,8 @@ sys.setrecursionlimit(10**6)</pre>([[레슨:A20]] 「입출력과 재귀 함정�
       { title: '백트래킹: 순열 생성', text: '@prompt', pid: 'A19P3', needs: [['used[i] = True;  path.append(s[i])', 'A19B/0', '고르기'], ['go()', 'A19B/0', '다음 칸으로 들어가기(재귀)'], ['path.pop();  used[i] = False', 'A19B/1', '되돌리기']] },
     ],
     A20: [
-      { title: '빠른 입출력', text: '@prompt', pid: 'A20P2', needs: [['data = sys.stdin.read().split()', 'A20/2', '한 번에 다 읽기'], ['print("\\n".join(out))', 'A20/2', '한 번에 출력']] },
       { title: '경계에서 터지는 코드', text: '@prompt', pid: 'A20P3', given: true, needs: [['if not nums:  print(0)', 'A20/3', '빈 입력을 먼저 처리'], ['max(nums) - min(nums)', 'A20/3', '빈 리스트에 max 하면 ValueError']] },
+      { title: '빠른 입출력', text: '@prompt', pid: 'A20P2', needs: [['data = sys.stdin.read().split()', 'A20/2', '한 번에 다 읽기'], ['print("\\n".join(out))', 'A20/2', '한 번에 출력']] },
       { title: '제출 전 체크리스트 통과', text: '@prompt', pid: 'A20P5', needs: [['vals = sorted(set(nums), reverse=True)', 'A20/3', '같은 값은 하나로, 큰 순'], ['if len(vals) < 2:  print("없음")', 'A20/4', '0개 · 1개 · 전부 같은 값']] },
     ],
     AB5: [
