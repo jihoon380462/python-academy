@@ -892,16 +892,601 @@ print("전체 시트 3행:", [c.value for c in wb["전체"][3]])` } },
   summary: ["for ws in wb: 로 시트를 돌고, 합칠 땐 rec[\"월\"] = ws.title 처럼 시트 · 파일 이름을 칸으로 남겨요", "sorted(Path(\"지점\").glob(\"*.xlsx\")) 로 파일을 돌되 ~$ 잠금 파일은 이름만 보고 건너뛰어요(안 그러면 BadZipFile)", "열 순서는 믿지 말고 머리줄 이름으로 맞추고(빠진 열은 경고 + 빈칸), 결과는 「출처」 열 + create_sheet(\"요약\", 0)"] },
 { id: 'FB2', ch: 2, boss: true, title: "만들어 보기: 월별 매출 보고서", mode: 'text', pages: [], summary: [],
   tutorSummary: "챕터 2 만들어 보기. 빵집_매출.xlsx(시트 7월 · 8월 · 9월, 날짜 · 품목 · 분류 · 단가 · 수량 20줄씩, 매출 = 단가 × 수량)로 3분기 매출 보고서를 만든다. ① read_sales(path) — for ws in wb + dict(zip(header, row)) + 월 · 매출 칸, 월별 합계(7월 957,400 · 8월 864,900 · 9월 1,015,800 · 합계 2,838,100) ② 분류별 합계(빵 · 케이크 · 음료)와 비율, 품목 매출 TOP 3(딸기케이크 · 식빵 · 크루아상) ③ 매출_보고서.xlsx 「요약」 시트: 월 × 분류 표(값은 파이썬 계산) + 합계 열 =SUM(B2:D2) · 합계 줄 =SUM(B2:B4) 수식 + 머리줄 색 · #,##0 · 열 너비 · 틀 고정 B2, 다시 읽어 찍고 data_only=True 의 E5 는 None ④ 분류를 쌓은 월별 막대 차트(grouping stacked · overlap 100, G2), zip 목록의 xl/charts/chart1.xml 로 확인 ⑤ make_report(src, dst) 함수(report.py, if __name__ == \"__main__\")로 묶어 「요약」 + 「품목」(순위 · TOP 3 칠) 시트를 쓰고 결과 딕셔너리를 돌려줌, check_report 로 다시 읽어 시트 순서 · 수식 글자 · data_only None · 파이썬 합계 · TOP 3 · 차트 파일을 assert, 그리고 엑셀에서 열어 ☐(색 · 차트 · 수식 결과가 파이썬 합계와 같은지). 업무 자동화 교과서가 make_report 를 불러 쓴다." },
-{ id: 'F12', ch: 3, n: 12, title: 'JSON ↔ CSV ↔ 엑셀', mode: 'text', draft: true,
-  tutorSummary: '잃는 것 · 바꿀 함수표 · 왕복',
-  pages: FILES_TODO('잃는 것 · 바꿀 함수표 · 왕복'), summary: ["잃는 것", "바꿀 함수표", "왕복"] },
-{ id: 'F13', ch: 3, n: 13, title: '중첩 JSON 을 표로 펴기', mode: 'text', draft: true,
-  tutorSummary: 'flatten · 줄로 늘리기 · 두 표',
-  pages: FILES_TODO('flatten · 줄로 늘리기 · 두 표'), summary: ["flatten", "줄로 늘리기", "두 표"] },
-{ id: 'F14', ch: 3, n: 14, title: 'TOML 맛보기 · 형식 고르기', mode: 'text', draft: true,
-  tutorSummary: 'tomllib · rb · 형식 고르기 표',
-  pages: FILES_TODO('tomllib · rb · 형식 고르기 표'), summary: ["tomllib", "rb", "형식 고르기 표"] },
-{ id: 'FB3', ch: 3, boss: true, title: '만들어 보기: 가계부 엑셀 → JSON → 보고서', mode: 'text', draft: true,
-  tutorSummary: '만들어 보기: 가계부 엑셀 → JSON → 보고서', pages: [], summary: [] },
+{ id: 'F12', ch: 3, n: 12, title: 'JSON ↔ CSV ↔ 엑셀', mode: 'text',
+  tutorSummary: "형식마다 잃는 것: CSV 는 값이 다 글자 · 시트 하나 · 서식 없음, JSON 은 날짜 종류가 없고(ISO 글자) 표 모양이 아님, 엑셀은 중첩이 없고 날짜는 datetime 으로 돌아오며 앞자리 0 은 글자로 넣어야 남는다. CSV → JSON: csv.DictReader 줄마다 열마다 바꿀 함수표 CONVERT = {\"날짜\": date.fromisoformat, \"수량\": int} 로 바꾸고 빈 글자는 None, 바꾸다 난 ValueError 는 enumerate(…, 2) 줄 번호와 함께 남기고 건너뜀, 저장은 json.dump(default=to_json). JSON 리스트 → 엑셀 · CSV: 머리줄 = 키 합집합(처음 나온 순서, if key not in header: header.append(key)), 칸은 rec.get(key) 라 빠진 키는 빈칸. DictWriter 의 fieldnames 에 없는 키가 오면 ValueError: dict contains fields not in fieldnames. 엑셀 → CSV: open(…, \"w\", encoding=\"utf-8-sig\", newline=\"\"), datetime 은 v.date().isoformat(), None 은 \"\", 숫자 날짜는 from_excel. 앞자리 0(04001)은 CSV 파일엔 남지만 엑셀이 CSV 를 열 때 숫자로 바꿔 보여 줌. 왕복 시험: CSV → 엑셀 → CSV 를 read_text(encoding=\"utf-8-sig\").splitlines() 로 줄마다 비교. csv 모듈 자체는 파이썬 L29.",
+  terms: { "왕복 시험": "바꾼 것을 거꾸로 다시 바꿔서 처음과 같은지 보는 시험. 바꾸는 함수 짝이 정보를 잃지 않는지 확인한다" },
+  pages: [
+    { title: "형식마다 잃는 것: CSV · JSON · 엑셀", html: `<p>복습: 엑셀 읽기 · 쓰기는 [[레슨:F7]] · [[레슨:F8]], csv 모듈은 <a href="../python/#lesson/L29" target="_blank" rel="noopener">파이썬 교과서 「csv 모듈 제대로」 ↗</a>. 이 레슨은 csv 모듈 자체가 아니라 <b>형식 사이를 오가는 길</b>을 봐요.</p><p>같은 기록 한 건을 세 형식에 담았다가 다시 읽어 보면, 형식마다 <b>잃는 것</b>이 달라요.</p><table class="kb"><tbody><tr><th>형식</th><th>잘 담는 것</th><th>잃는 것</th></tr><tr><td>CSV</td><td>표 하나 · 어디서나 열림</td><td>값이 <b>다 글자</b>(숫자 · 날짜 · 빈 값 모두) · 시트 하나 · 서식 · 수식 없음</td></tr><tr><td>JSON</td><td>중첩 · 숫자 · <code>true</code> · <code>null</code></td><td><b>날짜 종류가 없음</b>(ISO 글자로, [[레슨:F3]]) · 표 모양이 아님 · 서식 없음</td></tr><tr><td>엑셀</td><td>여러 시트 · 숫자 · 날짜 · 서식 · 수식</td><td><b>중첩이 없음</b>(한 칸 = 값 하나, [[레슨:F13]]) · 날짜는 <code>datetime</code> 으로 돌아옴 · 앞자리 0 은 글자로 넣어야 남음</td></tr></tbody></table><p>예제는 기록 한 건을 CSV · JSON · 엑셀로 한 번씩 왕복하고, 값마다 종류 이름을 찍어요. 실행하면 CSV 쪽은 전부 <code>str</code> 이고, 엑셀 쪽 날짜는 <code>datetime</code> 이에요.</p><div class="bk-warn"><b>바꾸기 = 잃은 것 되살리기</b> — 형식을 바꾸는 코드는 대부분 잃은 것을 되살리는 코드예요. CSV 에서 읽으면 숫자 · 날짜를 다시 만들고, JSON 에 넣을 땐 날짜를 글자로, 엑셀에서 꺼내면 <code>datetime</code> 을 <code>date</code> 로 바꿔요. 다음 쪽부터 하나씩 해요.</div>`,
+      example: { code: `import csv
+import json
+from datetime import date
+from openpyxl import Workbook, load_workbook
+
+row = {"날짜": date(2026, 9, 3), "품목": "소금빵", "수량": 3, "우편번호": "04001"}
+
+
+def kinds(d):
+    return {k: type(v).__name__ for k, v in d.items()}
+
+
+print("원래", kinds(row))
+
+# CSV: 쓰고 다시 읽기
+with open("one.csv", "w", encoding="utf-8", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=list(row))
+    w.writeheader()
+    w.writerow(row)
+with open("one.csv", encoding="utf-8", newline="") as f:
+    back = next(csv.DictReader(f))
+print("CSV ", kinds(back))
+
+# JSON: 날짜는 글자로 바꿔야 들어가요
+text = json.dumps(row, ensure_ascii=False, default=str)
+back = json.loads(text)
+print("JSON", kinds(back))
+
+# 엑셀: 쓰고 다시 읽기
+wb = Workbook()
+ws = wb.active
+ws.append(list(row))
+cells = list(row.values())
+ws.append(cells)
+wb.save("one.xlsx")
+ws = load_workbook("one.xlsx").active
+header, values = ws.iter_rows(values_only=True)
+back = dict(zip(header, values))
+print("엑셀", kinds(back))
+` } },
+    { title: "CSV → JSON: 열마다 바꿀 함수표", html: `<p>CSV 에서 읽은 값은 다 글자예요(<code>"3"</code> · <code>"2026-09-01"</code>, 빈칸은 <code>""</code>). JSON 으로 옮기기 전에 <b>열마다 바꿀 함수</b>를 표로 적어 두면, 바꾸기가 한 곳에 모여요.</p><pre>CONVERT = {"날짜": date.fromisoformat, "단가": int, "수량": int}</pre><ul><li>표의 값은 <b>함수 자체</b>예요. 괄호 없이 <code>int</code> · <code>date.fromisoformat</code> 을 넣고, 쓸 때 <code>table[key](text)</code> 로 불러요</li><li>표에 없는 열(품목 · 메모)은 글자 그대로 두고, 빈 글자 <code>""</code> 는 <code>None</code> 으로 바꿔요(JSON 에서는 <code>null</code>)</li><li>바꾸기는 <b>검사</b>도 돼요. <code>2026-09-31</code> 이면 <code>date.fromisoformat</code> 이 <code>ValueError</code> 를 내요. <code>enumerate(csv.DictReader(f), 2)</code> 로 줄 번호를 붙여(1번 줄은 머리줄) 어느 줄인지 남기고 넘어가요</li><li>저장할 땐 날짜를 다시 ISO 글자로 — <code>json.dump(records, f, …, default=to_json)</code>(복습: [[레슨:F3]])</li></ul><p>예제는 9월 31일이 섞인 작은 CSV 를 JSON 으로 옮겨요. 실행하면 <code>4번째 줄 건너뜀</code> 이 나오고, 나머지 세 건이 저장돼요.</p><p>pandas 로도 돼요 — <code>pd.read_csv</code> · <code>df.to_json</code>, <a href="../data/#lesson/P1" target="_blank" rel="noopener">데이터 분석 교과서 P1 ↗</a>. 이 교과서는 표준 라이브러리로만 해요.</p>`,
+      example: { code: `import csv
+import json
+from datetime import date
+
+CSV_TEXT = """날짜,품목,단가,수량,메모
+2026-09-01,소금빵,3200,4,
+2026-09-01,라테,4800,2,포장
+2026-09-31,식빵,4500,1,
+2026-09-02,크루아상,3800,3,
+"""
+with open("sales.csv", "w", encoding="utf-8", newline="") as f:
+    f.write(CSV_TEXT)
+
+CONVERT = {"날짜": date.fromisoformat, "단가": int, "수량": int}
+
+
+def convert(row, table):
+    out = {}
+    for key, text in row.items():
+        if text == "":
+            out[key] = None
+        elif key in table:
+            out[key] = table[key](text)
+        else:
+            out[key] = text
+    return out
+
+
+def to_json(o):
+    if isinstance(o, date):
+        return o.isoformat()
+    raise TypeError(f"{type(o).__name__} 는 JSON 에 못 넣어요")
+
+
+records = []
+with open("sales.csv", encoding="utf-8", newline="") as f:
+    for line_no, row in enumerate(csv.DictReader(f), 2):
+        try:
+            records.append(convert(row, CONVERT))
+        except ValueError as e:
+            print(f"{line_no}번째 줄 건너뜀: {e}")
+
+print(records[0])
+with open("sales.json", "w", encoding="utf-8") as f:
+    json.dump(records, f, ensure_ascii=False, indent=2, default=to_json)
+print(len(records), "건 → sales.json")
+print(json.dumps(records[0], ensure_ascii=False, default=to_json))
+` } },
+    { title: "JSON → 엑셀: 머리줄은 키 합집합", html: `<p>거꾸로 JSON 리스트를 엑셀 · CSV 표로 옮길 땐 <b>머리줄</b>부터 정해요. API 응답이나 손으로 쓴 기록은 딕셔너리마다 키가 조금씩 달라요. 첫 딕셔너리의 키만 쓰면 뒤에 나온 키(<code>메모</code> · <code>쿠폰</code>)가 사라져요.</p><p>그래서 머리줄 = <b>모든 키의 합집합</b>, 순서는 <b>처음 나온 순서</b>예요. <code>set</code> 은 순서를 안 지켜서 리스트에 모아요.</p><pre>header = []
+for rec in records:
+    for key in rec:
+        if key not in header:
+            header.append(key)</pre><p>줄마다 <code>rec.get(key)</code> 로 값을 꺼내면, 없는 키는 <code>None</code> → 엑셀의 빈칸이 돼요. 날짜 글자는 함수표로 <code>date</code> 로 바꿔 넣어야 엑셀이 날짜로 알아봐요(날짜 정렬 · 필터가 돼요). 한 줄은 <code>ws.append(row)</code>(복습: [[레슨:F8]]).</p><div class="bk-warn"><b>csv.DictWriter 도 같은 머리줄로</b> — <code>fieldnames</code> 에 없는 키가 든 딕셔너리를 쓰면 <code>ValueError: dict contains fields not in fieldnames: '쿠폰'</code> 으로 멈춰요. 빠진 키는 괜찮아요(빈칸으로 써요). 그래서 CSV 로 쓸 때도 <code>csv.DictWriter(f, fieldnames=header)</code> 처럼 합집합을 넘겨요.</div><p>예제는 키가 다른 기록 셋을 엑셀로 쓰고 다시 열어 찍어요. 실행하면 머리줄이 <code>['날짜', '품목', '수량', '메모', '쿠폰']</code> 이에요.</p>`,
+      example: { code: `from datetime import date
+from openpyxl import Workbook, load_workbook
+
+records = [
+    {"날짜": "2026-09-01", "품목": "소금빵", "수량": 4},
+    {"날짜": "2026-09-01", "품목": "라테", "수량": 2, "메모": "포장"},
+    {"날짜": "2026-09-02", "품목": "식빵", "쿠폰": "WELCOME", "수량": 1},
+]
+FROM_JSON = {"날짜": date.fromisoformat}
+
+header = []
+for rec in records:
+    for key in rec:
+        if key not in header:
+            header.append(key)
+print(header)
+
+wb = Workbook()
+ws = wb.active
+ws.title = "판매"
+ws.append(header)
+for rec in records:
+    row = []
+    for key in header:
+        value = rec.get(key)
+        if value is not None and key in FROM_JSON:
+            value = FROM_JSON[key](value)
+        row.append(value)
+    ws.append(row)
+wb.save("판매.xlsx")
+
+ws = load_workbook("판매.xlsx")["판매"]
+for row in ws.iter_rows(min_row=2, values_only=True):
+    print(row)
+` } },
+    { title: "엑셀 → CSV: utf-8-sig · ISO 날짜 · 앞자리 0", html: `<p>엑셀 표를 CSV 로 내보낼 때 챙길 것이에요.</p><table class="kb"><tbody><tr><th>무엇</th><th>어떻게</th></tr><tr><td>엑셀에서 열 CSV</td><td><code>open("out.csv", "w", encoding="utf-8-sig", newline="")</code> — 맨 앞 BOM 이 있어야 엑셀이 한글을 안 깨뜨려요(<a href="../python/#lesson/L29" target="_blank" rel="noopener">파이썬 교과서 「csv 모듈 제대로」 ↗</a> 4쪽)</td></tr><tr><td>날짜</td><td>openpyxl 은 날짜 칸을 <code>datetime</code> 으로 줘요. 그대로 쓰면 <code>2026-09-03 00:00:00</code> 이 돼요. <code>v.date()</code> 로 날짜만 떼고 <code>.isoformat()</code> 으로 <code>2026-09-03</code></td></tr><tr><td>빈칸</td><td><code>None</code> → <code>""</code></td></tr><tr><td>숫자로 온 날짜</td><td>날짜 열인데 <code>46270</code> 같은 숫자면 엑셀의 날짜 번호예요 → <code>from_excel(46270)</code>(복습: [[레슨:F7]])</td></tr></tbody></table><pre>from openpyxl.utils.datetime import from_excel
+
+print(from_excel(46270))   # 2026-09-05 00:00:00</pre><p>이 바꾸기들을 함수 <code>cell_text(v)</code> 하나에 모아 칸마다 불러요. 예제는 작은 통합 문서를 CSV 로 내보내고 파일 내용을 그대로 찍어요. 실행하면 첫 줄이 <code>2026-09-03,소금빵,04001,3,</code> 처럼 ISO 날짜 · 빈칸이에요.</p><div class="bk-warn"><b>앞자리 0 — 파일은 맞는데 엑셀이 바꿔요</b> — 우편번호 <code>04001</code> 은 CSV 파일 안에 그대로 있어요. 그런데 엑셀에서 CSV 를 <b>더블클릭으로 열면</b> 엑셀이 숫자로 보고 <code>4001</code> 로 보여 줘요(그대로 저장하면 파일도 바뀌어요). 지키려면 CSV 대신 <code>.xlsx</code> 로 주거나(글자 칸으로 넣기, [[레슨:F8]]), 엑셀의 「데이터 → 텍스트/CSV에서」 로 가져오며 그 열을 「텍스트」 로 골라요.</div>`,
+      example: { code: `import csv
+from datetime import date, datetime
+from openpyxl import Workbook, load_workbook
+
+wb = Workbook()
+ws = wb.active
+ws.append(["날짜", "품목", "우편번호", "수량", "메모"])
+ws.append([date(2026, 9, 3), "소금빵", "04001", 3, None])
+ws.append([date(2026, 9, 4), "라테", "13529", 2, "포장"])
+wb.save("주문.xlsx")
+
+
+def cell_text(v):
+    if v is None:
+        return ""
+    if isinstance(v, datetime):
+        return v.date().isoformat()
+    return v
+
+
+ws = load_workbook("주문.xlsx").active
+with open("주문.csv", "w", encoding="utf-8-sig", newline="") as f:
+    w = csv.writer(f)
+    for row in ws.iter_rows(values_only=True):
+        w.writerow([cell_text(v) for v in row])
+
+with open("주문.csv", encoding="utf-8-sig") as f:
+    print(f.read().rstrip())
+
+first = next(ws.iter_rows(min_row=2, values_only=True))
+print("바꾸지 않으면:", str(first[0]))
+` } },
+    { title: "왕복 시험: CSV → 엑셀 → CSV 가 같은가", html: `<p>바꾸는 함수 짝을 만들었으면 [[왕복 시험]]을 해요. CSV → 엑셀 → CSV 를 돌려 <b>처음 CSV 와 같은지</b> 줄마다 비교해요. 다르면 어느 열의 바꾸기가 정보를 잃었는지 바로 보여요.</p><ul><li>함수 둘: <code>csv_to_xlsx(src, dst, table)</code> 는 함수표로 바꿔 엑셀에, <code>xlsx_to_csv(src, dst)</code> 는 <code>cell_text</code> 로 글자로</li><li>비교는 <b>글자</b>로 해요. <code>Path(p).read_text(encoding="utf-8-sig")</code> 로 읽어 <code>splitlines()</code>(줄마다 나눈 리스트, 끝의 줄바꿈 글자는 빠짐) — <code>utf-8-sig</code> 는 BOM 이 있으면 떼고 없으면 그대로라, 두 파일이 같은 모양이 돼요</li><li>다른 줄만 <code>(원래, 왕복)</code> 짝으로 모아요. 빈 리스트면 왕복 OK</li></ul><p>예제는 같은 CSV 를 함수표 둘로 왕복해요. 우편번호까지 <code>int</code> 로 바꾸는 표는 <code>04001</code> 이 <code>4001</code> 로 돌아와서 왕복이 깨져요. 실행하면 <code>('2026-09-03,소금빵,04001,3', '2026-09-03,소금빵,4001,3')</code> 이 보여요.</p><div class="bk-warn"><b>고칠 때마다 다시</b> — 왕복 시험은 함수를 고칠 때마다 다시 돌려요. <code>assert round_trip(GOOD) == []</code> 처럼 한 줄로 두면, 누가 함수표를 잘못 바꿨을 때 바로 멈춰요(복습: [[레슨:F4]] 의 왕복 시험).</div>`,
+      example: { code: `import csv
+from datetime import date, datetime
+from pathlib import Path
+from openpyxl import Workbook, load_workbook
+
+Path("원본.csv").write_text(
+    "날짜,품목,우편번호,수량\\n2026-09-03,소금빵,04001,3\\n2026-09-04,라테,13529,2\\n",
+    encoding="utf-8",
+)
+
+
+def cell_text(v):
+    if v is None:
+        return ""
+    if isinstance(v, datetime):
+        return v.date().isoformat()
+    return v
+
+
+def csv_to_xlsx(src, dst, table):
+    wb = Workbook()
+    ws = wb.active
+    with open(src, encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        ws.append(reader.fieldnames)
+        for row in reader:
+            ws.append([table[k](v) if k in table else v for k, v in row.items()])
+    wb.save(dst)
+
+
+def xlsx_to_csv(src, dst):
+    ws = load_workbook(src).active
+    with open(dst, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f)
+        for row in ws.iter_rows(values_only=True):
+            w.writerow([cell_text(v) for v in row])
+
+
+def round_trip(table):
+    csv_to_xlsx("원본.csv", "중간.xlsx", table)
+    xlsx_to_csv("중간.xlsx", "왕복.csv")
+    a = Path("원본.csv").read_text(encoding="utf-8-sig").splitlines()
+    b = Path("왕복.csv").read_text(encoding="utf-8-sig").splitlines()
+    if len(a) != len(b):
+        return [("줄 수", len(a), len(b))]
+    return [(x, y) for x, y in zip(a, b) if x != y]
+
+
+GOOD = {"날짜": date.fromisoformat, "수량": int}
+BAD = {"날짜": date.fromisoformat, "수량": int, "우편번호": int}
+
+print("GOOD:", round_trip(GOOD) or "왕복 OK")
+for pair in round_trip(BAD):
+    print("BAD:", pair)
+` } },
+  ],
+  summary: ["형식마다 잃는 것이 달라요 — CSV 는 다 글자, JSON 은 날짜가 없고, 엑셀은 중첩이 없어요", "CSV → JSON 은 열마다 바꿀 함수표, JSON → 엑셀 · CSV 의 머리줄은 키 합집합(처음 나온 순서)", "엑셀 → CSV 는 utf-8-sig · newline=\"\" · 날짜는 ISO 글자, 바꾸는 함수 짝은 왕복 시험으로 확인"] },
+{ id: 'F13', ch: 3, n: 13, title: '중첩 JSON 을 표로 펴기', mode: 'text',
+  tutorSummary: "엑셀 · CSV 는 한 칸에 값 하나라 중첩 JSON 은 펴서 넣는다. flatten(d, prefix=\"\") 재귀: 값이 딕셔너리면 flat.update(flatten(value, name + \".\")), 아니면 flat[name] = value → \"customer.address.city\" 키. 리스트(items)는 그대로 두고 따로 정한다. orders.json 의 A-1003 은 address: null 이라 flatten 이 안으로 안 들어가 customer.address 한 칸만 생김 → 열 목록 COLUMNS 를 먼저 정하고 row.get(col)(없으면 None = 빈칸), 또는 펴기 전에 address or {} 로 채우기. 리스트 다루는 길: 줄로 늘리기(주문 1 × 상품 n → n 줄, 주문 칸 되풀이 — 4 주문 → 7 줄), 글자로 붙이기 \", \".join(titles), 두 표로 나누기(주문 표 + 상품 표, 주문번호로 잇기 = JOIN, SQL S4 · 데이터 분석 P5). 금액 글자는 Decimal. 엑셀은 시간대 있는 datetime 을 못 넣음(TypeError) → replace(tzinfo=None) 후 열 이름에 (한국). 거꾸로: unflatten 은 key.split(\".\") 로 한 겹씩 here = here.setdefault(part, {}), 상품 줄은 grouped.setdefault(주문번호, {...}) 로 묶어 다시 items. 왕복 unflatten(flatten(o)) == o. pandas json_normalize 는 이름만.",
+  terms: { "펴기": "중첩된 딕셔너리를 한 겹으로 바꾸기. 키를 점으로 이어 customer.address.city 처럼 만들어서 표의 열 이름으로 쓴다" },
+  pages: [
+    { title: "flatten(d) 로 펴기: \"a.b.c\" 키", html: `<p>엑셀 · CSV 는 <b>평평</b>해요. 한 칸에 값 하나뿐이에요. 그런데 <code>orders.json</code> 의 주문 하나는 <code>customer</code> 안에 <code>address</code> 가 든 3겹이에요(복습: 경로로 꺼내기 [[레슨:F2]]). 표로 옮기려면 먼저 [[펴기]]를 해요.</p><p>규칙은 하나예요. 값이 딕셔너리면 <b>그 안으로 들어가</b> 키 앞에 <code>바깥키.</code> 를 붙이고, 아니면 그대로 한 칸이에요. 몇 겹인지 모르니 재귀로 써요(복습: <a href="../python/#lesson/L32" target="_blank" rel="noopener">파이썬 교과서 「재귀」 ↗</a>).</p><pre>def flatten(d, prefix=""):
+    flat = {}
+    for key, value in d.items():
+        name = prefix + key
+        if isinstance(value, dict):
+            flat.update(flatten(value, name + "."))
+        else:
+            flat[name] = value
+    return flat
+
+
+print(flatten({"a": 1, "b": {"c": 2, "d": {"e": 3}}}))   # {'a': 1, 'b.c': 2, 'b.d.e': 3}</pre><ul><li><code>flat.update(다른_딕셔너리)</code> — 다른 딕셔너리의 키 · 값을 한꺼번에 넣어요. 안쪽을 편 결과를 바깥에 붓는 거예요</li><li>안쪽을 부를 때 <code>prefix</code> 에 <code>name + "."</code> 을 넘겨서 <code>customer.address.city</code> 처럼 이어져요</li><li><b>리스트는 그대로</b> 둬요(<code>items</code>). 리스트를 어떻게 펼지는 정해야 할 게 있어서 셋째 쪽에서 따로 봐요</li></ul><p>예제는 첫 주문을 펴서 칸마다 찍어요. 실행하면 <code>customer.address.city = 서울</code> 이 보여요.</p><p>pandas 로도 돼요 — <code>pd.json_normalize</code>, 데이터 분석 교과서. 이 교과서는 표준 라이브러리로만 해요.</p>`,
+      example: { code: `import json
+
+
+def flatten(d, prefix=""):
+    flat = {}
+    for key, value in d.items():
+        name = prefix + key
+        if isinstance(value, dict):
+            flat.update(flatten(value, name + "."))
+        else:
+            flat[name] = value
+    return flat
+
+
+with open("orders.json", encoding="utf-8") as f:
+    data = json.load(f)
+orders = data["data"]["orders"]
+
+row = flatten(orders[0])
+for key, value in row.items():
+    if key != "items":
+        print(key, "=", value)
+print("items 는 아직 리스트:", len(row["items"]), "개")
+`, prep: [{ name: 'orders.json', text: BOOKSHOP_JSON }] } },
+    { title: "address: null 인 A-1003 — 열을 먼저 정하기", html: `<p>세 번째 주문 A-1003 은 취소된 주문이라 <code>"email": null</code> · <code>"address": null</code> 이에요. <code>None</code> 은 딕셔너리가 아니라서 <code>flatten</code> 이 안으로 들어가지 않아요. 그래서 A-1003 만 키 모양이 달라요.</p><table class="kb"><tbody><tr><th>주문</th><th>편 키</th></tr><tr><td>A-1001</td><td><code>customer.address.city</code> · <code>customer.address.district</code> · <code>customer.address.zip</code></td></tr><tr><td>A-1003</td><td><code>customer.address</code> 하나(값 <code>None</code>)</td></tr></tbody></table><p>키 합집합으로 머리줄을 만들면([[레슨:F12]]) <code>customer.address</code> 라는 엉뚱한 열이 하나 더 생겨요. 길은 둘이에요.</p><ul><li><b>열을 먼저 정해요</b> — <code>COLUMNS = ["id", …, "customer.address.city"]</code> 로 보여 줄 열을 내가 고르고, 칸은 <code>row.get(col)</code>. 없는 열은 <code>None</code> → 빈칸이에요. 보고서처럼 모양이 정해진 표는 이 길이 좋아요</li><li><b>펴기 전에 채워요</b> — <code>order["customer"]["address"] or {}</code> 처럼 <code>None</code> 을 빈 딕셔너리로 바꾸고 <code>.get("city")</code>. 한 칸만 필요할 때 짧아요</li></ul><p>빈칸을 그대로 둘지, <code>-</code> 로 보일지, 취소 주문은 아예 뺄지는 표를 볼 사람이 정해요. 예제는 열을 먼저 정해서 네 주문을 한 표로 찍어요. 실행하면 A-1003 줄이 <code>A-1003 | cancelled | 박서준 | - | - | -</code> 이에요.</p>`,
+      example: { code: `import json
+
+
+def flatten(d, prefix=""):
+    flat = {}
+    for key, value in d.items():
+        name = prefix + key
+        if isinstance(value, dict):
+            flat.update(flatten(value, name + "."))
+        else:
+            flat[name] = value
+    return flat
+
+
+with open("orders.json", encoding="utf-8") as f:
+    data = json.load(f)
+orders = data["data"]["orders"]
+
+keys_1001 = set(flatten(orders[0]))
+keys_1003 = set(flatten(orders[2]))
+print("A-1003 에만:", sorted(keys_1003 - keys_1001))
+print("A-1001 에만:", sorted(keys_1001 - keys_1003))
+
+COLUMNS = ["id", "status", "customer.name", "customer.email",
+           "customer.address.city", "customer.address.district"]
+print(" | ".join(COLUMNS))
+for order in orders:
+    row = flatten(order)
+    cells = []
+    for col in COLUMNS:
+        value = row.get(col)
+        cells.append("-" if value is None else str(value))
+    print(" | ".join(cells))
+`, prep: [{ name: 'orders.json', text: BOOKSHOP_JSON }] } },
+    { title: "items 리스트: 줄로 늘리기 vs \", \".join", html: `<p>주문 하나에 상품이 여럿(<code>items</code> 리스트)이에요. 표의 한 칸에는 리스트를 못 넣으니 둘 중 하나를 골라요.</p><table class="kb"><tbody><tr><th>길</th><th>모양</th><th>좋은 점 · 조심할 점</th></tr><tr><td><b>줄로 늘리기</b></td><td>주문 1 × 상품 n → n 줄, 주문 칸(번호 · 고객)은 줄마다 되풀이</td><td>상품별로 합계 · 필터가 돼요. 주문 수를 셀 땐 줄 수가 아니라 주문번호 수를 세요</td></tr><tr><td><b>글자로 붙이기</b></td><td>주문 1 → 1 줄, 제목은 <code>", ".join(titles)</code></td><td>사람이 읽기 좋아요. 대신 붙인 글자로는 다시 계산을 못 해요</td></tr></tbody></table><pre>for order in orders:
+    for item in order["items"]:
+        item_rows.append([order["id"], order["customer"]["name"], item["title"], item["qty"]])</pre><p>금액은 <code>"18000.00"</code> 같은 글자라 <code>Decimal(item["price"]) * item["qty"]</code> 로 계산해요(복습: [[레슨:F3]]). 예제는 두 길을 다 해 봐요. 실행하면 <code>4 주문 → 7 줄</code> 이 나와요.</p>`,
+      example: { code: `import json
+from decimal import Decimal
+
+with open("orders.json", encoding="utf-8") as f:
+    data = json.load(f)
+orders = data["data"]["orders"]
+
+# ① 줄로 늘리기: 주문 1 × 상품 n → n 줄
+item_rows = []
+for order in orders:
+    for item in order["items"]:
+        money = Decimal(item["price"]) * item["qty"]
+        item_rows.append([order["id"], order["customer"]["name"], item["title"], item["qty"], money])
+print(len(orders), "주문 →", len(item_rows), "줄")
+for row in item_rows[:3]:
+    print(row[0], row[1], row[2], row[3], str(row[4]))
+
+# ② 글자로 붙이기: 주문 1 → 1 줄
+for order in orders:
+    titles = [item["title"] for item in order["items"]]
+    books = sum(item["qty"] for item in order["items"])
+    print(order["id"], f"{books}권", ", ".join(titles))
+
+total = sum(row[4] for row in item_rows)
+print("줄로 늘린 표의 금액 합:", str(total))
+`, prep: [{ name: 'orders.json', text: BOOKSHOP_JSON }] } },
+    { title: "두 표로 나누기: 주문 표 + 상품 표", html: `<p>셋째 길은 <b>표를 둘로 나누는 것</b>이에요. 「주문」 표는 주문 하나에 한 줄, 「상품」 표는 상품 하나에 한 줄이고, 상품 표에 <b>주문번호</b> 열을 둬서 이어요. 고객 이름이 되풀이되지 않고, 두 표 다 평평해요.</p><table class="kb"><tbody><tr><th>시트 「주문」</th><th>시트 「상품」</th></tr><tr><td>주문번호 · 주문시각 · 상태 · 고객 · 도시</td><td><b>주문번호</b> · 제목 · 단가 · 수량</td></tr></tbody></table><p>엑셀에서는 한 통합 문서의 시트 둘로 두면 돼요(<code>wb.create_sheet("상품")</code>, 복습: [[레슨:F11]]). 다시 이을 땐 <code>{주문번호: 고객}</code> 딕셔너리를 만들어 찾아요. 데이터베이스에서는 이렇게 나누고 잇는 것을 JOIN 이라고 해요 — <a href="../sql/#lesson/S4" target="_blank" rel="noopener">SQL 교과서 「JOIN 1: 표를 왜 나누고 어떻게 합치나」 ↗</a> · <a href="../data/#lesson/P5" target="_blank" rel="noopener">데이터 분석 교과서 「합치기 merge · concat」 ↗</a>.</p><div class="bk-warn"><b>엑셀에는 시간대가 없어요</b> — <code>datetime.fromisoformat("2026-09-03T14:05:00+09:00")</code> 은 시간대가 붙은 시각이에요. 이걸 칸에 넣고 저장하면 openpyxl 이 <code>TypeError: Excel does not support timezones …</code> 로 멈춰요. 한국 시각 그대로 보여 줄 거면 <code>at.replace(tzinfo=None)</code> 으로 떼고, 열 이름에 「(한국)」 처럼 적어 둬요. A-1004 처럼 자정 무렵 주문은 UTC 로 바꾸면 날짜가 하루 달라지니까요(복습: [[레슨:F3]]).</div><p>예제는 두 시트로 쓰고, 다시 열어 주문번호로 고객 이름을 찾아 이어요. 실행하면 <code>['주문', '상품'] 4 주문 7 상품 줄</code> 이 나와요.</p>`,
+      example: { code: `import json
+from datetime import datetime
+from decimal import Decimal
+from openpyxl import Workbook, load_workbook
+
+with open("orders.json", encoding="utf-8") as f:
+    data = json.load(f)
+orders = data["data"]["orders"]
+
+wb = Workbook()
+ws_orders = wb.active
+ws_orders.title = "주문"
+ws_orders.append(["주문번호", "주문시각(한국)", "상태", "고객", "도시"])
+ws_items = wb.create_sheet("상품")
+ws_items.append(["주문번호", "제목", "단가", "수량"])
+
+for order in orders:
+    at = datetime.fromisoformat(order["ordered_at"])
+    address = order["customer"]["address"] or {}
+    ws_orders.append([order["id"], at.replace(tzinfo=None), order["status"],
+                      order["customer"]["name"], address.get("city")])
+    for item in order["items"]:
+        price = int(Decimal(item["price"]))
+        ws_items.append([order["id"], item["title"], price, item["qty"]])
+wb.save("orders_flat.xlsx")
+
+wb = load_workbook("orders_flat.xlsx")
+print(wb.sheetnames, wb["주문"].max_row - 1, "주문", wb["상품"].max_row - 1, "상품 줄")
+
+# 손으로 잇기: 주문번호 → 고객
+name_of = {}
+for oid, at, status, name, city in wb["주문"].iter_rows(min_row=2, values_only=True):
+    name_of[oid] = name
+for oid, title, price, qty in wb["상품"].iter_rows(min_row=2, max_row=4, values_only=True):
+    print(oid, name_of[oid], title, price * qty)
+
+# 시간대를 떼지 않으면?
+test = Workbook()
+try:
+    test.active["A1"] = datetime.fromisoformat(orders[0]["ordered_at"])
+    test.save("tz.xlsx")
+except TypeError as e:
+    print("TypeError:", e)
+`, prep: [{ name: 'orders.json', text: BOOKSHOP_JSON }] } },
+    { title: "거꾸로 접기: unflatten · setdefault 로 묶기", html: `<p>표를 다시 중첩 JSON 으로 되돌릴 때도 있어요(엑셀로 고친 값을 앱에 다시 넣을 때). 점 키를 쪼개 한 겹씩 들어가며 만들어요.</p><pre>def unflatten(flat):
+    nested = {}
+    for key, value in flat.items():
+        parts = key.split(".")
+        here = nested
+        for part in parts[:-1]:
+            here = here.setdefault(part, {})
+        here[parts[-1]] = value
+    return nested
+</pre><ul><li><code>d.setdefault(key, 기본값)</code> — <code>key</code> 가 있으면 그 값을, 없으면 <b>기본값을 넣고</b> 그 값을 돌려줘요. 「없으면 만들고 들어가기」 가 한 줄이에요</li><li>왕복 시험: <code>unflatten(flatten(o)) == o</code> 가 참이면 펴기 · 접기 짝이 정보를 안 잃은 거예요. A-1003 의 <code>address: None</code> 도 <code>customer.address</code> 한 칸으로 갔다가 그대로 돌아와요</li><li>단, 둘째 쪽처럼 <b>열을 먼저 정해 편 줄</b>을 접으면 A-1003 의 주소는 <code>{"city": None, …}</code> 로 돌아와요 — 원래의 <code>None</code> 과 달라요. 되돌릴 일이 있으면 그 규칙도 정해 둬요</li></ul><p>줄로 늘린 상품 표는 <b>주문번호끼리 묶어</b> 다시 <code>items</code> 리스트로 만들어요. 여기서도 <code>grouped.setdefault(주문번호, {"id": …, "items": []})</code> 가 「처음 보는 주문이면 새로 만들기」 를 해 줘요.</p><p>예제를 실행하면 <code>펴고 접으면 그대로: [True, True, True, True]</code> 가 나와요.</p>`,
+      example: { code: `import json
+
+
+def flatten(d, prefix=""):
+    flat = {}
+    for key, value in d.items():
+        name = prefix + key
+        if isinstance(value, dict):
+            flat.update(flatten(value, name + "."))
+        else:
+            flat[name] = value
+    return flat
+
+
+def unflatten(flat):
+    nested = {}
+    for key, value in flat.items():
+        parts = key.split(".")
+        here = nested
+        for part in parts[:-1]:
+            here = here.setdefault(part, {})
+        here[parts[-1]] = value
+    return nested
+
+
+with open("orders.json", encoding="utf-8") as f:
+    data = json.load(f)
+orders = data["data"]["orders"]
+
+print(unflatten({"id": "A-1", "customer.name": "김하늘", "customer.address.city": "서울"}))
+same = [unflatten(flatten(o)) == o for o in orders]
+print("펴고 접으면 그대로:", same)
+
+# 상품 줄(주문번호 + 상품)을 주문번호끼리 묶어 다시 중첩
+item_rows = []
+for order in orders:
+    for item in order["items"]:
+        item_rows.append({"order_id": order["id"], "title": item["title"], "qty": item["qty"]})
+
+grouped = {}
+for row in item_rows:
+    order = grouped.setdefault(row["order_id"], {"id": row["order_id"], "items": []})
+    order["items"].append({"title": row["title"], "qty": row["qty"]})
+for order in grouped.values():
+    print(order["id"], len(order["items"]), "개", order["items"][0])
+`, prep: [{ name: 'orders.json', text: BOOKSHOP_JSON }] } },
+  ],
+  summary: ["flatten(d) 재귀로 중첩 딕셔너리를 customer.address.city 같은 점 키로 펴요 — 리스트는 따로 정해요", "None 이 든 A-1003 처럼 모양이 다르면 열 목록을 먼저 정하고 row.get(열), 리스트는 줄로 늘리기 · 글자로 붙이기 · 두 표로 나누기", "거꾸로는 unflatten 과 setdefault 로 주문번호끼리 묶기 — 펴고 접은 결과가 처음과 같은지 확인해요"] },
+{ id: 'F14', ch: 3, n: 14, title: 'TOML 맛보기 · 형식 고르기', mode: 'text',
+  tutorSummary: "TOML = 사람이 손으로 쓰는 설정 파일(pyproject.toml). key = 값, # 주석, [표] → 딕셔너리, [[배열 표]] 를 되풀이 → 딕셔너리 리스트, [project.scripts] 처럼 점 든 표 이름은 안쪽 표, 키에 - 가능(project[\"requires-python\"]). 읽기: tomllib(3.11+, 설치 없음). 파일은 open(\"config.toml\", \"rb\") 로 열어 tomllib.load(f) — 글자 모드면 TypeError: File must be opened in binary mode(TOML 은 늘 UTF-8 이라 tomllib 이 직접 풂), 글자는 tomllib.loads(text). 읽기만 됨(쓰기는 tomli-w 패키지 이름만, 다시 쓰면 주석이 사라짐). 종류: 글자 str · 정수 int · 25.5 float · true bool · 2026-09-01 은 datetime.date 로 바로 · 시각+시간대 datetime · 배열 list · 표 dict. 문법 틀림은 tomllib.TOMLDecodeError (at line, column). 형식 고르기: 사람이 쓰는 설정 = TOML · 프로그램끼리 데이터 = JSON · 쌓이는 기록 = JSONL · 표 주고받기 = CSV · 사람에게 보일 보고 = 엑셀 · 많고 자주 찾음 = SQLite(파이썬 L30). match path.suffix 로 형식마다 읽는 함수 load_any. YAML · XML 은 다루지 않음. pyproject 만들기는 API 교과서 H16.",
+  terms: { "TOML": "사람이 손으로 쓰는 설정 파일 형식. key = 값, # 주석, [표] 로 묶는다. 파이썬 3.11 부터 tomllib 으로 읽는다" },
+  pages: [
+    { title: "TOML 생김새: # 주석 · [표] · 배열 표", html: `<p>[[TOML]] 은 <b>사람이 손으로 쓰는 설정 파일</b> 형식이에요. 파이썬 프로젝트의 <code>pyproject.toml</code> 이 대표예요. JSON 과 견주면 주석을 달 수 있고, 따옴표 · 괄호가 적고, 날짜가 있어요.</p><pre># 사진 정리기 설정 — 사람이 직접 고치는 파일이라 주석을 달 수 있어요
+title = "사진 정리기"         # 글자는 큰따옴표
+version = 3                    # 정수
+started = 2026-09-01           # 날짜 — 따옴표 없이
+
+[source]                       # 표 = 딕셔너리 config["source"]
+folder = "사진/원본"
+extensions = [".jpg", ".png", ".heic"]   # 배열 = 리스트
+
+&#91;&#91;rules&#93;&#93;                      # 배열 표 = 딕셔너리 리스트 config["rules"]
+name = "스크린샷"
+match = "Screenshot*"
+move_to = "스크린샷"
+
+&#91;&#91;rules&#93;&#93;                      # 하나 더 → config["rules"][1]
+name = "메신저"
+match = "KakaoTalk_*"
+move_to = "메신저"</pre><table class="kb"><tbody><tr><th>TOML</th><th>파이썬으로 읽으면</th></tr><tr><td><code>key = 값</code></td><td>딕셔너리의 키 · 값</td></tr><tr><td><code># …</code></td><td>주석 — 읽으면 사라져요(JSON 에는 주석이 없어요, [[레슨:F1]])</td></tr><tr><td><code>[source]</code> 아래 줄들</td><td><code>config["source"]</code> 딕셔너리</td></tr><tr><td><code>&#91;&#91;rules&#93;&#93;</code> 를 여러 번</td><td><code>config["rules"]</code> = 딕셔너리 <b>리스트</b>, 나온 차례대로</td></tr></tbody></table><p>글자로 가진 TOML 은 <code>tomllib.loads(text)</code> 로 읽어요(<code>json.loads</code> 와 같은 짝이에요). <code>tomllib</code> 은 파이썬 3.11 부터 들어 있어 설치가 필요 없어요. 예제는 짧은 설정을 읽어 딕셔너리로 찍어요. 실행하면 <code>2 메신저</code> 가 나와요 — 배열 표 둘째의 이름이에요.</p>`,
+      example: { code: `import tomllib
+
+TEXT = """
+# 사람이 고치는 파일이라 주석을 달 수 있어요
+title = "사진 정리기"
+version = 3
+
+[source]
+folder = "사진/원본"
+extensions = [".jpg", ".png"]
+
+[[rules]]
+name = "스크린샷"
+move_to = "스크린샷"
+
+[[rules]]
+name = "메신저"
+move_to = "메신저"
+"""
+
+config = tomllib.loads(TEXT)
+print(config)
+print(config["source"]["folder"])
+print(len(config["rules"]), config["rules"][1]["name"])
+` } },
+    { title: "tomllib.load(f) 는 open(…, \"rb\") 로", html: `<p>파일은 <code>tomllib.load(f)</code> 로 읽어요. 한 가지가 달라요. 파일을 <b>바이트 모드 <code>"rb"</code></b> 로 열어요.</p><pre>import tomllib
+
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)</pre><ul><li>TOML 은 늘 UTF-8 이라고 정해져 있어서, <code>tomllib</code> 이 바이트를 받아 <b>스스로</b> 글자로 풀어요. 그래서 <code>encoding=</code> 도 안 써요</li><li>글자 모드(<code>"r"</code>)로 열어 넘기면 <code>TypeError: File must be opened in binary mode, e.g. use &#96;open('foo.toml', 'rb')&#96;</code> 로 멈춰요 — 에러 글에 고칠 방법이 그대로 있어요</li><li><b>읽기만</b> 돼요. <code>tomllib</code> 에는 <code>dump</code> 가 없어요. 쓰려면 <code>tomli-w</code> 패키지가 있지만, 설정 파일은 사람이 고치는 파일이라 프로그램이 다시 쓰면 주석이 다 사라져요. 프로그램이 쓰는 값은 JSON 에 따로 두는 게 보통이에요</li></ul><p>예제는 공부 폴더의 <code>config.toml</code>(시작하기 2, 아래 준비 파일)을 읽어요. 실행하면 <code>Screenshot* → 스크린샷</code> 처럼 규칙이 찍히고, 마지막 줄은 글자 모드로 열었을 때의 <code>TypeError</code> 예요.</p>`,
+      example: { code: `import tomllib
+
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)
+
+print(config["title"], "v", config["version"])
+print(config["source"]["folder"], config["source"]["extensions"])
+print("최대", config["output"]["max_size_mb"], "MB · 원본 남기기", config["output"]["keep_original"])
+for rule in config["rules"]:
+    print(rule["match"], "→", rule["move_to"])
+
+try:
+    with open("config.toml", encoding="utf-8") as f:
+        tomllib.load(f)
+except TypeError as e:
+    print("TypeError:", e)
+`, prep: [{ name: 'config.toml', text: APP_TOML }] } },
+    { title: "종류 대응: date 로 바로 · TOMLDecodeError", html: `<p>TOML 은 JSON 보다 종류가 많아요. 특히 <b>날짜</b>가 있어서 [[레슨:F3]] 처럼 글자를 손으로 바꿀 필요가 없어요.</p><table class="kb"><tbody><tr><th>TOML</th><th>파이썬</th></tr><tr><td><code>"사진 정리기"</code></td><td><code>str</code></td></tr><tr><td><code>3</code> · <code>25.5</code></td><td><code>int</code> · <code>float</code></td></tr><tr><td><code>true</code> · <code>false</code></td><td><code>True</code> · <code>False</code></td></tr><tr><td><code>2026-09-01</code></td><td><code>datetime.date</code></td></tr><tr><td><code>2026-09-01T09:00:00+09:00</code></td><td>시간대가 붙은 <code>datetime</code></td></tr><tr><td><code>[".jpg", ".png"]</code></td><td><code>list</code></td></tr><tr><td><code>[표]</code> · <code>&#91;&#91;배열 표&#93;&#93;</code></td><td><code>dict</code> · <code>dict</code> 의 <code>list</code></td></tr></tbody></table><p>글자에 따옴표를 빠뜨리는 것처럼 문법이 틀리면 <code>tomllib.TOMLDecodeError</code> 가 나요. 에러 글 끝에 <code>(at line 1, column 9)</code> 처럼 <b>줄 · 칸</b>이 붙어 있어 어디를 고칠지 보여요.</p><p>예제는 <code>config.toml</code> 의 값마다 종류를 찍고, 따옴표가 빠진 설정을 읽어 봐요. 실행하면 <code>started</code> 가 <code>date</code> 예요.</p>`,
+      example: { code: `import tomllib
+
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)
+
+for key in ["title", "version", "debug", "started", "source", "rules"]:
+    print(f"{key:<8} {type(config[key]).__name__}")
+print(config["output"]["max_size_mb"], type(config["output"]["max_size_mb"]).__name__)
+
+started = config["started"]
+print(started.year, started.month, started.isoformat())
+
+broken = 'title = 사진 정리기\\nversion = 3\\n'
+try:
+    tomllib.loads(broken)
+except tomllib.TOMLDecodeError as e:
+    print("TOMLDecodeError:", e)
+`, prep: [{ name: 'config.toml', text: APP_TOML }] } },
+    { title: "pyproject.toml 읽어 보기", html: `<p>파이썬 프로젝트를 패키지로 묶을 때 쓰는 <code>pyproject.toml</code> 도 TOML 이에요(만드는 법은 <a href="../api/#lesson/H16" target="_blank" rel="noopener">API 교과서 「패키지로 묶어 쓰고 나눠 주기」 ↗</a>). 이름 · 판 · 필요한 패키지 · 도구 설정이 한 파일에 있어요.</p><pre>[project]
+name = "photo-sorter"
+version = "0.3.0"
+requires-python = "&gt;=3.11"
+dependencies = ["openpyxl&gt;=3.1", "pillow&gt;=10"]
+
+[project.scripts]
+photo-sorter = "photo_sorter.cli:main"
+
+[tool.ruff]
+line-length = 100</pre><ul><li><code>[project.scripts]</code> 처럼 점이 든 표 이름은 <b>안쪽 표</b>예요 → <code>meta["project"]["scripts"]</code></li><li>키에 <code>-</code> 가 있어도 돼요(<code>requires-python</code>). 파이썬에서는 <code>project["requires-python"]</code> 처럼 글자 키로 꺼내요</li><li><code>[tool.ruff]</code> 처럼 <code>[tool.도구이름]</code> 은 도구마다 자기 설정을 두는 자리예요. 내 도구의 설정도 <code>[tool.photo-sorter]</code> 같은 표를 만들어 읽으면 돼요</li></ul><p>예제는 이 모양을 <code>tomllib.loads</code> 로 읽어 꺼내요. 실행하면 <code>photo-sorter 0.3.0 &gt;=3.11</code> 이 나와요.</p>`,
+      example: { code: `import tomllib
+
+PYPROJECT = """
+[project]
+name = "photo-sorter"
+version = "0.3.0"
+requires-python = ">=3.11"
+dependencies = [
+    "openpyxl>=3.1",
+    "pillow>=10",
+]
+
+[project.scripts]
+photo-sorter = "photo_sorter.cli:main"
+
+[tool.ruff]
+line-length = 100
+"""
+
+meta = tomllib.loads(PYPROJECT)
+project = meta["project"]
+print(project["name"], project["version"], project["requires-python"])
+for dep in project["dependencies"]:
+    print(" -", dep)
+print(project["scripts"])
+print(meta["tool"]["ruff"]["line-length"])
+` } },
+    { title: "형식 고르기 표 · load_any(path)", html: `<p>이 교과서에서 다룬 형식을 한 표로 모아요. 「누가 쓰고 누가 읽나」 로 고르면 거의 맞아요.</p><table class="kb"><tbody><tr><th>이럴 때</th><th>형식</th><th>까닭</th></tr><tr><td>사람이 손으로 고치는 설정</td><td><b>TOML</b></td><td>주석 · 날짜 · 덜 깐깐한 문법. 프로그램은 읽기만</td></tr><tr><td>프로그램끼리 주고받는 데이터 · API · 앱 저장</td><td><b>JSON</b></td><td>중첩 · 어느 언어나 읽음. 날짜는 ISO 글자로([[레슨:F3]])</td></tr><tr><td>계속 쌓이는 기록 · 로그</td><td><b>JSONL</b></td><td>한 줄씩 이어 쓰고 한 줄씩 읽음([[레슨:F5]])</td></tr><tr><td>다른 프로그램과 표 주고받기</td><td><b>CSV</b></td><td>가장 단순. 대신 값이 다 글자([[레슨:F12]])</td></tr><tr><td>사람에게 보여 줄 표 · 보고서</td><td><b>엑셀</b></td><td>여러 시트 · 서식 · 차트([[레슨:F10]])</td></tr><tr><td>많고, 자주 찾고, 여럿이 고침</td><td><b>SQLite</b></td><td>파일 하나짜리 데이터베이스 — <a href="../python/#lesson/L30" target="_blank" rel="noopener">파이썬 교과서 「sqlite3 맛보기」 ↗</a></td></tr></tbody></table><p>여러 형식을 받는 도구라면 확장자로 고르는 함수 하나를 두면 편해요. <code>match path.suffix:</code> 로 나눠요(복습: <a href="../python/#lesson/L37" target="_blank" rel="noopener">파이썬 교과서 「match-case」 ↗</a>). 예제는 같은 설정을 네 형식으로 써 두고 하나의 함수로 읽어요. 실행하면 CSV 쪽만 <code>'14'</code> 글자예요.</p><div class="bk-warn"><b>YAML · XML 은?</b> — 둘 다 흔한 형식이지만 표준 라이브러리로 편하게 읽기 어렵거나(YAML 은 패키지가 필요) 쓰임이 줄었어요. 이 교과서는 다루지 않아요.</div>`,
+      example: { code: `import csv
+import json
+import tomllib
+from pathlib import Path
+
+Path("a.json").write_text('{"theme": "dark", "font_size": 14}', encoding="utf-8")
+Path("a.toml").write_text('theme = "dark"\\nfont_size = 14\\n', encoding="utf-8")
+Path("a.jsonl").write_text('{"event": "open"}\\n{"event": "save"}\\n', encoding="utf-8")
+Path("a.csv").write_text("theme,font_size\\ndark,14\\n", encoding="utf-8")
+
+
+def load_any(path):
+    match path.suffix:
+        case ".json":
+            return json.loads(path.read_text(encoding="utf-8"))
+        case ".jsonl":
+            lines = path.read_text(encoding="utf-8").splitlines()
+            return [json.loads(line) for line in lines if line.strip()]
+        case ".toml":
+            with path.open("rb") as f:
+                return tomllib.load(f)
+        case ".csv":
+            with path.open(encoding="utf-8-sig", newline="") as f:
+                return list(csv.DictReader(f))
+        case _:
+            raise ValueError(f"모르는 형식: {path.suffix}")
+
+
+for name in ["a.json", "a.toml", "a.jsonl", "a.csv"]:
+    data = load_any(Path(name))
+    print(f"{name:<8}", data)
+` } },
+  ],
+  summary: ["TOML 은 사람이 쓰는 설정 — # 주석 · [표] 는 딕셔너리 · 배열 표는 딕셔너리 리스트", "tomllib.load(f) 는 open(…, \"rb\") 로 열고, 읽기만 돼요 — 날짜는 date 로 바로 와요", "설정 = TOML · 데이터 = JSON · 기록 = JSONL · 표 = CSV · 보고 = 엑셀 · 많고 자주 찾음 = SQLite"] },
+{ id: 'FB3', ch: 3, boss: true, title: '만들어 보기: 가계부 엑셀 → JSON → 보고서', mode: 'text',
+  tutorSummary: "만들어 보기: 가계부_카드내역.xlsx(시트 이용내역 — 1~2행 병합 제목, 3행 빈 줄, 4행 머리줄 이용일 · 가맹점 · 분류 · 이용금액, 금액 \"32,400원\" 글자 · 환불 \"-21,600원\", 날짜 두 칸은 숫자 46270 · 46282, 중간 빈 줄, 맨 아래 합계 174,750원) → ① 머리줄은 첫 칸이 이용일인 줄로 찾고, set(row) == {None} 빈 줄 건너뛰기, 합계 줄은 따로 맞춰 보기, won(text) 쉼표 · 원 떼고 int, to_date: datetime 은 .date(), 숫자는 openpyxl.utils.datetime.from_excel(n).date() ② read_card(path) 로 묶어 ISO 날짜 · 정수 원 기록으로, F6 식 check(rec, where) 가 틀린 곳 목록(필수 키 집합 차 · fromisoformat · bool 먼저 거른 int · 0 아님 · 분류 집합) — 검사기 자체도 틀린 기록으로 시험, 통과하면 {\"version\": 1, \"records\": [...]} 로 가계부.json ③ JSON 에서 월(날짜[:7]) · 분류별 합계 by_month.setdefault(month, {}), 환불은 음수(집계는 파이썬 X4 와 같음) ④ 가계부_보고서.xlsx: 요약 시트(분류 · 금액 큰 순 + =SUM 수식 줄, 머리줄 Font · PatternFill 4472C4, #,##0, 너비, D2 에 BarChart) + 원본 시트(date 로, freeze_panes A2), 가계부.csv(utf-8-sig, newline=\"\"), 다시 열어 확인 · zip 목록에 xl/charts/chart1.xml ⑤ 가계부_카드내역_10월.xlsx 는 앞 두 건이 9월 끝 두 건과 같음 → 열쇠 (날짜, 가맹점, 금액) 집합으로 겹친 건 건너뛰고 날짜 순 저장, 같은 파일을 두 번 넣어도 그대로. 열쇠의 한계(같은 날 같은 금액 두 번)와 승인번호.", pages: [], summary: [] },
 ];
 const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)

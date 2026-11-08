@@ -99,5 +99,1187 @@ const BOOK = {
       { title: "④ 분류를 쌓은 월별 막대 차트", text: "<p>③ 의 「요약」 시트에 막대 차트를 더해요. 달마다 막대 하나, 그 안을 분류별로 쌓은 막대예요(<code>chart.grouping = \"stacked\"</code> · <code>chart.overlap = 100</code>).</p><ul><li>데이터는 B1:D4(머리줄부터, 계열 셋 = 빵 · 음료 · 케이크), 막대 이름은 A2:A4 — 합계 줄 · 합계 열은 넣지 않아요</li><li>제목 <code>3분기 월별 매출</code>, 세로축 <code>원</code>, 크기 18 × 9, 자리 <code>G2</code></li></ul><p>차트는 함수 <code>add_chart(ws, n_months)</code> 로 묶어요. 저장한 뒤 다시 열어 시트 이름과 머리줄을 찍고, zip 목록에서 차트 파일 · 그림 자리 파일(<code>xl/drawings/</code>)을 찍으세요.</p>", needs: [["Reference(ws, min_col=2, max_col=4, min_row=1, max_row=4)", "F10/3", "여러 열 = 계열 여러 개"], ["chart.grouping = \"stacked\"  chart.overlap = 100", "F10/3", "한 막대에 쌓기"], ["chart.set_categories(cats)", "F10/3", "막대 이름"], ["ws.add_chart(chart, \"G2\")", "F10/3", "차트 자리"], ["zipfile.ZipFile(p).namelist()", "F10/4", "차트 파일 확인"]], prep: [SAMPLES_PREP], io: [{ output: "['요약'] ['월', '빵', '음료', '케이크', '합계']\n차트: ['xl/charts/chart1.xml']\n그림 자리: ['xl/drawings/drawing1.xml']" }], answer: "import zipfile\nfrom openpyxl import Workbook, load_workbook\nfrom openpyxl.styles import Font, PatternFill, Alignment\nfrom openpyxl.chart import BarChart, Reference\n\n\ndef read_sales(path):\n    rows = []\n    for ws in load_workbook(path):\n        it = ws.iter_rows(values_only=True)\n        header = next(it)\n        for row in it:\n            rec = dict(zip(header, row))\n            rec[\"월\"] = ws.title\n            rec[\"매출\"] = rec[\"단가\"] * rec[\"수량\"]\n            rows.append(rec)\n    return rows\n\n\nKINDS = [\"빵\", \"음료\", \"케이크\"]\n\n\ndef write_summary(ws, rows):\n    months = []\n    table = {}\n    for r in rows:\n        if r[\"월\"] not in months:\n            months.append(r[\"월\"])\n        key = (r[\"월\"], r[\"분류\"])\n        table[key] = table.get(key, 0) + r[\"매출\"]\n\n    ws.append([\"월\"] + KINDS + [\"합계\"])\n    for i, m in enumerate(months, 2):\n        ws.append([m] + [table.get((m, k), 0) for k in KINDS] + [f\"=SUM(B{i}:D{i})\"])\n    last = len(months) + 1\n    ws.append([\"합계\"] + [f\"=SUM({col}2:{col}{last})\" for col in \"BCDE\"])\n\n    for c in ws[1]:\n        c.font = Font(bold=True, color=\"FFFFFF\")\n        c.fill = PatternFill(\"solid\", fgColor=\"4472C4\")\n        c.alignment = Alignment(horizontal=\"center\")\n    for c in ws[ws.max_row]:\n        c.font = Font(bold=True)\n    for row in ws.iter_rows(min_row=2, min_col=2):\n        for c in row:\n            c.number_format = \"#,##0\"\n    ws.column_dimensions[\"A\"].width = 8\n    for col in \"BCDE\":\n        ws.column_dimensions[col].width = 13\n    ws.freeze_panes = \"B2\"\n    return months\n\n\ndef add_chart(ws, n_months):\n    chart = BarChart()\n    chart.title = \"3분기 월별 매출\"\n    chart.y_axis.title = \"원\"\n    chart.grouping = \"stacked\"\n    chart.overlap = 100\n    data = Reference(ws, min_col=2, max_col=4, min_row=1, max_row=n_months + 1)\n    cats = Reference(ws, min_col=1, min_row=2, max_row=n_months + 1)\n    chart.add_data(data, titles_from_data=True)\n    chart.set_categories(cats)\n    chart.width = 18\n    chart.height = 9\n    ws.add_chart(chart, \"G2\")\n\n\nrows = read_sales(\"빵집_매출.xlsx\")\nwb = Workbook()\nws = wb.active\nws.title = \"요약\"\nmonths = write_summary(ws, rows)\nadd_chart(ws, len(months))\nwb.save(\"매출_보고서.xlsx\")\n\nwb = load_workbook(\"매출_보고서.xlsx\")\nprint(wb.sheetnames, [c.value for c in wb[\"요약\"][1]])\nwith zipfile.ZipFile(\"매출_보고서.xlsx\") as z:\n    names = z.namelist()\nprint(\"차트:\", [n for n in names if n.startswith(\"xl/charts/\")])\nprint(\"그림 자리:\", [n for n in names if n.startswith(\"xl/drawings/\") and n.endswith(\".xml\")])", checks: [{"text": "엑셀에서 「요약」 시트를 열면 G2 근처에 막대 셋(7월 · 8월 · 9월)이 있고, 9월 막대가 가장 높아요"}, {"text": "막대마다 빵 · 음료 · 케이크가 다른 색으로 쌓여 있고, 범례에 세 분류 이름이 보여요"}, {"text": "차트 위에 「3분기 월별 매출」, 세로축에 「원」 이 보여요"}] },
       { title: "⑤ 보고서 함수 make_report · 다시 읽어 검사", text: "<p>마지막으로 ①~④ 를 함수 하나로 묶어요. 나중에 「정해진 시간에 보고서 만들기」 처럼 다른 프로그램이 <code>from report import make_report</code> 로 불러 쓸 수 있게, 파일 이름은 <code>report.py</code> 로 하고 맨 아래 실행 부분은 <code>if __name__ == \"__main__\":</code> 안에 둬요.</p><ul><li><code>make_report(src, dst)</code> — <code>src</code> 를 읽어 <code>dst</code> 에 「요약」 시트(③ · ④ 그대로)와 「품목」 시트를 쓰고, <code>{\"월별\": {…}, \"합계\": …, \"TOP3\": [품목, 품목, 품목]}</code> 딕셔너리를 돌려줘요</li><li>「품목」 시트: <code>순위 · 품목 · 분류 · 수량 · 매출</code>, 매출 큰 순, TOP 3 줄은 연노랑 <code>FFF2CC</code>, 머리줄 꾸밈 · 매출 <code>#,##0</code> · 틀 고정 · 필터</li><li><code>check_report(dst, result)</code> — 다시 열어 검사해요: 시트 순서, E5 수식 글자, <code>data_only=True</code> 로 연 E5 가 <code>None</code>, 요약 표 B2:D4 값의 합이 <code>result[\"합계\"]</code> 와 같은지, 품목 시트 1~3위, 차트 파일. 다르면 <code>assert</code> 로 멈추고, 다 맞으면 찍은 뒤 <code>검사 통과</code></li></ul><p>그다음 엑셀에서 직접 열어 아래 ☐ 를 확인해요. 수식 칸의 값은 엑셀이 열 때 계산하니까, 파이썬 합계와 같은지는 눈으로 봐요.</p>", needs: [["for ws in load_workbook(path):", "F11/0", "시트마다 읽기"], ["wb.create_sheet(\"품목\")", "F11/3", "시트 더하기 · 순서"], ["PatternFill(\"solid\", fgColor=\"FFF2CC\")", "F10/0", "TOP 3 줄 칠하기"], ["ws.auto_filter.ref = ws.dimensions", "F10/2", "필터 단추"], ["load_workbook(dst, data_only=True)[\"요약\"][\"E5\"].value", "F10/4", "아직 계산 안 된 수식은 None"], ["\"xl/charts/chart1.xml\" in z.namelist()", "F10/4", "차트 파일 확인"]], prep: [SAMPLES_PREP], io: [{ output: "7월 957,400원\n8월 864,900원\n9월 1,015,800원\n시트 순서: ['요약', '품목']\nE5 수식: =SUM(E2:E4)\ndata_only 로 연 E5: None (엑셀에서 열어 저장하기 전)\n표 값의 합: 2,838,100 | 파이썬 합계: 2,838,100\n품목 1~3위: 딸기케이크 · 식빵 · 크루아상 | 칠: 00FFF2CC\n차트 파일: True\n검사 통과" }], answer: "\"\"\"report.py — 빵집 매출 엑셀 → 3분기 보고서 엑셀.\n다른 프로그램에서: from report import make_report\"\"\"\nimport zipfile\nfrom openpyxl import Workbook, load_workbook\nfrom openpyxl.styles import Font, PatternFill, Alignment\nfrom openpyxl.chart import BarChart, Reference\n\n\ndef read_sales(path):\n    rows = []\n    for ws in load_workbook(path):\n        it = ws.iter_rows(values_only=True)\n        header = next(it)\n        for row in it:\n            rec = dict(zip(header, row))\n            rec[\"월\"] = ws.title\n            rec[\"매출\"] = rec[\"단가\"] * rec[\"수량\"]\n            rows.append(rec)\n    return rows\n\n\nKINDS = [\"빵\", \"음료\", \"케이크\"]\n\n\ndef write_summary(ws, rows):\n    months = []\n    table = {}\n    for r in rows:\n        if r[\"월\"] not in months:\n            months.append(r[\"월\"])\n        key = (r[\"월\"], r[\"분류\"])\n        table[key] = table.get(key, 0) + r[\"매출\"]\n\n    ws.append([\"월\"] + KINDS + [\"합계\"])\n    for i, m in enumerate(months, 2):\n        ws.append([m] + [table.get((m, k), 0) for k in KINDS] + [f\"=SUM(B{i}:D{i})\"])\n    last = len(months) + 1\n    ws.append([\"합계\"] + [f\"=SUM({col}2:{col}{last})\" for col in \"BCDE\"])\n\n    for c in ws[1]:\n        c.font = Font(bold=True, color=\"FFFFFF\")\n        c.fill = PatternFill(\"solid\", fgColor=\"4472C4\")\n        c.alignment = Alignment(horizontal=\"center\")\n    for c in ws[ws.max_row]:\n        c.font = Font(bold=True)\n    for row in ws.iter_rows(min_row=2, min_col=2):\n        for c in row:\n            c.number_format = \"#,##0\"\n    ws.column_dimensions[\"A\"].width = 8\n    for col in \"BCDE\":\n        ws.column_dimensions[col].width = 13\n    ws.freeze_panes = \"B2\"\n    return months\n\n\ndef add_chart(ws, n_months):\n    chart = BarChart()\n    chart.title = \"3분기 월별 매출\"\n    chart.y_axis.title = \"원\"\n    chart.grouping = \"stacked\"\n    chart.overlap = 100\n    data = Reference(ws, min_col=2, max_col=4, min_row=1, max_row=n_months + 1)\n    cats = Reference(ws, min_col=1, min_row=2, max_row=n_months + 1)\n    chart.add_data(data, titles_from_data=True)\n    chart.set_categories(cats)\n    chart.width = 18\n    chart.height = 9\n    ws.add_chart(chart, \"G2\")\n\n\ndef write_items(ws, rows):\n    money = {}\n    count = {}\n    kind_of = {}\n    for r in rows:\n        money[r[\"품목\"]] = money.get(r[\"품목\"], 0) + r[\"매출\"]\n        count[r[\"품목\"]] = count.get(r[\"품목\"], 0) + r[\"수량\"]\n        kind_of[r[\"품목\"]] = r[\"분류\"]\n    ranked = sorted(money, key=money.get, reverse=True)\n    ws.append([\"순위\", \"품목\", \"분류\", \"수량\", \"매출\"])\n    for rank, name in enumerate(ranked, 1):\n        ws.append([rank, name, kind_of[name], count[name], money[name]])\n    for c in ws[1]:\n        c.font = Font(bold=True, color=\"FFFFFF\")\n        c.fill = PatternFill(\"solid\", fgColor=\"4472C4\")\n        c.alignment = Alignment(horizontal=\"center\")\n    for r in range(2, 5):\n        for c in ws[r]:\n            c.fill = PatternFill(\"solid\", fgColor=\"FFF2CC\")\n    for c in ws[\"E\"][1:]:\n        c.number_format = \"#,##0\"\n    for col, w in {\"A\": 6, \"B\": 14, \"C\": 8, \"D\": 8, \"E\": 12}.items():\n        ws.column_dimensions[col].width = w\n    ws.freeze_panes = \"A2\"\n    ws.auto_filter.ref = ws.dimensions\n    return ranked[:3]\n\n\ndef make_report(src, dst):\n    rows = read_sales(src)\n    wb = Workbook()\n    ws = wb.active\n    ws.title = \"요약\"\n    months = write_summary(ws, rows)\n    add_chart(ws, len(months))\n    top3 = write_items(wb.create_sheet(\"품목\"), rows)\n    wb.save(dst)\n    by_month = {m: sum(r[\"매출\"] for r in rows if r[\"월\"] == m) for m in months}\n    return {\"월별\": by_month, \"합계\": sum(by_month.values()), \"TOP3\": top3}\n\n\ndef check_report(dst, result):\n    wb = load_workbook(dst)\n    print(\"시트 순서:\", wb.sheetnames)\n    assert wb.sheetnames == [\"요약\", \"품목\"]\n    s = wb[\"요약\"]\n    print(\"E5 수식:\", s[\"E5\"].value)\n    assert s[\"E5\"].value == \"=SUM(E2:E4)\"\n    e5 = load_workbook(dst, data_only=True)[\"요약\"][\"E5\"].value\n    print(\"data_only 로 연 E5:\", e5, \"(엑셀에서 열어 저장하기 전)\")\n    assert e5 is None\n    cells = sum(c.value for row in s[\"B2:D4\"] for c in row)\n    print(f\"표 값의 합: {cells:,} | 파이썬 합계: {result['합계']:,}\")\n    assert cells == result[\"합계\"]\n    top = [wb[\"품목\"].cell(row=r, column=2).value for r in range(2, 5)]\n    print(\"품목 1~3위:\", \" · \".join(top), \"| 칠:\", wb[\"품목\"][\"B2\"].fill.fgColor.rgb)\n    assert top == result[\"TOP3\"]\n    with zipfile.ZipFile(dst) as z:\n        has_chart = \"xl/charts/chart1.xml\" in z.namelist()\n    print(\"차트 파일:\", has_chart)\n    assert has_chart\n    print(\"검사 통과\")\n\n\nif __name__ == \"__main__\":\n    result = make_report(\"빵집_매출.xlsx\", \"매출_보고서.xlsx\")\n    for month, total in result[\"월별\"].items():\n        print(f\"{month} {total:,}원\")\n    check_report(\"매출_보고서.xlsx\", result)", checks: [{"text": "엑셀(또는 LibreOffice Calc)에서 <code>매출_보고서.xlsx</code> 를 열면 「요약」 시트가 먼저 보이고, E5 에 <code>2,838,100</code> 이 보여요 — check_report 가 찍은 파이썬 합계와 같아요"}, {"text": "「요약」 시트 G2 근처에 분류를 쌓은 막대 셋이 있고, 9월 막대가 가장 높아요"}, {"text": "「품목」 시트의 1~3위 줄이 연노랑이고, 「분류」 필터 단추로 케이크만 골라 볼 수 있어요"}, {"text": "엑셀에서 저장하고 닫은 뒤 <code>print(load_workbook(\"매출_보고서.xlsx\", data_only=True)[\"요약\"][\"E5\"].value)</code> 만 따로 돌리면 이번엔 <code>2838100</code> 이 나와요(엑셀이 계산해 저장해 둔 값)"}] },
     ],
+    F12: [
+      { title: "CSV 와 엑셀에서 돌아온 값 — 출력 예측",
+        text: `<p>기록 한 건을 CSV 와 엑셀에 한 번씩 넣었다가 꺼내요. 실행하기 전에 출력을 종이에 적어 보고, VS Code 에서 돌려 맞혀 보세요. <code>"007"</code> · <code>3</code> · <code>None</code> · 날짜가 각각 어떻게 돌아오는지 눈여겨봐요.</p>`,
+        needs: [["csv.DictWriter(f, fieldnames=list(rec))", "F12/0", "CSV 에 쓰면 값이 다 글자"], ["load_workbook(\"t.xlsx\").active", "F12/0", "다시 열어 종류 보기"], ["back[\"수량\"] + \"개\"", "F12/0", "글자끼리는 + 로 이어 붙음"]],
+        predict: true,
+        io: [{ output: `{'코드': '007', '수량': '3', '할인': '0.5', '배송': '', '날짜': '2026-09-03'}
+False 3개
+A1 '007'
+B1 3
+C1 0.5
+D1 None
+E1 datetime.datetime(2026, 9, 3, 0, 0)` }],
+        answer: `import csv
+from datetime import date
+from openpyxl import Workbook, load_workbook
+
+rec = {"코드": "007", "수량": 3, "할인": 0.5, "배송": None, "날짜": date(2026, 9, 3)}
+
+with open("t.csv", "w", encoding="utf-8", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=list(rec))
+    w.writeheader()
+    w.writerow(rec)
+with open("t.csv", encoding="utf-8", newline="") as f:
+    back = next(csv.DictReader(f))
+print(back)
+print(back["배송"] is None, back["수량"] + "개")
+
+wb = Workbook()
+ws = wb.active
+cells = list(rec.values())
+ws.append(cells)
+wb.save("t.xlsx")
+ws = load_workbook("t.xlsx").active
+for cell in ws[1]:
+    print(cell.coordinate, repr(cell.value))
+`,
+        explain: `<p>CSV 는 값을 <b>모두 글자로</b> 써요. 그래서 다시 읽으면 <code>'3'</code> · <code>'0.5'</code> · <code>'2026-09-03'</code> 이고, <code>None</code> 은 빈 글자 <code>''</code> 로 돌아와서 <code>is None</code> 이 <code>False</code> 예요. 수량도 글자라 <code>+ "개"</code> 가 돼요(숫자였다면 <code>TypeError</code>). 엑셀은 종류를 지켜요. 글자로 넣은 <code>'007'</code> 은 글자 그대로, <code>3</code> · <code>0.5</code> 는 숫자, 빈칸은 <code>None</code>. 다만 날짜는 <code>date</code> 가 아니라 <code>datetime.datetime(2026, 9, 3, 0, 0)</code> 으로 돌아와요 — 그래서 엑셀 → CSV 에서 <code>v.date()</code> 가 필요해요.</p>` },
+      { title: "🏠 빵집 9월 매출 — 엑셀 → CSV → JSON",
+        text: `<p>빵집 사장님이 <code>빵집_매출.xlsx</code> 의 「9월」 시트를 회계 프로그램에 넣을 <b>CSV</b> 와, 주문 앱에 넣을 <b>JSON</b> 으로 달래요(예제 파일은 아래 준비 파일로 만들어요).</p><ul><li><code>9월.csv</code> — 엑셀에서도 한글이 안 깨지게 쓰고, 열은 원래 다섯(날짜 · 품목 · 분류 · 단가 · 수량)에 <code>매출</code>(단가 × 수량)을 더해 여섯이에요. 날짜는 <code>2026-09-01</code> 모양</li><li><code>9월.json</code> — 방금 쓴 <code>9월.csv</code> 를 <b>다시 읽어</b>, 함수표로 단가 · 수량 · 매출은 <code>int</code>, 날짜는 <code>date</code> 로 바꾼 뒤 저장해요(날짜는 ISO 글자, 한글 그대로, 들여쓰기 2)</li></ul><p><code>20줄 → 9월.csv</code>, CSV 파일의 첫 두 줄, <code>20건 → 9월.json</code>, JSON 을 다시 읽은 첫 건, 매출 합계를 출력 예처럼 출력하세요.</p>`,
+        needs: [["ws.iter_rows(values_only=True)", "F12/0", "줄마다 값 튜플"], ["open(\"9월.csv\", \"w\", encoding=\"utf-8-sig\", newline=\"\")", "F12/3", "엑셀에서도 열 CSV"], ["v.date().isoformat()", "F12/3", "datetime → 2026-09-01 글자"], ["CONVERT = {\"날짜\": date.fromisoformat, \"단가\": int, …}", "F12/1", "열마다 바꿀 함수표"], ["json.dump(records, f, ensure_ascii=False, indent=2, default=to_json)", "F12/1", "날짜는 ISO 글자로 저장"]],
+        prep: [SAMPLES_PREP],
+        io: [{ output: `20줄 → 9월.csv
+날짜,품목,분류,단가,수량,매출
+2026-09-01,크루아상,빵,3800,11,41800
+20건 → 9월.json
+{'날짜': '2026-09-01', '품목': '크루아상', '분류': '빵', '단가': 3800, '수량': 11, '매출': 41800}
+매출 합계 1,015,800원` }],
+        answer: `import csv
+import json
+from datetime import date, datetime
+from openpyxl import load_workbook
+
+
+def cell_text(v):
+    if v is None:
+        return ""
+    if isinstance(v, datetime):
+        return v.date().isoformat()
+    return v
+
+
+ws = load_workbook("빵집_매출.xlsx")["9월"]
+rows = ws.iter_rows(values_only=True)
+header = list(next(rows)) + ["매출"]
+count = 0
+with open("9월.csv", "w", encoding="utf-8-sig", newline="") as f:
+    w = csv.writer(f)
+    w.writerow(header)
+    for day, name, kind, price, qty in rows:
+        values = [day, name, kind, price, qty, price * qty]
+        w.writerow([cell_text(v) for v in values])
+        count += 1
+print(f"{count}줄 → 9월.csv")
+
+with open("9월.csv", encoding="utf-8-sig") as f:
+    lines = f.read().splitlines()
+print(lines[0])
+print(lines[1])
+
+CONVERT = {"날짜": date.fromisoformat, "단가": int, "수량": int, "매출": int}
+
+
+def convert(row, table):
+    out = {}
+    for key, text in row.items():
+        if text == "":
+            out[key] = None
+        elif key in table:
+            out[key] = table[key](text)
+        else:
+            out[key] = text
+    return out
+
+
+def to_json(o):
+    if isinstance(o, date):
+        return o.isoformat()
+    raise TypeError(f"{type(o).__name__} 는 JSON 에 못 넣어요")
+
+
+with open("9월.csv", encoding="utf-8-sig", newline="") as f:
+    records = [convert(row, CONVERT) for row in csv.DictReader(f)]
+with open("9월.json", "w", encoding="utf-8") as f:
+    json.dump(records, f, ensure_ascii=False, indent=2, default=to_json)
+print(f"{len(records)}건 → 9월.json")
+
+with open("9월.json", encoding="utf-8") as f:
+    back = json.load(f)
+print(back[0])
+total = sum(r["매출"] for r in back)
+print(f"매출 합계 {total:,}원")
+` },
+      { title: "에러 읽기 — dict contains fields not in fieldnames",
+        text: `<p>서점 주문 기록을 CSV 로 쓰려는데 이렇게 멈춰요.</p><pre>Traceback (most recent call last):
+  File "C:\\Users\\me\\files-study\\main.py", line 13, in &lt;module&gt;
+    w.writerows(records)
+    ~~~~~~~~~~~^^^^^^^^^
+  File "C:\\Users\\me\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\csv.py", line 229, in writerows
+  File "C:\\Users\\me\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\csv.py", line 221, in _dict_to_list
+ValueError: dict contains fields not in fieldnames: '쿠폰'</pre><p>먼저 말해 보세요. <b>몇 번째 줄</b>에서, <b>무슨 에러</b>가, <b>왜</b> 났나요? (<code>fieldnames</code> 는 누구의 키로 만들었나요? 셋째 · 넷째 기록에는 어떤 키가 더 있나요?) 머리줄을 <b>모든 키의 합집합</b>(처음 나온 순서)으로 고쳐서 출력 예처럼 나오게 하세요. 넷째 기록처럼 <code>책</code> 이 빠진 칸은 빈칸이면 돼요.</p>`,
+        needs: [["if key not in header: header.append(key)", "F12/2", "키 합집합 — 처음 나온 순서"], ["csv.DictWriter(f, fieldnames=header)", "F12/2", "빠진 키는 빈칸, 없는 키는 ValueError"]],
+        given: `import csv
+
+records = [
+    {"이름": "김하늘", "책": "파이썬 첫걸음", "권수": 1},
+    {"이름": "이도윤", "책": "데이터 정리의 기술", "권수": 2},
+    {"이름": "박서준", "책": "하루 10분 SQL", "권수": 1, "쿠폰": "WELCOME"},
+    {"이름": "최유나", "권수": 3, "메모": "선물 포장"},
+]
+
+with open("주문.csv", "w", encoding="utf-8-sig", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=list(records[0]))
+    w.writeheader()
+    w.writerows(records)
+
+with open("주문.csv", encoding="utf-8-sig") as f:
+    print(f.read().rstrip())
+`,
+        io: [{ output: `이름,책,권수,쿠폰,메모
+김하늘,파이썬 첫걸음,1,,
+이도윤,데이터 정리의 기술,2,,
+박서준,하루 10분 SQL,1,WELCOME,
+최유나,,3,,선물 포장` }],
+        answer: `import csv
+
+records = [
+    {"이름": "김하늘", "책": "파이썬 첫걸음", "권수": 1},
+    {"이름": "이도윤", "책": "데이터 정리의 기술", "권수": 2},
+    {"이름": "박서준", "책": "하루 10분 SQL", "권수": 1, "쿠폰": "WELCOME"},
+    {"이름": "최유나", "권수": 3, "메모": "선물 포장"},
+]
+
+header = []
+for rec in records:
+    for key in rec:
+        if key not in header:
+            header.append(key)
+
+with open("주문.csv", "w", encoding="utf-8-sig", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=header)
+    w.writeheader()
+    w.writerows(records)
+
+with open("주문.csv", encoding="utf-8-sig") as f:
+    print(f.read().rstrip())
+` },
+      { title: "고치기 — 왕복 시험이 깨져요",
+        text: `<p>CSV → 엑셀 → CSV 를 돌리고 처음과 같은지 보는 왕복 시험이에요. 돌리면 <code>다름:</code> 줄이 둘 찍히고 <code>AssertionError: 왕복이 달라요</code> 로 멈춰요.</p><p>어느 열이 어떻게 달라졌는지 먼저 읽어 보세요. 빈칸(<code>메모</code>)은 괜찮은데 왜 날짜만 달라졌을까요? <b>엑셀 → CSV</b> 쪽을 고쳐서(원본 · 왕복 시험 코드는 그대로) 출력 예처럼 <code>왕복 OK</code> 가 나오게 하세요.</p>`,
+        needs: [["v.date().isoformat()", "F12/3", "datetime 에서 날짜만 ISO 글자로"], ["w.writerow([cell_text(v) for v in row])", "F12/3", "칸마다 바꿔서 쓰기"], ["Path(\"왕복.csv\").read_text(encoding=\"utf-8-sig\").splitlines()", "F12/4", "글자로 줄마다 비교"]],
+        given: `import csv
+from datetime import date
+from pathlib import Path
+from openpyxl import Workbook, load_workbook
+
+Path("원본.csv").write_text(
+    "날짜,품목,수량,메모\\n2026-09-03,소금빵,3,\\n2026-09-04,라테,2,포장\\n",
+    encoding="utf-8",
+)
+TABLE = {"날짜": date.fromisoformat, "수량": int}
+
+# CSV → 엑셀
+wb = Workbook()
+ws = wb.active
+with open("원본.csv", encoding="utf-8", newline="") as f:
+    reader = csv.DictReader(f)
+    ws.append(reader.fieldnames)
+    for row in reader:
+        values = []
+        for key, text in row.items():
+            if text == "":
+                values.append(None)
+            elif key in TABLE:
+                values.append(TABLE[key](text))
+            else:
+                values.append(text)
+        ws.append(values)
+wb.save("중간.xlsx")
+
+# 엑셀 → CSV
+ws = load_workbook("중간.xlsx").active
+with open("왕복.csv", "w", encoding="utf-8-sig", newline="") as f:
+    w = csv.writer(f)
+    for row in ws.iter_rows(values_only=True):
+        w.writerow(row)
+
+# 왕복 시험
+a = Path("원본.csv").read_text(encoding="utf-8-sig").splitlines()
+b = Path("왕복.csv").read_text(encoding="utf-8-sig").splitlines()
+for x, y in zip(a, b):
+    if x != y:
+        print("다름:", x, "|", y)
+assert a == b, "왕복이 달라요"
+print("왕복 OK")
+for line in b:
+    print(line)
+`,
+        io: [{ output: `왕복 OK
+날짜,품목,수량,메모
+2026-09-03,소금빵,3,
+2026-09-04,라테,2,포장` }],
+        answer: `import csv
+from datetime import date, datetime
+from pathlib import Path
+from openpyxl import Workbook, load_workbook
+
+Path("원본.csv").write_text(
+    "날짜,품목,수량,메모\\n2026-09-03,소금빵,3,\\n2026-09-04,라테,2,포장\\n",
+    encoding="utf-8",
+)
+TABLE = {"날짜": date.fromisoformat, "수량": int}
+
+# CSV → 엑셀
+wb = Workbook()
+ws = wb.active
+with open("원본.csv", encoding="utf-8", newline="") as f:
+    reader = csv.DictReader(f)
+    ws.append(reader.fieldnames)
+    for row in reader:
+        values = []
+        for key, text in row.items():
+            if text == "":
+                values.append(None)
+            elif key in TABLE:
+                values.append(TABLE[key](text))
+            else:
+                values.append(text)
+        ws.append(values)
+wb.save("중간.xlsx")
+
+# 엑셀 → CSV
+
+
+def cell_text(v):
+    if v is None:
+        return ""
+    if isinstance(v, datetime):
+        return v.date().isoformat()
+    return v
+
+
+ws = load_workbook("중간.xlsx").active
+with open("왕복.csv", "w", encoding="utf-8-sig", newline="") as f:
+    w = csv.writer(f)
+    for row in ws.iter_rows(values_only=True):
+        w.writerow([cell_text(v) for v in row])
+
+# 왕복 시험
+a = Path("원본.csv").read_text(encoding="utf-8-sig").splitlines()
+b = Path("왕복.csv").read_text(encoding="utf-8-sig").splitlines()
+for x, y in zip(a, b):
+    if x != y:
+        print("다름:", x, "|", y)
+assert a == b, "왕복이 달라요"
+print("왕복 OK")
+for line in b:
+    print(line)
+` },
+    ],
+    F13: [
+      { title: "에러 읽기 — 'NoneType' object is not subscriptable",
+        text: `<p>주문마다 배송 도시를 찍으려는데, 두 줄을 찍고 이렇게 멈춰요.</p><pre>Traceback (most recent call last):
+  File "C:\\Users\\me\\files-study\\main.py", line 8, in &lt;module&gt;
+    print(order["id"], address["city"], address["district"])
+                       ~~~~~~~^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable</pre><p>먼저 말해 보세요. <b>몇 번째 줄</b>에서, <b>무슨 에러</b>가, <b>왜</b> 났나요? (두 줄은 찍혔으니 세 번째 주문이 문제예요. <code>orders.json</code> 에서 A-1003 의 <code>address</code> 는 무엇인가요? <code>None["city"]</code> 는 될까요?) 주문을 <code>flatten</code> 으로 펴고 열 목록 <code>["id", "customer.address.city", "customer.address.district"]</code> 로 칸을 꺼내도록 고쳐서, 주소가 없으면 <code>-</code> 가 나오게 하세요.</p>`,
+        needs: [["flat.update(flatten(value, name + \".\"))", "F13/0", "딕셔너리면 안으로 들어가 펴기"], ["row.get(col)", "F13/1", "없는 열은 None — 에러가 아님"]],
+        prep: [{ name: 'orders.json', text: BOOKSHOP_JSON }],
+        given: `import json
+
+with open("orders.json", encoding="utf-8") as f:
+    data = json.load(f)
+
+for order in data["data"]["orders"]:
+    address = order["customer"]["address"]
+    print(order["id"], address["city"], address["district"])
+`,
+        io: [{ output: `A-1001 서울 마포구
+A-1002 성남 분당구
+A-1003 - -
+A-1004 서울 강남구` }],
+        answer: `import json
+
+
+def flatten(d, prefix=""):
+    flat = {}
+    for key, value in d.items():
+        name = prefix + key
+        if isinstance(value, dict):
+            flat.update(flatten(value, name + "."))
+        else:
+            flat[name] = value
+    return flat
+
+
+with open("orders.json", encoding="utf-8") as f:
+    data = json.load(f)
+
+COLUMNS = ["id", "customer.address.city", "customer.address.district"]
+for order in data["data"]["orders"]:
+    row = flatten(order)
+    cells = []
+    for col in COLUMNS:
+        value = row.get(col)
+        cells.append("-" if value is None else str(value))
+    print(" ".join(cells))
+` },
+      { title: "어떤 칸이 남을까 — 출력 예측",
+        text: `<p>주문 하나를 <code>flatten</code> 으로 펴요. 실행하기 전에 출력을 종이에 적어 보고, VS Code 에서 돌려 맞혀 보세요. <code>None</code> · 빈 딕셔너리 <code>{}</code> · 리스트가 각각 어떻게 되는지 눈여겨봐요.</p>`,
+        needs: [["flatten(d, prefix=\"\")", "F13/0", "딕셔너리만 안으로 들어감"], ["isinstance(value, dict)", "F13/0", "None 은 딕셔너리가 아님"]],
+        predict: true,
+        io: [{ output: `id → B-1
+customer.name → 민수
+customer.address → None
+items → [{'title': '모모', 'qty': 1}]
+pay.card.brand → ◇◇
+pay.card.last4 → 0012
+6 칸` }],
+        answer: `def flatten(d, prefix=""):
+    flat = {}
+    for key, value in d.items():
+        name = prefix + key
+        if isinstance(value, dict):
+            flat.update(flatten(value, name + "."))
+        else:
+            flat[name] = value
+    return flat
+
+
+order = {
+    "id": "B-1",
+    "customer": {"name": "민수", "address": None, "tags": {}},
+    "items": [{"title": "모모", "qty": 1}],
+    "pay": {"card": {"brand": "◇◇", "last4": "0012"}},
+}
+flat = flatten(order)
+for key, value in flat.items():
+    print(key, "→", value)
+print(len(flat), "칸")
+`,
+        explain: `<p><code>flatten</code> 은 값이 <b>딕셔너리일 때만</b> 안으로 들어가요. <code>address</code> 는 <code>None</code> 이라 <code>customer.address → None</code> 한 칸이 돼요(A-1003 과 같아요). <code>items</code> 는 리스트라 들어가지 않고 리스트 통째로 한 칸이에요. 놓치기 쉬운 건 <code>tags: {}</code> 예요 — 딕셔너리라 안으로 들어가는데 안이 비어서 <b>칸이 하나도 안 생겨요</b>. 그래서 <code>customer.tags</code> 는 사라지고 모두 6 칸이에요. 표에 꼭 있어야 하는 열이면 열 목록을 먼저 정해 두는 까닭이에요.</p>` },
+      { title: "🏠 서점 주문 상품표 — 줄로 늘려 엑셀로",
+        text: `<p>서점 사장님이 「어떤 책이 얼마나 팔렸는지」 엑셀로 보고 싶대요. 같은 폴더의 <code>orders.json</code>(아래 준비 파일)을 <b>상품 하나에 한 줄</b>로 늘려서 <code>주문_상품.xlsx</code> 의 「상품」 시트에 쓰세요.</p><ul><li>열은 <code>주문번호 · 주문일 · 고객 · 도시 · 제목 · 단가 · 수량 · 금액</code></li><li>취소된 주문(<code>status</code> 가 <code>paid</code> 가 아님)은 빼고 <code>취소 1건 뺌</code> 을 출력해요</li><li>주문일은 <code>ordered_at</code> 의 앞 10글자(한국 날짜)를 <code>date</code> 로, 단가는 글자 금액을 <code>Decimal</code> 로 읽어 정수 원으로, 금액 = 단가 × 수량</li><li>주소가 <code>null</code> 이어도 멈추지 않게 써요(지금 데이터에서는 취소 주문이지만, 다음 달엔 아닐 수 있어요)</li></ul><p>저장한 뒤 <b>다시 열어</b> 머리줄과 줄마다 <code>A-1001 2026-09-03 김하늘 서울 파이썬 첫걸음 18,000 × 1 = 18,000</code> 처럼 찍고, 마지막에 줄 수와 금액 합계를 출력하세요.</p>`,
+        needs: [["for item in order[\"items\"]:", "F13/2", "주문 1 × 상품 n → n 줄"], ["Decimal(item[\"price\"]) * item[\"qty\"]", "F13/2", "글자 금액을 정확하게"], ["customer[\"address\"] or {}", "F13/1", "None 이면 빈 딕셔너리로"], ["ws.append([...])", "F12/2", "한 줄 쓰기"], ["load_workbook(\"주문_상품.xlsx\")[\"상품\"]", "F12/2", "다시 열어 확인"]],
+        prep: [{ name: 'orders.json', text: BOOKSHOP_JSON }],
+        io: [{ output: `취소 1건 뺌
+주문번호 주문일 고객 도시 제목 단가 수량 금액
+A-1001 2026-09-03 김하늘 서울 파이썬 첫걸음 18,000 × 1 = 18,000
+A-1001 2026-09-03 김하늘 서울 엑셀 업무 노트 12,500 × 2 = 25,000
+A-1002 2026-09-03 이도윤 성남 데이터 정리의 기술 22,000 × 1 = 22,000
+A-1004 2026-09-05 최유나 서울 하루 10분 SQL 15,800 × 1 = 15,800
+A-1004 2026-09-05 최유나 서울 엑셀 업무 노트 12,500 × 1 = 12,500
+A-1004 2026-09-05 최유나 서울 그림으로 보는 네트워크 19,500 × 1 = 19,500
+6줄 · 금액 합계 112,800원` }],
+        answer: `import json
+from datetime import date
+from decimal import Decimal
+from openpyxl import Workbook, load_workbook
+
+with open("orders.json", encoding="utf-8") as f:
+    orders = json.load(f)["data"]["orders"]
+
+HEADER = ["주문번호", "주문일", "고객", "도시", "제목", "단가", "수량", "금액"]
+wb = Workbook()
+ws = wb.active
+ws.title = "상품"
+ws.append(HEADER)
+skipped = 0
+for order in orders:
+    if order["status"] != "paid":
+        skipped += 1
+        continue
+    customer = order["customer"]
+    address = customer["address"] or {}
+    day = date.fromisoformat(order["ordered_at"][:10])
+    for item in order["items"]:
+        price = Decimal(item["price"])
+        money = price * item["qty"]
+        ws.append([order["id"], day, customer["name"], address.get("city"),
+                   item["title"], int(price), item["qty"], int(money)])
+wb.save("주문_상품.xlsx")
+print(f"취소 {skipped}건 뺌")
+
+ws = load_workbook("주문_상품.xlsx")["상품"]
+print(" ".join(cell.value for cell in ws[1]))
+total = 0
+for oid, day, name, city, title, price, qty, money in ws.iter_rows(min_row=2, values_only=True):
+    print(oid, day.date(), name, city, title, f"{price:,} × {qty} = {money:,}")
+    total += money
+print(f"{ws.max_row - 1}줄 · 금액 합계 {total:,}원")
+` },
+      { title: "두 표를 다시 묶기 — 주문 표 + 상품 표 → JSON",
+        text: `<p>다른 가게에서 주문을 <b>두 표</b>로 받았어요(아래 준비 파일 둘). <code>주문.csv</code> 는 주문 하나에 한 줄인데 열 이름이 펴 둔 점 키예요. <code>상품.csv</code> 는 상품 하나에 한 줄이고 <code>order_id</code> 로 주문을 가리켜요.</p><ul><li>주문 줄은 <code>unflatten</code> 으로 다시 중첩하고(빈 글자는 <code>None</code>), <code>"items": []</code> 를 붙여요</li><li>상품 줄은 <code>order_id</code> 로 주문을 찾아 <code>items</code> 에 <code>{"title", "price"(정수), "qty"(정수)}</code> 로 넣어요</li><li>주문 표에 없는 주문번호를 가리키는 상품 줄은 넣지 말고 <code>주문 표에 없는 주문번호: A-1009 (하루 10분 SQL)</code> 을 출력해요 — 잇다가 짝이 없는 줄이에요</li></ul><p>그다음 주문마다 <code>json.dumps(order, ensure_ascii=False)</code> 한 줄씩, 마지막에 <code>3 주문 · 4 상품</code> 을 출력하세요.</p>`,
+        needs: [["here = here.setdefault(part, {})", "F13/4", "없으면 만들고 들어가기"], ["by_id = {o[\"id\"]: o for o in orders}", "F13/3", "주문번호 → 주문 딕셔너리로 잇기"], ["csv.DictReader(f)", "F12/0", "줄마다 딕셔너리(값은 글자)"], ["json.dumps(order, ensure_ascii=False)", "F12/0", "한글 그대로 한 줄 JSON"]],
+        prep: [{ name: "주문.csv", text: `id,customer.name,customer.address.city
+A-1001,김하늘,서울
+A-1002,이도윤,성남
+A-1003,박서준,
+` }, { name: "상품.csv", text: `order_id,title,price,qty
+A-1001,파이썬 첫걸음,18000,1
+A-1001,엑셀 업무 노트,12500,2
+A-1002,데이터 정리의 기술,22000,1
+A-1003,파이썬 첫걸음,18000,3
+A-1009,하루 10분 SQL,15800,1
+` }],
+        io: [{ output: `주문 표에 없는 주문번호: A-1009 (하루 10분 SQL)
+{"id": "A-1001", "customer": {"name": "김하늘", "address": {"city": "서울"}}, "items": [{"title": "파이썬 첫걸음", "price": 18000, "qty": 1}, {"title": "엑셀 업무 노트", "price": 12500, "qty": 2}]}
+{"id": "A-1002", "customer": {"name": "이도윤", "address": {"city": "성남"}}, "items": [{"title": "데이터 정리의 기술", "price": 22000, "qty": 1}]}
+{"id": "A-1003", "customer": {"name": "박서준", "address": {"city": null}}, "items": [{"title": "파이썬 첫걸음", "price": 18000, "qty": 3}]}
+3 주문 · 4 상품` }],
+        answer: `import csv
+import json
+
+
+def unflatten(flat):
+    nested = {}
+    for key, value in flat.items():
+        parts = key.split(".")
+        here = nested
+        for part in parts[:-1]:
+            here = here.setdefault(part, {})
+        here[parts[-1]] = value
+    return nested
+
+
+with open("주문.csv", encoding="utf-8", newline="") as f:
+    order_rows = list(csv.DictReader(f))
+with open("상품.csv", encoding="utf-8", newline="") as f:
+    item_rows = list(csv.DictReader(f))
+
+orders = []
+for row in order_rows:
+    flat = {}
+    for key, text in row.items():
+        flat[key] = None if text == "" else text
+    order = unflatten(flat)
+    order["items"] = []
+    orders.append(order)
+
+by_id = {o["id"]: o for o in orders}
+for row in item_rows:
+    order = by_id.get(row["order_id"])
+    if order is None:
+        print(f"주문 표에 없는 주문번호: {row['order_id']} ({row['title']})")
+        continue
+    order["items"].append({"title": row["title"], "price": int(row["price"]), "qty": int(row["qty"])})
+
+for order in orders:
+    print(json.dumps(order, ensure_ascii=False))
+count = sum(len(o["items"]) for o in orders)
+print(len(orders), "주문 ·", count, "상품")
+` },
+    ],
+    F14: [
+      { title: "TOML 의 종류 — 출력 예측",
+        text: `<p>동네 책방 설정을 TOML 글자로 읽어요. 실행하기 전에 출력을 종이에 적어 보고, VS Code 에서 돌려 맞혀 보세요. 따옴표 없는 날짜, <code>12500.0</code>, 따옴표로 감싼 키, 두 번 나온 <code>&#91;&#91;shelves&#93;&#93;</code> 를 눈여겨봐요.</p>`,
+        needs: [["tomllib.loads(TEXT)", "F14/0", "글자로 가진 TOML 읽기"], ["type(value).__name__", "F14/2", "종류 이름 — date · float · list · dict"], ["conf[\"shelves\"][1]", "F14/0", "배열 표 = 딕셔너리 리스트"]],
+        predict: true,
+        io: [{ output: `name str
+open date
+rating int
+price float
+tags list
+zip code str
+owner dict
+shelves list
+9 04001
+{'name': '만화', 'size': 3}
+김하늘 2` }],
+        answer: `import tomllib
+
+TEXT = """
+name = "동네 책방"
+open = 2026-09-01
+rating = 4
+price = 12500.0
+tags = ["책", "커피"]
+"zip code" = "04001"
+
+[owner]
+name = "김하늘"
+
+[[shelves]]
+name = "소설"
+
+[[shelves]]
+name = "만화"
+size = 3
+"""
+
+conf = tomllib.loads(TEXT)
+for key, value in conf.items():
+    print(key, type(value).__name__)
+print(conf["open"].month, conf["zip code"])
+print(conf["shelves"][1])
+print(conf["owner"]["name"], len(conf["shelves"]))
+`,
+        explain: `<p>키는 쓴 차례대로 나와요. <code>open = 2026-09-01</code> 은 따옴표가 없어서 글자가 아니라 <code>date</code> 예요 — 그래서 <code>.month</code> 가 <code>9</code>. <code>12500.0</code> 은 소수점이 있어 <code>float</code>, <code>4</code> 는 <code>int</code>, <code>"04001"</code> 은 따옴표가 있어 앞자리 0 이 남는 <code>str</code> 이에요. 빈칸이 든 키는 <code>"zip code"</code> 처럼 따옴표로 감싸요. <code>[owner]</code> 는 <code>dict</code>, 두 번 쓴 배열 표 <code>shelves</code> 는 딕셔너리 둘의 <code>list</code> 이고, 둘째에만 <code>size</code> 가 있어도 괜찮아요.</p>` },
+      { title: "에러 읽기 — File must be opened in binary mode",
+        text: `<p>사진 정리기 설정 <code>config.toml</code>(아래 준비 파일)을 읽으려는데 이렇게 멈춰요.</p><pre>Traceback (most recent call last):
+  File "C:\\Users\\me\\files-study\\main.py", line 4, in &lt;module&gt;
+    config = tomllib.load(f)
+  File "C:\\Users\\me\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\tomllib\\_parser.py", line 71, in load
+TypeError: File must be opened in binary mode, e.g. use &#96;open('foo.toml', 'rb')&#96;</pre><p>먼저 말해 보세요. <b>몇 번째 줄</b>에서, <b>무슨 에러</b>가, <b>왜</b> 났나요? (JSON 은 이렇게 열어도 되는데 TOML 은 왜 안 될까요? 에러 글 끝에 고칠 방법이 적혀 있어요.) 고쳐서 출력 예처럼 나오게 하세요.</p>`,
+        needs: [["open(\"config.toml\", \"rb\")", "F14/1", "바이트 모드로 열기 — encoding 없이"], ["tomllib.load(f)", "F14/1", "TOML 파일 읽기"]],
+        prep: [{ name: 'config.toml', text: APP_TOML }],
+        given: `import tomllib
+
+with open("config.toml", encoding="utf-8") as f:
+    config = tomllib.load(f)
+
+print(config["title"], "v", config["version"])
+print("원본 폴더:", config["source"]["folder"])
+print("확장자:", ", ".join(config["source"]["extensions"]))
+print("규칙", len(config["rules"]), "개")
+`,
+        io: [{ output: `사진 정리기 v 3
+원본 폴더: 사진/원본
+확장자: .jpg, .png, .heic
+규칙 2 개` }],
+        answer: `import tomllib
+
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)
+
+print(config["title"], "v", config["version"])
+print("원본 폴더:", config["source"]["folder"])
+print("확장자:", ", ".join(config["source"]["extensions"]))
+print("규칙", len(config["rules"]), "개")
+` },
+      { title: "🏠 사진 정리기 — 설정대로 옮길 곳 정하기",
+        text: `<p>사진 정리 도구를 만들어요. 같은 폴더의 <code>config.toml</code>(아래 준비 파일)을 읽고, 파일마다 <b>옮길 폴더</b>를 정해 출력하세요(진짜로 옮기지는 않아요).</p><ul><li>맨 위에 <code>사진 정리기 v3 · 2026-09-01 부터</code> — 제목 · 판 · 시작한 날</li><li>확장자(소문자로 바꿔서)가 <code>[source] extensions</code> 에 없으면 <code>건너뜀(사진 아님)</code></li><li>크기가 <code>[output] max_size_mb</code> 보다 크면 <code>건너뜀(25.5MB 넘음)</code></li><li><code>&#91;&#91;rules&#93;&#93;</code> 를 차례로 보며 <code>match</code> 에서 <code>*</code> 를 뗀 글자로 이름이 시작하면 <code>[output] folder</code> + <code>/</code> + <code>move_to</code>, 맞는 규칙이 없으면 <code>[output] folder</code></li></ul><p>파일은 <code>[("Screenshot_0901.png", 1.2), ("KakaoTalk_20260902_1.jpg", 3.4), ("IMG_1234.HEIC", 4.8), ("가족여행.jpg", 31.0), ("회의록.txt", 0.1)]</code>(이름, MB) 이에요. 규칙 · 폴더 이름을 코드에 직접 쓰지 말고 다 설정에서 꺼내세요 — 설정만 고치면 동작이 바뀌어야 해요.</p>`,
+        needs: [["with open(\"config.toml\", \"rb\") as f:", "F14/1", "TOML 은 바이트 모드"], ["for rule in config[\"rules\"]:", "F14/1", "배열 표는 딕셔너리 리스트"], ["Path(name).suffix.lower()", "F14/4", "확장자 — 소문자로 바꿔 비교"]],
+        prep: [{ name: 'config.toml', text: APP_TOML }],
+        io: [{ output: `사진 정리기 v3 · 2026-09-01 부터
+Screenshot_0901.png → 사진/정리/스크린샷
+KakaoTalk_20260902_1.jpg → 사진/정리/메신저
+IMG_1234.HEIC → 사진/정리
+가족여행.jpg → 건너뜀(25.5MB 넘음)
+회의록.txt → 건너뜀(사진 아님)` }],
+        answer: `import tomllib
+from pathlib import Path
+
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)
+
+
+def destination(name, size_mb, config):
+    ext = Path(name).suffix.lower()
+    if ext not in config["source"]["extensions"]:
+        return "건너뜀(사진 아님)"
+    if size_mb > config["output"]["max_size_mb"]:
+        return f'건너뜀({config["output"]["max_size_mb"]}MB 넘음)'
+    folder = config["output"]["folder"]
+    for rule in config["rules"]:
+        prefix = rule["match"].replace("*", "")
+        if name.startswith(prefix):
+            return f'{folder}/{rule["move_to"]}'
+    return folder
+
+
+print(f'{config["title"]} v{config["version"]} · {config["started"]} 부터')
+files = [("Screenshot_0901.png", 1.2), ("KakaoTalk_20260902_1.jpg", 3.4),
+         ("IMG_1234.HEIC", 4.8), ("가족여행.jpg", 31.0), ("회의록.txt", 0.1)]
+for name, size_mb in files:
+    print(name, "→", destination(name, size_mb, config))
+` },
+      { title: "TOML → JSON 으로 바꾸고 왕복 확인",
+        text: `<p>사진 정리기 설정을 웹 화면(브라우저)에서도 보여 주려고 해요. 브라우저는 TOML 을 못 읽으니 <b>JSON</b> 으로 바꿔 줘요 — 사람이 쓰는 설정은 TOML, 프로그램끼리 주고받는 데이터는 JSON 이에요.</p><ul><li><code>config.toml</code>(아래 준비 파일)을 읽어 <code>config.json</code> 으로 저장해요. 한글 그대로, 들여쓰기 2</li><li>TOML 의 날짜 <code>started</code> 는 JSON 에 없는 종류라, <code>default=</code> 함수로 ISO 글자로 바꿔요(복습: [[레슨:F3]])</li><li>JSON 글자를 출력한 뒤, <code>config.json</code> 을 다시 읽어 <code>started</code> 의 종류와 값을 출력하고, <code>date.fromisoformat</code> 으로 되돌려 TOML 에서 읽은 딕셔너리와 <b>같은지</b> <code>assert</code> 해요. 같으면 <code>왕복 OK</code></li></ul><p>JSON 쪽에는 TOML 의 주석이 남지 않는다는 것도 확인해 보세요.</p>`,
+        needs: [["tomllib.load(f)", "F14/1", "TOML 읽기"], ["json.dumps(config, ensure_ascii=False, indent=2, default=to_json)", "F12/0", "JSON 에 없는 종류는 default 로"], ["date.fromisoformat(back[\"started\"])", "F12/1", "ISO 글자 → date"], ["assert back == config", "F12/4", "왕복 시험"]],
+        prep: [{ name: 'config.toml', text: APP_TOML }],
+        io: [{ output: `{
+  "title": "사진 정리기",
+  "version": 3,
+  "debug": false,
+  "started": "2026-09-01",
+  "source": {
+    "folder": "사진/원본",
+    "extensions": [
+      ".jpg",
+      ".png",
+      ".heic"
+    ]
+  },
+  "output": {
+    "folder": "사진/정리",
+    "max_size_mb": 25.5,
+    "keep_original": true
+  },
+  "rules": [
+    {
+      "name": "스크린샷",
+      "match": "Screenshot*",
+      "move_to": "스크린샷"
+    },
+    {
+      "name": "메신저",
+      "match": "KakaoTalk_*",
+      "move_to": "메신저"
+    }
+  ]
+}
+str 2026-09-01
+왕복 OK` }],
+        answer: `import json
+import tomllib
+from datetime import date
+
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)
+
+
+def to_json(o):
+    if isinstance(o, date):
+        return o.isoformat()
+    raise TypeError(f"{type(o).__name__} 는 JSON 에 못 넣어요")
+
+
+text = json.dumps(config, ensure_ascii=False, indent=2, default=to_json)
+with open("config.json", "w", encoding="utf-8") as f:
+    f.write(text + "\\n")
+print(text)
+
+with open("config.json", encoding="utf-8") as f:
+    back = json.load(f)
+print(type(back["started"]).__name__, back["started"])
+back["started"] = date.fromisoformat(back["started"])
+assert back == config
+print("왕복 OK")
+` },
+    ],
+    FB3: [
+      { title: "① 카드 내역 엑셀 — 지저분한 표 읽기",
+        text: `<p>카드사에서 내려받은 엑셀 가계부를 다섯 문제에 나눠 다뤄요. ① 지저분한 표 읽기 → ② 깨끗한 JSON 으로 저장 + 검사 → ③ JSON 으로 합계 → ④ 엑셀 보고서 · CSV 내보내기 → ⑤ 다음 달 파일을 겹치지 않게 더하기. 이 만들어 보기의 중심은 <b>형식 사이의 흐름</b>(지저분한 엑셀 → 검사한 JSON → 보기 좋은 엑셀 · CSV)이에요. 합계 내는 논리는 <a href="../python/#lesson/X4" target="_blank" rel="noopener">파이썬 교과서 「실전 4: 가계부 분석기」 ↗</a> 에서 한 것과 같아요.</p><p>예제 파일 <code>가계부_카드내역.xlsx</code>(아래 준비 파일로 만들어요)의 「이용내역」 시트는 사람이 보기 좋게 만든 표라 바로 읽기 어려워요. 먼저 엑셀(또는 LibreOffice Calc)로 열어서 생김새를 보세요.</p><ul><li>1 · 2행은 병합된 제목, 3행은 빈 줄, <b>4행이 머리줄</b> <code>이용일 · 가맹점 · 분류 · 이용금액</code> — 머리줄은 행 번호를 외우지 말고 <b>첫 칸이 <code>이용일</code> 인 줄</b>로 찾아요(카드사가 제목 줄을 하나 더 넣어도 안 깨지게)</li><li>중간에 칸이 다 빈 줄이 있어요 — <code>set(row) == {None}</code> 이면 건너뛰어요</li><li>맨 아래 <code>합계</code> 줄은 기록이 아니에요. 금액만 따로 챙겨 두고 나중에 맞춰 봐요</li><li>금액 <code>"32,400원"</code> · <code>"-21,600원"</code>(환불)은 글자 → 정수 <code>32400</code> · <code>-21600</code></li><li>날짜는 대부분 <code>datetime</code> 인데 두 칸은 <code>46270</code> · <code>46282</code> 같은 <b>숫자</b>예요 → <code>date</code> 로</li></ul><p>출력 예처럼 머리줄을 찾은 행, 건너뛴 빈 줄 수, 기록마다 한 줄, 마지막에 건수 · 계산한 합계 · 합계 줄의 금액이 같은지 출력하세요.</p>`,
+        needs: [["ws.iter_rows(values_only=True)", "F12/0", "줄마다 값 튜플"], ["enumerate(…, 1)", "F12/1", "행 번호 붙이기"], ["dict(zip(header, row))", "F12/0", "머리줄과 짝지어 딕셔너리로"], ["from_excel(46270).date()", "F12/3", "엑셀 날짜 번호 → date"], ["value.date()", "F12/3", "datetime 에서 날짜만"]],
+        prep: [SAMPLES_PREP],
+        io: [{ output: `머리줄: 4행 ['이용일', '가맹점', '분류', '이용금액']
+빈 줄 1개 건너뜀
+2026-09-01 동네마트 식비 32,400
+2026-09-02 버스·지하철 교통 1,500
+2026-09-03 김밥천국 식비 8,000
+2026-09-05 온라인서점 문화 21,600
+2026-09-08 약국 건강 6,300
+2026-09-12 동네마트 식비 45,900
+2026-09-14 영화관 문화 14,000
+2026-09-17 버스·지하철 교통 1,500
+2026-09-20 온라인서점 문화 -21,600
+2026-09-25 통신사 통신 33,000
+2026-09-28 카페 식비 4,800
+2026-09-30 동네마트 식비 27,350
+12건 · 계산 174,750원 · 합계 줄 174,750원 → 같아요` }],
+        answer: `from datetime import date, datetime
+from openpyxl import load_workbook
+from openpyxl.utils.datetime import from_excel
+
+
+def won(text):
+    return int(text.replace(",", "").replace("원", ""))
+
+
+def to_date(value):
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, int):
+        return from_excel(value).date()  # 46270 같은 엑셀 날짜 번호
+    raise ValueError(f"날짜가 아니에요: {value!r}")
+
+
+ws = load_workbook("가계부_카드내역.xlsx")["이용내역"]
+header = None
+records = []
+blank = 0
+total_line = None
+for r, row in enumerate(ws.iter_rows(values_only=True), 1):
+    if header is None:
+        if row[0] == "이용일":
+            header = list(row)
+            print(f"머리줄: {r}행 {header}")
+        continue
+    if set(row) == {None}:
+        blank += 1
+        continue
+    if row[0] == "합계":
+        total_line = won(row[3])
+        continue
+    rec = dict(zip(header, row))
+    records.append({"날짜": to_date(rec["이용일"]), "가맹점": rec["가맹점"],
+                    "분류": rec["분류"], "금액": won(rec["이용금액"])})
+
+print(f"빈 줄 {blank}개 건너뜀")
+for rec in records:
+    print(rec["날짜"], rec["가맹점"], rec["분류"], f'{rec["금액"]:,}')
+total = sum(rec["금액"] for rec in records)
+same = "같아요" if total == total_line else "달라요!"
+print(f"{len(records)}건 · 계산 {total:,}원 · 합계 줄 {total_line:,}원 → {same}")
+` },
+      { title: "② 깨끗한 가계부.json — 검사하고 저장",
+        text: `<p>① 처럼 카드 내역을 읽어(이번엔 함수 <code>read_card(path)</code> 로 묶고, 날짜는 ISO 글자 <code>"2026-09-05"</code> 로), <b>검사를 통과했을 때만</b> <code>가계부.json</code> 으로 저장하세요. 모양은 <code>{"version": 1, "records": [...]}</code> — 나중에 칸이 늘면 판 번호로 알아봐요([[레슨:F4]]). 한글 그대로, 들여쓰기 2.</p><p>검사는 [[레슨:F6]] 식으로 함수 <code>check(rec, where)</code> 가 <b>틀린 곳 목록</b>을 돌려줘요(첫 에러에서 멈추지 않고 모아서).</p><ul><li>필수 키 <code>날짜 · 가맹점 · 분류 · 금액</code> — 빠지면 그 목록만 돌려줘요(집합 차 <code>REQUIRED - rec.keys()</code>)</li><li>날짜는 <code>date.fromisoformat</code> 이 읽을 수 있는 글자</li><li>금액은 정수(<code>True</code> 도 <code>int</code> 로 통과하니 <code>bool</code> 을 먼저 걸러요), 0 은 안 돼요(환불은 음수라 괜찮아요)</li><li>분류는 <code>식비 · 교통 · 문화 · 건강 · 통신</code> 중 하나</li></ul><p>검사기도 시험해요. 저장하기 전에 일부러 틀린 기록 셋(출력 예 참고 — 날짜 · 분류 · 금액 글자, 금액 <code>True</code>, 키 빠짐)을 넣어 보고 걸리는지 출력하세요. 진짜 기록이 걸리면 저장하지 않고 멈춰요. 저장한 뒤엔 다시 읽어 판 · 건수와 넷째 기록(숫자였던 날짜)을 출력하세요.</p>`,
+        needs: [["REQUIRED - rec.keys()", "F13/1", "빠진 키 = 키 집합의 차"], ["isinstance(money, bool) or not isinstance(money, int)", "F6/1", "True 도 int — bool 먼저"], ["except (TypeError, ValueError):", "F12/1", "날짜 글자가 틀리면 ValueError"], ["to_date(rec[\"이용일\"]).isoformat()", "F12/3", "date → ISO 글자"], ["json.dump({\"version\": 1, \"records\": records}, f, ensure_ascii=False, indent=2)", "F12/1", "한글 그대로 저장"]],
+        prep: [SAMPLES_PREP],
+        io: [{ output: `검사기 시험:
+  tests[0].날짜: 2026-09-01 모양이어야 해요 ('2026-09-31')
+  tests[0].금액: 정수(원)여야 해요 ('4,800원')
+  tests[0].분류: ['건강', '교통', '문화', '식비', '통신'] 중 하나여야 해요 ('간식')
+  tests[1].금액: 정수(원)여야 해요 (True)
+  tests[2]: 빠진 키 ['가맹점', '분류']
+검사 통과 12건
+다시 읽음: 1 12 건
+{"날짜": "2026-09-05", "가맹점": "온라인서점", "분류": "문화", "금액": 21600}` }],
+        answer: `import json
+from datetime import date, datetime
+from openpyxl import load_workbook
+from openpyxl.utils.datetime import from_excel
+
+
+def won(text):
+    return int(text.replace(",", "").replace("원", ""))
+
+
+def to_date(value):
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, int):
+        return from_excel(value).date()  # 46270 같은 엑셀 날짜 번호
+    raise ValueError(f"날짜가 아니에요: {value!r}")
+
+
+def read_card(path):
+    ws = load_workbook(path)["이용내역"]
+    header = None
+    records = []
+    for row in ws.iter_rows(values_only=True):
+        if header is None:
+            if row[0] == "이용일":
+                header = list(row)
+            continue
+        if set(row) == {None} or row[0] == "합계":
+            continue
+        rec = dict(zip(header, row))
+        records.append({"날짜": to_date(rec["이용일"]).isoformat(), "가맹점": rec["가맹점"],
+                        "분류": rec["분류"], "금액": won(rec["이용금액"])})
+    return records
+
+
+REQUIRED = {"날짜", "가맹점", "분류", "금액"}
+KINDS = {"식비", "교통", "문화", "건강", "통신"}
+
+
+def check(rec, where):
+    missing = REQUIRED - rec.keys()
+    if missing:
+        return [f"{where}: 빠진 키 {sorted(missing)}"]
+    errors = []
+    try:
+        date.fromisoformat(rec["날짜"])
+    except (TypeError, ValueError):
+        errors.append(f"{where}.날짜: 2026-09-01 모양이어야 해요 ({rec['날짜']!r})")
+    money = rec["금액"]
+    if isinstance(money, bool) or not isinstance(money, int):
+        errors.append(f"{where}.금액: 정수(원)여야 해요 ({money!r})")
+    elif money == 0:
+        errors.append(f"{where}.금액: 0원은 기록하지 않아요")
+    if rec["분류"] not in KINDS:
+        errors.append(f"{where}.분류: {sorted(KINDS)} 중 하나여야 해요 ({rec['분류']!r})")
+    return errors
+
+
+# 검사기부터 시험: 틀린 기록은 틀렸다고 해야 해요
+tests = [
+    {"날짜": "2026-09-31", "가맹점": "카페", "분류": "간식", "금액": "4,800원"},
+    {"날짜": "2026-09-01", "가맹점": "카페", "분류": "식비", "금액": True},
+    {"날짜": "2026-09-01", "금액": 4800},
+]
+print("검사기 시험:")
+for i, rec in enumerate(tests):
+    for e in check(rec, f"tests[{i}]"):
+        print(" ", e)
+
+records = read_card("가계부_카드내역.xlsx")
+errors = []
+for i, rec in enumerate(records):
+    errors += check(rec, f"records[{i}]")
+if errors:
+    for e in errors:
+        print(e)
+    raise SystemExit("검사에 걸려서 저장하지 않았어요")
+print(f"검사 통과 {len(records)}건")
+
+with open("가계부.json", "w", encoding="utf-8") as f:
+    json.dump({"version": 1, "records": records}, f, ensure_ascii=False, indent=2)
+
+with open("가계부.json", encoding="utf-8") as f:
+    book = json.load(f)
+print("다시 읽음:", book["version"], len(book["records"]), "건")
+print(json.dumps(book["records"][3], ensure_ascii=False))
+` },
+      { title: "③ JSON 에서 월 · 분류별 합계",
+        text: `<p>같은 폴더에 ② 가 만든 <code>가계부.json</code>(아래 준비 파일)이 있어요. 모양은 <code>{"version": 1, "records": [{"날짜": "2026-09-01", "가맹점": …, "분류": …, "금액": 32400}, …]}</code> 이에요.</p><p>엑셀이 아니라 <b>검사를 마친 JSON</b> 에서 합계를 내요. 이제 금액은 정수, 날짜는 ISO 글자라 그냥 더하고 자르면 돼요.</p><ul><li>월은 날짜 글자의 앞 7글자 <code>"2026-09"</code> — ISO 글자라 이렇게 잘라도 돼요</li><li>월마다 분류별 합계를 두 겹 딕셔너리 <code>{월: {분류: 금액}}</code> 에 모아요. 처음 보는 월이면 빈 딕셔너리를 만드는 <code>setdefault</code> 가 편해요</li><li>월은 차례대로, 분류는 큰 금액 순으로 출력하고, 마지막에 환불(음수) 기록을 출력하세요. 문화비에서 환불이 빠졌는지 확인해 봐요</li></ul><p>⑤ 에서 10월이 더해져도 이 코드는 그대로 돌아가요.</p>`,
+        needs: [["kinds = by_month.setdefault(month, {})", "F13/4", "처음 보는 월이면 새 딕셔너리"], ["kinds.get(kind, 0) + money", "F12/2", "없는 키는 0 부터"]],
+        prep: [{ name: "가계부.json", text: `{
+  "version": 1,
+  "records": [
+    {
+      "날짜": "2026-09-01",
+      "가맹점": "동네마트",
+      "분류": "식비",
+      "금액": 32400
+    },
+    {
+      "날짜": "2026-09-02",
+      "가맹점": "버스·지하철",
+      "분류": "교통",
+      "금액": 1500
+    },
+    {
+      "날짜": "2026-09-03",
+      "가맹점": "김밥천국",
+      "분류": "식비",
+      "금액": 8000
+    },
+    {
+      "날짜": "2026-09-05",
+      "가맹점": "온라인서점",
+      "분류": "문화",
+      "금액": 21600
+    },
+    {
+      "날짜": "2026-09-08",
+      "가맹점": "약국",
+      "분류": "건강",
+      "금액": 6300
+    },
+    {
+      "날짜": "2026-09-12",
+      "가맹점": "동네마트",
+      "분류": "식비",
+      "금액": 45900
+    },
+    {
+      "날짜": "2026-09-14",
+      "가맹점": "영화관",
+      "분류": "문화",
+      "금액": 14000
+    },
+    {
+      "날짜": "2026-09-17",
+      "가맹점": "버스·지하철",
+      "분류": "교통",
+      "금액": 1500
+    },
+    {
+      "날짜": "2026-09-20",
+      "가맹점": "온라인서점",
+      "분류": "문화",
+      "금액": -21600
+    },
+    {
+      "날짜": "2026-09-25",
+      "가맹점": "통신사",
+      "분류": "통신",
+      "금액": 33000
+    },
+    {
+      "날짜": "2026-09-28",
+      "가맹점": "카페",
+      "분류": "식비",
+      "금액": 4800
+    },
+    {
+      "날짜": "2026-09-30",
+      "가맹점": "동네마트",
+      "분류": "식비",
+      "금액": 27350
+    }
+  ]
+}` }],
+        io: [{ output: `2026-09 모두 174,750원
+  식비  118,450원
+  통신   33,000원
+  문화   14,000원
+  건강    6,300원
+  교통    3,000원
+환불: 2026-09-20 온라인서점 -21,600원` }],
+        answer: `import json
+
+with open("가계부.json", encoding="utf-8") as f:
+    records = json.load(f)["records"]
+
+by_month = {}
+for rec in records:
+    month = rec["날짜"][:7]
+    kinds = by_month.setdefault(month, {})
+    kinds[rec["분류"]] = kinds.get(rec["분류"], 0) + rec["금액"]
+
+for month, kinds in sorted(by_month.items()):
+    print(f"{month} 모두 {sum(kinds.values()):,}원")
+    for kind, money in sorted(kinds.items(), key=lambda kv: -kv[1]):
+        print(f"  {kind} {money:>8,}원")
+
+for rec in records:
+    if rec["금액"] < 0:
+        print(f"환불: {rec['날짜']} {rec['가맹점']} {rec['금액']:,}원")
+` },
+      { title: "④ 가계부 보고서 엑셀 + CSV 내보내기",
+        text: `<p>같은 폴더에 ② 가 만든 <code>가계부.json</code>(아래 준비 파일)이 있어요. 모양은 <code>{"version": 1, "records": [{"날짜": "2026-09-01", "가맹점": …, "분류": …, "금액": 32400}, …]}</code> 이에요.</p><p>가족에게 보여 줄 <code>가계부_보고서.xlsx</code> 와, 다른 가계부 앱에 넣을 <code>가계부.csv</code> 를 만들어요.</p><ul><li>「요약」 시트(맨 앞) — 머리줄 <code>분류 · 금액</code>, 분류별 합계를 큰 순으로, 맨 아래 <code>합계</code> 줄은 <code>=SUM(B2:B6)</code> 수식([[레슨:F9]]). 머리줄은 흰 굵은 글씨에 파란 바탕 <code>4472C4</code>, 금액은 <code>#,##0</code>, A · B 열 너비 10 · 12([[레슨:F10]])</li><li>「요약」 의 D2 에 분류별 막대 차트 「분류별 지출」</li><li>「원본」 시트 — 기록 전부, 날짜는 <code>date</code> 로 바꿔 넣어 엑셀이 날짜로 알아보게, 머리줄 틀 고정</li><li><code>가계부.csv</code> — 엑셀에서 열어도 한글이 안 깨지게, 날짜는 ISO 글자 그대로</li></ul><p>그다음 이 코스의 습관대로 <b>다시 열어</b> 확인해요. 시트 순서, 요약 줄들(수식 글자 그대로), 파이썬으로 계산한 합계, 머리줄 굵기 · 색 · 금액 모양 · 너비, 원본 줄 수 · 틀 고정 · 날짜 모양, 차트 파일이 있는지(<code>.xlsx</code> 는 zip — [[레슨:F10]]), CSV 맨 앞 BOM 과 줄 수를 출력 예처럼 출력하세요. 겉모양은 엑셀에서 열어 봐요.</p>`,
+        needs: [["Font(bold=…, color=\"FFFFFF\")  PatternFill(\"solid\", fgColor=\"4472C4\")", "F10/0", "머리줄 꾸미기"], ["chart = BarChart()", "F10/3", "막대 차트 — Reference · add_data · set_categories · add_chart"], ["f\"=SUM(B2:B{last})\"", "F9/0", "합계 줄은 수식 글자"], ["date.fromisoformat(rec[\"날짜\"])", "F12/2", "날짜 글자 → date 로 넣어야 엑셀 날짜"], ["csv.DictWriter(f, fieldnames=[…])", "F12/2", "딕셔너리 리스트를 CSV 로"], ["open(\"가계부.csv\", \"w\", encoding=\"utf-8-sig\", newline=\"\")", "F12/3", "엑셀에서 열 CSV"]],
+        prep: [{ name: "가계부.json", text: `{
+  "version": 1,
+  "records": [
+    {
+      "날짜": "2026-09-01",
+      "가맹점": "동네마트",
+      "분류": "식비",
+      "금액": 32400
+    },
+    {
+      "날짜": "2026-09-02",
+      "가맹점": "버스·지하철",
+      "분류": "교통",
+      "금액": 1500
+    },
+    {
+      "날짜": "2026-09-03",
+      "가맹점": "김밥천국",
+      "분류": "식비",
+      "금액": 8000
+    },
+    {
+      "날짜": "2026-09-05",
+      "가맹점": "온라인서점",
+      "분류": "문화",
+      "금액": 21600
+    },
+    {
+      "날짜": "2026-09-08",
+      "가맹점": "약국",
+      "분류": "건강",
+      "금액": 6300
+    },
+    {
+      "날짜": "2026-09-12",
+      "가맹점": "동네마트",
+      "분류": "식비",
+      "금액": 45900
+    },
+    {
+      "날짜": "2026-09-14",
+      "가맹점": "영화관",
+      "분류": "문화",
+      "금액": 14000
+    },
+    {
+      "날짜": "2026-09-17",
+      "가맹점": "버스·지하철",
+      "분류": "교통",
+      "금액": 1500
+    },
+    {
+      "날짜": "2026-09-20",
+      "가맹점": "온라인서점",
+      "분류": "문화",
+      "금액": -21600
+    },
+    {
+      "날짜": "2026-09-25",
+      "가맹점": "통신사",
+      "분류": "통신",
+      "금액": 33000
+    },
+    {
+      "날짜": "2026-09-28",
+      "가맹점": "카페",
+      "분류": "식비",
+      "금액": 4800
+    },
+    {
+      "날짜": "2026-09-30",
+      "가맹점": "동네마트",
+      "분류": "식비",
+      "금액": 27350
+    }
+  ]
+}` }],
+        io: [{ output: `['요약', '원본']
+('분류', '금액')
+('식비', 118450)
+('통신', 33000)
+('문화', 14000)
+('건강', 6300)
+('교통', 3000)
+('합계', '=SUM(B2:B6)')
+파이썬 합계 174,750
+머리줄 True 004472C4 · 금액 모양 #,##0 · 너비 12.0
+원본 12 줄 · 틀 고정 A2 · 날짜 2026-09-01 yyyy-mm-dd
+차트 파일: True
+CSV 맨 앞 BOM: True
+12 줄 → 날짜,가맹점,분류,금액 | 2026-09-05,온라인서점,문화,21600` }],
+        answer: `import csv
+import json
+import zipfile
+from datetime import date
+from openpyxl import Workbook, load_workbook
+from openpyxl.chart import BarChart, Reference
+from openpyxl.styles import Font, PatternFill
+
+with open("가계부.json", encoding="utf-8") as f:
+    records = json.load(f)["records"]
+
+totals = {}
+for rec in records:
+    totals[rec["분류"]] = totals.get(rec["분류"], 0) + rec["금액"]
+kinds = sorted(totals, key=lambda k: -totals[k])
+
+wb = Workbook()
+summary = wb.active
+summary.title = "요약"
+summary.append(["분류", "금액"])
+for kind in kinds:
+    summary.append([kind, totals[kind]])
+last = summary.max_row
+summary.append(["합계", f"=SUM(B2:B{last})"])
+for cell in summary[1]:
+    cell.font = Font(bold=True, color="FFFFFF")
+    cell.fill = PatternFill("solid", fgColor="4472C4")
+for r in range(2, last + 2):
+    summary[f"B{r}"].number_format = "#,##0"
+summary.column_dimensions["A"].width = 10
+summary.column_dimensions["B"].width = 12
+
+chart = BarChart()
+chart.title = "분류별 지출"
+data = Reference(summary, min_col=2, min_row=1, max_row=last)
+cats = Reference(summary, min_col=1, min_row=2, max_row=last)
+chart.add_data(data, titles_from_data=True)
+chart.set_categories(cats)
+summary.add_chart(chart, "D2")
+
+raw = wb.create_sheet("원본")
+raw.append(["날짜", "가맹점", "분류", "금액"])
+for rec in records:
+    raw.append([date.fromisoformat(rec["날짜"]), rec["가맹점"], rec["분류"], rec["금액"]])
+raw.freeze_panes = "A2"
+wb.save("가계부_보고서.xlsx")
+
+with open("가계부.csv", "w", encoding="utf-8-sig", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=["날짜", "가맹점", "분류", "금액"])
+    w.writeheader()
+    w.writerows(records)
+
+# 다시 열어 확인
+wb = load_workbook("가계부_보고서.xlsx")
+print(wb.sheetnames)
+ws = wb["요약"]
+for row in ws.iter_rows(values_only=True):
+    print(row)
+print("파이썬 합계", f"{sum(totals.values()):,}")
+print("머리줄", ws["A1"].font.b, ws["A1"].fill.fgColor.rgb, "· 금액 모양", ws["B2"].number_format, "· 너비", ws.column_dimensions["B"].width)
+ws = wb["원본"]
+print("원본", ws.max_row - 1, "줄 · 틀 고정", ws.freeze_panes, "· 날짜", ws["A2"].value.date(), ws["A2"].number_format)
+names = zipfile.ZipFile("가계부_보고서.xlsx").namelist()
+print("차트 파일:", "xl/charts/chart1.xml" in names)
+
+with open("가계부.csv", "rb") as f:
+    print("CSV 맨 앞 BOM:", f.read(3) == b"\\xef\\xbb\\xbf")
+with open("가계부.csv", encoding="utf-8-sig") as f:
+    lines = f.read().splitlines()
+print(len(lines) - 1, "줄 →", lines[0], "|", lines[4])
+`,
+        checks: [{ text: `<code>가계부_보고서.xlsx</code> 를 엑셀(또는 LibreOffice Calc)에서 열면 「요약」 이 맨 앞이고, 머리줄이 파란 바탕에 흰 굵은 글씨예요` }, { text: `금액이 <code>118,450</code> 처럼 쉼표로 보이고, 합계 칸에 파이썬 합계와 같은 <code>174,750</code> 이 보여요` }, { text: `D2 쯤에 분류 다섯 개의 막대 차트 「분류별 지출」 이 있어요` }, { text: `「원본」 시트의 날짜가 <code>2026-09-01</code> 모양이고, 아래로 내려도 머리줄이 남아 있어요` }, { text: `<code>가계부.csv</code> 를 엑셀에서 더블클릭으로 열어도 한글이 안 깨져요` }] },
+      { title: "⑤ 다음 달 카드 내역 더하기 — 겹침 막기",
+        text: `<p>한 달 뒤 <code>가계부_카드내역_10월.xlsx</code>(아래 준비 파일로 만들어요)를 내려받았어요. 그런데 조회 기간이 <code>2026-09-28 ~ 2026-10-31</code> 이라 <b>앞 두 건이 9월 파일과 같은 건</b>이에요. 그냥 붙이면 9월 28일 카페 · 9월 30일 동네마트가 두 번 들어가요. 실수로 같은 파일을 두 번 넣을 수도 있고요.</p><ul><li><code>add_card(path)</code> — <code>가계부.json</code> 을 읽고(없으면 빈 가계부), 카드 파일을 읽어 <b>아직 없는 건만</b> 더해 날짜 순으로 다시 저장해요. 읽기는 ② 의 <code>read_card</code> 그대로예요</li><li>같은 건인지는 <b>열쇠</b> <code>(날짜, 가맹점, 금액)</code> 튜플로 봐요. 이미 있는 열쇠를 집합에 모아 두고, 새 기록의 열쇠가 그 안에 있으면 건너뛰어요</li><li>파일마다 <code>몇 건 중 몇 건 더함 · 겹침 몇 건 → 모두 몇 건</code> 을 출력해요</li></ul><p>연습이라 처음에 <code>가계부.json</code> 을 지우고 시작해서, 9월 → 10월 → 10월(한 번 더) 차례로 넣으세요. 마지막에 월별 합계를 출력해요. 9월 합계가 ① 의 합계 줄과 같은지 봐요.</p><div class="bk-warn"><b>열쇠는 약속이에요</b> — 같은 날 같은 가게에서 같은 금액을 두 번 쓰면(버스를 두 번 탄 날) 이 열쇠로는 한 건으로 합쳐져요. 진짜 카드 내역에는 <b>승인번호</b> 칸이 있어서 그걸 열쇠로 쓰면 정확해요. 내 데이터에 무엇이 「하나뿐인 값」 인지 먼저 찾아보는 게 겹침 막기의 시작이에요.</div>`,
+        needs: [["if key_of(rec) in seen:", "F12/2", "이미 본 것은 건너뛰기 — 키 합집합과 같은 모양"], ["json.dump({\"version\": 1, \"records\": records}, f, ensure_ascii=False, indent=2)", "F12/1", "날짜 순으로 다시 저장"]],
+        prep: [SAMPLES_PREP],
+        io: [{ output: `가계부_카드내역.xlsx: 12건 중 12건 더함 · 겹침 0건 → 모두 12건
+가계부_카드내역_10월.xlsx: 7건 중 5건 더함 · 겹침 2건 → 모두 17건
+가계부_카드내역_10월.xlsx: 7건 중 0건 더함 · 겹침 7건 → 모두 17건
+2026-09 174,750원
+2026-10 92,200원` }],
+        answer: `import json
+from pathlib import Path
+from datetime import date, datetime
+from openpyxl import load_workbook
+from openpyxl.utils.datetime import from_excel
+
+
+def won(text):
+    return int(text.replace(",", "").replace("원", ""))
+
+
+def to_date(value):
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, int):
+        return from_excel(value).date()  # 46270 같은 엑셀 날짜 번호
+    raise ValueError(f"날짜가 아니에요: {value!r}")
+
+
+def read_card(path):
+    ws = load_workbook(path)["이용내역"]
+    header = None
+    records = []
+    for row in ws.iter_rows(values_only=True):
+        if header is None:
+            if row[0] == "이용일":
+                header = list(row)
+            continue
+        if set(row) == {None} or row[0] == "합계":
+            continue
+        rec = dict(zip(header, row))
+        records.append({"날짜": to_date(rec["이용일"]).isoformat(), "가맹점": rec["가맹점"],
+                        "분류": rec["분류"], "금액": won(rec["이용금액"])})
+    return records
+
+
+STORE = Path("가계부.json")
+
+
+def load_store():
+    if not STORE.exists():
+        return []
+    with STORE.open(encoding="utf-8") as f:
+        return json.load(f)["records"]
+
+
+def save_store(records):
+    records = sorted(records, key=lambda rec: rec["날짜"])
+    with STORE.open("w", encoding="utf-8") as f:
+        json.dump({"version": 1, "records": records}, f, ensure_ascii=False, indent=2)
+
+
+def key_of(rec):
+    return (rec["날짜"], rec["가맹점"], rec["금액"])
+
+
+def add_card(path):
+    records = load_store()
+    seen = set()
+    for rec in records:
+        seen.add(key_of(rec))
+    new = read_card(path)
+    added = []
+    for rec in new:
+        if key_of(rec) in seen:
+            continue
+        seen.add(key_of(rec))
+        added.append(rec)
+    save_store(records + added)
+    print(f"{path}: {len(new)}건 중 {len(added)}건 더함 · 겹침 {len(new) - len(added)}건 → 모두 {len(records) + len(added)}건")
+
+
+STORE.unlink(missing_ok=True)  # 연습: 빈 가계부에서 시작
+add_card("가계부_카드내역.xlsx")
+add_card("가계부_카드내역_10월.xlsx")
+add_card("가계부_카드내역_10월.xlsx")  # 실수로 한 번 더
+
+by_month = {}
+for rec in load_store():
+    month = rec["날짜"][:7]
+    by_month[month] = by_month.get(month, 0) + rec["금액"]
+for month, money in by_month.items():
+    print(month, f"{money:,}원")
+` },
+    ],
   },
 };

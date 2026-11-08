@@ -38,7 +38,7 @@ const CONFIG = {
     { id: 'oop', short: '설계', name: '객체지향·설계', icon: '🧱', desc: '캡슐화 · 합성 · 다형성 · 설계 원칙 · 디자인 패턴 · 리팩터링으로 고치기 쉬운 파이썬 코드를 짜는 교과서', path: 'courses/oop/', color: '#5d4037', ready: true, book: true, bookNote: '파이썬 다음 — 클래스를 나누는 법', lessons: 17 /* v2.33.0 객체지향·설계 교과서 완성 — 17 전부 */ },
     { id: 'ml', short: '머신러닝', name: 'AI·머신러닝 기초', icon: '🧠', desc: '선형 회귀 · 경사하강 · k-NN · 로지스틱 회귀 · 결정 트리 · 평가 지표 · k-평균을 numpy 와 scikit-learn 으로 직접 만드는 교과서', path: 'courses/ml/', color: '#00695c', ready: true, book: true, bookNote: '파이썬 다음 — numpy · scikit-learn', lessons: 16 /* v2.33.0 AI·머신러닝 기초 교과서 완성 — 16 전부 */ },
     { id: 'ai', short: 'AI 협업', name: 'AI와 협업', icon: '🤝', desc: '좋은 요청 · 단계 나누기 · AI 코드 검증 · 환각 알아보기 · 개인정보 · 저작권까지 AI 도구와 일하는 법을 익히는 교과서', path: 'courses/ai/', color: '#ad1457', ready: true, book: true, bookNote: '파이썬 다음 — AI 도구 잘 쓰기', lessons: 16 /* v2.33.0 AI와 협업 교과서 완성 — 16 전부 */ },
-    { id: 'files', short: '데이터 파일', name: '데이터 파일 다루기', icon: '🗂️', desc: 'JSON · JSON Lines · TOML · 엑셀(openpyxl)을 파이썬으로 읽고 · 검사하고 · 바꾸고 · 보기 좋은 엑셀 보고서로 내보내는 교과서', path: 'courses/files/', color: '#2e7d32', ready: true, book: true, bookNote: '파이썬 다음 — JSON · 엑셀', lessons: 0 /* v2.41.0 만드는 중 */ },
+    { id: 'files', short: '데이터 파일', name: '데이터 파일 다루기', icon: '🗂️', desc: 'JSON · JSON Lines · TOML · 엑셀(openpyxl)을 파이썬으로 읽고 · 검사하고 · 바꾸고 · 보기 좋은 엑셀 보고서로 내보내는 교과서', path: 'courses/files/', color: '#2e7d32', ready: true, book: true, bookNote: '파이썬 다음 — JSON · 엑셀', lessons: 18 /* v2.41.0 데이터 파일 다루기 교과서 — 18 전부 */ },
   ],
 
   // --- 외부 라이브러리 (버전 고정) ---
