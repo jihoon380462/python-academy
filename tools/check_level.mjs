@@ -142,7 +142,8 @@ export function detect(src, { structure = true } = {}) {
   const code = stripStrings(src); const lineOf = (s, i) => s.slice(0, i).split('\n').length; const lineText = (s, i) => s.split('\n')[lineOf(s, i) - 1].trim();
   const put = (k, s, i) => { if (!found.has(k)) found.set(k, { line: lineOf(s, i), text: lineText(s, i) }); };
   for (const [label, re] of CATALOG) { const s = RAW_FEATURES.has(label) ? src : code; const m = s.match(re); if (m) put(label, s, m.index); }
-  for (const m of code.matchAll(/^[ \t]*(?:import\s+(\w+)|from\s+(\w+))/gm)) put(`import ${m[1] || m[2]}`, code, m.index);
+  for (const m of code.matchAll(/^[ \t]*import\s+([\w.]+(?:\s+as\s+\w+)?(?:\s*,\s*[\w.]+(?:\s+as\s+\w+)?)*)/gm)) for (const part of m[1].split(',')) put(`import ${part.trim().split(/[\s.]/)[0]}`, code, m.index);   // v2.42.0 import a, b 의 b 도
+  for (const m of code.matchAll(/^[ \t]*from\s+(\w+)/gm)) put(`import ${m[1]}`, code, m.index);
   for (const m of code.matchAll(new RegExp(`(?<![\\w.])(${MODULES.join('|')})\\.(\\w+)`, 'g'))) put(`${m[1]}.${m[2]}`, code, m.index);
   if (structure) for (const [k, v] of scanStructure(code)) if (!found.has(k)) found.set(k, v);
   return found;
