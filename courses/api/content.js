@@ -277,7 +277,11 @@ INFO:     127.0.0.1:52351 - "POST /hello HTTP/1.1" 405 Method Not Allowed</pre>
 
 client = TestClient(app)
 res = client.get("/hello")
-print(res.status_code, res.json())</pre>`,
+print(res.status_code, res.json())</pre>
+<p>엔드포인트 함수 안에서는 파이썬을 그대로 써요. 지금 시각을 돌려주고 싶으면 <code>datetime</code> 모듈의 <code>datetime.now()</code> 로 시각을 받고, <code>.strftime("%H:%M:%S")</code> 로 「시:분:초」 글자로 바꿔요.</p>
+<pre class="code">from datetime import datetime
+
+print(datetime.now().strftime("%H:%M:%S"))   # 14:05:09 처럼 — 돌릴 때마다 달라요</pre>`,
       example: { code: 'from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\n\napp = FastAPI()\n\n\n@app.get("/hello")\ndef hello():\n    return {"message": "안녕하세요"}\n\n\nclient = TestClient(app)\nres = client.get("/hello")\nprint(res.status_code, res.json())\nprint(client.get("/hi").status_code, client.post("/hello").status_code)\nspec = client.get("/openapi.json").json()\nprint(list(spec["paths"]))', label: '예제 코드 — 서버를 안 켜고 실행(fastapi 설치 뒤)' } },
   ],
   summary: ['@app.get("/hello") 함수가 dict 를 돌려주면 JSON', 'fastapi dev main.py → 127.0.0.1:8000 · Ctrl+C', '/docs 는 저절로 생긴 문서 · TestClient 로 서버 없이 시험'] },
