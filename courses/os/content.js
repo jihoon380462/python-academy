@@ -279,6 +279,7 @@ print("main 이 본 money:", money)</pre>
     { title: 'threading.Thread · start · join · Threads:', html: `<table class="kb"><tbody><tr><td><code>t = threading.Thread(target=함수, args=(값,))</code></td><td>일꾼 만들기(아직 안 움직여요). <code>args</code> 는 튜플 — 값이 하나면 <code>(값,)</code></td></tr><tr><td><code>t.start()</code></td><td>일 시작 — 이 줄은 바로 돌아오고, 일꾼은 옆에서 따로 돌아요</td></tr><tr><td><code>t.join()</code></td><td>그 일꾼이 끝날 때까지 기다리기(프로세스의 <code>waitpid</code> 같은 것)</td></tr></tbody></table>
 <p>일꾼이 도는 동안 <code>/proc/self/status</code> 의 <code>Threads:</code> 를 보면 늘어나 있어요. 처음부터 있던 <b>메인 스레드</b> 하나 + 내가 만든 수예요.</p>
 <pre class="code">import threading
+import time
 def threads():
     with open("/proc/self/status") as f:
         for line in f:
@@ -292,9 +293,13 @@ print("일하는 중 Threads:", threads())
 go.set()
 for t in workers:
     t.join()
+for _ in range(50):          # 운영체제가 끝난 스레드를 치울 틈(최대 0.5초)
+    if threads() == 1:
+        break
+    time.sleep(0.01)
 print("끝난 뒤 Threads:", threads())</pre>
-<p><code>threading.Event()</code> 는 「신호 깃발」 — <code>go.wait()</code> 는 깃발이 올라갈 때까지 기다리고 <code>go.set()</code> 이 깃발을 올려요. 실행하면 <code>일하는 중 Threads: 4</code>, <code>끝난 뒤 Threads: 1</code>. 터미널에서는 <code>ps -o pid,nlwp,cmd</code> 의 NLWP 칸(스레드 수)으로도 봐요.</p>` + OS_DATE,
-      example: { code: 'import threading\ndef threads():\n    with open("/proc/self/status") as f:\n        for line in f:\n            if line.startswith("Threads:"):\n                return int(line.split()[1])\ngo = threading.Event()\nworkers = [threading.Thread(target=go.wait) for _ in range(3)]\nfor t in workers:\n    t.start()\nprint("일하는 중 Threads:", threads())\ngo.set()\nfor t in workers:\n    t.join()\nprint("끝난 뒤 Threads:", threads())' } },
+<p><code>threading.Event()</code> 는 「신호 깃발」 — <code>go.wait()</code> 는 깃발이 올라갈 때까지 기다리고 <code>go.set()</code> 이 깃발을 올려요. 실행하면 <code>일하는 중 Threads: 4</code>, <code>끝난 뒤 Threads: 1</code>. <code>join()</code> 은 파이썬 쪽 일이 끝나면 바로 돌아오고, 운영체제가 그 스레드를 실제로 치우는 데는 아주 잠깐 더 걸려요 — 그래서 바쁜 컴퓨터에서는 바로 세면 4 가 나올 수 있어, 1 이 될 때까지 잠깐 기다렸다 세요. 터미널에서는 <code>ps -o pid,nlwp,cmd</code> 의 NLWP 칸(스레드 수)으로도 봐요.</p>` + OS_DATE,
+      example: { code: 'import threading\nimport time\ndef threads():\n    with open("/proc/self/status") as f:\n        for line in f:\n            if line.startswith("Threads:"):\n                return int(line.split()[1])\ngo = threading.Event()\nworkers = [threading.Thread(target=go.wait) for _ in range(3)]\nfor t in workers:\n    t.start()\nprint("일하는 중 Threads:", threads())\ngo.set()\nfor t in workers:\n    t.join()\nfor _ in range(50):          # 운영체제가 끝난 스레드를 치울 틈(최대 0.5초)\n    if threads() == 1:\n        break\n    time.sleep(0.01)\nprint("끝난 뒤 Threads:", threads())' } },
     { title: 'GIL 맛보기: 기다리기는 겹치고, 계산은 번갈아', html: `<p>보통 쓰는 파이썬(CPython)에는 <b>GIL</b>(전역 인터프리터 락)이 있어요. <b>파이썬 코드는 한 번에 한 스레드만</b> 실행돼요. 그래서 효과가 둘로 갈려요.</p>
 <ul><li><b>기다리는 일</b>(<code>time.sleep</code> · 파일 · 네트워크)은 기다리는 동안 GIL 을 내놓아서 <b>겹쳐서</b> 돌아요 → 스레드로 빨라져요.</li><li><b>계산만 하는 일</b>(큰 반복문)은 서로 번갈아 돌 뿐이라 스레드를 늘려도 <b>안 빨라져요</b>. 계산을 나누려면 프로세스를 여럿(<code>multiprocessing</code>) 써요.</li></ul>
 <pre class="code">import threading, time
