@@ -1,4 +1,4 @@
-// courses/sql/book.js — SQL 「교과서」 모드 데이터 (v2.13.0, 사용자 11/6 「2번(SQL·터미널·웹 교과서) 해」 · 「내 컴퓨터 도구로」 · 「필수 사항은 강조하고 계속 다음 진행해」 = N2)
+// courses/sql/book.js — SQL 「교과서」 모드 데이터 (v2.13.0, 사용자 결정 11/6: SQL · 터미널 · 웹 교과서를 내 컴퓨터 도구로, 필수 사항 강조 = N2)
 // 화면은 core/ui-views-book.js. 연습은 사용자 PC 의 DB Browser for SQLite(Windows) + 연습 DB cafe.db(courses/sql/cafe.db — datasets.js 의 cafe 로 만듦, tools/build_cafe_db.py)
 // lessonPages: S0~S13 쪽 통째(content.js 의 브라우저 실행용 쪽·「준비 중」 대신). example.code = Execute SQL 탭에 붙여 넣을 SQL
 // tasks 필드: answer = 예시 답 SQL(또는 runPy:true 면 파이썬 코드 — cafe.db 옆에서 실행한 출력이 결과) · io[0].output = 결과 표(「열 | 열」 머리줄 + 행) · check = 바꾸기 문제에서 다 하고 확인하는 SELECT

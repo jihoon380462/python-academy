@@ -1,4 +1,4 @@
-// courses/vim/book.js — 공용 「Vim 에디터 교과서」 데이터 (v2.11.0, 사용자 2026-11-06 「공용에 windows 버전 vim 에디터 설치 및 사용법 그리고 단축키 교과서 만들어 그리고 파이썬과 연결하고 자동 띄어쓰기 및 자동완성 기능까지」)
+// courses/vim/book.js — 공용 「Vim 에디터 교과서」 데이터 (v2.11.0, 사용자 요청 11/6: 공용 Windows Vim 설치 · 사용법 · 단축키, 파이썬 연결 · 자동 들여쓰기 · 자동완성까지)
 // 화면은 core/ui-views-book.js (파이썬·터미널 교과서와 같은 틀). 연습은 사용자 PC 의 gVim 9.2(Windows).
 // tasks 필드: setup = 준비 명령(Ex 명령 한 줄 — 📋 복사 → gVim 에서 : → Ctrl+R + → Enter 하면 ~/vim-study/파일 이 처음 상태로 열림)
 //   answer = 예시 답 키(<Esc> <Enter> <BS> <C-n> 표기) · io[0].output = 다 하고 :w 한 파일 내용 · file = 비교할 파일(기본: setup 이 연 파일)
@@ -9,7 +9,7 @@ const VPLAY = VS('play.txt', ['Vim 연습 파일이에요. 마음껏 고쳐 보�
 const BOOK = {
   check: 'vim',
   meta: {
-    // v2.12.2 사용자 「필수 사항은 강조하고」 — 먼저 해야 하는 것(목차·레슨 1쪽·만들어 보기 위 경고 상자)
+    // v2.12.2 사용자 요청(필수 사항 강조) — 먼저 해야 하는 것(목차·레슨 1쪽·만들어 보기 위 경고 상자)
     prereq: [
       { lessons: ['V0', 'V1'], chapters: [1], ref: 'SETUP/0', btn: '시작하기 1 · Vim 설치 보기',
         title: '먼저 꼭! 「🛠 시작하기」 1~2 — gVim 설치(「Do not remap keys」 그대로) · 준비 명령 넣는 법',

@@ -92,7 +92,7 @@ const Review = {
   afterReview(p, success, hints) { const r = Store.prob(p.id); const st = r.review ? r.review.stage : 0; const next = (success && hints === 0) ? Math.min(CONFIG.REVIEW_INTERVALS.length - 1, st + 1) : 0; r.review = { stage: next, due: addDays(todayKey(), CONFIG.REVIEW_INTERVALS[next]) }; /* 11/4: 틀린 뒤 맞혀도 복습 한 개로 셈(단계는 0 = 내일 다시) */ this.noteResult(p, success, hints); { Game.stat('reviewsDone'); const rt = Store.data.reviewToday; if (rt.date !== todayKey()) { rt.date = todayKey(); rt.count = 0; rt.bonus = false; /* QA #149: 날짜가 바뀌면 하루 보너스도 다시 — 예전엔 bonus 가 한 번 true 되면 영영 안 풀려 첫날만 받았음 */ } rt.count++; } Store.save(); },
   tagStats() { const tags = {}; PROBLEMS.forEach(p => { const r = Store.prob(p.id); p.tags.forEach(t => { tags[t] = tags[t] || { total: 0, clear: 0, attempts: 0, fails: 0 }; const s = tags[t]; s.total++; if (r.status === 'clear') s.clear++; s.attempts += r.attempts; s.fails += r.fails; }); }); return tags; },
   weakest() { const ts = this.tagStats(); let w = null, wr = 2; Object.entries(ts).forEach(([t, s]) => { if (s.attempts + s.clear === 0) return; const rate = s.clear / Math.max(1, s.clear + s.fails); if (rate < wr) { wr = rate; w = t; } }); return w; },
-  /* 사용자 요청(11/4) 「챕터 6까지 했는데 아무거나 던지는 건 무책임하다」 — 복습 고르기를 약점·챕터 고르게·밀린 날짜로.
+  /* 사용자 지적(11/4): 복습 문제를 아무거나 고르면 안 됨 — 복습 고르기를 약점·챕터 고르게·밀린 날짜로.
      plan({ mode:'due'|'extra', lessonIds, n }) → { items:[{ id, ch, lesson, kind:'due'|'weak', reasons:[…] }], dueCount, poolCount }
      · due  = 오늘의 복습: 다시 볼 날(review.due)이 된 문제가 먼저. 모자라면 약점(틀림·힌트·정답 보기·별 낮음·약한 주제) 문제로 채움
      · extra = 더 복습하기: 범위 안 클리어 문제 중 다시 볼 날이 안 된 것에서 약점·오래된 순 (QA #149: 날 된 문제는 오늘의 복습 몫)

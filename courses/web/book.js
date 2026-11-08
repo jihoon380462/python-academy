@@ -1,4 +1,4 @@
-// courses/web/book.js — 웹 「교과서」 모드 데이터 (v2.14.0, 사용자 11/6 「2번(SQL·터미널·웹 교과서) 해」 · 「내 컴퓨터 도구로」 · 「계속 다음 진행해」 = N3)
+// courses/web/book.js — 웹 「교과서」 모드 데이터 (v2.14.0, 사용자 결정 11/6: SQL · 터미널 · 웹 교과서를 내 컴퓨터 도구로 = N3)
 // 화면은 core/ui-views-book.js. 연습은 사용자 PC 의 VS Code(+ Live Server 확장) + 크롬/엣지(개발자 도구 F12).
 // lessonPages: W0~W13 쪽 통째(content.js 의 브라우저 편집기용 쪽·「준비 중」 대신) · 보스는 「만들어 보기」 만
 // tasks 필드: answer = 예시 답(index.html 파일 전체) · checks = 「브라우저에서 확인할 것」(core/runners/web.js 의 Web.check 형식 — 화면엔 text 만 보임)

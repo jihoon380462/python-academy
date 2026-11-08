@@ -1,4 +1,4 @@
-// courses/linux/content.js — 「리눅스 교과서」 (v2.21.0, 사용자 공용 코스 「리눅스는 우분투, 가상 VM 설치 및 적용」 11/6 · 「T9 리눅스 먼저」·결정 D13 11/7). 설계: specs/linux-course.md
+// courses/linux/content.js — 「리눅스 교과서」 (v2.21.0, 사용자 결정: 공용 코스 리눅스는 우분투 VM 설치부터 11/6 · T9 리눅스를 먼저, D13 11/7). 설계: specs/linux-course.md
 // 처음부터 교과서 모드(book.js + core/ui-views-book.js). 문제·채점 없음(PROBLEMS 빈 배열). 연습은 사용자의 Windows PC 에 설치한 VirtualBox + 그 안의 Ubuntu Desktop 26.04 LTS.
 // 화면 이름은 VirtualBox 7.2 매뉴얼(virtualbox.org/manual) · Ubuntu 문서(documentation.ubuntu.com)로 확인한 영어 글자 그대로 + 괄호 안 한국어 뜻. 화면이 바뀌면 여기를 고치고 QA 문서에 적어요.
 // 레슨 쪽 example.shell = 우분투 터미널에 칠 명령(CI 에서는 안 돌림 — apt·sudo 가 있어서). 「만들어 보기」·시작하기·도감 도구 상자는 book.js. 검사: node tools/check_book.mjs linux

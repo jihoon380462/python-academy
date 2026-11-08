@@ -1,4 +1,4 @@
-// courses/data/content.js — 「데이터 분석 교과서」 (v2.33.0, 사용자 「1」 → T3 ~ T7 전부 11/7). 설계: specs/courses-t3-t7.md
+// courses/data/content.js — 「데이터 분석 교과서」 (v2.33.0, 사용자 선택 11/7: T3 ~ T7 전부). 설계: specs/courses-t3-t7.md
 // 교과서 모드. 연습은 내 PC 의 VS Code + 파이썬. example.code = 파이썬(check_book 이 python3 로 실제 실행).
 const COURSE = { id: 'data', name: '데이터 분석', runner: 'python', bench: false,
   tutorPersona: '너는 파이썬을 아는 성인에게 데이터 분석 을 작은 파이썬 코드로 직접 해 보며 가르치는 선생님이다.' };

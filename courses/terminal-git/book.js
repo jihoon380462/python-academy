@@ -1,4 +1,4 @@
-// courses/terminal-git/book.js — 터미널·Git 「교과서」 모드 데이터 (v2.10.0, 사용자 결정 2026-11-06 「2번(SQL·터미널·웹 교과서) 해」 · 「내 컴퓨터 도구로」 · 「터미널·Git 먼저」).
+// courses/terminal-git/book.js — 터미널·Git 「교과서」 모드 데이터 (v2.10.0, 사용자 결정 11/6: SQL · 터미널 · 웹 교과서를 내 컴퓨터 도구로, 터미널·Git 먼저).
 // 화면은 core/ui-views-book.js (파이썬 교과서와 같은 틀). 연습은 사용자의 진짜 터미널 = Windows 의 Git Bash.
 // meta: 코스마다 다른 글귀 · setup: 첫 화면 「시작하기」 · lessonPages: 레슨 id → 쪽 목록 통째(content.js 의 「준비 중」 쪽 대신)
 // pages: 'T0/1' → { html | rep } 기존 쪽 고쳐 쓰기(T0 은 연습용 가짜 터미널 기준이라 Git Bash 기준으로)
@@ -25,7 +25,7 @@ const BOOK = {
     fileExt: '', setupLabel: '준비 명령 — 붙여 넣으면 이 문제용 폴더가 생기고 그 안으로 들어가요', answerLabel: '예시 답(명령)', needsLabel: '필요한 명령',
     checkLabel: '확인 명령 — 다 했으면 이걸 쳐 보세요', outLabel: '이렇게 나오면 성공', inLabel: '입력',
     homeNote: '<code>/c/Users/me</code> 의 <code>me</code> 자리는 내 Windows 사용자 이름이에요',
-    // v2.12.1 사용자 「나중에 할 거니까 레슨 6번은 설정을 해야 한다고 강조해」 — Git 레슨마다·목차에 경고 상자
+    // v2.12.1 사용자 요청(레슨 6 의 처음 설정을 강조) — Git 레슨마다·목차에 경고 상자
     prereq: [
     { lessons: ['T0', 'T1'], chapters: [1], ref: 'SETUP/0', btn: '시작하기 1 · Git Bash 설치 보기',
       title: '먼저 꼭! 「🛠 시작하기」 1~3 — Git for Windows(Git Bash) 설치 · 연습 폴더 만들기',
@@ -362,7 +362,7 @@ $ echo "안녕 $name"
   },
 };
 
-// ================= v2.12.0 Git 편 (T6~T16 · TB2 · TB3) — 사용자 11/6 「2번 진행」(N1 2차) =================
+// ================= v2.12.0 Git 편 (T6~T16 · TB2 · TB3) — 사용자 선택 11/6(N1 2차) =================
 // 연습은 진짜 git(Git Bash). 원격(push·pull·clone)은 처음엔 「내 컴퓨터 안의 가짜 GitHub」 = bare 저장소 폴더(remote.git)로, T16 에서 실제 GitHub.
 // 준비 명령의 git init 은 늘 -b main(설치 때 main 을 안 골랐어도 같게). 파일 이름은 영어(한글 이름은 git status 에 \355… 로 보임 — T6 설정에서 quotepath 를 끄지만 같게 보이도록).
 // 검사(check_book): 커밋 해시·날짜는 컴퓨터마다 달라서 확인 명령은 --format=%s(메시지)·status --short·ls-files 처럼 늘 같은 것만.

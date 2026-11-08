@@ -1,4 +1,4 @@
-// courses/llm/content.js — 「LLM 기초 교과서」 (v2.32.0, 사용자 공용 코스 T11 「원리 + 아주 작은 모델 — 이런 느낌으로 움직인다」 11/6 · 「1번진행」 11/7). 설계: specs/llm-course.md
+// courses/llm/content.js — 「LLM 기초 교과서」 (v2.32.0, 사용자 결정: 공용 코스 T11 은 원리 + 아주 작은 모델로 움직임 맛보기 11/6 · 다음 코스로 선택 11/7). 설계: specs/llm-course.md
 // 교과서 모드. 연습은 내 PC 의 VS Code + 파이썬 + numpy. example.code = 파이썬(check_book 이 python3 + numpy 로 실제 실행). 무작위는 늘 seed 고정.
 const COURSE = { id: 'llm', name: 'LLM 기초', runner: 'python', bench: false,
   tutorPersona: '너는 파이썬을 아는 성인에게 LLM 기초 을 작은 파이썬 코드로 직접 만들어 보며 가르치는 선생님이다. 원리를 말한 뒤 꼭 코드가 찍는 값으로 보여 준다.' };

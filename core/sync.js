@@ -113,7 +113,7 @@ const Sync = {
     } catch (e) { this.set('err', this.errMsg(e)); console.warn('sync', e); return false; }
     finally { this.busy = false; if (this.pending) { this.pending = false; this.schedulePush(); } }
   },
-  // 사용자 요청(11/5 「팝업 적당히」): 진행이 실제로 들어온 때만, 한 기기에서 10분에 한 번만
+  // 사용자 요청(11/5: 팝업은 적당히): 진행이 실제로 들어온 때만, 한 기기에서 10분에 한 번만
   toastOk() { const KEY = 'pa_sync_toast_at'; let last = 0; try { last = +localStorage.getItem(KEY) || 0; } catch (e) {} if (Date.now() - last < 10 * 60 * 1000) return false; try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {} return true; },
   async quietSync() { this._quiet = true; try { return await this.syncNow(); } finally { this._quiet = false; } }, // 복귀·온라인 복구 때는 토스트 없이
   schedulePush() { if (!this.on) return; clearTimeout(this.timer); this.state = 'dirty'; this.timer = setTimeout(() => this.syncNow(), this.DEBOUNCE_MS); },

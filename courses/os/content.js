@@ -1,4 +1,4 @@
-// courses/os/content.js — 「운영체제 교과서」 (v2.23.0, 사용자 공용 코스 「운영체제는 중요해서 따로 뺐다 — 운영체제 섹션에서 자세히」 11/6 · 「전부 추천대로」 11/7). 설계: specs/os-course.md
+// courses/os/content.js — 「운영체제 교과서」 (v2.23.0, 사용자 결정: 운영체제는 중요해서 공용 코스로 따로 11/6 · 설계는 전부 추천안대로 11/7). 설계: specs/os-course.md
 // 처음부터 교과서 모드(book.js + core/ui-views-book.js). 문제·채점 없음(PROBLEMS 빈 배열). 연습은 리눅스 교과서에서 만든 VirtualBox 의 Ubuntu 26.04 VM 안의 python3.
 // 레슨 쪽 example.code = 파이썬(check_book 이 python3 로 실제 실행 — CI 도 리눅스라 os.fork·/proc 이 있음) · example.shell = 우분투 터미널에 칠 명령(안 돌림).
 // 자식 프로세스는 os._exit 로 끝내서 출력 버퍼가 안 비워짐 → 자식의 print 와 fork 바로 앞의 print 에는 flush=True(K2 1쪽에서 가르침).
