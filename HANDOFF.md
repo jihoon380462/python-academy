@@ -301,6 +301,7 @@
 | 문서 | 용도 |
 | --- | --- |
 | `CLAUDE.md` | Claude Code 가 세션마다 저절로 읽는 짧은 안내. 방 구분 · 꼭 지킬 것 |
+| `.claude/settings.json` · `.claude/hooks/korean_reply.py` | 답하는 언어를 한국어로 고정하고, 영어로만 쓴 글이 있으면 답을 끝내지 못하게 막는 Stop 훅(LESSON U1) |
 | **`LESSON.md`** | **실패 기록**(11/8 사용자 지시). 작업 전에 1절 점검표, 실패가 생기면 같은 PR 에서 최신화 |
 | `TODO.md` | 남은 일(1절) · 사용자 결정 기록 D1~(2절) · 끝난 일 N · T(3절) |
 | `specs/site-intent.md` | 사이트 의도 · 코스별 정상 동작 · 자동 검사. QA 기준 |
