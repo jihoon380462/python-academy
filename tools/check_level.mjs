@@ -28,7 +28,7 @@ function loadCourse(id) {
   const byId = Object.fromEntries(c.PROBLEMS.map(p => [p.id, p])); const ordered = []; const seen = new Set();
   for (const l of c.LESSONS) { const ts = ((cx.BOOK && cx.BOOK.tasks) || {})[l.id] || [];
     // 이 레슨 · 앞 문제에서 학습자가 만든 내 모듈(문제 글 · 준비 파일의 「이름.py」)은 import 해도 새 기능이 아님(L16C 「내 모듈」)
-    const own = new Set(); for (const t of ts) { for (const m of String((t.text || '') + '\n' + (t.answer || '')).matchAll(/([A-Za-z_]\w*)\.py\b/g)) own.add(m[1]); for (const f of [].concat(t.prep || [])) if (f && f.name) { const m = String(f.name).match(/([A-Za-z_]\w*)\.py$/); if (m) own.add(m[1]); } }
+    const own = new Set(); for (const t of ts) { for (const m of String((t.text || '') + '\n' + (t.answer || '')).matchAll(/([A-Za-z_]\w*)(?:\.py\b|\/)/g)) own.add(m[1]); for (const f of [].concat(t.prep || [])) if (f && f.name) { const m = String(f.name).match(/([A-Za-z_]\w*)\.py$/); if (m) own.add(m[1]); const top = String(f.name).split('/'); if (top.length > 1) own.add(top[0]); } }
     const ownRe = own.size ? new RegExp(`^[ \\t]*(?:import|from)\\s+(?:${[...own].join('|')})\\b.*$`, 'gm') : null; const strip = (s) => ownRe ? String(s || '').replace(ownRe, '') : (s || '');
     ts.forEach((t, k) => { if (t.pid && byId[t.pid]) { ordered.push(byId[t.pid]); seen.add(t.pid); return; } if (typeof t.answer !== 'string') return;
       ordered.push({ id: `${l.id}#${k + 1}`, lesson: l.id, type: 'code', title: t.title || '', prompt: t.text || '', solution: t.predict ? '' : strip(t.answer), starter: t.predict ? strip(t.answer) : strip(t.given || ''), hints: [], bookTask: true }); }); }
@@ -176,7 +176,8 @@ export function analyzeCourse(c, seed) {
     probs.forEach((p, pi) => {
       const sol = solutionOf(p); const h3 = (p.hints || [])[2] || '';
       const own = new Map([...detect(htmlToText(p.prompt)), ...detect(p.starter || '')]);
-      const used = new Map(); for (const [k, v] of detect(sol)) used.set(k, { ...v, src: '정답' }); for (const [k, v] of detect(h3)) if (!used.has(k)) used.set(k, { ...v, src: '힌트3' });
+      const defined = new Set([...probs.slice(0, pi + 1).map(q => solutionOf(q) + '\n' + (q.starter || '') + '\n' + (q.prompt || '')).join('\n').matchAll(/def\s+(\w+)\s*\(/g)].map(m => m[1]));   // 이 문제 · 같은 레슨 앞 문제에서 정의한 것   // v2.42.0 직접 정의한 메서드(.clear 등)는 새 기능 아님
+      const used = new Map(); for (const [k, v] of detect(sol)) if (!(k.startsWith('.') && defined.has(k.slice(1)))) used.set(k, { ...v, src: '정답' }); for (const [k, v] of detect(h3)) if (!used.has(k)) used.set(k, { ...v, src: '힌트3' });
       const inStarter = detect(p.starter || (p.fill && p.fill.code) || (p.bug && p.bug.code) || ''); /* 빈칸·버그 문제는 주어진 코드가 starter 역할 */ // v2.8.8: starter 에 이미 적힌 기능은 학습자가 치지 않으니 ② 「합친 새 기능」에서 뺀다 (3-2절 「starter 에 대부분을 적어 두고 칠 줄을 콕 집는다」)
       const outside = [], combo = [], where = {};
       for (const [k, v] of used) { const t = taught.get(k); if (!t) outside.push({ feature: k, inPrompt: own.has(k), src: v.src, line: v.line, text: v.text }); else { where[k] = t; if (t.lesson === l.id && lessonNew.has(k) && !SUB.has(k) && !inStarter.has(k)) combo.push(k); } }
