@@ -10,18 +10,584 @@ const CHAPTERS = [
 ];
 const FILES_TODO = (t) => [{ title: '준비 중', html: `<p>TODO: ${t}</p>` }]; // v2.41.0 뼈대 — draft:true 라 목차에 「준비 중」
 const LESSONS = [
-{ id: 'F0', ch: 0, n: 0, title: '데이터 파일 한눈에', mode: 'text', draft: true,
-  tutorSummary: 'JSON · JSONL · CSV · 엑셀 · TOML · 준비',
-  pages: FILES_TODO('JSON · JSONL · CSV · 엑셀 · TOML · 준비'), summary: ["JSON", "JSONL", "CSV"] },
-{ id: 'F1', ch: 1, n: 1, title: 'JSON 다시 보기 · 깨진 JSON', mode: 'text', draft: true,
-  tutorSummary: 'dumps · loads · JSONDecodeError',
-  pages: FILES_TODO('dumps · loads · JSONDecodeError'), summary: ["dumps", "loads", "JSONDecodeError"] },
-{ id: 'F2', ch: 1, n: 2, title: '중첩 구조에서 꺼내기', mode: 'text', draft: true,
-  tutorSummary: '경로 · dig · match',
-  pages: FILES_TODO('경로 · dig · match'), summary: ["경로", "dig", "match"] },
-{ id: 'F3', ch: 1, n: 3, title: 'JSON 에 없는 값: 날짜 · 돈', mode: 'text', draft: true,
-  tutorSummary: 'isoformat · 시간대 · Decimal',
-  pages: FILES_TODO('isoformat · 시간대 · Decimal'), summary: ["isoformat", "시간대", "Decimal"] },
+{ id: 'F0', ch: 0, n: 0, title: '데이터 파일 한눈에', mode: 'text',
+  tutorSummary: '코스 첫 레슨. 다섯 형식 — JSON(.json, 앱 설정 · API 응답, 표준 json), JSON Lines(.jsonl, 한 줄에 JSON 하나, 기록 · 로그, json 을 한 줄씩), CSV(.csv, 표 주고받기, 칸이 늘 글자, 표준 csv — 파이썬 L29), 엑셀(.xlsx, 사람에게 보여 줄 표 · 보고서, 글자 파일이 아님 — 맨 앞 바이트 b\'PK\' 인 zip, openpyxl 을 pip 로), TOML(.toml, 사람이 고치는 설정, 표준 tomllib 은 3.11+ · 읽기만). 같은 두 줄을 json.loads · splitlines 로 한 줄씩 · csv.DictReader · tomllib.loads 로 읽으면 CSV 만 qty 가 \'3\' 글자. 준비는 시작하기 1~3 을 가리킴: 가상 환경 + python -m pip install openpyxl, 글자 파일 넷(settings.json · orders.json · events.jsonl · config.toml), make_samples.py 를 저장해 python make_samples.py 한 번 → 엑셀 6개(Path(".").rglob("*.xlsx") 로 하위 폴더까지 확인, p.as_posix()). 막히면 ModuleNotFoundError: openpyxl → .venv 확인 · 다시 설치. 이 코스의 습관: 파일을 만들면 다시 읽어서 값으로 확인(save_json 이 저장 후 json.load 해 == 비교, 튜플은 리스트로 돌아와 「달라요」) + 엑셀에서 열어 겉모양 ☐. Windows 는 엑셀이 연 파일에 저장하면 PermissionError(F8). 다루지 않음: .xls · VBA(.xlsm) · xlwings · 비밀번호 파일 · Google Sheets API · YAML · XML, pandas 는 이름만(데이터 분석 교과서).',
+  terms: { 'JSON Lines': '한 줄에 JSON 하나씩 적는 형식(.jsonl). 기록을 한 줄씩 덧붙이기 좋다', 'TOML': '사람이 손으로 고치는 설정 파일 형식(.toml). 주석과 [표] 가 있고, 파이썬은 tomllib 으로 읽는다' },
+  pages: [
+    { title: '다섯 형식: .json · .jsonl · .csv · .xlsx · .toml', html: `<p>이 코스에서 만나는 데이터 파일은 다섯 가지예요. 앱 설정 · API 응답 · 쌓이는 기록 · 엑셀 표처럼, 일하다 보면 <b>실제로 받는</b> 파일들이에요.</p>
+<table class="kb"><tbody><tr><th>형식</th><th>생김새</th><th>누가 쓰나</th><th>파이썬 도구</th></tr>
+<tr><td><b>JSON</b><br><code>.json</code></td><td><code>{"item": "소금빵", "qty": 3}</code> — 중괄호 · 대괄호 · 큰따옴표</td><td>앱 설정 · API 응답 · 프로그램끼리 주고받기</td><td><code>json</code>(표준) — [[레슨:F1]] ~ [[레슨:F6]]</td></tr>
+<tr><td><b>[[JSON Lines]]</b><br><code>.jsonl</code></td><td>한 줄에 <code>{…}</code> 하나씩</td><td>사용 기록 · 로그 · 계속 쌓이는 데이터</td><td><code>json</code> 을 한 줄씩 — [[레슨:F5]]</td></tr>
+<tr><td><b>CSV</b><br><code>.csv</code></td><td><code>item,qty</code> 다음 줄 <code>소금빵,3</code> — 쉼표로 나눈 줄</td><td>표 주고받기 · 사이트에서 내려받기</td><td><code>csv</code>(표준, <a href="../python/#lesson/L29" target="_blank" rel="noopener">파이썬 교과서 「csv 모듈 제대로」 ↗</a>) — [[레슨:F12]]</td></tr>
+<tr><td><b>엑셀</b><br><code>.xlsx</code></td><td>시트 · 칸 · 서식 · 수식 · 차트. 메모장으로 열면 알아볼 수 없는 글자</td><td>사람에게 보여 줄 표 · 보고서</td><td><code>openpyxl</code>(pip 로 설치) — [[레슨:F7]] ~ [[레슨:F11]]</td></tr>
+<tr><td><b>[[TOML]]</b><br><code>.toml</code></td><td><code>qty = 3</code> · <code>[표 이름]</code> · <code># 주석</code></td><td>사람이 손으로 고치는 설정(<code>pyproject.toml</code>)</td><td><code>tomllib</code>(표준, 읽기만) — [[레슨:F14]]</td></tr></tbody></table>
+<p>엑셀을 뺀 넷은 <b>글자 파일</b>이라 VS Code 로 열어 읽고 고칠 수 있어요. 아래 예제는 같은 빵집 매출 두 줄을 글자 형식 넷으로 적고, 형식마다 제 도구로 읽어요. 실행하면 CSV 줄만 <code>'qty': '3'</code> 처럼 수량이 글자예요. CSV 는 칸이 늘 글자라서, 숫자로 쓰려면 <code>int()</code> 로 바꿔야 해요.</p>
+<ul><li><code>json.loads(글자)</code> — 파일이 아니라 <b>글자</b>에서 JSON 을 읽어요(자세히는 [[레슨:F1]])</li><li><code>text.splitlines()</code> — 글자를 줄마다 나눠 리스트로 만들어요. JSON Lines 는 그 한 줄 한 줄이 JSON 이에요</li><li><code>tomllib.loads(글자)</code> — TOML 을 읽어요(파이썬 3.11 부터 들어 있어요)</li></ul>`,
+      example: { code: `import csv
+import json
+import tomllib
+
+JSON_TEXT = '[{"item": "소금빵", "qty": 3}, {"item": "라테", "qty": 2}]'
+JSONL_TEXT = """{"item": "소금빵", "qty": 3}
+{"item": "라테", "qty": 2}
+"""
+CSV_TEXT = """item,qty
+소금빵,3
+라테,2
+"""
+TOML_TEXT = """[[sales]]
+item = "소금빵"
+qty = 3
+
+[[sales]]
+item = "라테"
+qty = 2
+"""
+
+print("JSON :", json.loads(JSON_TEXT))
+print("JSONL:", [json.loads(line) for line in JSONL_TEXT.splitlines()])
+print("CSV  :", list(csv.DictReader(CSV_TEXT.splitlines())))
+print("TOML :", tomllib.loads(TOML_TEXT)["sales"])` } },
+    { title: '준비: 시작하기 1 · 2 · 3 과 make_samples.py', html: `<p>준비는 이 교과서 맨 앞 <b>시작하기</b> 세 쪽에 다 있어요. 여기서는 다 해 두었는지만 확인해요.</p>
+<table class="kb"><tbody><tr><th>시작하기</th><th>해 둘 것</th></tr>
+<tr><td><b>1</b> 준비물</td><td>공부 폴더 <code>files-study</code> · 가상 환경 <code>.venv</code> · <code>python -m pip install openpyxl</code></td></tr>
+<tr><td><b>2</b> 글자 파일 넷</td><td><code>settings.json</code> · <code>orders.json</code> · <code>events.jsonl</code> · <code>config.toml</code> 을 공부 폴더에 저장. 지금 없어도 돼요 — 쓰는 레슨에서 다시 나와요</td></tr>
+<tr><td><b>3</b> 엑셀 예제</td><td><code>make_samples.py</code> 를 저장하고 <code>python make_samples.py</code> 를 <b>한 번</b> 실행 → 엑셀 파일 여섯 개</td></tr></tbody></table>
+<p>아래 예제를 공부 폴더에서 돌려 엑셀 파일이 다 생겼는지 봐요. 실행하면 <code>엑셀 파일 6개</code> 와 파일 이름 여섯 줄이 나와요.</p>
+<ul><li><code>Path(".").rglob("*.xlsx")</code> — 이 폴더와 그 <b>아래 폴더까지</b> 뒤져서 찾아요(<code>지점/</code> 안의 셋도). <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리」 ↗</a> 의 <code>glob</code> 은 그 폴더만 봐요</li><li><code>p.as_posix()</code> — 경로를 <code>지점/강남.xlsx</code> 처럼 <code>/</code> 로 보여 줘요(Windows 에서 그냥 찍으면 <code>지점&#92;강남.xlsx</code>)</li><li><code>Path("빵집_매출.xlsx").exists()</code> — 그 파일이 있으면 <code>True</code>. <code>p.name</code> 은 파일 이름, <code>p.suffix</code> 는 확장자(<code>".xlsx"</code>)예요</li><li><code>open(p, "rb")</code> — 글자가 아니라 <b>바이트</b>로 읽어요(<code>b</code> = bytes). 엑셀 파일의 맨 앞은 <code>b'PK'</code> 예요. 사실 여러 파일을 묶은 압축 파일(zip)이라서, <code>encoding="utf-8"</code> 글자로 읽으면 <code>UnicodeDecodeError</code> 가 나요. <code>try</code> 로 읽고 <code>except UnicodeDecodeError:</code> 로 받을 수 있어요(<a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩」 ↗</a>)</li><li><code>sys.version_info &gt;= (3, 11)</code> — 내 파이썬이 3.11 이상이면 <code>True</code>(TOML 을 읽는 <code>tomllib</code> 이 3.11 부터)</li></ul>
+<div class="bk-warn"><b>막혔을 때</b> — <code>ModuleNotFoundError: No module named 'openpyxl'</code> 이면 가상 환경이 꺼져 있거나 설치를 안 한 거예요. VS Code 오른쪽 아래의 파이썬이 <code>.venv</code> 인지 보고, 터미널에서 <code>python -m pip install openpyxl</code> 을 다시 해요(<a href="../python/#lesson/L16D" target="_blank" rel="noopener">파이썬 교과서 「pip 와 가상 환경」 ↗</a>). 엑셀 파일이 엉뚱한 곳에 생기면 터미널이 공부 폴더에 있는지(<code>cd files-study</code>) 봐요.</div>`,
+      example: { code: `from pathlib import Path
+
+files = sorted(Path(".").rglob("*.xlsx"))
+print(f"엑셀 파일 {len(files)}개")
+for p in files:
+    print(" ", p.as_posix())
+
+with open("빵집_매출.xlsx", "rb") as f:
+    print("빵집_매출.xlsx 의 맨 앞:", f.read(2))`, prep: [SAMPLES_PREP] } },
+    { title: '습관: 만들면 다시 읽기 + 엑셀에서 ☐', html: `<p>이 코스에서 파일을 만들면 <b>두 번</b> 확인해요.</p>
+<ol><li><b>다시 읽어서 값으로</b> — 저장한 파일을 프로그램으로 다시 열어, 넣은 값이 그대로인지 찍거나 비교해요. 「만들어 보기」 의 「출력 예」 도 대부분 이렇게 다시 읽은 값이에요</li><li><b>눈으로 ☐</b> — 엑셀(또는 LibreOffice Calc)에서 직접 열어 봐요. 머리줄 색 · 열 너비 · 차트 모양 · 수식 칸의 결과는 파이썬이 대신 봐 줄 수 없어요. 「내 화면에서 확인할 것」 의 ☐ 가 이거예요</li></ol>
+<p>저장이 「된 것 같은」 것과 「제대로 된」 것은 달라요. 아래 저장 함수는 끝에서 파일을 다시 읽어 넣은 값과 비교해요.</p>
+<pre>def save_json(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    with open(path, encoding="utf-8") as f:
+        back = json.load(f)          # 다시 읽기
+    print(path, "다시 읽기:", "같아요" if back == data else "달라요!")
+    return back</pre>
+<p>예제의 두 번째 저장은 <code>달라요!</code> 예요. 튜플 <code>(3, 7)</code> 을 넣었는데 JSON 에는 튜플이 없어서 리스트 <code>[3, 7]</code> 로 돌아와요(<a href="../python/#lesson/L17C" target="_blank" rel="noopener">파이썬 교과서 「JSON 으로 저장하기」 ↗</a> 복습). 다시 읽어 보지 않았다면 모르고 지나갔을 거예요.</p>
+<p>엑셀도 똑같아요. [[레슨:F8]] 부터는 저장한 뒤 <code>load_workbook</code> 으로 다시 열어 칸 값을 찍고, 엑셀에서 한 번 열어 봐요.</p>
+<div class="bk-warn"><b>Windows</b> — 엑셀에서 파일을 열어 둔 채로 파이썬이 같은 파일에 저장하면 <code>PermissionError</code> 가 나요. 눈으로 본 뒤에는 엑셀 창을 닫고 다시 돌려요(자세히는 [[레슨:F8]]).</div>`,
+      example: { code: `import json
+
+def save_json(path, data):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    with open(path, encoding="utf-8") as f:
+        back = json.load(f)
+    print(path, "다시 읽기:", "같아요" if back == data else "달라요!")
+    return back
+
+save_json("today.json", {"날짜": "2026-09-03", "매출": [32000, 4800]})
+back = save_json("seat.json", {"이름": "민수", "자리": (3, 7)})
+print("돌아온 자리:", back["자리"])` } },
+    { title: '이 코스의 길 · 다루지 않는 것', html: `<p>세 챕터를 지나며 파일을 읽고 → 검사하고 → 바꾸고 → 보고서로 내보내요. 챕터 끝마다 「만들어 보기」 가 하나씩 있어요.</p>
+<table class="kb"><tbody><tr><th>챕터</th><th>배우는 것</th><th>만들어 보기</th></tr>
+<tr><td><b>1</b> JSON 깊게</td><td>깨진 JSON 찾기 · 중첩에서 꺼내기 · 날짜와 돈 · 내 클래스 저장 · JSON Lines · 값 검사</td><td>앱 설정과 API 응답 정리</td></tr>
+<tr><td><b>2</b> 엑셀</td><td>읽기 · 새로 쓰기 · 수식과 값 · 서식과 차트 · 여러 시트와 파일 합치기</td><td>월별 매출 보고서</td></tr>
+<tr><td><b>3</b> 서로 바꾸기</td><td>JSON ↔ CSV ↔ 엑셀 · 중첩 JSON 을 표로 · TOML 과 형식 고르기</td><td>가계부 엑셀 → JSON → 보고서</td></tr></tbody></table>
+<p><b>다루지 않는 것</b>(이름만): 옛 엑셀 형식 <code>.xls</code> · 매크로(VBA, <code>.xlsm</code>) · 엑셀 프로그램을 직접 움직이는 <code>xlwings</code> · 비밀번호 걸린 파일 · Google Sheets API(인터넷이 필요) · YAML · XML.</p>
+<p><b>pandas 는 안 써요.</b> pandas 는 표를 통째로 한 번에 다루는 도구예요 — <code>pd.read_excel</code> · <code>pd.json_normalize</code> · <code>pd.read_json(lines=True)</code>. 이 코스에서 파일의 한 칸 · 한 줄이 어떻게 생겼는지 손으로 익히고 <a href="../data/" target="_blank" rel="noopener">데이터 분석 교과서 ↗</a> 로 가면 빨라요.</p>
+<ul><li>JSON 을 진짜 API 에서 받기 → <a href="../api/" target="_blank" rel="noopener">HTTP · API 교과서 ↗</a></li><li>파일이 커지고 찾을 일이 많아지면 → <a href="../sql/" target="_blank" rel="noopener">SQL 교과서 ↗</a></li></ul>` },
+  ],
+  summary: ['데이터 파일 다섯: JSON(설정 · 응답) · JSON Lines(기록) · CSV(표 주고받기) · 엑셀(보고서) · TOML(사람이 고치는 설정)', '준비는 시작하기 1~3 — 가상 환경에 openpyxl, 글자 파일 넷, python make_samples.py 한 번이면 엑셀 여섯 개', '습관: 파일을 만들면 다시 읽어서 값으로 확인하고, 엑셀에서 열어 눈으로 ☐'] },
+{ id: 'F1', ch: 1, n: 1, title: 'JSON 다시 보기 · 깨진 JSON', mode: 'text',
+  tutorSummary: 'L17C(json.dump/load · ensure_ascii · indent · True↔true · None↔null · 튜플→리스트 · 키는 늘 글자)와 API H3(json.loads · JSONDecodeError) 복습 위에서 시작. 넷 정리: 파일과는 dump/load, 글자와는 dumps/loads(s = string). 문법 규칙: 키와 글자는 큰따옴표만(작은따옴표 → Expecting property name enclosed in double quotes), 끝 쉼표 ✗, 주석 ✗(// # /* */ → Expecting \',\' delimiter), true/false/null 소문자(True → Expecting value), 빈 글자 · HTML 도 Expecting value. 끝 쉼표의 에러 글은 판마다 다름: 3.13+ Illegal trailing comma before end of object/array, 3.12 이하 Expecting property name… / Expecting value. 옵션: indent=2 · ensure_ascii=False(복습) · sort_keys=True(키 순서를 늘 같게, 안쪽 딕셔너리까지 — 어제 파일과 비교 · Git) · separators=(",", ":")(빈칸 없이 가장 짧게). 깨진 자리: except json.JSONDecodeError as e → e.msg · e.lineno · e.colno(1부터) · e.pos(0부터), text.splitlines()[e.lineno - 1] 로 그 줄을 꺼내 " " * (e.colno - 1) + "^" 로 짚기. 에러 자리는 실수 바로 뒤일 때가 많다(빠진 쉼표는 다음 줄 첫 키에서 알아챔) → 그 줄과 바로 앞 줄을 본다. 한글은 터미널에서 두 칸이라 ^ 가 어긋날 수 있음. 함정: float("nan") 은 NaN 으로 써지는데 JSON 이 아님(브라우저 · 다른 언어가 못 읽음) → allow_nan=False 면 ValueError: Out of range float values are not JSON compliant: nan, 값 없음은 None. 같은 키 두 번은 에러 없이 마지막만 남음 → object_pairs_hook=함수(객체마다 (키, 값) 쌍 리스트를 받아 돌려준 것이 그 자리 값) 로 같은 키면 raise ValueError.',
+  pages: [
+    { title: 'dump · dumps · load · loads 넷 정리', html: `<p>복습부터 해요. 파일에 저장하고 불러오는 <code>json.dump</code> · <code>json.load</code> 와 아래 대응표는 <a href="../python/#lesson/L17C" target="_blank" rel="noopener">파이썬 교과서 「JSON 으로 저장하기」 ↗</a> 에서 배웠어요.</p>
+<table class="kb"><tbody><tr><th>파이썬</th><th>JSON</th><th>다시 읽으면</th></tr>
+<tr><td><code>dict</code></td><td><code>{"키": 값}</code> 객체</td><td><code>dict</code> — 키는 늘 글자(<code>1</code> → <code>"1"</code>)</td></tr>
+<tr><td><code>list</code> · <code>tuple</code></td><td><code>[1, 2]</code> 배열</td><td><code>list</code>(튜플도 리스트로)</td></tr>
+<tr><td><code>str</code></td><td><code>"글자"</code></td><td><code>str</code></td></tr>
+<tr><td><code>int</code> · <code>float</code></td><td><code>3</code> · <code>3.5</code></td><td>그대로</td></tr>
+<tr><td><code>True</code> · <code>False</code> · <code>None</code></td><td><code>true</code> · <code>false</code> · <code>null</code></td><td>그대로</td></tr></tbody></table>
+<p>이번에 더하는 건 <b>글자</b>와 오가는 짝이에요. 이름 끝의 <code>s</code> 는 string(글자)이에요.</p>
+<table class="kb"><tbody><tr><th></th><th>파일과</th><th>글자와</th></tr>
+<tr><td>파이썬 → JSON</td><td><code>json.dump(data, f)</code></td><td><code>json.dumps(data)</code> → 글자</td></tr>
+<tr><td>JSON → 파이썬</td><td><code>json.load(f)</code></td><td><code>json.loads(text)</code> ← 글자</td></tr></tbody></table>
+<p>API 응답(<a href="../api/#lesson/H3" target="_blank" rel="noopener">HTTP · API 교과서 「헤더와 JSON」 ↗</a>) · 코드 안의 글자 상수 · JSON Lines 의 한 줄은 다 <b>글자</b>라서 <code>loads</code> · <code>dumps</code> 를 써요. 이 코스의 쪽 예제도 대부분 글자 상수를 <code>loads</code> 해요 — 준비 파일 없이 바로 돌아가게요.</p>`,
+      example: { code: `import json
+
+text = '{"name": "민수", "scores": [90, 85], "pass": true, "memo": null}'
+data = json.loads(text)
+print(type(text).__name__, "→", type(data).__name__)
+print(data["scores"][0], data["pass"], data["memo"])
+
+again = json.dumps(data, ensure_ascii=False)
+print(again)
+print(again == text)
+
+with open("data.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, ensure_ascii=False)
+with open("data.json", encoding="utf-8") as f:
+    print(json.load(f) == data)` } },
+    { title: '문법 규칙: 큰따옴표만 · 끝 쉼표 ✗ · 주석 ✗', html: `<p>JSON 은 파이썬 딕셔너리와 닮았지만 <b>더 엄격해요</b>. 손으로 고친 설정 파일이 안 열리는 까닭은 거의 이 넷이에요.</p>
+<table class="kb"><tbody><tr><th>규칙</th><th>✗ 틀림</th><th>○ 맞음</th></tr>
+<tr><td>키 · 글자는 <b>큰따옴표</b>만</td><td><code>{'theme': 'dark'}</code></td><td><code>{"theme": "dark"}</code></td></tr>
+<tr><td>마지막 뒤에 <b>쉼표 ✗</b></td><td><code>{"a": 1, "b": 2,}</code></td><td><code>{"a": 1, "b": 2}</code></td></tr>
+<tr><td><b>주석 ✗</b>(<code>//</code> · <code>#</code> · <code>/* */</code> 다)</td><td><code>{"a": 1 // 메모}</code></td><td>주석이 꼭 필요한 설정은 TOML([[레슨:F14]])</td></tr>
+<tr><td><code>true</code> · <code>false</code> · <code>null</code> 은 <b>소문자</b></td><td><code>{"on": True}</code></td><td><code>{"on": true}</code></td></tr></tbody></table>
+<p>틀린 글을 <code>json.loads</code> 하면 <code>json.JSONDecodeError</code> 가 나요. <code>except json.JSONDecodeError as e</code> 로 받으면 <code>e.msg</code> 에 까닭이 영어로 들어 있어요. 예제를 실행하면 작은따옴표는 <code>Expecting property name enclosed in double quotes</code>, 대문자 True 는 <code>Expecting value</code> 예요.</p>
+<ul><li><code>Expecting value</code> — 값이 와야 할 자리에 다른 게 있어요. 빈 글자나, JSON 인 줄 알았는데 HTML 인 글을 읽어도 이거예요</li><li><code>Expecting ',' delimiter</code> — 쉼표가 빠졌거나, 주석처럼 끼어든 글자가 있어요</li></ul>
+<div class="bk-warn"><b>끝 쉼표의 에러 글은 판마다 달라요</b> — 파이썬 3.13 부터는 <code>Illegal trailing comma before end of object</code>(배열이면 <code>… end of array</code>)로 바로 알려 줘요. 3.12 까지는 <code>Expecting property name enclosed in double quotes</code>(배열이면 <code>Expecting value</code>)라고 해서 헷갈려요. 내 파이썬은 무엇을 보여 주는지 예제로 확인해 봐요.</div>`,
+      example: { code: `import json
+
+samples = {
+    "맞는 글": '{"theme": "dark"}',
+    "작은따옴표": "{'theme': 'dark'}",
+    "끝 쉼표": '{"theme": "dark",}',
+    "주석": '{"theme": "dark" /* 어두운 화면 */}',
+    "대문자 True": '{"autosave": True}',
+    "빈 글자": "",
+}
+for name, text in samples.items():
+    try:
+        json.loads(text)
+        print(f"{name}: 괜찮아요")
+    except json.JSONDecodeError as e:
+        print(f"{name}: {e.msg}")` } },
+    { title: '옵션: indent · sort_keys · separators', html: `<p>저장 모양을 정하는 옵션이에요. 앞의 둘은 복습이에요.</p>
+<table class="kb"><tbody><tr><th>옵션</th><th>하는 일</th><th>언제</th></tr>
+<tr><td><code>indent=2</code></td><td>두 칸씩 들여 써서 여러 줄로</td><td>사람이 열어 볼 파일</td></tr>
+<tr><td><code>ensure_ascii=False</code></td><td>한글을 그대로(빼면 <code>"&#92;uac00"</code> 같은 기호)</td><td>한글이 든 파일은 늘</td></tr>
+<tr><td><code>sort_keys=True</code></td><td>키를 abc · 가나다 순으로(안쪽 딕셔너리까지)</td><td>저장할 때마다 같은 모양이어야 할 때 — 어제 파일과 비교 · Git 에 올리기</td></tr>
+<tr><td><code>separators=(",", ":")</code></td><td>쉼표 · 쌍점 뒤의 빈칸을 빼서 가장 짧게</td><td>사람이 안 보는 파일 · 보내는 데이터의 크기를 줄일 때</td></tr></tbody></table>
+<pre>import json
+data = {"b": 1, "a": [1, 2]}
+print(json.dumps(data))                          # {"b": 1, "a": [1, 2]}
+print(json.dumps(data, sort_keys=True))          # {"a": [1, 2], "b": 1}
+print(json.dumps(data, separators=(",", ":")))   # {"b":1,"a":[1,2]}</pre>
+<p>파이썬 딕셔너리는 넣은 순서를 기억해요. 그래서 <code>sort_keys</code> 가 없으면, 프로그램이 키를 넣는 순서만 바뀌어도 파일 모양이 바뀌어요. 내용은 같은데 「바뀐 파일」 로 보이는 거죠. 옵션은 몇 개든 함께 줄 수 있어요.</p>`,
+      example: { code: `import json
+
+data = {"theme": "dark", "font_size": 14, "editor": {"word_wrap": True, "tab_size": 4}, "이름": "민수"}
+print(json.dumps(data))
+print(json.dumps(data, ensure_ascii=False, sort_keys=True))
+print(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+print(json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True))` } },
+    { title: '어디가 깨졌나: e.lineno · e.colno · e.msg', html: `<p>긴 파일이 깨지면 「몇 번째 줄?」 이 궁금해요. <code>JSONDecodeError</code> 에는 자리가 들어 있어요.</p>
+<table class="kb"><tbody><tr><td><code>e.msg</code></td><td>까닭(<code>Expecting ',' delimiter</code>)</td></tr><tr><td><code>e.lineno</code></td><td>몇 번째 줄(1 부터)</td></tr><tr><td><code>e.colno</code></td><td>그 줄의 몇 번째 칸(1 부터)</td></tr><tr><td><code>e.pos</code></td><td>글 전체에서 몇 번째 글자(0 부터)</td></tr></tbody></table>
+<p>줄 번호로 그 줄을 꺼내 보여 주면 찾기 쉬워요. <code>text.splitlines()</code> 는 줄마다 나눈 리스트라 <code>lines[e.lineno - 1]</code> 이 그 줄이에요. 칸 번호만큼 띄우고 <code>^</code> 를 찍어 짚어요.</p>
+<p>예제는 3번째 줄 끝에 쉼표가 빠진 설정이에요. 실행하면 <code>4번째 줄 3번째 칸: Expecting ',' delimiter</code> 가 나와요. <b>에러 자리는 실수 바로 뒤</b>예요 — 파이썬은 4번째 줄의 <code>"language"</code> 를 보고서야 「여기 앞에 쉼표가 있어야 했는데」 하고 알아채요. 그래서 그 줄과 <b>바로 앞 줄</b>을 같이 봐요.</p>
+<ul><li>파일이면 <code>Path(path).read_text(encoding="utf-8")</code> 로 글자를 먼저 얻고 <code>json.loads</code> 해요. 그래야 같은 글로 에러 줄도 보여 줄 수 있어요(<code>json.load(f)</code> 는 글을 따로 안 남겨요)</li><li>한글이 든 줄은 <code>^</code> 가 살짝 앞에 보일 수 있어요. 한글 한 자가 터미널에서 두 칸을 차지해서예요</li></ul>`,
+      example: { code: `import json
+
+TEXT = """{
+  "theme": "dark",
+  "font_size": 14
+  "language": "ko"
+}"""
+
+def show_error(text):
+    try:
+        json.loads(text)
+        print("문제없어요")
+    except json.JSONDecodeError as e:
+        print(f"{e.lineno}번째 줄 {e.colno}번째 칸: {e.msg}")
+        lines = text.splitlines()
+        if e.lineno >= 2:
+            print(lines[e.lineno - 2])
+        print(lines[e.lineno - 1])
+        print(" " * (e.colno - 1) + "^")
+
+show_error(TEXT)
+show_error('{"theme": "dark"}')` } },
+    { title: '함정 둘: NaN · 같은 키 두 번', html: `<p><b>① NaN</b> — 점수가 없는 사람의 평균에 <code>float("nan")</code>(숫자가 아님)을 넣는 일이 있어요. 파이썬 <code>json</code> 은 이걸 <code>NaN</code> 으로 써 줘요.</p>
+<pre>import json
+print(json.dumps({"avg": float("nan")}))   # {"avg": NaN}</pre>
+<p>그런데 <code>NaN</code> 은 <b>JSON 이 아니에요</b>. 파이썬은 다시 읽어 주지만, 웹 브라우저(자바스크립트)나 다른 언어는 그 파일을 못 읽어요. <code>allow_nan=False</code> 를 주면 저장할 때 바로 <code>ValueError</code> 로 알려 줘요. 「값이 없음」 은 <code>None</code>(JSON 의 <code>null</code>)으로 저장해요.</p>
+<p><b>② 같은 키 두 번</b> — 손으로 고치다 같은 키를 두 번 쓰면, 에러 없이 <b>마지막 것만</b> 남아요. 앞의 값은 조용히 사라져요.</p>
+<pre>import json
+print(json.loads('{"theme": "light", "theme": "dark"}'))   # {'theme': 'dark'}</pre>
+<p>잡으려면 <code>object_pairs_hook=</code> 에 함수를 줘요. <code>json</code> 은 <code>{…}</code> 하나를 읽을 때마다(안쪽 것도) 그 함수를 <code>[("theme", "light"), ("theme", "dark")]</code> 같은 <b>쌍 리스트</b>로 불러요. 함수가 돌려준 것이 그 자리의 값이 돼요.</p>
+<pre>def no_dupes(pairs):
+    d = {}
+    for key, value in pairs:
+        if key in d:
+            raise ValueError(f"같은 키가 두 번: {key}")
+        d[key] = value
+    return d
+
+data = json.loads(text, object_pairs_hook=no_dupes)</pre>`,
+      example: { code: `import json
+
+scores = {"민수": [90, 80], "영희": []}
+avg = {}
+for name, nums in scores.items():
+    avg[name] = sum(nums) / len(nums) if nums else float("nan")
+print(json.dumps(avg, ensure_ascii=False))
+try:
+    json.dumps(avg, ensure_ascii=False, allow_nan=False)
+except ValueError as e:
+    print("ValueError:", e)
+
+def no_dupes(pairs):
+    d = {}
+    for key, value in pairs:
+        if key in d:
+            raise ValueError(f"같은 키가 두 번: {key}")
+        d[key] = value
+    return d
+
+text = '{"theme": "light", "font_size": 14, "theme": "dark"}'
+print(json.loads(text))
+try:
+    json.loads(text, object_pairs_hook=no_dupes)
+except ValueError as e:
+    print("ValueError:", e)` } },
+  ],
+  summary: ['파일과는 dump · load, 글자와는 dumps · loads — sort_keys=True 는 키 순서를 늘 같게, separators=(",", ":") 는 가장 짧게', 'JSON 은 큰따옴표만 · 끝 쉼표 ✗ · 주석 ✗ — 깨지면 JSONDecodeError 의 e.lineno · e.colno · e.msg 로 그 줄과 바로 앞 줄을 봐요', 'NaN 은 JSON 이 아니라서 allow_nan=False 로 막고, 같은 키 두 번은 object_pairs_hook 으로 잡아요'] },
+{ id: 'F2', ch: 1, n: 2, title: '중첩 구조에서 꺼내기', mode: 'text',
+  tutorSummary: 'API 응답처럼 겹겹인 JSON(orders.json: data.orders[] · customer.address · items[])에서 값 꺼내기. 경로: data["data"]["orders"][0]["items"][1]["title"] — 한 겹에 대괄호 하나, 딕셔너리는 키 · 리스트는 번호, 길면 중간에 이름(orders = data["data"]["orders"] → for order in orders). 틀린 경로: KeyError(없는 키 · 오타) · IndexError(번호 넘음) · TypeError: list indices must be integers or slices, not str(그 겹이 생각한 모양이 아님). .get 이어 쓰기 order.get("customer", {}).get("address", {}).get("city") 는 키가 없을 때만 기본값 — 값이 null(None)이면 None.get 이라 AttributeError: \'NoneType\' object has no attribute \'get\'(A-1003) → (order["customer"].get("address") or {}).get("city", "주소 없음"). API 는 값 없음을 키 빼기와 null 둘 다로 보냄. dig(data, *path, default=None): cur = data 에서 한 겹씩 cur = cur[key], except (KeyError, IndexError, TypeError) 면 default — *path 는 L8C 의 *args, default 는 이름 붙여 줌. dig 는 키 오타도 조용히 숨기므로 꼭 있어야 하는 값은 [] 로. 모으기: [item["title"] for item in order["items"]] · sum(item["qty"] for item in order["items"]). 고르기: match order: case {"status": "paid", "items": items}: (그 키들이 있고 값이 맞으면, 다른 키가 더 있어도 맞음, L37 복습) · case {"status": "cancelled"}: · case _:. 금액은 글자라 F3. 모르는 구조는 outline(data, depth=0): isinstance(data, dict) 면 키: type(value).__name__ 찍고 재귀(depth + 1), 비지 않은 list 면 [0]: 종류 (모두 n개) 찍고 첫 원소로 재귀, 나머지는 멈춤(L32 · L18G 복습). 첫 원소만 보므로 다른 원소는 모양이 다를 수 있음(둘째 주문 address 는 NoneType).',
+  pages: [
+    { title: '경로로 꺼내기: data["data"]["orders"][0]…', html: `<p>API 응답은 대부분 겹겹이에요. 서점 주문 목록 <code>orders.json</code>(시작하기 2)은 이렇게 생겼어요.</p>
+<pre>{"status": "ok", "page": 1, "total_pages": 1,
+ "data": {"orders": [
+   {"id": "A-1001", "status": "paid",
+    "customer": {"name": "김하늘", "address": {"city": "서울", …}},
+    "items": [{"title": "파이썬 첫걸음", "qty": 1, …}, …]},
+   …]}}</pre>
+<p>한 겹 들어갈 때마다 대괄호 하나예요. <b>딕셔너리는 키 글자</b>, <b>리스트는 번호</b>로요.</p>
+<table class="kb"><tbody><tr><th>여기까지 쓰면</th><th>나오는 것</th></tr>
+<tr><td><code>data["data"]</code></td><td>딕셔너리 — 키는 <code>orders</code> 하나</td></tr>
+<tr><td><code>…["orders"]</code></td><td>리스트 — 주문들</td></tr>
+<tr><td><code>…[0]</code></td><td>딕셔너리 — 첫 주문</td></tr>
+<tr><td><code>…["items"]</code></td><td>리스트 — 그 주문의 책들</td></tr>
+<tr><td><code>…[1]["title"]</code></td><td><code>"엑셀 업무 노트"</code></td></tr></tbody></table>
+<p>길면 중간에 이름을 붙여요. <code>orders = data["data"]["orders"]</code> 로 받아 두고 <code>for order in orders:</code> 로 돌면 읽기 쉬워요. 예제는 <code>orders.json</code> 을 두 건으로 줄인 글자예요.</p>
+<p>경로가 틀리면 에러 셋 중 하나예요.</p>
+<ul><li><code>KeyError: 'order'</code> — 딕셔너리에 그 키가 없어요(오타 · 대소문자)</li><li><code>IndexError: list index out of range</code> — 리스트 번호가 너무 커요</li><li><code>TypeError: list indices must be integers or slices, not str</code> — 리스트에 글자 키를 썼어요. 그 겹이 생각한 모양이 아니라는 뜻이에요(리스트인 줄 몰랐거나 번호를 빼먹었거나)</li></ul>`,
+      example: { code: `import json
+
+TEXT = """{
+  "status": "ok",
+  "data": {
+    "orders": [
+      {"id": "A-1001", "status": "paid",
+       "customer": {"name": "김하늘", "address": {"city": "서울"}},
+       "items": [{"title": "파이썬 첫걸음", "qty": 1},
+                 {"title": "엑셀 업무 노트", "qty": 2}]},
+      {"id": "A-1003", "status": "cancelled",
+       "customer": {"name": "박서준", "address": null},
+       "items": [{"title": "파이썬 첫걸음", "qty": 3}]}
+    ]
+  }
+}"""
+
+data = json.loads(TEXT)
+print(data["data"]["orders"][0]["items"][1]["title"])
+
+orders = data["data"]["orders"]
+for order in orders:
+    print(order["id"], order["customer"]["name"], len(order["items"]), "종류")
+
+try:
+    print(orders["id"])
+except TypeError as e:
+    print("TypeError:", e)` } },
+    { title: '.get("a", {}) 이어 쓰기와 None 함정', html: `<p>있을 수도 없을 수도 있는 값은 <code>.get</code> 으로 꺼내요. 겹겹이면 기본값으로 빈 딕셔너리 <code>{}</code> 를 줘서 이어 써요.</p>
+<pre>city = order.get("customer", {}).get("address", {}).get("city")</pre>
+<p>키가 <b>없으면</b> <code>{}</code> 가 대신 와서 다음 <code>.get</code> 도 탈 없이 돼요. 그런데 <code>orders.json</code> 의 A-1003 주문은 <code>"address": null</code> 이에요. 키가 <b>있고</b> 값이 <code>None</code> 이면, <code>.get</code> 은 기본값이 아니라 그 <code>None</code> 을 돌려줘요. 그다음은 <code>None.get(…)</code> 이라서 이렇게 멈춰요.</p>
+<pre>AttributeError: 'NoneType' object has no attribute 'get'</pre>
+<p><code>.get</code> 의 기본값은 「키가 없을 때」 만이에요. 「없거나 <code>None</code> 일 때」 를 함께 막으려면 <code>or {}</code> 를 붙여요. <code>None or {}</code> 는 <code>{}</code> 예요.</p>
+<pre>address = order["customer"].get("address") or {}
+city = address.get("city", "주소 없음")</pre>
+<p>API 는 「값 없음」 을 키를 빼서도, <code>null</code> 로도 보내요. 같은 API 안에서도 섞여요. 둘 다 생각해 두세요.</p>`,
+      example: { code: `import json
+
+TEXT = """{"data": {"orders": [
+  {"id": "A-1001", "customer": {"name": "김하늘", "address": {"city": "서울"}}},
+  {"id": "A-1003", "customer": {"name": "박서준", "address": null}},
+  {"id": "A-1009", "customer": {"name": "정다은"}}
+]}}"""
+orders = json.loads(TEXT)["data"]["orders"]
+
+for order in orders:
+    address = order["customer"].get("address") or {}
+    print(order["id"], address.get("city", "주소 없음"))
+
+try:
+    for order in orders:
+        print(order["id"], order.get("customer", {}).get("address", {}).get("city"))
+except AttributeError as e:
+    print("AttributeError:", e)` } },
+    { title: 'dig(data, "data", "orders", 0, …)', html: `<p>깊은 곳을 자주 꺼내면 경로 함수 하나를 만들어 둬요. 키와 번호를 차례로 받아 한 겹씩 들어가다가, 길이 막히면 <code>default</code> 를 돌려줘요.</p>
+<pre>def dig(data, *path, default=None):
+    cur = data
+    for key in path:
+        try:
+            cur = cur[key]
+        except (KeyError, IndexError, TypeError):
+            return default
+    return cur</pre>
+<ul><li><code>*path</code> — 키 · 번호를 몇 개든 받아 튜플로 모아요(<a href="../python/#lesson/L8C" target="_blank" rel="noopener">파이썬 교과서 「함수 3: 범위 · 문서 · *args」 ↗</a>). 그 뒤에 오는 <code>default=</code> 는 꼭 이름을 붙여 줘요</li><li><code>except (KeyError, IndexError, TypeError):</code> — 괄호로 묶으면 셋 중 무엇이든 받아요. <code>KeyError</code> 는 딕셔너리에 키가 없음, <code>IndexError</code> 는 리스트 번호가 넘음, <code>TypeError</code> 는 <code>None</code> 이나 리스트에 글자 키 — 그 겹이 다른 모양이에요</li><li><code>dig(order, "customer", "address", "city", default="주소 없음")</code> — 앞 쪽의 <code>or {}</code> 이어 쓰기가 한 줄이 돼요</li></ul>
+<div class="bk-warn"><b>dig 는 오타도 숨겨요</b> — <code>"custmer"</code> 처럼 키 이름을 틀려도 에러 없이 <code>None</code> 이에요. 꼭 있어야 하는 값(주문 번호 · 상태)은 <code>order["id"]</code> 처럼 대괄호로 꺼내 틀리면 바로 멈추게 하고, 정말 빠질 수 있는 값(주소 · 이메일)에만 <code>dig</code> 를 써요.</div>`,
+      example: { code: `import json
+
+TEXT = """{"data": {"orders": [
+  {"id": "A-1001", "customer": {"name": "김하늘", "address": {"city": "서울"}}},
+  {"id": "A-1003", "customer": {"name": "박서준", "address": null}}
+]}}"""
+data = json.loads(TEXT)
+
+def dig(data, *path, default=None):
+    cur = data
+    for key in path:
+        try:
+            cur = cur[key]
+        except (KeyError, IndexError, TypeError):
+            return default
+    return cur
+
+print(dig(data, "data", "orders", 0, "customer", "name"))
+print(dig(data, "data", "orders", 1, "customer", "address", "city"))
+print(dig(data, "data", "orders", 1, "customer", "address", "city", default="주소 없음"))
+print(dig(data, "data", "orders", 5, "id", default="그런 주문 없음"))
+print(dig(data, "data", "orders", "id"))
+print(dig(data, "data", "orders", 0, "custmer", "name"))` } },
+    { title: '모으기 · 고르기: 컴프리헨션 · sum · match', html: `<p>리스트 안의 딕셔너리에서 한 칸씩만 모을 때는 컴프리헨션이 짧아요.</p>
+<pre>titles = [item["title"] for item in order["items"]]
+books = sum(item["qty"] for item in order["items"])   # 그 주문의 권수</pre>
+<p>주문의 모양이나 상태에 따라 다르게 다뤄야 하면 <code>match</code> 의 <b>딕셔너리 모양</b>을 써요(<a href="../python/#lesson/L37" target="_blank" rel="noopener">파이썬 교과서 「match-case」 ↗</a> 복습). <code>case {"status": "paid", "items": items}:</code> 는 「<code>status</code> 가 <code>"paid"</code> 이고 <code>items</code> 키가 있는 딕셔너리」 와 맞고, 그 값을 <code>items</code> 에 담아 줘요. 다른 키가 더 있어도 맞아요.</p>
+<pre>match order:
+    case {"status": "paid", "items": items}:
+        ...   # 결제된 주문 — items 를 바로 써요
+    case {"status": "cancelled"}:
+        ...   # 취소
+    case _:
+        ...   # 모르는 상태 — 빼먹지 말고 알려요</pre>
+<p><code>if order["status"] == "paid":</code> 로도 되지만, 키가 빠진 주문이 오면 <code>KeyError</code> 예요. <code>match</code> 는 모양이 안 맞으면 다음 <code>case</code> 로 넘어가요. 금액(<code>"18000.00"</code>)은 글자라 바로 더하면 안 돼요 — [[레슨:F3]] 에서 다뤄요.</p>`,
+      example: { code: `import json
+
+TEXT = """{"data": {"orders": [
+  {"id": "A-1001", "status": "paid",
+   "items": [{"title": "파이썬 첫걸음", "qty": 1}, {"title": "엑셀 업무 노트", "qty": 2}]},
+  {"id": "A-1003", "status": "cancelled",
+   "items": [{"title": "파이썬 첫걸음", "qty": 3}]},
+  {"id": "A-1007", "status": "refunding"}
+]}}"""
+orders = json.loads(TEXT)["data"]["orders"]
+
+for order in orders:
+    titles = [item["title"] for item in order.get("items", [])]
+    print(order["id"], titles)
+
+paid_books = 0
+for order in orders:
+    match order:
+        case {"status": "paid", "items": items}:
+            books = sum(item["qty"] for item in items)
+            paid_books += books
+            print(order["id"], "결제", books, "권")
+        case {"status": "cancelled"}:
+            print(order["id"], "취소 — 세지 않아요")
+        case _:
+            print(order["id"], "모르는 상태:", order.get("status"))
+print("결제된 책", paid_books, "권")` } },
+    { title: '모르는 구조 살피기: outline(data)', html: `<p>처음 받은 응답 파일은 어디에 무엇이 있는지부터 봐야 해요. 길면 <b>키와 종류만</b> 나무처럼 찍는 함수가 편해요. 딕셔너리 안에 또 딕셔너리가 있으니 재귀로 한 겹씩 들어가요(<a href="../python/#lesson/L32" target="_blank" rel="noopener">파이썬 교과서 「재귀」 ↗</a> · <a href="../python/#lesson/L18G" target="_blank" rel="noopener">「isinstance」 ↗</a> 복습).</p>
+<pre>def outline(data, depth=0):
+    pad = "  " * depth
+    if isinstance(data, dict):
+        for key, value in data.items():
+            print(f"{pad}{key}: {type(value).__name__}")
+            outline(value, depth + 1)
+    elif isinstance(data, list) and data:
+        print(f"{pad}[0]: {type(data[0]).__name__} (모두 {len(data)}개)")
+        outline(data[0], depth + 1)</pre>
+<ul><li>딕셔너리면 키마다 <code>키: 종류</code> 를 찍고, 그 값 안으로 한 칸 더 들여 들어가요</li><li>리스트는 <b>첫 원소만</b> 보고 개수를 붙여요. 원소가 수백 개여도 짧게 끝나요</li><li>글자 · 숫자 · <code>None</code> 은 더 들어갈 곳이 없어서 아무것도 안 해요 — 재귀가 멈추는 곳이에요</li></ul>
+<div class="bk-warn"><b>첫 원소만 본다는 것</b> — 예제의 둘째 주문은 <code>address</code> 가 <code>NoneType</code> 이에요. 첫 주문만 보면 몰라요. 모양이 섞일 수 있는 칸은 <code>dig</code> 로 꺼내거나, 값마다 검사해요([[레슨:F6]]).</div>`,
+      example: { code: `import json
+
+TEXT = """{
+  "status": "ok",
+  "data": {
+    "orders": [
+      {"id": "A-1001", "status": "paid",
+       "customer": {"name": "김하늘", "address": {"city": "서울"}},
+       "items": [{"title": "파이썬 첫걸음", "qty": 1},
+                 {"title": "엑셀 업무 노트", "qty": 2}]},
+      {"id": "A-1003", "status": "cancelled",
+       "customer": {"name": "박서준", "address": null},
+       "items": [{"title": "파이썬 첫걸음", "qty": 3}]}
+    ]
+  }
+}"""
+
+def outline(data, depth=0):
+    pad = "  " * depth
+    if isinstance(data, dict):
+        for key, value in data.items():
+            print(f"{pad}{key}: {type(value).__name__}")
+            outline(value, depth + 1)
+    elif isinstance(data, list) and data:
+        print(f"{pad}[0]: {type(data[0]).__name__} (모두 {len(data)}개)")
+        outline(data[0], depth + 1)
+
+data = json.loads(TEXT)
+outline(data)
+print("--- 둘째 주문의 customer")
+outline(data["data"]["orders"][1]["customer"])` } },
+  ],
+  summary: ['경로는 한 겹에 대괄호 하나 — 딕셔너리는 키, 리스트는 번호. 틀리면 KeyError · IndexError · TypeError', '.get("a", {}) 는 키가 없을 때만 기본값 — 값이 null 이면 (… or {}), 깊은 곳은 dig(data, *path, default=None)', '모을 땐 컴프리헨션 · sum, 고를 땐 case {"status": "paid", "items": items}:, 모르는 구조는 outline(data) 로 먼저 살펴요'] },
+{ id: 'F3', ch: 1, n: 3, title: 'JSON 에 없는 값: 날짜 · 돈', mode: 'text',
+  tutorSummary: 'JSON 에는 글자 · 숫자 · true/false · null · 배열 · 객체뿐 — date · datetime · Decimal · set 을 dumps 하면 TypeError: Object of type date is not JSON serializable(type 뒤 이름이 걸린 종류). 날짜는 ISO 8601 글자 d.isoformat() "2026-09-03" 로 저장, 읽은 뒤 date.fromisoformat 로 되돌림(L19 복습). ISO 는 자릿수가 같아 글자로 정렬해도 날짜 순, 사람용 모양은 보여 줄 때만 strftime. 시각: datetime.fromisoformat("2026-09-03T14:05:00+09:00") — 끝의 +09:00 이 시간대(UTC 보다 9시간 빠름), "Z" 는 UTC(3.11+ 에서 읽힘). KST = timezone(timedelta(hours=9)), t.astimezone(timezone.utc) 로 같은 순간을 UTC 시계로 — A-1004(9/5 00:30 KST)는 UTC 로 9/4 15:30, t.date() 는 날짜만. 만들 때 datetime(…, tzinfo=KST). 시간대 없는 것과 있는 것 비교는 TypeError: can\'t compare offset-naive and offset-aware datetimes. zoneinfo.ZoneInfo("Asia/Seoul") 은 Windows 에서 pip install tzdata 가 따로 필요 → 이 코스는 timezone(timedelta(hours=9))(한국은 서머타임 없음). 유닉스 시간(1970-01-01 UTC 부터 초, L26 time.time()) → datetime.fromtimestamp(ts, timezone.utc) 또는 (ts, KST); 시간대를 빼면 PC 시간대라 PC 마다 다름; 13자리는 밀리초라 ts / 1000(그대로면 해가 너무 커서 에러); 되돌리기 int(t.timestamp()). 돈: JSON 소수는 float 라 0.1 + 0.2 = 0.30000000000000004 → json.loads(text, parse_float=Decimal)(정수는 int 그대로), 글자 금액 "18000.00" 은 Decimal(item["price"]). 저장은 str(Decimal) 글자 "43000.00" 또는 정수 원 int(Decimal), float 는 안 씀(L24 복습). json.dumps(data, default=to_json): 못 바꾸는 값을 만날 때마다 불림 — isinstance(o, (date, datetime)) 면 o.isoformat(), Decimal 이면 str(o), 나머지는 raise TypeError(f"JSON 으로 못 바꿔요: {type(o).__name__}"). default=str 도 되지만 set 같은 것도 글자로 넣어 실수를 숨김. 되돌리기는 내가 — JSON 은 날짜였는지 기억 못 하므로 어느 칸인지 아는 곳에서 fromisoformat · Decimal(내 클래스는 F4).',
+  pages: [
+    { title: '날짜는 글자로: isoformat() ↔ fromisoformat', html: `<p>JSON 이 담는 건 여섯 가지뿐이에요 — 글자 · 숫자 · <code>true</code>/<code>false</code> · <code>null</code> · 배열 · 객체. <b>날짜도 돈(Decimal)도 없어요.</b> 그래서 <code>date</code> 를 그냥 저장하면 이렇게 멈춰요.</p>
+<pre>TypeError: Object of type date is not JSON serializable</pre>
+<p>「date 종류의 객체는 JSON 으로 바꿀(serialize) 수 없어요」 라는 뜻이에요. <code>Decimal</code> · <code>set</code> · 내 클래스도 같은 에러예요. <code>type</code> 뒤의 이름이 걸린 값의 종류예요.</p>
+<p>날짜는 <b>ISO 8601 글자</b>로 저장해요. <code>d.isoformat()</code> 이 <code>"2026-09-03"</code> 을 만들고, 읽은 뒤에는 <code>date.fromisoformat</code> 으로 되돌려요(<a href="../python/#lesson/L19" target="_blank" rel="noopener">파이썬 교과서 「날짜 2: 글자 ↔ 날짜」 ↗</a> 복습).</p>
+<ul><li>ISO 8601 은 「연-월-일」 순서의 국제 표준 모양이에요. 다른 언어 · 엑셀 · DB 도 다 알아봐요</li><li>자릿수가 늘 같아서(<code>09</code>), <b>글자로 정렬해도 날짜 순</b>이에요</li><li><code>"9/3"</code> · <code>"2026년 9월 3일"</code> 같은 사람용 모양은 보여 줄 때만 <code>strftime</code> 으로 만들어요. 저장은 늘 ISO 로요</li></ul>`,
+      example: { code: `import json
+from datetime import date
+
+entry = {"title": "장보기", "due": date(2026, 9, 3)}
+try:
+    json.dumps(entry)
+except TypeError as e:
+    print("TypeError:", e)
+
+saved = json.dumps({"title": entry["title"], "due": entry["due"].isoformat()}, ensure_ascii=False)
+print(saved)
+
+back = json.loads(saved)
+print(type(back["due"]).__name__, back["due"])
+due = date.fromisoformat(back["due"])
+print(type(due).__name__, due == entry["due"])
+print(sorted(["2026-10-01", "2026-09-30", "2026-09-03"]))` } },
+    { title: '시각 · 시간대: "+09:00" · "Z" · astimezone', html: `<p>주문 시각은 <code>"2026-09-03T14:05:00+09:00"</code> 처럼 와요. <code>T</code> 뒤가 시각, 끝의 <code>+09:00</code> 이 <b>시간대</b>예요 — 「세계 표준시(UTC)보다 9시간 빠른 곳의 시각」, 곧 한국 시간이에요. 끝이 <code>Z</code> 면 UTC 그 자체예요.</p>
+<pre>from datetime import datetime, timezone, timedelta
+
+KST = timezone(timedelta(hours=9))   # 한국 시간대
+t = datetime.fromisoformat("2026-09-05T00:30:00+09:00")
+print(t.astimezone(timezone.utc))     # 2026-09-04 15:30:00+00:00</pre>
+<ul><li><code>datetime</code> 은 날짜 + 시각이에요. <code>date</code> 처럼 <code>fromisoformat</code> · <code>isoformat()</code> 이 있고, <code>t.date()</code> 는 날짜만 떼어 줘요</li><li><code>.astimezone(시간대)</code> — 같은 순간을 다른 시간대의 시계로 읽어요. A-1004 주문은 한국으론 9월 5일인데 UTC 로는 <b>9월 4일</b>이에요. 「하루 매출」 을 셀 때 어느 시계로 셀지 먼저 정해야 해요</li><li><code>"…Z"</code> 를 <code>fromisoformat</code> 으로 읽는 건 파이썬 3.11 부터 돼요</li><li>내가 만드는 시각에는 <code>datetime(2026, 9, 3, 14, 5, tzinfo=KST)</code> 처럼 시간대를 붙여요. 시간대가 있는 시각과 없는 시각은 비교할 수 없어요 — <code>TypeError: can't compare offset-naive and offset-aware datetimes</code></li></ul>
+<div class="bk-warn"><b>zoneinfo 는 Windows 에서 조심</b> — <code>ZoneInfo("Asia/Seoul")</code> 도 한국 시간대인데, Windows 파이썬에는 시간대 자료가 없어서 <code>pip install tzdata</code> 를 따로 해야 해요. 한국은 서머타임이 없어 늘 +9 시간이라, 이 코스는 <code>timezone(timedelta(hours=9))</code> 로 써요.</div>`,
+      example: { code: `from datetime import datetime, timezone, timedelta
+
+KST = timezone(timedelta(hours=9))
+for text in ["2026-09-03T14:05:00+09:00", "2026-09-05T00:30:00+09:00", "2026-09-04T15:30:00Z"]:
+    t = datetime.fromisoformat(text)
+    utc = t.astimezone(timezone.utc)
+    kst = t.astimezone(KST)
+    print(text, "→ UTC", utc.date(), "· 한국", kst.strftime("%Y-%m-%d %H:%M"))
+
+made = datetime(2026, 9, 3, 14, 5, tzinfo=KST)
+print(made.isoformat())
+print(made == datetime.fromisoformat("2026-09-03T05:05:00Z"))
+try:
+    print(datetime(2026, 9, 3, 14, 5) < made)
+except TypeError as e:
+    print("TypeError:", e)` } },
+    { title: '유닉스 시간: fromtimestamp(ts, timezone.utc)', html: `<p>어떤 API 는 시각을 <code>1788535800</code> 같은 <b>숫자</b>로 줘요. 1970년 1월 1일 0시(UTC)부터 지난 <b>초</b>예요. 유닉스 시간이라고 해요(<a href="../python/#lesson/L26" target="_blank" rel="noopener">파이썬 교과서 「시간 재기: time」 ↗</a> 의 <code>time.time()</code> 이 이 숫자예요). 시간대 걱정이 없고 빼기 쉬워서 기록에 많이 써요.</p>
+<pre>from datetime import datetime, timezone, timedelta
+KST = timezone(timedelta(hours=9))
+ts = 1788535800
+print(datetime.fromtimestamp(ts, timezone.utc))   # 2026-09-04 15:30:00+00:00
+print(datetime.fromtimestamp(ts, KST))            # 2026-09-05 00:30:00+09:00</pre>
+<ul><li>시간대를 <b>꼭</b> 줘요. <code>datetime.fromtimestamp(ts)</code> 처럼 빼면 그 PC 의 시간대로 바뀌어서, 내 PC 와 서버의 결과가 달라요</li><li>13자리(<code>1788535800000</code>)면 <b>밀리초</b>예요. <code>ts / 1000</code> 으로 나눠 넣어요. 그대로 넣으면 해가 너무 커서 에러예요</li><li>거꾸로 시각 → 숫자는 <code>t.timestamp()</code> 예요. 소수가 붙어 나오니 <code>int(…)</code> 로 감싸요</li></ul>
+<p>저장할 때는 받은 숫자 그대로 두어도 되고, 사람이 읽을 파일이면 <code>isoformat()</code> 글자로 바꿔 둬요.</p>`,
+      example: { code: `from datetime import datetime, timezone, timedelta
+
+KST = timezone(timedelta(hours=9))
+logs = [{"event": "open", "ts": 1788535800},
+        {"event": "save", "ts": 1788536100},
+        {"event": "close", "ts": 1788537000123}]
+for rec in logs:
+    ts = rec["ts"]
+    if ts > 10 ** 11:   # 13자리 — 밀리초
+        ts = ts / 1000
+    t = datetime.fromtimestamp(ts, KST)
+    print(rec["event"], t.strftime("%Y-%m-%d %H:%M:%S"))
+
+t = datetime.fromisoformat("2026-09-05T00:30:00+09:00")
+print(int(t.timestamp()))
+try:
+    datetime.fromtimestamp(1788537000123, timezone.utc)
+except (ValueError, OSError, OverflowError):
+    print("밀리초를 그대로 넣으면 에러 — 해가 너무 커요")` } },
+    { title: '돈: json.loads(text, parse_float=Decimal)', html: `<p>JSON 의 <code>12.5</code> 같은 소수는 읽으면 <code>float</code> 이 돼요. float 은 소수를 어림해 담아서 돈 계산에 오차가 생겨요(<a href="../python/#lesson/L24" target="_blank" rel="noopener">파이썬 교과서 「소수 오차와 Decimal」 ↗</a> 복습).</p>
+<pre>import json
+d = json.loads('{"a": 0.1, "b": 0.2}')
+print(d["a"] + d["b"])   # 0.30000000000000004</pre>
+<p><code>parse_float=Decimal</code> 을 주면 소수를 읽을 때마다 <code>Decimal(글자)</code> 로 만들어 줘요. 글자에서 바로 만드니 어림이 끼지 않아요. 정수는 그대로 <code>int</code> 예요.</p>
+<pre>import json
+from decimal import Decimal
+d = json.loads('{"a": 0.1, "b": 0.2, "n": 3}', parse_float=Decimal)
+print(d["a"] + d["b"], d["n"])   # 0.3 3</pre>
+<p>서점 API 처럼 금액을 아예 <b>글자</b>(<code>"18000.00"</code>)로 주는 곳도 많아요. 바로 이 오차 때문이에요. 그때는 꺼내서 <code>Decimal(item["price"])</code> 로 바꿔요. 저장할 때는 이렇게 골라요.</p>
+<table class="kb"><tbody><tr><th>저장 모양</th><th>예</th><th>언제</th></tr>
+<tr><td>글자 <code>str(Decimal)</code></td><td><code>"43000.00"</code></td><td>소수 자리가 있는 돈(달러 · 환율) — 자리 수까지 그대로</td></tr>
+<tr><td>정수 원 <code>int(Decimal)</code></td><td><code>43000</code></td><td>원 단위로 딱 떨어지는 돈</td></tr>
+<tr><td>float</td><td><code>43000.0</code></td><td>돈에는 쓰지 않아요</td></tr></tbody></table>`,
+      example: { code: `import json
+from decimal import Decimal
+
+TEXT = """{"items": [{"title": "파이썬 첫걸음", "price": "18000.00", "qty": 1},
+                    {"title": "엑셀 업무 노트", "price": "12500.00", "qty": 2}],
+           "shipping": 2500.50}"""
+data = json.loads(TEXT, parse_float=Decimal)
+print(type(data["shipping"]).__name__, data["shipping"])
+
+total = sum(Decimal(item["price"]) * item["qty"] for item in data["items"])
+print("책값", total)
+print("배송비까지", total + data["shipping"])
+
+print(json.dumps({"total": str(total)}))
+print(json.dumps({"total_won": int(total)}))` } },
+    { title: 'json.dumps(data, default=to_json)', html: `<p>날짜 · 돈이 여기저기 섞인 데이터를 칸마다 <code>isoformat()</code> · <code>str()</code> 로 바꾸기는 번거로워요. <code>default=</code> 에 함수를 주면, <code>json</code> 이 <b>못 바꾸는 값을 만날 때마다</b> 그 함수를 불러요. 함수가 돌려준 값(글자 · 숫자 …)을 대신 저장해요.</p>
+<pre>from datetime import date, datetime
+from decimal import Decimal
+
+def to_json(o):
+    if isinstance(o, (date, datetime)):
+        return o.isoformat()
+    if isinstance(o, Decimal):
+        return str(o)
+    raise TypeError(f"JSON 으로 못 바꿔요: {type(o).__name__}")
+
+text = json.dumps(data, default=to_json)</pre>
+<ul><li>함수에 <code>()</code> 를 붙이지 않아요 — <code>default=to_json</code> 은 함수 자체를 넘겨요</li><li>모르는 종류는 <code>raise TypeError</code> 로 돌려보내요. 조용히 넘기면 저장이 「된 것 같은데」 엉뚱한 값이 들어가요</li><li><code>default=str</code> 로 아무거나 글자로 만들 수도 있어요. 짧지만 <code>set</code> 이나 내 클래스까지 글자로 넣어 버려서 실수를 숨겨요</li></ul>
+<p><b>되돌리기는 내가 해요.</b> 저장된 파일에는 <code>"2026-09-03"</code> 이라는 글자만 있어요. JSON 은 그게 날짜였는지 기억하지 못해요. 읽은 뒤에, 어느 칸이 날짜 · 돈인지 아는 내가 <code>date.fromisoformat</code> · <code>Decimal</code> 로 바꿔요. 내 클래스를 통째로 저장하고 되살리는 길은 [[레슨:F4]] 에서 이어가요.</p>`,
+      example: { code: `import json
+from datetime import date, datetime, timezone, timedelta
+from decimal import Decimal
+
+KST = timezone(timedelta(hours=9))
+
+def to_json(o):
+    if isinstance(o, (date, datetime)):
+        return o.isoformat()
+    if isinstance(o, Decimal):
+        return str(o)
+    raise TypeError(f"JSON 으로 못 바꿔요: {type(o).__name__}")
+
+report = {"day": date(2026, 9, 3), "made_at": datetime(2026, 9, 4, 9, 0, tzinfo=KST),
+          "total": Decimal("65000.00"), "orders": 2}
+text = json.dumps(report, default=to_json, indent=2)
+print(text)
+
+back = json.loads(text)
+back["day"] = date.fromisoformat(back["day"])
+back["made_at"] = datetime.fromisoformat(back["made_at"])
+back["total"] = Decimal(back["total"])
+print(back == report)
+
+try:
+    json.dumps({"tags": {"신간", "할인"}}, default=to_json)
+except TypeError as e:
+    print("TypeError:", e)` } },
+  ],
+  summary: ['JSON 에는 날짜 · Decimal 이 없어요 — 날짜는 isoformat() 글자로 저장하고, 읽은 뒤 fromisoformat 으로 되돌려요', '시간대는 "+09:00" · "Z" — KST = timezone(timedelta(hours=9)), 유닉스 시간은 datetime.fromtimestamp(ts, timezone.utc)', '돈은 parse_float=Decimal · Decimal(글자)로 읽어 str 이나 정수 원으로 저장 — 섞여 있으면 json.dumps(data, default=to_json), 되돌리기는 내가'] },
 { id: 'F4', ch: 1, n: 4, title: '내 클래스 저장 · 되살리기', mode: 'text',
   tutorSummary: "dataclass 객체는 json.dumps 에 바로 못 넣는다(TypeError: Object of type Order is not JSON serializable). dataclasses.asdict(o) 는 안쪽 dataclass · 리스트까지 딕셔너리로 바꾸지만 date · Decimal 은 그대로 둔다. 그래서 F3 의 default= 함수에 if is_dataclass(o): return asdict(o) 를 더하면 함수 하나로 안쪽 date · Decimal 까지 글자가 된다(모르는 값은 raise TypeError). 되살리기 Book(**d)(H15 의 Todo(**data))는 한 겹만 풀어서 안쪽 items 는 딕셔너리 리스트 그대로 — 중첩은 손으로 Order(items=[Item(**x) for x in d[\"items\"]]), 날짜는 date.fromisoformat. 모르는 키가 있으면 TypeError: Item.__init__() got an unexpected keyword argument 라 남이 주는 데이터는 쓸 키만 골라 넣는다. json.loads(s, object_hook=f) 의 f 는 딕셔너리를 하나 다 읽을 때마다(안쪽부터) 불리고 돌려준 값이 그 자리에 들어간다 — 꼬리표 {\"__type__\": \"date\", \"value\": \"2026-09-03\"} 를 보고 date 로, 아니면 return d(빼먹으면 None). 클래스 안에 to_dict 메서드와 @classmethod from_dict(cls, d) 짝을 두고 왕복 시험: text = json.dumps(o.to_dict()); assert Order.from_dict(json.loads(text)) == o. 저장 모양에 \"version\": 2 를 넣어 두면 칸이 늘어도 d.get(\"memo\", \"\") 처럼 옛 판을 가려 읽는다.",
   terms: { "왕복 시험": "객체 → JSON → 객체 로 한 바퀴 돌려, 되살린 것이 처음과 같은지 assert 로 확인하는 시험" },
