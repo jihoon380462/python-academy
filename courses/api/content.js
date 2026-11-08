@@ -278,7 +278,7 @@ INFO:     127.0.0.1:52351 - "POST /hello HTTP/1.1" 405 Method Not Allowed</pre>
 client = TestClient(app)
 res = client.get("/hello")
 print(res.status_code, res.json())</pre>`,
-      example: { code: 'from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\n\napp = FastAPI()\n\n\n@app.get("/hello")\ndef hello():\n    return {"message": "안녕하세요"}\n\n\nclient = TestClient(app)\nres = client.get("/hello")\nprint(res.status_code, res.json())\nprint(client.get("/hi").status_code, client.post("/hello").status_code)\nprint(list(client.get("/openapi.json").json()["paths"]))', label: '예제 코드 — 서버를 안 켜고 실행(fastapi 설치 뒤)' } },
+      example: { code: 'from fastapi import FastAPI\nfrom fastapi.testclient import TestClient\n\napp = FastAPI()\n\n\n@app.get("/hello")\ndef hello():\n    return {"message": "안녕하세요"}\n\n\nclient = TestClient(app)\nres = client.get("/hello")\nprint(res.status_code, res.json())\nprint(client.get("/hi").status_code, client.post("/hello").status_code)\nspec = client.get("/openapi.json").json()\nprint(list(spec["paths"]))', label: '예제 코드 — 서버를 안 켜고 실행(fastapi 설치 뒤)' } },
   ],
   summary: ['@app.get("/hello") 함수가 dict 를 돌려주면 JSON', 'fastapi dev main.py → 127.0.0.1:8000 · Ctrl+C', '/docs 는 저절로 생긴 문서 · TestClient 로 서버 없이 시험'] },
 { id: 'H11', ch: 3, n: 11, title: '입력 받기: 경로 · 쿼리 · 본문', mode: 'text', tutorSummary: '경로 파라미터 /todos/{todo_id} + 함수 인자 todo_id: int — 글자를 주면 422. 경로에 없는 인자는 쿼리(done: bool | None = None, limit: int = 10, true · 1 · yes 는 True). 본문은 Pydantic BaseModel(text: str = Field(min_length=1)), model_dump(). 빠진 칸 · 틀린 타입 · 규칙 위반은 FastAPI 가 알아서 422 + detail 목록(type · loc · msg · input).',

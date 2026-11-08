@@ -274,7 +274,8 @@ for n, want in cases:
     else:
         print("FAIL", n, clap(n), "기대", want)
 print(f"정리한 뒤에도 {passed}/{len(cases)} 통과")
-print(" ".join(clap(n) for n in range(1, 14)))` } },
+claps = [clap(n) for n in range(1, 14)]
+print(" ".join(claps))` } },
     { title: 'pytest 로 TDD — test_clap.py 부터', html: `<p>진짜 프로젝트에서는 pytest 로 같은 순서를 밟아요. <b>테스트 파일을 먼저</b> 만들어요. <code>clap.py</code> 는 아직 없어요.</p>
 <pre>from clap import clap
 

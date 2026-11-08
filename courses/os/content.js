@@ -424,9 +424,10 @@ print(sorted(done))</pre>
 <div class="bk-layers" role="img" aria-label="주소 공간: 위에서부터 스택 · 라이브러리 · 힙 · 데이터 · 코드"><div class="bk-layer v"><b>스택 (stack)</b><span>함수를 부를 때마다 쌓이는 칸 — 지역 변수 · 돌아갈 자리</span></div><div class="bk-layer h"><b>라이브러리 · mmap</b><span>libc 같은 공용 코드 · 큰 덩어리 메모리</span></div><div class="bk-layer g"><b>힙 (heap)</b><span>실행 중에 필요할 때 받아 쓰는 칸</span></div><div class="bk-layer h"><b>데이터 · 코드</b><span>프로그램 파일에서 읽어 온 값과 명령</span></div></div>
 <p>파이썬의 모든 값(목록 · 딕셔너리 · 글자)은 힙과 mmap 칸 어딘가에 있어요. <code>id(값)</code> 은 CPython 에서 그 값이 있는 <b>가상 주소</b>예요.</p>
 <pre class="code">nums = [1, 2, 3]
-print("nums 가 있는 가상 주소:", hex(id(nums)))</pre>
+addr = id(nums)
+print("nums 가 있는 가상 주소:", hex(addr))</pre>
 <p>주소 숫자는 실행할 때마다 달라요(보안을 위해 커널이 시작 위치를 섞어요 — ASLR).</p>` + OS_DATE,
-      example: { code: 'nums = [1, 2, 3]\nprint("nums 가 있는 가상 주소:", hex(id(nums)))' } },
+      example: { code: 'nums = [1, 2, 3]\naddr = id(nums)\nprint("nums 가 있는 가상 주소:", hex(addr))' } },
     { title: '/proc/self/maps: 내 주소 공간의 지도', html: `<p><code>/proc/self/maps</code> 는 내 주소 공간의 <b>지도</b>예요. 한 줄이 한 구역이에요.</p>
 <pre class="code">55d0a1c00000-55d0a1c21000 rw-p 00000000 00:00 0      [heap]
 7ffc8e3a1000-7ffc8e3c2000 rw-p 00000000 00:00 0      [stack]
@@ -437,9 +438,10 @@ print("nums 가 있는 가상 주소:", hex(id(nums)))</pre>
 names = [line.split()[-1] for line in lines]
 print("[heap] 있음:", "[heap]" in names)
 print("[stack] 있음:", "[stack]" in names)
-print("실행할 수 있는 칸이 있나요?", any(line.split()[1] == "r-xp" for line in lines))</pre>
+perms = [line.split()[1] for line in lines]
+print("실행할 수 있는 칸이 있나요?", "r-xp" in perms)</pre>
 <p>터미널에서는 <code>cat /proc/$$/maps</code>(bash 의 지도)나 <code>pmap -x $$</code>(칸마다 크기)로 봐요. 코드 칸에 쓰기가 막혀 있어서, 프로그램이 자기 명령을 실수로 덮어쓰면 <b>Segmentation fault</b>(허락 안 된 칸을 만짐)로 멈춰요.</p>` + OS_DATE,
-      example: { code: 'with open("/proc/self/maps") as f:\n    lines = f.read().splitlines()\nnames = [line.split()[-1] for line in lines]\nprint("[heap] 있음:", "[heap]" in names)\nprint("[stack] 있음:", "[stack]" in names)\nprint("실행할 수 있는 칸이 있나요?", any(line.split()[1] == "r-xp" for line in lines))' } },
+      example: { code: 'with open("/proc/self/maps") as f:\n    lines = f.read().splitlines()\nnames = [line.split()[-1] for line in lines]\nprint("[heap] 있음:", "[heap]" in names)\nprint("[stack] 있음:", "[stack]" in names)\nperms = [line.split()[1] for line in lines]\nprint("실행할 수 있는 칸이 있나요?", "r-xp" in perms)' } },
     { title: '같은 주소, 다른 메모리: 쓸 때만 복사', html: `<p>레슨 2 에서 자식이 money 를 바꿔도 부모는 그대로였죠. 그런데 자식이 보는 <b>주소</b>는 부모와 똑같아요.</p>
 <pre class="code">import os
 data = [0]
@@ -618,26 +620,30 @@ int main(void) {
 before = len(os.listdir("/proc/self/fd"))
 f = open("note.txt", "w")
 print("받은 번호:", f.fileno())
-print("열린 번호가 하나 늘었나요?", len(os.listdir("/proc/self/fd")) == before + 1)
+opened = len(os.listdir("/proc/self/fd"))
+print("열린 번호가 하나 늘었나요?", opened == before + 1)
 f.close()
-print("닫으니 원래대로?", len(os.listdir("/proc/self/fd")) == before)</pre>
+closed = len(os.listdir("/proc/self/fd"))
+print("닫으니 원래대로?", closed == before)</pre>
 <ul><li><code>f.fileno()</code> 는 파이썬 파일 뒤에 있는 진짜 번호(fd)예요.</li><li><code>/proc/self/fd</code> 폴더에는 지금 열어 둔 번호마다 이름이 하나씩 있어요. 터미널에서 <code>ls -l /proc/$$/fd</code> 로 보면 어느 파일을 가리키는지도 보여요.</li><li>번호는 <b>프로세스마다</b> 따로예요. fork 한 자식은 부모의 번호표를 복사해 받아요 — 레슨 5 에서 파이프 끝을 자식에게 넘길 수 있었던 이유예요.</li></ul>` + OS_DATE,
-      example: { code: 'import os\nbefore = len(os.listdir("/proc/self/fd"))\nf = open("note.txt", "w")\nprint("받은 번호:", f.fileno())\nprint("열린 번호가 하나 늘었나요?", len(os.listdir("/proc/self/fd")) == before + 1)\nf.close()\nprint("닫으니 원래대로?", len(os.listdir("/proc/self/fd")) == before)' } },
+      example: { code: 'import os\nbefore = len(os.listdir("/proc/self/fd"))\nf = open("note.txt", "w")\nprint("받은 번호:", f.fileno())\nopened = len(os.listdir("/proc/self/fd"))\nprint("열린 번호가 하나 늘었나요?", opened == before + 1)\nf.close()\nclosed = len(os.listdir("/proc/self/fd"))\nprint("닫으니 원래대로?", closed == before)' } },
     { title: '닫지 않으면: 한도와 with', html: `<p>번호에는 <b>한도</b>가 있어요(우분투 기본은 한 프로세스에 1024개). 파일을 열기만 하고 닫지 않는 코드가 오래 돌면 번호가 바닥나서 <code>OSError: [Errno 24] Too many open files</code> 로 멈춰요.</p>
 <pre class="code">import os, resource
 soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
 print("한도가 있나요?", soft &gt; 0)
 before = len(os.listdir("/proc/self/fd"))
 kept = [open("note.txt", "w") for _ in range(3)]
-print("닫지 않은 3개:", len(os.listdir("/proc/self/fd")) - before)
+now = len(os.listdir("/proc/self/fd"))
+print("닫지 않은 3개:", now - before)
 for f in kept:
     f.close()
 for _ in range(3):
     with open("note.txt", "w") as f:
         f.write("x")
-print("with 로 3번:", len(os.listdir("/proc/self/fd")) - before)</pre>
+now = len(os.listdir("/proc/self/fd"))
+print("with 로 3번:", now - before)</pre>
 <p>실행하면 <code>닫지 않은 3개: 3</code>, <code>with 로 3번: 0</code>. <code>with</code> 는 블록이 끝나면(에러가 나도) 닫아 줘요. 터미널에서는 <code>ulimit -n</code> 이 한도예요.</p>` + OS_DATE,
-      example: { code: 'import os, resource\nsoft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)\nprint("한도가 있나요?", soft > 0)\nbefore = len(os.listdir("/proc/self/fd"))\nkept = [open("note.txt", "w") for _ in range(3)]\nprint("닫지 않은 3개:", len(os.listdir("/proc/self/fd")) - before)\nfor f in kept:\n    f.close()\nfor _ in range(3):\n    with open("note.txt", "w") as f:\n        f.write("x")\nprint("with 로 3번:", len(os.listdir("/proc/self/fd")) - before)' } },
+      example: { code: 'import os, resource\nsoft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)\nprint("한도가 있나요?", soft > 0)\nbefore = len(os.listdir("/proc/self/fd"))\nkept = [open("note.txt", "w") for _ in range(3)]\nnow = len(os.listdir("/proc/self/fd"))\nprint("닫지 않은 3개:", now - before)\nfor f in kept:\n    f.close()\nfor _ in range(3):\n    with open("note.txt", "w") as f:\n        f.write("x")\nnow = len(os.listdir("/proc/self/fd"))\nprint("with 로 3번:", now - before)' } },
     { title: '버퍼 · flush · os.fsync', html: `<p>시스템 콜은 공짜가 아니라서, 파이썬은 <code>f.write</code> 를 할 때마다 <code>write</code> 를 부르지 않고 <b>버퍼</b>에 모았다가 한 번에 써요(레슨 2 의 <code>flush=True</code> 가 이것).</p>
 <pre class="code">import os
 f = open("buf.txt", "w")
