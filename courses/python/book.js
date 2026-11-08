@@ -7,7 +7,7 @@
 //   검증: node tools/check_book.mjs (모든 예시 답을 실제 파이썬으로 돌려 출력 예와 같은지)
 const BOOK = {
   // v2.12.2 사용자 요청(필수 사항 강조) — 먼저 해야 하는 것(core/ui-views-book.js 가 목차·레슨 1쪽·만들어 보기 위에 경고 상자로)
-  meta: { checksLabel: '내 화면에서 확인할 것' /* v2.30.0: L16D · B6 의 ☐(가상 환경 · python -m) */, exampleErrorsOk: ['L22/0'] /* 트레이스백을 보여 주려고 일부러 IndexError 가 나는 예제 — check_book ⑤ */, prereq: [
+  meta: { preSyntaxOk: ["L0/3 본문 코드 1"] /* v2.43.3 check_book ⑭: 끝 따옴표를 일부러 빠뜨린 코드(SyntaxError 를 보여 줌) */, checksLabel: '내 화면에서 확인할 것' /* v2.30.0: L16D · B6 의 ☐(가상 환경 · python -m) */, exampleErrorsOk: ['L22/0'] /* 트레이스백을 보여 주려고 일부러 IndexError 가 나는 예제 — check_book ⑤ */, prereq: [
     { lessons: ['L0', 'L1'], chapters: [0], ref: 'SETUP/0', btn: '시작하기 1 · 파이썬 설치 보기',
       title: '먼저 꼭! 「🛠 시작하기」 1~3 — 파이썬 설치 · VS Code 연결 · 첫 파일 실행',
       html: '이 교과서의 예제와 「만들어 보기」 는 전부 <b>내 컴퓨터의 VS Code</b> 에서 돌려요. 아래 셋이 되면 준비 끝이에요.<ol><li>파이썬 설치 때 <b>「Add python.exe to PATH」</b> 를 체크해요. 안 하면 터미널에 치는 <code>python</code> 명령이 안 돼요</li><li>VS Code 에 <b>Python 확장</b>을 깔아요. 없으면 오른쪽 위 ▷ 가 없어요</li><li>확인: 터미널에서 <code>python --version</code> 이 버전을 보여 주고, VS Code 오른쪽 위 ▷ 로 <code>hello.py</code> 가 돌아요</li></ol>' },
