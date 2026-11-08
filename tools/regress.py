@@ -54,7 +54,7 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==19 and r['ready']==19, f"코스 카드 19개(코스 12 + 공용 7), 열린 것 19개 = 전부(v2.33.0 디버깅·데이터 분석·객체지향·머신러닝·AI 협업까지) (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==20 and r['ready']==20, f"코스 카드 20개, 열린 것 20개 = 전부(v2.41.0 데이터 파일 다루기까지) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and r['cont'].rstrip('/').endswith('courses/python'), '이어서 하기 링크(아직 본 레슨이 없으면 파이썬 교과서 목차, v2.19.0): '+str(r['cont']))
     check('이어서 하기' in (r['today'] or '') and r['stats']==0 and '오늘의 도전' not in (r['today'] or ''), '이어서 하기 상자(v2.17.1: 문제집 코스(수학)를 시작하기 전엔 「오늘 n/5 문제·복습」 줄 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
@@ -138,6 +138,13 @@ with sync_playwright() as p:
     pg.goto(HUB); pg.wait_for_timeout(300); pg.goto(BOOKURL+'#problem/L4P2'); pg.wait_for_timeout(1200); bk=pg.evaluate("[UI.view, UI.params.lessonId, document.querySelectorAll('.bk-tab.make.on').length, location.hash]"); check(bk[:3]==['lesson','L4',1], '옛 문제 주소 #problem/L4P2 → 레슨 4 「만들어 보기」 %s' % bk)
     pg.evaluate("UI.go('lesson',{lessonId:'B3',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-task').count()==4 and '가계부' in pg.inner_text('.bk-art'), '보스(B3) = 챕터 「만들어 보기」 큰 문제 2개 + 🏠 생활형 2개')
     pg.evaluate("UI.go('lesson',{lessonId:'X1',page:8})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prep').count()==1 and 'data.csv' in pg.inner_text('.bk-prep'), '실전 프로젝트: 준비 파일(data.csv) 내용 보여 주기')
+    # v2.41.0 데이터 파일 다루기: 긴 준비 파일(make_samples.py)은 접혀 있고 「건너뛰기」 말 · 만들어 보기로 가는 [[레슨:FB…]] 링크는 「레슨 undefined」 가 아니라 제목
+    pg.goto('file://'+os.path.join(ROOT,'courses/files/index.html')); pg.wait_for_timeout(700); pg.evaluate("UI.go('lesson',{lessonId:'F0',page:1})"); pg.wait_for_timeout(300)
+    fd=pg.evaluate("(()=>{ const d=document.querySelector('details.bk-prep-fold'); return d ? {open:d.open, sum:d.querySelector('summary').innerText, code:d.textContent} : null; })()")
+    check(bool(fd) and not fd['open'] and 'make_samples.py' in fd['sum'] and '건너뛰' in fd['sum'] and 'openpyxl' in fd['code'], '데이터 파일 F0: 준비 파일 make_samples.py 는 접혀 있고 「이미 했으면 건너뛰어요」 · 펴면 스크립트 (%s)' % (fd and fd['sum']))
+    pg.evaluate("UI.go('lesson',{lessonId:'F10',page:1})"); pg.wait_for_timeout(300); lr=pg.evaluate("[...document.querySelectorAll('.bk-art .lref')].map(x=>x.innerText)")
+    check(bool(lr) and not any('undefined' in x for x in lr) and any('만들어 보기' in x for x in lr), '만들어 보기로 가는 레슨 링크: 「레슨 undefined」 대신 제목 (%s)' % lr)
+    pg.goto(BOOKURL); pg.wait_for_timeout(700)
     # v2.9.4 문법 도감 + 「갔으면 돌아올 수 있게」(사용자: 갈 수 있게만 하지 말고 다시 올 수 있게 해)
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(200); pg.click('#bkDex'); pg.wait_for_timeout(300); check(pg.locator('.bk-dex-e').count()>=200, '문법 도감: 레슨 쪽 문법 200개 이상')
     pg.fill('#dexQ','split'); pg.wait_for_timeout(400); n_split=pg.locator('.bk-dex-e').count(); check(0<n_split<30, '문법 도감 검색 split → %d개' % n_split)
