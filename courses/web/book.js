@@ -848,7 +848,7 @@ form.addEventListener("submit", (e) =&gt; { e.preventDefault(); add(input.value)
         checks: [{ text: '「카페라테 4050원, 치즈케이크 5400원」', sel: '#sale', equals: '카페라테 4050원, 치즈케이크 5400원' }] },
     ],
     W7B: [
-      { title: '타입 맞히기', text: '아래 일곱 값의 <code>typeof</code> 를 먼저 종이에 적어 보고, 한 줄에 하나씩 Console 에 찍어 확인하는 코드를 쓰세요: <code>4500</code> · <code>"4500"</code> · <code>true</code> · <code>null</code> · <code>undefined</code> · <code>[1, 2]</code> · <code>{ a: 1 }</code>.', needs: [['typeof', 'W7B/1', '타입 이름'], ['console.log', 'W7/0', 'Console 출력']],
+      { title: '타입 맞히기', text: '아래 일곱 값의 <code>typeof</code> 를 먼저 예상해 보고, 한 줄에 하나씩 Console 에 찍어 확인하는 코드를 쓰세요: <code>4500</code> · <code>"4500"</code> · <code>true</code> · <code>null</code> · <code>undefined</code> · <code>[1, 2]</code> · <code>{ a: 1 }</code>.', needs: [['typeof', 'W7B/1', '타입 이름'], ['console.log', 'W7/0', 'Console 출력']],
         answer: WJ('타입', 'const values = [4500, "4500", true, null, undefined, [1, 2], { a: 1 }];\nfor (const v of values) {\n  console.log(typeof v);\n}'), io: [{ output: 'number\nstring\nboolean\nobject\nundefined\nobject\nobject' }], outLabel: CONSOLE_OUT, checks: CK },
       { title: '「23잔」 고치기', text: '폼 입력 칸에서 온 값은 글자예요. 아래 코드는 <code>총 23잔</code> 이 나와요. <code>총 5잔</code> 과 <code>합계 22500원</code>(5잔 × 4500원)이 나오게 고치세요.', needs: [['Number("2")', 'W7B/2', '글자 → 숫자'], ['parseInt("4500원")', 'W7B/2', '앞에서부터 숫자만'], ['`${…}`', 'W7/1', '글자 안에 값']],
         given: 'const cups = "2";        // 입력 칸에서 온 글자\nconst more = "3";\nconst price = "4500원";\nconst total = cups + more;\nconsole.log(`총 ${total}잔`);',
