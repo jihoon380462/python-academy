@@ -15,7 +15,19 @@
 // 「본문」 = 그 레슨까지(포함)의 pages[].html(접힌 <details> 「더 알아보기」 제외) + pages[].example.code + 같은 레슨 앞 문제의 지문·starter.
 // 대상: runner 가 python 이고 지식 지도(map:'graph')가 아닌 코스 (python·algo). math 는 「대상 아님」, terminal-git 은 건너뜀.
 import fs from 'node:fs'; import path from 'node:path'; import { pathToFileURL } from 'node:url';
-import { ROOT, courses, loadCourse, instantiate } from './load_content.mjs';
+import { ROOT, courses, loadCourse as loadContent, instantiate } from './load_content.mjs';
+import vm from 'node:vm';
+// v2.42.0 교과서의 「만들어 보기」(book.js 의 BOOK.tasks)도 잰다 — 전엔 옛 문제집(PROBLEMS)만 재서 교과서에서 새로 쓴 문제 329개(파이썬)가 빠져 있었음.
+//   pid 가 있는 문제는 PROBLEMS 로 이미 재니 빼고, 예시 답 = 정답 · 고칠 코드(given) = starter · 출력 예측(predict)의 코드 = starter(학습자는 읽기만).
+function loadCourse(id) {
+  const c = loadContent(id); const dir = path.join(ROOT, 'courses', id); const bookPath = path.join(dir, 'book.js'); if (!fs.existsSync(bookPath)) return c;
+  const cx = { window: {} }; vm.createContext(cx);
+  const src = ['datasets.js', 'content.js', 'book.js'].filter(f => fs.existsSync(path.join(dir, f))).map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n').replace(/^(const|let) /gm, 'var ');
+  try { vm.runInContext(src, cx); } catch (e) { return c; }
+  const extra = []; for (const [lid, ts] of Object.entries((cx.BOOK && cx.BOOK.tasks) || {})) (ts || []).forEach((t, k) => { if (t.pid || typeof t.answer !== 'string') return;
+    extra.push({ id: `${lid}#${k + 1}`, lesson: lid, type: 'code', title: t.title || '', prompt: t.text || '', solution: t.predict ? '' : t.answer, starter: t.predict ? t.answer : (t.given || ''), hints: [], bookTask: true }); });
+  return { ...c, PROBLEMS: c.PROBLEMS.concat(extra) };
+}
 
 // =====================================================================
 // 기능 카탈로그 — 여기 한 곳만 고치면 된다. [라벨, 정규식(코드 쪽은 문자열·주석을 지운 뒤 적용), 비고]
@@ -186,7 +198,7 @@ const fmtOutside = (o) => o.map(x => `\`${x.feature}\`${x.inPrompt ? '(지문○
 
 const out = {}; const lines = []; const say = (s = '') => lines.push(s); const cache = {};
 const isTarget = (c) => c.meta.runner === 'python' && c.meta.map !== 'graph';
-const analyze = (id) => { if (cache[id]) return cache[id]; const c = loadCourse(id); const req = c.meta.requires && c.meta.requires.course; let seed = null;
+const analyze = (id) => { if (cache[id]) return cache[id]; const c = loadCourse(id); const req = (c.meta.requires && c.meta.requires.course) || (id !== 'python' ? 'python' : null) /* v2.42.0 파이썬 다음 교과서는 모두 「파이썬 교과서를 다 배운 사람」 대상 */; let seed = null;
   if (req && isTarget(loadCourse(req))) seed = analyze(req).taught;   // 선수 코스(예: algo ← python)가 가르친 기능은 이미 배운 것으로
   return (cache[id] = { c, ...analyzeCourse(c, seed), seeded: req }); };
 for (const id of courses()) {
