@@ -643,7 +643,7 @@ except TypeError as e:
   tutorSummary: 'openpyxl 로 엑셀(.xlsx) 읽기. 세 겹: 통합 문서 wb = load_workbook("빵집_매출.xlsx") → 시트 wb["7월"] · wb.active · wb.sheetnames(없는 이름은 KeyError) → 셀 ws["B2"].value · ws.cell(row=2, column=3)(행·열은 1부터). 열 글자 ↔ 번호 get_column_letter(3) == "C" · column_index_from_string("E") == 5 (openpyxl.utils). 범위 ws["A1:C3"] 은 줄마다 셀 튜플. 많은 줄은 ws.iter_rows(min_row=2, values_only=True) 로 값 튜플, 머리줄 [c.value for c in ws[1]] 과 dict(zip(header, row)) 로 이름으로 꺼내기. 읽은 값: 숫자 int/float · 글자 str · 날짜는 datetime(날짜만이어도 00:00 이 붙음, .date()) · 빈 칸 None. 함정: ws.max_row · max_column 은 서식만 있는 빈 칸까지, 빈 칸을 읽기만 해도 칸이 생겨 늘어남 → any(v is not None for v in row) 로 거르기. 병합 칸은 왼쪽 위에만 값, 나머지는 MergedCell(값 None, 쓰면 AttributeError), ws.merged_cells.ranges. 날짜가 46270 같은 숫자면 openpyxl.utils.datetime.from_excel(46270) == datetime(2026, 9, 5). .xls(옛 형식) · .csv 는 InvalidFileException. 큰 파일은 load_workbook(…, read_only=True) — iter_rows 로 차례로 읽기만, 저장 ✗(TypeError), merged_cells 없음, 끝나면 wb.close().',
   terms: { '통합 문서': '엑셀 파일 하나(.xlsx). 안에 시트가 여러 장 들어 있어요 — openpyxl 의 Workbook', '시트': '통합 문서 안의 표 한 장. 엑셀 아래쪽 탭에 이름이 보여요 — openpyxl 의 Worksheet', '셀': '시트의 칸 하나. B2 처럼 열 글자 + 행 번호로 불러요 — openpyxl 의 Cell', '병합 칸': '여러 칸을 하나로 합친 칸. 값은 왼쪽 위 칸에만 있고, 나머지는 openpyxl 에서 MergedCell 이에요' },
   pages: [
-    { title: 'load_workbook · wb.sheetnames · wb["7월"]', html: `<p>[[레슨:F6]] 까지는 글자 파일(JSON)을 다뤘어요. 이번 챕터는 엑셀 파일(.xlsx)이에요. 엑셀 파일은 글자 파일이 아니라서 <code>open()</code> 으로 읽으면 알 수 없는 기호만 나와요. 그래서 시작하기 1 에서 깐 <b>openpyxl</b> 을 써요.</p>
+    { title: 'load_workbook · wb.sheetnames · wb["7월"]', html: `<p>챕터 1([[레슨:F1]] ~ [[레슨:FB1]])은 글자 파일(JSON)이었어요. 이번 챕터는 엑셀 파일(.xlsx)이에요. 엑셀 파일은 글자 파일이 아니라서 <code>open()</code> 으로 읽으면 알 수 없는 기호만 나와요. 그래서 시작하기 1 에서 깐 <b>openpyxl</b> 을 써요.</p>
 <p>엑셀 파일 하나를 [[통합 문서]], 그 안의 표 한 장을 [[시트]], 칸 하나를 [[셀]] 이라고 해요. openpyxl 도 이 세 겹 그대로예요.</p>
 <table class="kb"><tbody><tr><th>엑셀</th><th>openpyxl</th><th>꺼내는 코드</th></tr><tr><td>통합 문서</td><td><code>Workbook</code></td><td><code>wb = load_workbook("빵집_매출.xlsx")</code></td></tr><tr><td>시트</td><td><code>Worksheet</code></td><td><code>wb["7월"]</code> · <code>wb.active</code>(저장할 때 열려 있던 시트)</td></tr><tr><td>셀</td><td><code>Cell</code></td><td><code>ws["B2"]</code> → 값은 <code>.value</code></td></tr></tbody></table>
 <pre>from openpyxl import load_workbook
@@ -724,7 +724,7 @@ print("케이크", len(cakes), "줄:", cakes)`, prep: [SAMPLES_PREP] } },
 <pre>rows = [r for r in ws.iter_rows(min_row=2, values_only=True)
         if any(v is not None for v in r)]</pre>
 <p><b>② [[병합 칸]]은 왼쪽 위에만 값이 있어요.</b> 엑셀에서 A1:C1 을 합쳐 제목을 달면, 값은 <code>A1</code> 에만 있고 <code>B1</code> · <code>C1</code> 은 <code>MergedCell</code> 이에요. 값은 <code>None</code> 이고, 거기에 쓰면 <code>AttributeError: 'MergedCell' object attribute 'value' is read-only</code>. 어디가 합쳐졌는지는 <code>ws.merged_cells.ranges</code> 에 있어요.</p>
-<p>예제는 이런 파일을 직접 흉내 내 만들어요. <code>ws.merge_cells("A1:C1")</code> 이 엑셀의 「병합하고 가운데 맞춤」 이고, <code>number_format</code> 한 줄은 「빈 칸에 서식만 있는」 모양을 만들려고 넣었어요(꾸미기는 [[레슨:F10]]). 진짜로는 카드사에서 받은 <code>가계부_카드내역.xlsx</code> 가 딱 이 모양이에요 — 1 · 2행이 병합 제목, 4행이 머리줄이에요.</p>`,
+<p>예제는 이런 파일을 직접 흉내 내 만들어요. 새 파일 <code>Workbook()</code> · 한 줄씩 붙이는 <code>ws.append([...])</code> · <code>wb.save()</code> 는 [[레슨:F8]] 에서 자세히 배워요. <code>ws.merge_cells("A1:C1")</code> 이 엑셀의 「병합하고 가운데 맞춤」 이고, <code>number_format</code> 한 줄은 「빈 칸에 서식만 있는」 모양을 만들려고 넣었어요(꾸미기는 [[레슨:F10]]). 진짜로는 카드사에서 받은 <code>가계부_카드내역.xlsx</code> 가 딱 이 모양이에요 — 1 · 2행이 병합 제목, 4행이 머리줄이에요.</p>`,
       example: { code: `from openpyxl import Workbook, load_workbook
 
 # 1) 함정이 든 파일 흉내 내기
@@ -1143,7 +1143,7 @@ except AttributeError as e:
     c.number_format = "#,##0"
 for c in ws["C"][1:]:                 # 머리줄은 빼고
     c.number_format = "0.0%"</pre>
-<ul><li><code>ws["B"]</code> 는 B 열의 칸들이에요. <code>[1:]</code> 로 머리줄을 빼요. 글자 칸(머리줄)에 숫자 모양을 줘도 아무 일 없어요</li><li>모양 안에 글자를 넣을 땐 큰따옴표로 감싸요: <code>'#,##0"원"'</code>. 파이썬 쪽은 작은따옴표로 감싸면 편해요</li><li>비율은 <code>0.358</code> 을 넣고 <code>"0.0%"</code> 로 보여요. <code>35.8</code> 을 넣으면 3580.0% 가 돼요</li><li>날짜를 넣으면 openpyxl 이 <code>"yyyy-mm-dd"</code> 를 알아서 줘요. 다시 읽으면 <code>datetime</code> 이에요(복습: [[레슨:F7]])</li></ul>
+<ul><li><code>ws["B"]</code> 는 B 열의 칸들이에요. <code>[1:]</code> 로 머리줄을 빼요. 글자 칸(머리줄)에 숫자 모양을 줘도 아무 일 없어요</li><li>모양 안에 글자를 넣을 땐 큰따옴표로 감싸요: <code>'#,##0"원"'</code>. 파이썬 쪽은 작은따옴표로 감싸면 편해요</li><li>비율은 <code>0.358</code> 을 넣고 <code>"0.0%"</code> 로 보여요. <code>35.8</code> 을 넣으면 3580.0% 가 돼요</li><li>날짜를 넣으면 openpyxl 이 <code>"yyyy-mm-dd"</code> 를 알아서 줘요. 다시 읽으면 <code>datetime</code> 이에요(복습: [[레슨:F8]])</li></ul>
 <div class="bk-warn"><b>f"{n:,}원" 글자를 넣지 마세요</b> — <code>"1,015,800원"</code> 은 숫자가 아니라 글자예요. 엑셀에서 왼쪽에 붙고, 더하기 · 정렬이 안 돼요. 카드사 파일이 이런 모양이라 다시 읽을 때 고생해요([[레슨:FB3]]). 값은 숫자로 넣고, 모양은 <code>number_format</code> 으로 줘요.</div>`,
       example: { code: `from datetime import date
 from openpyxl import Workbook, load_workbook
@@ -1230,7 +1230,7 @@ wb.save("차트.xlsx")
 print("그릴 값:", data)
 print("막대 이름:", cats)
 print("저장했어요: 차트.xlsx")` } },
-    { title: "zipfile 로 차트 확인 · 다시 읽어 찍기", html: `<p>이 코스의 습관이에요. <b>저장 → 다시 열어 찍기 → 엑셀에서 열어 눈으로 ☐</b>. 서식도 다시 읽으면 파이썬으로 확인할 수 있어요.</p>
+    { title: "zipfile 로 차트 확인 · 다시 읽어 찍기", html: `<p>복습: [[레슨:F8]] 에서 정한 이 교과서의 습관이에요. <b>저장 → 다시 열어 찍기 → 엑셀에서 열어 눈으로 ☐</b>. 서식도 다시 읽으면 파이썬으로 확인할 수 있어요.</p>
 <table class="kb"><tbody><tr><th>확인할 것</th><th>다시 읽어 찍기</th></tr>
 <tr><td>굵게 · 글자색</td><td><code>c.font.b</code> · <code>c.font.color.rgb</code></td></tr>
 <tr><td>칠하기</td><td><code>c.fill.fill_type</code> · <code>c.fill.fgColor.rgb</code></td></tr>
@@ -1284,7 +1284,7 @@ check("확인.xlsx")` } },
   ],
   summary: ["서식은 보이는 모양만 — c.font = Font(bold=True) · PatternFill(\"solid\", fgColor=…) 처럼 늘 새로 만들어 통째로 넣어요(\"solid\" 를 빼면 안 칠해져요)", "number_format(\"#,##0\" · \"0.0%\" · \"yyyy-mm-dd\")은 값을 그대로 두니 숫자는 숫자로 넣어요 — 보기는 column_dimensions · freeze_panes · auto_filter", "차트는 Reference(데이터는 머리줄부터 · 이름은 2행부터) + add_chart — 확인은 다시 읽어 찍기 + zip 목록의 xl/charts/chart1.xml, 겉모양은 엑셀에서 ☐"] },
 { id: 'F11', ch: 2, n: 11, title: "여러 시트 · 여러 파일 합치기", mode: 'text',
-  tutorSummary: "여러 시트 · 여러 파일을 한 표로. for ws in wb: 는 wb.sheetnames 순서로 시트를 준다 — it = ws.iter_rows(values_only=True), header = next(it), 나머지 줄은 dict(zip(header, row)) 에 rec[\"월\"] = ws.title 처럼 시트 이름을 값으로 더한다. 메모 시트는 if not ws.title.endswith(\"월\"): continue. 여러 파일: for p in sorted(Path(\"지점\").glob(\"*.xlsx\")):(glob 은 순서가 없어 sorted, p.stem 이 출처 이름, 하위 폴더까지는 rglob). Windows 에서 엑셀이 파일을 열고 있으면 같은 폴더에 숨은 잠금 파일 ~$강남.xlsx 가 생긴다(엑셀이 갑자기 꺼지면 남음) — 진짜 엑셀이 아니라 load_workbook 하면 zipfile.BadZipFile: File is not a zip file 이므로 p.name.startswith(\"~$\") 면 건너뛴다. 열 순서가 다른 파일(판교: 품목 · 날짜 · 수량 · 단가 · 분류)은 자리(row[3])로 꺼내면 엉뚱한 값이 들어가거나 TypeError — 머리줄 이름으로 맞춘다: COLUMNS 를 정하고 [rec.get(c) for c in COLUMNS], 머리줄 글자는 str(h).strip(). 빠진 열은 멈추지 말고 경고만 하고 None(엑셀에서 빈칸). 합친 결과는 새 통합 문서의 「전체」 시트에 맨 앞 「출처」 열과 함께, 요약은 wb.create_sheet(\"요약\", 0)(0 = 맨 앞). wb.active 는 「몇 번째 시트」 라서 맨 앞에 끼우면 끼운 시트가 처음 보인다. 요약의 합계는 파이썬이 계산한 값으로(수식이면 data_only 로도 None). pandas 로는 pd.read_excel(sheet_name=None) + pd.concat — 데이터 분석 교과서 P5.",
+  tutorSummary: "여러 시트 · 여러 파일을 한 표로. for ws in wb: 는 wb.sheetnames 순서로 시트를 준다 — it = ws.iter_rows(values_only=True), header = next(it), 나머지 줄은 dict(zip(header, row)) 에 rec[\"월\"] = ws.title 처럼 시트 이름을 값으로 더한다. 메모 시트는 if not ws.title.endswith(\"월\"): continue. 여러 파일: for p in sorted(Path(\"지점\").glob(\"*.xlsx\")):(glob 은 순서가 없어 sorted, p.stem 이 출처 이름, 하위 폴더까지는 rglob). Windows 에서 엑셀이 파일을 열고 있으면 같은 폴더에 숨은 잠금 파일 ~$강남.xlsx 가 생긴다(엑셀이 갑자기 꺼지면 남음) — 진짜 엑셀이 아니라 load_workbook 하면 zipfile.BadZipFile: File is not a zip file 이므로 p.name.startswith(\"~$\") 면 건너뛴다. 열 순서가 다른 파일(판교: 품목 · 날짜 · 수량 · 단가 · 분류)은 자리(row[3])로 꺼내면 엉뚱한 값이 들어가거나 TypeError — 머리줄 이름으로 맞춘다: COLUMNS 를 정하고 [rec.get(c) for c in COLUMNS], 머리줄 글자는 str(h).strip(). 빠진 열은 멈추지 말고 경고만 하고 None(엑셀에서 빈 칸). 합친 결과는 새 통합 문서의 「전체」 시트에 맨 앞 「출처」 열과 함께, 요약은 wb.create_sheet(\"요약\", 0)(0 = 맨 앞). wb.active 는 「몇 번째 시트」 라서 맨 앞에 끼우면 끼운 시트가 처음 보인다. 요약의 합계는 파이썬이 계산한 값으로(수식이면 data_only 로도 None). pandas 로는 pd.read_excel(sheet_name=None) + pd.concat — 데이터 분석 교과서 P5.",
   terms: {"출처": "합친 표에서 그 줄이 어느 파일 · 시트에서 왔는지 적어 둔 칸", "잠금 파일": "엑셀이 파일을 열고 있는 동안 같은 폴더에 만드는 숨은 파일(~$이름.xlsx). 진짜 엑셀 파일이 아니다"},
   pages: [
     { title: "for ws in wb: — 시트 이름을 「월」 칸으로", html: `<p>복습: [[레슨:F7]] 의 <code>iter_rows(values_only=True)</code> 와 <code>dict(zip(header, row))</code> 예요. 이번엔 시트 <b>여러 개</b>를 한 번에 읽어 한 표로 모아요. 빵집 파일처럼 「7월 · 8월 · 9월」 시트가 같은 모양일 때예요.</p>
@@ -1374,7 +1374,7 @@ def read_table(ws, source):
         rec = dict(zip(header, row))
         out.append([source] + [rec.get(c) for c in COLUMNS])
     return out</pre>
-<ul><li>내가 원하는 열 순서 <code>COLUMNS</code> 를 정해 두고, 줄마다 이름표(딕셔너리)를 만든 뒤 그 순서로 다시 줄 세워요. 파일의 열 순서와 상관없어져요</li><li><code>str(h).strip()</code> — 머리줄에 <code>" 수량 "</code> 처럼 빈칸이 붙어 오는 일이 흔해요</li><li>빠진 열에서 멈추지 말고 <b>경고</b>만 하고, <code>rec.get(c)</code> 로 <code>None</code>(엑셀에서 빈칸)을 넣어요. 어느 파일에 무엇이 빠졌는지 한 번에 보여요</li><li><code>COLUMNS</code> 에 없는 열(예: 「메모」)은 버려져요. 필요하면 그것도 알려 줘요</li></ul>`,
+<ul><li>내가 원하는 열 순서 <code>COLUMNS</code> 를 정해 두고, 줄마다 이름표(딕셔너리)를 만든 뒤 그 순서로 다시 줄 세워요. 파일의 열 순서와 상관없어져요</li><li><code>str(h).strip()</code> — 머리줄에 <code>" 수량 "</code> 처럼 빈칸이 붙어 오는 일이 흔해요</li><li>빠진 열에서 멈추지 말고 <b>경고</b>만 하고, <code>rec.get(c)</code> 로 <code>None</code>(엑셀에서 빈 칸)을 넣어요. 어느 파일에 무엇이 빠졌는지 한 번에 보여요</li><li><code>COLUMNS</code> 에 없는 열(예: 「메모」)은 버려져요. 필요하면 그것도 알려 줘요</li></ul>`,
       example: { code: `from openpyxl import Workbook
 
 COLUMNS = ["날짜", "품목", "분류", "단가", "수량"]
@@ -1422,7 +1422,7 @@ summary.append(["출처", "줄 수", "매출"])
 for r in summary_rows:
     summary.append(r)
 out.save("합친.xlsx")</pre>
-<ul><li><code>create_sheet(이름, 자리)</code> — 자리 <code>0</code> 은 맨 앞이에요. 빼면 맨 뒤예요</li><li>파일을 열면 처음 보이는 시트는 <code>wb.active</code> 예요. 「몇 번째 시트」 로 기억해서, 맨 앞에 끼우면 끼운 시트가 처음 보여요</li><li>요약의 합계는 파이썬이 계산한 값으로 써요. 수식으로 넣으면 다시 읽을 때 <code>data_only=True</code> 로도 <code>None</code> 이에요(복습: [[레슨:F9]])</li><li>출처 칸이 있으면 이상한 줄을 봤을 때 어느 파일을 열어 볼지 바로 알아요</li></ul>
+<ul><li><code>create_sheet(이름, 자리)</code> — 복습: [[레슨:F8]] 에서는 맨 뒤에 만든 뒤 <code>move_sheet</code> 로 옮겼어요. 둘째 인자로 자리를 주면 처음부터 그 자리에 끼워요. <code>0</code> 은 맨 앞, 빼면 맨 뒤예요</li><li>파일을 열면 처음 보이는 시트는 <code>wb.active</code> 예요. 「몇 번째 시트」 로 기억해서, 맨 앞에 끼우면 끼운 시트가 처음 보여요</li><li>요약의 합계는 파이썬이 계산한 값으로 써요. 수식으로 넣으면 다시 읽을 때 <code>data_only=True</code> 로도 <code>None</code> 이에요(복습: [[레슨:F9]])</li><li>출처 칸이 있으면 이상한 줄을 봤을 때 어느 파일을 열어 볼지 바로 알아요</li></ul>
 <p>pandas 로도 돼요 — <code>pd.read_excel(…, sheet_name=None)</code> 로 시트를 다 읽고 <code>pd.concat</code> 으로 이어요. <a href="../data/#lesson/P5" target="_blank" rel="noopener">데이터 분석 교과서 「합치기 merge · concat」 ↗</a></p>`,
       example: { code: `from openpyxl import Workbook, load_workbook
 
@@ -1455,7 +1455,7 @@ for row in wb["요약"].iter_rows(values_only=True):
     print(row)
 print("전체 시트 3행:", [c.value for c in wb["전체"][3]])` } },
   ],
-  summary: ["for ws in wb: 로 시트를 돌고, 합칠 땐 rec[\"월\"] = ws.title 처럼 시트 · 파일 이름을 칸으로 남겨요", "sorted(Path(\"지점\").glob(\"*.xlsx\")) 로 파일을 돌되 ~$ 잠금 파일은 이름만 보고 건너뛰어요(안 그러면 BadZipFile)", "열 순서는 믿지 말고 머리줄 이름으로 맞추고(빠진 열은 경고 + 빈칸), 결과는 「출처」 열 + create_sheet(\"요약\", 0)"] },
+  summary: ["for ws in wb: 로 시트를 돌고, 합칠 땐 rec[\"월\"] = ws.title 처럼 시트 · 파일 이름을 칸으로 남겨요", "sorted(Path(\"지점\").glob(\"*.xlsx\")) 로 파일을 돌되 ~$ 잠금 파일은 이름만 보고 건너뛰어요(안 그러면 BadZipFile)", "열 순서는 믿지 말고 머리줄 이름으로 맞추고(빠진 열은 경고 + 빈 칸), 결과는 「출처」 열 + create_sheet(\"요약\", 0)"] },
 { id: 'FB2', ch: 2, boss: true, title: "만들어 보기: 월별 매출 보고서", mode: 'text', pages: [], summary: [],
   tutorSummary: "챕터 2 만들어 보기. 빵집_매출.xlsx(시트 7월 · 8월 · 9월, 날짜 · 품목 · 분류 · 단가 · 수량 20줄씩, 매출 = 단가 × 수량)로 3분기 매출 보고서를 만든다. ① read_sales(path) — for ws in wb + dict(zip(header, row)) + 월 · 매출 칸, 월별 합계(7월 957,400 · 8월 864,900 · 9월 1,015,800 · 합계 2,838,100) ② 분류별 합계(빵 · 케이크 · 음료)와 비율, 품목 매출 TOP 3(딸기케이크 · 식빵 · 크루아상) ③ 매출_보고서.xlsx 「요약」 시트: 월 × 분류 표(값은 파이썬 계산) + 합계 열 =SUM(B2:D2) · 합계 줄 =SUM(B2:B4) 수식 + 머리줄 색 · #,##0 · 열 너비 · 틀 고정 B2, 다시 읽어 찍고 data_only=True 의 E5 는 None ④ 분류를 쌓은 월별 막대 차트(grouping stacked · overlap 100, G2), zip 목록의 xl/charts/chart1.xml 로 확인 ⑤ make_report(src, dst) 함수(report.py, if __name__ == \"__main__\")로 묶어 「요약」 + 「품목」(순위 · TOP 3 칠) 시트를 쓰고 결과 딕셔너리를 돌려줌, check_report 로 다시 읽어 시트 순서 · 수식 글자 · data_only None · 파이썬 합계 · TOP 3 · 차트 파일을 assert, 그리고 엑셀에서 열어 ☐(색 · 차트 · 수식 결과가 파이썬 합계와 같은지). 업무 자동화 교과서가 make_report 를 불러 쓴다." },
 { id: 'F12', ch: 3, n: 12, title: 'JSON ↔ CSV ↔ 엑셀', mode: 'text',
