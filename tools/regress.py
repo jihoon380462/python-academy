@@ -108,9 +108,10 @@ with sync_playwright() as p:
     check(not bad, '수학 교과서 레슨 45개 첫 그림 전부 그려짐 · 폰 390 가로 넘침 없음 (%s)' % (bad or 'OK'))
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); check(pg.inner_text('.tb-title')=='수학 도감' and pg.locator('.bk-dex-e').count()>=80 and pg.evaluate("document.documentElement.scrollWidth")<=390, '수학 도감: 식과 코드 80개 이상 · 폰 가로 넘침 없음')
     merr=errors[m0:]; check(not merr, '수학 교과서 pageerror 0 (%s)' % (merr[:2] or 'OK'))
-    pg.goto(HUB); pg.wait_for_timeout(600); check(pg.locator('.hub-spaces .hc').count()==7 and 'LLM 기초' in pg.locator('.hub-spaces').inner_text() and '어셈블리어' in pg.locator('.hub-spaces').inner_text() and '수학 공간' in pg.locator('.hub-spaces').inner_text() and 'Vim 에디터' in pg.locator('.hub-spaces').inner_text() and '리눅스' in pg.locator('.hub-spaces').inner_text() and '운영체제' in pg.locator('.hub-spaces').inner_text(), '허브: 「공용」 구역에 수학 공간 + Vim 에디터 + 리눅스 + 운영체제 + 어셈블리어 카드')
-    check('공용' in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')") and '공간 ' not in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')"), 'v2.11.0 사용자 「공간을 공용으로 변경」: 허브 구역 이름 「공용」')
-    check('코스 순서와 무관' not in pg.locator('.hub-spaces .hc').first.inner_text(), '허브 수학 카드 문구 중복 없음 (QA #12)')
+    pg.goto(HUB); pg.wait_for_timeout(600); hc=pg.evaluate("Object.fromEntries([...document.querySelectorAll('.hub-cat')].map(sec=>[sec.dataset.cat,[...sec.querySelectorAll('a.hc')].map(a=>a.getAttribute('href').split('/')[1])]))")
+    check(hc.get('start')==['python'] and hc.get('tools')==['terminal-git','github','vim','linux'] and hc.get('pyskill')==['debug','oop','algo'] and hc.get('webdev')==['web','api','sql'] and hc.get('data')==['math','data','ml','llm','ai'] and hc.get('deep')==['cs','os','asm'] and 'etc' not in hc and 'make' not in hc and sum(len(v) for v in hc.values())==19, 'v2.40.0 허브 분류: 처음 시작 · 개발 도구 · 파이썬 실력 · 웹과 서비스 · 데이터와 AI · 컴퓨터 깊이(빈 「만들기」 는 숨김 · 「기타」 없음 · 카드 19) (%s)' % hc)
+    hh=pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')"); check('처음 시작' in hh and '개발 도구' in hh and '컴퓨터 깊이' in hh and '공간 ' not in hh, 'v2.40.0 허브 분류 이름(옛 「코스 · 공용」 대신 목적별) (%s)' % hh[:120])
+    check('코스 순서와 무관' not in pg.locator('a.hc[href*="courses/math/"]').inner_text(), '허브 수학 카드 문구 중복 없음 (QA #12)')
     print('[모바일 390px]'); pg.set_viewport_size({'width':390,'height':800})
     pg.goto(HUB); pg.wait_for_timeout(500); check(pg.evaluate('document.documentElement.scrollWidth')<=390, '허브 가로 스크롤 없음'); pg.screenshot(path=SHOT+'/hub_m.png', full_page=True)
     # QA #159 (PR 무관): terminal-git 코스는 Py 가 없어도 열림
@@ -337,7 +338,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('lesson',{lessonId:'U8',page:4})"); pg.wait_for_timeout(300); ut=pg.evaluate("[...document.querySelectorAll('.bk-task')].map(x=>[x.innerText.includes('준비 명령'), !!x.querySelector('.bk-io')])"); check(len(ut)==2 and all(a and b for a,b in ut), 'U8 만들어 보기: 명령 문제 = 준비 명령 + 이렇게 나오면 성공 (bash 자동 검사) (%s)' % ut)
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','스냅샷'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=2 and pg.inner_text('.tb-title')=='리눅스 도감', '리눅스 도감: 스냅샷 검색')
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(200), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '리눅스 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',0),('U0',0),('U1',2),('U2',1),('U2',2),('U2',4),('U3',1),('U4',0),('UB1',0),('U5',1),('U8',1),('U8',4),('U9',1),('U10',1),('U12',2),('U13',1),('U13',2),('U14',1),('UB2',0),('UB3',0)] ]
-    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); lxc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/linux/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); lxc=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/linux/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
     check('읽은 레슨' in lxc and '/18' in lxc and '리눅스' in lxc, '허브 「공용」 칸에 리눅스 카드 · 읽은 레슨 n/18 (%s)' % lxc[-60:])
     xerr=errors[x0:]; check(not xerr, '리눅스 교과서 pageerror 0 (%s)' % (xerr[:2] or 'OK'))
     pg.set_viewport_size({'width':1280,'height':900}); aerr=errors[a0:]; check(not aerr, '알고리즘 교과서 pageerror 0 (%s)' % (aerr[:2] or 'OK'))
@@ -360,7 +361,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','fork'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=3 and pg.inner_text('.tb-title')=='운영체제 도감', '운영체제 도감: fork 검색')
     check(pg.evaluate("typeof Py==='undefined' || Py.phase==='idle' || !Py.phase"), '운영체제 교과서: 브라우저에서 파이썬 엔진을 받지 않음(실행은 우분투에서)')
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(200), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '운영체제 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',0),('K0',0),('K1',0),('K2',0),('K3',1),('K4',0),('K5',1),('K5',2),('K5',3),('KB1',0),('K6',1),('K9',0),('KB2',0),('K12',0),('KB3',0),('K14',2),('K16',1),('KB4',0)] ]
-    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); osc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/os/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); osc=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/os/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
     check('읽은 레슨' in osc and '/21' in osc and '운영체제' in osc, '허브 「공용」 칸에 운영체제 카드 · 읽은 레슨 n/21 (%s)' % osc[-60:])
     oerr=errors[o0:]; check(not oerr, '운영체제 교과서 pageerror 0 (%s)' % (oerr[:2] or 'OK'))
     # ===== [어셈블리어 교과서 v2.31.0] T10 — 우분투 VM 의 x86-64 NASM, 설계 specs/asm-course.md (사용자 「1」 11/7 · 레슨은 서브 에이전트 6개가 동시에, Opus 검수)
@@ -376,7 +377,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','mov'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=2 and pg.inner_text('.tb-title')=='어셈블리어 도감', '어셈블리어 도감: mov 검색')
     pg.set_viewport_size({'width':390,'height':800}); alp=[('SETUP',0),('SETUP',1)]+[(l, p) for l, p in pg.evaluate("LESSONS.flatMap(l=>{ const n=(BOOK.lessonPages&&BOOK.lessonPages[l.id]||l.pages||[]).length; return Array.from({length:n+1},(_,i)=>[l.id,i]); })")]
     for lp in alp: pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp); pg.wait_for_timeout(120); check(pg.evaluate("document.documentElement.scrollWidth")<=390, '어셈블리어 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)
-    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); asc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/asm/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); asc=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/asm/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
     check('읽은 레슨' in asc and '/21' in asc and '어셈블리어' in asc, '허브 「공용」 칸에 어셈블리어 카드 · 읽은 레슨 n/21 (%s)' % asc[-60:])
     aerr=errors[a0:]; check(not aerr, '어셈블리어 교과서 pageerror 0 (%s)' % (aerr[:2] or 'OK'))
     # ===== [CS 교과서 v2.32.0] — 설계 specs/cs-course.md (사용자 「1번진행」 11/7 · 레슨은 서브 에이전트가 동시에, Opus 검수)
@@ -390,7 +391,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','encode'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=1 and pg.inner_text('.tb-title')=='CS 도감', 'CS 도감: encode 검색')
     pg.set_viewport_size({'width':390,'height':800}); zlp=[('SETUP',i) for i in range(1)]+[(l, p) for l, p in pg.evaluate("LESSONS.flatMap(l=>{ const n=(BOOK.lessonPages&&BOOK.lessonPages[l.id]||l.pages||[]).length; return Array.from({length:n+1},(_,i)=>[l.id,i]); })")]
     for lp in zlp: pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp); pg.wait_for_timeout(120); check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'CS 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)
-    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); zc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/cs/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); zc=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/cs/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
     check('읽은 레슨' in zc and '/23' in zc, '허브 「공용」 칸에 CS 카드 · 읽은 레슨 n/23 (%s)' % zc[-60:])
     zerr=errors[z0:]; check(not zerr, 'CS 교과서 pageerror 0 (%s)' % (zerr[:2] or 'OK'))
     # ===== [LLM 기초 교과서 v2.32.0] — 설계 specs/llm-course.md (사용자 「1번진행」 11/7 · 레슨은 서브 에이전트가 동시에, Opus 검수)
@@ -404,7 +405,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); pg.fill('#dexQ','softmax'); pg.wait_for_timeout(400); check(pg.locator('.bk-dex-e').count()>=1 and pg.inner_text('.tb-title')=='LLM 도감', 'LLM 도감: softmax 검색')
     pg.set_viewport_size({'width':390,'height':800}); zlp=[('SETUP',i) for i in range(2)]+[(l, p) for l, p in pg.evaluate("LESSONS.flatMap(l=>{ const n=(BOOK.lessonPages&&BOOK.lessonPages[l.id]||l.pages||[]).length; return Array.from({length:n+1},(_,i)=>[l.id,i]); })")]
     for lp in zlp: pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp); pg.wait_for_timeout(120); check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'LLM 기초 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)
-    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); zc=pg.evaluate("(()=>{ const a=document.querySelector('.hub-spaces a.hc[href*=\"courses/llm/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
+    pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); zc=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/llm/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
     check('읽은 레슨' in zc and '/20' in zc, '허브 「공용」 칸에 LLM 기초 카드 · 읽은 레슨 n/20 (%s)' % zc[-60:])
     zerr=errors[z0:]; check(not zerr, 'LLM 기초 교과서 pageerror 0 (%s)' % (zerr[:2] or 'OK'))
     # ===== [디버깅·테스트 교과서 v2.33.0] — 설계 specs/courses-t3-t7.md (사용자 「1」 → T3~T7 전부 11/7 · 레슨은 서브 에이전트가 동시에, Opus 검수)

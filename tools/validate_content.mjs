@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // tools/validate_content.mjs — 배포 전 게이트 1. 콘텐츠 스키마·id 중복·힌트 수·태그·테스트·레슨 참조·?v= 버전 일치 검사. 에러가 하나라도 있으면 exit 1.
+import vm from 'vm';
 import fs from 'node:fs'; import path from 'node:path';
 import { ROOT, courses, loadCourse } from './load_content.mjs';
 const errors = [], warns = [];
@@ -10,7 +11,12 @@ for (const id of courses()) {
   const c = loadCourse(id); const lessonIds = new Set(); const pids = new Set();
   if (!c.meta.id || c.meta.id !== id) err(`${id}: course.json의 id가 폴더 이름과 달라요`);
   for (const l of c.LESSONS) { if (lessonIds.has(l.id)) err(`${id}: 레슨 id 중복 ${l.id}`); lessonIds.add(l.id); if (!l.title) err(`${id}: 레슨 ${l.id} 제목 없음`); if (!l.boss && !l.draft && !(l.pages && l.pages.length)) err(`${id}: 레슨 ${l.id} 페이지 없음`); /* v2.7.0: draft 레슨(뼈대)은 본문 없어도 됨 */ }
-  if (c.LESSONS.some(l => l.draft)) warn(`${id}: 준비 중(draft) 레슨 ${c.LESSONS.filter(l => l.draft).length}개 — 본문을 채우면 draft 를 지우세요`);
+  { /* v2.40.0: 화면(ui-views-book.js ready())과 같은 기준 — draft 여도 book.js 의 lessonPages · tasks 에 내용이 있으면 열린 레슨(웹 교과서가 이 방식이라 「준비 중 33」 경고가 늘 잘못 떴음) */
+    const bk = path.join(ROOT, 'courses', id, 'book.js'); const bs = fs.existsSync(bk) ? fs.readFileSync(bk, 'utf8') : '';
+    let BK = {}; try { const cx = { window: {}, console }; vm.createContext(cx); vm.runInContext(bs.replace(/^(const|let) /gm, 'var ') + ';this.__B = typeof BOOK !== "undefined" ? BOOK : {};', cx); BK = cx.__B || {}; } catch (e) { BK = {}; }
+    const filled = (lid) => !!((BK.lessonPages || {})[lid]) || !!(((BK.tasks || {})[lid] || []).length);
+    const drafts = c.LESSONS.filter(l => l.draft && !filled(l.id));
+    if (drafts.length) warn(`${id}: 준비 중(draft) 레슨 ${drafts.length}개 — 본문을 채우면 draft 를 지우세요`); }
   for (const p of [...c.PROBLEMS, ...(c.DRILLS || [])]) {
     const where = `${id}/${p.id}`;
     if ((c.DRILLS || []).includes(p)) { if (p.type !== 'code') err(`${where}: 타자 연습(DRILLS)은 type 'code' 만`); if (!(p.tests && p.tests.length >= 2)) err(`${where}: 타자 연습 테스트 2개 이상`); if (p.boss || p.project) err(`${where}: 타자 연습에 boss/project 불가`); }
