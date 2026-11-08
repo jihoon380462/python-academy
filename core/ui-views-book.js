@@ -161,7 +161,7 @@
   };
   // ---------- 파이썬 문법 도감 (v2.9.4 사용자 「문법을 숨길 필요 없잖아, 어차피 실전은 전부 오픈북이니까. 파이썬 문법 도감 만들어」) ----------
   // 항목 = 코드가 있는 레슨 쪽 하나. 이름 = 쪽 제목(BOOK.titles 적용), 설명 = 본문 첫 문단, 예제 = 본문 첫 코드 상자(없으면 예제 코드). 레슨을 고치면 도감도 같이 바뀜.
-  const deHtml = (h) => String(h || '').replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '').replace(/\[\[레슨:([A-Za-z0-9_]+)\]\]/g, (m, id) => { const l = Content.lessonMap && Content.lessonMap[id]; return l ? `레슨 ${l.n}` : '레슨'; }).replace(/\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g, '$1').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#92;/g, '\\').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&');
+  const deHtml = (h) => String(h || '').replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '').replace(/\[\[레슨:([A-Za-z0-9_]+)\]\]/g, (m, id) => { const l = Content.lessonMap && Content.lessonMap[id]; return l ? (l.n != null ? `레슨 ${l.n}` : `「${l.title}」`) : '레슨'; }).replace(/\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g, '$1').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#92;/g, '\\').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&');
   let _dex = null;
   const dexEntries = () => {
     if (_dex) return _dex; _dex = [];
