@@ -23,7 +23,7 @@
 2. **챕터 하나씩 읽기** — 챕터 0 → 11 차례로. 레슨의 모든 쪽 → 만들어 보기 → 예시 답 순서로 읽어요.
    - 아래 3절 점검표로 봐요.
    - 폰 캡처(`/tmp/qa_m/python/`)를 같이 눈으로 봐요.
-3. **찾으면 그 자리에서 고치기** — 미루지 않아요(5절).
+3. **찾은 것은 고치지 않고 보고서에 적기** — `qa-reports/<날짜>-python/README.md`. 항목마다 레슨 id · 쪽 · 무엇이 문제인지 · 근거(실행 결과 · 원문) · 확인 정도(직접 확인 / 의심)를 적어요. 고치기는 개발 방이 해요.
 4. **챕터마다 짧게 보고** — 한국어로, 진행률 % 와 함께.
 
 ## 3. 점검표 (11/8 실제로 나온 실수에서 뽑음)
@@ -55,7 +55,10 @@ with sync_playwright() as p:
 
 레슨 id ↔ 화면 번호 표: `node -e "const vm=require('vm'),fs=require('fs');const x={};vm.createContext(x);vm.runInContext(fs.readFileSync('courses/python/content.js','utf8').replace(/^const (\w+)/mg,'var \$1'),x);x.LESSONS.forEach(l=>console.log(l.id,l.n,l.title))"`
 
-## 5. 고칠 때 지킬 것
+## 5. 고칠 때 지킬 것 (개발 방)
+
+QA 방은 교과서를 고치지 않아요. 아래는 보고서를 받아 **개발 방이 고칠 때** 지킬 것이에요. QA 방은 보고서 파일만 PR 로 올려요.
+
 
 - **쪽을 더하거나 지우거나 순서를 바꾸지 마요.** 쪽 번호가 바뀌면 「필요한 코드」 칩이 깨져요. 새 쪽이 꼭 필요하면 레슨 **맨 끝**에만.
 - 본문은 `courses/python/content.js` 의 JS 템플릿 글자 안이에요. 백틱 · `${` 금지. 화면에 `\n` 글자를 보이려면 `\\n`.
