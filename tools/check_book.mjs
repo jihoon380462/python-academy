@@ -125,7 +125,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
   for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const m = ent(bookPage(l.id, i).html).match(/.{0,20}몸풀기.{0,20}/); if (m) bad(`${l.id}/${i}: 옛 이름 「몸풀기」 「${m[0]}」`); });
   // ⑰ v2.43.3: 본문 html 에 태그가 아닌 「<」 가 &lt; 없이 들어감 — 화면은 멀쩡해 보여도 문법 도감 · 검사가 태그를 지울 때 「< 60 … >」 가 통째로 사라짐(파이썬 L18B/5 any · all 이 도감에서 `s = 50` 으로 보였던 것)
   for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const h = bookPage(l.id, i).html; const m = /<(?![a-zA-Z\/!])/.exec(h); if (m) bad(`${l.id}/${i}: html 에 「<」 가 &lt; 없이 있어요 「${h.slice(Math.max(0, m.index - 20), m.index + 20)}」 — 문법 도감에서 글이 지워져요`); });
-  // ⑯ v2.43.3: 「필요한 문법」 칩 코드에서 여러 문장을 공백 두세 칸으로 한 줄에 이음 — 칩은 white-space:pre-wrap 이라 \n 이 줄바꿈. 한 줄로 치면 SyntaxError 인 모양(파이썬 QA 패턴 1, 교과서 12개 547곳)
+  // ⑯ v2.43.3: 「필요한 문법」 칩 코드에서 여러 문장을 공백 두세 칸으로 한 줄에 이음 — 칩은 white-space:pre-wrap 이라 \n 이 줄바꿈. 한 줄로 치면 SyntaxError 인 모양(파이썬 QA 패턴 1, 교과서 12개 528곳)
   //    따옴표 안 공백 · 뒤에 붙인 「# 주석」 · 「(설명)」 은 괜찮음. 기호만 늘어놓은 것은 「 · 」 로
   for (const [lid, ts] of Object.entries(BOOK.tasks || {})) (ts || []).forEach((t, ti) => (t.needs || []).forEach(([syn]) => { const x = String(syn).replace(/"""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*'/g, '""'); if (/\S {2,}(?![#(;\s])\S/.test(x)) bad(`${lid}#${ti + 1} ${t.title}: 필요한 문법 「${syn}」 이 여러 문장을 공백으로 한 줄에 이었어요 — 문장 사이는 \\n(줄바꿈)으로`); }));
   // ⑩ Vim 교과서: 본문·예제에 나오는 「:명령」 을 진짜 vim(교과서 기본 _vimrc)에서 하나씩 실행해 「없는 명령(E492)·없는 설정(E518)·잘못된 값(E474)·뒤에 남은 글자(E488)」 가 안 나는지. 끝내기(:q …)·플러그인 명령·한글 자리표시(:e 파일)는 건너뜀 v2.15.4

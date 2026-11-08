@@ -413,7 +413,7 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .bk-nav{display:flex;justify-content:space-between;gap:10px;margin-top:26px}.bk-nav .btn{min-height:46px;flex:1;max-width:260px}
 .bk-step-box{border-left:3px solid var(--primary);padding:6px 0 6px 14px;margin:12px 0}
 .bk-warn{border-left:3px solid var(--gold);padding:6px 0 6px 14px;margin:12px 0}
-.bk-art kbd{font-family:var(--mono);font-size:max(12px,.88em);padding:1px 6px;border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;background:var(--surface2)}
+.bk-art kbd{font-family:var(--mono);font-size:max(13px,.88em);padding:1px 6px;border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;background:var(--surface2)}
 .bk-copy{white-space:nowrap;flex:none}.btn.xs.bk-copy{font-size:12.5px} /* v2.22.1 PC QA: 📋 복사 글자 10.9px → 읽기 쉽게 */.bk-code-h span{min-width:0}.bk-step-box pre,.bk-warn pre{margin:8px 0}
 .bk-needs{flex-direction:column;align-items:stretch;gap:6px}.bk-needs .lbl{margin:0 0 2px}
 .bk-need{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font:inherit;text-align:left;cursor:pointer}.bk-need:hover{border-color:var(--primary)}
