@@ -5,12 +5,20 @@ const Hub = {
   // 「읽은 레슨 n/m」 — 읽음 표시는 코스 조각의 lessons[레슨id].read (시작하기 SETUP_n 은 빼고)
   bookProgress(c) { const ls = (c.id === Store.course ? Store.data.lessons : Store.courseData(c.id).lessons) || {}; const pat = new RegExp((CONFIG.COURSE_ID_PATTERNS || {})[c.id] || '^$'); const read = Math.min(c.lessons || 0, Object.keys(ls).filter(k => ls[k] && ls[k].read && pat.test(k)).length); return { read, total: c.lessons || 0, pct: c.lessons ? Math.round(100 * read / c.lessons) : 0 }; },
   ring(pct, color) { const r = 26, C = 2 * Math.PI * r; return `<svg class="ring" viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="7"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct / 100)}" transform="rotate(-90 32 32)"/><text x="32" y="36" text-anchor="middle" font-size="14" font-weight="800" fill="var(--text)">${pct}%</text></svg>`; },
+  // v2.40.0: CONFIG.CATEGORIES 대로 묶기(묶음 안은 적힌 순서). 어느 묶음에도 없는 코스는 맨 끝 「기타」, 빈 묶음은 안 보임
+  categories() {
+    const byId = Object.fromEntries(CONFIG.COURSES.map(c => [c.id, c])); const seen = new Set();
+    const out = (CONFIG.CATEGORIES || []).map(g => ({ ...g, list: g.courses.map(id => byId[id]).filter(Boolean).filter(c => (seen.add(c.id), true)) }));
+    const rest = CONFIG.COURSES.filter(c => !seen.has(c.id));
+    if (rest.length) out.push({ id: 'etc', icon: '📦', name: '기타', sub: '', list: rest });
+    return out.filter(g => g.list.length);
+  },
   render() {
     const d = Store.data; const py = CONFIG.COURSES.find(c => c.id === 'python');
     const last = d.last && d.last.course ? d.last : null; const lastCourse = last ? CONFIG.COURSES.find(c => c.id === last.course && c.ready) : null;
     const contCourse = lastCourse || py; const contHash = lastCourse && last.params && last.params.lessonId ? `lesson/${last.params.lessonId}` : '';
     const contLabel = lastCourse ? `${esc(lastCourse.name)} 교과서 이어서 읽기` : `${esc(py.name)} 교과서부터 시작하기`;
-    const books = CONFIG.COURSES.filter(c => c.ready && c.book).sort((a, b) => !!a.space - !!b.space).map(c => esc(c.short || c.name)).join('·');
+    const cats = this.categories(); const books = cats.flatMap(g => g.list).filter(c => c.ready && c.book).map(c => esc(c.short || c.name)).join('·');
     /* v2.17.1: 안내 문구는 COURSES 에서 만든다(코스가 늘어도 빠지지 않게). GitHub 교과서는 내 GitHub 계정을 쓰므로 「계정 필요 없음」 은 빼고 「사이트 가입 없음」 */
     const lead = `📖 교과서 코스(${books})는 설명을 읽고 내 컴퓨터에서 직접 만들어 봐요 — VS Code·Git Bash·DB Browser·Vim, GitHub 는 내 계정으로. 채점·점수·잠금 없이 필요한 곳부터 펴 보면 돼요. 사이트 가입은 필요 없어요.`;
     $('#topbar').innerHTML = `<div class="tb-title"><span class="tb-brand">${esc(T.appName)}</span></div>
@@ -20,9 +28,7 @@ const Hub = {
       <div class="card hub-today"><div class="card-h">이어서 하기</div>
         <a class="btn primary big hub-cont" href="${this.courseUrl(contCourse, contHash)}">▶ ${contLabel}</a>
       </div>
-      <h2 class="hub-h">코스</h2>
-      <div class="hub-courses">${CONFIG.COURSES.filter(c => !c.space).map(c => this.courseCard(c)).join('')}</div>
-      ${CONFIG.COURSES.some(c => c.space) ? `<h2 class="hub-h">공용 <small class="muted">코스 순서와 무관 — 언제든</small></h2><div class="hub-courses hub-spaces">${CONFIG.COURSES.filter(c => c.space).map(c => this.courseCard(c)).join('')}</div>` : ''}
+      ${cats.map(g => `<section class="hub-cat" data-cat="${g.id}"><h2 class="hub-h">${g.icon} ${esc(g.name)} <small class="muted">${esc(g.sub)}</small></h2><div class="hub-courses">${g.list.map(c => this.courseCard(c)).join('')}</div></section>`).join('')}
       <div class="muted small center hub-foot">${T.appName} v${CONFIG.APP_VERSION} · <b>완전 무료</b> · 사이트 가입 없음 · 진행은 내 기기에만 저장(설정에서 백업·기기 연동) · 한 번 연 뒤엔 오프라인도 OK</div>
     </div>`;
   },
