@@ -4,7 +4,7 @@
 //   사용: node tools/check_nesting.mjs            → 파이썬·알고 모두 검사, 하나라도 있으면 exit 1 (CI 게이트)
 //         node tools/check_nesting.mjs python list → 그 코스의 걸린 줄 목록
 import fs from 'node:fs'; import vm from 'node:vm';
-const courses = process.argv[2] ? [process.argv[2]] : ['python', 'algo', 'files', 'debug', 'data', 'oop', 'ml', 'ai', 'cs', 'llm', 'api', 'os']; let total = 0; // v2.41.0 파이썬 계열 교과서 전부(전엔 python · algo 만 봐서 다른 교과서에 181줄이 쌓였음)
+const courses = process.argv[2] ? [process.argv[2]] : ['python', 'algo', 'files', 'debug', 'data', 'oop', 'ml', 'ai', 'cs', 'llm', 'api', 'os', 'auto']; let total = 0; // v2.41.0 파이썬 계열 교과서 전부(전엔 python · algo 만 봐서 다른 교과서에 181줄이 쌓였음)
 for (const course of courses) {
   const ctx = { window: {}, console }; vm.createContext(ctx);
 vm.runInContext((fs.existsSync(`courses/${course}/datasets.js`) ? fs.readFileSync(`courses/${course}/datasets.js`, 'utf8') + '\n' : '') /* v2.41.0 */ + fs.readFileSync(`courses/${course}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var '), ctx);

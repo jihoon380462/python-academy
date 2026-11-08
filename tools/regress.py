@@ -54,7 +54,7 @@ with sync_playwright() as p:
     check(r['works']==1 and r['chats']==1 and r['bestT']==42 and r['checkup']==80, '작품·선생님 대화·타임어택·체크업 보존')
     check(r['apiKey']=='sk-ant-test' and r['theme']=='light' and r['focus'] is True, '설정(API 키·테마·집중 모드) 보존')
     check(r['sync'] is True, '기기 연동 설정 키 이전(academy.sync)')
-    check(r['cards']==20 and r['ready']==20, f"코스 카드 20개, 열린 것 20개 = 전부(v2.41.0 데이터 파일 다루기까지) (cards={r['cards']}, ready={r['ready']})")
+    check(r['cards']==21 and r['ready']==21, f"코스 카드 21개, 열린 것 21개 = 전부(v2.42.0 업무 자동화까지) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and r['cont'].rstrip('/').endswith('courses/python'), '이어서 하기 링크(아직 본 레슨이 없으면 파이썬 교과서 목차, v2.19.0): '+str(r['cont']))
     check('이어서 하기' in (r['today'] or '') and r['stats']==0 and '오늘의 도전' not in (r['today'] or ''), '이어서 하기 상자(v2.17.1: 문제집 코스(수학)를 시작하기 전엔 「오늘 n/5 문제·복습」 줄 없음): '+(r['today'] or '').replace('\n',' '))
     # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
@@ -68,7 +68,7 @@ with sync_playwright() as p:
     print('[N13 v2.19.0 옛 화면 보관]'); n13=len(errors); MATH='file://'+os.path.join(ROOT,'courses/math/index.html')
     hubg=pg.evaluate("({lessons:typeof LESSONS, content:[...document.scripts].some(x=>/content\\.js/.test(x.src)), imgs:document.querySelectorAll('img').length})"); check(hubg['lessons']=='undefined' and not hubg['content'] and hubg['imgs']==0, '허브: 코스 콘텐츠·그림 없이 「읽은 레슨」 만 셈 (%s)' % hubg)
     OLDG=['Game','Grader','Sessions','Tutor','QuickKeys','Loader','Coach','TextEditor','Confetti','BADGES','Haptic','myMascot','Review','Onboarding']
-    for cid in ['python','algo','terminal-git','github','sql','web','vim','math','linux','os','asm','cs','llm','api','debug','data','oop','ml','ai','files']:
+    for cid in ['python','algo','terminal-git','github','sql','web','vim','math','linux','os','asm','cs','llm','api','debug','data','oop','ml','ai','files','auto']:
         pg.goto('file://'+os.path.join(ROOT,'courses/%s/index.html?classic=1' % cid)); pg.wait_for_timeout(700)
         cr=pg.evaluate("(g)=>({book:document.documentElement.classList.contains('book-mode'), home:!!document.querySelector('.bk-home'), old:g.filter(n=>typeof window[n]!=='undefined' || (()=>{ try { return eval('typeof '+n)!=='undefined'; } catch(e){ return false; } })()), arch:[...document.scripts].map(x=>x.src).filter(x=>/game|tutor|fx\\.js|ui-editors|ui-views-(main|more|shell|sql|web)|badges|runners\\/(shell|sql|web)/.test(x)), imgs:document.querySelectorAll('img').length})", OLDG)
         check(cr['book'] and cr['home'] and not cr['old'] and not cr['arch'] and cr['imgs']==0, '%s: ?classic=1 을 붙여도 교과서 목차 · 옛 화면 코드(Game·Grader·Tutor…)·옛 스크립트·그림 없음 (%s)' % (cid, {k:v for k,v in cr.items() if k in ('old','arch','imgs')}))
@@ -109,7 +109,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); check(pg.inner_text('.tb-title')=='수학 도감' and pg.locator('.bk-dex-e').count()>=80 and pg.evaluate("document.documentElement.scrollWidth")<=390, '수학 도감: 식과 코드 80개 이상 · 폰 가로 넘침 없음')
     merr=errors[m0:]; check(not merr, '수학 교과서 pageerror 0 (%s)' % (merr[:2] or 'OK'))
     pg.goto(HUB); pg.wait_for_timeout(600); hc=pg.evaluate("Object.fromEntries([...document.querySelectorAll('.hub-cat')].map(sec=>[sec.dataset.cat,[...sec.querySelectorAll('a.hc')].map(a=>a.getAttribute('href').split('/')[1])]))")
-    check(hc.get('start')==['python'] and hc.get('tools')==['terminal-git','github','vim','linux'] and hc.get('pyskill')==['debug','oop','algo'] and hc.get('webdev')==['web','api','sql'] and hc.get('data')==['math','data','ml','llm','ai'] and hc.get('deep')==['cs','os','asm'] and hc.get('make')==['files'] and 'etc' not in hc and sum(len(v) for v in hc.values())==20, 'v2.41.0 허브 분류: 처음 시작 · 개발 도구 · 파이썬 실력 · 파이썬으로 만들기(데이터 파일) · 웹과 서비스 · 데이터와 AI · 컴퓨터 깊이(「기타」 없음 · 카드 20) (%s)' % hc)
+    check(hc.get('start')==['python'] and hc.get('tools')==['terminal-git','github','vim','linux'] and hc.get('pyskill')==['debug','oop','algo'] and hc.get('webdev')==['web','api','sql'] and hc.get('data')==['math','data','ml','llm','ai'] and hc.get('deep')==['cs','os','asm'] and hc.get('make')==['files','auto'] and 'etc' not in hc and sum(len(v) for v in hc.values())==21, 'v2.42.0 허브 분류: 처음 시작 · 개발 도구 · 파이썬 실력 · 파이썬으로 만들기(데이터 파일 · 업무 자동화) · 웹과 서비스 · 데이터와 AI · 컴퓨터 깊이(「기타」 없음 · 카드 20) (%s)' % hc)
     hh=pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')"); check('처음 시작' in hh and '개발 도구' in hh and '컴퓨터 깊이' in hh and '공간 ' not in hh, 'v2.40.0 허브 분류 이름(옛 「코스 · 공용」 대신 목적별) (%s)' % hh[:120])
     check('코스 순서와 무관' not in pg.locator('a.hc[href*="courses/math/"]').inner_text(), '허브 수학 카드 문구 중복 없음 (QA #12)')
     print('[모바일 390px]'); pg.set_viewport_size({'width':390,'height':800})

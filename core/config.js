@@ -12,12 +12,12 @@ const CONFIG = {
     { id: 'start', icon: '🐍', name: '처음 시작', sub: '여기서부터 — 파이썬 하나로 프로그래밍의 기본을', courses: ['python'] },
     { id: 'tools', icon: '🧰', name: '개발 도구', sub: '어느 코스를 하든 같이 쓰는 도구 — 언제든', courses: ['terminal-git', 'github', 'vim', 'linux'] },
     { id: 'pyskill', icon: '💪', name: '파이썬 실력 키우기', sub: '파이썬 다음 — 버그 잡기 · 설계 · 알고리즘', courses: ['debug', 'oop', 'algo'] },
-    { id: 'make', icon: '🛠', name: '파이썬으로 만들기', sub: '데이터 파일 · 자동화 · 크롤링 · 게임(자동화부터는 만드는 중)', courses: ['files'] },
+    { id: 'make', icon: '🛠', name: '파이썬으로 만들기', sub: '데이터 파일 · 업무 자동화 · 크롤링 · 게임(크롤링부터는 만드는 중)', courses: ['files', 'auto'] },
     { id: 'webdev', icon: '🌐', name: '웹과 서비스', sub: '화면 · 서버 · API · 데이터베이스', courses: ['web', 'api', 'sql'] },
     { id: 'data', icon: '📊', name: '데이터와 AI', sub: '수학부터 데이터 분석 · 머신러닝 · 언어 모델까지', courses: ['math', 'data', 'ml', 'llm', 'ai'] },
     { id: 'deep', icon: '⚙️', name: '컴퓨터 깊이', sub: '컴퓨터가 실제로 어떻게 돌아가나 — 리눅스 다음', courses: ['cs', 'os', 'asm'] },
   ],
-  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+[A-Z]?([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', vim: '^(V|VB)\\d+(P\\d+)?$', github: '^(G|GB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+[A-Z]?(P\\d+)?$', api: '^(H|HB)\\d+(P\\d+)?$', linux: '^(U|UB)\\d+(P\\d+)?$', os: '^(K|KB)\\d+(P\\d+)?$', asm: '^(R|RB)\\d+(P\\d+)?$', cs: '^(C|CB)\\d+(P\\d+)?$', llm: '^(N|NB)\\d+(P\\d+)?$', debug: '^(D|DB)\\d+(P\\d+)?$', data: '^(P|PB)\\d+(P\\d+)?$', oop: '^(O|OB)\\d+(P\\d+)?$', ml: '^(I|IB)\\d+(P\\d+)?$', ai: '^(Z|ZB)\\d+(P\\d+)?$', files: '^(F|FB)\\d+(P\\d+)?$' },
+  COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+[A-Z]?([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', vim: '^(V|VB)\\d+(P\\d+)?$', github: '^(G|GB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+[A-Z]?(P\\d+)?$', api: '^(H|HB)\\d+(P\\d+)?$', linux: '^(U|UB)\\d+(P\\d+)?$', os: '^(K|KB)\\d+(P\\d+)?$', asm: '^(R|RB)\\d+(P\\d+)?$', cs: '^(C|CB)\\d+(P\\d+)?$', llm: '^(N|NB)\\d+(P\\d+)?$', debug: '^(D|DB)\\d+(P\\d+)?$', data: '^(P|PB)\\d+(P\\d+)?$', oop: '^(O|OB)\\d+(P\\d+)?$', ml: '^(I|IB)\\d+(P\\d+)?$', ai: '^(Z|ZB)\\d+(P\\d+)?$', files: '^(F|FB)\\d+(P\\d+)?$', auto: '^(J|JB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
     { id: 'python', short: '파이썬', name: '파이썬', icon: '🐍', desc: '문법 설명을 읽고 VS Code 에서 직접 만들어 보는 파이썬 교과서', path: 'courses/python/', color: '#2bb673', ready: true, lessons: 100, book: true /* v2.10.1: 교과서 코스 — 허브 카드는 문제 수 대신 「읽은 레슨」(lessons = 열린 레슨 수, check_book 이 맞는지 검사) */ },
     { id: 'algo', short: '알고리즘', name: '알고리즘·자료구조', icon: '🧭', desc: '그림으로 돌아가는 모습을 보며 읽고, VS Code 에서 직접 풀어 보는 알고리즘 교과서 — 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, lessons: 36, book: true, bookNote: '그림으로 보기 · 모의고사 15문제' /* v2.15.0 N5: 교과서 */ },
@@ -39,6 +39,7 @@ const CONFIG = {
     { id: 'ml', short: '머신러닝', name: 'AI·머신러닝 기초', icon: '🧠', desc: '선형 회귀 · 경사하강 · k-NN · 로지스틱 회귀 · 결정 트리 · 평가 지표 · k-평균을 numpy 와 scikit-learn 으로 직접 만드는 교과서', path: 'courses/ml/', color: '#00695c', ready: true, book: true, bookNote: '파이썬 다음 — numpy · scikit-learn', lessons: 16 /* v2.33.0 AI·머신러닝 기초 교과서 완성 — 16 전부 */ },
     { id: 'ai', short: 'AI 협업', name: 'AI와 협업', icon: '🤝', desc: '좋은 요청 · 단계 나누기 · AI 코드 검증 · 환각 알아보기 · 개인정보 · 저작권까지 AI 도구와 일하는 법을 익히는 교과서', path: 'courses/ai/', color: '#ad1457', ready: true, book: true, bookNote: '파이썬 다음 — AI 도구 잘 쓰기', lessons: 16 /* v2.33.0 AI와 협업 교과서 완성 — 16 전부 */ },
     { id: 'files', short: '데이터 파일', name: '데이터 파일 다루기', icon: '🗂️', desc: 'JSON · JSON Lines · TOML · 엑셀(openpyxl)을 파이썬으로 읽고 · 검사하고 · 바꾸고 · 보기 좋은 엑셀 보고서로 내보내는 교과서', path: 'courses/files/', color: '#2e7d32', ready: true, book: true, bookNote: '파이썬 다음 — JSON · 엑셀', lessons: 18 /* v2.41.0 데이터 파일 다루기 교과서 — 18 전부 */ },
+    { id: 'auto', short: '업무 자동화', name: '파이썬 업무 자동화', icon: '📎', desc: '파일 · 폴더 일괄 처리 · 백업 · 압축, PDF · 워드 문서, 템플릿과 이메일, 정해진 시간에 혼자 돌아가는 스크립트까지 내 사무 일을 파이썬으로 자동화하는 교과서', path: 'courses/auto/', color: '#6a1b9a', ready: true, book: true, bookNote: '파이썬 다음 — 사무 일 자동화', lessons: 0 /* v2.42.0 만드는 중 */ },
   ],
 
   // --- 외부 라이브러리 (버전 고정) ---
