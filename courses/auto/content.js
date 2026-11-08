@@ -11,15 +11,948 @@ const CHAPTERS = [
 ];
 const AUTO_TODO = (t) => [{ title: '준비 중', html: `<p>TODO: ${t}</p>` }]; // v2.42.0 뼈대
 const LESSONS = [
-{ id: 'J0', ch: 0, n: 0, title: '업무 자동화 첫걸음', mode: 'text', draft: true,
-  tutorSummary: '고를 일 · 안전 세 원칙 · 준비',
-  pages: AUTO_TODO('고를 일 · 안전 세 원칙 · 준비'), summary: ["고를 일", "안전 세 원칙", "준비"] },
-{ id: 'J1', ch: 1, n: 1, title: '이름 한꺼번에 바꾸기 · 날짜로 정리', mode: 'text', draft: true,
-  tutorSummary: '규칙 함수 · 충돌 검사 · 되돌리기',
-  pages: AUTO_TODO('규칙 함수 · 충돌 검사 · 되돌리기'), summary: ["규칙 함수", "충돌 검사", "되돌리기"] },
-{ id: 'J2', ch: 1, n: 2, title: '백업: 복사 · 비교 · 정리', mode: 'text', draft: true,
-  tutorSummary: 'copy2 · copytree · filecmp',
-  pages: AUTO_TODO('copy2 · copytree · filecmp'), summary: ["copy2", "copytree", "filecmp"] },
+{ id: 'J0', ch: 0, n: 0, title: '업무 자동화 첫걸음', mode: 'text',
+  tutorSummary: "코스 첫 레슨. 무대는 가상의 가게 「햇살 공방」 의 사무 일. 자동화할 일 고르기: 자주 · 규칙대로 · 오래 걸리는 일 — 시간은 곱해서(한 번 5분 × 주 5번 × 52주 = 1300분 ≈ 21시간, minutes * per_week * 52 // 60). 사람이 판단할 일(상담 · 사과 메일 · 금액 확인)은 남기고 프로그램은 모으기 · 정리 · 초안까지. 엑셀은 이 코스가 아니라 데이터 파일 다루기 교과서(F7 · F8), 표는 csv. 안전 세 원칙: ① 원본은 읽기만(파이썬이 지운 파일은 휴지통에 안 감) ② 결과는 새 폴더에(정리본/ · outbox/ · 백업/날짜/) ③ 미리 보기 먼저(dry run) — 파이썬 L27 · X7(--dry-run 정리기)은 다시 가르치지 않고 링크, 연습은 tempfile.TemporaryDirectory() 임시 폴더 + p.name 만 출력, 원본을 바꿔야 하는 이름 바꾸기는 되돌리기 기록(J1). 준비: 가상 환경에 python -m pip install pypdf python-docx reportlab cryptography → pip list 로 확인, 설치 이름 python-docx ≠ import docx(pip install docx 는 옛 패키지), importlib.import_module(\"docx\") 는 이름을 글자로 받는 import(없으면 ModuleNotFoundError). 연습 재료 samples.py(시작하기 2)를 .py 파일과 같은 폴더에 — import 는 실행한 파일의 폴더에서 찾음, 아니면 No module named 'samples'. make_files(폴더) 는 다운로드 흉내 12개(~$ 임시 · Thumbs.db · 임시.tmp · 대문자 확장자 · 빈칸, 수정 시각 고정)를 만들고 이름 순 경로 리스트를 돌려줌. 프로그램의 기본 모양: main(argv=None, today=None) + argparse(위치 인자 src dst, --dry-run action=\"store_true\") + parse_args(argv) + today 가 None 이면 date.today()(시험은 today=date(2026, 11, 8)) + 없는 폴더면 stderr 안내 후 return 1 + plan() 으로 할 일 목록만 만들고 dry_run 이면 보여 주고 return 0, 아니면 실행하며 log.info + 맨 아래 if __name__ == \"__main__\": logging.basicConfig(filename=…) · sys.exit(main()). 예제는 쓸모 있는 파일만 결과/모음_2026-11-08 로 복사하는 collect.py.",
+  terms: { "미리 보기": "실제로 바꾸지 않고 무엇을 할지 목록만 보여 주는 실행. 영어로 dry run. 명령 줄 프로그램에서는 흔히 --dry-run 옵션이에요" },
+  pages: [
+    { title: "5분 × 5번 × 52주 = 21시간", html: `<p>파이썬 교과서를 다 배웠으면 이제 <b>내 일</b>에 써 볼 차례예요. 이 교과서의 무대는 가상의 작은 가게 「햇살 공방」 이에요. 공방의 사무 일 — 다운로드 폴더 정리 · 백업 · 청구서 PDF · 수료증 · 안내 메일 — 을 파이썬에게 맡겨요.</p>
+<p>무엇을 맡길지는 세 가지를 물어서 골라요.</p>
+<table class="kb"><tbody><tr><th>물음</th><th>그렇다는 뜻</th></tr><tr><td><b>자주</b> 하나요?</td><td>매일 · 매주 하는 일. 한 해에 한 번이면 손으로 해요</td></tr><tr><td><b>규칙대로</b> 하나요?</td><td>「빈칸은 _ 로」 「10월 청구서는 PDF 하나로」 처럼 규칙을 말로 적을 수 있어요</td></tr><tr><td><b>오래</b> 걸리나요?</td><td>한 번은 짧아도 쌓이면 길어요</td></tr></tbody></table>
+<p>걸리는 시간은 곱해서 세요. 한 번 5분 × 한 주 5번 × 52주면 1300분, 한 해에 <b>21시간</b>이 넘어요. 프로그램을 만드는 데 서너 시간이 들어도 남는 장사예요.</p>
+<pre>minutes = 5 * 5 * 52
+print(minutes)          # 1300
+print(minutes // 60)    # 21</pre>
+<div class="bk-warn"><b>사람이 판단할 일은 남겨 두기</b> — 수강 상담 전화, 거래처에 보낼 사과 메일, 「이 청구서 금액이 맞나?」 같은 일은 규칙으로 못 적어요. 프로그램은 <b>모으고 · 정리하고 · 초안을 만드는</b> 데까지 하고, 마지막 확인과 결정은 사람이 해요.</div>
+<p>이 교과서의 순서예요.</p>
+<table class="kb"><tbody><tr><th>챕터</th><th>공방의 일</th></tr><tr><td>1 파일 · 폴더</td><td>이름 한꺼번에 바꾸기 · 날짜 폴더로 정리 · 백업 · 압축</td></tr><tr><td>2 PDF · 워드</td><td>청구서에서 금액 꺼내기 · PDF 합치기 · 보고서 워드 만들기</td></tr><tr><td>3 템플릿 · 메일</td><td>명단으로 수료증과 안내 메일 대량 만들기 · 보내기</td></tr><tr><td>4 정해진 때에</td><td>월요일 9시에 사람 없이 혼자 돌기</td></tr></tbody></table>
+<p>엑셀 파일은 이 교과서에서 다루지 않아요. 엑셀을 읽고 쓰는 법은 <a href="../files/#lesson/F7" target="_blank" rel="noopener">데이터 파일 다루기 교과서 「엑셀 읽기: 통합 문서 · 시트 · 셀」 ↗</a> 에 있고, 여기서 표는 csv 로 주고받아요.</p>`,
+      example: { code: `jobs = [
+    # (일, 한 번에 걸리는 분, 한 주에 몇 번, 규칙대로 되나)
+    ("다운로드 폴더 정리", 5, 5, True),
+    ("청구서 PDF 모아 합치기", 20, 1, True),
+    ("수료증 만들어 메일 보내기", 4, 8, True),
+    ("수강 상담 전화", 10, 15, False),
+]
+
+for name, minutes, per_week, by_rule in jobs:
+    hours = minutes * per_week * 52 // 60
+    if by_rule:
+        verdict = "자동화 후보"
+    else:
+        verdict = "사람이 할 일"
+    print(f"{name}: 한 해 {hours}시간 → {verdict}")` } },
+    { title: "원본은 읽기만 · 새 폴더에 · 미리 보기 먼저", html: `<p>자동화 프로그램은 한 번에 파일 수십 개를 바꿔요. 실수도 수십 개가 한꺼번에 나요. 그래서 이 교과서의 모든 프로그램은 <b>안전 세 원칙</b>을 지켜요.</p>
+<table class="kb"><tbody><tr><th>원칙</th><th>왜 · 어떻게</th></tr><tr><td><b>① 원본은 읽기만</b></td><td>원본 파일은 열어 읽기만 하고 옮기거나 · 지우거나 · 덮어쓰지 않아요. 파이썬으로 지운 파일은 휴지통에 가지 않고 바로 사라져요</td></tr><tr><td><b>② 결과는 새 폴더에</b></td><td><code>정리본/</code> · <code>outbox/</code> · <code>백업/2026-11-08/</code> 처럼 새 폴더에 만들어요. 마음에 안 들면 그 폴더만 지우면 끝이에요</td></tr><tr><td><b>③ 미리 보기 먼저</b></td><td>무엇을 할지 목록부터 출력해서 눈으로 보고, 맞으면 그때 진짜로 해요([[미리 보기]], dry run)</td></tr></tbody></table>
+<p>복습: 파일 고르기 · 복사 · 옮기기 · 지우기와 <code>DRY_RUN</code> 변수는 <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리: pathlib · shutil」 ↗</a>, 그걸 <code>--dry-run</code> 옵션으로 만든 정리기는 <a href="../python/#lesson/X7" target="_blank" rel="noopener">파이썬 교과서 「실전 7: 다운로드 폴더 정리기」 ↗</a> 에서 이미 만들었어요. 이 교과서는 확장자별 정리를 다시 만들지 않고 그다음 — 이름 규칙 · 날짜별 정리 · 백업 — 으로 넘어가요.</p>
+<p>연습도 늘 <b>임시 폴더</b>에서 해요. <code>tempfile.TemporaryDirectory()</code> 안에 가짜 파일을 만들어 쓰고, with 를 나오면 폴더째 사라져요(복습: <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리: pathlib · shutil」 ↗</a> 첫 쪽). 경로는 실행할 때마다 달라서 출력에는 <code>p.name</code> 만 찍어요.</p>
+<div class="bk-warn"><b>원본을 바꿔야 하는 일은?</b> — 이름 바꾸기처럼 원본 자리에서 바꿔야 하는 일도 있어요. 그때는 미리 보기에 더해 <b>되돌리기 기록</b>을 남겨요([[레슨:J1]]).</div>`,
+      example: { code: `import shutil
+import tempfile
+from pathlib import Path
+from samples import make_files
+
+
+def is_junk(p):
+    return p.name.startswith("~$") or p.name == "Thumbs.db" or p.suffix.lower() == ".tmp"
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    src = base / "다운로드"
+    make_files(src)
+    before = sorted(p.name for p in src.iterdir())
+
+    # ③ 미리 보기 먼저: 할 일 목록만 만들어 보여 주기
+    todo = []
+    for p in sorted(src.iterdir()):
+        if not is_junk(p):
+            todo.append(p)
+    print("[미리 보기] 복사할 파일", len(todo), "개")
+    for p in todo:
+        print("  ", p.name)
+
+    # ② 결과는 새 폴더에
+    out = base / "정리본"
+    out.mkdir()
+    for p in todo:
+        shutil.copy(p, out)        # ① 원본은 읽기만 — 옮기지도 지우지도 않아요
+
+    after = sorted(p.name for p in src.iterdir())
+    made = sorted(out.iterdir())
+    print("원본 폴더 그대로:", before == after, len(after), "개")
+    print("정리본 폴더:", len(made), "개")`, prep: [SAMPLES_PREP] } },
+    { title: "pip list · make_files(tmp)", html: `<p>준비는 두 가지예요. 자세한 순서는 이 교과서 맨 앞 <b>시작하기 1 · 2</b> 에 있어요.</p>
+<p><b>① 패키지 넷.</b> 공부 폴더 <code>auto-study</code> 의 가상 환경을 켜고(복습: <a href="../python/#lesson/L16D" target="_blank" rel="noopener">파이썬 교과서 「pip 와 가상 환경」 ↗</a>) 한 번 깔아요. 다 깔렸는지는 <code>pip list</code> 로 봐요. 목록에 네 이름이 보이면 돼요(버전 숫자는 PC 마다 달라요).</p>
+<pre>python -m pip install pypdf python-docx reportlab cryptography
+python -m pip list</pre>
+<div class="bk-warn"><b>설치 이름 ≠ import 이름</b> — 워드 패키지는 <code>pip install python-docx</code> 로 깔고 코드에서는 <code>import docx</code> 예요. <code>pip install docx</code> 는 다른 옛 패키지라서 깔면 <code>import docx</code> 에서 에러가 나요. 잘못 깔았으면 <code>pip uninstall docx</code> 후 다시 깔아요.</div>
+<p>코드 안에서 확인할 수도 있어요. <code>importlib.import_module("docx")</code> 는 <code>import docx</code> 와 같은데, 모듈 이름을 <b>글자로</b> 받아서 반복문으로 여러 개를 차례로 불러 볼 수 있어요. 없으면 <code>ModuleNotFoundError</code> 예요(복습: <a href="../python/#lesson/L13" target="_blank" rel="noopener">파이썬 교과서 「예외 처리」 ↗</a>).</p>
+<pre>import importlib
+
+for module in ["pypdf", "docx", "reportlab", "cryptography"]:
+    try:
+        importlib.import_module(module)
+        print("OK", module)
+    except ModuleNotFoundError:
+        print("없음", module)</pre>
+<p><b>② 연습 재료 <code>samples.py</code>.</b> 시작하기 2 의 내용을 그대로 <code>samples.py</code> 로 저장해요. 예제와 문제는 내 진짜 파일 대신, <code>from samples import make_files</code> 로 불러 <b>임시 폴더 안에</b> 가짜 파일을 만들어 써요. 맨 먼저 쓸 <code>make_files(폴더)</code> 는 「다운로드」 폴더 흉내 파일 12개를 만들고, 만든 파일 경로를 이름 순 리스트로 돌려줘요. 사진 · 문서 사이에 워드 임시 파일 <code>~$견적서 최종.docx</code> · Windows 의 그림 미리 보기 파일 <code>Thumbs.db</code> · <code>임시.tmp</code>, 대문자 확장자 <code>.JPG</code> · <code>.PDF</code>, 이름에 빈칸이 섞여 있어요. 수정 시각도 2026년 10~11월로 고정돼 있어요.</p>
+<div class="bk-warn"><b>samples.py 는 .py 파일 옆에</b> — <code>import</code> 는 터미널의 현재 폴더가 아니라 <b>실행한 .py 파일이 있는 폴더</b>에서 찾아요. 다른 폴더에 두면 <code>ModuleNotFoundError: No module named 'samples'</code> 예요. 이 교과서의 .py 파일은 모두 <code>auto-study</code> 에, <code>samples.py</code> 와 나란히 만들어요. 실행한 파일이 있는 폴더는 <code>Path(__file__).parent</code> 예요(복습: <a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩」 ↗</a>) — <code>(Path(__file__).parent / "samples.py").exists()</code> 로 옆에 있는지 물을 수 있어요.</div>`,
+      example: { code: `import tempfile
+from samples import make_files
+
+with tempfile.TemporaryDirectory() as tmp:
+    files = make_files(tmp)          # 임시 폴더 안에 가짜 파일 12개
+    print(len(files), "개 만들었어요")
+    for p in files:
+        print(p.name)`, prep: [SAMPLES_PREP] } },
+    { title: "main(argv, today) · --dry-run", html: `<p>이 교과서의 프로그램은 모두 같은 모양이에요. 파이썬 교과서에서 배운 셋을 합친 모양이에요.</p>
+<ul><li><code>main(argv=None)</code> + argparse — 명령 줄에서도, 코드에서 <code>main(["원본", "결과", "--dry-run"])</code> 처럼 리스트로도 불러요(복습: <a href="../python/#lesson/L19B" target="_blank" rel="noopener">파이썬 교과서 「명령 줄 프로그램: sys.argv · argparse」 ↗</a>). <code>--dry-run</code> 처럼 값 없이 켜고 끄는 옵션은 <code>action="store_true"</code>(복습: <a href="../python/#lesson/X7" target="_blank" rel="noopener">파이썬 교과서 「실전 7: 다운로드 폴더 정리기」 ↗</a>)</li><li><code>return 0</code> · <code>return 1</code> 과 <code>sys.exit(main())</code> — 끝 코드. 에러 안내는 <code>file=sys.stderr</code>(복습: <a href="../python/#lesson/L19C" target="_blank" rel="noopener">파이썬 교과서 「명령 줄 프로그램 2: 하위 명령 · 끝 코드」 ↗</a>)</li><li><code>log.info(…)</code> — 한 일을 기록으로 남겨요(복습: <a href="../python/#lesson/L31" target="_blank" rel="noopener">파이썬 교과서 「logging 맛보기」 ↗</a>). 혼자 돌아가는 스크립트는 기록을 파일에 남기고 오래된 기록을 돌려 써요([[레슨:J12]])</li></ul>
+<p>새로 붙는 건 둘이에요.</p>
+<ul><li><b>계획과 실행 나누기</b> — <code>plan()</code> 은 할 일 목록만 만들고 아무것도 바꾸지 않아요. <code>--dry-run</code> 이면 그 목록을 보여 주고 끝, 아니면 목록대로 해요. 미리 보기와 진짜가 <b>같은 목록</b>을 써서, 본 그대로 돼요</li><li><b>오늘 날짜를 인자로</b> — <code>main(argv=None, today=None)</code>. 비어 있으면 <code>date.today()</code> 를 쓰고, 시험할 땐 <code>today=date(2026, 11, 8)</code> 을 넘겨요. 그래야 언제 돌려도 결과가 같아서 맞는지 확인할 수 있어요</li></ul>
+<pre>def main(argv=None, today=None):
+    parser = argparse.ArgumentParser(prog="collect")
+    parser.add_argument("src")
+    parser.add_argument("dst")
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args(argv)
+    if today is None:
+        today = date.today()
+    ...                      # 계획 → 미리 보기면 보여 주고 return 0 → 아니면 실행
+    return 0
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, filename="collect.log", encoding="utf-8",
+                        format="%(asctime)s %(levelname)s %(message)s")
+    sys.exit(main())</pre>
+<p>예제는 쓸모 있는 파일만 <code>결과/모음_2026-11-08/</code> 로 복사하는 <code>collect.py</code> 예요. 맨 아래의 진짜 시작 부분 대신, 임시 폴더에서 미리 보기 → 진짜 → 없는 폴더 순서로 <code>main</code> 을 불러 시험해요. 이 책 예제는 기록이 화면에 같이 보이게 <code>stream=sys.stdout</code> 으로 해 뒀어요.</p>`,
+      example: { code: `import argparse
+import logging
+import shutil
+import sys
+import tempfile
+from datetime import date
+from pathlib import Path
+from samples import make_files
+
+log = logging.getLogger("collect")
+
+
+def is_junk(p):
+    return p.name.startswith("~$") or p.name == "Thumbs.db" or p.suffix.lower() == ".tmp"
+
+
+def plan(src):
+    """할 일 목록만 만들어요 — 아무것도 바꾸지 않아요."""
+    todo = []
+    for p in sorted(src.iterdir()):
+        if p.is_file() and not is_junk(p):
+            todo.append(p)
+    return todo
+
+
+def main(argv=None, today=None):
+    parser = argparse.ArgumentParser(prog="collect")
+    parser.add_argument("src", help="원본 폴더(읽기만 해요)")
+    parser.add_argument("dst", help="결과를 둘 폴더")
+    parser.add_argument("--dry-run", action="store_true", help="복사하지 않고 미리 보기만")
+    args = parser.parse_args(argv)
+    if today is None:
+        today = date.today()
+    src = Path(args.src)
+    if not src.is_dir():
+        print(f"원본 폴더가 없어요: {args.src}", file=sys.stderr)
+        return 1
+    out = Path(args.dst) / f"모음_{today.isoformat()}"
+    todo = plan(src)
+    if args.dry_run:
+        for p in todo:
+            print("[미리 보기] 복사:", p.name)
+        print(f"미리 보기 끝 — {len(todo)}개를 {out.name} 에 복사할 거예요")
+        return 0
+    out.mkdir(parents=True, exist_ok=True)
+    for p in todo:
+        shutil.copy(p, out)
+        log.info("복사 %s", p.name)
+    print(f"{len(todo)}개를 {out.name} 에 복사했어요")
+    return 0
+
+
+# 연습: 임시 폴더에서 미리 보기 → 진짜 → 없는 폴더
+logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s", stream=sys.stdout)
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    make_files(base / "다운로드")
+    src = str(base / "다운로드")
+    dst = str(base / "결과")
+    day = date(2026, 11, 8)
+    code = main([src, dst, "--dry-run"], today=day)
+    print("끝 코드", code, "· 결과 폴더가 생겼나:", (base / "결과").exists())
+    code = main([src, dst], today=day)
+    print("끝 코드", code)
+    code = main([str(base / "없는폴더"), dst], today=day)
+    print("끝 코드", code)`, prep: [SAMPLES_PREP] } },
+  ],
+  summary: ["자동화할 일은 자주 · 규칙대로 · 오래 걸리는 일 — 한 번 5분 × 주 5번 × 52주 = 한 해 21시간, 사람이 판단할 일은 남겨요", "안전 세 원칙: 원본은 읽기만 · 결과는 새 폴더에 · 미리 보기 먼저 — 연습은 늘 임시 폴더에서, samples.py 의 make_files(tmp) 로 가짜 파일을 만들어요", "기본 모양은 main(argv=None, today=None) + argparse 의 --dry-run + plan() 으로 목록 먼저 + log.info + return 0 · 1 과 sys.exit(main())"] },
+{ id: 'J1', ch: 1, n: 1, title: '이름 한꺼번에 바꾸기 · 날짜로 정리', mode: 'text',
+  tutorSummary: "파이썬 L27(rename · shutil.move) · X7(확장자별 정리기)은 다시 가르치지 않고 링크. 규칙을 함수로: rule(p, i) 가 새 이름을 돌려줌 — 번호 f\"공방_{i:03}{p.suffix.lower()}\", 앞뒤 붙이기 f\"…{p.stem}…\", re.sub(r\"^IMG_\", \"사진_\", p.name). safe_name(text): re.sub(r'[<>:\"/\\\\|?*\\s]+', \"_\", text).strip(\"_\") — Windows 금지 글자 9개와 빈칸을 _ 하나로. 순서: plan(files, rule) → [(원래, 새)](그대로인 것 뺌, i 는 1부터) → preview(pairs) 「전 → 후」 표 → conflicts(pairs) 빈 리스트일 때만 바꾸기. 충돌 둘: 새 이름끼리 겹침(Counter 로 str(new).lower() 를 세어 2 이상) · 이미 있는 다른 파일(names_in(new.parent) — 폴더 이름을 소문자로 모은 set, 이번에 바꿀 원래 파일이면 충돌 아님). Windows · Mac 은 대소문자를 같게 봐서 IMG_0001.JPG 가 있으면 Path(\"IMG_0001.jpg\").exists() 가 True — exists() 대신 소문자 비교로 어느 OS 든 같은 답. 맞바꾸기 함정: a→b, b→a 나 번호 밀기 01→02, 02→03 을 차례로 rename 하면 Windows 는 FileExistsError, Mac · 리눅스는 말없이 덮어씀 → apply(pairs) 두 단계(① 모두 __바꾸는중{i}__원래이름 으로 rename ② shutil.move 로 새 자리, mkdir(parents=True, exist_ok=True)). 되돌리기: save_log 로 rename_log.csv(utf-8-sig, newline=\"\", 열 원래 · 새, 전체 경로, 바꾸는 폴더 밖에) · undo(log_path) 는 (새, 원래) 로 뒤집어 conflicts → apply, 문제 있으면 False. rename_files(pairs, log_path, dry_run=False) = preview → conflicts(있으면 「멈춤 —」 출력 후 False) → dry_run 이면 False → apply → save_log → True. 날짜: p.stat().st_mtime(타임스탬프) → datetime.fromtimestamp(ts)(내 PC 시각대), datetime 은 date + 시분초, strftime(\"%Y-%m-%d\"), datetime(…).timestamp(), os.utime(p, (ts, ts)) 로 수정 시각 정하기(samples 가 고정해 둠). dated_name(p, i) → 2026-10-03_IMG_0001.jpg, month_folder(base, p) → base/2026/10/이름 으로 짝을 만들어 conflicts → apply. YYYY-MM-DD 는 이름 순 = 날짜 순. 결과 찍기: base.glob(\"**/*\") + p.relative_to(base).as_posix(). 수정 시각 ≠ 찍은 날(EXIF 는 이름만).",
+  terms: { "충돌": "이름을 바꾸거나 옮길 때 새 이름이 다른 파일과 겹치는 것. 그대로 두면 덮어쓰거나 에러가 나서, 바꾸기 전에 먼저 찾아요", "타임스탬프": "1970년 1월 1일 0시(세계 표준시)부터 센 초. 파일의 수정 시각 st_mtime 이 이 모양이에요" },
+  pages: [
+    { title: "new_name(p, i) · f\"{i:03}\" · re.sub", html: `<p>복습: 이름 하나 바꾸기 <code>p.rename(새 경로)</code> 와 옮기기 <code>shutil.move</code> 는 <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리: pathlib · shutil」 ↗</a>, 확장자별 정리는 <a href="../python/#lesson/X7" target="_blank" rel="noopener">파이썬 교과서 「실전 7: 다운로드 폴더 정리기」 ↗</a> 에서 했어요. 이번엔 이름 <b>수십 개를 규칙대로</b> 한꺼번에 바꿔요. 공방의 다운로드 폴더 이름은 제각각이에요 — <code>IMG_0001.JPG</code> · <code>견적서 최종.docx</code> · <code>스크린샷 2026-10-05.png</code>.</p>
+<p>먼저 <b>규칙을 함수 하나로</b> 떼요. 파일 <code>p</code> 와 차례 번호 <code>i</code> 를 받아 새 이름(글자)을 돌려주는 함수예요. 규칙만 바꿔 끼우면 나머지 코드(미리 보기 · 검사 · 바꾸기)는 그대로 써요(함수를 값처럼 넘기기 — 복습: <a href="../python/#lesson/L18" target="_blank" rel="noopener">파이썬 교과서 「람다 · 함수를 값처럼」 ↗</a>).</p>
+<table class="kb"><tbody><tr><th>규칙</th><th>함수 안</th><th>예</th></tr><tr><td>번호 붙이기</td><td><code>f"공방_{i:03}{p.suffix.lower()}"</code></td><td><code>IMG_0001.JPG</code> → <code>공방_001.jpg</code></td></tr><tr><td>앞 · 뒤에 붙이기</td><td><code>f"2026_{p.stem}_최종{p.suffix}"</code></td><td><code>견적.docx</code> → <code>2026_견적_최종.docx</code></td></tr><tr><td>일부 바꾸기</td><td><code>re.sub(r"^IMG_", "사진_", p.name)</code></td><td><code>IMG_0001.JPG</code> → <code>사진_0001.JPG</code></td></tr></tbody></table>
+<p><code>{i:03}</code> 은 세 자리로 맞추고 빈 자리는 0 으로 채워요(복습: <a href="../python/#lesson/L9C" target="_blank" rel="noopener">파이썬 교과서 「서식 출력: 칸 맞추기 · 소수 · 쉼표」 ↗</a>). <code>001 · 002 · … · 010</code> 이라야 이름 순으로 늘어놓았을 때 <code>10</code> 이 <code>2</code> 앞에 오지 않아요. <code>re.sub(패턴, 바꿀 글자, 글)</code> 은 모양으로 찾아 바꿔요(복습: <a href="../python/#lesson/L20B" target="_blank" rel="noopener">파이썬 교과서 「정규식 2: 찾아 꺼내기 · 줄 처음과 끝」 ↗</a>).</p>
+<p>그리고 이름에 <b>못 쓰는 글자</b>를 미리 바꿔 두는 함수가 하나 더 있으면 좋아요. Windows 는 <code>&lt; &gt; : " / \\ | ? *</code> 아홉 글자를 파일 이름에 못 써요. 빈칸은 쓸 수는 있지만 명령 줄에서 따옴표가 필요해서 <code>_</code> 로 바꿔 두면 편해요.</p>
+<pre>def safe_name(text):
+    text = re.sub(r'[&lt;&gt;:"/\\\\|?*\\s]+', "_", text)
+    return text.strip("_")
+
+print(safe_name("10월 회의: 결정 사항?"))    # 10월_회의_결정_사항</pre>
+<ul><li>대괄호 <code>[…]</code> 는 「이 글자들 중 하나」, 뒤의 <code>+</code> 는 「하나 이상 이어진 것」 이라서 <code>: </code> 처럼 붙어 있는 두 글자도 <code>_</code> 하나가 돼요. <code>\\\\</code> 는 역슬래시 한 글자, <code>\\s</code> 는 빈칸이에요</li><li><code>strip("_")</code> 은 앞뒤 끝의 <code>_</code> 를 떼요(<code>"?"</code> 로 끝났던 자리)</li></ul>`,
+      example: { code: `import re
+from pathlib import Path
+
+
+def safe_name(text):
+    """Windows 가 못 쓰는 글자 9개와 빈칸 → _ (여러 개가 붙어 있으면 _ 하나)"""
+    text = re.sub(r'[<>:"/\\\\|?*\\s]+', "_", text)
+    return text.strip("_")
+
+
+def new_name(p, i):
+    """규칙 하나 = 함수 하나: 공방_001.jpg 처럼 번호 붙이기"""
+    return f"공방_{i:03}{p.suffix.lower()}"
+
+
+print(safe_name("10월 회의: 결정 사항?"))
+print(safe_name("  견적서 최종 (2).docx "))
+print(safe_name('A/S 접수 "급함" <꼭>'))
+
+files = [Path("IMG_0001.JPG"), Path("IMG_0002.jpg"), Path("스크린샷 2026-10-05.png")]
+for i, p in enumerate(files):
+    print(p.name, "→", new_name(p, i + 1))
+
+print(re.sub(r"^IMG_", "사진_", "IMG_0001.JPG"))
+print(f"2026_{Path('견적.docx').stem}_최종.docx")` } },
+    { title: "plan · preview · conflicts", html: `<p>규칙이 생겼으면 <b>바로 바꾸지 않아요</b>. 순서는 늘 셋이에요: ① 바꿀 목록 만들기 → ② 미리 보기 표 → ③ 충돌 검사. 문제가 하나라도 있으면 하나도 바꾸지 않고 멈춰요. 반쯤 바꾸다 멈추면 고치기가 더 어려워요.</p>
+<pre>pairs = plan(files, new_name)     # [(원래 경로, 새 경로), …]
+preview(pairs)                    # IMG_0001.JPG  →  공방_001.jpg …
+problems = conflicts(pairs)       # 빈 리스트면 바꿔도 돼요</pre>
+<p><code>plan</code> 은 파일마다 규칙을 불러 <code>(원래, 새)</code> 짝 리스트를 만들어요. 이름이 그대로인 파일은 빼요. [[충돌]]은 두 가지예요.</p>
+<table class="kb"><tbody><tr><th>충돌</th><th>예</th><th>찾는 법</th></tr><tr><td>새 이름끼리 겹침</td><td>두 파일이 둘 다 <code>사진.jpg</code> 가 됨</td><td><code>Counter</code> 로 새 이름을 세어 2 이상(복습: <a href="../python/#lesson/L16E" target="_blank" rel="noopener">파이썬 교과서 「표준 라이브러리 둘러보기」 ↗</a>)</td></tr><tr><td>이미 있는 다른 파일</td><td>지난번에 만든 <code>공방_001.jpg</code> 가 폴더에 있음</td><td>그 폴더의 이름들에 새 이름이 있는지</td></tr></tbody></table>
+<p><code>Counter(str(new).lower() for old, new in pairs)</code> 의 괄호 안은 제너레이터 식이에요(복습: <a href="../python/#lesson/L18C" target="_blank" rel="noopener">파이썬 교과서 「반복자와 제너레이터」 ↗</a>). 단, 이미 있는 파일이 <b>이번에 바꿀 원래 파일 중 하나</b>면 충돌이 아니에요 — 곧 다른 이름으로 비켜 줄 테니까요(맞바꾸기는 다음 쪽).</p>
+<div class="bk-warn"><b>Windows 는 대소문자를 같게 봐요</b> — Windows(그리고 Mac 기본 설정)에서는 <code>IMG_0001.JPG</code> 가 있으면 <code>Path("IMG_0001.jpg").exists()</code> 도 <code>True</code> 예요. 같은 파일이거든요. 그래서 <code>exists()</code> 로 검사하면 확장자만 소문자로 바꾸는 규칙이 「이미 있어요」 로 막히고, 리눅스에서는 반대로 <code>img.jpg</code> 와 <code>IMG.JPG</code> 가 따로 있을 수 있어요. 이 교과서는 <code>names_in(folder)</code> 로 폴더의 이름을 <b>소문자로 모아</b> 직접 비교해서, 어느 컴퓨터에서나 같은 답을 내요.</div>`,
+      example: { code: `import re
+import tempfile
+from collections import Counter
+from pathlib import Path
+from samples import make_files
+
+def safe_name(text):
+    """Windows 가 못 쓰는 글자 9개와 빈칸 → _ (여러 개가 붙어 있으면 _ 하나)"""
+    text = re.sub(r'[<>:"/\\\\|?*\\s]+', "_", text)
+    return text.strip("_")
+
+def plan(files, rule):
+    """[(원래 경로, 새 경로)] — rule(p, i) 가 새 이름을 돌려줘요(i 는 1부터). 그대로인 것은 빼요"""
+    pairs = []
+    for i, p in enumerate(files):
+        new = p.parent / rule(p, i + 1)
+        if new != p:
+            pairs.append((p, new))
+    return pairs
+
+
+def preview(pairs):
+    for old, new in pairs:
+        print(f"  {old.name}  →  {new.name}")
+    print(f"바꿀 파일 {len(pairs)}개")
+
+def names_in(folder):
+    """폴더 안의 이름들(소문자로) — Windows 처럼 대소문자를 같게 보려고"""
+    names = set()
+    if folder.is_dir():
+        for q in folder.iterdir():
+            names.add(q.name.lower())
+    return names
+
+
+def conflicts(pairs):
+    """바꾸기 전에 막을 것 두 가지: 새 이름끼리 겹침 · 이미 있는 다른 파일"""
+    olds = set()
+    for old, new in pairs:
+        olds.add(str(old).lower())
+    counts = Counter(str(new).lower() for old, new in pairs)
+    problems = []
+    for old, new in pairs:
+        key = str(new).lower()
+        if counts[key] > 1:
+            problems.append(f"새 이름이 겹쳐요: {old.name} → {new.name}")
+        elif key not in olds and new.name.lower() in names_in(new.parent):
+            problems.append(f"이미 있어요: {new.name}")
+    return problems
+
+def is_junk(p):
+    return p.name.startswith("~$") or p.name == "Thumbs.db" or p.suffix.lower() == ".tmp"
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    src = Path(tmp) / "다운로드"
+    files = make_files(src)
+    keep = []
+    for p in files:
+        if not is_junk(p):
+            keep.append(p)
+
+    def tidy(p, i):                       # 규칙 ①: 빈칸은 _, 확장자는 소문자
+        return safe_name(p.stem) + p.suffix.lower()
+
+    pairs = plan(keep, tidy)
+    preview(pairs)
+    print("충돌:", conflicts(pairs))       # IMG_0001.JPG → .jpg 도 문제없어요
+
+    def photo(p, i):                       # 규칙 ②: 사진은 사진_001.jpg …
+        return f"사진_{i:03}{p.suffix.lower()}"
+
+    photos = []
+    for p in keep:
+        if p.suffix.lower() == ".jpg":
+            photos.append(p)
+    (src / "사진_001.jpg").write_text("지난번 것", encoding="utf-8")   # 지난번에 만든 파일이 남아 있다면
+    pairs = plan(photos, photo)
+    for msg in conflicts(pairs):
+        print(msg)
+
+    def same(p, i):                        # 규칙 ③: 실수 — 모두 같은 이름
+        return "사진.jpg"
+
+    pairs = plan(photos, same)
+    for msg in conflicts(pairs):
+        print(msg)`, prep: [SAMPLES_PREP] } },
+    { title: "맞바꾸기 함정 → 임시 이름으로 두 단계", html: `<p>검사를 통과한 목록을 <code>for old, new in pairs: old.rename(new)</code> 로 차례로 바꾸면 될까요? 짝이 서로 얽혀 있으면 안 돼요.</p>
+<table class="kb"><tbody><tr><th>목록</th><th>차례로 바꾸면</th></tr><tr><td>맞바꾸기 <code>발표1 → 발표2</code>, <code>발표2 → 발표1</code></td><td>첫 줄에서 <code>발표2</code> 가 이미 있어요</td></tr><tr><td>번호 밀기 <code>01 → 02</code>, <code>02 → 03</code></td><td>첫 줄에서 <code>02</code> 가 이미 있어요</td></tr></tbody></table>
+<p>이때 무슨 일이 나는지는 운영 체제마다 달라요. <b>Windows</b> 는 <code>FileExistsError</code> 로 첫 줄에서 멈춰요 — 반만 바뀌진 않았지만 일은 안 됐어요. <b>Mac · 리눅스</b> 는 에러 없이 <code>발표2</code> 를 <b>덮어써서</b> 그 내용이 사라져요. 둘 다 원치 않아요.</p>
+<p>답은 <b>두 단계</b>예요. ① 바꿀 파일을 모두 아무도 안 쓰는 임시 이름(<code>__바꾸는중0__발표1.pptx</code>)으로 비켜 놓고 ② 임시 이름에서 새 이름으로 옮겨요. ①이 끝나면 원래 이름들이 모두 비어 있어서, 맞바꾸기든 번호 밀기든 안전해요.</p>
+<pre>def apply(pairs):
+    temps = []
+    for i, pair in enumerate(pairs):
+        old, new = pair
+        tmp = old.parent / f"__바꾸는중{i}__{old.name}"
+        old.rename(tmp)                  # ① 비켜 놓기
+        temps.append((tmp, new))
+    for tmp, new in temps:
+        new.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(tmp, new)            # ② 새 자리로</pre>
+<ul><li>②에서 <code>rename</code> 대신 <code>shutil.move</code> 를 쓰면 새 자리가 다른 폴더 · 다른 드라이브여도 돼요(날짜 폴더로 옮기기는 마지막 쪽). <code>mkdir(parents=True, exist_ok=True)</code> 는 <code>2026/10</code> 처럼 중간 폴더까지 한 번에 만들어요</li><li><code>apply</code> 앞에는 늘 <code>conflicts</code> 를 먼저 불러요. <code>apply</code> 는 검사하지 않아요</li></ul>`,
+      example: { code: `import re
+import shutil
+import tempfile
+from collections import Counter
+from pathlib import Path
+
+def names_in(folder):
+    """폴더 안의 이름들(소문자로) — Windows 처럼 대소문자를 같게 보려고"""
+    names = set()
+    if folder.is_dir():
+        for q in folder.iterdir():
+            names.add(q.name.lower())
+    return names
+
+
+def conflicts(pairs):
+    """바꾸기 전에 막을 것 두 가지: 새 이름끼리 겹침 · 이미 있는 다른 파일"""
+    olds = set()
+    for old, new in pairs:
+        olds.add(str(old).lower())
+    counts = Counter(str(new).lower() for old, new in pairs)
+    problems = []
+    for old, new in pairs:
+        key = str(new).lower()
+        if counts[key] > 1:
+            problems.append(f"새 이름이 겹쳐요: {old.name} → {new.name}")
+        elif key not in olds and new.name.lower() in names_in(new.parent):
+            problems.append(f"이미 있어요: {new.name}")
+    return problems
+
+def apply(pairs):
+    """두 단계로 바꿔요: ① 모두 임시 이름으로 ② 임시 이름 → 새 이름"""
+    temps = []
+    for i, pair in enumerate(pairs):
+        old, new = pair
+        tmp = old.parent / f"__바꾸는중{i}__{old.name}"
+        old.rename(tmp)
+        temps.append((tmp, new))
+    for tmp, new in temps:
+        new.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(tmp, new)
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    (base / "발표1.pptx").write_text("인사", encoding="utf-8")
+    (base / "발표2.pptx").write_text("본론", encoding="utf-8")
+
+    swap = [(base / "발표1.pptx", base / "발표2.pptx"),
+            (base / "발표2.pptx", base / "발표1.pptx")]
+    print("충돌:", conflicts(swap))      # 서로 비켜 주니까 충돌이 아니에요
+    apply(swap)
+    for p in sorted(base.iterdir()):
+        print(p.name, p.read_text(encoding="utf-8"))
+
+    for n in [1, 2, 3]:
+        (base / f"사진_{n:03}.jpg").write_text(f"{n}번 사진", encoding="utf-8")
+    shift = []
+    for n in [1, 2, 3]:                  # 번호를 하나씩 밀어서 001 자리를 비우기
+        shift.append((base / f"사진_{n:03}.jpg", base / f"사진_{n + 1:03}.jpg"))
+    print("충돌:", conflicts(shift))
+    apply(shift)
+    for p in sorted(base.glob("사진_*.jpg")):
+        print(p.name, p.read_text(encoding="utf-8"))` } },
+    { title: "rename_log.csv · undo(log_path)", html: `<p>이름 바꾸기는 원본 자리에서 바꾸는 일이라 「결과는 새 폴더에」 원칙을 못 지켜요. 대신 <b>되돌리기 기록</b>을 남겨요. 무엇을 무엇으로 바꿨는지 csv 로 적어 두면, 그 기록을 거꾸로 읽어 원래대로 돌려놓을 수 있어요.</p>
+<pre>원래,새
+C:\\Users\\me\\Downloads\\IMG_0001.JPG,C:\\Users\\me\\Downloads\\IMG_0001.jpg
+C:\\Users\\me\\Downloads\\견적서 최종.docx,C:\\Users\\me\\Downloads\\견적서_최종.docx</pre>
+<ul><li>기록은 <b>전체 경로</b>로 적어요. 그래야 어느 폴더에서 <code>undo</code> 를 돌려도 같은 파일을 찾아요</li><li>엑셀에서도 열어 보게 <code>encoding="utf-8-sig"</code> · <code>newline=""</code> 로 써요(복습: <a href="../python/#lesson/L29" target="_blank" rel="noopener">파이썬 교과서 「csv 모듈 제대로」 ↗</a>)</li><li>기록 파일은 <b>바꾸는 폴더 밖에</b> 둬요. 안에 두면 다음번 목록에 기록 파일까지 끼어요</li></ul>
+<p><code>undo</code> 는 기록을 읽어 <code>(새, 원래)</code> 로 뒤집은 목록을 만들고, 앞에서 만든 <code>conflicts</code> → <code>apply</code> 를 그대로 써요. 바꾼 뒤에 누가 같은 이름으로 새 파일을 만들었으면 검사에서 멈춰요.</p>
+<p>지금까지의 순서를 함수 하나로 묶으면 <code>rename_files(pairs, log_path, dry_run=False)</code> 예요: 미리 보기 → 충돌 검사(있으면 멈춤) → 미리 보기 모드면 여기서 끝 → <code>apply</code> → 기록. [[레슨:J0]] 의 <code>--dry-run</code> 을 여기에 이어 주면 돼요.</p>`,
+      example: { code: `import csv
+import re
+import shutil
+import tempfile
+from collections import Counter
+from pathlib import Path
+from samples import make_files
+
+def safe_name(text):
+    """Windows 가 못 쓰는 글자 9개와 빈칸 → _ (여러 개가 붙어 있으면 _ 하나)"""
+    text = re.sub(r'[<>:"/\\\\|?*\\s]+', "_", text)
+    return text.strip("_")
+
+def plan(files, rule):
+    """[(원래 경로, 새 경로)] — rule(p, i) 가 새 이름을 돌려줘요(i 는 1부터). 그대로인 것은 빼요"""
+    pairs = []
+    for i, p in enumerate(files):
+        new = p.parent / rule(p, i + 1)
+        if new != p:
+            pairs.append((p, new))
+    return pairs
+
+
+def preview(pairs):
+    for old, new in pairs:
+        print(f"  {old.name}  →  {new.name}")
+    print(f"바꿀 파일 {len(pairs)}개")
+
+def names_in(folder):
+    """폴더 안의 이름들(소문자로) — Windows 처럼 대소문자를 같게 보려고"""
+    names = set()
+    if folder.is_dir():
+        for q in folder.iterdir():
+            names.add(q.name.lower())
+    return names
+
+
+def conflicts(pairs):
+    """바꾸기 전에 막을 것 두 가지: 새 이름끼리 겹침 · 이미 있는 다른 파일"""
+    olds = set()
+    for old, new in pairs:
+        olds.add(str(old).lower())
+    counts = Counter(str(new).lower() for old, new in pairs)
+    problems = []
+    for old, new in pairs:
+        key = str(new).lower()
+        if counts[key] > 1:
+            problems.append(f"새 이름이 겹쳐요: {old.name} → {new.name}")
+        elif key not in olds and new.name.lower() in names_in(new.parent):
+            problems.append(f"이미 있어요: {new.name}")
+    return problems
+
+def apply(pairs):
+    """두 단계로 바꿔요: ① 모두 임시 이름으로 ② 임시 이름 → 새 이름"""
+    temps = []
+    for i, pair in enumerate(pairs):
+        old, new = pair
+        tmp = old.parent / f"__바꾸는중{i}__{old.name}"
+        old.rename(tmp)
+        temps.append((tmp, new))
+    for tmp, new in temps:
+        new.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(tmp, new)
+
+def save_log(pairs, log_path):
+    with open(log_path, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["원래", "새"])
+        for old, new in pairs:
+            w.writerow([str(old), str(new)])
+
+
+def rename_files(pairs, log_path, dry_run=False):
+    """미리 보기 → 충돌 검사 → (진짜면) 바꾸고 기록. 바꿨으면 True"""
+    preview(pairs)
+    problems = conflicts(pairs)
+    for msg in problems:
+        print("멈춤 —", msg)
+    if problems or dry_run:
+        return False
+    apply(pairs)
+    save_log(pairs, log_path)
+    return True
+
+
+def undo(log_path):
+    """rename_log.csv 를 거꾸로(새 → 원래) 되돌려요"""
+    with open(log_path, encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+    back = []
+    for row in rows:
+        back.append((Path(row["새"]), Path(row["원래"])))
+    problems = conflicts(back)
+    for msg in problems:
+        print("되돌리지 못해요 —", msg)
+    if problems:
+        return False
+    apply(back)
+    return True
+
+def is_junk(p):
+    return p.name.startswith("~$") or p.name == "Thumbs.db" or p.suffix.lower() == ".tmp"
+
+
+def tidy(p, i):
+    return safe_name(p.stem) + p.suffix.lower()
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    src = base / "다운로드"
+    log_path = base / "rename_log.csv"       # 바꾸는 폴더 밖에
+    files = make_files(src)
+    before = sorted(p.name for p in src.iterdir())
+    keep = []
+    for p in files:
+        if not is_junk(p):
+            keep.append(p)
+    pairs = plan(keep, tidy)
+
+    print("바꿨나:", rename_files(pairs, log_path, dry_run=True))   # 미리 보기만
+    print("바꿨나:", rename_files(pairs, log_path))
+    now = sorted(p.name for p in src.iterdir())
+    print(now[:5])
+
+    with open(log_path, encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+    print("기록", len(rows), "줄 — 첫 줄:", Path(rows[0]["원래"]).name, "→", Path(rows[0]["새"]).name)
+
+    print("되돌렸나:", undo(log_path))
+    after = sorted(p.name for p in src.iterdir())
+    print("처음과 같나:", before == after)`, prep: [SAMPLES_PREP] } },
+    { title: "st_mtime → fromtimestamp · 2026/10", html: `<p>사진 · 문서를 <b>날짜로</b> 정리하려면 파일마다 날짜가 있어야 해요. 파일의 <b>수정 시각</b>은 <code>p.stat().st_mtime</code> 에 있어요. 1970년 1월 1일부터 센 초([[타임스탬프]])라서 <code>1791...</code> 같은 큰 수예요. 사람이 읽는 시각으로 바꾸려면 <code>datetime</code> 을 써요.</p>
+<p>복습: <a href="../python/#lesson/L16B" target="_blank" rel="noopener">파이썬 교과서 「날짜: datetime 맛보기」 ↗</a> · <a href="../python/#lesson/L19" target="_blank" rel="noopener">파이썬 교과서 「날짜 2: 글자 ↔ 날짜 · 비교」 ↗</a> 의 <code>date</code> 는 날짜만이었어요. <code>datetime</code> 은 날짜에 <b>시 · 분 · 초</b>까지 붙은 값이에요. 쓰는 법은 거의 같아요.</p>
+<pre>from datetime import datetime
+
+d = datetime(2026, 10, 3, 9, 12)
+print(d)                          # 2026-10-03 09:12:00
+print(d.strftime("%Y-%m-%d"))     # 2026-10-03
+print(d.strftime("%Y"), d.strftime("%m"))   # 2026 10
+print(d.date())                   # 2026-10-03</pre>
+<table class="kb"><tbody><tr><th>바꾸기</th><th>코드</th></tr><tr><td>타임스탬프 → 시각</td><td><code>datetime.fromtimestamp(p.stat().st_mtime)</code> — 내 PC 의 시각대(한국 시각)로</td></tr><tr><td>시각 → 타임스탬프</td><td><code>datetime(2026, 10, 3, 9, 12).timestamp()</code></td></tr><tr><td>파일의 수정 시각 정하기</td><td><code>os.utime(p, (ts, ts))</code> — 앞은 열어 본 시각, 뒤가 수정 시각. <code>samples.py</code> 의 <code>make_files</code> 가 이걸로 날짜를 고정해 둬요</td></tr></tbody></table>
+<p>이제 규칙 함수 둘을 만들어요. <code>dated_name</code> 은 이름 앞에 날짜를 붙이는 규칙(<code>2026-10-03_IMG_0001.jpg</code>)이라 <code>plan</code> 에 그대로 넣어요. <code>month_folder</code> 는 <b>옮길 자리</b>(<code>정리/2026/10/IMG_0001.JPG</code>)를 돌려줘서, 짝을 직접 만들어 <code>conflicts</code> → <code>apply</code> 에 넘겨요. <code>YYYY-MM-DD</code> 처럼 큰 단위부터 두 자리로 맞춘 날짜는 <b>이름 순 = 날짜 순</b>이에요.</p>
+<p>옮긴 결과는 <code>base.glob("**/*")</code> 로 안쪽 폴더까지 다 돌며 찍어요. <code>p.relative_to(base)</code> 는 <code>base</code> 에서부터의 경로(<code>정리/2026/10/IMG_0001.JPG</code>)이고, <code>.as_posix()</code> 는 Windows 에서도 <code>/</code> 로 잇는 글자예요. 임시 폴더 경로 없이 짧게, 어느 PC 에서나 같은 모양으로 찍혀요.</p>
+<div class="bk-warn"><b>수정 시각 ≠ 찍은 날</b> — 카톡 · 메일로 받거나 다른 PC 에서 복사해 오면 수정 시각이 그날로 바뀔 수 있어요. 사진을 찍은 날은 사진 파일 안의 EXIF 정보에 따로 있어요(Pillow 같은 패키지로 읽어요, 이 교과서는 이름만).</div>`,
+      example: { code: `import os
+import re
+import shutil
+import tempfile
+from collections import Counter
+from datetime import datetime
+from pathlib import Path
+from samples import make_files
+
+def safe_name(text):
+    """Windows 가 못 쓰는 글자 9개와 빈칸 → _ (여러 개가 붙어 있으면 _ 하나)"""
+    text = re.sub(r'[<>:"/\\\\|?*\\s]+', "_", text)
+    return text.strip("_")
+
+def plan(files, rule):
+    """[(원래 경로, 새 경로)] — rule(p, i) 가 새 이름을 돌려줘요(i 는 1부터). 그대로인 것은 빼요"""
+    pairs = []
+    for i, p in enumerate(files):
+        new = p.parent / rule(p, i + 1)
+        if new != p:
+            pairs.append((p, new))
+    return pairs
+
+
+def preview(pairs):
+    for old, new in pairs:
+        print(f"  {old.name}  →  {new.name}")
+    print(f"바꿀 파일 {len(pairs)}개")
+
+def names_in(folder):
+    """폴더 안의 이름들(소문자로) — Windows 처럼 대소문자를 같게 보려고"""
+    names = set()
+    if folder.is_dir():
+        for q in folder.iterdir():
+            names.add(q.name.lower())
+    return names
+
+
+def conflicts(pairs):
+    """바꾸기 전에 막을 것 두 가지: 새 이름끼리 겹침 · 이미 있는 다른 파일"""
+    olds = set()
+    for old, new in pairs:
+        olds.add(str(old).lower())
+    counts = Counter(str(new).lower() for old, new in pairs)
+    problems = []
+    for old, new in pairs:
+        key = str(new).lower()
+        if counts[key] > 1:
+            problems.append(f"새 이름이 겹쳐요: {old.name} → {new.name}")
+        elif key not in olds and new.name.lower() in names_in(new.parent):
+            problems.append(f"이미 있어요: {new.name}")
+    return problems
+
+def apply(pairs):
+    """두 단계로 바꿔요: ① 모두 임시 이름으로 ② 임시 이름 → 새 이름"""
+    temps = []
+    for i, pair in enumerate(pairs):
+        old, new = pair
+        tmp = old.parent / f"__바꾸는중{i}__{old.name}"
+        old.rename(tmp)
+        temps.append((tmp, new))
+    for tmp, new in temps:
+        new.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(tmp, new)
+
+def modified(p):
+    """수정 시각(내 PC 시각으로)"""
+    ts = p.stat().st_mtime
+    return datetime.fromtimestamp(ts)
+
+
+def dated_name(p, i):
+    """규칙: 2026-10-03_IMG_0001.jpg"""
+    day = modified(p).strftime("%Y-%m-%d")
+    return f"{day}_{safe_name(p.stem)}{p.suffix.lower()}"
+
+
+def month_folder(base, p):
+    """옮길 자리: base/2026/10/이름"""
+    d = modified(p)
+    return base / d.strftime("%Y") / d.strftime("%m") / p.name
+
+def is_junk(p):
+    return p.name.startswith("~$") or p.name == "Thumbs.db" or p.suffix.lower() == ".tmp"
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    src = base / "다운로드"
+    files = make_files(src)
+    keep = []
+    for p in files:
+        if not is_junk(p):
+            keep.append(p)
+    for p in keep[:3]:
+        print(p.name, modified(p))
+
+    preview(plan(keep, dated_name))          # 규칙: 이름 앞에 날짜
+
+    memo = src / "새 메모.txt"                # 수정 시각을 직접 정해 보기
+    memo.write_text("연습", encoding="utf-8")
+    ts = datetime(2026, 9, 30, 18, 0).timestamp()
+    os.utime(memo, (ts, ts))
+    keep.append(memo)
+
+    pairs = []
+    for p in keep:                           # 옮기기: 정리/2026/10/이름
+        pairs.append((p, month_folder(base / "정리", p)))
+    print("충돌:", conflicts(pairs))
+    apply(pairs)
+    for p in sorted((base / "정리").glob("**/*")):
+        if p.is_file():
+            print(p.relative_to(base).as_posix())`, prep: [SAMPLES_PREP] } },
+  ],
+  summary: ["규칙은 rule(p, i) 함수 하나로 — 번호 f\"{i:03}\" · 앞뒤 붙이기 · re.sub, Windows 금지 글자 9개와 빈칸은 safe_name 으로 _", "바꾸기 전에 plan → preview → conflicts(새 이름끼리는 Counter, 있던 파일은 소문자 이름 비교) — 맞바꾸기 · 번호 밀기는 임시 이름을 거치는 apply 두 단계로", "rename_log.csv 에 원래 → 새 를 남기면 undo 로 되돌려요 — 날짜 정리는 st_mtime → datetime.fromtimestamp → 2026-10-03_ 이름이나 2026/10 폴더"] },
+{ id: 'J2', ch: 1, n: 2, title: '백업: 복사 · 비교 · 정리', mode: 'text',
+  tutorSummary: "파이썬 L27(shutil.copy · move · rmtree)은 링크만. 백업은 shutil.copy2(a, b) — 내용 + 수정 시각까지(copy 는 시각이 지금으로). p.stat().st_size(바이트) · st_mtime(타임스탬프, J1). copy2 도 Windows 권한 · 주인은 안 가져감. 폴더 통째: shutil.copytree(src, dst, dirs_exist_ok=True(없으면 이미 있을 때 FileExistsError), ignore=shutil.ignore_patterns(\"*.tmp\", \"~$*\", \"Thumbs.db\", \"__pycache__\")) — 패턴은 Windows dir 같은 * 모양(정규식 아님), 내 코드에서는 fnmatch.fnmatch(이름, 패턴). 결과 찍기 dst.glob(\"**/*\") + relative_to(dst).as_posix(). 바뀐 것만 복사: 빠른 검사 changed(src, dst) — 없거나 st_size 다르거나 st_mtime 차이 > 2초(USB FAT 는 2초 단위), 확실한 검사 filecmp.cmp(a, b, shallow=False)(shallow 기본 True 는 크기 · 시각이 같으면 내용을 안 봄). copy_changed(src_dir, dst_dir, patterns=SKIP, dry_run=False) 는 src_dir.glob(\"**/*\") 를 돌며 rel = p.relative_to(src_dir), skipped(rel, patterns)(rel.parts 의 칸마다 fnmatch — 폴더 __pycache__ 안도), changed 면 target.parent.mkdir(parents=True, exist_ok=True) + copy2, 복사한 rel.as_posix() 리스트를 돌려줌(dry_run 이면 목록만). 두 폴더 비교 filecmp.dircmp(a, b): left_only · right_only · diff_files · common_dirs, 바로 안만(subdirs[이름] 으로 들어감), 빠른 검사. 날짜 이름 백업(2026-11-08/ · 문서_2026-11-08.zip): YYYY-MM-DD 는 이름 순 = 날짜 순, 덮어쓰기 백업은 어제 지운 파일도 사라짐. 최근 n개만 남기기: old_backups(root, keep, prefix=\"\") 는 re.search(r\"\\d{4}-\\d{2}-\\d{2}\", 이름) 이 있고 prefix 로 시작하는 것만 (날짜, 이름) 튜플로 sort, cut = max(len - keep, 0), 앞쪽 cut 개 = 지울 것(오래된 것부터), 날짜 없는 파일은 안 건드림 — dated[:-keep] 은 keep=0 이면 [:0] 이라 안 지워지는 함정. prune_backups(root, keep, prefix, dry_run) 은 [미리 보기] 지울 백업 출력 또는 폴더는 rmtree · 파일은 unlink. shutil.disk_usage(경로).total · used · free(바이트, 값은 PC 마다 달라 ☐). 중복 찾기: 크기로 먼저 defaultdict(list) 로 묶고, 둘 이상인 크기만 hashlib.sha256(p.read_bytes()).hexdigest()(해시는 CS C16 링크, read_bytes 는 바이트로 통째 읽기)로 다시 묶어 둘 이상인 묶음 — 보여 주기만, 지울 쪽은 사람이.",
+  terms: { "백업": "원본이 망가지거나 지워져도 되살릴 수 있게 다른 곳에 복사해 두는 것. 날짜별로 여러 개를 남겨 두면 며칠 전 상태로도 돌아갈 수 있어요" },
+  pages: [
+    { title: "shutil.copy2 vs copy — 수정 시각까지", html: `<p>복습: 파일 하나 복사 <code>shutil.copy(원본, 폴더)</code> 와 옮기기 · 지우기는 <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리: pathlib · shutil」 ↗</a> 에서 했어요. [[백업]]은 복사인데, 그냥 복사와 다른 점이 하나 있어요. <b>수정 시각</b>도 같이 가져가야 해요. 그래야 나중에 「원본이 바뀌었나?」 를 시각으로 비교하고, 백업 폴더에서도 날짜 순으로 볼 수 있어요.</p>
+<table class="kb"><tbody><tr><th></th><th><code>shutil.copy(a, b)</code></th><th><code>shutil.copy2(a, b)</code></th></tr><tr><td>내용</td><td>복사</td><td>복사</td></tr><tr><td>수정 시각</td><td><b>지금</b>으로 바뀜</td><td>원본 그대로</td></tr><tr><td>쓰는 곳</td><td>새로 만드는 결과물</td><td><b>백업</b></td></tr></tbody></table>
+<p>연습 파일은 <code>p.write_text("글", encoding="utf-8")</code>(복습: <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리: pathlib · shutil」 ↗</a>) 말고 <code>p.write_bytes(b"photo-1")</code> 로도 만들어요. 사진 · PDF 처럼 글자가 아닌 파일은 <b>바이트</b>로 쓰고 읽어요(<code>p.read_bytes()</code>). <code>samples.py</code> 도 이렇게 가짜 사진을 만들어요.</p>
+<p>파일 정보는 <code>p.stat()</code> 하나로 꺼내요. <code>st_size</code> 는 바이트 크기, <code>st_mtime</code> 은 수정 시각(타임스탬프 — [[레슨:J1]] 마지막 쪽)이에요.</p>
+<pre>info = p.stat()
+print(info.st_size)       # 바이트 수
+print(datetime.fromtimestamp(info.st_mtime))   # 수정 시각</pre>
+<div class="bk-warn"><b>copy2 도 다 가져가진 않아요</b> — Windows 의 파일 주인 · 보안 설정 같은 것은 복사되지 않아요. 사무 문서 백업에는 상관없지만, 프로그램 폴더를 통째로 옮길 때는 Windows 탐색기나 <code>robocopy</code> 를 써요.</div>`,
+      example: { code: `import shutil
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from samples import make_files
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    src = base / "문서"
+    make_files(src)
+    out = base / "USB"
+    out.mkdir()
+
+    p = src / "회의 메모.txt"
+    shutil.copy(p, out / "copy.txt")
+    shutil.copy2(p, out / "copy2.txt")
+
+    for q in [p, out / "copy.txt", out / "copy2.txt"]:
+        info = q.stat()
+        when = datetime.fromtimestamp(info.st_mtime)
+        print(q.name, info.st_size, "바이트 · 2026-11-02 그대로?", when.date().isoformat() == "2026-11-02")`, prep: [SAMPLES_PREP] } },
+    { title: "copytree · ignore_patterns(\"~$*\")", html: `<p>폴더 하나를 <b>안쪽 폴더까지 통째로</b> 복사하는 건 <code>shutil.copytree(원본 폴더, 새 폴더)</code> 예요. 파일마다 <code>copy2</code> 로 복사해서 수정 시각도 그대로예요.</p>
+<pre>shutil.copytree(src, dst, dirs_exist_ok=True,
+                ignore=shutil.ignore_patterns("*.tmp", "~$*", "Thumbs.db", "__pycache__"))</pre>
+<table class="kb"><tbody><tr><th>인자</th><th>뜻</th></tr><tr><td><code>dirs_exist_ok=True</code></td><td>새 폴더가 이미 있어도 그 안에 복사(같은 이름 파일은 덮어씀). 빼면 <code>FileExistsError</code></td></tr><tr><td><code>ignore=shutil.ignore_patterns(…)</code></td><td>이름이 패턴에 맞는 파일 · 폴더는 건너뜀</td></tr></tbody></table>
+<p>패턴의 <code>*</code> 는 「아무 글자나 몇 개든」 이에요. <code>"*.tmp"</code> 는 <code>.tmp</code> 로 끝나는 이름, <code>"~$*"</code> 는 <code>~$</code> 로 시작하는 이름(워드 · 엑셀이 열려 있는 동안 생기는 임시 파일), <code>"Thumbs.db"</code> 는 그 이름 하나, <code>"__pycache__"</code> 는 파이썬이 만드는 폴더예요. 정규식이 아니라 Windows 의 <code>dir *.txt</code> 와 같은 모양이에요.</p>
+<p>복사된 결과는 <code>dst.glob("**/*")</code> 로 안쪽까지 돌며 <code>p.relative_to(dst).as_posix()</code> 로 찍어요([[레슨:J1]] 마지막 쪽). 같은 패턴 검사를 내 코드에서 쓰려면 <code>fnmatch.fnmatch(이름, 패턴)</code> 이에요 — <code>ignore_patterns</code> 가 안에서 쓰는 함수예요. 다음 쪽에서 써요.</p>
+<pre>import fnmatch
+
+print(fnmatch.fnmatch("~$견적.docx", "~$*"))    # True
+print(fnmatch.fnmatch("견적.docx", "~$*"))      # False</pre>`,
+      example: { code: `import shutil
+import tempfile
+from pathlib import Path
+from samples import make_files
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    src = base / "문서"
+    make_files(src)
+    (src / "사진").mkdir()
+    shutil.copy2(src / "IMG_0001.JPG", src / "사진" / "공방 입구.jpg")
+    (src / "__pycache__").mkdir()
+    (src / "__pycache__" / "x.pyc").write_bytes(b"pyc")
+
+    dst = base / "USB" / "문서"
+    skip = shutil.ignore_patterns("*.tmp", "~$*", "Thumbs.db", "__pycache__")
+    shutil.copytree(src, dst, dirs_exist_ok=True, ignore=skip)
+
+    names = []
+    for p in sorted(dst.glob("**/*")):
+        names.append(p.relative_to(dst).as_posix())
+    print(len(names), "개:", names)
+
+    shutil.copytree(src, dst, dirs_exist_ok=True, ignore=skip)   # 한 번 더 — 덮어써요
+    try:
+        shutil.copytree(src, dst, ignore=skip)                   # dirs_exist_ok 를 빼면
+    except FileExistsError as e:
+        print("FileExistsError — 이미 있는 폴더라서 멈췄어요")`, prep: [SAMPLES_PREP] } },
+    { title: "바뀐 것만 — st_mtime · filecmp.cmp", html: `<p><code>copytree</code> 는 매번 <b>전부</b> 복사해요. 사진 몇 기가가 든 폴더를 매일 그러면 오래 걸려요. 백업 도구는 <b>새 파일 · 바뀐 파일만</b> 복사해요. 「바뀌었나」 는 두 단계로 봐요.</p>
+<table class="kb"><tbody><tr><th></th><th>빠른 검사</th><th>확실한 검사</th></tr><tr><td>무엇을</td><td>크기 <code>st_size</code> + 수정 시각 <code>st_mtime</code></td><td>내용을 한 바이트씩</td></tr><tr><td>코드</td><td><code>changed(src, dst)</code>(아래)</td><td><code>filecmp.cmp(a, b, shallow=False)</code></td></tr><tr><td>속도</td><td>파일을 안 열어서 빨라요</td><td>두 파일을 다 읽어요</td></tr><tr><td>놓치는 것</td><td>크기와 시각이 같은데 내용만 다른 드문 경우</td><td>없어요</td></tr></tbody></table>
+<ul><li><code>copy2</code> 로 복사했으니 바뀌지 않았으면 시각이 같아요. 원본을 고치면 크기나 시각이 달라져요</li><li>USB 메모리(FAT32 · exFAT)는 시각을 2초 단위로 적어서 <code>copy2</code> 로도 1초쯤 어긋나요. 그래서 2초 안쪽 차이는 같다고 봐요. <code>abs(x)</code> 는 부호를 뗀 크기라서, 어느 쪽이 더 늦든 차이만 봐요</li><li><code>filecmp.cmp(a, b)</code> 는 <code>shallow</code> 를 빼면 <code>True</code> — 크기 · 시각이 같으면 내용을 안 보고 「같다」 고 해요. 확실히 보려면 <code>shallow=False</code></li></ul>
+<p>둘을 합친 <code>copy_changed(src_dir, dst_dir)</code> 는 원본의 모든 파일을 돌며 ① 건너뛸 이름이면 넘기고 ② <code>changed</code> 면 <code>copy2</code> 해요. 상대 경로 <code>rel</code> 을 그대로 백업 쪽에 붙여서(<code>dst_dir / rel</code>) 폴더 구조가 같게 돼요. <code>rel.parts</code> 는 경로를 칸으로 나눈 튜플(<code>('사진', '입구.jpg')</code>)이라 <code>__pycache__</code> 폴더 안의 파일도 걸러요. 미리 보기면 목록만 돌려줘요.</p>
+<p>두 폴더를 한눈에 비교하는 <code>filecmp.dircmp(a, b)</code> 도 있어요: <code>left_only</code>(왼쪽에만) · <code>right_only</code>(오른쪽에만) · <code>diff_files</code>(둘 다 있는데 다름) · <code>common_dirs</code>(둘 다 있는 폴더). 바로 안의 것만 보고, 안쪽 폴더는 <code>c.subdirs["사진"]</code> 으로 들어가요. 내용 비교는 <code>filecmp.cmp</code> 의 빠른 검사와 같아요.</p>`,
+      example: { code: `import filecmp
+import fnmatch
+import os
+import shutil
+import tempfile
+from pathlib import Path
+from samples import make_files
+
+SKIP = ["*.tmp", "~$*", "Thumbs.db", "__pycache__"]
+
+
+def skipped(rel, patterns=SKIP):
+    """상대 경로의 어느 한 칸이라도 패턴에 맞으면 True(폴더 __pycache__ 안의 파일도)"""
+    for part in rel.parts:
+        for pattern in patterns:
+            if fnmatch.fnmatch(part, pattern):
+                return True
+    return False
+
+def changed(src, dst):
+    """dst 가 없거나 크기 · 수정 시각이 다르면 True(빠른 검사)"""
+    if not dst.exists():
+        return True
+    a = src.stat()
+    b = dst.stat()
+    if a.st_size != b.st_size:
+        return True
+    return abs(a.st_mtime - b.st_mtime) > 2      # USB(FAT) 는 2초 단위라 그 안은 같다고 봐요
+
+def copy_changed(src_dir, dst_dir, patterns=SKIP, dry_run=False):
+    """새 파일 · 바뀐 파일만 copy2. 복사한(미리 보기면 복사할) 상대 경로 리스트를 돌려줘요"""
+    done = []
+    for p in sorted(src_dir.glob("**/*")):
+        rel = p.relative_to(src_dir)
+        if not p.is_file() or skipped(rel, patterns):
+            continue
+        target = dst_dir / rel
+        if not changed(p, target):
+            continue
+        done.append(rel.as_posix())
+        if not dry_run:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(p, target)
+    return done
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    src = base / "문서"
+    dst = base / "USB" / "문서"
+    make_files(src)
+
+    todo = copy_changed(src, dst, dry_run=True)
+    print("미리 보기:", len(todo), "개")
+    done = copy_changed(src, dst)
+    print("1번째:", len(done), "개 복사")
+    print("2번째:", copy_changed(src, dst))
+
+    (src / "회의 메모.txt").write_text("회의는 화요일 10시로 바뀜", encoding="utf-8")
+    (src / "견적서 v2.docx").write_bytes(b"docx-v2")
+    print("3번째:", copy_changed(src, dst))
+
+    # 크기 · 시각이 같은데 내용만 다르면?
+    a = src / "IMG_0002.jpg"
+    b = dst / "IMG_0002.jpg"
+    a.write_bytes(b"photo-X")                   # 같은 7바이트
+    ts = b.stat().st_mtime
+    os.utime(a, (ts, ts))                       # 시각도 같게
+    print("빠른 검사 changed:", changed(a, b))
+    print("filecmp.cmp:", filecmp.cmp(a, b), "/ shallow=False:", filecmp.cmp(a, b, shallow=False))
+
+    (dst / "옛날 견적.docx").write_bytes(b"old")
+    (src / "청구서_10월.PDF").write_bytes(b"pdf-oct-fixed")
+    c = filecmp.dircmp(src, dst)
+    print("원본에만:", sorted(c.left_only))
+    print("백업에만:", sorted(c.right_only))
+    print("다름:", sorted(c.diff_files))`, prep: [SAMPLES_PREP] } },
+    { title: "문서_2026-11-08 · 최근 n개만 남기기", html: `<p>백업을 매일 같은 폴더에 덮어쓰면, 어제 실수로 지운 파일이 오늘 백업에서도 사라져요. 그래서 백업은 <b>날짜 이름</b>으로 하나씩 쌓아요: <code>백업/2026-11-08/</code> · <code>백업/문서_2026-11-08.zip</code>([[레슨:J3]] 의 zip). 그럼 며칠 전 상태로도 돌아갈 수 있어요.</p>
+<p><code>YYYY-MM-DD</code> 는 큰 단위부터 두 자리로 맞춰서 <b>이름 순 = 날짜 순</b>이에요. 대신 계속 쌓이면 디스크가 차니까 <b>최근 n개만 남기고</b> 지워요. 지우기라서 [[레슨:J0]] 의 원칙대로 지울 목록을 먼저 보여 줘요.</p>
+<pre>old = old_backups(backup_root, keep=7)     # 지울 것: 오래된 것부터
+prune_backups(backup_root, 7, dry_run=True) # [미리 보기] 지울 백업: …
+prune_backups(backup_root, 7)               # 진짜로</pre>
+<ul><li>이름에서 날짜는 <code>re.search(r"\\d{4}-\\d{2}-\\d{2}", 이름)</code> 으로 찾아요(복습: <a href="../python/#lesson/L20B" target="_blank" rel="noopener">파이썬 교과서 「정규식 2: 찾아 꺼내기 · 줄 처음과 끝」 ↗</a>). 날짜가 없는 파일 · 폴더(<code>메모.txt</code>)는 <b>절대 건드리지 않아요</b></li><li><code>(날짜, 이름)</code> 튜플 리스트를 <code>sort()</code> 하면 날짜 순이에요. 이름 앞부분이 달라도(<code>문서_</code> · <code>사진_</code>) 날짜로 줄 서요. 한 폴더에 여러 백업을 둘 땐 <code>prefix="문서_"</code> 로 하나만 골라요</li><li>몇 개를 지울지는 <code>max(len(dated) - keep, 0)</code> — 백업이 아직 keep 개보다 적으면 0개예요. <code>dated[:-keep]</code> 으로 쓰면 <code>keep=0</code> 일 때 <code>[:-0]</code> = <code>[:0]</code> 이라 하나도 안 지워지는 함정이 있어요</li><li>폴더 백업은 <code>shutil.rmtree</code>, 파일(zip) 백업은 <code>unlink</code> 로 지워요</li></ul>
+<p>지우기 전에 남은 공간을 보고 싶으면 <code>shutil.disk_usage(경로)</code> 예요. <code>total</code> · <code>used</code> · <code>free</code> 가 바이트로 나와요. 값은 PC 마다 달라서 이 교과서는 찍지 않아요 — 내 PC 에서 <code>u.free // 2**30</code>(GB) 를 찍어 보세요.</p>
+<pre>u = shutil.disk_usage(".")
+print(u.free // 2**30, "GB 남음")</pre>`,
+      example: { code: `import re
+import shutil
+import tempfile
+from pathlib import Path
+
+def old_backups(root, keep, prefix=""):
+    """root 안의 날짜 이름 백업(2026-11-08 · 문서_2026-11-08.zip) 가운데
+    최근 keep 개를 뺀 나머지 = 지울 것, 오래된 것부터"""
+    dated = []
+    for p in root.iterdir():
+        m = re.search(r"\\d{4}-\\d{2}-\\d{2}", p.name)
+        if m and p.name.startswith(prefix):
+            dated.append((m.group(), p.name))
+    dated.sort()
+    cut = max(len(dated) - keep, 0)
+    old = []
+    for day, name in dated[:cut]:
+        old.append(root / name)
+    return old
+
+
+def prune_backups(root, keep, prefix="", dry_run=False):
+    """지울 목록을 먼저 보여 주고(미리 보기면 거기까지) 지워요"""
+    old = old_backups(root, keep, prefix)
+    for p in old:
+        if dry_run:
+            print("[미리 보기] 지울 백업:", p.name)
+        elif p.is_dir():
+            shutil.rmtree(p)
+            print("지웠어요:", p.name)
+        else:
+            p.unlink()
+            print("지웠어요:", p.name)
+    return old
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp) / "백업"
+    root.mkdir()
+    for day in ["2026-11-01", "2026-11-03", "2026-10-28", "2026-11-08", "2026-11-05"]:
+        (root / day).mkdir()                                 # 폴더 백업
+        (root / f"문서_{day}.zip").write_bytes(b"zip")        # 파일 백업
+    (root / "메모.txt").write_text("날짜 없는 파일", encoding="utf-8")
+
+    old = old_backups(root, 3, prefix="문서_")
+    print("지울 zip:", [p.name for p in old])
+    print("keep=9:", old_backups(root, 9, prefix="문서_"))
+
+    prune_backups(root, 3, prefix="문서_", dry_run=True)   # 미리 보기 먼저
+    prune_backups(root, 3, prefix="문서_")
+    prune_backups(root, 2, prefix="2026-")                # 폴더 백업은 2개만
+    left = sorted(p.name for p in root.iterdir())
+    print("남은 것:", left)
+
+    u = shutil.disk_usage(root)
+    print("공간 정보는 바이트 정수:", type(u.free).__name__, u.free > 0)`, prep: [SAMPLES_PREP] } },
+    { title: "중복 파일 찾기 — 크기로 묶고 sha256", html: `<p>백업 전에 같은 파일이 여기저기 복사돼 있으면 공간만 차지해요. <code>IMG_0001.JPG</code> 와 <code>IMG_0001 (1).JPG</code> 처럼요. <b>내용이 똑같은</b> 파일을 찾아요. 이름은 믿을 수 없어서 내용으로 봐요.</p>
+<p>내용 비교에는 파일의 지문 sha256 을 써요. 내용이 같으면 지문이 같고, 한 바이트만 달라도 완전히 달라져요. 해시가 무엇인지는 <a href="../cs/#lesson/C16" target="_blank" rel="noopener">CS 교과서 「해시: 데이터의 지문」 ↗</a> 에서 배워요. 여기서는 한 줄이면 돼요.</p>
+<pre>hashlib.sha256(p.read_bytes()).hexdigest()   # 64글자 지문</pre>
+<p><code>p.read_bytes()</code> 는 파일을 바이트로 통째로 읽어요(이 레슨 첫 쪽). 그런데 모든 파일을 다 읽어 지문을 내면 느려요. 그래서 두 단계로 해요.</p>
+<ol><li><b>크기로 먼저 묶기</b> — 크기가 다르면 절대 같은 파일이 아니에요. <code>st_size</code> 는 파일을 안 열어서 빨라요. <code>defaultdict(list)</code> 로 크기별로 모아요(복습: <a href="../python/#lesson/L25" target="_blank" rel="noopener">파이썬 교과서 「collections 더: defaultdict · deque · namedtuple」 ↗</a>)</li><li><b>같은 크기끼리만 지문</b> — 둘 이상인 묶음만 sha256 으로 다시 묶어요</li></ol>
+<p>찾은 묶음은 <b>보여 주기만</b> 해요. 어느 쪽을 지울지는 사람이 정해요(어느 폴더의 것이 「진짜」 인지는 프로그램이 몰라요). 아주 큰 파일(동영상)은 <code>read_bytes</code> 로 통째로 읽지 말고 조금씩 읽어 지문에 더해요 — <a href="../cs/#lesson/C16" target="_blank" rel="noopener">CS 교과서 「해시: 데이터의 지문」 ↗</a> 에 그 방법이 있어요.</p>`,
+      example: { code: `import hashlib
+import shutil
+import tempfile
+from collections import defaultdict
+from pathlib import Path
+from samples import make_files
+
+def file_hash(p):
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def duplicates(folder):
+    """내용이 똑같은 파일 묶음들 — 크기로 먼저 묶고, 같은 크기끼리만 sha256"""
+    by_size = defaultdict(list)
+    for p in sorted(folder.glob("**/*")):
+        if p.is_file():
+            by_size[p.stat().st_size].append(p)
+    groups = []
+    for size in sorted(by_size):
+        same_size = by_size[size]
+        if len(same_size) < 2:
+            continue
+        by_hash = defaultdict(list)
+        for p in same_size:
+            by_hash[file_hash(p)].append(p)
+        for same in by_hash.values():
+            if len(same) > 1:
+                groups.append(same)
+    return groups
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    make_files(base)
+    (base / "사진").mkdir()
+    shutil.copy2(base / "IMG_0001.JPG", base / "IMG_0001 (1).JPG")
+    shutil.copy2(base / "IMG_0001.JPG", base / "사진" / "공방 입구.jpg")
+
+    sizes = defaultdict(list)
+    for p in sorted(base.glob("**/*")):
+        if p.is_file():
+            sizes[p.stat().st_size].append(p.name)
+    print("7바이트 파일:", sizes[7])
+
+    print(file_hash(base / "IMG_0001.JPG")[:16])
+    print(file_hash(base / "IMG_0002.jpg")[:16])
+
+    for group in duplicates(base):
+        names = []
+        for p in group:
+            names.append(p.relative_to(base).as_posix())
+        print("같은 내용:", names)`, prep: [SAMPLES_PREP] } },
+  ],
+  summary: ["백업은 수정 시각까지 가져가는 shutil.copy2, 폴더 통째는 copytree(…, dirs_exist_ok=True, ignore=shutil.ignore_patterns(\"~$*\", …))", "바뀐 것만 복사: 크기 st_size + 수정 시각 st_mtime 으로 빠르게, 확실히는 filecmp.cmp(a, b, shallow=False) — 두 폴더는 dircmp 의 left_only · right_only · diff_files", "날짜 이름(YYYY-MM-DD) 백업은 이름 순 = 날짜 순 — 최근 n개만 남기기는 지울 목록을 먼저 보여 주고, 중복 파일은 크기로 묶은 뒤 sha256 으로"] },
 { id: 'J3', ch: 1, n: 3, title: '압축: zipfile', mode: 'text',
   tutorSummary: "zipfile 로 묶고 · 보고 · 풀기. zipfile.ZipFile(path, \"w\", compression=zipfile.ZIP_DEFLATED) — compression 을 빼면 ZIP_STORED(담기만). \"w\" 는 덮어쓰기, \"a\" 는 뒤에 더하기(같은 이름이면 하나 더 생기고 Duplicate name 경고, read 는 마지막 것), 기본 \"r\". 늘 with. zf.write(p, arcname=p.relative_to(src).as_posix()) — arcname 을 빼면 내 PC 경로(Users/me/AppData/…)가 통째로 들어가는 함정, as_posix 로 / 구분, src.rglob(\"*\") 에서 is_file 만, zip 은 원본 폴더 밖에(안에 두면 자기 자신이 들어감 — out.resolve().is_relative_to(src.resolve())). zf.writestr(이름, 글자). 보기: namelist()(넣은 순서 → sorted) · infolist() 의 filename · file_size · compress_size · compress_type · getinfo · zf.read(name) 은 바이트 → decode(\"utf-8\"), 없는 이름은 KeyError. jpg · png · zip 은 거의 안 줄고 아주 작은 파일은 늘기도 함 → 크기는 참 · 거짓으로만. 풀기: extractall(새 빈 폴더 — 같은 이름은 덮어씀) · extract · testzip()(괜찮으면 None, 아니면 처음 망가진 이름 — 파일마다 적힌 CRC-32 지문, J2 의 sha256 과 같은 생각) · is_zipfile · BadZipFile(\"File is not a zip file\", \"Bad CRC-32\"). read_bytes · write_bytes. 암호 zip 은 푸는 것만 pwd=b\"1234\"(만들기는 표준에 없음 — 7-Zip, AES 는 NotImplementedError). 한글 이름이 ░▀└√ 처럼 깨지는 zip(옛 Windows 기본 압축 = cp949, utf-8 표시 없음 → 파이썬은 cp437 로 읽음) → ZipFile(path, metadata_encoding=\"cp949\")(3.11+, 읽기만 — \"w\" 면 ValueError), 깨진 이름으론 read 가 KeyError. shutil.make_archive(확장자 뺀 이름, \"zip\", root_dir=폴더)(\".zip\" 을 주면 .zip.zip) · unpack_archive — 고를 수 없음 → fnmatch.fnmatch(name.lower(), pattern.lower())(* · ? · Windows 는 대소문자 무시) 와 rel.parts 의 . 조각(숨김 폴더)으로 직접 골라 담기. glob 도 같은 모양(문서_????-??-??.zip). tar 는 리눅스 U14.",
   pages: [
@@ -1348,21 +2281,441 @@ with tempfile.TemporaryDirectory() as tmp:
         print(p.name, len(r.pages), "쪽 |", text)`, prep: [SAMPLES_PREP] } },
   ],
   summary: ["EmailMessage 에 msg[\"To\"] = formataddr((이름, 주소)) · Subject(한글 그대로)를 넣어요 — 같은 머리글은 두 번 못 넣으니 사람마다 새 메시지", "본문은 set_content(글) + add_alternative(html, subtype=\"html\"), 첨부는 read_bytes() 한 바이트를 add_attachment(…, maintype, subtype, filename) 로 — 종류는 내 표로", "write_bytes(msg.as_bytes()) 로 .eml 저장 → BytesParser(policy=policy.default) 로 다시 읽어 받는 사람 · 제목 · 본문 · 첨부를 확인해요 — 원문 비교는 안 돼요"] },
-{ id: 'J10', ch: 3, n: 10, title: '이메일 보내기', mode: 'text', draft: true,
-  tutorSummary: 'SMTP · 앱 비밀번호 · 가짜 서버',
-  pages: AUTO_TODO('SMTP · 앱 비밀번호 · 가짜 서버'), summary: ["SMTP", "앱 비밀번호", "가짜 서버"] },
-{ id: 'JB3', ch: 3, boss: true, title: '만들어 보기: 수료증 · 안내 메일 발송기', mode: 'text', draft: true,
-  tutorSummary: '만들어 보기: 수료증 · 안내 메일 발송기', pages: [], summary: [] },
+{ id: 'J10', ch: 3, n: 10, title: '이메일 보내기', mode: 'text',
+  tutorSummary: "smtplib 로 내 메일 계정의 SMTP 서버에 로그인해 EmailMessage 를 보낸다. 465 는 smtplib.SMTP_SSL(host, 465, timeout=30), 587 은 smtplib.SMTP(host, 587) 뒤 server.starttls() 를 login 보다 먼저 — 포트와 짝을 맞춘다. with 가 끝나면 quit. server.login(아이디, 앱 비밀번호) → server.send_message(msg) 는 To · Cc · Bcc 모두에게 보내고 Bcc 머리는 빼 준다. Gmail: smtp.gmail.com, 아이디 = 주소 전체, Google 계정 관리 → 보안 → 2단계 인증 켜기 → 계정 검색 칸에 「앱 비밀번호」 → 앱 이름 → 만들기 → 16글자 복사(다시 못 봄), SMTP 는 따로 켤 것 없음, Workspace 계정은 관리자가 막을 수 있음. 네이버: smtp.naver.com, 아이디 = @ 앞부분, 메일 환경설정 → POP3/IMAP 설정 → IMAP/SMTP 설정 → 사용함 → 저장, 2단계 인증이면 네이버 내정보 → 보안설정 → 2단계 인증 관리 → 애플리케이션 비밀번호 관리 → 직접 입력 → 생성하기. 메뉴 이름은 바뀔 수 있음. From 은 로그인한 내 주소. 에러: SMTPAuthenticationError 535(비밀번호 · 설정), socket.gaierror(서버 이름 철자), ssl.SSLError WRONG_VERSION_NUMBER(587 에 SMTP_SSL), TimeoutError(네트워크가 막음) — 모두 OSError 갈래. 비밀번호는 코드 밖: os.environ.get(\"MAIL_PASSWORD\")(PowerShell $env:MAIL_PASSWORD=\"…\", L28) 또는 from getpass import getpass → getpass(\"…\") 는 치는 글자가 안 보이는 input, 앱 비밀번호 빈칸은 replace 로 빼기, 찍지 않기, .env 는 API 교과서 H7. 보내는 부분을 함수로 떼고 서버를 인자로(deliver(msg, server=None, outbox=None)): None 이면 outbox/ 에 .eml 만(미리 보기), 시험은 send_message 만 있는 가짜 서버(samples 의 FakeSMTP: sent · login · with · fail=). 순서: 미리 보기 → 가짜 → 나에게 한 통 → 모두. 여러 명: 한 명에 한 통, 사이에 time.sleep(delay)(시험은 0), 실패는 except OSError as e 로 적어 두고 continue, 보낸 다음에 sent.csv 에 \"a\" 로 한 줄(mark_sent) · done.add — 다시 돌리면 이미 보낸 주소는 건너뛰어 실패한 사람만 다시. 광고는 동의 + (광고), 하루 한도, 명단 · sent.csv 는 개인정보. 받기는 imaplib(이름만).",
+  terms: {"SMTP":"메일을 보내는 약속이자 그 일을 하는 서버. 내 메일 계정의 SMTP 서버에 로그인해서 메일을 맡기면 받는 사람 쪽으로 전해 줘요","앱 비밀번호":"메일 서비스가 프로그램용으로 따로 만들어 주는 비밀번호. 진짜 비밀번호 대신 쓰고, 새어 나가면 그것만 지우면 돼요"},
+  pages: [
+    { title: "SMTP_SSL(host, 465) · send_message", html: `<p>[[레슨:J9]] 에서 만든 <code>EmailMessage</code> 를 이제 진짜로 보내요. 메일을 받아서 상대에게 전해 주는 곳이 [[SMTP]] 서버예요. 파이썬 표준 모듈 <code>smtplib</code> 로 <b>내 메일 계정의 SMTP 서버</b>에 로그인해서 메일을 맡기면 돼요.</p>
+<pre>import os
+import smtplib
+from email.message import EmailMessage
+
+ME = "내아이디@gmail.com"                # 내 주소로 바꿔요
+pw = os.environ.get("MAIL_PASSWORD")    # 앱 비밀번호 — 코드에 적지 않아요(3쪽)
+
+msg = EmailMessage()
+msg["From"] = ME
+msg["To"] = ME                          # 첫 발송은 늘 나에게
+msg["Subject"] = "파이썬에서 보낸 첫 메일"
+msg.set_content("잘 도착했나요?")
+
+with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as server:
+    server.login(ME, pw)
+    server.send_message(msg)
+print("보냈어요")</pre>
+<p>서버에 붙는 방법은 둘이에요. 둘 다 비밀번호가 오가기 전에 연결을 암호화해요. <b>포트 번호와 짝을 맞춰야</b> 해요.</p>
+<table class="kb"><tbody><tr><th>포트</th><th>코드</th><th>뜻</th></tr><tr><td><code>465</code></td><td><code>smtplib.SMTP_SSL(host, 465)</code></td><td>처음부터 암호화된 연결</td></tr><tr><td><code>587</code></td><td><code>smtplib.SMTP(host, 587)</code> → <code>server.starttls()</code></td><td>보통 연결로 붙은 뒤 암호화로 바꾸기 — <code>login</code> 보다 먼저</td></tr></tbody></table>
+<pre>with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as server:
+    server.starttls()          # 여기서부터 암호화
+    server.login(ME, pw)
+    server.send_message(msg)</pre>
+<table class="kb"><tbody><tr><th>메일</th><th>서버 이름</th><th>포트</th><th>login 아이디</th></tr><tr><td>Gmail</td><td><code>smtp.gmail.com</code></td><td>465 · 587</td><td>주소 전체(<code>…@gmail.com</code>)</td></tr><tr><td>네이버</td><td><code>smtp.naver.com</code></td><td>465 · 587</td><td>네이버 아이디(<code>@naver.com</code> 앞부분)</td></tr><tr><td>회사 · 학교 메일</td><td colspan="3">담당자에게 서버 이름 · 포트 · 로그인 방법을 물어요. 바깥 프로그램의 로그인을 막아 둔 곳이 많아요</td></tr></tbody></table>
+<ul><li><code>From</code> 은 <b>로그인한 내 주소</b>로 써요. 다른 주소를 쓰면 네이버는 거절하고, Gmail 은 내 주소로 바꿔 버려요</li><li><code>with</code> 가 끝나면 연결을 닫는 <code>server.quit()</code> 을 대신 불러 줘요</li><li><code>send_message(msg)</code> 는 <code>To</code> · <code>Cc</code> · <code>Bcc</code> 의 주소 모두에게 보내요. <code>Bcc</code> 는 받는 사람 목록에만 넣고 <b>나가는 메일의 머리에서는 빼 줘요</b>. 그래서 받는 사람끼리 Bcc 주소를 못 봐요</li><li><code>timeout=30</code> — 서버가 30초 동안 대답이 없으면 <code>TimeoutError</code> 로 멈춰요. 빼면 한없이 기다릴 수 있어요</li><li>로그인이 틀리면 <code>smtplib.SMTPAuthenticationError</code> 예요(2쪽 표)</li><li>받은 메일함을 읽는 쪽은 표준 <code>imaplib</code> 모듈이 있어요. 이 교과서에서는 이름만 알아 둬요</li></ul>
+<div class="bk-warn"><b>이 쪽의 코드는 진짜로 보내요</b> — 그래서 실행 예제 없이 글로만 두었어요. 처음에는 꼭 <code>To</code> 를 <b>내 주소</b>로 두고, 받은편지함(스팸함 아님)에 오는지 본 다음에 남에게 보내요. 시험은 4쪽의 가짜 서버로 해요.</div>` },
+    { title: "smtp.gmail.com · 네이버 앱 비밀번호", html: `<p>SMTP 서버에 로그인할 때는 평소 비밀번호 대신 [[앱 비밀번호]]를 써요. 메일 서비스가 프로그램용으로 따로 만들어 주는 비밀번호예요. 새어 나가도 그것만 지우면 되고, 내 진짜 비밀번호는 프로그램에 한 번도 들어가지 않아요.</p>
+<p><b>Gmail</b> — 앱 비밀번호만 만들면 돼요. SMTP 는 따로 켤 것이 없어요.</p>
+<ol><li><b>2단계 인증 켜기</b>: 브라우저에서 Google 오른쪽 위 내 사진 → 「Google 계정 관리」 → 왼쪽 메뉴 「보안」 → 「Google에 로그인하는 방법」 칸의 「2단계 인증」 → 안내대로 휴대전화를 등록하고 켜요. 앱 비밀번호는 2단계 인증을 켠 계정에만 나와요</li><li><b>앱 비밀번호 화면 찾기</b>: 「Google 계정 관리」 화면 맨 위의 검색 칸(「Google 계정 검색」)에 <code>앱 비밀번호</code> 를 쳐서 「앱 비밀번호」 화면으로 가요</li><li><b>만들기</b>: 「앱 이름」 칸에 <code>햇살 공방 파이썬</code> 처럼 알아볼 이름을 쓰고 「만들기」</li><li><b>복사</b>: 창에 뜬 16글자(4글자씩 네 묶음)를 바로 복사해 두고 「완료」. 이 창을 닫으면 다시 볼 수 없어요. 잃어버리면 같은 화면에서 지우고 새로 만들어요</li></ol>
+<p>검색해도 「앱 비밀번호」 가 안 나오면 2단계 인증이 꺼져 있거나, 회사 · 학교 계정(Google Workspace)이라 관리자가 막아 둔 거예요.</p>
+<p><b>네이버</b> — SMTP 를 켜고, 2단계 인증을 쓰면 앱 비밀번호도 만들어요.</p>
+<ol><li><b>SMTP 켜기</b>: 네이버 메일(mail.naver.com) 왼쪽 아래 「환경설정」 → 위쪽 「POP3/IMAP 설정」 → 「IMAP/SMTP 설정」 탭 → 「IMAP/SMTP 사용」 칸을 「사용함」 → 맨 아래 「저장」. 같은 화면 아래에 SMTP 서버 <code>smtp.naver.com</code> 과 포트 <code>465</code> 가 적혀 있어요</li><li><b>앱 비밀번호</b>: 네이버 첫 화면의 내 이름 → 「네이버 내정보」 → 「보안설정」 → 「2단계 인증」 의 「관리」 → 아래쪽 「애플리케이션 비밀번호 관리」 → 종류 칸에서 「직접 입력」, 이름 칸에 <code>파이썬</code> → 「생성하기」 → 나온 비밀번호를 복사해요</li><li>2단계 인증을 안 켰다면 네이버 로그인 비밀번호로도 들어가져요. 하지만 그러면 진짜 비밀번호가 프로그램에 들어가니, 2단계 인증 + 앱 비밀번호를 권해요</li><li>login 아이디는 네이버 아이디(<code>@naver.com</code> 앞부분)예요</li></ol>
+<p>메뉴 이름과 자리는 서비스가 화면을 고치면서 바뀔 수 있어요(2026년 11월 기준). 안 보이면 계정 설정 화면의 검색 칸에 「앱 비밀번호」 · 「SMTP」 를 쳐 보세요.</p>
+<p>설정이 틀리면 트레이스백 마지막 줄이 이렇게 나와요.</p>
+<table class="kb"><tbody><tr><th>마지막 줄</th><th>까닭 · 고칠 곳</th></tr><tr><td><code>smtplib.SMTPAuthenticationError: (535, …)</code></td><td>아이디 · 앱 비밀번호가 틀림, 2단계 인증이나 네이버 「IMAP/SMTP 사용」 이 꺼짐</td></tr><tr><td><code>socket.gaierror: [Errno 11001] getaddrinfo failed</code></td><td>서버 이름 철자(<code>smtp.gmial.com</code>) · 인터넷 연결</td></tr><tr><td><code>ssl.SSLError: [SSL: WRONG_VERSION_NUMBER] …</code></td><td>587 에 <code>SMTP_SSL</code> 을 씀 — 465 로 바꾸거나 <code>SMTP</code> + <code>starttls()</code></td></tr><tr><td><code>TimeoutError: timed out</code></td><td>회사 · 학교 · 카페 네트워크가 465 · 587 을 막음, 또는 465 에 <code>SMTP</code> 를 씀</td></tr></tbody></table>` },
+    { title: "os.environ.get(…) · getpass() 비밀번호", html: `<p>앱 비밀번호도 비밀번호예요. <b>코드에 적지 않아요</b>. .py 파일은 남에게 보내고 GitHub 에 올리는 파일이니까요(복습: <a href="../python/#lesson/L28" target="_blank" rel="noopener">파이썬 교과서 「환경 변수와 다른 프로그램: os · subprocess」 ↗</a>). 코드 밖에서 받는 길이 둘이에요.</p>
+<table class="kb"><tbody><tr><th>방법</th><th>코드</th><th>언제</th></tr><tr><td>환경 변수</td><td><code>os.environ.get("MAIL_PASSWORD")</code></td><td>터미널에서 <code>$env:MAIL_PASSWORD="…"</code> 로 정해 두고 여러 번 돌릴 때. 그 터미널 창에서만 살아요</td></tr><tr><td>물어보기</td><td><code>getpass("앱 비밀번호: ")</code></td><td>그때그때 쳐 넣을 때. <code>input()</code> 처럼 받지만 <b>치는 글자가 화면에 안 보여요</b></td></tr></tbody></table>
+<pre>from getpass import getpass
+
+pw = getpass("앱 비밀번호(화면에 안 보여요): ")</pre>
+<p><code>getpass</code> 는 표준 모듈 <code>getpass</code> 의 함수예요. VS Code 아래 터미널에서 돌리면 커서만 깜빡이고 아무것도 안 찍혀요. 그래도 들어가고 있어요. 다 치고 Enter 를 눌러요.</p>
+<ul><li>둘을 합쳐 「환경 변수에 있으면 그것, 없으면 물어보기」 로 쓰면 편해요. 아래 예제의 <code>get_password</code> 예요</li><li>묻는 함수 <code>ask</code> 를 인자로 받으니, 시험할 때는 가짜 함수를 넘겨요. 4쪽의 가짜 서버와 같은 생각이에요</li><li>Gmail 앱 비밀번호의 빈칸(4글자씩 띄운 것)은 <code>.replace(" ", "")</code> 로 빼고 써요</li><li>비밀번호는 <code>print</code> 로도, 로그 파일([[레슨:J12]])에도 찍지 않아요. 확인이 필요하면 앞 몇 글자와 길이만</li><li>예약해서 혼자 도는 스크립트([[레슨:J13]])는 물어볼 사람이 없어서 환경 변수만 써요</li><li>비밀번호를 <code>.env</code> 파일에 두는 방법은 <a href="../api/#lesson/H7" target="_blank" rel="noopener">HTTP·API·SDK 교과서 「인증: API 키와 토큰」 ↗</a> 에 있어요</li></ul>
+<div class="bk-warn"><b>코드에 적어 올렸다면</b> — 지워도 Git 기록에 남아요. 그 앱 비밀번호를 2쪽의 같은 화면에서 바로 지우고 새로 만들어요. 앱 비밀번호만 지우면 되는 게 앱 비밀번호의 좋은 점이에요.</div>`,
+      example: { code: `import os
+from getpass import getpass
+
+
+def get_password(name="MAIL_PASSWORD", ask=getpass):
+    """환경 변수에 있으면 그것을, 없으면 물어봐요. 앱 비밀번호의 빈칸은 빼요."""
+    pw = os.environ.get(name)
+    if pw:
+        print(name, "환경 변수에서 읽었어요")
+    else:
+        pw = ask("메일 앱 비밀번호(화면에 안 보여요): ")
+    return pw.replace(" ", "")
+
+
+# ① 환경 변수가 있을 때 — 터미널에서 정한 것처럼 흉내(진짜 비밀번호는 여기 적지 않아요)
+os.environ["MAIL_PASSWORD"] = "abcd efgh ijkl mnop"
+pw = get_password()
+print("앞 네 글자만:", pw[:4] + "…", "· 길이", len(pw))
+
+# ② 없을 때 — getpass 대신 가짜 ask 를 넘겨 시험
+del os.environ["MAIL_PASSWORD"]
+
+
+def fake_ask(prompt):
+    print("물어봄 →", prompt)
+    return "wxyz 1234 wxyz 1234"
+
+
+pw = get_password(ask=fake_ask)
+print("앞 네 글자만:", pw[:4] + "…", "· 길이", len(pw))` } },
+    { title: "deliver(msg, server) — 가짜 서버로 시험", html: `<p>진짜 서버로 시험하면 시험할 때마다 메일이 나가요. 그래서 <b>보내는 부분을 함수로 떼고, 서버를 인자로 받아요</b>. 함수는 받은 서버가 진짜인지 몰라요. <code>send_message</code> 만 있으면 돼요. 시험할 때는 기록만 하는 가짜 서버를 넘겨요(가짜 객체: <a href="../debug/#lesson/D10" target="_blank" rel="noopener">디버깅·테스트 교과서 「예외 · 가짜 객체 테스트」 ↗</a>).</p>
+<pre>def deliver(msg, server=None, outbox=None):
+    if server is None:                       # 미리 보기 — 파일로만
+        addr = parseaddr(msg["To"])[1]
+        (outbox / f"{addr}.eml").write_bytes(msg.as_bytes())
+        return "저장"
+    server.send_message(msg)                 # 진짜든 가짜든 똑같이
+    return "보냄"</pre>
+<table class="kb"><tbody><tr><th>단계</th><th>넘기는 것</th><th>확인</th></tr><tr><td>① 미리 보기</td><td><code>server=None</code>, <code>outbox=폴더</code></td><td><code>outbox/</code> 의 <code>.eml</code> 을 다시 읽어 찍고, 메일 앱으로 열어 봐요([[레슨:J9]])</td></tr><tr><td>② 시험</td><td>가짜 서버 <code>FakeSMTP()</code></td><td><code>server.sent</code> 에 (받는 사람, 제목)이 쌓여요</td></tr><tr><td>③ 나에게 한 통</td><td>진짜 서버, <code>To</code> = 내 주소</td><td>받은편지함에서 눈으로</td></tr><tr><td>④ 모두에게</td><td>진짜 서버</td><td>5쪽의 <code>sent.csv</code></td></tr></tbody></table>
+<p>가짜 서버는 직접 만들 수 있어요. <code>send_message</code> 가 메일을 받아 리스트에 적기만 하면 끝이에요. 연습 재료의 <code>FakeSMTP</code> 는 여기에 <code>login</code> · <code>quit</code> · <code>with</code> 와 <code>fail=(주소들)</code>(그 주소면 일부러 <code>OSError</code>)을 더한 거예요. 진짜로 보낼 때는 같은 <code>deliver</code> 에 진짜 서버를 넘겨요.</p>
+<pre>with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as server:
+    server.login(ME, get_password())
+    deliver(msg, server)</pre>
+<p><code>parseaddr</code> 는 <code>"김하늘 &lt;sky@example.com&gt;"</code> 을 <code>("김하늘", "sky@example.com")</code> 으로 나눠요([[레슨:J9]]). 미리 보기 파일 이름에 주소만 써요.</p>`,
+      example: { code: `import tempfile
+from email import policy
+from email.message import EmailMessage
+from email.parser import BytesParser
+from email.utils import formataddr, parseaddr
+from pathlib import Path
+
+from samples import FakeSMTP
+
+
+def make_mail(name, addr):
+    msg = EmailMessage()
+    msg["From"] = formataddr(("햇살 공방", "hello@example.com"))
+    msg["To"] = formataddr((name, addr))
+    msg["Subject"] = f"{name}님, 11월 수업 안내예요"
+    msg.set_content(f"{name}님, 안녕하세요.\\n11월 수업은 매주 토요일 10시예요.")
+    return msg
+
+
+def deliver(msg, server=None, outbox=None):
+    """server 를 받으면 보내고, None 이면 outbox 폴더에 .eml 로만 저장(미리 보기)."""
+    if server is None:
+        addr = parseaddr(msg["To"])[1]
+        path = outbox / f"{addr}.eml"
+        path.write_bytes(msg.as_bytes())
+        return "저장"
+    server.send_message(msg)
+    return "보냄"
+
+
+class MySMTP:
+    """직접 만든 가짜 서버 — send_message 만 있으면 deliver 가 쓸 수 있어요."""
+
+    def __init__(self):
+        self.sent = []
+
+    def send_message(self, msg):
+        self.sent.append((msg["To"], msg["Subject"]))
+
+
+msg = make_mail("김하늘", "sky@example.com")
+
+# ① 미리 보기: 서버 없이 outbox/ 에 저장하고 다시 읽기
+with tempfile.TemporaryDirectory() as tmp:
+    outbox = Path(tmp) / "outbox"
+    outbox.mkdir()
+    print(deliver(msg, outbox=outbox))
+    for p in sorted(outbox.iterdir()):
+        with open(p, "rb") as f:
+            back = BytesParser(policy=policy.default).parse(f)
+        print(" ", p.name, "|", back["Subject"])
+
+# ② 내가 만든 가짜 서버
+mine = MySMTP()
+print(deliver(msg, mine), mine.sent)
+
+# ③ samples.py 의 FakeSMTP — with · login 까지 진짜 smtplib 처럼
+with FakeSMTP() as server:
+    server.login("hello@example.com", "가짜 비밀번호")
+    print(deliver(msg, server), server.user, server.sent)`, prep: [SAMPLES_PREP] } },
+    { title: "한 명씩 · time.sleep · 실패 기록 · sent.csv", html: `<p>명단의 여러 사람에게 보낼 때 규칙은 넷이에요.</p>
+<ol><li><b>한 명에 한 통</b> — <code>To</code> 에 여러 주소를 넣으면 받는 사람끼리 서로 주소가 보여요(개인정보). 이름이 들어간 안내는 사람마다 한 통씩 만들어 보내요</li><li><b>사이에 쉬기</b> — 한꺼번에 몰아 보내면 스팸으로 의심받아 막힐 수 있어요. 한 통 보내고 <code>time.sleep(delay)</code>(복습: <a href="../python/#lesson/L26" target="_blank" rel="noopener">파이썬 교과서 「시간 재기: time」 ↗</a>). <code>delay</code> 를 인자로 두면 시험에서는 <code>0</code> 을 넘겨 바로 끝나요</li><li><b>실패는 적어 두고 계속</b> — 한 사람 주소가 틀렸다고 나머지가 못 받으면 안 돼요. <code>smtplib</code> 의 에러도, 연결 에러(<code>TimeoutError</code> · <code>socket.gaierror</code>)도 모두 <code>OSError</code> 의 갈래라서 <code>except OSError as e:</code> 하나로 잡혀요. <code>type(e).__name__</code> 은 그 에러의 종류 이름(<code>SMTPAuthenticationError</code> 같은 것)이에요</li><li><b><code>sent.csv</code> 로 두 번 안 보내기</b> — 보낸 <b>바로 그때</b> 한 줄씩 더해요(<code>"a"</code> 모드). 다시 돌리면 거기 있는 주소는 건너뛰니, 실패한 사람에게만 다시 가요. 중간에 프로그램이 멈춰도 보낸 데까지는 남아요</li></ol>
+<pre>for name, addr in people:
+    if addr in done:
+        continue                       # 이미 보냄
+    try:
+        server.send_message(make_mail(name, addr))
+    except OSError as e:
+        failed.append(addr)            # 적어 두고
+        continue                       # 다음 사람
+    mark_sent(sent_path, addr, …)      # 보낸 다음에 기록
+    done.add(addr)
+    time.sleep(delay)</pre>
+<p><code>mark_sent</code> 는 <b>보낸 다음에</b> 불러요. 보내기 전에 적으면, 실패한 사람도 「보냄」 으로 남아 영영 못 받아요.</p>
+<div class="bk-warn"><b>보내기 전에 꼭</b> — ① 받는 사람이 받기로 한 안내만 보내요. 광고 메일은 미리 동의를 받아야 하고 제목 앞에 <code>(광고)</code> 를 붙여야 해요. ② 메일 서비스마다 하루에 보낼 수 있는 수가 정해져 있어요. 넘기면 계정이 한동안 막혀요. 많으면 며칠에 나눠요. ③ 명단 · <code>sent.csv</code> · <code>outbox/</code> 는 개인정보예요. 공유 폴더나 GitHub 에 올리지 않아요.</div>`,
+      example: { code: `import csv
+import tempfile
+import time
+from email.message import EmailMessage
+from email.utils import formataddr
+from pathlib import Path
+
+from samples import FakeSMTP
+
+PEOPLE = [("김하늘", "sky@example.com"), ("이도윤", "doyun@example.com"),
+          ("최유나", "yuna@example.com"), ("정민지", "minji@example.com")]
+
+
+def make_mail(name, addr):
+    msg = EmailMessage()
+    msg["From"] = formataddr(("햇살 공방", "hello@example.com"))
+    msg["To"] = formataddr((name, addr))
+    msg["Subject"] = f"{name}님, 11월 수업 안내예요"
+    msg.set_content(f"{name}님, 안녕하세요.\\n11월 수업은 매주 토요일 10시예요.")
+    return msg
+
+
+def load_sent(path):
+    """sent.csv 에 적힌 주소들(없으면 빈 set)."""
+    done = set()
+    if path.exists():
+        with open(path, encoding="utf-8-sig", newline="") as f:
+            for row in csv.DictReader(f):
+                done.add(row["이메일"])
+    return done
+
+
+def mark_sent(path, addr, subject):
+    """보낸 즉시 한 줄 더하기 — 중간에 멈춰도 여기까지는 남아요."""
+    new = not path.exists()
+    with open(path, "a", encoding="utf-8-sig", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(["이메일", "제목"])
+        w.writerow([addr, subject])
+
+
+def send_batch(server, people, sent_path, delay=1.0):
+    done = load_sent(sent_path)
+    sent, failed, skipped = [], [], []
+    for name, addr in people:
+        if addr in done:
+            skipped.append(addr)
+            continue
+        msg = make_mail(name, addr)
+        try:
+            server.send_message(msg)
+        except OSError as e:          # smtplib 의 에러도 모두 OSError 갈래
+            failed.append(addr)
+            print("  실패 —", type(e).__name__, e)
+            continue                  # 멈추지 않고 다음 사람
+        mark_sent(sent_path, addr, msg["Subject"])
+        done.add(addr)                # 명단에 같은 주소가 또 있어도 한 번만
+        sent.append(addr)
+        time.sleep(delay)             # 한 통 보내고 잠깐 쉬기
+    print(f"  보냄 {len(sent)} · 실패 {len(failed)} · 건너뜀 {len(skipped)}")
+    return failed
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    sent_path = Path(tmp) / "sent.csv"
+    print("첫 번째 실행")
+    with FakeSMTP(fail=["yuna@example.com"]) as server:
+        send_batch(server, PEOPLE, sent_path, delay=0)
+    print("두 번째 실행(같은 명령 그대로)")
+    with FakeSMTP() as server:
+        send_batch(server, PEOPLE, sent_path, delay=0)
+        print("  이번에 간 메일:", server.sent)
+    print(sent_path.read_text(encoding="utf-8-sig"), end="")`, prep: [SAMPLES_PREP] } },
+  ],
+  summary: ["진짜 발송은 smtplib.SMTP_SSL(host, 465) 또는 SMTP(host, 587) + starttls() 에 login(아이디, 앱 비밀번호) → send_message(msg) — Gmail 은 2단계 인증 뒤 앱 비밀번호, 네이버는 환경설정에서 IMAP/SMTP 사용함","비밀번호는 코드 밖에 — os.environ.get(\"MAIL_PASSWORD\") 로 읽고 없으면 getpass() 로 물어보며, 찍지도 올리지도 않아요","보내는 함수는 서버를 인자로 받아 가짜 서버로 시험하고, 여러 명은 한 통씩 · sleep · 실패는 적고 계속 · 보낸 다음 sent.csv 에 적어 두 번 안 보내요"] },
+{ id: 'JB3', ch: 3, boss: true, title: '만들어 보기: 수료증 · 안내 메일 발송기', mode: 'text',
+  tutorSummary: "만들어 보기: ROSTER_CSV 명단 → ① 명단 검사(빈 이메일 · 모양 · 겹침, 먼저 알리고 건너뛰기 또는 strict 면 멈춤) ② 사람마다 수료증 워드(틀의 쪼개진 ${이름} run 만 이어 붙여 KTemplate 로 채우기 — 굵게 유지, 남은 ${…} 검사) + reportlab PDF 판 ③ 사람마다 EmailMessage(본문 · 제목은 KTemplate, 수료증 PDF 첨부) ④ 미리 보기: outbox/ 에 .eml, 다시 읽어 받는 사람 · 첨부 이름 · 첨부 바이트 비교 ⑤ --send 는 서버를 인자로 받아 FakeSMTP 로 보내고 sent.csv 기록, 다시 돌리면 이미 보낸 사람 건너뜀, 실패 있으면 끝 코드 1 ⑥ 진짜 SMTP 로 --send --to-me 나에게 한 통(☐).", pages: [], summary: [] },
 { id: 'J11', ch: 4, n: 11, title: '맛보기: 클립보드 · 키보드 · 마우스', mode: 'text', draft: true,
   tutorSummary: 'pyperclip · pyautogui · 언제 피하나',
   pages: AUTO_TODO('pyperclip · pyautogui · 언제 피하나'), summary: ["pyperclip", "pyautogui", "언제 피하나"] },
 { id: 'J12', ch: 4, n: 12, title: '혼자 돌아가는 스크립트', mode: 'text', draft: true,
   tutorSummary: '__file__ 기준 · 회전 로그 · 잠금',
   pages: AUTO_TODO('__file__ 기준 · 회전 로그 · 잠금'), summary: ["__file__ 기준", "회전 로그", "잠금"] },
-{ id: 'J13', ch: 4, n: 13, title: '정해진 시간에 돌리기', mode: 'text', draft: true,
-  tutorSummary: '작업 스케줄러 · next_run · 놓친 실행',
-  pages: AUTO_TODO('작업 스케줄러 · next_run · 놓친 실행'), summary: ["작업 스케줄러", "next_run", "놓친 실행"] },
-{ id: 'JB4', ch: 4, boss: true, title: '만들어 보기: 월요일 아침 자동 비서', mode: 'text', draft: true,
+{ id: 'J13', ch: 4, n: 13, title: '정해진 시간에 돌리기', mode: 'text',
+  tutorSummary: "정해진 시간에 스크립트 돌리기. Windows 작업 스케줄러(taskschd.msc) → 기본 작업 만들기 → 트리거(매주 월 09:00) → 동작 「프로그램 시작」: 프로그램/스크립트 = 가상 환경의 .venv\\Scripts\\pythonw.exe(창 없음, print 는 어디에도 안 나가 로그 파일이 유일한 기록, 경로는 sys.executable 로 확인), 인수 = weekly.py, 시작 위치 = 스크립트 폴더(비우면 C:\\Windows\\System32 에서 돌아 스크립트를 못 찾아 0x2). 「실행」 → F5 → 마지막 실행 결과 0x0(끝 코드 0) · 0x1(return 1 · 잡지 못한 에러) · 0x2(파일 못 찾음 · argparse 거절) · 0x41301(도는 중) · 0x41303(아직 안 돎). 「모든 작업 기록 사용」 으로 기록 탭 켜기. 속성: 조건 탭 AC 전원 칸 해제(노트북), 설정 탭 「예약된 시작 시간을 놓친 경우 가능한 대로 빨리 작업 시작」 체크, 이미 실행 중이면 새 인스턴스 시작 안 함, 오래 돌면 중지. 명령: schtasks /Create /SC WEEKLY /D MON /ST 09:00 /TN \"햇살공방\\월요일비서\" /TR \"pythonw.exe 전체경로 스크립트 전체경로\" /F · /Query /V /FO LIST · /Run · /Delete /F — schtasks 에는 시작 위치가 없어 전체 경로 + Path(__file__).parent 기준. macOS · 리눅스는 cron(리눅스 교과서 U14), PATH 가 짧아 sys.executable 의 절대 경로를 적는다. 파이썬 쪽은 표준만: next_run(now, \"09:00\", weekdays={0, 1, 2, 3, 4}) — 오늘 그 시각에서 시작해 t <= now 이거나 요일이 아니면 timedelta(days=1) 씩, 월말은 calendar.monthrange(연, 월) = (1일의 요일, 날 수), 마지막 평일은 말일에서 주말을 거꾸로 건너뜀. 놓친 실행: last_run.json 에 마지막 성공 시각(isoformat · datetime.fromisoformat), due(last, now) = last 가 None 이거나 next_run(last) <= now, 놓친 횟수 missed, 따라잡기는 한 번에 기간을 넓혀서. while True + time.sleep 이나 schedule 패키지는 프로그램이 계속 켜져 있어야 해서 맛보기만 — 기다리기는 OS, 판단은 파이썬.",
+  terms: {"작업 스케줄러": "Windows 에 들어 있는 예약 실행 프로그램(taskschd.msc). 정한 때에 프로그램을 대신 실행해 줘요", "트리거": "작업을 언제 시작할지 정한 조건 — 매일 · 매주 · 매월 · 로그온할 때 등", "동작": "트리거가 오면 할 일. 파이썬 스크립트는 늘 「프로그램 시작」 이에요"},
+  pages: [
+    { title: "taskschd.msc → 기본 작업 만들기 · 시작 위치",
+      html: `<p>[[레슨:J12]] 에서 사람 없이 혼자 도는 스크립트를 만들었어요. 이번엔 그 스크립트를 <b>정해진 때에 불러 주는 쪽</b>이에요. Windows 에는 [[작업 스케줄러]]가 들어 있어요. 시작 메뉴에서 「작업 스케줄러」 를 찾거나, <kbd>Win</kbd>+<kbd>R</kbd> 을 누르고 <code>taskschd.msc</code> 를 쳐요.</p>
+<p>오른쪽 「동작」 창의 <b>「기본 작업 만들기…」</b> 를 누르면 마법사가 한 화면씩 물어요. 화면마다 넣을 칸은 이래요(예: 공부 폴더가 <code>C:\\Users\\me\\auto-study</code> 일 때).</p>
+<table class="kb"><tbody><tr><th>화면</th><th>칸</th><th>넣을 것</th></tr><tr><td>기본 작업 만들기</td><td>이름 · 설명</td><td><code>햇살 공방 월요일 비서</code></td></tr><tr><td>[[트리거]]</td><td>매일 · 매주 · 매월 · 컴퓨터 시작 시 · 로그온할 때</td><td>매주</td></tr><tr><td>주간</td><td>시작(날짜 · 시각) · 요일</td><td><code>오전 9:00:00</code> · 월요일</td></tr><tr><td>[[동작]]</td><td>프로그램 시작 · (나머지는 옛 기능)</td><td>프로그램 시작</td></tr><tr><td rowspan="3">프로그램 시작</td><td>프로그램/스크립트</td><td><code>C:\\Users\\me\\auto-study\\.venv\\Scripts\\pythonw.exe</code></td></tr><tr><td>인수 추가(옵션)</td><td><code>weekly.py</code></td></tr><tr><td><b>시작 위치(옵션)</b></td><td><code>C:\\Users\\me\\auto-study</code></td></tr><tr><td>마침</td><td>「마침을 클릭할 때 이 작업의 속성 대화 상자 열기」</td><td>체크 — 다음 쪽의 설정으로 이어져요</td></tr></tbody></table>
+<p><b>프로그램 칸은 <code>python</code> 이 아니라 가상 환경 안의 파이썬 파일</b>이에요. 작업 스케줄러는 VS Code 가 켜 준 가상 환경을 몰라요. <code>python</code> 만 쓰면 다른 파이썬이 불려 와서 <code>ModuleNotFoundError: No module named 'pypdf'</code> 로 멈춰요. 경로는 VS Code 터미널에서 가상 환경을 켠 채로 <code>sys.executable</code> 을 찍으면 나와요(아래 예제 명령).</p>
+<p>그 폴더에는 <code>python.exe</code> 옆에 <b><code>pythonw.exe</code></b> 가 있어요. 같은 파이썬인데 <b>검은 창을 띄우지 않아요</b>. <code>python.exe</code> 로 걸면 월요일 9시마다 검은 창이 떴다 사라져서 일하다 놀라요. 대신 <code>pythonw.exe</code> 는 <code>print</code> 가 어디에도 안 나가요. 그래서 [[레슨:J12]] 의 로그 파일이 유일한 기록이에요.</p>
+<div class="bk-warn"><b>시작 위치 칸을 비우면</b> — 작업이 <code>C:\\Windows\\System32</code> 에서 돌아요. 인수의 <code>weekly.py</code> 를 거기서 찾다가 못 찾아 파이썬이 끝 코드 2 로 끝나요(다음 쪽의 <code>0x2</code>). 스크립트 안의 <code>open("config.toml")</code> 같은 상대 경로도 거기서 찾아요. 시작 위치를 꼭 채우고, 스크립트 안은 늘 <code>Path(__file__).parent</code> 기준으로(<a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩」 ↗</a> · [[레슨:J12]]).</div>
+<p>처음 등록하면 이것만은 눈으로 봐요.</p>
+<ul><li>☐ 「동작」 탭의 프로그램 칸이 <code>.venv\\Scripts\\pythonw.exe</code> 로 끝나요</li><li>☐ 시작 위치 칸이 스크립트가 있는 폴더예요(비어 있지 않아요)</li><li>☐ 시험은 트리거를 「지금부터 2분 뒤」 로 잡거나, 다음 쪽의 「실행」 으로 바로 해요 — 월요일까지 기다리지 않아요</li></ul>`,
+      example: { label: "예제 명령 — VS Code 터미널에서, 가상 환경을 켠 채로", shell: `python -c "import sys; print(sys.executable)"
+# C:\\Users\\me\\auto-study\\.venv\\Scripts\\python.exe 처럼 나와요
+# 작업 스케줄러에는 같은 폴더의 pythonw.exe 를 넣어요` } },
+    { title: "「실행」 → 마지막 실행 결과 0x0",
+      html: `<p>작업을 만들었으면 바로 돌려 봐요. 왼쪽 「작업 스케줄러 라이브러리」 에서 작업을 고르고, 오른쪽 「선택한 항목」 의 <b>「실행」</b>(또는 오른쪽 클릭 → 실행)을 눌러요. 끝나면 <kbd>F5</kbd> 로 새로 고치고, 가운데 목록의 <b>「마지막 실행 결과」</b> 칸을 봐요.</p>
+<table class="kb"><tbody><tr><th>마지막 실행 결과</th><th>뜻</th><th>볼 곳</th></tr><tr><td><code>0x0</code></td><td>끝 코드 0 — 잘 끝났어요</td><td>로그에 「끝」 줄</td></tr><tr><td><code>0x1</code></td><td>끝 코드 1 — 스크립트가 <code>return 1</code> 했거나, 잡지 못한 에러로 멈췄어요</td><td>로그의 트레이스백([[레슨:J12]])</td></tr><tr><td><code>0x2</code></td><td>끝 코드 2 — 파이썬이 스크립트 파일을 못 찾았거나, argparse 가 인자를 거절했어요</td><td>시작 위치 · 인수 칸(<a href="../python/#lesson/L19C" target="_blank" rel="noopener">파이썬 교과서 「명령 줄 프로그램 2」 ↗</a>)</td></tr><tr><td><code>0x41301</code></td><td>지금 도는 중</td><td>잠시 뒤 F5</td></tr><tr><td><code>0x41303</code></td><td>아직 한 번도 안 돌았어요</td><td>트리거 시각</td></tr><tr><td><code>0x8007…</code> 처럼 긴 값</td><td>작업 스케줄러가 프로그램을 띄우지도 못했어요(프로그램 칸 경로 오타 등)</td><td>아래 「기록」 탭</td></tr></tbody></table>
+<p>끝 코드는 [[레슨:J12]] 에서 <code>sys.exit(main())</code> 으로 돌려준 그 숫자예요. 사람이 안 보는 프로그램이 「잘 됐는지」 를 알리는 유일한 길이라, 실패하면 꼭 1 을 돌려줘야 해요.</p>
+<p>아래쪽 탭 「기록」 에는 언제 시작해서 언제 끝났는지가 남아요. 처음엔 꺼져 있어요(「기록(사용 안 함)」). 오른쪽 「동작」 창의 <b>「모든 작업 기록 사용」</b> 을 한 번 누르면 켜져요(관리자 권한).</p>
+<p>작업을 두 번 눌러 속성을 열면 탭마다 고칠 곳이 있어요. Windows 버전에 따라 말이 조금 다를 수 있어요.</p>
+<table class="kb"><tbody><tr><th>탭</th><th>칸</th><th>권하는 값</th></tr><tr><td>일반</td><td>「사용자가 로그온할 때만 실행」 · 「사용자의 로그온 여부에 관계없이 실행」</td><td>처음엔 앞쪽(기본). 뒤쪽은 Windows 비밀번호를 묻고, 내 네트워크 드라이브가 안 보일 수 있어요</td></tr><tr><td>조건</td><td>「컴퓨터의 AC 전원이 켜져 있는 경우에만 작업 시작」</td><td>노트북이면 <b>체크 해제</b> — 배터리로 쓰는 날은 안 돌아요</td></tr><tr><td>설정</td><td>「예약된 시작 시간을 놓친 경우 가능한 대로 빨리 작업 시작」</td><td><b>체크</b> — 9시에 PC 가 꺼져 있었으면 켜진 뒤 곧 돌아요</td></tr><tr><td>설정</td><td>「작업이 이미 실행 중이면 다음 규칙 적용」</td><td>「새 인스턴스 시작 안 함」(기본). 그래도 잠금 파일([[레슨:J12]])은 둬요 — 내가 VS Code 에서 손으로 돌리는 것까지는 못 막으니까요</td></tr><tr><td>설정</td><td>「다음 시간 이상 작업이 실행되면 중지」</td><td>기본 3일 → 1시간쯤으로 줄여요. 멈춰 버린 스크립트가 다음 주까지 남지 않게</td></tr></tbody></table>
+<ul><li>☐ 「실행」 → F5 → 마지막 실행 결과가 <code>0x0</code> 이에요</li><li>☐ 스크립트 폴더에 로그 파일이 생겼고, 맨 끝 줄이 방금 시각이에요</li><li>☐ 「다음 실행 시간」 칸이 다음 월요일 오전 9:00 이에요</li></ul>` },
+    { title: "schtasks /Create · cron 은 절대 경로",
+      html: `<p>화면 대신 <b>명령 한 줄</b>로 등록할 수도 있어요. PC 를 바꿨을 때 다시 만들기 쉽고, 무엇을 넣었는지 글로 남아요. VS Code 터미널(PowerShell)이나 명령 프롬프트에서 <code>schtasks</code> 를 써요.</p>
+<pre>schtasks /Create /SC WEEKLY /D MON /ST 09:00 /TN "햇살공방\\월요일비서" /TR "C:\\Users\\me\\auto-study\\.venv\\Scripts\\pythonw.exe C:\\Users\\me\\auto-study\\weekly.py" /F
+schtasks /Query /TN "햇살공방\\월요일비서" /V /FO LIST
+schtasks /Run /TN "햇살공방\\월요일비서"
+schtasks /Delete /TN "햇살공방\\월요일비서" /F</pre>
+<table class="kb"><tbody><tr><th>옵션</th><th>뜻</th></tr><tr><td><code>/SC</code></td><td>얼마나 자주 — <code>DAILY</code> · <code>WEEKLY</code> · <code>MONTHLY</code> · <code>ONLOGON</code>(로그온할 때)</td></tr><tr><td><code>/D</code></td><td>요일 — <code>MON</code> · <code>TUE</code> … 여럿은 <code>MON,WED,FRI</code></td></tr><tr><td><code>/ST</code></td><td>시작 시각 <code>09:00</code>(24시간)</td></tr><tr><td><code>/TN</code></td><td>작업 이름. <code>햇살공방\\월요일비서</code> 처럼 <code>\\</code> 를 넣으면 라이브러리에 「햇살공방」 폴더가 생겨 내 작업끼리 모여요</td></tr><tr><td><code>/TR</code></td><td>돌릴 명령 — 프로그램과 인수를 <b>따옴표 하나 안에</b></td></tr><tr><td><code>/F</code></td><td>만들 때는 같은 이름을 덮어쓰기, 지울 때는 묻지 않기</td></tr><tr><td><code>/SC MONTHLY /MO LASTDAY /M *</code></td><td>매달 마지막 날</td></tr></tbody></table>
+<p><code>/Query … /V /FO LIST</code> 는 작업 하나를 자세히 보여 줘요. 「마지막 결과」 · 「다음 실행 시간」 · 「실행할 작업」 줄을 보면 화면의 칸과 같아요. <code>/Run</code> 은 화면의 「실행」 이에요.</p>
+<div class="bk-warn"><b>schtasks 에는 시작 위치 칸이 없어요</b> — 이렇게 만든 작업은 <code>C:\\Windows\\System32</code> 에서 돌아요. 그래서 <code>/TR</code> 안의 스크립트는 꼭 <b>전체 경로</b>로 쓰고, 스크립트 안은 <code>Path(__file__).parent</code> 기준이어야 해요. 경로에 빈칸이 있으면(<code>C:\\Users\\김 햇살\\…</code>) 따옴표 안에 따옴표를 또 넣어야 해서 헷갈려요 — 그럴 땐 앞 쪽의 화면으로 등록하세요.</div>
+<p><b>macOS · 리눅스는 cron</b> 이에요. <code>crontab -e</code> 의 「분 시 일 월 요일」 문법과 함정은 <a href="../linux/#lesson/U14" target="_blank" rel="noopener">리눅스 교과서 「예약 작업」 ↗</a> 에서 배워요. 파이썬 쪽에서 챙길 것은 하나예요. cron 은 PATH 가 아주 짧아서 <code>python</code> 이라고만 쓰면 못 찾거나 다른 파이썬을 불러요. 가상 환경을 켜고 <code>sys.executable</code> 이 찍어 준 <b>절대 경로</b>를 그대로 적어요.</p>
+<pre>0 9 * * 1  /home/me/auto-study/.venv/bin/python /home/me/auto-study/weekly.py</pre>
+<ul><li>☐ <code>schtasks /Query /TN "햇살공방\\월요일비서" /V /FO LIST</code> 의 「실행할 작업」 이 <code>pythonw.exe</code> 와 스크립트 전체 경로예요</li><li>☐ <code>schtasks /Run</code> 뒤 화면에서 F5 → 마지막 실행 결과 <code>0x0</code></li></ul>`,
+      example: { label: "예제 명령 — Windows 터미널에서(경로는 내 것으로)", shell: `schtasks /Create /SC WEEKLY /D MON /ST 09:00 /TN "햇살공방\\월요일비서" /TR "C:\\Users\\me\\auto-study\\.venv\\Scripts\\pythonw.exe C:\\Users\\me\\auto-study\\weekly.py" /F
+schtasks /Run /TN "햇살공방\\월요일비서"
+schtasks /Query /TN "햇살공방\\월요일비서" /V /FO LIST
+schtasks /Delete /TN "햇살공방\\월요일비서" /F` } },
+    { title: "next_run(now, \"09:00\", weekdays) · 월말",
+      html: `<p>시각을 맞춰 불러 주는 건 작업 스케줄러인데, 파이썬도 시각을 계산할 일이 있어요. ① 로그에 「다음 실행: 11-16 (월) 09:00」 을 남기기 ② 다음 쪽의 「놓친 실행」 판단 ③ 「그달 마지막 평일」 처럼 스케줄러 칸으로는 못 정하는 규칙. 바깥 패키지 없이 <code>datetime</code> 과 <code>timedelta</code> 면 돼요.</p>
+<p>복습: <code>date</code> 는 날짜만, <code>datetime</code> 은 날짜 + 시각이에요(<a href="../python/#lesson/L16B" target="_blank" rel="noopener">파이썬 교과서 「날짜: datetime 맛보기」 ↗</a>). <code>datetime(2026, 11, 9, 9, 0)</code> 처럼 시 · 분까지 넣고, <code>.year</code> · <code>.month</code> · <code>.day</code> · <code>.hour</code> · <code>.minute</code> 로 조각을, <code>.date()</code> 로 날짜만 꺼내요. <code>+ timedelta(days=1)</code> 로 하루 뒤, 둘을 빼면 <code>timedelta</code>, <code>&lt;</code> · <code>&lt;=</code> 로 비교해요. <code>.weekday()</code> 는 월요일 0 ~ 일요일 6 이에요.</p>
+<pre>def next_run(now, at, weekdays=(0, 1, 2, 3, 4, 5, 6)):
+    h, m = at.split(":")
+    t = datetime(now.year, now.month, now.day, int(h), int(m))
+    while t &lt;= now or t.weekday() not in weekdays:
+        t += timedelta(days=1)
+    return t</pre>
+<ul><li>오늘의 그 시각에서 시작해요. 이미 지났거나 요일이 아니면 하루씩 뒤로 — 많아야 7번 돌아요</li><li><code>&lt;=</code> 가 중요해요. 9시 딱에 돈 스크립트가 「다음은 언제?」 를 물으면 지금이 아니라 <b>다음</b> 차례여야 해요</li><li><code>weekdays={0, 1, 2, 3, 4}</code> 는 평일, <code>{0}</code> 은 월요일만. 집합이든 튜플이든 <code>in</code> 으로 확인해요</li></ul>
+<p><b>월말</b>은 달마다 날 수가 달라요. <code>calendar.monthrange(연, 월)</code> 이 <code>(1일의 요일, 그달 날 수)</code> 를 돌려줘요. 윤년 2월 29일도 알아서 세요.</p>
+<pre>import calendar
+
+first, days = calendar.monthrange(2026, 2)
+print(first, days)    # 6 28</pre>
+<p>2026년 2월 1일은 일요일(6)이고 28일까지 있다는 뜻이에요. 작업 스케줄러는 「매월 → 마지막 날」 은 되지만 「마지막 <b>평일</b>」 은 없어요. 그럴 땐 작업을 매일 같은 시각에 걸고, 스크립트가 맨 앞에서 <code>if today != month_end_workday(…): return 0</code> 으로 「오늘은 내 차례가 아님」 을 스스로 판단해요.</p>`,
+      example: { code: `import calendar
+from datetime import date, datetime, timedelta
+
+DAYS = ["월", "화", "수", "목", "금", "토", "일"]
+
+
+def next_run(now, at, weekdays=(0, 1, 2, 3, 4, 5, 6)):
+    """now 보다 뒤인 첫 실행 시각. at 은 "09:00", weekdays 는 월=0 … 일=6."""
+    h, m = at.split(":")
+    t = datetime(now.year, now.month, now.day, int(h), int(m))
+    while t <= now or t.weekday() not in weekdays:
+        t += timedelta(days=1)
+    return t
+
+
+def show(t):
+    return t.strftime("%m-%d") + f" ({DAYS[t.weekday()]}) " + t.strftime("%H:%M")
+
+
+WORKDAYS = {0, 1, 2, 3, 4}
+for now in [datetime(2026, 11, 6, 18, 0),    # 금요일 저녁
+            datetime(2026, 11, 7, 10, 0),    # 토요일
+            datetime(2026, 11, 9, 8, 59),    # 월요일 8시 59분
+            datetime(2026, 11, 9, 9, 0)]:    # 월요일 9시 딱
+    t = next_run(now, "09:00", weekdays=WORKDAYS)
+    print(show(now), "→", show(t))
+
+start = datetime(2026, 11, 9, 9, 0)
+monday = next_run(start, "09:00", weekdays={0})
+print("매주 월요일:", show(monday), "/", (monday - start).days, "일 뒤")
+
+
+def month_end_workday(year, month):
+    """그달 마지막 평일 — 말일이 토 · 일이면 금요일로 당겨요."""
+    first, last_day = calendar.monthrange(year, month)
+    d = date(year, month, last_day)
+    while d.weekday() >= 5:
+        d -= timedelta(days=1)
+    return d
+
+
+first, last_day = calendar.monthrange(2026, 11)
+print("2026년 11월 1일:", DAYS[first], "/ 말일:", last_day)
+for month in [2, 5, 10, 11]:
+    d = month_end_workday(2026, month)
+    print(f"2026년 {month}월 마감:", d, DAYS[d.weekday()])
+` } },
+    { title: "due(last, now) · last_run.json",
+      html: `<p>월요일 9시에 노트북이 꺼져 있었다면? 앞의 「놓친 경우 가능한 대로 빨리」 가 켜진 뒤 한 번 불러 줘요. 하지만 그 칸이 꺼져 있거나, 두 주 내내 휴가였거나, 내가 「실행」 을 두 번 누르면요? <b>스크립트가 스스로 판단</b>하게 해요.</p>
+<ul><li>마지막으로 <b>성공한</b> 때를 <code>last_run.json</code> 에 적어요. 실패하면 적지 않아서 다음에 다시 해요</li><li>돌 때마다 <code>due(last, now)</code> — 지난번 다음 차례가 이미 지났으면 할 차례예요</li><li>할 차례가 아니면 조용히 끝 코드 0. 그래서 작업 스케줄러는 「매주 월 9시」 에 「로그온할 때」 트리거를 하나 더 넉넉히 걸어 둬도 돼요</li><li>두 주를 놓쳤어도 <b>한 번만</b> 돌아요. 대신 기간을 「지난번부터 지금까지」 로 잡아 두 주 몫을 한꺼번에 해요([[레슨:JB4]])</li></ul>
+<p>JSON 은 <code>datetime</code> 을 그대로 못 담아서 글자로 바꿔 넣어요. <code>now.isoformat()</code> → <code>"2026-11-09T09:00:00"</code>, 되돌리기는 <code>datetime.fromisoformat(글자)</code> — <code>date</code> 에서 쓰던 짝 그대로예요(<a href="../python/#lesson/L19" target="_blank" rel="noopener">파이썬 교과서 「날짜 2: 글자 ↔ 날짜 · 비교」 ↗</a>).</p>
+<p><b>그냥 파이썬이 기다리면 안 되나요?</b> <code>time.sleep</code>(<a href="../python/#lesson/L26" target="_blank" rel="noopener">파이썬 교과서 「시간 재기: time」 ↗</a>)으로 다음 차례까지 자는 모양은 이래요. 맛보기만 해요.</p>
+<pre>while True:                         # 맛보기 — 이 창이 계속 떠 있어야 해요
+    now = datetime.now()
+    t = next_run(now, "09:00", weekdays={0})
+    print("다음 실행:", t)
+    wait = t - now
+    time.sleep(wait.total_seconds())    # timedelta → 초
+    run_job()</pre>
+<p>창을 닫거나, PC 를 다시 켜거나, <code>run_job()</code> 에서 에러가 한 번 나면 그걸로 끝이에요. 절전에서 깨어나면 시계가 어긋나기도 해요. 바깥 패키지 <code>schedule</code> 도 결국 <code>while True: schedule.run_pending(); time.sleep(1)</code> 처럼 <b>프로그램이 계속 켜져 있어야</b> 해서 같은 처지예요. 그래서 이 교과서는 이렇게 나눠요 — <b>기다리기는 OS 에게</b>(작업 스케줄러 · cron), <b>판단은 파이썬이</b>(<code>next_run</code> · <code>due</code>).</p>`,
+      example: { code: `import json
+import tempfile
+from datetime import datetime, timedelta
+from pathlib import Path
+
+AT = "09:00"
+DAYS = {0}          # 매주 월요일
+
+
+def next_run(now, at, weekdays=(0, 1, 2, 3, 4, 5, 6)):
+    h, m = at.split(":")
+    t = datetime(now.year, now.month, now.day, int(h), int(m))
+    while t <= now or t.weekday() not in weekdays:
+        t += timedelta(days=1)
+    return t
+
+
+def due(last, now):
+    """지난번(last) 다음 예약 시각이 벌써 지났으면 True — 한 번도 안 돌았으면(None) True."""
+    if last is None:
+        return True
+    return next_run(last, AT, DAYS) <= now
+
+
+def missed(last, now):
+    """last 다음부터 now 까지 지나간 예약 시각 수."""
+    n = 0
+    t = next_run(last, AT, DAYS)
+    while t <= now:
+        n += 1
+        t = next_run(t, AT, DAYS)
+    return n
+
+
+def load_last(path):
+    if not path.exists():
+        return None
+    with open(path, encoding="utf-8") as f:
+        return datetime.fromisoformat(json.load(f)["last_run"])
+
+
+def save_last(path, when):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"last_run": when.isoformat()}, f)
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    state = Path(tmp) / "last_run.json"
+    last = load_last(state)
+    monday = datetime(2026, 11, 9, 9, 0)
+    print("처음:", last, "→ 할 차례?", due(last, monday))
+
+    save_last(state, datetime(2026, 10, 26, 9, 0))    # 마지막으로 돈 때
+    print(state.read_text(encoding="utf-8"))
+    last = load_last(state)
+    for now in [datetime(2026, 11, 2, 8, 0),          # 월요일 아침 8시
+                datetime(2026, 11, 10, 8, 30)]:       # 지난 두 월요일에 PC 가 꺼져 있었음
+        print(now, "할 차례?", due(last, now), "놓친 횟수:", missed(last, now))
+
+    save_last(state, datetime(2026, 11, 10, 8, 30))   # 따라잡기 한 번 하고 기록
+    last = load_last(state)
+    later = datetime(2026, 11, 10, 8, 31)
+    print("다시 돌리면:", due(last, later))
+    print("다음 차례:", next_run(last, AT, DAYS))
+` } },
+  ],
+  summary: ["작업 스케줄러: 기본 작업 만들기 → 트리거 → 「프로그램 시작」 에 가상 환경의 pythonw.exe · 스크립트 · 시작 위치(비우면 System32 에서 돎) — 「실행」 해서 마지막 실행 결과 0x0 을 봐요", "명령으로는 schtasks /Create /SC WEEKLY /D MON /ST 09:00 /TN … /TR …(시작 위치가 없으니 전체 경로), 리눅스 · macOS 는 cron 에 sys.executable 의 절대 경로", "파이썬은 판단만: next_run(now, \"09:00\", weekdays) · 월말 calendar.monthrange · last_run.json 과 due(last, now) 로 놓친 실행 따라잡기 — while + sleep 으로 기다리지 않아요"] },
+{ id: 'JB4', ch: 4, boss: true, title: '만들어 보기: 월요일 아침 자동 비서', mode: 'text',
   tutorSummary: '만들어 보기: 월요일 아침 자동 비서', pages: [], summary: [] },
 ];
 const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)
