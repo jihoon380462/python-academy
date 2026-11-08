@@ -15,7 +15,26 @@
 // 「본문」 = 그 레슨까지(포함)의 pages[].html(접힌 <details> 「더 알아보기」 제외) + pages[].example.code + 같은 레슨 앞 문제의 지문·starter.
 // 대상: runner 가 python 이고 지식 지도(map:'graph')가 아닌 코스 (python·algo). math 는 「대상 아님」, terminal-git 은 건너뜀.
 import fs from 'node:fs'; import path from 'node:path'; import { pathToFileURL } from 'node:url';
-import { ROOT, courses, loadCourse, instantiate } from './load_content.mjs';
+import { ROOT, courses, loadCourse as loadContent, instantiate } from './load_content.mjs';
+import vm from 'node:vm';
+// v2.42.0 교과서의 「만들어 보기」(book.js 의 BOOK.tasks)도 잰다 — 전엔 옛 문제집(PROBLEMS)만 재서 교과서에서 새로 쓴 문제 329개(파이썬)가 빠져 있었음.
+//   pid 가 있는 문제는 PROBLEMS 로 이미 재니 빼고, 예시 답 = 정답 · 고칠 코드(given) = starter · 출력 예측(predict)의 코드 = starter(학습자는 읽기만).
+function loadCourse(id) {
+  const c = loadContent(id); const dir = path.join(ROOT, 'courses', id); const bookPath = path.join(dir, 'book.js'); if (!fs.existsSync(bookPath)) return c;
+  const cx = { window: {} }; vm.createContext(cx);
+  const src = ['datasets.js', 'content.js', 'book.js'].filter(f => fs.existsSync(path.join(dir, f))).map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n').replace(/^(const|let) /gm, 'var ');
+  try { vm.runInContext(src, cx); } catch (e) { return c; }
+  // 교과서는 학습자가 보는 순서 = BOOK.tasks 의 순서로 잰다(③ 「첫 문제」 도 이 순서). pid 문제는 옛 문제를 그 자리에, 교과서에 안 쓰는 옛 문제는 화면에 없으니 빼요.
+  const byId = Object.fromEntries(c.PROBLEMS.map(p => [p.id, p])); const ordered = []; const seen = new Set();
+  for (const l of c.LESSONS) { const ts = ((cx.BOOK && cx.BOOK.tasks) || {})[l.id] || [];
+    // 이 레슨 · 앞 문제에서 학습자가 만든 내 모듈(문제 글 · 준비 파일의 「이름.py」)은 import 해도 새 기능이 아님(L16C 「내 모듈」)
+    const own = new Set(); for (const t of ts) { for (const m of String((t.text || '') + '\n' + (t.answer || '')).matchAll(/([A-Za-z_]\w*)(?:\.py\b|\/)/g)) own.add(m[1]); for (const f of [].concat(t.prep || [])) if (f && f.name) { const m = String(f.name).match(/([A-Za-z_]\w*)\.py$/); if (m) own.add(m[1]); const top = String(f.name).split('/'); if (top.length > 1) own.add(top[0]); } }
+    const ownRe = own.size ? new RegExp(`^[ \\t]*(?:import|from)\\s+(?:${[...own].join('|')})\\b.*$`, 'gm') : null; const strip = (s) => ownRe ? String(s || '').replace(ownRe, '') : (s || '');
+    ts.forEach((t, k) => { if (t.pid && byId[t.pid]) { ordered.push(byId[t.pid]); seen.add(t.pid); return; } if (typeof t.answer !== 'string') return;
+      ordered.push({ id: `${l.id}#${k + 1}`, lesson: l.id, type: 'code', title: t.title || '', prompt: t.text || '', solution: t.predict ? '' : strip(t.answer), starter: t.predict ? strip(t.answer) : strip(t.given || ''), hints: [], bookTask: true }); }); }
+  if (!ordered.length) return c;
+  return { ...c, PROBLEMS: ordered };
+}
 
 // =====================================================================
 // 기능 카탈로그 — 여기 한 곳만 고치면 된다. [라벨, 정규식(코드 쪽은 문자열·주석을 지운 뒤 적용), 비고]
@@ -123,7 +142,8 @@ export function detect(src, { structure = true } = {}) {
   const code = stripStrings(src); const lineOf = (s, i) => s.slice(0, i).split('\n').length; const lineText = (s, i) => s.split('\n')[lineOf(s, i) - 1].trim();
   const put = (k, s, i) => { if (!found.has(k)) found.set(k, { line: lineOf(s, i), text: lineText(s, i) }); };
   for (const [label, re] of CATALOG) { const s = RAW_FEATURES.has(label) ? src : code; const m = s.match(re); if (m) put(label, s, m.index); }
-  for (const m of code.matchAll(/^[ \t]*(?:import\s+(\w+)|from\s+(\w+))/gm)) put(`import ${m[1] || m[2]}`, code, m.index);
+  for (const m of code.matchAll(/^[ \t]*import\s+([\w.]+(?:\s+as\s+\w+)?(?:\s*,\s*[\w.]+(?:\s+as\s+\w+)?)*)/gm)) for (const part of m[1].split(',')) put(`import ${part.trim().split(/[\s.]/)[0]}`, code, m.index);   // v2.42.0 import a, b 의 b 도
+  for (const m of code.matchAll(/^[ \t]*from\s+(\w+)/gm)) put(`import ${m[1]}`, code, m.index);
   for (const m of code.matchAll(new RegExp(`(?<![\\w.])(${MODULES.join('|')})\\.(\\w+)`, 'g'))) put(`${m[1]}.${m[2]}`, code, m.index);
   if (structure) for (const [k, v] of scanStructure(code)) if (!found.has(k)) found.set(k, v);
   return found;
@@ -156,7 +176,8 @@ export function analyzeCourse(c, seed) {
     probs.forEach((p, pi) => {
       const sol = solutionOf(p); const h3 = (p.hints || [])[2] || '';
       const own = new Map([...detect(htmlToText(p.prompt)), ...detect(p.starter || '')]);
-      const used = new Map(); for (const [k, v] of detect(sol)) used.set(k, { ...v, src: '정답' }); for (const [k, v] of detect(h3)) if (!used.has(k)) used.set(k, { ...v, src: '힌트3' });
+      const defined = new Set([...probs.slice(0, pi + 1).map(q => solutionOf(q) + '\n' + (q.starter || '') + '\n' + (q.prompt || '')).join('\n').matchAll(/def\s+(\w+)\s*\(/g)].map(m => m[1]));   // 이 문제 · 같은 레슨 앞 문제에서 정의한 것   // v2.42.0 직접 정의한 메서드(.clear 등)는 새 기능 아님
+      const used = new Map(); for (const [k, v] of detect(sol)) if (!(k.startsWith('.') && defined.has(k.slice(1)))) used.set(k, { ...v, src: '정답' }); for (const [k, v] of detect(h3)) if (!used.has(k)) used.set(k, { ...v, src: '힌트3' });
       const inStarter = detect(p.starter || (p.fill && p.fill.code) || (p.bug && p.bug.code) || ''); /* 빈칸·버그 문제는 주어진 코드가 starter 역할 */ // v2.8.8: starter 에 이미 적힌 기능은 학습자가 치지 않으니 ② 「합친 새 기능」에서 뺀다 (3-2절 「starter 에 대부분을 적어 두고 칠 줄을 콕 집는다」)
       const outside = [], combo = [], where = {};
       for (const [k, v] of used) { const t = taught.get(k); if (!t) outside.push({ feature: k, inPrompt: own.has(k), src: v.src, line: v.line, text: v.text }); else { where[k] = t; if (t.lesson === l.id && lessonNew.has(k) && !SUB.has(k) && !inStarter.has(k)) combo.push(k); } }
@@ -186,7 +207,7 @@ const fmtOutside = (o) => o.map(x => `\`${x.feature}\`${x.inPrompt ? '(지문○
 
 const out = {}; const lines = []; const say = (s = '') => lines.push(s); const cache = {};
 const isTarget = (c) => c.meta.runner === 'python' && c.meta.map !== 'graph';
-const analyze = (id) => { if (cache[id]) return cache[id]; const c = loadCourse(id); const req = c.meta.requires && c.meta.requires.course; let seed = null;
+const analyze = (id) => { if (cache[id]) return cache[id]; const c = loadCourse(id); const req = (c.meta.requires && c.meta.requires.course) || (id !== 'python' ? 'python' : null) /* v2.42.0 파이썬 다음 교과서는 모두 「파이썬 교과서를 다 배운 사람」 대상 */; let seed = null;
   if (req && isTarget(loadCourse(req))) seed = analyze(req).taught;   // 선수 코스(예: algo ← python)가 가르친 기능은 이미 배운 것으로
   return (cache[id] = { c, ...analyzeCourse(c, seed), seeded: req }); };
 for (const id of courses()) {

@@ -1,0 +1,1 @@
+{"id": "auto", "name": "파이썬 업무 자동화", "icon": "📎", "desc": "파일 · 폴더 일괄 처리 · 백업 · 압축, PDF · 워드 문서, 템플릿과 이메일, 정해진 시간에 혼자 돌아가는 스크립트까지 내 사무 일을 파이썬으로 자동화하는 교과서", "runner": "python", "mapColor": "#6a1b9a", "mascotGear": null}

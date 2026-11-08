@@ -10,9 +10,14 @@
     "algo": {
       "outside": 0,
       "combo": 0,
-      "first": 7
+      "first": 0
     },
     "api": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
+    "auto": {
       "outside": 0,
       "combo": 0,
       "first": 0
@@ -60,7 +65,7 @@
     "python": {
       "outside": 0,
       "combo": 0,
-      "first": 4
+      "first": 0
     }
   }
 }

@@ -38,7 +38,7 @@ jobs:
       - name: 설치(nasm · 파이썬 패키지)
         run: |
           sudo apt-get install -y -qq nasm  # v2.31.0~ 어셈블리어 교과서: 예시 답 · 예제를 nasm · ld · gcc 로 진짜 빌드 · 실행(tools/asm_book_run.py)
-          pip install --quiet -r tools/requirements-ci.txt  # LLM(numpy) · 디버깅(pytest) · 데이터 파일(openpyxl) · 데이터 분석(pandas · matplotlib) · 머신러닝(scikit-learn) · HTTP·API·SDK(fastapi · httpx · requests)
+          pip install --quiet -r tools/requirements-ci.txt  # LLM(numpy) · 디버깅(pytest) · 데이터 파일(openpyxl) · 업무 자동화(pypdf · python-docx · reportlab · cryptography) · 데이터 분석(pandas · matplotlib) · 머신러닝(scikit-learn) · HTTP·API·SDK(fastapi · httpx · requests)
       - name: check_book (교과서 19개 — 필요한 문법 링크 · 예시 답 실행, 교과서마다 동시에)
         run: node tools/check_book_par.mjs
       - name: run_solutions

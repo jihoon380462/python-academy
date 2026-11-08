@@ -176,7 +176,7 @@ for i in range(len(ids) - 3):
 '밥을 ' → '먹'
 …
 '먹는다' → '.'</pre>
-<ul><li>글자가 L 개면 문제는 <code>L - 3</code> 개예요. 맨 앞 3글자는 앞에 3글자가 없어서 정답 자리로 못 써요. 큰 모델은 글 앞에 「시작」 표시를 채워 넣어서 첫 글자도 맞혀 봐요</li><li>numpy 로 바꾸면 <code>X</code> 는 모양 <code>(N, 3)</code>, <code>Y</code> 는 <code>(N,)</code> — 문제 N 개, 문제마다 번호 3개와 정답 1개예요</li><li>창을 3 이 아니라 5 · 10 으로 늘리면 더 멀리 봐요. 그만큼 입력이 길어지는데, 이 문제는 다음 레슨의 어텐션이 풀어요</li></ul>`,
+<ul><li>글자가 L 개면 문제는 <code>L - 3</code> 개예요. 맨 앞 3글자는 앞에 3글자가 없어서 정답 자리로 못 써요. 큰 모델은 글 앞에 「시작」 표시를 채워 넣어서 첫 글자도 맞혀 봐요</li><li>numpy 로 바꾸면 <code>X</code> 는 모양 <code>(N, 3)</code>, <code>Y</code> 는 <code>(N,)</code> — 문제 N 개, 문제마다 번호 3개와 정답 1개예요</li><li>서로 다른 문맥이 몇 개인지 세려면 <code>set</code> 에 넣어요. 리스트는 바뀔 수 있는 값이라 <code>set</code> 에 못 넣어서, <code>tuple(x)</code> 로 바꿔 넣어요: <code>kinds = set(tuple(x) for x in X)</code> 한 뒤 <code>len(kinds)</code></li><li>창을 3 이 아니라 5 · 10 으로 늘리면 더 멀리 봐요. 그만큼 입력이 길어지는데, 이 문제는 다음 레슨의 어텐션이 풀어요</li></ul>`,
       example: { code: `import numpy as np
 
 text = "나는 밥을 먹는다."

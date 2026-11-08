@@ -1,15 +1,15 @@
 # HANDOFF — 다음 작업 세션 인수인계
 
-> 새 채팅은 **「HANDOFF.md 읽고 TODO 대로 진행」** 으로 시작한다. 읽는 순서: **이 파일 → [`specs/site-intent.md`](specs/site-intent.md)(무엇이 정상·버그인가) → [`TODO.md`](TODO.md)(지금 할 일 · 예정 코스)**.
+> 새 채팅은 **「HANDOFF.md 읽고 TODO 대로 진행」** 으로 시작한다. 읽는 순서: **[`LESSON.md`](LESSON.md)(실패 기록 — 1절 작업 전 점검표) → 이 파일 → [`specs/site-intent.md`](specs/site-intent.md)(무엇이 정상·버그인가) → [`TODO.md`](TODO.md)(지금 할 일 · 예정 코스)**.
 > 2026-11-06 v2.17.1 시점에 다시 썼고, 2026-11-07 v2.28.1 시점에 최신화했다(사용자 「HANDOFF.md 와 TODO.md 최신화」). 그 전 내용은 [`docs/archive/HANDOFF-2026-11-06-old.md`](docs/archive/HANDOFF-2026-11-06-old.md)(권한·머지 규칙 등이 지금과 다름). 버전별로 무엇이 바뀌었는지는 [`CHANGELOG.md`](CHANGELOG.md).
 
 ## 0. 상태판 (배포할 때마다 갱신)
 
 | 항목 | 내용 |
 | --- | --- |
-| **현재 버전** | **v2.41.1 배포**(괄호 3겹 줄 정리 — 교과서 아홉 + 파이썬 예시 답, 검사 빈틈 막기: check_nesting 대상 12개 · book.js 예시 답 · check_level 기준선). 그 전 **v2.41.0**(새 교과서 「데이터 파일 다루기: JSON · 엑셀」 `files` 18 레슨 · 준비 파일 여러 개 · datasets.js · 만들어 보기 링크 버그). 그 전 **v2.40.0**(허브 분류 목적별 7묶음 · 파이썬 다음 코스 6개 설계 `specs/courses-python-next.md` — 아직 안 만듦). 그 전 **v2.39.0**(CI 줄이기 — 작업 셋 동시에 · check_book 교과서마다 동시에(`tools/check_book_par.mjs`) · 화면 검사 대기 줄이기(`REGRESS_WAIT_SCALE`) · 도감 검색 버그). 그 전 **v2.38.0**(파이썬 교과서 **100 레슨** — 챕터 8 표준 라이브러리 더 · 9 실전 2 · 10 더 깊이 · 11 실전 3, 문제 412, 설계 `specs/python-100.md`). v2.37.0 은 67 레슨(타입 힌트 두 레슨 등). 손보기 1 · 2 · 3단계 끝(v2.34.0 ~ v2.36.0, 검토 `specs/python-review.md`). 버전별 내용은 [`CHANGELOG.md`](CHANGELOG.md) |
-| **마지막 작업** | (Opus, 11/8) **데이터 파일 다루기 교과서**(사용자 「1」 = 설계 순서대로 만들기의 첫 코스): 공통 기능(prep 배열 · run · fold · datasets.js) → 예제 데이터 직접 → 쓰기 에이전트 5 동시 → 레슨 id 로 합치기(합치기 도구가 문제 안 JSON 의 「  },」 에 속아 만들어 보기 3 을 잃을 뻔 — 커밋 전에 잡고 끝 찾기를 고침) → 이어 읽기 검수 에이전트 3 → 폰 390 · PC 점검. (Opus, 11/8) **파이썬 100 레슨**(사용자 「1, 2」): 뼈대 → 에이전트 9개 동시 작성 → 레슨 id 로 합치기(합치기 도구가 레슨을 못 찾아 문제를 지울 뻔한 것을 커밋 전에 잡고 안전장치 넣음) → 칩 22곳 → 이어 읽기 검토 2개 → 폰 표 · 제목. 그 전(11/7~8): **파이썬 교과서 전체 검토 → 손보기 3단계**(사용자 「반복 · 난이도 · 문제 성격 · 안 배운 것 · 기타」 → 「4」 = 1 · 2 · 3단계 모두): 검토 `specs/python-review.md`(측정 스크립트 + 읽기 에이전트 5 + 직접 확인, 잘못 본 판정은 「정정」 으로 남김) → v2.34.0 틀린 것 고치기 → v2.35.0 문제 189 → 232(출력 예측 · 고치기 · 에러 읽기 · 생활형) → v2.36.0 58 → 66 레슨(무거운 레슨 나누기 · 반복 정리 · 테스트/디버깅을 실전 앞으로). 단계마다 챕터별 에이전트 4~5개를 worktree 에서 돌리고 쪽 번호 대응표로 칩을 다시 맞춤 |
-| **다음 후보** | 설계 순서대로 다음 코스: **업무 자동화(`auto`)** → 크롤링 → Flask → pygame → 파이썬 중급(`specs/courses-python-next.md`) |
+| **현재 버전** | **v2.42.0 배포**(새 교과서 「파이썬 업무 자동화」 `auto` 18 레슨 · 모든 교과서 만들어 보기 = 챕터 복습(문제 5~10개 · 챕터 레슨 전부 가리킴, 239 → 439) · check_level 이 교과서 문제도 재고 13 교과서 모두 0). 그 전 **v2.41.1**(괄호 3겹 줄 정리 — 교과서 아홉 + 파이썬 예시 답, 검사 빈틈 막기: check_nesting 대상 12개 · book.js 예시 답 · check_level 기준선). 그 전 **v2.41.0**(새 교과서 「데이터 파일 다루기: JSON · 엑셀」 `files` 18 레슨 · 준비 파일 여러 개 · datasets.js · 만들어 보기 링크 버그). 그 전 **v2.40.0**(허브 분류 목적별 7묶음 · 파이썬 다음 코스 6개 설계 `specs/courses-python-next.md` — 아직 안 만듦). 그 전 **v2.39.0**(CI 줄이기 — 작업 셋 동시에 · check_book 교과서마다 동시에(`tools/check_book_par.mjs`) · 화면 검사 대기 줄이기(`REGRESS_WAIT_SCALE`) · 도감 검색 버그). 그 전 **v2.38.0**(파이썬 교과서 **100 레슨** — 챕터 8 표준 라이브러리 더 · 9 실전 2 · 10 더 깊이 · 11 실전 3, 문제 412, 설계 `specs/python-100.md`). v2.37.0 은 67 레슨(타입 힌트 두 레슨 등). 손보기 1 · 2 · 3단계 끝(v2.34.0 ~ v2.36.0, 검토 `specs/python-review.md`). 버전별 내용은 [`CHANGELOG.md`](CHANGELOG.md) |
+| **마지막 작업** | (Opus, 11/8) **업무 자동화 교과서**(사용자 「다음」): 뼈대 · 연습 재료 samples.py → 쓰기 에이전트 동시 → 레슨 id 로 합치기 → 이어 읽기 검수. 같이: 사용자 「만들어 보기만 해도 복습이 되게 · 5~10개」 → check_book ⑫ 를 먼저 만들고 교과서 21개를 에이전트로 고침, 「만들어 보기도 맞게 고쳤나」 → check_level 이 교과서 문제를 안 쟀던 것을 고치고 걸린 것을 모두 고침. (Opus, 11/8) **데이터 파일 다루기 교과서**(사용자 「1」 = 설계 순서대로 만들기의 첫 코스): 공통 기능(prep 배열 · run · fold · datasets.js) → 예제 데이터 직접 → 쓰기 에이전트 5 동시 → 레슨 id 로 합치기(합치기 도구가 문제 안 JSON 의 「  },」 에 속아 만들어 보기 3 을 잃을 뻔 — 커밋 전에 잡고 끝 찾기를 고침) → 이어 읽기 검수 에이전트 3 → 폰 390 · PC 점검. (Opus, 11/8) **파이썬 100 레슨**(사용자 「1, 2」): 뼈대 → 에이전트 9개 동시 작성 → 레슨 id 로 합치기(합치기 도구가 레슨을 못 찾아 문제를 지울 뻔한 것을 커밋 전에 잡고 안전장치 넣음) → 칩 22곳 → 이어 읽기 검토 2개 → 폰 표 · 제목. 그 전(11/7~8): **파이썬 교과서 전체 검토 → 손보기 3단계**(사용자 「반복 · 난이도 · 문제 성격 · 안 배운 것 · 기타」 → 「4」 = 1 · 2 · 3단계 모두): 검토 `specs/python-review.md`(측정 스크립트 + 읽기 에이전트 5 + 직접 확인, 잘못 본 판정은 「정정」 으로 남김) → v2.34.0 틀린 것 고치기 → v2.35.0 문제 189 → 232(출력 예측 · 고치기 · 에러 읽기 · 생활형) → v2.36.0 58 → 66 레슨(무거운 레슨 나누기 · 반복 정리 · 테스트/디버깅을 실전 앞으로). 단계마다 챕터별 에이전트 4~5개를 worktree 에서 돌리고 쪽 번호 대응표로 칩을 다시 맞춤 |
+| **다음 후보** | 설계 순서대로 다음 코스: **크롤링(`crawl`)** → Flask → pygame → 파이썬 중급(`specs/courses-python-next.md`) |
 | **막힌 것** | 없음 |
 
 ## 1. 이게 뭔가
@@ -31,9 +31,9 @@
 2. 고치기. 화면이 바뀌면 `core/config.js` 의 **`APP_VERSION` 을 올리고** `node tools/stamp.mjs`(모든 `?v=` · `sw.js` 미리 캐시 목록). 허브 카드의 레슨 수·문구는 `CONFIG.COURSES`(`lessons` · `bookNote` · `short`)에 손으로 — 교과서 레슨 수를 바꾸면 같은 PR 에서.
 3. 검사 전부(= CI `verify`, 명령은 `README.md` 「작업 방법」 · 설명은 `specs/site-intent.md` 7절). `python3 tools/regress.py` 끝 줄 **FAILS 0**.
 4. **QA 를 직접**: Playwright 로 휴대폰 390 · PC 1440 화면을 찍어 **눈으로** 보기(가로 넘침 · pageerror 0), 「이 시점의 초보자가 따라 할 수 있나」. 사이트 전체(또는 코스 몇 개)는 **`python3 tools/qa_screens.py --out /tmp/qa_pc`**(PC) · `--w 390 --h 844`(폰) · `--theme light` · `--font 3` — 모든 쪽을 열어 대비·글자 크기·누를 곳·가로 넘침을 재고 캡처를 남긴다(쓰는 법은 파일 맨 위 주석, `specs/qa-team.md`).
-5. 문서: **이 파일 0절 상태판** + `CHANGELOG.md` 새 항목(+ 바뀐 규칙이면 `specs/site-intent.md`, 할 일이면 `TODO.md`).
+5. 문서: **이 파일 0절 상태판** + `CHANGELOG.md` 새 항목(+ 바뀐 규칙이면 `specs/site-intent.md`, 할 일이면 `TODO.md`). 이번 작업에서 실패가 있었으면(CI 빨강 · 사용자 지적 · 검사가 놓친 것 · 도구가 깨뜨린 것) **[`LESSON.md`](LESSON.md) 최신화**.
 6. 커밋(끝에 세션 지침의 Co-Authored-By · Claude-Session 줄) → push → PR(본문 끝에 🤖 Generated with Claude Code 줄 + 세션 주소). **도구**: `gh` CLI 가 있으면 `gh api repos/jihoon380462/python-academy/pulls …`, 클라우드 세션(claude.ai/code)이면 GitHub MCP 도구(`create_pull_request` · `pull_request_read`(get_check_runs) · `merge_pull_request`(squash, `expectedHeadSha` 40자) · `actions_list`).
-7. **사용자에게 「CI 기다리는 중」 이라고 먼저 말하고** check-run `verify` 가 success 될 때까지 기다림(클라우드 세션은 `subscribe_pr_activity` 로 CI 결과가 저절로 옴 — 기다리며 다음 챕터를 미리 만들어 둬도 됨, 단 커밋은 머지 뒤) → squash 머지. 빨가면 로그(`get_job_logs`)로 원인을 찾아 고쳐 push(예: v2.28.1 은 CI 에 `requests` 가 없어 실패 → ci.yml 설치 줄에 더함).
+7. **사용자에게 「CI 기다리는 중」 이라고 먼저 말하고** check-run `verify` 가 success 될 때까지 기다림(클라우드 세션은 `subscribe_pr_activity` 로 CI 결과가 저절로 옴 — 기다리며 다음 챕터를 미리 만들어 둬도 됨, 단 커밋은 머지 뒤) → squash 머지. 빨가면 로그(`get_job_logs`)로 원인을 찾아 고쳐 push(예: v2.28.1 은 CI 에 `requests` 가 없어 실패 → ci.yml 설치 줄에 더함). **그리고 같은 PR 에서 [`LESSON.md`](LESSON.md) 에 기록**(무슨 일 · 진짜 원인 · 막는 장치).
 8. main 의 새 SHA 로 배포 run(「Deploy to GitHub Pages」)이 success 인지 확인 → 작업 브랜치를 main 으로 되돌림(`git checkout -B <브랜치> origin/main`). 같은 이름의 원격 브랜치에 squash 전 커밋이 남아 있으면 force push 대신 `git merge -s ours origin/<브랜치>` 로 이어 붙이고 push(클라우드 세션은 force push 가 막혀 있음).
 9. 사용자에게: 무엇이 바뀌었나(짧게) + **다음 선택지 목록**.
 
@@ -84,6 +84,8 @@
 
 | 문서 | 용도 |
 | --- | --- |
+| **`LESSON.md`** | **실패 기록**(사용자 11/8 지시) — 작업 전에 1절 점검표를 읽고, 실패가 생기면 같은 PR 에서 최신화. `CLAUDE.md` 도 이 파일을 가리킴 |
+| `CLAUDE.md` | Claude Code 가 세션마다 저절로 읽는 짧은 안내 — LESSON.md · 이 파일을 읽으라는 것과 꼭 지킬 것 |
 | `TODO.md` | 지금 할 일(1절) · 사용자 결정(3절) · **예정 코스**(남은 것: 공용 T1 CS · T10 어셈블리어 · T11 LLM, 코스 T3~T7) |
 | `specs/site-intent.md` | 사이트 의도 · 코스별 정상 동작 · 자동 검사 — QA 기준 |
 | `specs/workflow.md` · `specs/qa-team.md` | 작업 규칙 · QA 채팅 지시서(QA 는 직접 플레이 → `qa-reports/` 에 PR, 화면 검수 도구 `tools/qa_screens.py`) |
