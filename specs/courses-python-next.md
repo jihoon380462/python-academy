@@ -7,7 +7,7 @@
 
 | 코스 | id · 레슨 글자 | 레슨 | 허브 분류(v2.40.0) | 바깥 패키지(CI) |
 |---|---|---|---|---|
-| 데이터 파일 다루기: JSON · 엑셀 | `files` · F / FB | 18 | 🛠 파이썬으로 만들기 | openpyxl |
+| 데이터 파일 다루기: JSON · 엑셀 ✅ v2.41.0 | `files` · F / FB | 18 | 🛠 파이썬으로 만들기 | openpyxl |
 | 파이썬 업무 자동화 | `auto` · J / JB | 18 | 🛠 파이썬으로 만들기 | pypdf · python-docx · reportlab · cryptography |
 | 웹 크롤링과 스크래핑 | `crawl` · Y / YB | 17 | 🛠 파이썬으로 만들기 | beautifulsoup4 |
 | pygame 으로 게임 만들기 | `game` · GM / GMB | 17 | 🛠 파이썬으로 만들기 | pygame-ce(고정 2.5.8) |
