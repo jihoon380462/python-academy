@@ -24,9 +24,16 @@ function loadCourse(id) {
   const cx = { window: {} }; vm.createContext(cx);
   const src = ['datasets.js', 'content.js', 'book.js'].filter(f => fs.existsSync(path.join(dir, f))).map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n').replace(/^(const|let) /gm, 'var ');
   try { vm.runInContext(src, cx); } catch (e) { return c; }
-  const extra = []; for (const [lid, ts] of Object.entries((cx.BOOK && cx.BOOK.tasks) || {})) (ts || []).forEach((t, k) => { if (t.pid || typeof t.answer !== 'string') return;
-    extra.push({ id: `${lid}#${k + 1}`, lesson: lid, type: 'code', title: t.title || '', prompt: t.text || '', solution: t.predict ? '' : t.answer, starter: t.predict ? t.answer : (t.given || ''), hints: [], bookTask: true }); });
-  return { ...c, PROBLEMS: c.PROBLEMS.concat(extra) };
+  // 교과서는 학습자가 보는 순서 = BOOK.tasks 의 순서로 잰다(③ 「첫 문제」 도 이 순서). pid 문제는 옛 문제를 그 자리에, 교과서에 안 쓰는 옛 문제는 화면에 없으니 빼요.
+  const byId = Object.fromEntries(c.PROBLEMS.map(p => [p.id, p])); const ordered = []; const seen = new Set();
+  for (const l of c.LESSONS) { const ts = ((cx.BOOK && cx.BOOK.tasks) || {})[l.id] || [];
+    // 이 레슨 · 앞 문제에서 학습자가 만든 내 모듈(문제 글 · 준비 파일의 「이름.py」)은 import 해도 새 기능이 아님(L16C 「내 모듈」)
+    const own = new Set(); for (const t of ts) { for (const m of String((t.text || '') + '\n' + (t.answer || '')).matchAll(/([A-Za-z_]\w*)\.py\b/g)) own.add(m[1]); for (const f of [].concat(t.prep || [])) if (f && f.name) { const m = String(f.name).match(/([A-Za-z_]\w*)\.py$/); if (m) own.add(m[1]); } }
+    const ownRe = own.size ? new RegExp(`^[ \\t]*(?:import|from)\\s+(?:${[...own].join('|')})\\b.*$`, 'gm') : null; const strip = (s) => ownRe ? String(s || '').replace(ownRe, '') : (s || '');
+    ts.forEach((t, k) => { if (t.pid && byId[t.pid]) { ordered.push(byId[t.pid]); seen.add(t.pid); return; } if (typeof t.answer !== 'string') return;
+      ordered.push({ id: `${l.id}#${k + 1}`, lesson: l.id, type: 'code', title: t.title || '', prompt: t.text || '', solution: t.predict ? '' : strip(t.answer), starter: t.predict ? strip(t.answer) : strip(t.given || ''), hints: [], bookTask: true }); }); }
+  if (!ordered.length) return c;
+  return { ...c, PROBLEMS: ordered };
 }
 
 // =====================================================================
