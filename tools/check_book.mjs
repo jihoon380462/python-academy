@@ -140,6 +140,15 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
   const open = LESSONS.filter(l => (!l.mock || ((BOOK.tasks || {})[l.id] || []).length) /* 모의고사는 교과서가 문제를 채웠을 때만(화면 lessonsOf 와 같게, v2.15.0) */ && (!l.draft || (BOOK.lessonPages || {})[l.id] || ((BOOK.tasks || {})[l.id] || []).length)).length;
   if (!cc || !cc.book || !cc.ready) bad(`config.js COURSES 의 ${cid} 에 ready:true, book:true 가 있어야 해요(허브 카드가 「읽은 레슨」으로 보이게)`); else if (cc.lessons !== open) bad(`config.js ${cid}.lessons = ${cc.lessons} 인데 열린 레슨은 ${open}개 — 허브 카드 숫자를 맞추세요`);
   if (cc && /가상|시뮬레이터|브라우저에서 바로/.test(cc.desc || '')) bad(`config.js ${cid}.desc 가 교과서와 안 맞아요: ${cc.desc}`); }
+// ⑫ 챕터 만들어 보기 = 챕터 복습(v2.42.0 사용자 「해당 챕터의 만들어보기만 해도 복습이 될 수 있게 … 5개 이상 10개 이하」):
+//    만들어 보기 레슨마다 문제 5~10개, 한 챕터의 만들어 보기 문제들이 「필요한 코드」 로 그 챕터의 열린 레슨을 모두 한 번 이상 가리킴
+{ const isOpen = (l) => !l.draft || (BOOK.lessonPages || {})[l.id] || ((BOOK.tasks || {})[l.id] || []).length;
+  const bossL = LESSONS.filter(l => l.boss && isOpen(l));
+  for (const b of bossL) { const k = (BOOK.tasks[b.id] || []).length; if (k < 5 || k > 10) bad(`${b.id} 「${b.title}」: 만들어 보기 문제가 ${k}개 — 챕터 복습이 되게 5~10개`); }
+  for (const ch of [...new Set(bossL.map(b => b.ch))]) { const bs = bossL.filter(b => b.ch === ch);
+    const refs = new Set(bs.flatMap(b => (BOOK.tasks[b.id] || []).flatMap(t => (t.needs || []).map(x => String(x[1]).split('/')[0]))));
+    const miss = LESSONS.filter(l => l.ch === ch && !l.boss && !l.mock && !l.practical /* 실전 프로젝트 레슨은 그 자체가 큰 만들어 보기 */ && isOpen(l) && !refs.has(l.id)).map(l => l.id);
+    if (miss.length) bad(`챕터 ${ch} 만들어 보기(${bs.map(b => b.id).join(' · ')})가 「필요한 코드」 로 안 가리킨 레슨: ${miss.join(', ')} — 만들어 보기만 풀어도 챕터 복습이 되게 그 레슨을 쓰는 문제를`); } }
 const noTasks = LESSONS.filter(l => !l.mock && !(BOOK.tasks[l.id] || []).length).map(l => l.id); if (noTasks.length) console.log(`  · [${cid}] 만들어 보기가 없는 레슨:`, noTasks.join(', '));
 console.log(fails ? `✗ check_book [${cid}] 실패 ${fails} (문제 ${n}, 실행 ${ran})` : `✓ check_book [${cid}] OK (문제 ${n}, 예시 답 실행 ${ran})`); return fails;
 // 셸: 빈 HOME 에서 setup → answer(또는 run) → check. 출력의 HOME 경로는 /c/Users/me 로(교과서가 Git Bash 기준으로 보여 주는 모양)
