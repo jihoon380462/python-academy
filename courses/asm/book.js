@@ -1156,7 +1156,7 @@ main:
     ],
     RB3: [
       { title: "복습 — 스택에 쌓고 꺼내면 · 출력 예측", text: "<p>함수 모음을 만들기 전에 레슨 10 의 스택을 되짚어요. 글자 <code>a</code> · <code>s</code> · <code>m</code> 을 차례로 <code>push</code> 하고, 세 번 <code>pop</code> 하면서 꺼낸 순서대로 <code>buf</code> 에 적어 찍어요. 세 번 쌓은 뒤 <code>rsp</code> 가 얼마나 내려갔는지는 종료 코드로 남겨요.</p><p>돌리기 전에 출력 한 줄과 <code>echo $?</code> 의 수를 먼저 예상해 보고, 우분투에서 빌드해 돌려 맞았는지 확인해 보세요.</p>", needs: [["push rax · pop rbx", "R10/1", "나중에 넣은 것이 먼저 나와요"], ["mov rbx, rsp", "R10/0", "rsp 는 하나 쌓을 때마다 8 작아져요"], ["pop rax   mov [rdi], al", "R10/3", "쌓았다가 거꾸로 꺼내 buf 에 — 스택으로 뒤집기"], ["mov [rdi + 1], al", "R8/3", "한 바이트씩 쓰기"]], predict: true, echoExit: true, answer: "default rel\nsection .bss\nbuf resb 4\n\nsection .text\nglobal _start\n_start:\n    mov r12, rsp        ; 처음 rsp\n    push 'a'\n    push 's'\n    push 'm'\n    mov r13, r12\n    sub r13, rsp        ; 처음 − 지금 = 얼마나 내려갔나\n    lea rdi, [buf]\n    pop rax\n    mov [rdi], al\n    pop rax\n    mov [rdi + 1], al\n    pop rax\n    mov [rdi + 2], al\n    mov byte [rdi + 3], 10\n    mov rax, 1          ; write(1, buf, 4)\n    mov rsi, rdi\n    mov rdi, 1\n    mov rdx, 4\n    syscall\n    mov rdi, r13        ; 내려간 바이트 수를 종료 코드로\n    mov rax, 60\n    syscall", explain: "<p>① 마지막에 넣은 <code>m</code> 이 꼭대기라 먼저 나와요. 그래서 <code>buf</code> 에는 <code>m</code> · <code>s</code> · <code>a</code> 순서로 적혀 <b>msa</b> 가 찍혀요. 넣은 순서가 거꾸로 되는 게 스택으로 뒤집기의 원리예요. ② <code>push</code> 는 늘 8바이트라 세 번이면 <code>rsp</code> 가 <b>24</b> 내려가요. ③ 세 번 넣고 세 번 꺼냈으니 끝에서 <code>rsp</code> 는 처음 자리로 돌아와 있어요. 함수에서 push 한 만큼 pop 해야 <code>ret</code> 이 제자리로 돌아가는 것도 이 때문이에요.</p>", io: [{ output: "msa\n24" }] },
-      { title: '① strlen · print_str · print_int', text: `챕터 3 의 함수 모음을 만들어요. 모두 <b>호출 규약대로</b>(인자 <code>rdi</code>, 결과 <code>rax</code>, <code>rbx</code> 를 쓰면 <code>push</code> · <code>pop</code>). 시작은 <code>global main</code>, 빌드는 <code>gcc -no-pie</code>, 끝은 <code>ret</code>.<ul><li><code>strlen(s)</code> → 0 앞까지의 바이트 수</li><li><code>print_str(s)</code> → s 와 줄바꿈을 <code>write</code></li><li><code>show_len(s)</code> → s 한 줄, 길이 한 줄(<code>print_int</code>)</li></ul><code>main</code> 에서 <code>"hello"</code> · <code>"어셈블리"</code> · 빈 글자(0 하나)로 <code>show_len</code> 을 불러요. C 라이브러리에도 <code>strlen</code> 이 있지만, <code>global</code> 을 안 붙인 라벨은 이 파일 안에서만 쓰여서 부딪치지 않아요.`,
+      { title: 'strlen · print_str · print_int', text: `챕터 3 의 함수 모음을 만들어요. 모두 <b>호출 규약대로</b>(인자 <code>rdi</code>, 결과 <code>rax</code>, <code>rbx</code> 를 쓰면 <code>push</code> · <code>pop</code>). 시작은 <code>global main</code>, 빌드는 <code>gcc -no-pie</code>, 끝은 <code>ret</code>.<ul><li><code>strlen(s)</code> → 0 앞까지의 바이트 수</li><li><code>print_str(s)</code> → s 와 줄바꿈을 <code>write</code></li><li><code>show_len(s)</code> → s 한 줄, 길이 한 줄(<code>print_int</code>)</li></ul><code>main</code> 에서 <code>"hello"</code> · <code>"어셈블리"</code> · 빈 글자(0 하나)로 <code>show_len</code> 을 불러요. C 라이브러리에도 <code>strlen</code> 이 있지만, <code>global</code> 을 안 붙인 라벨은 이 파일 안에서만 쓰여서 부딪치지 않아요.`,
         needs: [['strlen:   …   ret', 'R11/0', '함수 = ret 으로 끝나는 라벨'], ['push rbx   mov rbx, rdi   …   pop rbx', 'R12/1', '부르는 동안 인자 간직하기'], ['call print_int', 'R11/2', '숫자 출력 함수'], ['global main   ret', 'R13/0', 'gcc -no-pie 로 빌드']],
         io: [{ output: `hello
 5
@@ -1250,7 +1250,7 @@ print_int:
     syscall
     add rsp, 32
     ret` },
-      { title: '② to_upper: 한 줄을 대문자로', text: `<code>to_upper(s)</code> 를 만드세요. s 의 <code>a</code>~<code>z</code> 를 <b>그 자리에서</b> <code>A</code>~<code>Z</code> 로 바꾸고, 다른 바이트(숫자 · 기호 · 한글)는 그대로 둬요. <code>main</code> 은 <code>read</code> 로 한 줄을 받아 끝의 줄바꿈을 0 으로 바꾸고, <code>to_upper</code> → ① 의 <code>print_str</code> 순서로 불러요.`,
+      { title: 'to_upper: 한 줄을 대문자로', text: `<code>to_upper(s)</code> 를 만드세요. s 의 <code>a</code>~<code>z</code> 를 <b>그 자리에서</b> <code>A</code>~<code>Z</code> 로 바꾸고, 다른 바이트(숫자 · 기호 · 한글)는 그대로 둬요. <code>main</code> 은 <code>read</code> 로 한 줄을 받아 끝의 줄바꿈을 0 으로 바꾸고, <code>to_upper</code> → ② 의 <code>print_str</code> 순서로 불러요.`,
         needs: [['to_upper:   …   ret', 'R11/0', '함수로 만들기'], ['lea rdi, [buf]   call to_upper', 'R11/1', '인자는 rdi(글자의 주소)'], ['global main', 'R13/0', 'main 에서 시작']],
         io: [{ input: `hello, asm!\n`, output: `HELLO, ASM!` }, { input: `Ubuntu 24.04 LTS\n`, output: `UBUNTU 24.04 LTS` }, { input: `안녕 abc\n`, output: `안녕 ABC` }],
         answer: `default rel
@@ -1320,7 +1320,7 @@ print_str:                  ; print_str(s): s 와 줄바꿈을 write
     syscall
     pop rbx
     ret` },
-      { title: '③ max_of(arr, n)', text: `qword 배열의 주소와 칸 수를 받아 가장 큰 값을 돌려주는 <code>max_of(arr, n)</code> 을 만드세요(음수도 있어요, n 은 1 이상). <code>[3, -7, 12, 5]</code> · <code>[-5, -2, -9]</code> · <code>[42]</code> 로 불러 <code>print_int</code> 로 찍어요.`,
+      { title: 'max_of(arr, n)', text: `qword 배열의 주소와 칸 수를 받아 가장 큰 값을 돌려주는 <code>max_of(arr, n)</code> 을 만드세요(음수도 있어요, n 은 1 이상). <code>[3, -7, 12, 5]</code> · <code>[-5, -2, -9]</code> · <code>[42]</code> 로 불러 <code>print_int</code> 로 찍어요.`,
         needs: [['lea rdi, [arr1]   mov rsi, 4   call max_of', 'R12/0', '인자 1 = rdi, 인자 2 = rsi'], ['mov rdi, rax   call print_int', 'R11/2', '결과 찍기']],
         io: [{ output: `12
 -2
@@ -1399,7 +1399,7 @@ print_int:
     syscall
     add rsp, 32
     ret` },
-      { title: '④ 모두 모아 printf 한 줄', text: `<code>"hello asm"</code> 을 <code>to_upper</code> 로 바꾸고, <code>strlen</code> 으로 길이를, <code>max_of</code> 로 <code>nums dq 4, 8, -15, 16, 23, -42</code> 의 최댓값을 구해 <code>printf</code> 한 번으로 찍으세요. 함수를 부르는 동안 길이 · 최댓값은 <code>rbx</code> · <code>r12</code> 에 간직하고, push 수로 정렬을 맞춰요.<br><span class="muted small">이 문제는 숫자를 <code>printf</code> 로만 찍어요. <code>write</code> 로 바로 쓰는 <code>print_int</code> 와 글자를 모아 뒀다 쓰는 <code>printf</code> 를 섞으면 나오는 순서가 뒤바뀔 수 있어요.</span>`,
+      { title: '모두 모아 printf 한 줄', text: `<code>"hello asm"</code> 을 <code>to_upper</code> 로 바꾸고, <code>strlen</code> 으로 길이를, <code>max_of</code> 로 <code>nums dq 4, 8, -15, 16, 23, -42</code> 의 최댓값을 구해 <code>printf</code> 한 번으로 찍으세요. 함수를 부르는 동안 길이 · 최댓값은 <code>rbx</code> · <code>r12</code> 에 간직하고, push 수로 정렬을 맞춰요.<br><span class="muted small">이 문제는 숫자를 <code>printf</code> 로만 찍어요. <code>write</code> 로 바로 쓰는 <code>print_int</code> 와 글자를 모아 뒀다 쓰는 <code>printf</code> 를 섞으면 나오는 순서가 뒤바뀔 수 있어요.</span>`,
         needs: [['push rbp   push rbx   push r12', 'R13/3', 'push 세 번 = 정렬 · 지킬 레지스터 맡기기'], ['mov rbx, rax', 'R12/1', '부르는 동안 간직할 값은 rbx · r12'], ['lea rdi, [fmt]   lea rsi, [name]   mov rdx, rbx   mov rcx, r12   xor eax, eax   call printf', 'R13/1', '인자 넷: 형식 · %s · %ld · %ld']],
         io: [{ output: `HELLO ASM / 9 글자 / 최댓값 23` }],
         answer: `default rel
