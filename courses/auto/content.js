@@ -83,10 +83,7 @@ with tempfile.TemporaryDirectory() as tmp:
     print("원본 폴더 그대로:", before == after, len(after), "개")
     print("정리본 폴더:", len(made), "개")`, prep: [SAMPLES_PREP] } },
     { title: "pip list · make_files(tmp)", html: `<p>준비는 두 가지예요. 자세한 순서는 이 교과서 맨 앞 <b>시작하기 1 · 2</b> 에 있어요.</p>
-<p><b>① 패키지 넷.</b> 공부 폴더 <code>auto-study</code> 의 가상 환경을 켜고(복습: <a href="../python/#lesson/L16D" target="_blank" rel="noopener">파이썬 교과서 「pip 와 가상 환경」 ↗</a>) 한 번 깔아요. 다 깔렸는지는 <code>pip list</code> 로 봐요. 목록에 네 이름이 보이면 돼요(버전 숫자는 PC 마다 달라요).</p>
-<pre>python -m pip install pypdf python-docx reportlab cryptography
-python -m pip list</pre>
-<div class="bk-warn"><b>설치 이름 ≠ import 이름</b> — 워드 패키지는 <code>pip install python-docx</code> 로 깔고 코드에서는 <code>import docx</code> 예요. <code>pip install docx</code> 는 다른 옛 패키지라서 깔면 <code>import docx</code> 에서 에러가 나요. 잘못 깔았으면 <code>pip uninstall docx</code> 후 다시 깔아요.</div>
+<p><b>① 패키지 넷.</b> 설치 명령과 「설치 이름 ≠ import 이름」 함정은 복습: 시작하기 1 이에요. 다 깔렸는지는 터미널에서 <code>python -m pip list</code> 로 봐요(목록에 네 이름이 보이면 돼요). <code>pip install docx</code> 로 잘못 깔았으면 <code>pip uninstall docx</code> 후 다시 깔아요.</p>
 <p>코드 안에서 확인할 수도 있어요. <code>importlib.import_module("docx")</code> 는 <code>import docx</code> 와 같은데, 모듈 이름을 <b>글자로</b> 받아서 반복문으로 여러 개를 차례로 불러 볼 수 있어요. 없으면 <code>ModuleNotFoundError</code> 예요(복습: <a href="../python/#lesson/L13" target="_blank" rel="noopener">파이썬 교과서 「예외 처리」 ↗</a>).</p>
 <pre>import importlib
 
@@ -96,7 +93,7 @@ for module in ["pypdf", "docx", "reportlab", "cryptography"]:
         print("OK", module)
     except ModuleNotFoundError:
         print("없음", module)</pre>
-<p><b>② 연습 재료 <code>samples.py</code>.</b> 시작하기 2 의 내용을 그대로 <code>samples.py</code> 로 저장해요. 예제와 문제는 내 진짜 파일 대신, <code>from samples import make_files</code> 로 불러 <b>임시 폴더 안에</b> 가짜 파일을 만들어 써요. 맨 먼저 쓸 <code>make_files(폴더)</code> 는 「다운로드」 폴더 흉내 파일 12개를 만들고, 만든 파일 경로를 이름 순 리스트로 돌려줘요. 사진 · 문서 사이에 워드 임시 파일 <code>~$견적서 최종.docx</code> · Windows 의 그림 미리 보기 파일 <code>Thumbs.db</code> · <code>임시.tmp</code>, 대문자 확장자 <code>.JPG</code> · <code>.PDF</code>, 이름에 빈칸이 섞여 있어요. 수정 시각도 2026년 10~11월로 고정돼 있어요.</p>
+<p><b>② 연습 재료 <code>samples.py</code>.</b> 시작하기 2 의 내용을 그대로 <code>samples.py</code> 로 저장해요(함수 목록도 거기 표에 있어요). 맨 먼저 쓸 <code>make_files(폴더)</code> 는 「다운로드」 폴더 흉내 파일 12개를 만들고, 만든 파일 경로를 이름 순 리스트로 돌려줘요. 아래 예제로 한 번 돌려 보세요.</p>
 <div class="bk-warn"><b>samples.py 는 .py 파일 옆에</b> — <code>import</code> 는 터미널의 현재 폴더가 아니라 <b>실행한 .py 파일이 있는 폴더</b>에서 찾아요. 다른 폴더에 두면 <code>ModuleNotFoundError: No module named 'samples'</code> 예요. 이 교과서의 .py 파일은 모두 <code>auto-study</code> 에, <code>samples.py</code> 와 나란히 만들어요. 실행한 파일이 있는 폴더는 <code>Path(__file__).parent</code> 예요(복습: <a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩」 ↗</a>) — <code>(Path(__file__).parent / "samples.py").exists()</code> 로 옆에 있는지 물을 수 있어요.</div>`,
       example: { code: `import tempfile
 from samples import make_files
