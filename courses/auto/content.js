@@ -21,7 +21,8 @@ const LESSONS = [
 <p>걸리는 시간은 곱해서 세요. 한 번 5분 × 한 주 5번 × 52주면 1300분, 한 해에 <b>21시간</b>이 넘어요. 프로그램을 만드는 데 서너 시간이 들어도 남는 장사예요.</p>
 <pre>minutes = 5 * 5 * 52
 print(minutes)          # 1300
-print(minutes // 60)    # 21</pre>
+print(minutes // 60)    # 21 — 시간
+print(minutes % 60)     # 40 — 남은 분</pre>
 <div class="bk-warn"><b>사람이 판단할 일은 남겨 두기</b> — 수강 상담 전화, 거래처에 보낼 사과 메일, 「이 청구서 금액이 맞나?」 같은 일은 규칙으로 못 적어요. 프로그램은 <b>모으고 · 정리하고 · 초안을 만드는</b> 데까지 하고, 마지막 확인과 결정은 사람이 해요.</div>
 <p>이 교과서의 순서예요.</p>
 <table class="kb"><tbody><tr><th>챕터</th><th>공방의 일</th></tr><tr><td>1 파일 · 폴더</td><td>이름 한꺼번에 바꾸기 · 날짜 폴더로 정리 · 백업 · 압축</td></tr><tr><td>2 PDF · 워드</td><td>청구서에서 금액 꺼내기 · PDF 합치기 · 보고서 워드 만들기</td></tr><tr><td>3 템플릿 · 메일</td><td>명단으로 수료증과 안내 메일 대량 만들기 · 보내기</td></tr><tr><td>4 정해진 때에</td><td>월요일 9시에 사람 없이 혼자 돌기</td></tr></tbody></table>
@@ -676,7 +677,7 @@ with tempfile.TemporaryDirectory() as tmp:
   ],
   summary: ["규칙은 rule(p, i) 함수 하나로 — 번호 f\"{i:03}\" · 앞뒤 붙이기 · re.sub, Windows 금지 글자 9개와 빈칸은 safe_name 으로 _", "바꾸기 전에 plan → preview → conflicts(새 이름끼리는 Counter, 있던 파일은 소문자 이름 비교) — 맞바꾸기 · 번호 밀기는 임시 이름을 거치는 apply 두 단계로", "rename_log.csv 에 원래 → 새 를 남기면 undo 로 되돌려요 — 날짜 정리는 st_mtime → datetime.fromtimestamp → 2026-10-03_ 이름이나 2026/10 폴더"] },
 { id: 'J2', ch: 1, n: 2, title: '백업: 복사 · 비교 · 정리', mode: 'text',
-  tutorSummary: "파이썬 L27(shutil.copy · move · rmtree)은 링크만. 백업은 shutil.copy2(a, b) — 내용 + 수정 시각까지(copy 는 시각이 지금으로). p.stat().st_size(바이트) · st_mtime(타임스탬프, J1). copy2 도 Windows 권한 · 주인은 안 가져감. 폴더 통째: shutil.copytree(src, dst, dirs_exist_ok=True(없으면 이미 있을 때 FileExistsError), ignore=shutil.ignore_patterns(\"*.tmp\", \"~$*\", \"Thumbs.db\", \"__pycache__\")) — 패턴은 Windows dir 같은 * 모양(정규식 아님), 내 코드에서는 fnmatch.fnmatch(이름, 패턴). 결과 찍기 dst.glob(\"**/*\") + relative_to(dst).as_posix(). 바뀐 것만 복사: 빠른 검사 changed(src, dst) — 없거나 st_size 다르거나 st_mtime 차이 > 2초(USB FAT 는 2초 단위), 확실한 검사 filecmp.cmp(a, b, shallow=False)(shallow 기본 True 는 크기 · 시각이 같으면 내용을 안 봄). copy_changed(src_dir, dst_dir, patterns=SKIP, dry_run=False) 는 src_dir.glob(\"**/*\") 를 돌며 rel = p.relative_to(src_dir), skipped(rel, patterns)(rel.parts 의 칸마다 fnmatch — 폴더 __pycache__ 안도), changed 면 target.parent.mkdir(parents=True, exist_ok=True) + copy2, 복사한 rel.as_posix() 리스트를 돌려줌(dry_run 이면 목록만). 두 폴더 비교 filecmp.dircmp(a, b): left_only · right_only · diff_files · common_dirs, 바로 안만(subdirs[이름] 으로 들어감), 빠른 검사. 날짜 이름 백업(2026-11-08/ · 문서_2026-11-08.zip): YYYY-MM-DD 는 이름 순 = 날짜 순, 덮어쓰기 백업은 어제 지운 파일도 사라짐. 최근 n개만 남기기: old_backups(root, keep, prefix=\"\") 는 re.search(r\"\\d{4}-\\d{2}-\\d{2}\", 이름) 이 있고 prefix 로 시작하는 것만 (날짜, 이름) 튜플로 sort, cut = max(len - keep, 0), 앞쪽 cut 개 = 지울 것(오래된 것부터), 날짜 없는 파일은 안 건드림 — dated[:-keep] 은 keep=0 이면 [:0] 이라 안 지워지는 함정. prune_backups(root, keep, prefix, dry_run) 은 [미리 보기] 지울 백업 출력 또는 폴더는 rmtree · 파일은 unlink. shutil.disk_usage(경로).total · used · free(바이트, 값은 PC 마다 달라 ☐). 중복 찾기: 크기로 먼저 defaultdict(list) 로 묶고, 둘 이상인 크기만 hashlib.sha256(p.read_bytes()).hexdigest()(해시는 CS C16 링크, read_bytes 는 바이트로 통째 읽기)로 다시 묶어 둘 이상인 묶음 — 보여 주기만, 지울 쪽은 사람이.",
+  tutorSummary: "파이썬 L27(shutil.copy · move · rmtree)은 링크만. 백업은 shutil.copy2(a, b) — 내용 + 수정 시각까지(copy 는 시각이 지금으로). p.stat().st_size(바이트) · st_mtime(타임스탬프, J1). copy2 도 Windows 권한 · 주인은 안 가져감. 폴더 통째: shutil.copytree(src, dst, dirs_exist_ok=True(없으면 이미 있을 때 FileExistsError), ignore=shutil.ignore_patterns(\"*.tmp\", \"~$*\", \"Thumbs.db\", \"__pycache__\")) — 패턴은 Windows dir 같은 * 모양(정규식 아님), 내 코드에서는 fnmatch.fnmatch(이름, 패턴). 결과 찍기 dst.glob(\"**/*\") + relative_to(dst).as_posix(). 바뀐 것만 복사: 빠른 검사 changed(src, dst) — 없거나 st_size 다르거나 st_mtime 차이 > 2초(USB FAT 는 2초 단위), 확실한 검사 filecmp.cmp(a, b, shallow=False)(shallow 기본 True 는 크기 · 시각이 같으면 내용을 안 봄). copy_changed(src_dir, dst_dir, patterns=SKIP, dry_run=False) 는 src_dir.glob(\"**/*\") 를 돌며 rel = p.relative_to(src_dir), skipped(rel, patterns)(rel.parts 의 조각마다 fnmatch — 폴더 __pycache__ 안도), changed 면 target.parent.mkdir(parents=True, exist_ok=True) + copy2, 복사한 rel.as_posix() 리스트를 돌려줌(dry_run 이면 목록만). 두 폴더 비교 filecmp.dircmp(a, b): left_only · right_only · diff_files · common_dirs, 바로 안만(subdirs[이름] 으로 들어감), 빠른 검사. 날짜 이름 백업(2026-11-08/ · 문서_2026-11-08.zip): YYYY-MM-DD 는 이름 순 = 날짜 순, 덮어쓰기 백업은 어제 지운 파일도 사라짐. 최근 n개만 남기기: old_backups(root, keep, prefix=\"\") 는 re.search(r\"\\d{4}-\\d{2}-\\d{2}\", 이름) 이 있고 prefix 로 시작하는 것만 (날짜, 이름) 튜플로 sort, cut = max(len - keep, 0), 앞쪽 cut 개 = 지울 것(오래된 것부터), 날짜 없는 파일은 안 건드림 — dated[:-keep] 은 keep=0 이면 [:0] 이라 안 지워지는 함정. prune_backups(root, keep, prefix, dry_run) 은 [미리 보기] 지울 백업 출력 또는 폴더는 rmtree · 파일은 unlink. shutil.disk_usage(경로).total · used · free(바이트, 값은 PC 마다 달라 ☐). 중복 찾기: 크기로 먼저 defaultdict(list) 로 묶고, 둘 이상인 크기만 hashlib.sha256(p.read_bytes()).hexdigest()(해시는 CS C16 링크, read_bytes 는 바이트로 통째 읽기)로 다시 묶어 둘 이상인 묶음 — 보여 주기만, 지울 쪽은 사람이.",
   terms: { "백업": "원본이 망가지거나 지워져도 되살릴 수 있게 다른 곳에 복사해 두는 것. 날짜별로 여러 개를 남겨 두면 며칠 전 상태로도 돌아갈 수 있어요" },
   pages: [
     { title: "shutil.copy2 vs copy — 수정 시각까지", html: `<p>복습: 파일 하나 복사 <code>shutil.copy(원본, 폴더)</code> 와 옮기기 · 지우기는 <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리: pathlib · shutil」 ↗</a> 에서 했어요. [[백업]]은 복사인데, 그냥 복사와 다른 점이 하나 있어요. <b>수정 시각</b>도 같이 가져가야 해요. 그래야 나중에 「원본이 바뀌었나?」 를 시각으로 비교하고, 백업 폴더에서도 날짜 순으로 볼 수 있어요.</p>
@@ -749,7 +750,7 @@ with tempfile.TemporaryDirectory() as tmp:
     { title: "바뀐 것만 — st_mtime · filecmp.cmp", html: `<p><code>copytree</code> 는 매번 <b>전부</b> 복사해요. 사진 몇 기가가 든 폴더를 매일 그러면 오래 걸려요. 백업 도구는 <b>새 파일 · 바뀐 파일만</b> 복사해요. 「바뀌었나」 는 두 단계로 봐요.</p>
 <table class="kb"><tbody><tr><th></th><th>빠른 검사</th><th>확실한 검사</th></tr><tr><td>무엇을</td><td>크기 <code>st_size</code> + 수정 시각 <code>st_mtime</code></td><td>내용을 한 바이트씩</td></tr><tr><td>코드</td><td><code>changed(src, dst)</code>(아래)</td><td><code>filecmp.cmp(a, b, shallow=False)</code></td></tr><tr><td>속도</td><td>파일을 안 열어서 빨라요</td><td>두 파일을 다 읽어요</td></tr><tr><td>놓치는 것</td><td>크기와 시각이 같은데 내용만 다른 드문 경우</td><td>없어요</td></tr></tbody></table>
 <ul><li><code>copy2</code> 로 복사했으니 바뀌지 않았으면 시각이 같아요. 원본을 고치면 크기나 시각이 달라져요</li><li>USB 메모리(FAT32 · exFAT)는 시각을 2초 단위로 적어서 <code>copy2</code> 로도 1초쯤 어긋나요. 그래서 2초 안쪽 차이는 같다고 봐요. <code>abs(x)</code> 는 부호를 뗀 크기라서, 어느 쪽이 더 늦든 차이만 봐요</li><li><code>filecmp.cmp(a, b)</code> 는 <code>shallow</code> 를 빼면 <code>True</code> — 크기 · 시각이 같으면 내용을 안 보고 「같다」 고 해요. 확실히 보려면 <code>shallow=False</code></li></ul>
-<p>둘을 합친 <code>copy_changed(src_dir, dst_dir)</code> 는 원본의 모든 파일을 돌며 ① 건너뛸 이름이면 넘기고 ② <code>changed</code> 면 <code>copy2</code> 해요. 상대 경로 <code>rel</code> 을 그대로 백업 쪽에 붙여서(<code>dst_dir / rel</code>) 폴더 구조가 같게 돼요. <code>rel.parts</code> 는 경로를 칸으로 나눈 튜플(<code>('사진', '입구.jpg')</code>)이라 <code>__pycache__</code> 폴더 안의 파일도 걸러요. 미리 보기면 목록만 돌려줘요.</p>
+<p>둘을 합친 <code>copy_changed(src_dir, dst_dir)</code> 는 원본의 모든 파일을 돌며 ① 건너뛸 이름이면 넘기고 ② <code>changed</code> 면 <code>copy2</code> 해요. 상대 경로 <code>rel</code> 을 그대로 백업 쪽에 붙여서(<code>dst_dir / rel</code>) 폴더 구조가 같게 돼요. <code>rel.parts</code> 는 경로를 조각으로 나눈 튜플(<code>('사진', '입구.jpg')</code>)이라 <code>__pycache__</code> 폴더 안의 파일도 걸러요. 미리 보기면 목록만 돌려줘요.</p>
 <p>두 폴더를 한눈에 비교하는 <code>filecmp.dircmp(a, b)</code> 도 있어요: <code>left_only</code>(왼쪽에만) · <code>right_only</code>(오른쪽에만) · <code>diff_files</code>(둘 다 있는데 다름) · <code>common_dirs</code>(둘 다 있는 폴더). 바로 안의 것만 보고, 안쪽 폴더는 <code>c.subdirs["사진"]</code> 으로 들어가요. 내용 비교는 <code>filecmp.cmp</code> 의 빠른 검사와 같아요.</p>`,
       example: { code: `import filecmp
 import fnmatch
@@ -763,7 +764,7 @@ SKIP = ["*.tmp", "~$*", "Thumbs.db", "__pycache__"]
 
 
 def skipped(rel, patterns=SKIP):
-    """상대 경로의 어느 한 칸이라도 패턴에 맞으면 True(폴더 __pycache__ 안의 파일도)"""
+    """상대 경로의 어느 한 조각이라도 패턴에 맞으면 True(폴더 __pycache__ 안의 파일도)"""
     for part in rel.parts:
         for pattern in patterns:
             if fnmatch.fnmatch(part, pattern):
@@ -961,13 +962,7 @@ with tempfile.TemporaryDirectory() as tmp:
 <p>늘 <code>with</code> 로 열어요. with 를 나올 때 zip 의 목차가 마저 써져요. 목차가 빠진 zip 은 열리지 않아요.</p>
 <div class="bk-warn"><b>compression 을 빼면 압축을 안 해요</b> — 기본값은 <code>ZIP_STORED</code>(담기만)예요. 크기를 줄이려면 <code>compression=zipfile.ZIP_DEFLATED</code> 를 꼭 적어요.</div>
 <p><b>arcname 함정</b>: <code>zf.write(p)</code> 처럼 arcname 을 빼면 zip 안의 이름이 <b>p 의 경로 그대로</b>예요. Windows 라면 <code>Users/me/AppData/Local/Temp/tmpab12cd/다운로드/회의 메모.txt</code> 처럼 내 PC 의 폴더가 통째로 들어가요. 받는 사람이 풀면 폴더가 일곱 겹이고, 내 사용자 이름까지 보여요. 그래서 원본 폴더 기준 <b>상대 경로</b>를 arcname 으로 줘요.</p>
-<pre>from pathlib import Path
-
-src = Path("다운로드")
-p = src / "거래처" / "연락처.txt"
-rel = p.relative_to(src)
-print(rel.as_posix())   # 거래처/연락처.txt</pre>
-<ul><li><code>p.relative_to(src)</code> — p 에서 앞의 src 부분을 떼어 낸 나머지 경로</li><li><code>.as_posix()</code> — 구분 글자를 <code>/</code> 로. Windows 경로는 <code>\\</code> 로 이어지지만, zip 안의 이름은 늘 <code>/</code> 예요</li><li><code>src.rglob("*")</code> — 안쪽 폴더까지 전부. <code>src.glob("**/*")</code> 와 같아요(복습: <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리: pathlib · shutil」 ↗</a>)</li><li>rglob 은 폴더도 주니까 <code>p.is_file()</code> 인 것만 넣어요</li></ul>
+<ul><li>복습: <code>p.relative_to(src).as_posix()</code> 는 [[레슨:J1]] 마지막 쪽에서 본 「src 에서부터의 경로를 <code>/</code> 로 이은 글자」 예요(<code>거래처/연락처.txt</code>). zip 안의 이름은 Windows 에서도 늘 <code>/</code> 라서 딱 맞아요</li><li><code>src.rglob("*")</code> — 안쪽 폴더까지 전부. [[레슨:J1]] · [[레슨:J2]] 에서 쓴 <code>src.glob("**/*")</code> 와 같아요</li><li>rglob 은 폴더도 주니까 <code>p.is_file()</code> 인 것만 넣어요</li></ul>
 <div class="bk-warn"><b>zip 은 원본 폴더 밖에</b> — <code>다운로드/다운로드.zip</code> 처럼 원본 안에 만들면, rglob 이 만드는 중인 zip 자신까지 찾아 넣어요. 결과는 늘 다른 폴더에 둬요(안전 원칙 「결과는 새 폴더에」, [[레슨:J0]]). 원본 안인지는 <code>out.resolve().is_relative_to(src.resolve())</code> 로 물어요. <code>resolve()</code> 는 <code>..</code> 같은 것을 풀어 진짜 전체 경로로 바꾸고, <code>is_relative_to(폴더)</code> 는 그 폴더 안이면 <code>True</code> 예요.</div>`,
       example: { code: `import tempfile
 import zipfile
@@ -1046,7 +1041,7 @@ with tempfile.TemporaryDirectory() as tmp:
 <table class="kb"><tbody><tr><th>코드</th><th>하는 일</th></tr><tr><td><code>zf.extractall(새 폴더)</code></td><td>전부 풀기. 폴더가 없으면 만들어요</td></tr><tr><td><code>zf.extract(name, 폴더)</code></td><td>하나만 풀기</td></tr><tr><td><code>zf.testzip()</code></td><td>전부 읽어 보며 검사. 괜찮으면 <code>None</code>, 아니면 처음 망가진 파일 이름</td></tr><tr><td><code>zipfile.is_zipfile(path)</code></td><td>zip 파일이 맞나 <code>True</code> / <code>False</code></td></tr></tbody></table>
 <div class="bk-warn"><b>풀기는 늘 새 빈 폴더에</b> — <code>extractall</code> 은 같은 이름의 파일이 있으면 묻지 않고 덮어써요. 남이 보낸 zip 은 <code>받은_자료/견적_2026-11-08</code> 처럼 새 폴더를 만들어 풀어요. 파이썬은 <code>../</code> 같은 위험한 이름을 걸러 내고 풀지만, 원본이 있는 폴더에 바로 푸는 건 피해요.</div>
 <p>testzip 은 어떻게 망가진 걸 알까요? zip 은 파일마다 <b>CRC-32</b> 라는 짧은 지문을 같이 적어 둬요. testzip 은 내용을 다시 읽어 지문을 계산하고 맞춰 봐요. [[레슨:J2]] 에서 중복 파일을 찾은 <code>hashlib.sha256(p.read_bytes()).hexdigest()</code> 와 같은 생각이에요. CRC 는 더 짧고, 우연한 고장을 찾는 데 써요(지문 이야기: <a href="../cs/#lesson/C16" target="_blank" rel="noopener">CS 교과서 「해시: 데이터의 지문」 ↗</a>).</p>
-<p>예제는 zip 을 일부러 망가뜨려 봐요. <code>p.read_bytes()</code> 는 파일을 통째로 바이트로 읽고, <code>p.write_bytes(b)</code> 는 바이트를 통째로 써요(<code>read_text</code> · <code>write_text</code> 의 바이트판). 압축하지 않고 담은 zip 이라 안에 <code>photo-2</code> 가 그대로 들어 있어서, 그 한 곳만 바꿔요.</p>
+<p>예제는 zip 을 일부러 망가뜨려 봐요. 파일을 바이트로 통째 읽고 쓰는 <code>read_bytes</code> · <code>write_bytes</code> 는 [[레슨:J2]] 첫 쪽에서 봤어요. 압축하지 않고 담은 zip 이라 안에 <code>photo-2</code> 가 그대로 들어 있어서, 그 한 곳만 바꿔요.</p>
 <p>zip 이 아닌 파일을 열면 <code>zipfile.BadZipFile: File is not a zip file</code> 이에요. 내려받다 끊긴 zip 도 이렇게 나와요.</p>
 <p><b>암호 걸린 zip</b> 은 푸는 것만 돼요.</p>
 <pre>with zipfile.ZipFile("받은_자료.zip") as zf:
@@ -1133,15 +1128,10 @@ with tempfile.TemporaryDirectory() as tmp:
 made = shutil.make_archive("백업/다운로드", "zip", root_dir="다운로드")
 shutil.unpack_archive("백업/다운로드.zip", "풀기")</pre>
 <ul><li>첫 칸은 확장자를 <b>뺀</b> 이름이에요. <code>.zip</code> 은 저절로 붙어서, <code>"다운로드.zip"</code> 을 주면 <code>다운로드.zip.zip</code> 이 돼요</li><li><code>root_dir</code> 기준 상대 경로로 들어가요(arcname 걱정 없음). 돌려준 값은 만든 파일의 경로 글자예요</li><li><code>"zip"</code> 대신 <code>"gztar"</code> 면 <code>.tar.gz</code> 예요. tar 는 <a href="../linux/#lesson/U14" target="_blank" rel="noopener">리눅스 교과서 「예약 작업」 ↗</a></li><li><code>unpack_archive(파일, 폴더)</code> 는 확장자를 보고 알아서 풀어요</li></ul>
-<p>한계는 <b>고를 수 없다</b>는 거예요. <code>~$</code> 임시 파일 · <code>Thumbs.db</code> · <code>.venv</code> 까지 다 들어가요. 고르려면 첫 쪽처럼 직접 돌면서 이름 모양으로 걸러요. <code>fnmatch.fnmatch(이름, 모양)</code> 은 [[레슨:J2]] 의 <code>ignore_patterns</code> 와 같은 모양 규칙을 이름 하나에 맞춰 봐요.</p>
+<p>한계는 <b>고를 수 없다</b>는 거예요. <code>~$</code> 임시 파일 · <code>Thumbs.db</code> · <code>.venv</code> 까지 다 들어가요. 고르려면 첫 쪽처럼 직접 돌면서 이름 모양으로 걸러요. 복습: [[레슨:J2]] 의 <code>skipped</code> 처럼 <code>fnmatch.fnmatch(이름, 모양)</code> 으로 맞춰 봐요. 여기서는 빼는 까닭을 돌려주는 <code>skip_reason</code> 으로 조금 바꾸고, 대소문자도 맞춰요(아래). 모양에는 <code>?</code> 도 있어요.</p>
 <table class="kb"><tbody><tr><th>모양</th><th>뜻</th><th>맞는 예</th></tr><tr><td><code>*</code></td><td>아무 글자 몇 개든(0개도)</td><td><code>*.tmp</code> → <code>임시.tmp</code></td></tr><tr><td><code>?</code></td><td>아무 글자 딱 하나</td><td><code>문서_????-??-??.zip</code> → <code>문서_2026-11-08.zip</code></td></tr><tr><td><code>~$*</code></td><td><code>~$</code> 로 시작</td><td><code>~$견적서 최종.docx</code></td></tr></tbody></table>
 <p><code>glob</code> 도 같은 모양 규칙을 써요. <code>dest.glob("문서_????-??-??.zip")</code> 은 폴더에서 날짜 이름 백업만 골라 줘요.</p>
-<p>숨김 폴더(<code>.git</code> · <code>.venv</code> 처럼 이름이 <code>.</code> 으로 시작)는 경로의 조각마다 봐야 해요. <code>rel.parts</code> 는 경로를 조각 튜플로 줘요.</p>
-<pre>from pathlib import Path
-
-rel = Path(".venv/Lib/site.py")
-print(rel.parts)   # ('.venv', 'Lib', 'site.py')
-print(rel.name)    # site.py</pre>
+<p>숨김 폴더(<code>.git</code> · <code>.venv</code> 처럼 이름이 <code>.</code> 으로 시작)는 경로의 조각마다 봐야 해요. 조각 튜플은 [[레슨:J2]] 에서 본 <code>rel.parts</code> 예요(<code>Path(".venv/Lib/site.py").parts</code> → <code>('.venv', 'Lib', 'site.py')</code>).</p>
 <div class="bk-warn"><b>대소문자</b> — Windows 의 fnmatch 는 대소문자를 안 가리고(<code>THUMBS.DB</code> 도 걸려요), 리눅스 · Mac 은 가려요. 어디서나 같게 하려면 둘 다 <code>.lower()</code> 로 맞춰 비교해요.</div>`,
       example: { code: `import fnmatch
 import shutil
@@ -1156,7 +1146,7 @@ SKIP = ["~$*", "*.tmp", "Thumbs.db"]
 def skip_reason(rel):
     for part in rel.parts:
         if part.startswith("."):
-            return "숨김"
+            return "숨김 폴더"
     for pattern in SKIP:
         if fnmatch.fnmatch(rel.name.lower(), pattern.lower()):
             return pattern
@@ -1198,7 +1188,7 @@ with tempfile.TemporaryDirectory() as tmp:
   ],
   summary: ["zip 만들기는 ZipFile(경로, \"w\", compression=ZIP_DEFLATED) 와 zf.write(p, arcname=p.relative_to(src).as_posix()) — arcname 을 빼면 내 PC 경로가 통째로 들어가고, zip 은 원본 폴더 밖에 둬요", "풀지 않고 namelist() · infolist() · zf.read(name) 으로 보고, 풀기는 새 빈 폴더에 extractall, 검사는 testzip()(괜찮으면 None) — jpg · zip 은 압축해도 거의 안 줄어요", "한글 이름이 그림 글자로 깨지면 ZipFile(path, metadata_encoding=\"cp949\"), 한 줄 묶기는 shutil.make_archive, 골라 담기는 fnmatch 와 rel.parts 로 직접 해요"] },
 { id: 'JB1', ch: 1, boss: true, title: '만들어 보기: 매일 쓰는 백업 도구', mode: 'text',
-  tutorSummary: "만들어 보기: 매일 쓰는 백업 도구 backup.py — ① 넣을 파일 고르기(~$* · *.tmp · Thumbs.db · 숨김 폴더, fnmatch · rel.parts) ② manifest.json(상대 경로 → size · sha256)으로 지난번과 비교, 같으면 건너뜀 ③ 문서_2026-11-08.zip 만들고 다시 열어 namelist · testzip 확인 ④ dest.glob(\"문서_????-??-??.zip\") 으로 최근 n개만(미리 보기 먼저) ⑤ backup(src, dest, today, keep=7, dry_run=False) + main(argv, today=date(2026, 11, 8)) · 끝 코드 · 요약. JB4 가 backup() 을 다시 씀.", pages: [], summary: [] },
+  tutorSummary: "만들어 보기: 매일 쓰는 백업 도구 backup.py — ① 넣을 파일 고르기(~$* · *.tmp · Thumbs.db · 숨김 폴더, fnmatch · rel.parts) ② manifest.json(상대 경로 → size · sha256)으로 지난번과 비교, 같으면 건너뜀 ③ 문서_2026-11-08.zip 만들고 다시 열어 namelist · testzip 확인 ④ dest.glob(\"문서_????-??-??.zip\") 으로 최근 n개만(미리 보기 먼저) ⑤ backup(src, dest, today, keep=7, dry_run=False) + main(argv, today=date(2026, 11, 8)) · 끝 코드(에러 안내는 stderr) · 요약. JB4 가 이 백업을 짧게 다시 씀.", pages: [], summary: [] },
 { id: 'J4', ch: 2, n: 4, title: 'PDF 읽기 · 글자 꺼내기', mode: 'text',
   tutorSummary: "pypdf 로 PDF 읽기. r = PdfReader(path) · len(r.pages) · r.pages[0](0부터) · page.extract_text()(쪽 글자 str, 줄은 \\n) · r.metadata.title · .author(reportlab 기본값 untitled · anonymous, 없으면 None). 옛 PyPDF2 블로그 코드: PdfFileReader → PdfReader, numPages → len(r.pages), getPage(0) → pages[0], extractText → extract_text, getDocumentInfo → metadata, isEncrypted → is_encrypted, PdfFileMerger · PdfMerger → PdfWriter().append, addPage → add_page, rotateClockwise → rotate, mergePage → merge_page, addBookmark → add_outline_item (옛 이름은 ImportError · AttributeError). PDF 는 좌표에 글자를 그릴 뿐이라 빈칸 · 줄 · 순서를 pypdf 가 짐작 → 버전 · 프로그램마다 다름 → \" \".join(text.split()) 로 고른 뒤 정규식(L20B)으로 이름표 다음 값만: 거래처:\\s*(\\w+) · 청구\\s*번호:\\s*(INV-\\d{4}-\\d{4}) · 청구일:\\s*(\\d{4}-\\d{2}-\\d{2}) · 합계\\s*금액:\\s*([0-9,]+)\\s*원 → parse_invoice(text) 가 {거래처, 번호, 날짜(date.fromisoformat), 금액(int(s.replace(\",\", \"\")))} 또는 None. 줄 번호로 꺼내지 않기. 스캔본은 extract_text() 가 에러 없이 \"\" → if not text.strip(), OCR(Tesseract · ocrmypdf)은 이름만. 암호 PDF: PdfReader 는 열리지만 쪽을 읽으면 FileNotDecryptedError → r.is_encrypted → r.decrypt(pw)(틀려도 에러 없이 0, 맞으면 1 · 2) → open_pdf(path, password) 가 못 풀면 None. AES 는 cryptography 필요(DependencyError). 권한 암호만 있으면 그냥 읽힘. 폴더째: read_invoices(folder, password) → (날짜 순 rows, 못 읽은 (이름, 까닭)) → csv.DictWriter + utf-8-sig + newline=\"\"(L29). 엑셀은 files 코스 F8, 표 꺼내기 pdfplumber 는 이름만.",
   terms: { "스캔본": "종이를 스캐너로 찍어 만든 PDF. 쪽마다 사진 한 장이라 꺼낼 글자가 없어요", "OCR": "사진 속 글자를 읽어 진짜 글자로 바꾸는 일(광학 문자 인식). Tesseract · ocrmypdf 같은 프로그램이 해요" },
