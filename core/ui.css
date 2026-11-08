@@ -528,3 +528,5 @@ body{word-break:keep-all;overflow-wrap:break-word}
 /* v2.22.5 N15 E-T6 첫 쪽의 꺼진 「← 이전」 이 배경에 묻히던 것 — 점선 테두리 */
 .bk-nav .btn:disabled{opacity:.6;border-style:dashed}
 .bk-pred .bk-io{margin-top:8px}.bk-explain{margin-top:8px;padding:8px 12px;border-left:3px solid var(--primary);background:var(--surface2);border-radius:6px}
+/* v2.41.0 긴 준비 파일 접기(fold) — 「데이터 파일 다루기」 의 make_samples.py */
+.bk-prep-fold{margin:10px 0}.bk-prep-fold>summary{cursor:pointer;min-height:40px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:var(--muted)}

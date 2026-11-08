@@ -68,7 +68,7 @@ with sync_playwright() as p:
     print('[N13 v2.19.0 옛 화면 보관]'); n13=len(errors); MATH='file://'+os.path.join(ROOT,'courses/math/index.html')
     hubg=pg.evaluate("({lessons:typeof LESSONS, content:[...document.scripts].some(x=>/content\\.js/.test(x.src)), imgs:document.querySelectorAll('img').length})"); check(hubg['lessons']=='undefined' and not hubg['content'] and hubg['imgs']==0, '허브: 코스 콘텐츠·그림 없이 「읽은 레슨」 만 셈 (%s)' % hubg)
     OLDG=['Game','Grader','Sessions','Tutor','QuickKeys','Loader','Coach','TextEditor','Confetti','BADGES','Haptic','myMascot','Review','Onboarding']
-    for cid in ['python','algo','terminal-git','github','sql','web','vim','math','linux','os','asm','cs','llm','api','debug','data','oop','ml','ai']:
+    for cid in ['python','algo','terminal-git','github','sql','web','vim','math','linux','os','asm','cs','llm','api','debug','data','oop','ml','ai','files']:
         pg.goto('file://'+os.path.join(ROOT,'courses/%s/index.html?classic=1' % cid)); pg.wait_for_timeout(700)
         cr=pg.evaluate("(g)=>({book:document.documentElement.classList.contains('book-mode'), home:!!document.querySelector('.bk-home'), old:g.filter(n=>typeof window[n]!=='undefined' || (()=>{ try { return eval('typeof '+n)!=='undefined'; } catch(e){ return false; } })()), arch:[...document.scripts].map(x=>x.src).filter(x=>/game|tutor|fx\\.js|ui-editors|ui-views-(main|more|shell|sql|web)|badges|runners\\/(shell|sql|web)/.test(x)), imgs:document.querySelectorAll('img').length})", OLDG)
         check(cr['book'] and cr['home'] and not cr['old'] and not cr['arch'] and cr['imgs']==0, '%s: ?classic=1 을 붙여도 교과서 목차 · 옛 화면 코드(Game·Grader·Tutor…)·옛 스크립트·그림 없음 (%s)' % (cid, {k:v for k,v in cr.items() if k in ('old','arch','imgs')}))
