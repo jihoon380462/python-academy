@@ -1809,14 +1809,524 @@ with tempfile.TemporaryDirectory() as tmp:
         print(i, "쪽 도장:", "입금 완료" in text)`, prep: [SAMPLES_PREP] } },
   ],
   summary: ["w = PdfWriter() 에 w.append(p) · w.append(p, pages=(0, 2)) · w.add_page(page) 로 쪽을 붙이고 w.write(새 이름) — 확인은 늘 다시 열어 쪽 수와 쪽마다 첫 낱말을 찍어요", "사람의 쪽 범위 \"1-3,5\" 는 parse_pages 로 0부터 번호 [0, 1, 2, 4] 로 바꿔 고르기 · 빼기 · 순서 바꾸기에 쓰고, 나누기는 쪽마다 새 PdfWriter(_p01), 회전은 rotate(90)(시계 방향 · 더해짐)", "write 전에 책갈피 add_outline_item(이름, 쪽) · 제목 add_metadata({\"/Title\": …}) · 암호 encrypt(pw, algorithm=\"AES-256\"), 도장은 reportlab 으로 만든 한 쪽을 page.merge_page(stamp) 로 겹쳐요"] },
-{ id: 'J6', ch: 2, n: 6, title: '워드 문서 만들기', mode: 'text', draft: true,
-  tutorSummary: 'Document · run · 표',
-  pages: AUTO_TODO('Document · run · 표'), summary: ["Document", "run", "표"] },
-{ id: 'J7', ch: 2, n: 7, title: '워드 읽고 고치기 · 틀 채우기', mode: 'text', draft: true,
-  tutorSummary: 'run 쪼개짐 · 틀 채우기 · PDF 로',
-  pages: AUTO_TODO('run 쪼개짐 · 틀 채우기 · PDF 로'), summary: ["run 쪼개짐", "틀 채우기", "PDF 로"] },
-{ id: 'JB2', ch: 2, boss: true, title: '만들어 보기: 청구서 정리기', mode: 'text', draft: true,
-  tutorSummary: '만들어 보기: 청구서 정리기', pages: [], summary: [] },
+{ id: 'J6', ch: 2, n: 6, title: "워드 문서 만들기", mode: 'text',
+  tutorSummary: "python-docx(설치 python-docx, import docx)로 워드 만들기. Document() · add_heading(글, level=1)(스타일 Heading 1, level=0 은 Title) · add_paragraph(글, style=\"List Bullet\") · save(같은 이름 덮어씀, Word 가 열고 있으면 PermissionError) → Document(path) 로 다시 열어 paragraphs 의 text · style.name 찍기. 문단 = run 여럿: p.add_run(글) 의 bold · italic · underline(None = 스타일 따름) · font.size = Pt(14) · font.color.rgb = RGBColor(0xC0,0x39,0x2B). 한글 글꼴 함정: font.name 은 ascii · hAnsi 칸만 바꿔서 한글은 그대로 → r._element.rPr.rFonts.set(qn(\"w:eastAsia\"), \"맑은 고딕\"), 문서 전체는 doc.styles[\"Normal\"] 에 한 번(set_korean_font). 제목 스타일은 테마 글꼴이라 틀 문서로 시작하는 게 쉬움. 표: add_table(rows=1, cols=3) · style = \"Table Grid\"(한국어 화면 이름 「표 구분선」 을 쓰면 KeyError) · rows[0].cells · add_row().cells · cell(r, c).text · 칸에는 글자만(int 는 TypeError: 'int' object is not iterable → f\"{n:,}원\"). 쪽: add_page_break · sections[0].left_margin = Cm(2)(다시 읽으면 2.00025 → round) · header/footer.paragraphs[0].text · add_picture(겉모양 ☐). .doc · .hwp 는 zip 이 아니라 BadZipFile → 프로그램에서 docx 로 저장.",
+  terms: { "run": "워드 문단 안에서 같은 서식(굵게 · 크기 · 색)이 이어지는 글자 조각. 문단 하나는 run 여러 개로 되어 있고, p.text 는 run 글자를 이어 붙인 것" },
+  pages: [
+    { title: "Document() · add_heading · add_paragraph", html: `<p>이번엔 워드 문서(<code>.docx</code>)를 파이썬으로 <b>만들어요</b>. 패키지 이름은 <code>python-docx</code> 고, 코드에서는 <code>from docx import Document</code> 예요(설치 이름과 import 이름이 달라요 — 시작하기 1).</p>
+<p>워드 문서는 위에서 아래로 늘어선 <b>문단(paragraph)</b>의 줄이에요. 제목도 한 문단, 글머리 기호 한 줄도 한 문단이에요. 그리고 문단마다 <b>스타일</b>(제목 1 · 보통 · 글머리 기호 …)이 하나씩 붙어 있어요.</p>
+<table class="kb"><tbody><tr><th>코드</th><th>하는 일</th></tr><tr><td><code>doc = Document()</code></td><td>빈 새 문서</td></tr><tr><td><code>doc.add_heading("제목", level=1)</code></td><td>제목 문단(스타일 <code>Heading 1</code>). <code>level=2</code> 는 작은 제목, <code>level=0</code> 은 문서 제목 <code>Title</code></td></tr><tr><td><code>doc.add_paragraph("글")</code></td><td>보통 문단(스타일 <code>Normal</code>)</td></tr><tr><td><code>doc.add_paragraph("글", style="List Bullet")</code></td><td>글머리 기호 문단</td></tr><tr><td><code>doc.save(path)</code></td><td>저장 — 같은 이름이 있으면 묻지 않고 덮어써요</td></tr><tr><td><code>Document(path)</code></td><td>있는 문서 열기</td></tr><tr><td><code>doc.paragraphs</code></td><td>문단 리스트. <code>p.text</code> 글자 · <code>p.style.name</code> 스타일 이름</td></tr></tbody></table>
+<p>이 교과서의 습관 그대로예요. <b>저장했으면 <code>Document(path)</code> 로 다시 열어 찍어 봐요.</b> 문단 글자와 스타일 이름이 넣은 대로인지 확인되고, 겉모양(글꼴 · 간격 · 테두리)은 그다음 Word 로 열어 눈으로 봐요.</p>
+<p>예제는 임시 폴더에 저장해서 끝나면 지워져요(복습: <a href="../python/#lesson/L21" target="_blank" rel="noopener">파이썬 교과서 「테스트 작성: 내 함수 검사하기」 ↗</a> 의 <code>TemporaryDirectory</code>). 만든 문서를 Word 로 열어 보고 싶으면 <code>folder = Path(tmp)</code> 를 <code>folder = Path("결과")</code> 로 바꾸고 <code>folder.mkdir(exist_ok=True)</code> 한 줄을 더해 돌려요.</p>
+<div class="bk-warn"><b>Word 가 그 파일을 열고 있으면</b> — Windows 에서 <code>doc.save</code> 가 <code>PermissionError: [Errno 13] Permission denied</code> 로 멈춰요. Word 를 닫고 다시 돌려요. 엑셀과 똑같아요(<a href="../files/#lesson/F8" target="_blank" rel="noopener">데이터 파일 다루기 교과서 「새로 만들어 쓰기」 ↗</a>).</div>`,
+      example: { code: `import tempfile
+from pathlib import Path
+from docx import Document
+
+with tempfile.TemporaryDirectory() as tmp:
+    folder = Path(tmp)          # Word 로 열어 보려면 Path("결과") 로 바꿔요
+    path = folder / "11월_안내.docx"
+
+    doc = Document()
+    doc.add_heading("햇살 공방 11월 안내", level=1)
+    doc.add_paragraph("11월에는 수업 넷이 새로 열려요.")
+    doc.add_paragraph("가죽 공예 · 목공 기초", style="List Bullet")
+    doc.add_paragraph("도자기 · 캘리그라피", style="List Bullet")
+    doc.add_paragraph("신청은 공방 전화로 받아요.")
+    doc.save(path)
+
+    # 습관: 다시 열어서 확인
+    again = Document(path)
+    print("문단", len(again.paragraphs), "개")
+    for p in again.paragraphs:
+        print(f"{p.style.name:12} | {p.text}")` } },
+    { title: "p.add_run() · bold · Pt(14) · RGBColor", html: `<p>한 문단 안에서 <b>일부만</b> 굵게 · 크게 · 다른 색으로 하려면 [[run]] 을 써요. run 은 「같은 서식이 이어지는 글자 조각」 이에요. 문단 하나 = run 여러 개예요.</p>
+<pre>p = doc.add_paragraph("수업료는 ")
+r = p.add_run("11월 7일까지")
+r.bold = True
+p.add_run(" 내 주세요.")</pre>
+<table class="kb"><tbody><tr><th>코드</th><th>하는 일</th></tr><tr><td><code>r.bold = True</code> · <code>r.italic</code> · <code>r.underline</code></td><td>굵게 · 기울임 · 밑줄</td></tr><tr><td><code>r.font.size = Pt(14)</code></td><td>크기(포인트). <code>from docx.shared import Pt</code></td></tr><tr><td><code>r.font.color.rgb = RGBColor(0xC0, 0x39, 0x2B)</code></td><td>글자 색 — 빨강 · 초록 · 파랑(0~255). 16진수 <code>0xC0</code> 로 쓰면 Word 의 색 코드 <code>C0392B</code> 와 같아 보기 편해요</td></tr><tr><td><code>p.runs</code></td><td>문단의 run 리스트</td></tr></tbody></table>
+<p><code>bold</code> 는 값이 셋이에요. <code>True</code>(굵게) · <code>False</code>(굵게 아님) · <code>None</code>(따로 정하지 않음 = 스타일을 따름). 다시 열어 찍었을 때 <code>None</code> 이면 「안 정했다」 는 뜻이에요. 크기 · 색도 안 정했으면 <code>None</code> 이에요.</p>
+<p><code>add_paragraph("글")</code> 은 run 하나짜리 문단을 만들어 줘요. 문단의 글자 <code>p.text</code> 는 run 글자를 이어 붙인 것이에요. 이 「글자가 run 여러 개에 나뉘어 있다」 는 점이 [[레슨:J7]] 에서 틀을 채울 때 함정이 돼요.</p>`,
+      example: { code: `import tempfile
+from pathlib import Path
+from docx import Document
+from docx.shared import Pt, RGBColor
+
+with tempfile.TemporaryDirectory() as tmp:
+    path = Path(tmp) / "회비.docx"
+    doc = Document()
+    p = doc.add_paragraph("11월 회비는 ")
+    r = p.add_run("30,000원")
+    r.bold = True
+    r.font.size = Pt(14)
+    r.font.color.rgb = RGBColor(0xC0, 0x39, 0x2B)
+    p.add_run("이에요. ")
+    r = p.add_run("7일까지")
+    r.underline = True
+    p.add_run(" 내 주세요.")
+    doc.save(path)
+
+    p = Document(path).paragraphs[0]
+    print(p.text)
+    print("run", len(p.runs), "개")
+    for r in p.runs:
+        size = r.font.size.pt if r.font.size else None
+        print(repr(r.text), r.bold, r.underline, size, r.font.color.rgb)` } },
+    { title: "한글 글꼴: font.name + w:eastAsia", html: `<p>글꼴을 맑은 고딕으로 바꾸려고 <code>r.font.name = "맑은 고딕"</code> 만 쓰면 — 영어 · 숫자만 맑은 고딕이 되고 <b>한글은 그대로</b>예요. 에러도 없고, 다시 읽은 <code>r.font.name</code> 도 <code>'맑은 고딕'</code> 이라 더 헷갈려요.</p>
+<p>까닭은 이래요. 워드는 run 하나에 글꼴을 <b>네 칸</b>으로 나눠 적어요.</p>
+<table class="kb"><tbody><tr><th>칸</th><th>쓰는 글자</th><th><code>font.name</code> 이 바꾸나</th></tr><tr><td><code>w:ascii</code></td><td>영어 · 숫자</td><td>예</td></tr><tr><td><code>w:hAnsi</code></td><td>그 밖의 유럽 글자</td><td>예</td></tr><tr><td><code>w:eastAsia</code></td><td><b>한글</b> · 한자 · 일본 글자</td><td><b>아니요</b></td></tr><tr><td><code>w:cs</code></td><td>아랍 글자 등</td><td>아니요</td></tr></tbody></table>
+<p>그래서 한글 칸은 직접 적어요. python-docx 에 이 칸을 바꾸는 기능이 따로 없어서, 문서 속 XML 에 바로 써요. <code>_element</code> 처럼 밑줄로 시작하는 이름은 「속 부품」 이라는 뜻인데, 이 한 줄은 다들 쓰는 방법이에요.</p>
+<pre>from docx.oxml.ns import qn
+
+r.font.name = "맑은 고딕"                                  # 영어 칸 (글꼴 칸 rFonts 도 만들어 줌)
+r._element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")   # 한글 칸</pre>
+<p>순서가 중요해요. <code>font.name</code> 을 먼저 써야 <code>rFonts</code> 가 생겨요. run 마다 이렇게 하면 끝이 없으니, 보통은 <b>문서 전체에 한 번</b> — 모든 문단이 따르는 기본 스타일 <code>doc.styles["Normal"]</code> 에 적어요(스타일은 <code>.element</code> 로 속을 봐요).</p>
+<pre>def set_korean_font(doc, name="맑은 고딕", size=11):
+    normal = doc.styles["Normal"]
+    normal.font.name = name
+    normal.font.size = Pt(size)
+    normal.element.rPr.rFonts.set(qn("w:eastAsia"), name)</pre>
+<div class="bk-warn"><b>글꼴은 눈으로 확인</b> — 다시 열어 찍을 수 있는 건 「적어 둔 글꼴 이름」 까지예요. 정말 그 글꼴로 보이는지는 Word 에서 한글을 골라 글꼴 칸을 봐요. 그 PC 에 없는 글꼴이면 다른 글꼴로 바뀌어 보여요. 그리고 제목(<code>Heading 1</code> …) 스타일은 테마 글꼴을 따로 써서 Normal 을 바꿔도 제목의 한글은 그대로일 수 있어요. 겉모양을 많이 맞춰야 하면 Word 에서 꾸며 둔 빈 문서를 <code>Document("틀.docx")</code> 로 열어 시작하는 게 훨씬 쉬워요.</div>`,
+      example: { code: `import tempfile
+from pathlib import Path
+from docx import Document
+from docx.oxml.ns import qn
+from docx.shared import Pt
+
+
+def fonts_of(rpr):
+    """글자 서식(rPr)의 네 글꼴 칸 가운데 적혀 있는 것만"""
+    found = {}
+    if rpr is None or rpr.rFonts is None:
+        return found
+    for key in ["ascii", "hAnsi", "eastAsia", "cs"]:
+        value = rpr.rFonts.get(qn("w:" + key))
+        if value:
+            found[key] = value
+    return found
+
+
+def set_korean_font(doc, name="맑은 고딕", size=11):
+    """문서 전체(Normal 스타일)의 글꼴을 영어 · 한글 둘 다 name 으로"""
+    normal = doc.styles["Normal"]
+    normal.font.name = name
+    normal.font.size = Pt(size)
+    normal.element.rPr.rFonts.set(qn("w:eastAsia"), name)
+
+
+doc = Document()
+r = doc.add_paragraph().add_run("햇살 공방 Sunny Studio")
+r.font.name = "맑은 고딕"
+print("font.name 만:", r.font.name, fonts_of(r._element.rPr))
+r._element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+print("eastAsia 까지:", fonts_of(r._element.rPr))
+
+print("Normal 처음:", fonts_of(doc.styles["Normal"].element.rPr))
+set_korean_font(doc)
+with tempfile.TemporaryDirectory() as tmp:
+    path = Path(tmp) / "글꼴.docx"
+    doc.save(path)
+    normal = Document(path).styles["Normal"]
+    print("다시 연 Normal:", fonts_of(normal.element.rPr), normal.font.size.pt)` } },
+    { title: "add_table · \"Table Grid\" · add_row().cells", html: `<p>표는 <code>add_table</code> 로 만들고, 한 줄씩 더해 가요.</p>
+<table class="kb"><tbody><tr><th>코드</th><th>하는 일</th></tr><tr><td><code>t = doc.add_table(rows=1, cols=3)</code></td><td>1줄 3칸 표(첫 줄을 머리줄로)</td></tr><tr><td><code>t.style = "Table Grid"</code></td><td>칸마다 테두리. 안 정하면 테두리 없는 표예요</td></tr><tr><td><code>t.rows[0].cells</code></td><td>첫 줄의 칸 리스트 → <code>cells[0].text = "이름"</code></td></tr><tr><td><code>cells = t.add_row().cells</code></td><td>맨 아래에 줄을 더하고, 그 줄의 칸들</td></tr><tr><td><code>t.cell(r, c).text</code></td><td>r 줄 c 칸(0부터)</td></tr><tr><td><code>len(t.rows)</code> · <code>len(t.columns)</code></td><td>줄 수 · 칸 수</td></tr><tr><td><code>doc.tables</code></td><td>문서 안의 표 리스트(다시 열었을 때)</td></tr></tbody></table>
+<p>칸 안의 글자도 문단이에요. 머리줄을 굵게 하려면 <code>cell.paragraphs[0].runs[0].bold = True</code> 처럼 그 칸 문단의 run 을 고쳐요.</p>
+<ul><li>칸에는 <b>글자만</b> 넣어요. <code>cell.text = 180000</code> 은 <code>TypeError: 'int' object is not iterable</code> 이에요. 엑셀과 달리 워드 표의 칸은 늘 글자라서, 금액은 <code>f"{fee:,}원"</code> 처럼 모양을 만들어 넣어요(복습: <a href="../python/#lesson/L9C" target="_blank" rel="noopener">파이썬 교과서 「서식 출력: 칸 맞추기 · 소수 · 쉼표」 ↗</a>)</li><li>명단을 csv 에서 읽을 때는 <code>encoding="utf-8-sig"</code> · <code>newline=""</code>(복습: <a href="../python/#lesson/L29" target="_blank" rel="noopener">파이썬 교과서 「csv 모듈 제대로」 ↗</a>)</li></ul>
+<div class="bk-warn"><b>스타일 이름은 영어로</b> — 한국어 Word 화면에서는 「표 구분선」 · 「제목 1」 · 「목록 글머리 기호」 처럼 보이지만, 파이썬에서는 영어 이름 <code>"Table Grid"</code> · <code>"Heading 1"</code> · <code>"List Bullet"</code> 이에요. 화면에 보이는 한국어 이름을 쓰면 <code>KeyError: "no style with name '표 구분선'"</code> 이 나요.</div>`,
+      example: { code: `import csv
+import tempfile
+from pathlib import Path
+from docx import Document
+from samples import ROSTER_CSV
+
+with tempfile.TemporaryDirectory() as tmp:
+    folder = Path(tmp)
+    src = folder / "명단.csv"
+    src.write_text(ROSTER_CSV, encoding="utf-8-sig")
+    with open(src, encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))[:4]
+
+    doc = Document()
+    doc.add_heading("10월 수료생", level=1)
+    t = doc.add_table(rows=1, cols=3)
+    t.style = "Table Grid"
+    for cell, name in zip(t.rows[0].cells, ["이름", "수업", "수강료"]):
+        cell.text = name
+        cell.paragraphs[0].runs[0].bold = True
+    total = 0
+    for row in rows:
+        fee = int(row["수강료"])
+        total += fee
+        cells = t.add_row().cells
+        cells[0].text = row["이름"]
+        cells[1].text = row["수업"]
+        cells[2].text = f"{fee:,}원"      # 칸에는 글자만
+    cells = t.add_row().cells
+    cells[0].text = "합계"
+    cells[2].text = f"{total:,}원"
+    doc.save(folder / "수료생.docx")
+
+    t = Document(folder / "수료생.docx").tables[0]
+    print(t.style.name, len(t.rows), "줄", len(t.columns), "칸")
+    for row in t.rows:
+        print([c.text for c in row.cells])
+    print("머리줄 굵게:", t.cell(0, 0).paragraphs[0].runs[0].bold)`, prep: [SAMPLES_PREP] } },
+    { title: "add_page_break · 여백 Cm(2) · 머리글 · 바닥글", html: `<p>마지막은 쪽 설정이에요. 쪽 나누기 · 여백 · 머리글 · 바닥글이에요.</p>
+<table class="kb"><tbody><tr><th>코드</th><th>하는 일</th></tr><tr><td><code>doc.add_page_break()</code></td><td>여기서 다음 쪽으로(글자 없는 문단이 하나 생겨요)</td></tr><tr><td><code>s = doc.sections[0]</code></td><td>구역 = 쪽 설정 묶음. 새 문서에는 하나예요</td></tr><tr><td><code>s.left_margin = Cm(2)</code></td><td>왼쪽 여백. <code>right_margin</code> · <code>top_margin</code> · <code>bottom_margin</code> 도 같아요. <code>from docx.shared import Cm</code></td></tr><tr><td><code>s.header.paragraphs[0].text = "…"</code></td><td>머리글(모든 쪽 위)</td></tr><tr><td><code>s.footer.paragraphs[0].text = "…"</code></td><td>바닥글(모든 쪽 아래)</td></tr><tr><td><code>doc.add_picture("logo.png", width=Cm(4))</code></td><td>그림 넣기(새 문단으로). 크기 · 자리는 Word 에서 눈으로 봐요</td></tr></tbody></table>
+<ul><li>다시 읽은 여백이 <code>2.00025</code> 처럼 조금 달라요. 워드는 길이를 「1/20 포인트」 단위 정수로 저장해서 cm 가 딱 떨어지지 않아요. 찍을 때는 <code>round(s.left_margin.cm, 1)</code></li><li>쪽 번호를 넣는 기능은 python-docx 에 없어요. 쪽 번호가 필요하면 Word 에서 바닥글에 쪽 번호를 넣은 틀 문서로 시작해요</li><li>마지막 쪽 뒤에 <code>add_page_break()</code> 를 하면 빈 쪽이 하나 더 생겨요. 예제처럼 마지막은 빼요</li></ul>
+<div class="bk-warn"><b>.doc · .hwp 는 못 열어요</b> — python-docx 는 <code>.docx</code> 만 읽어요. <code>.docx</code> 는 속이 zip 파일([[레슨:J3]] 의 그 zip)인데, 옛 Word 의 <code>.doc</code> 와 한글의 <code>.hwp</code> 는 zip 이 아니라서 <code>Document("견적.doc")</code> 는 <code>BadZipFile: File is not a zip file</code> 로 멈춰요. 프로그램에서 docx 로 저장해서 열어요([[레슨:J7]] 의 마지막 쪽).</div>`,
+      example: { code: `import tempfile
+from pathlib import Path
+from docx import Document
+from docx.shared import Cm
+
+with tempfile.TemporaryDirectory() as tmp:
+    path = Path(tmp) / "수업_계획.docx"
+    doc = Document()
+    s = doc.sections[0]
+    s.left_margin = Cm(2)
+    s.right_margin = Cm(2)
+    s.header.paragraphs[0].text = "햇살 공방 · 수업 계획"
+    s.footer.paragraphs[0].text = "공방 안에서만 보기"
+
+    for name in ["가죽 공예", "목공 기초", "도자기"]:
+        doc.add_heading(name, level=1)
+        doc.add_paragraph(f"{name} 수업은 4주 과정이에요.")
+        if name != "도자기":           # 마지막 뒤에는 쪽을 안 나눠요
+            doc.add_page_break()
+    doc.save(path)
+
+    again = Document(path)
+    s = again.sections[0]
+    print("머리글:", s.header.paragraphs[0].text)
+    print("바닥글:", s.footer.paragraphs[0].text)
+    print("왼쪽 여백:", s.left_margin.cm, "→", round(s.left_margin.cm, 1), "cm")
+    for p in again.paragraphs:
+        print(f"{p.style.name:10} |", repr(p.text))` } },
+  ],
+  summary: ["Document() 에 add_heading · add_paragraph(style=…) · add_table 로 문단과 표를 더하고 save — 저장하면 Document(path) 로 다시 열어 text · style.name · 표 칸을 찍어 확인해요", "문단 안 일부의 서식은 run 으로(bold · Pt · RGBColor), 한글 글꼴은 font.name 만으로 안 되고 w:eastAsia 칸까지 — 문서 전체는 Normal 스타일에 한 번", "스타일 이름은 영어(\"Table Grid\" · \"List Bullet\"), 표 칸에는 글자만, 쪽은 add_page_break · sections[0] 의 여백 · 머리글 · 바닥글 — .doc · .hwp 는 docx 로 저장해서 열어요"] },
+{ id: 'J7', ch: 2, n: 7, title: "워드 읽고 고치기 · 틀 채우기", mode: 'text',
+  tutorSummary: "있는 워드 읽고 고치기. doc.paragraphs 는 본문만 → 표 칸(tables → rows → cells → paragraphs) · 머리글 · 바닥글(sections → header/footer.paragraphs)까지 모으는 all_paragraphs(doc). 자리 이름은 re.findall(r\"\\$\\{(.+?)\\}\", p.text). 틀 채우기 함정 둘: ① run 쪼개짐 — Word 가 맞춤법 검사 · 고친 기록 · 나중에 고쳐 친 글자마다 run 을 나눠서 ${이름} 이 ${ + 이름} 두 run(make_template_docx) → run 마다 replace 는 안 바뀜 ② p.text = … 는 run 을 다 지우고 서식 없는 run 하나 → 굵은 ${수업} 의 굵게가 사라짐. 해결 fill_paragraph: run 이 ${ 를 열고 안 닫았으면(is_open, 끝이 $ 여도) 다음 run 글자를 끌어와 잇고 끌어온 run 은 비운 뒤 run 마다 replace(이어 붙인 자리는 첫 run 서식). fill_docx(doc, values) 는 all_paragraphs 를 다 채우고 남은 ${…} 이름 리스트를 돌려줌. 틀은 그대로 두고 새 이름으로 저장, 사람마다 Document(틀) 을 새로 열기(한 번만 열면 모두 첫 사람 이름). 열어 둔 표에 줄 더하기 doc.tables[0].add_row().cells. PDF 로: Word 있으면 docx2pdf convert, 없으면 soffice --headless --convert-to pdf --outdir(subprocess, Windows 는 전체 경로) — 둘 다 ☐. HWP 는 직접 안 열고 한글에서 「다른 이름으로 저장」 → PDF(J4 · J5) 나 docx(J6 · J7). .hwp 를 Document 로 열면 BadZipFile, .hwpx 도 못 엶.",
+  pages: [
+    { title: "all_paragraphs(doc): 본문 · 표 · 머리글까지", html: `<p>이번엔 있는 워드 문서를 <b>읽고 고쳐요</b>. 첫 일은 글자가 있는 곳을 빠짐없이 도는 거예요. 그런데 <code>doc.paragraphs</code> 는 <b>본문 문단만</b> 줘요. 표 칸 안의 글자, 머리글 · 바닥글의 글자는 따로 있어요.</p>
+<table class="kb"><tbody><tr><th>글자가 있는 곳</th><th>도는 법</th></tr><tr><td>본문</td><td><code>doc.paragraphs</code></td></tr><tr><td>표 칸</td><td><code>doc.tables</code> → <code>t.rows</code> → <code>row.cells</code> → <code>cell.paragraphs</code></td></tr><tr><td>머리글 · 바닥글</td><td><code>doc.sections</code> → <code>s.header.paragraphs</code> · <code>s.footer.paragraphs</code></td></tr></tbody></table>
+<p>그래서 이 셋을 한 리스트로 모으는 함수를 하나 만들어 두고 계속 써요.</p>
+<pre>def all_paragraphs(doc):
+    """본문 · 표 칸 · 머리글 · 바닥글의 문단을 모두 모아 돌려줘요."""
+    ps = list(doc.paragraphs)
+    for t in doc.tables:
+        for row in t.rows:
+            for cell in row.cells:
+                ps.extend(cell.paragraphs)
+    for s in doc.sections:
+        ps.extend(s.header.paragraphs)
+        ps.extend(s.footer.paragraphs)
+    return ps</pre>
+<ul><li><code>ps.extend(리스트)</code> 는 리스트를 통째로 이어 붙여요(<code>append</code> 는 하나씩)</li><li>틀이 바라는 자리 이름은 문단 글자에서 정규식으로 찾아요: <code>re.findall(r"\\$\\{(.+?)\\}", p.text)</code>. <code>$</code> · <code>{</code> 는 정규식에서 뜻이 있는 글자라 <code>\\</code> 를 붙여요(복습: <a href="../python/#lesson/L20B" target="_blank" rel="noopener">파이썬 교과서 「정규식 2: 찾아 꺼내기 · 줄 처음과 끝」 ↗</a>)</li><li>병합한 칸은 <code>row.cells</code> 에 두 번 나올 수 있어요. 바꾸기는 두 번째엔 바꿀 게 없어서 괜찮지만, 셀 때는 주의해요</li><li>글상자(텍스트 상자) 속 글자는 이 셋에 없어요. 틀에는 글상자를 쓰지 않는 게 좋아요</li></ul>`,
+      example: { code: `import re
+import tempfile
+from pathlib import Path
+from docx import Document
+
+def all_paragraphs(doc):
+    """본문 · 표 칸 · 머리글 · 바닥글의 문단을 모두 모아 돌려줘요."""
+    ps = list(doc.paragraphs)
+    for t in doc.tables:
+        for row in t.rows:
+            for cell in row.cells:
+                ps.extend(cell.paragraphs)
+    for s in doc.sections:
+        ps.extend(s.header.paragraphs)
+        ps.extend(s.footer.paragraphs)
+    return ps
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    path = Path(tmp) / "견적_틀.docx"
+    doc = Document()                       # 연습용 틀: 본문 · 표 · 머리글에 자리가 있어요
+    doc.sections[0].header.paragraphs[0].text = "\${거래처} 귀하"
+    doc.add_heading("견적서", level=1)
+    doc.add_paragraph("견적일: \${견적일}")
+    t = doc.add_table(rows=2, cols=2)
+    t.cell(0, 0).text = "품목"
+    t.cell(0, 1).text = "금액"
+    t.cell(1, 0).text = "\${품목}"
+    t.cell(1, 1).text = "\${금액}"
+    doc.save(path)
+
+    doc = Document(path)
+    print("본문 문단만:", len(doc.paragraphs), "개")
+    ps = all_paragraphs(doc)
+    print("all_paragraphs:", len(ps), "개")
+    names = []
+    for p in ps:
+        for name in re.findall(r"\\$\\{(.+?)\\}", p.text):
+            names.append(name)
+    print("자리:", names)` } },
+    { title: "\"${\" + \"이름}\": run 쪼개짐 · p.text 함정", html: `<p>틀의 <code>\${이름}</code> 을 사람 이름으로 바꾸는 건 쉬워 보여요. 그런데 두 가지 함정이 있어요. 연습 재료의 수료증 틀 <code>make_template_docx</code> 로 직접 봐요.</p>
+<p><b>함정 1 — run 쪼개짐.</b> 문단 글자는 <code>\${이름} 님은 …</code> 인데, run 을 찍어 보면 <code>['\${', '이름}', …]</code> 처럼 <b>두 run 에 나뉘어</b> 있어요. 그래서 run 마다 <code>replace("\${이름}", …)</code> 하면 어느 run 에도 <code>\${이름}</code> 이 통째로 없어서 안 바뀌어요. 에러도 안 나요.</p>
+<p>일부러 만든 게 아니에요. <b>Word 가 실제로 이렇게 쪼개요.</b> 맞춤법 검사 밑줄이 생겼다 사라질 때, 고친 기록을 남길 때, 나중에 몇 글자만 고쳐 쳤을 때, 한/영 전환을 할 때마다 run 을 나눠요. 화면에서는 똑같이 보여서 사람은 몰라요.</p>
+<p><b>함정 2 — <code>p.text = …</code>.</b> 그럼 문단 글자를 통째로 바꾸면? <code>\${이름}</code> 은 바뀌어요. 하지만 <code>p.text</code> 에 쓰면 python-docx 가 run 을 다 지우고 <b>서식 없는 run 하나</b>로 새로 만들어요. 그래서 굵게 해 둔 <code>\${수업}</code> 의 굵게가 사라져요.</p>
+<table class="kb"><tbody><tr><th>방법</th><th><code>\${이름}</code>(쪼개짐)</th><th><code>\${수업}</code>(굵게)</th></tr><tr><td>run 마다 바꾸기</td><td>✗ 안 바뀜</td><td>○ 바뀌고 굵게 남음</td></tr><tr><td><code>p.text = …</code></td><td>○ 바뀜</td><td>✗ 굵게가 사라짐</td></tr></tbody></table>
+<p>두 장점을 다 가지는 방법은 다음 쪽에서 만들어요.</p>`,
+      example: { code: `import tempfile
+from pathlib import Path
+from docx import Document
+from samples import make_template_docx
+
+with tempfile.TemporaryDirectory() as tmp:
+    tpl = make_template_docx(Path(tmp) / "수료증_틀.docx")
+
+    doc = Document(tpl)
+    p = doc.paragraphs[1]
+    print(p.text)
+    print([r.text for r in p.runs])
+
+    # 시도 1: run 마다 바꾸기 → \${이름} 은 run 둘에 걸쳐 있어서 못 찾아요
+    for r in p.runs:
+        r.text = r.text.replace("\${이름}", "김하늘").replace("\${수업}", "가죽 공예")
+    print("시도 1:", p.text)
+
+    # 시도 2: 문단 글자 통째로 → 바뀌긴 하는데 run 이 하나로 합쳐져 굵게가 사라져요
+    doc = Document(tpl)
+    p = doc.paragraphs[1]
+    print("굵은 run:", [r.text for r in p.runs if r.bold])
+    p.text = p.text.replace("\${이름}", "김하늘").replace("\${수업}", "가죽 공예")
+    print("시도 2:", p.text)
+    print("run", len(p.runs), "개, 굵게:", p.runs[0].bold)`, prep: [SAMPLES_PREP] } },
+    { title: "fill_docx(doc, values): 끊긴 자리만 잇기", html: `<p>생각은 이래요. run 마다 바꾸되, <b>어떤 run 이 <code>\${</code> 를 열고 안 닫았으면</b> 다음 run 글자를 끌어와 이어 붙여요. 끌어온 run 은 비워요. 그러면 쪼개진 자리는 한 run 에 모여서 바뀌고, 쪼개지지 않은 자리(굵은 <code>\${수업}</code>)는 제 run 그대로 바뀌어 서식이 남아요.</p>
+<table class="kb"><tbody><tr><th>run</th><th>처음</th><th>잇기</th><th>바꾸기</th></tr><tr><td>0</td><td><code>\${</code></td><td><code>\${이름}</code></td><td><code>김하늘</code></td></tr><tr><td>1</td><td><code>이름}</code></td><td>(빈 글자)</td><td>(빈 글자)</td></tr><tr><td>3 (굵게)</td><td><code>\${수업}</code></td><td>그대로</td><td><b><code>가죽 공예</code></b></td></tr></tbody></table>
+<pre>def is_open(s):
+    """\${ 를 열고 아직 } 로 안 닫았으면 True (끝이 $ 하나여도 열린 것으로)"""
+    if s.endswith("$"):
+        return True
+    return "\${" in s and "}" not in s.split("\${")[-1]
+
+
+def fill_paragraph(p, values):
+    runs = p.runs
+    for i, r in enumerate(runs):
+        j = i + 1
+        while is_open(r.text) and j &lt; len(runs):
+            r.text = r.text + runs[j].text    # 다음 run 글자를 끌어와 잇고
+            runs[j].text = ""                 # 끌어온 run 은 비워요
+            j += 1
+        for key, value in values.items():
+            r.text = r.text.replace("\${" + key + "}", str(value))
+
+
+def fill_docx(doc, values):
+    """doc 의 \${이름} 자리를 values 로 채우고, 못 채운 자리 이름 리스트를 돌려줘요."""
+    left = []
+    for p in all_paragraphs(doc):
+        fill_paragraph(p, values)
+        for name in re.findall(r"\\$\\{(.+?)\\}", p.text):
+            if name not in left:
+                left.append(name)
+    return left</pre>
+<ul><li><code>is_open</code>: 마지막 <code>\${</code> 뒤에 <code>}</code> 가 없으면 「열려 있음」. Word 가 <code>$</code> 와 <code>{</code> 사이를 쪼갤 수도 있어서, 끝이 <code>$</code> 인 run 도 열린 것으로 봐요</li><li>이어 붙인 자리의 서식은 <b>첫 run 의 서식</b>을 따라요. 틀을 만들 때 자리 하나는 같은 서식으로 쳐 두면 돼요</li><li><code>str(value)</code> 라서 숫자도 넣을 수 있지만, 금액 · 날짜 모양은 넘기기 전에 만들어요(<code>f"{n:,}원"</code>)</li><li>다 바꾼 뒤 남은 <code>\${…}</code> 를 찾아 <b>돌려줘요</b>. 값을 빠뜨렸거나 자리 이름에 오타가 있으면 여기 나와요. 남은 게 있으면 저장하지 않고 알리는 게 안전해요</li></ul>
+<div class="bk-warn"><b>틀은 그대로 두고 새 이름으로</b> — <code>fill_docx</code> 는 열어 둔 <code>doc</code> 을 바꿔요. 저장은 늘 <code>수료증_김하늘.docx</code> 처럼 새 이름으로 하고, 틀 파일에는 저장하지 않아요. 틀을 덮어쓰면 다음 사람부터 채울 자리가 없어요.</div>`,
+      example: { code: `import re
+import tempfile
+from pathlib import Path
+from docx import Document
+from samples import make_template_docx
+
+def all_paragraphs(doc):
+    """본문 · 표 칸 · 머리글 · 바닥글의 문단을 모두 모아 돌려줘요."""
+    ps = list(doc.paragraphs)
+    for t in doc.tables:
+        for row in t.rows:
+            for cell in row.cells:
+                ps.extend(cell.paragraphs)
+    for s in doc.sections:
+        ps.extend(s.header.paragraphs)
+        ps.extend(s.footer.paragraphs)
+    return ps
+
+def is_open(s):
+    """\${ 를 열고 아직 } 로 안 닫았으면 True (끝이 $ 하나여도 열린 것으로)"""
+    if s.endswith("$"):
+        return True
+    return "\${" in s and "}" not in s.split("\${")[-1]
+
+
+def fill_paragraph(p, values):
+    runs = p.runs
+    for i, r in enumerate(runs):
+        j = i + 1
+        while is_open(r.text) and j < len(runs):
+            r.text = r.text + runs[j].text    # 다음 run 글자를 끌어와 잇고
+            runs[j].text = ""                 # 끌어온 run 은 비워요
+            j += 1
+        for key, value in values.items():
+            r.text = r.text.replace("\${" + key + "}", str(value))
+
+
+def fill_docx(doc, values):
+    """doc 의 \${이름} 자리를 values 로 채우고, 못 채운 자리 이름 리스트를 돌려줘요."""
+    left = []
+    for p in all_paragraphs(doc):
+        fill_paragraph(p, values)
+        for name in re.findall(r"\\$\\{(.+?)\\}", p.text):
+            if name not in left:
+                left.append(name)
+    return left
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    tpl = make_template_docx(Path(tmp) / "수료증_틀.docx")
+    doc = Document(tpl)
+    left = fill_docx(doc, {"이름": "김하늘", "수업": "가죽 공예"})
+    print("못 채운 자리:", left)
+    out = Path(tmp) / "수료증_김하늘.docx"
+    doc.save(out)
+
+    p = Document(out).paragraphs[1]
+    print(p.text)
+    for r in p.runs:
+        if r.text:
+            print(repr(r.text), r.bold)`, prep: [SAMPLES_PREP] } },
+    { title: "사람마다 Document(틀) · 새 이름 · 표에 줄", html: `<p>여러 장을 만들 때 가장 흔한 실수는 <b>틀을 한 번만 열어 두고</b> 사람마다 채우는 거예요.</p>
+<pre>doc = Document(tpl)                 # ✗ 한 번만 열면
+for name, course in people:
+    fill_docx(doc, {"이름": name, "수업": course})
+    doc.save(f"수료증_{name}.docx")  # 둘째 사람부터 이미 「김하늘」 이 들어간 문서</pre>
+<p>첫 사람을 채운 순간 <code>\${이름}</code> 자리가 사라져요. 둘째 · 셋째 파일도 전부 김하늘이에요. 에러도 없어요. 그래서 <b>사람마다 <code>Document(tpl)</code> 로 틀을 새로 열어요.</b> 파일을 다시 읽는 건 금방이에요.</p>
+<p>열어 둔 문서의 표에 줄을 더하는 건 [[레슨:J6]] 그대로예요. <code>doc.tables[0].add_row().cells</code> 로 줄을 더하고 칸에 글자를 넣은 뒤 저장해요. 예제는 발급 대장 표에 한 줄씩 더해요.</p>
+<p>그리고 저장한 파일을 다시 열어 <b>사람마다 이름이 다른지</b>, 틀은 그대로인지 찍어 봐요. 「다 김하늘」 실수는 이렇게 찍어 봐야 보여요.</p>`,
+      example: { code: `import re
+import tempfile
+from pathlib import Path
+from docx import Document
+from samples import make_template_docx
+
+def all_paragraphs(doc):
+    """본문 · 표 칸 · 머리글 · 바닥글의 문단을 모두 모아 돌려줘요."""
+    ps = list(doc.paragraphs)
+    for t in doc.tables:
+        for row in t.rows:
+            for cell in row.cells:
+                ps.extend(cell.paragraphs)
+    for s in doc.sections:
+        ps.extend(s.header.paragraphs)
+        ps.extend(s.footer.paragraphs)
+    return ps
+
+def is_open(s):
+    """\${ 를 열고 아직 } 로 안 닫았으면 True (끝이 $ 하나여도 열린 것으로)"""
+    if s.endswith("$"):
+        return True
+    return "\${" in s and "}" not in s.split("\${")[-1]
+
+
+def fill_paragraph(p, values):
+    runs = p.runs
+    for i, r in enumerate(runs):
+        j = i + 1
+        while is_open(r.text) and j < len(runs):
+            r.text = r.text + runs[j].text    # 다음 run 글자를 끌어와 잇고
+            runs[j].text = ""                 # 끌어온 run 은 비워요
+            j += 1
+        for key, value in values.items():
+            r.text = r.text.replace("\${" + key + "}", str(value))
+
+
+def fill_docx(doc, values):
+    """doc 의 \${이름} 자리를 values 로 채우고, 못 채운 자리 이름 리스트를 돌려줘요."""
+    left = []
+    for p in all_paragraphs(doc):
+        fill_paragraph(p, values)
+        for name in re.findall(r"\\$\\{(.+?)\\}", p.text):
+            if name not in left:
+                left.append(name)
+    return left
+
+
+people = [("김하늘", "가죽 공예"), ("이도윤", "목공 기초"), ("박서준", "도자기")]
+
+with tempfile.TemporaryDirectory() as tmp:
+    folder = Path(tmp)
+    tpl = make_template_docx(folder / "수료증_틀.docx")
+
+    log = Document()                       # 발급 대장: 머리줄만 있는 표
+    t = log.add_table(rows=1, cols=3)
+    for cell, head in zip(t.rows[0].cells, ["번호", "이름", "파일"]):
+        cell.text = head
+    log.save(folder / "발급_대장.docx")
+
+    log = Document(folder / "발급_대장.docx")
+    for i, (name, course) in enumerate(people, start=1):
+        doc = Document(tpl)                # 사람마다 틀을 새로 열어요
+        fill_docx(doc, {"이름": name, "수업": course, "수료일": "2026년 10월 31일"})
+        out = folder / f"수료증_{name}.docx"
+        doc.save(out)
+        cells = log.tables[0].add_row().cells      # 열어 둔 표에 줄 더하기
+        cells[0].text = str(i)
+        cells[1].text = name
+        cells[2].text = out.name
+    log.save(folder / "발급_대장.docx")
+
+    names = sorted(p.name for p in folder.glob("*.docx"))
+    print(names)
+    for name, course in people:
+        print(Document(folder / f"수료증_{name}.docx").paragraphs[1].text[:20])
+    print("틀:", Document(tpl).paragraphs[1].text[:20])
+    for row in Document(folder / "발급_대장.docx").tables[0].rows:
+        print([c.text for c in row.cells])`, prep: [SAMPLES_PREP] } },
+    { title: "PDF 로 바꾸기 · 한글(HWP)은 저장해서", html: `<p>워드 → PDF, 한글 → 워드 같은 <b>형식 바꾸기는 파이썬이 직접 하지 않고 그 형식을 아는 프로그램에게 맡겨요.</b></p>
+<p><b>워드 → PDF.</b> 둘 중 하나예요.</p>
+<table class="kb"><tbody><tr><th>내 PC</th><th>쓰는 것</th></tr><tr><td>Word 가 깔려 있음(Windows · macOS)</td><td><code>pip install docx2pdf</code> → <code>convert("수료증", "pdf")</code>(폴더째) — 뒤에서 Word 를 몰래 켜서 저장해요</td></tr><tr><td>Word 가 없음</td><td>LibreOffice(무료)의 <code>soffice --headless --convert-to pdf --outdir pdf 파일.docx</code> 를 <code>subprocess.run</code> 으로(복습: <a href="../python/#lesson/L28" target="_blank" rel="noopener">파이썬 교과서 「환경 변수와 다른 프로그램: os · subprocess」 ↗</a>)</td></tr></tbody></table>
+<pre>import subprocess
+from docx2pdf import convert
+
+convert("수료증", "pdf")                        # Word 가 있을 때
+
+files = sorted(Path("수료증").glob("*.docx"))
+cmd = pdf_command(files, Path("pdf"))
+subprocess.run(cmd, check=True)                # LibreOffice 로</pre>
+<ul><li>Windows 에서 <code>soffice</code> 는 보통 PATH 에 없어요. <code>C:\\Program Files\\LibreOffice\\program\\soffice.exe</code> 처럼 전체 경로를 첫 칸에 써요</li><li>LibreOffice 창이 하나라도 열려 있으면 <code>--headless</code> 변환이 조용히 아무것도 안 할 때가 있어요. 창을 다 닫고 돌려요</li><li>둘 다 이 교과서의 예제로는 돌리지 않아요(Word · LibreOffice 가 있어야 해서). 명령 리스트를 만드는 <code>pdf_command</code> 까지만 예제에서 돌리고, 진짜 바꾸기는 내 PC 에서 해 봐요. 만든 PDF 는 [[레슨:J4]] 의 <code>PdfReader</code> 로 다시 열어 쪽 수 · 글자를 확인해요</li></ul>
+<p><b>한글(HWP) 문서는?</b> 파이썬으로 <code>.hwp</code> 를 직접 열지 않아요. 공식 파이썬 라이브러리가 없고, 한컴오피스를 원격 조종하는 방법은 Windows + 한컴오피스가 있어야 하고 깨지기 쉬워요. 대신 <b>한글 프로그램에서 「파일 → 다른 이름으로 저장」 → 파일 형식을 고르면</b> 이 교과서의 도구를 그대로 써요.</p>
+<table class="kb"><tbody><tr><th>저장할 형식</th><th>그다음</th></tr><tr><td>PDF(<code>.pdf</code>)</td><td>글자 꺼내기 · 합치기 · 나누기 — [[레슨:J4]] · [[레슨:J5]]</td></tr><tr><td>MS Word 문서(<code>.docx</code>)</td><td><code>Document(path)</code> · <code>all_paragraphs</code> · <code>fill_docx</code> — [[레슨:J6]] · 이 레슨</td></tr></tbody></table>
+<ul><li><code>.hwp</code> 를 그냥 <code>Document()</code> 로 열면 <code>BadZipFile: File is not a zip file</code> 이에요. 요즘 한글의 <code>.hwpx</code> 는 zip 이긴 하지만 워드 형식이 아니라서 역시 못 열어요</li><li>docx 로 바꾸면 글자 · 문단 · 표는 대개 잘 넘어와요. 글상자 · 그리기 개체 · 한글만의 쪽 모양은 달라질 수 있어서, 처음 한 번은 Word 로 열어 눈으로 봐요</li><li>받은 한글 문서가 많으면 한글 프로그램의 「일괄 변환」 기능(버전마다 이름이 조금 달라요)으로 폴더째 docx · PDF 로 바꿀 수 있어요</li></ul>`,
+      example: { code: `import tempfile
+import zipfile
+from pathlib import Path
+from docx import Document
+
+
+def pdf_command(docx_files, outdir):
+    """LibreOffice 로 PDF 를 만드는 명령 리스트(subprocess.run 에 그대로 넘겨요)"""
+    cmd = ["soffice", "--headless", "--convert-to", "pdf", "--outdir", Path(outdir).as_posix()]
+    for p in docx_files:
+        cmd.append(Path(p).as_posix())
+    return cmd
+
+
+files = [Path("수료증_김하늘.docx"), Path("수료증_이도윤.docx")]
+cmd = pdf_command(files, Path("pdf"))
+print(cmd)
+
+with tempfile.TemporaryDirectory() as tmp:
+    hwp = Path(tmp) / "공방_안내문.hwp"
+    hwp.write_text("HWP Document File")   # 한글 파일 흉내(zip 이 아닌 파일)
+    try:
+        Document(hwp)
+    except zipfile.BadZipFile as e:
+        print("BadZipFile:", e)
+
+    saved = Path(tmp) / "공방_안내문.docx"           # 한글에서 「다른 이름으로 저장」 한 docx 흉내
+    doc = Document()
+    doc.add_heading("겨울 방학 특강", level=1)
+    doc.add_paragraph("12월 22일부터 2주 동안 열려요.")
+    doc.save(saved)
+    for p in Document(saved).paragraphs:
+        print(p.style.name, "|", p.text)` } },
+  ],
+  summary: ["doc.paragraphs 는 본문만이라, 표 칸 · 머리글 · 바닥글까지 모으는 all_paragraphs(doc) 로 돌아요", "Word 는 ${이름} 을 run 여러 개로 쪼개고, p.text = … 는 서식을 지워요 — fill_docx 는 끊긴 자리만 이어 붙여 바꾸고 남은 자리를 돌려줘요", "틀은 사람마다 새로 열고 새 이름으로 저장해요. PDF 로 바꾸기는 docx2pdf · LibreOffice 에, 한글(HWP)은 한글에서 PDF · docx 로 저장해서 다뤄요"] },
+{ id: 'JB2', ch: 2, boss: true, title: '만들어 보기: 청구서 정리기', mode: 'text',
+  tutorSummary: '만들어 보기: 청구서 정리기 — make_invoices 의 청구서 PDF 6개(스캔본 하나 · 암호 1234 하나)에서 read_invoice(PdfReader · decrypt · extract_text · 정규식)로 거래처 · 번호 · 청구일 · 금액을 뽑고(못 읽은 것은 까닭과 함께 따로, 암호는 input 으로 물어 다시), 청구일 순 모음 PDF(PdfWriter.append · 거래처 책갈피 add_outline_item · /Title), 보고서 틀(run 이 쪼개진 ${작성자})을 fill_docx 로 채운 워드 보고서(맑은 고딕 · 표 · 합계 · 못 읽은 파일), 다시 열어 assert 로 검사하는 check_outputs, csv(utf-8-sig) 까지 main(folder, out, today) 하나로', pages: [], summary: [] },
 { id: 'J8', ch: 3, n: 8, title: '템플릿으로 문서 대량 만들기', mode: 'text',
   tutorSummary: "string.Template 으로 틀 하나 × 명단 → 사람마다 문서. 자리 $name · ${name}, 진짜 $ 는 $$, substitute(값들)는 빠지면 KeyError · safe_substitute 는 빠진 자리를 그대로 남김(사람에게 줄 글은 substitute). 한글 자리 이름은 기본으로 안 됨: 기본 idpattern 이 (?a:[_a-z][_a-z0-9]*) 라 $이름 → ValueError: Invalid placeholder in string: line 1, col 1. class KTemplate(Template): idpattern = r\"[^\\W\\d]\\w*\" 로 자식 클래스(클래스 속성, 만든 뒤 Template.idpattern = … 은 안 먹음). 한글은 뒤 말까지 이름: $이름님 → KeyError: '이름님', 영문 $name님 도 KTemplate 에선 name님 → 늘 ${이름}님. t.get_identifiers() 로 틀이 바라는 자리, t.is_valid(). f-string 은 파일 속 틀에 못 쓰고, str.format 은 {m.__dict__} 처럼 속성까지 꺼내고 CSS 중괄호에 깨짐. 명단 csv(DictReader, utf-8-sig) → 전부 검사(check: 비어 있는 칸을 모두 모아 알리고 하나도 안 만듦) → 만들기. 값 서식은 넣기 전에(f\"{n:,}\", date.fromisoformat), 파일 이름은 re.sub 로 안전하게(J1), HTML 틀은 값마다 html.escape, 워드 틀은 p.text 를 합쳐 채우고 첫 run 에 넣고 나머지 run 비우기(J7, 서식은 첫 run 을 따라감).",
   terms: { "틀": "바꿀 자리만 비워 둔 글. 같은 모양의 글을 사람마다 만들 때 써요(템플릿)", "자리 이름": "틀 안의 $이름 · ${이름} 처럼 값이 들어갈 곳에 붙인 이름(placeholder)" },
@@ -2526,12 +3036,722 @@ with tempfile.TemporaryDirectory() as tmp:
   summary: ["진짜 발송은 smtplib.SMTP_SSL(host, 465) 또는 SMTP(host, 587) + starttls() 에 login(아이디, 앱 비밀번호) → send_message(msg) — Gmail 은 2단계 인증 뒤 앱 비밀번호, 네이버는 환경설정에서 IMAP/SMTP 사용함","비밀번호는 코드 밖에 — os.environ.get(\"MAIL_PASSWORD\") 로 읽고 없으면 getpass() 로 물어보며, 찍지도 올리지도 않아요","보내는 함수는 서버를 인자로 받아 가짜 서버로 시험하고, 여러 명은 한 통씩 · sleep · 실패는 적고 계속 · 보낸 다음 sent.csv 에 적어 두 번 안 보내요"] },
 { id: 'JB3', ch: 3, boss: true, title: '만들어 보기: 수료증 · 안내 메일 발송기', mode: 'text',
   tutorSummary: "만들어 보기: ROSTER_CSV 명단 → ① 명단 검사(빈 이메일 · 모양 · 겹침, 먼저 알리고 건너뛰기 또는 strict 면 멈춤) ② 사람마다 수료증 워드(틀의 쪼개진 ${이름} run 만 이어 붙여 KTemplate 로 채우기 — 굵게 유지, 남은 ${…} 검사) + reportlab PDF 판 ③ 사람마다 EmailMessage(본문 · 제목은 KTemplate, 수료증 PDF 첨부) ④ 미리 보기: outbox/ 에 .eml, 다시 읽어 받는 사람 · 첨부 이름 · 첨부 바이트 비교 ⑤ --send 는 서버를 인자로 받아 FakeSMTP 로 보내고 sent.csv 기록, 다시 돌리면 이미 보낸 사람 건너뜀, 실패 있으면 끝 코드 1 ⑥ 진짜 SMTP 로 --send --to-me 나에게 한 통(☐).", pages: [], summary: [] },
-{ id: 'J11', ch: 4, n: 11, title: '맛보기: 클립보드 · 키보드 · 마우스', mode: 'text', draft: true,
-  tutorSummary: 'pyperclip · pyautogui · 언제 피하나',
-  pages: AUTO_TODO('pyperclip · pyautogui · 언제 피하나'), summary: ["pyperclip", "pyautogui", "언제 피하나"] },
-{ id: 'J12', ch: 4, n: 12, title: '혼자 돌아가는 스크립트', mode: 'text', draft: true,
-  tutorSummary: '__file__ 기준 · 회전 로그 · 잠금',
-  pages: AUTO_TODO('__file__ 기준 · 회전 로그 · 잠금'), summary: ["__file__ 기준", "회전 로그", "잠금"] },
+{ id: 'J11', ch: 4, n: 11, title: '맛보기: 클립보드 · 키보드 · 마우스', mode: 'text',
+  tutorSummary: '화면 자동화 맛보기. 먼저 파일 · API 길(엑셀은 files 코스 openpyxl, 웹은 api 코스 requests, 메일 J10, PDF · 워드 J5 · J6)을 찾고, 화면 자동화(클립보드 · 키보드 · 마우스)는 그 길이 없는 옛 프로그램에만 — 해상도 · 배율 · 창 위치 · 알림 창 · 한글 입력기 · 느린 PC 에 따라 깨지니 짧게, 사람이 지켜볼 때만, 예약 스크립트(J12)에는 넣지 않는다. pyperclip · pyautogui 는 이 레슨에서만 쓰는 선택 설치(python -m pip install pyperclip pyautogui), 화면 있는 PC 에서만 돈다. 클립보드: 표준 tkinter 는 root = tk.Tk(); root.withdraw(); root.clipboard_get()(비었거나 그림이면 tk.TclError) · clipboard_clear() + clipboard_append(text) + root.update() 뒤 destroy, pyperclip 은 paste() · copy(text). 프로그램 모양은 읽기 → 정리 함수(글자 → 글자, 따로 시험) → 쓰기. 엑셀 · 웹 표를 복사한 글자는 칸 사이 \\t · 줄 끝 \\r\\n · 숫자는 보이는 모양 그대로 글자("125,000") · 따옴표/줄바꿈 든 칸은 "…" 로 감쌈 → text.splitlines()(\\r\\n · \\n 다 줄 끝, 끝에 빈 줄 안 만듦) → csv.reader(lines, delimiter="\\t")(감싼 칸도 풂, split("\\t") 은 따옴표가 남음), 칸은 strip, "".join(cells) 가 빈 글자인 줄은 버림, csv.writer(f).writerows(rows) 로 utf-8-sig · newline="" 저장. 칸 안 줄바꿈(Alt+Enter)은 splitlines 가 끊어서 줄바꿈이 빠짐 → 그런 표는 엑셀에서 csv 로 저장. 전화번호: d = re.sub(r"\\D", "", s)(\\D = 숫자가 아닌 글자) → 82 로 시작하면 "0" + d[2:] → 02 로 시작하고 9 · 10자리면 d[:2]-d[2:-4]-d[-4:], 0 으로 시작하고 10 · 11자리면 d[:3]-d[3:-4]-d[-4:], 그 밖은 None(억지로 맞추지 말고 사람이 보게), int 로 바꾸면 앞 0 이 사라짐. pyautogui: FAILSAFE = True(기본, 마우스를 화면 모서리로 → 다음 동작에서 FailSafeException) · PAUSE = 0.5 · size() · position() · moveTo(x, y, duration=) · click() · write("abc")(한글 ✗) · press("enter") · hotkey("ctrl", "v") — 한글은 pyperclip.copy 후 붙여 넣기. 결과 열어 주기: webbrowser.open(주소) · os.startfile(경로)(Windows 만, Mac open · 리눅스 xdg-open 은 subprocess). 브라우저 자동화 Playwright · Selenium 은 이름만.',
+  terms: { '화면 자동화': '사람 대신 프로그램이 마우스를 움직이고 키를 눌러 다른 프로그램을 다루게 하는 것. 파일 · API 길이 없을 때 쓰는 마지막 수단이에요', '클립보드': 'Ctrl+C 로 복사한 것이 잠깐 머무는 곳. Ctrl+V 로 붙여 넣어요. 모든 프로그램이 같이 써요' },
+  pages: [
+    { title: 'pip install pyperclip pyautogui · 언제 피하나', html: `<p>지금까지는 파일(폴더 · zip · PDF · 워드 · 메일)을 <b>직접</b> 만들고 읽었어요. 이번 레슨은 그 길이 없을 때 쓰는 <b>사람 손 흉내</b>를 맛만 봐요: 클립보드(복사 · 붙여 넣기) · 키보드 · 마우스.</p>
+<p>먼저 물어요. 「파일이나 API 로 할 수 있나?」 대부분은 돼요.</p>
+<table class="kb"><tbody><tr><th>하려는 일</th><th>먼저 볼 길</th></tr>
+<tr><td>엑셀 값 읽기 · 쓰기</td><td>파일을 직접 — <a href="../files/#lesson/F7" target="_blank" rel="noopener">데이터 파일 다루기 교과서 「엑셀 읽기: 통합 문서 · 시트 · 셀」 ↗</a></td></tr>
+<tr><td>웹 서비스의 자료 받기 · 올리기</td><td>그 서비스의 API — <a href="../api/#lesson/H5" target="_blank" rel="noopener">HTTP·API·SDK 교과서 「requests 기본기」 ↗</a></td></tr>
+<tr><td>메일 보내기</td><td>[[레슨:J10]] 의 <code>smtplib</code></td></tr>
+<tr><td>PDF · 워드 만들기</td><td>[[레슨:J5]] · [[레슨:J6]]</td></tr>
+<tr><td>파일 · API 가 없는 옛 프로그램에 값 넣기</td><td>그때 처음으로 [[화면 자동화]]</td></tr></tbody></table>
+<p>화면 자동화는 <b>마지막 수단</b>이에요. 잘 깨지거든요.</p>
+<ul><li>화면 해상도 · 배율(125% · 150%)이 바뀌면 누를 좌표가 틀려요</li><li>창 위치 · 크기가 달라지거나 알림 창 · 업데이트 창이 앞에 뜨면 엉뚱한 곳을 눌러요</li><li>한글 입력기가 한 · 영 어느 쪽인지에 따라 친 글자가 달라져요</li><li>PC 가 느리면 창이 뜨기 전에 키부터 눌러요</li><li>도는 동안 사람은 마우스 · 키보드를 못 써요. 화면이 잠기면 멈춰요</li></ul>
+<p>그래서 이 레슨의 방법은 <b>짧게, 내가 지켜볼 때만</b> 써요. 사람 없이 혼자 도는 스크립트([[레슨:J12]])에는 넣지 않아요.</p>
+<div class="bk-warn"><b>선택 설치 — 이 레슨에서만</b> — <code>pyperclip</code>(클립보드) · <code>pyautogui</code>(키보드 · 마우스)는 이 레슨에서만 써요. 다른 레슨과 만들어 보기에는 필요 없어서 시작하기의 패키지 넷에 넣지 않았어요. 해 보고 싶으면 가상 환경에서 아래 명령으로 깔아요. 둘 다 화면이 있는 내 PC 에서만 돌아요.</div>`,
+      example: { label: '예제 명령 — VS Code 터미널에서(선택 설치, 이 레슨에서만)', shell: `python -m pip install pyperclip pyautogui
+python -m pip list` } },
+    { title: 'pyperclip.paste() · copy() · tkinter 클립보드', html: `<p>[[클립보드]]는 Ctrl+C 로 복사한 것이 잠깐 머무는 곳이에요. 파이썬에서 읽고 쓰는 길이 둘 있어요.</p>
+<p><b>① 표준 tkinter</b> — 따로 깔지 않아도 돼요(창 만들기는 <a href="../python/#lesson/X14" target="_blank" rel="noopener">파이썬 교과서 「실전 14: tkinter 계산기」 ↗</a>). 창이 하나 있어야 해서, 숨긴 창을 만들어 쓰고 바로 닫아요.</p>
+<pre>import tkinter as tk
+
+
+def get_clip():
+    root = tk.Tk()
+    root.withdraw()              # 빈 창이 뜨지 않게 숨기기
+    try:
+        return root.clipboard_get()
+    except tk.TclError:          # 비었거나 글자가 아님(그림 · 파일을 복사했을 때)
+        return ""
+    finally:
+        root.destroy()
+
+
+def set_clip(text):
+    root = tk.Tk()
+    root.withdraw()
+    root.clipboard_clear()
+    root.clipboard_append(text)
+    root.update()                # 클립보드에 넘길 틈을 주기
+    root.destroy()</pre>
+<p><b>② pyperclip</b>(선택 설치) — 두 줄이면 돼요. Windows · Mac · 리눅스에서 같은 코드예요.</p>
+<pre>import pyperclip
+
+text = pyperclip.paste()          # 클립보드의 글자(비었으면 빈 글자)
+pyperclip.copy(text.upper())      # 클립보드를 이 글자로 바꾸기</pre>
+<ul><li>읽은 값은 <b>보통 str</b> 이에요. 엑셀에서 복사했으면 칸 사이에 탭 <code>\\t</code>, 줄 끝에 <code>\\r\\n</code> 이 들어 있어요(다음 쪽)</li><li>tkinter 로 넣은 글자는 프로그램이 끝나면 사라지는 PC(특히 리눅스)도 있어요. 이 점은 pyperclip 이 믿을 만해요</li><li>클립보드는 모든 프로그램이 같이 써요. 내 프로그램이 바꾸면 사람이 복사해 둔 것이 사라지니, 바꿨다고 꼭 알려 주세요</li></ul>
+<p>클립보드 프로그램은 늘 이 모양이에요. 읽기 → <b>정리 함수</b> → 쓰기.</p>
+<pre>text = pyperclip.paste()
+new_text = clean(text)            # ← 이 부분만 떼어 시험해요
+pyperclip.copy(new_text)</pre>
+<p>클립보드는 시험하기 어렵지만, 가운데 <code>clean</code> 은 글자를 받아 글자를 돌려주는 보통 함수예요. 다음 두 쪽에서 이런 정리 함수를 만들어요.</p>
+<div class="bk-warn"><b>이 쪽의 코드는 내 PC 에서만</b> — 클립보드는 화면이 있는 PC 에 붙어 있어요. 화면 없는 서버에서는 <code>TclError</code> 나 <code>PyperclipException</code> 이 나요. 그래서 이 쪽은 돌릴 예제 없이 코드만 보여 줘요. VS Code 에 붙여 직접 돌려 보세요.</div>` },
+    { title: 'csv.reader(lines, delimiter="\\t") · 복사한 표', html: `<p>엑셀 · 구글 시트 · 웹 페이지의 표를 골라 Ctrl+C 하면 클립보드에는 이런 글자가 들어가요.</p>
+<pre>"거래처\\t청구 번호\\t합계 금액\\r\\n햇살문구\\tINV-2026-1001\\t125,000\\r\\n"</pre>
+<ul><li>칸 사이는 탭 <code>\\t</code>, 줄 끝은 <code>\\r\\n</code>(Windows), 마지막 줄 뒤에도 줄바꿈이 붙어요</li><li>숫자 · 날짜는 <b>화면에 보이는 모양 그대로의 글자</b>예요 — <code>"125,000"</code> · <code>"2026-10-05"</code>. 계산하려면 <code>int(s.replace(",", ""))</code></li><li>칸 안에 따옴표 · 줄바꿈이 있으면 그 칸은 <code>"…"</code> 로 감싸여요</li></ul>
+<p>먼저 <code>text.splitlines()</code> 로 줄마다 나눠요. <code>split("\\n")</code> 과 달리 <code>\\r\\n</code> · <code>\\n</code> 을 다 줄 끝으로 보고, 맨 끝 줄바꿈 뒤에 빈 줄을 하나 더 만들지 않아요. 나눈 줄 리스트는 복습: <a href="../python/#lesson/L29" target="_blank" rel="noopener">파이썬 교과서 「csv 모듈 제대로」 ↗</a> 의 <code>csv.reader(f, delimiter="\\t")</code> 에 파일 대신 그대로 넣어요. <code>csv.reader</code> 는 줄 리스트도 받고, <code>"…"</code> 로 감싼 칸도 풀어 줘요.</p>
+<ul><li>빈 줄 · 탭만 있는 줄도 따라와요. 칸을 다 이어 붙인 <code>"".join(cells)</code> 가 빈 글자면 버려요</li><li>복사하다 칸 앞뒤에 빈칸이 붙기 쉬워요. <code>c.strip()</code></li><li>정리한 줄은 <code>csv.writer(f).writerows(rows)</code> 로 저장해요. 엑셀에서 열 파일이니 <code>encoding="utf-8-sig"</code> · <code>newline=""</code>(L29)</li></ul>
+<div class="bk-warn"><b>split("\\t") 만으로는 모자라요</b> — 감싼 칸 <code>"주차 가능, 2층"</code> 의 따옴표가 그대로 남아요. 또 엑셀 칸 안의 줄바꿈(Alt+Enter)은 <code>splitlines()</code> 가 먼저 끊어 버려서, 칸은 하나로 다시 붙지만 줄바꿈이 빠져요(<code>"두 줄메모"</code>). 그런 칸이 많은 표는 엑셀에서 csv 로 저장해 파일로 읽는 게 나아요.</div>`,
+      example: { code: `import csv
+import tempfile
+from pathlib import Path
+
+# 엑셀에서 표를 골라 Ctrl+C 하면 클립보드에 이런 글자가 들어가요(pyperclip.paste() 가 돌려주는 값)
+CLIP = "거래처\\t청구 번호\\t합계 금액\\r\\n햇살문구\\tINV-2026-1001\\t125,000\\r\\n바다인쇄 \\tINV-2026-1002\\t342,000\\r\\n\\r\\n숲속목재\\tINV-2026-1003\\t1,280,000\\r\\n"
+
+
+def clip_rows(text):
+    """복사한 표 글자 → 줄마다 칸 리스트(빈 줄은 빼고, 칸 앞뒤 빈칸은 지우고)"""
+    lines = text.splitlines()
+    rows = []
+    for row in csv.reader(lines, delimiter="\\t"):
+        cells = [c.strip() for c in row]
+        if "".join(cells):            # 칸을 다 이어도 빈 글자면 빈 줄
+            rows.append(cells)
+    return rows
+
+
+print(CLIP.splitlines()[:2])
+rows = clip_rows(CLIP)
+for r in rows:
+    print(r)
+
+with tempfile.TemporaryDirectory() as tmp:
+    out = Path(tmp) / "청구_목록.csv"
+    with open(out, "w", encoding="utf-8-sig", newline="") as f:
+        csv.writer(f).writerows(rows)
+
+    with open(out, encoding="utf-8-sig", newline="") as f:
+        back = list(csv.DictReader(f))
+    total = 0
+    for r in back:
+        total += int(r["합계 금액"].replace(",", ""))
+    print(out.name, len(back), "줄, 합계", f"{total:,}원")` } },
+    { title: 're.sub(r"\\D", "", s) · 전화번호 모양', html: `<p>여러 곳에서 복사해 온 전화번호는 모양이 제각각이에요: <code>010.1234.5678</code> · <code>010 9876 5432</code> · <code>(02) 345-6789</code> · <code>+82 10-5555-0123</code>. 받아 쓸 곳(문자 발송 · 명단)은 한 모양 <code>010-1234-5678</code> 을 바라요. 두 단계로 맞춰요.</p>
+<ol><li><b>숫자만 남기기</b> — <code>re.sub(r"\\D", "", s)</code>. <code>\\d</code> 가 숫자 한 글자였죠(복습: <a href="../python/#lesson/L20B" target="_blank" rel="noopener">파이썬 교과서 「정규식 2: 찾아 꺼내기 · 줄 처음과 끝」 ↗</a>). 대문자 <code>\\D</code> 는 그 반대, <b>숫자가 아닌</b> 한 글자예요. 그걸 빈 글자로 바꾸니 숫자만 남아요</li><li><b>앞자리와 길이로 다시 끊기</b> — 서울 <code>02</code> 는 두 자리 + 3~4자리 + 4자리, 나머지(<code>010</code> · <code>031</code> · <code>051</code> …)는 세 자리 + 3~4자리 + 4자리예요. 끝 네 자리는 늘 <code>d[-4:]</code>, 가운데는 <code>d[2:-4]</code> · <code>d[3:-4]</code></li></ol>
+<table class="kb"><tbody><tr><th>복사해 온 글자</th><th>숫자만</th><th>맞춘 모양</th></tr>
+<tr><td><code>010.1234.5678</code></td><td><code>01012345678</code></td><td><code>010-1234-5678</code></td></tr>
+<tr><td><code>(02) 345-6789</code></td><td><code>023456789</code></td><td><code>02-345-6789</code></td></tr>
+<tr><td><code>+82 10-5555-0123</code></td><td><code>821055550123</code> → 앞 <code>82</code> 를 <code>0</code> 으로</td><td><code>010-5555-0123</code></td></tr>
+<tr><td><code>1234-5678</code></td><td><code>12345678</code></td><td><code>None</code> — 모르는 모양</td></tr></tbody></table>
+<ul><li><b>모르는 모양은 고치지 말고 <code>None</code></b> — 자릿수가 모자란 번호를 억지로 맞추면 틀린 번호가 돼요. 그런 줄은 그대로 두고 「사람이 볼 것」 으로 따로 알려요. 판단은 사람 몫이에요([[레슨:J0]])</li><li>전화번호를 <code>int</code> 로 바꾸지 마세요. 앞의 0 이 사라져요</li><li>이 함수도 글자 → 글자라서, 클립보드 없이 여러 모양을 넣어 시험할 수 있어요</li></ul>`,
+      example: { code: `import re
+
+
+def fix_phone(s):
+    """여러 모양의 전화번호 → 010-1234-5678 모양. 모르는 모양이면 None"""
+    d = re.sub(r"\\D", "", s)          # 숫자가 아닌 것을 모두 지우기
+    if d.startswith("82"):            # +82 10 … (나라 번호) → 010 …
+        d = "0" + d[2:]
+    if d.startswith("02") and len(d) in (9, 10):     # 서울 02
+        return d[:2] + "-" + d[2:-4] + "-" + d[-4:]
+    if d.startswith("0") and len(d) in (10, 11):     # 010 · 031 · 051 …
+        return d[:3] + "-" + d[3:-4] + "-" + d[-4:]
+    return None
+
+
+for s in ["010.1234.5678", "010 9876 5432", "(02) 345-6789", "02-3456-7890",
+          "+82 10-5555-0123", "031)123-4567", "01012345678", "1234-5678", "연락처 없음"]:
+    print(f"{s:>18} → {fix_phone(s)}")
+
+# 복사한 여러 줄을 한 줄씩 고치고, 모르는 모양은 그대로 두고 따로 알려 주기
+text = "김하늘 010.1234.5678\\n이도윤 +82 10 9876 5432\\n박서준 1234-5678\\n"
+fixed, unknown = [], []
+for line in text.splitlines():
+    parts = line.split()
+    name = parts[0]
+    phone = " ".join(parts[1:])
+    new = fix_phone(phone)
+    if new is None:
+        unknown.append(name)
+        fixed.append(line)
+    else:
+        fixed.append(name + " " + new)
+print("\\n".join(fixed))
+print("사람이 볼 것:", unknown)` } },
+    { title: 'pyautogui.hotkey("ctrl", "v") · os.startfile', html: `<p><code>pyautogui</code>(선택 설치)는 마우스를 움직이고 누르고, 키를 쳐요. 맛만 봐요. 메모장을 하나 열어 두고 돌려 보세요.</p>
+<pre>import time
+
+import pyautogui
+import pyperclip
+
+pyautogui.FAILSAFE = True      # 기본값 — 마우스를 화면 모서리로 밀면 멈춰요
+pyautogui.PAUSE = 0.5          # 동작마다 0.5초 쉬기(창이 따라올 틈)
+
+print(pyautogui.size())        # 화면 크기 — 예: Size(width=1920, height=1080)
+print(pyautogui.position())    # 지금 마우스 자리 — 누를 좌표 찾기
+
+print("3초 안에 메모장을 클릭해 두세요")
+time.sleep(3)
+pyautogui.write("Hello 2026", interval=0.05)   # 영어 · 숫자 · 기호만
+pyautogui.press("enter")
+pyperclip.copy("햇살 공방 수강생 여러분, 안녕하세요")
+pyautogui.hotkey("ctrl", "v")                 # 한글은 클립보드로 붙여 넣기</pre>
+<table class="kb"><tbody><tr><th>코드</th><th>하는 일</th></tr>
+<tr><td><code>pyautogui.size()</code> · <code>position()</code></td><td>화면 크기 · 지금 마우스 자리(왼쪽 위가 <code>(0, 0)</code>)</td></tr>
+<tr><td><code>moveTo(500, 300, duration=0.5)</code> · <code>click()</code> · <code>click(500, 300)</code></td><td>옮기기 · 누르기</td></tr>
+<tr><td><code>write("abc")</code> · <code>press("enter")</code></td><td>글자 치기 · 키 하나</td></tr>
+<tr><td><code>hotkey("ctrl", "v")</code></td><td>함께 누르기(Mac 은 <code>"command"</code>)</td></tr></tbody></table>
+<div class="bk-warn"><b>비상 정지 FAILSAFE 를 끄지 마세요</b> — 프로그램이 엉뚱하게 움직이면 마우스를 화면 모서리(보통 왼쪽 위)로 세게 밀어요. 다음 동작을 하려는 순간 <code>pyautogui.FailSafeException</code> 으로 멈춰요. 터미널에서 Ctrl+C 도 돼요. <code>FAILSAFE = False</code> 로 끄면 멈출 길이 없어져요.</div>
+<p><b>한글은 <code>write</code> 로 못 쳐요.</b> <code>write</code> 는 키를 하나씩 누르는 흉내라서, 키보드에 없는 한글은 빠지거나 입력기 상태에 따라 영어로 쳐져요. 한글은 클립보드에 넣고 <code>hotkey("ctrl", "v")</code> 로 붙여 넣어요.</p>
+<p><b>다 만든 파일 · 페이지 열어 주기</b> — 결과를 사람에게 바로 보여 줄 땐 키보드 흉내보다 이쪽이 훨씬 튼튼해요.</p>
+<pre>import os
+import webbrowser
+
+webbrowser.open("https://docs.python.org/ko/3/")   # 기본 브라우저로
+os.startfile("청구_정리.docx")     # Windows: 더블 클릭처럼 연결된 프로그램(Word)으로
+os.startfile("outbox")             # 폴더면 탐색기로</pre>
+<ul><li><code>os.startfile</code> 은 Windows 에만 있어요. Mac 은 <code>subprocess.run(["open", 경로])</code>, 리눅스는 <code>["xdg-open", 경로]</code>(<a href="../python/#lesson/L28" target="_blank" rel="noopener">파이썬 교과서 「환경 변수와 다른 프로그램: os · subprocess」 ↗</a>)</li><li>사람 없이 혼자 도는 스크립트([[레슨:J12]])에서는 열지 마세요. 볼 사람이 없어요</li><li>웹 페이지를 클릭 · 입력으로 다루는 일은 브라우저 자동화 도구 <b>Playwright</b> · <b>Selenium</b> 이 따로 있어요. 이름만 알아 두고, 될 수 있으면 그 서비스의 API 를 먼저 찾아요(<a href="../api/#lesson/H5" target="_blank" rel="noopener">HTTP·API·SDK 교과서 「requests 기본기」 ↗</a>)</li></ul>` },
+  ],
+  summary: ['화면 자동화는 마지막 수단 — 파일 · API 길을 먼저 찾고, pyperclip · pyautogui 는 이 레슨에서만 쓰는 선택 설치로 내가 지켜볼 때만 써요', '클립보드 프로그램은 읽기(pyperclip.paste) → 정리 함수 → 쓰기(copy) 모양이고, 가운데 정리 함수(복사한 표 \\t → csv.reader · 전화번호 re.sub(r"\\D", "", s))만 떼어 시험해요', 'pyautogui 는 FAILSAFE(마우스를 모서리로 = 비상 정지)를 켜 두고, 한글은 write 대신 클립보드 + hotkey("ctrl", "v") — 결과는 webbrowser.open · os.startfile 로 열어 줘요'] },
+{ id: 'J12', ch: 4, n: 12, title: '혼자 돌아가는 스크립트', mode: 'text',
+  tutorSummary: '예약으로 사람 없이 돌 스크립트 만들기(등록은 J13). 달라지는 셋: 현재 폴더가 다름(작업 스케줄러 「시작 위치」 를 비우면 C:\\Windows\\System32) → HERE = Path(__file__).parent 기준(L17B), input() 은 대답할 사람이 없음(창이 없으면 에러, stdin 이 비면 EOFError) → 설정 파일로, print · 트레이스백은 아무도 안 봄 → 로그 파일 · 끝 코드. subprocess.run([sys.executable, 스크립트], cwd=폴더, stdin=subprocess.DEVNULL) 로 다른 폴더에서 실행해 확인. 시험하기 쉽게 main(argv=None, base=None, now=None), base = HERE if base is None else Path(base). 설정: config.toml(TOML — key = 값, \'글자\' · "글자", true/false, [묶음] 은 딕셔너리 안 딕셔너리, # 주석), tomllib(3.11+, 읽기만) — load_config(path) 는 read_text(encoding="utf-8-sig")(BOM 도) → tomllib.loads, 파일 없음 · tomllib.TOMLDecodeError 는 내 예외 ConfigError 로. tomllib.load(f) 는 open(path, "rb"). 함정: 큰따옴표 안 \\ 는 탈출 — "C:\\Users\\me" 는 TOMLDecodeError: Invalid hex value (at line 2, column 18), "D:\\new\\temp" 는 에러 없이 줄바꿈 · 탭 → Windows 경로는 작은따옴표 \'C:\\Users\\me\' 또는 슬래시. 없어도 되는 값은 cfg.get("days", 7). 로그: basicConfig(L31) 대신 부품 — log = logging.getLogger(name), log.setLevel(logging.INFO), h = RotatingFileHandler(path, maxBytes=…, backupCount=3, encoding="utf-8")(from logging.handlers, 넘기 전에 .1 · .2 · .3 으로 밀고 더 오래된 건 지움), h.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s")), log.addHandler(h). setup_log 는 먼저 close_log(핸들러 removeHandler + close)로 두 번 달림(줄 중복) 막기, 끝나면 close_log(Windows 는 열린 파일 못 지움). 예제는 시각 없는 LOG_FORMAT. log.exception("…") 은 except 안에서 ERROR + 트레이스백, log.error("%s", e) 는 한 줄. 잠금: open(lock, "x") 는 없을 때만 만들기(있으면 FileExistsError) — exists() 로 묻고 만들면 사이에 끼어듦. take_lock 은 시작 시각 now.isoformat() 을 적음. @contextmanager run_lock(lock, now, stale=timedelta(hours=6)): 이미 있으면 적힌 시각을 fromisoformat(깨졌으면 ValueError → 오래된 것), now - started < stale 이면 AlreadyRunning(내 예외), 아니면 지우고 다시 잡고 지운 글자를 yield(as old), try: yield finally: unlink(missing_ok=True) 로 에러가 나도 풂. now 를 인자로 받아 datetime(2026, 11, 9, 9, 0) 으로 시험. 끝 코드: 작업 스케줄러 「마지막 실행 결과」 0x0 · 0x1, main 이 0 · 1 을 돌려주고 sys.exit(main()) (L19C). 잘 끝남 0, AlreadyRunning 은 WARNING + 0, ConfigError 는 ERROR 한 줄 + 1, 그 밖 Exception 은 맨 바깥 한 곳에서 log.exception + 1, finally 에서 close_log, 실패하면 notify(제목, 본문)으로 나에게 알림(J10 메일), now = datetime.now() if now is None else now.',
+  terms: { '예약 실행': '사람이 없을 때 정해진 시각에 프로그램이 저절로 돌게 하는 것. Windows 는 작업 스케줄러, 리눅스 · Mac 은 cron 이 불러 줘요', '돌려 쓰는 로그': '로그 파일이 정한 크기를 넘으면 새 파일로 바꾸고, 옛 파일은 몇 개만 남기고 지우는 방식(rotating log). 로그가 끝없이 커지지 않아요', '핸들러': '로그 줄을 어디로 보낼지 정하는 부품. 파일 · 화면 · 메일 등. 로거에 여러 개를 달 수 있어요', '잠금 파일': '「지금 돌고 있어요」 표시로 만들어 두는 파일. 있으면 두 번째 실행은 건너뛰고, 끝나면 지워요' },
+  pages: [
+    { title: 'Path(__file__).parent 기준 · input() 금지', html: `<p>[[레슨:J13]] 에서 스크립트를 작업 스케줄러에 걸어 <b>사람 없이</b> 돌릴 거예요. 그 전에 스크립트를 「혼자 돌아도 되는 모양」 으로 고쳐요. VS Code 에서 내가 돌릴 때와 셋이 달라요.</p>
+<table class="kb"><tbody><tr><th>VS Code 에서 내가 돌릴 때</th><th>[[예약 실행]]으로 혼자 돌 때</th><th>그래서</th></tr>
+<tr><td>현재 폴더 = 공부 폴더</td><td>현재 폴더가 달라요. 작업 스케줄러의 「시작 위치」 를 비우면 <code>C:\\Windows\\System32</code></td><td>파일은 <code>Path(__file__).parent</code> 기준</td></tr>
+<tr><td><code>input()</code> 에 내가 대답</td><td>대답할 사람이 없어요. 창이 없으면 에러, 창이 있으면 영영 기다려요</td><td>물어볼 값은 설정 파일로(다음 쪽)</td></tr>
+<tr><td>print · 빨간 트레이스백을 내가 봐요</td><td>아무도 안 봐요. 창이 떠도 끝나면 바로 닫혀요</td><td>로그 파일 · 끝 코드(이 레슨 뒤쪽)</td></tr></tbody></table>
+<pre>from pathlib import Path
+
+HERE = Path(__file__).parent          # 이 .py 파일이 있는 폴더
+config_path = HERE / "config.toml"    # 어디서 실행해도 같은 파일
+log_path = HERE / "weekly.log"</pre>
+<p>복습: 상대 경로는 .py 파일이 아니라 <b>현재 폴더</b> 기준이에요(<a href="../python/#lesson/L17B" target="_blank" rel="noopener">파이썬 교과서 「파일 2: 경로 · 인코딩」 ↗</a>). 예제는 스크립트를 임시 폴더에 만들고 <code>subprocess.run</code>(<a href="../python/#lesson/L28" target="_blank" rel="noopener">파이썬 교과서 「환경 변수와 다른 프로그램: os · subprocess」 ↗</a>)으로 <b>다른 폴더에서</b> 실행해 봐요. 처음 보는 인자가 둘 있어요.</p>
+<ul><li><code>cwd=폴더</code> — 그 폴더를 현재 폴더로 삼아 실행해요. 작업 스케줄러의 「시작 위치」 칸과 같아요</li><li><code>stdin=subprocess.DEVNULL</code> — 입력을 하나도 주지 않아요. 그러면 <code>input()</code> 은 기다리지 않고 <code>EOFError</code> 를 내요</li></ul>
+<div class="bk-warn"><b>시험하기 쉽게 base 인자로</b> — 진짜로 돌 때는 <code>HERE</code> 를 쓰고, 시험할 때는 임시 폴더를 넘기게 <code>main(argv=None, base=None, now=None)</code> 처럼 받아요. 첫 줄은 <code>base = HERE if base is None else Path(base)</code>. 지금 시각 <code>now</code> 도 같은 방식이에요(이 레슨 마지막 쪽).</div>`,
+      example: { code: `import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+# 예약으로 돌 스크립트 흉내 — 상대 경로와 __file__ 기준, 그리고 input()
+JOB = '''from pathlib import Path
+
+HERE = Path(__file__).parent
+print("현재 폴더:", Path.cwd().name)
+print("Path('config.toml') 있나:", Path("config.toml").exists())
+print("HERE / 'config.toml' 있나:", (HERE / "config.toml").exists())
+try:
+    answer = input("계속할까요? ")
+except EOFError:
+    print("input(): EOFError — 대답할 사람이 없어요")
+'''
+
+with tempfile.TemporaryDirectory() as tmp:
+    app = Path(tmp) / "auto-study"
+    other = Path(tmp) / "System32"       # 작업 스케줄러의 「시작 위치」 를 비우면 여기서 돌아요
+    app.mkdir()
+    other.mkdir()
+    (app / "job.py").write_text(JOB, encoding="utf-8")
+    (app / "config.toml").write_text("keep = 7\\n", encoding="utf-8")
+
+    for where in [app, other]:
+        r = subprocess.run([sys.executable, str(app / "job.py")], cwd=where,
+                           stdin=subprocess.DEVNULL, capture_output=True, text=True)
+        print(f"--- {where.name} 에서 실행 (끝 코드 {r.returncode})")
+        print(r.stdout.strip())` } },
+    { title: 'tomllib.loads · Windows 경로는 \'작은따옴표\'', html: `<p>폴더 경로 · 남길 백업 수 · 받는 사람처럼 <b>바뀔 수 있는 값</b>은 코드에 박지 말고 설정 파일에 둬요. 메모장으로 고치기 쉬운 TOML 형식의 <code>config.toml</code> 을 써요. 파이썬 3.11 부터 표준 <code>tomllib</code> 로 읽어요(읽기만 — 쓰는 기능은 없어요).</p>
+<pre># config.toml — 월요일 아침 자동 비서 설정
+keep = 7                  # 숫자
+send_mail = false         # true · false
+
+[folders]                 # 묶음 — 딕셔너리 안의 딕셔너리
+downloads = 'C:\\Users\\me\\Downloads'
+documents = 'C:\\Users\\me\\Documents\\공방'
+
+[mail]
+to = ["me@example.com"]   # 리스트</pre>
+<table class="kb"><tbody><tr><th>TOML</th><th>읽으면</th></tr>
+<tr><td><code>keep = 7</code></td><td><code>cfg["keep"]</code> 이 <code>7</code>(int)</td></tr>
+<tr><td><code>'글자'</code> · <code>"글자"</code></td><td>str</td></tr>
+<tr><td><code>true</code> · <code>false</code></td><td><code>True</code> · <code>False</code></td></tr>
+<tr><td><code>["a", "b"]</code></td><td>list</td></tr>
+<tr><td><code>[folders]</code> 아래 줄들</td><td><code>cfg["folders"]["downloads"]</code></td></tr>
+<tr><td><code># …</code></td><td>주석 — JSON 과 달리 설명을 적어 둘 수 있어요</td></tr></tbody></table>
+<pre>class ConfigError(Exception):
+    pass
+
+
+def load_config(path):
+    """config.toml → 딕셔너리. 없거나 글이 틀리면 ConfigError"""
+    path = Path(path)
+    try:
+        text = path.read_text(encoding="utf-8-sig")
+    except FileNotFoundError:
+        raise ConfigError(f"설정 파일이 없어요: {path.name}")
+    try:
+        return tomllib.loads(text)
+    except tomllib.TOMLDecodeError as e:
+        raise ConfigError(f"{path.name} 의 글이 틀렸어요: {e}")</pre>
+<ul><li><code>tomllib.loads(글자)</code> 로 읽어요. 파일을 바로 읽는 <code>tomllib.load(f)</code> 도 있는데, 그땐 <code>open(path, "rb")</code>(바이트로 열기)여야 해요. 이 교과서는 <code>read_text(encoding="utf-8-sig")</code> — 옛 메모장이 파일 앞에 BOM 을 붙여 저장해도 읽혀요(L29)</li><li>파일이 없거나 글이 틀리면 내 예외 <code>ConfigError</code> 로 바꿔 던져요(<a href="../python/#lesson/L15C" target="_blank" rel="noopener">파이썬 교과서 「내 예외 만들기: raise」 ↗</a>). 부르는 쪽은 이 하나만 잡으면 돼요</li><li>없어도 되는 값은 <code>cfg.get("days", 7)</code> 처럼 기본값으로 꺼내요</li></ul>
+<div class="bk-warn"><b>Windows 경로는 작은따옴표</b> — TOML 의 큰따옴표 글자는 파이썬처럼 <code>\\</code> 를 탈출 글자로 읽어요. <code>"C:\\Users\\me"</code> 는 <code>\\U</code>(글자 번호) 자리에 <code>sers…</code> 가 와서 <code>TOMLDecodeError: Invalid hex value (at line 2, column 18)</code>. 더 나쁜 건 <code>"D:\\new\\temp"</code> — <code>\\n</code> · <code>\\t</code> 는 맞는 탈출 글자라 <b>에러 없이</b> 줄바꿈 · 탭이 들어가요. 작은따옴표 <code>'C:\\Users\\me'</code> 는 쓴 그대로예요. 슬래시로 쓴 <code>"C:/Users/me"</code> 도 Windows 가 알아들어요.</div>
+<p>에러의 <code>at line 2, column 18</code> 은 「2번째 줄 18번째 글자」 예요. 메모장 아래 상태 표시줄의 줄 · 열로 찾아가요.</p>
+<p>예제는 TOML 글을 파이썬 글자로 적으려고 <code>r&#39;&#39;&#39;…&#39;&#39;&#39;</code> 를 써요. 따옴표 셋은 여러 줄 글자, 앞의 <code>r</code> 은 정규식에서 본 <code>r"…"</code> 처럼 <code>\\</code> 를 파이썬이 건드리지 않고 그대로 두는 표시예요. 그래야 TOML 쪽에 <code>\\</code> 가 그대로 가요.</p>`,
+      example: { code: `import tempfile
+import tomllib
+from pathlib import Path
+
+
+class ConfigError(Exception):
+    pass
+
+
+def load_config(path):
+    """config.toml → 딕셔너리. 없거나 글이 틀리면 ConfigError"""
+    path = Path(path)
+    try:
+        text = path.read_text(encoding="utf-8-sig")   # 메모장이 붙인 BOM 도 벗겨요
+    except FileNotFoundError:
+        raise ConfigError(f"설정 파일이 없어요: {path.name}")
+    try:
+        return tomllib.loads(text)
+    except tomllib.TOMLDecodeError as e:
+        raise ConfigError(f"{path.name} 의 글이 틀렸어요: {e}")
+
+
+GOOD = r'''# 월요일 아침 자동 비서 설정
+keep = 7                 # 남길 백업 수
+send_mail = false
+
+[folders]
+downloads = 'C:\\Users\\me\\Downloads'
+documents = 'C:\\Users\\me\\Documents\\공방'
+
+[mail]
+to = ["me@example.com"]
+'''
+BAD = r'''[folders]
+downloads = "C:\\Users\\me\\Downloads"
+'''
+QUIET = r'''backup = "D:\\new\\temp"'''
+
+with tempfile.TemporaryDirectory() as tmp:
+    p = Path(tmp) / "config.toml"
+    try:
+        load_config(p)
+    except ConfigError as e:
+        print("ConfigError:", e)
+
+    p.write_text(GOOD, encoding="utf-8")
+    cfg = load_config(p)
+    print(cfg)
+    print(cfg["keep"] + 1, type(cfg["send_mail"]).__name__, cfg["mail"]["to"][0])
+    print(cfg["folders"]["downloads"])
+    print("days:", cfg.get("days", 7))         # 없는 키는 기본값
+
+    # ① 큰따옴표 안의 \\U 는 글자 번호 탈출(\\U0001F600 같은)로 읽혀서 에러
+    p.write_text(BAD, encoding="utf-8")
+    try:
+        load_config(p)
+    except ConfigError as e:
+        print("ConfigError:", e)
+
+# ② 더 나쁜 경우: \\n · \\t 는 맞는 탈출 글자라 에러 없이 줄바꿈 · 탭이 들어가요
+value = tomllib.loads(QUIET)["backup"]
+print("줄바꿈이 들어갔나:", "\\n" in value, "| 글자 수:", len(value))` } },
+    { title: 'RotatingFileHandler · log.exception', html: `<p>복습: <a href="../python/#lesson/L31" target="_blank" rel="noopener">파이썬 교과서 「logging 맛보기」 ↗</a> 에서 <code>basicConfig(filename="app.log", …)</code> 로 파일에 남겼어요. 몇 달 · 몇 년 혼자 도는 스크립트에는 둘이 더 필요해요.</p>
+<ul><li><b>파일이 끝없이 커지지 않게</b> — [[돌려 쓰는 로그]] <code>RotatingFileHandler</code></li><li><b>에러의 트레이스백까지 남기기</b> — 터미널을 아무도 안 보니까 로그에: <code>log.exception</code></li></ul>
+<p><code>basicConfig</code> 는 한 줄로 다 정하는 지름길이었어요. 이번에는 부품을 직접 이어요.</p>
+<table class="kb"><tbody><tr><th>부품</th><th>하는 일</th></tr>
+<tr><td><code>log = logging.getLogger("weekly")</code></td><td>이름 붙은 로거(L31)</td></tr>
+<tr><td><code>log.setLevel(logging.INFO)</code></td><td>INFO 이상만 남기기 — basicConfig 의 <code>level=</code></td></tr>
+<tr><td><code>RotatingFileHandler(path, maxBytes=1_000_000, backupCount=3, encoding="utf-8")</code></td><td>[[핸들러]]. 파일이 1MB 를 넘기 전에 <code>weekly.log</code> 를 <code>weekly.log.1</code> 로 밀고 새로 시작해요. 옛 파일은 <code>.1</code> · <code>.2</code> · <code>.3</code> 셋까지만, 더 오래된 건 지워요</td></tr>
+<tr><td><code>h.setFormatter(logging.Formatter(fmt))</code></td><td>줄 모양 — basicConfig 의 <code>format=</code></td></tr>
+<tr><td><code>log.addHandler(h)</code> · <code>log.removeHandler(h)</code> · <code>h.close()</code></td><td>로거에 달기 · 떼기 · 파일 닫기</td></tr></tbody></table>
+<pre>from logging.handlers import RotatingFileHandler
+
+LOG_FORMAT = "%(levelname)s %(message)s"   # 진짜 스크립트는 "%(asctime)s %(levelname)s %(message)s"
+
+
+def close_log(log):
+    """로거에 단 파일을 닫고 떼기 — Windows 는 열린 파일을 못 지워요"""
+    for h in list(log.handlers):
+        log.removeHandler(h)
+        h.close()
+
+
+def setup_log(path, name="job", fmt=LOG_FORMAT, max_bytes=1_000_000, backups=3):
+    """path 에 돌려 쓰는 로그 파일을 단 로거. 다시 불러도 줄이 두 번 남지 않아요"""
+    log = logging.getLogger(name)
+    close_log(log)
+    log.setLevel(logging.INFO)
+    h = RotatingFileHandler(path, maxBytes=max_bytes, backupCount=backups, encoding="utf-8")
+    h.setFormatter(logging.Formatter(fmt))
+    log.addHandler(h)
+    return log</pre>
+<ul><li><code>1_000_000</code> 은 <code>1000000</code> 이에요. 숫자 사이 밑줄은 읽기 쉽게 끊어 쓴 것뿐이에요</li><li><code>setup_log</code> 가 먼저 <code>close_log</code> 를 부르는 까닭 — 같은 이름의 로거에 핸들러를 두 번 달면 <b>줄이 두 번씩</b> 남아요</li><li>끝나면 꼭 <code>close_log(log)</code>. Windows 는 열려 있는 파일을 지우거나 이름을 못 바꿔서, 임시 폴더를 지울 때 <code>PermissionError</code> 가 나요</li><li>예제는 늘 같은 출력이 나오게 <code>%(asctime)s</code>(시각)를 뺐어요. 진짜 스크립트는 시각을 꼭 넣으세요</li></ul>
+<p><code>log.exception("…")</code> 은 <code>except</code> 블록 안에서 불러요. ERROR 단계로 한 줄 남기고, 그 아래에 <b>트레이스백 전체</b>를 붙여요. <code>log.error("%s", e)</code> 는 에러 한 줄뿐이에요. 예상 못 한 버그는 트레이스백이 있어야 어느 줄인지 알아요.</p>
+<pre>try:
+    each = total // people
+except ZeroDivisionError:
+    log.exception("1인당 금액 계산 실패")   # ERROR 줄 + Traceback … + ZeroDivisionError: …</pre>`,
+      example: { code: `import logging
+import tempfile
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+
+LOG_FORMAT = "%(levelname)s %(message)s"   # 진짜 스크립트는 "%(asctime)s %(levelname)s %(message)s"
+
+
+def close_log(log):
+    """로거에 단 파일을 닫고 떼기 — Windows 는 열린 파일을 못 지워요"""
+    for h in list(log.handlers):
+        log.removeHandler(h)
+        h.close()
+
+
+def setup_log(path, name="job", fmt=LOG_FORMAT, max_bytes=1_000_000, backups=3):
+    """path 에 돌려 쓰는 로그 파일을 단 로거. 다시 불러도 줄이 두 번 남지 않아요"""
+    log = logging.getLogger(name)
+    close_log(log)
+    log.setLevel(logging.INFO)
+    h = RotatingFileHandler(path, maxBytes=max_bytes, backupCount=backups, encoding="utf-8")
+    h.setFormatter(logging.Formatter(fmt))
+    log.addHandler(h)
+    return log
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+
+    # ① 돌려 쓰기: 100바이트를 넘기 전에 새 파일로, 옛 파일은 .1 · .2 로 밀려요
+    log = setup_log(base / "job.log", max_bytes=100, backups=2)
+    for i in range(1, 11):
+        log.info("%02d번째 실행 끝", i)         # %02d = 두 자리 숫자(01, 02 …)
+    close_log(log)
+    for p in sorted(base.iterdir()):
+        lines = p.read_text(encoding="utf-8").splitlines()
+        print(p.name, len(lines), "줄:", lines[0], "…", lines[-1])
+
+    # ② log.exception — except 안에서 부르면 트레이스백까지 남겨요
+    log = setup_log(base / "error.log")
+    classes = {"가죽 공예": (540000, 3), "도자기": (0, 0)}   # 수업: (수강료 합계, 수강생 수)
+    for name, pair in classes.items():
+        total, people = pair
+        try:
+            log.info("%s 1인당 %d원", name, total // people)
+        except ZeroDivisionError:
+            log.exception("%s 1인당 금액 계산 실패", name)
+    log.info("다음 일로 넘어가요")
+    close_log(log)
+
+    lines = (base / "error.log").read_text(encoding="utf-8").splitlines()
+    print("error.log:")
+    for line in lines:
+        if not line.startswith(" "):     # 들여 쓴 줄(파일 경로 · 코드)은 PC 마다 달라서 빼고 찍어요
+            print("  ", line)` } },
+    { title: 'open(lock, "x") · @contextmanager 잠금', html: `<p>월요일 9시에 시작한 일이 길어져 아직 도는데, 누가 「지금 실행」 을 또 누르면? 둘이 같은 zip 에 쓰고 같은 파일을 옮겨서 엉망이 돼요. 그래서 시작할 때 [[잠금 파일]]을 만들고, 이미 있으면 멈춰요.</p>
+<p>열기 모드 <code>"x"</code> 는 「<b>없을 때만</b> 새로 만들기」 예요. 이미 있으면 <code>FileExistsError</code>. <code>"w"</code> 처럼 덮어쓰지 않아요.</p>
+<pre>def take_lock(lock, now):
+    with open(lock, "x", encoding="utf-8") as f:
+        f.write(now.isoformat())</pre>
+<div class="bk-warn"><b>exists() 로 묻고 만들면 안 돼요</b> — <code>if not lock.exists(): lock.write_text(…)</code> 는 묻는 순간과 만드는 순간 사이에 다른 하나가 끼어들 수 있어요. <code>"x"</code> 는 운영체제가 묻기와 만들기를 <b>한 번에</b> 해서 둘 중 하나만 이겨요.</div>
+<p>잠금은 꼭 풀어야 해요. 일하다 에러가 나서 안 지우면 다음 주부터 영영 「이미 도는 중」 이에요. 복습: <a href="../python/#lesson/L34" target="_blank" rel="noopener">파이썬 교과서 「with 직접 만들기: 컨텍스트 매니저」 ↗</a> 의 <code>@contextmanager</code> 로 감싸고, <code>try: yield … finally:</code> 에서 지워요.</p>
+<pre>class AlreadyRunning(Exception):
+    pass
+
+
+@contextmanager
+def run_lock(lock, now, stale=timedelta(hours=6)):
+    """두 번 겹쳐 돌지 않게. 돌고 있으면 AlreadyRunning, stale 보다 오래된 잠금은 지우고 그 글자를 as 로"""
+    lock = Path(lock)
+    old = None
+    try:
+        take_lock(lock, now)
+    except FileExistsError:
+        text = lock.read_text(encoding="utf-8").strip()
+        try:
+            started = datetime.fromisoformat(text)
+        except ValueError:
+            started = None
+        if started is not None and now - started &lt; stale:
+            raise AlreadyRunning(f"이미 돌고 있어요({text} 시작)")
+        old = text or "(빈 잠금)"
+        lock.unlink()
+        take_lock(lock, now)
+    try:
+        yield old
+    finally:
+        lock.unlink(missing_ok=True)</pre>
+<ul><li>이미 도는 중이면 <code>yield</code> 전에 내 예외 <code>AlreadyRunning</code> 을 던져요. with 블록은 아예 돌지 않아요</li><li><b>남은 잠금</b> — 도는 중에 전원이 꺼지면 <code>finally</code> 도 못 돌아 잠금이 남아요. 그래서 잠금에 시작 시각을 적어 두고, <code>now - started</code> 가 <code>stale</code>(기본 6시간)을 넘으면 오래된 것으로 보고 지운 뒤 시작해요. 지운 잠금의 글자를 <code>as old</code> 로 돌려줘서 로그에 남겨요</li><li>잠금이 비었거나 깨졌으면(쓰다가 꺼짐) <code>fromisoformat</code> 이 <code>ValueError</code> — 그것도 오래된 것으로 봐요</li><li>지금 시각은 <code>now</code> 인자로 받아요. 그래서 6시간을 기다리지 않고 <code>datetime(2026, 11, 9, 9, 0)</code> 을 넘겨 시험해요</li></ul>`,
+      example: { code: `import tempfile
+from contextlib import contextmanager
+from datetime import datetime, timedelta
+from pathlib import Path
+
+
+class AlreadyRunning(Exception):
+    pass
+
+
+def take_lock(lock, now):
+    with open(lock, "x", encoding="utf-8") as f:   # "x": 없을 때만 새로 만들기, 있으면 FileExistsError
+        f.write(now.isoformat())
+
+
+@contextmanager
+def run_lock(lock, now, stale=timedelta(hours=6)):
+    """두 번 겹쳐 돌지 않게. 돌고 있으면 AlreadyRunning, stale 보다 오래된 잠금은 지우고 그 글자를 as 로"""
+    lock = Path(lock)
+    old = None
+    try:
+        take_lock(lock, now)
+    except FileExistsError:
+        text = lock.read_text(encoding="utf-8").strip()
+        try:
+            started = datetime.fromisoformat(text)
+        except ValueError:                  # 쓰다가 전원이 꺼져 비었거나 깨진 잠금
+            started = None
+        if started is not None and now - started < stale:
+            raise AlreadyRunning(f"이미 돌고 있어요({text} 시작)")
+        old = text or "(빈 잠금)"
+        lock.unlink()
+        take_lock(lock, now)
+    try:
+        yield old
+    finally:
+        lock.unlink(missing_ok=True)       # 에러가 나도 잠금을 풀어요
+
+
+now = datetime(2026, 11, 9, 9, 0)
+with tempfile.TemporaryDirectory() as tmp:
+    lock = Path(tmp) / "weekly.lock"
+
+    # ① 보통: 들어가면 생기고, 나오면 지워져요
+    with run_lock(lock, now) as old:
+        print("① 안:", lock.exists(), lock.read_text(encoding="utf-8"), old)
+        # ② 도는 중에 하나가 더 시작하면
+        try:
+            with run_lock(lock, now + timedelta(minutes=3)):
+                print("여기는 안 와요")
+        except AlreadyRunning as e:
+            print("② AlreadyRunning:", e)
+    print("① 나온 뒤:", lock.exists())
+
+    # ③ 블록 안에서 에러가 나도 finally 가 잠금을 지워요
+    try:
+        with run_lock(lock, now):
+            raise ValueError("청구서 폴더가 비었어요")
+    except ValueError as e:
+        print("③ ValueError:", e, "| 잠금 남았나:", lock.exists())
+
+    # ④ 지난주에 전원이 꺼져 남은 잠금 — 6시간보다 오래돼서 지우고 시작
+    lock.write_text("2026-11-02T09:00:00", encoding="utf-8")
+    with run_lock(lock, now) as old:
+        print("④ 지운 잠금:", old, "| 새 잠금:", lock.read_text(encoding="utf-8"))
+    print("④ 나온 뒤:", lock.exists())` } },
+    { title: 'sys.exit(main()) · 끝 코드 · now 인자', html: `<p>작업 스케줄러는 스크립트가 끝나며 남긴 끝 코드를 「마지막 실행 결과」 칸에 <code>0x0</code>(성공) · <code>0x1</code>(실패)로 보여 줘요([[레슨:J13]]). 복습: <a href="../python/#lesson/L19C" target="_blank" rel="noopener">파이썬 교과서 「명령 줄 프로그램 2: 하위 명령 · 끝 코드」 ↗</a> — <code>main</code> 이 0 · 1 을 돌려주고, 맨 아래 <code>sys.exit(main())</code> 이 그 수를 끝 코드로 남겨요.</p>
+<p>혼자 도는 스크립트의 <code>main</code> 은 일어난 일마다 로그와 끝 코드를 정해 둬요.</p>
+<table class="kb"><tbody><tr><th>일어난 일</th><th>로그</th><th>끝 코드</th></tr>
+<tr><td>잘 끝남</td><td>INFO 시작 · 결과</td><td><code>0</code></td></tr>
+<tr><td>다른 하나가 도는 중 <code>AlreadyRunning</code></td><td>WARNING 건너뜀</td><td><code>0</code> — 실패가 아니라 할 일이 없었던 것</td></tr>
+<tr><td>설정이 틀림 <code>ConfigError</code></td><td>ERROR 한 줄 — 내가 고칠 설정이라 트레이스백은 필요 없어요</td><td><code>1</code> + 알림</td></tr>
+<tr><td>예상 못 한 에러(그 밖의 <code>Exception</code>)</td><td><code>log.exception</code> — 트레이스백까지</td><td><code>1</code> + 알림</td></tr></tbody></table>
+<pre>def main(argv=None, base=None, now=None, notify=None):
+    base = HERE if base is None else Path(base)        # 스크립트 폴더 기준
+    now = datetime.now() if now is None else now       # 시험할 땐 now 를 넘겨요
+    parser = argparse.ArgumentParser(prog="weekly.py")
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args(argv)
+
+    log = setup_log(base / "weekly.log", name="weekly")
+    code = 1
+    try:
+        cfg = load_config(base / "config.toml")
+        with run_lock(base / "weekly.lock", now) as old:
+            if old:
+                log.warning("오래된 잠금(%s)을 지우고 시작해요", old)
+            mode = " (미리 보기)" if args.dry_run else ""
+            log.info("시작 %s%s", now.strftime("%Y-%m-%d %H:%M"), mode)
+            folder = base / cfg["folders"]["downloads"]
+            names = recent_files(folder, now, cfg.get("days", 7))
+            log.info("지난 %d일 새 파일 %d개: %s", cfg.get("days", 7), len(names), ", ".join(names))
+        code = 0
+    except AlreadyRunning as e:
+        log.warning("%s — 이번에는 건너뛰어요", e)
+        code = 0
+    except ConfigError as e:
+        log.error("%s", e)                       # 내가 고칠 설정 — 트레이스백은 필요 없어요
+    except Exception:
+        log.exception("예상 못 한 에러로 멈췄어요")   # 버그 — 트레이스백까지
+    finally:
+        close_log(log)
+    if code != 0 and notify:
+        notify("[weekly.py] 실패", "weekly.log 를 열어 보세요")
+    return code
+
+
+if __name__ == "__main__":
+    sys.exit(main())</pre>
+<ul><li>맨 바깥의 <code>except Exception:</code> — 평소에는 잡을 에러를 좁게 쓰지만, 혼자 도는 스크립트의 <b>맨 바깥 한 곳</b>만은 다 잡아 로그에 남겨요. 안 그러면 트레이스백이 아무도 안 보는 화면으로 가요</li><li><code>finally: close_log(log)</code> — 어느 길로 나가도 로그 파일을 닫아요</li><li><b>실패하면 나에게 알림</b> — 로그는 내가 열어 봐야 보여요. 실패했을 때만 [[레슨:J10]] 의 메일 보내기로 나에게 한 통 보내게 <code>notify</code> 함수를 넘겨요. 예제는 찍기만 하는 가짜를 넘겨요</li><li><code>now = datetime.now() if now is None else now</code> — 진짜로 돌 때만 지금 시각을 쓰고, 시험할 땐 <code>now</code> 를 넘겨요. 「지난 7일」 같은 계산이 늘 같은 답이 나와요. 수정 시각 읽기는 [[레슨:J1]]</li></ul>`,
+      example: { code: `import tempfile
+from samples import make_files
+import argparse
+import logging
+import sys
+import tomllib
+from contextlib import contextmanager
+from datetime import datetime, timedelta
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+
+HERE = Path(__file__).parent
+LOG_FORMAT = "%(levelname)s %(message)s"   # 진짜 스크립트는 "%(asctime)s %(levelname)s %(message)s"
+
+
+class ConfigError(Exception):
+    pass
+
+
+class AlreadyRunning(Exception):
+    pass
+
+
+def load_config(path):
+    """config.toml → 딕셔너리. 없거나 글이 틀리면 ConfigError"""
+    path = Path(path)
+    try:
+        text = path.read_text(encoding="utf-8-sig")
+    except FileNotFoundError:
+        raise ConfigError(f"설정 파일이 없어요: {path.name}")
+    try:
+        return tomllib.loads(text)
+    except tomllib.TOMLDecodeError as e:
+        raise ConfigError(f"{path.name} 의 글이 틀렸어요: {e}")
+
+
+def close_log(log):
+    """로거에 단 파일을 닫고 떼기 — Windows 는 열린 파일을 못 지워요"""
+    for h in list(log.handlers):
+        log.removeHandler(h)
+        h.close()
+
+
+def setup_log(path, name="job", fmt=LOG_FORMAT, max_bytes=1_000_000, backups=3):
+    """path 에 돌려 쓰는 로그 파일을 단 로거. 다시 불러도 줄이 두 번 남지 않아요"""
+    log = logging.getLogger(name)
+    close_log(log)
+    log.setLevel(logging.INFO)
+    h = RotatingFileHandler(path, maxBytes=max_bytes, backupCount=backups, encoding="utf-8")
+    h.setFormatter(logging.Formatter(fmt))
+    log.addHandler(h)
+    return log
+
+
+def take_lock(lock, now):
+    with open(lock, "x", encoding="utf-8") as f:
+        f.write(now.isoformat())
+
+
+@contextmanager
+def run_lock(lock, now, stale=timedelta(hours=6)):
+    """두 번 겹쳐 돌지 않게. 돌고 있으면 AlreadyRunning, stale 보다 오래된 잠금은 지우고 그 글자를 as 로"""
+    lock = Path(lock)
+    old = None
+    try:
+        take_lock(lock, now)
+    except FileExistsError:
+        text = lock.read_text(encoding="utf-8").strip()
+        try:
+            started = datetime.fromisoformat(text)
+        except ValueError:
+            started = None
+        if started is not None and now - started < stale:
+            raise AlreadyRunning(f"이미 돌고 있어요({text} 시작)")
+        old = text or "(빈 잠금)"
+        lock.unlink()
+        take_lock(lock, now)
+    try:
+        yield old
+    finally:
+        lock.unlink(missing_ok=True)
+def recent_files(folder, now, days):
+    """folder 에서 지난 days 일 안에 바뀐 파일 이름(복습: 수정 시각 — 레슨 J1)"""
+    since = now - timedelta(days=days)
+    names = []
+    for p in sorted(folder.iterdir()):
+        when = datetime.fromtimestamp(p.stat().st_mtime)
+        if p.is_file() and when >= since:
+            names.append(p.name)
+    return names
+
+
+def main(argv=None, base=None, now=None, notify=None):
+    base = HERE if base is None else Path(base)        # 스크립트 폴더 기준
+    now = datetime.now() if now is None else now       # 시험할 땐 now 를 넘겨요
+    parser = argparse.ArgumentParser(prog="weekly.py")
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args(argv)
+
+    log = setup_log(base / "weekly.log", name="weekly")
+    code = 1
+    try:
+        cfg = load_config(base / "config.toml")
+        with run_lock(base / "weekly.lock", now) as old:
+            if old:
+                log.warning("오래된 잠금(%s)을 지우고 시작해요", old)
+            mode = " (미리 보기)" if args.dry_run else ""
+            log.info("시작 %s%s", now.strftime("%Y-%m-%d %H:%M"), mode)
+            folder = base / cfg["folders"]["downloads"]
+            names = recent_files(folder, now, cfg.get("days", 7))
+            log.info("지난 %d일 새 파일 %d개: %s", cfg.get("days", 7), len(names), ", ".join(names))
+        code = 0
+    except AlreadyRunning as e:
+        log.warning("%s — 이번에는 건너뛰어요", e)
+        code = 0
+    except ConfigError as e:
+        log.error("%s", e)                       # 내가 고칠 설정 — 트레이스백은 필요 없어요
+    except Exception:
+        log.exception("예상 못 한 에러로 멈췄어요")   # 버그 — 트레이스백까지
+    finally:
+        close_log(log)
+    if code != 0 and notify:
+        notify("[weekly.py] 실패", "weekly.log 를 열어 보세요")
+    return code
+
+
+def show_log(base):
+    for line in (base / "weekly.log").read_text(encoding="utf-8").splitlines():
+        if not line.startswith(" "):
+            print("   ", line)
+
+
+def alert(subject, body):           # 진짜는 나에게 메일(레슨 J10) — 여기서는 찍기만
+    print("  [알림]", subject)
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    base = Path(tmp)
+    make_files(base / "Downloads")
+    now = datetime(2026, 11, 9, 9, 0)    # 월요일 아침 9시
+
+    cfg = base / "config.toml"
+    cfg.write_text("days = 7\\n[folders]\\ndownloads = 'Downloads'\\n", encoding="utf-8")
+    print("① 보통:", main([], base, now, notify=alert))
+
+    (base / "weekly.lock").write_text("2026-11-09T08:58:00", encoding="utf-8")
+    print("② 다른 하나가 도는 중:", main([], base, now, notify=alert))
+    (base / "weekly.lock").unlink()
+
+    cfg.write_text('[folders]\\ndownloads = "C:\\\\Users\\\\me\\\\Downloads"\\n', encoding="utf-8")
+    print("③ 설정 글이 틀림:", main([], base, now, notify=alert))
+
+    cfg.write_text("days = '7'\\n[folders]\\ndownloads = 'Downloads'\\n", encoding="utf-8")
+    print("④ 숫자 자리에 글자:", main(["--dry-run"], base, now, notify=alert))
+    show_log(base)
+    print("남은 잠금:", (base / "weekly.lock").exists())
+
+
+# 진짜로 돌릴 때(작업 스케줄러가 부를 때)는 맨 아래 두 줄:
+# if __name__ == "__main__":
+#     sys.exit(main())`, prep: [SAMPLES_PREP] } },
+  ],
+  summary: ['예약으로 혼자 돌면 현재 폴더 · input() · 화면이 달라져요 — 파일은 Path(__file__).parent 기준, 값은 config.toml(tomllib, Windows 경로는 작은따옴표), 결과는 로그 파일로', '로그는 RotatingFileHandler 로 크기를 넘기 전에 돌려 쓰고, 예상 못 한 에러는 맨 바깥 except 에서 log.exception 으로 트레이스백까지 남겨요 — 끝나면 close_log', '두 번 겹쳐 돌지 않게 open(lock, "x") 잠금을 @contextmanager 로 감싸 finally 에서 지우고, main 은 0 · 1 을 돌려 sys.exit(main()) — 시각은 now 인자로 받아 시험해요'] },
 { id: 'J13', ch: 4, n: 13, title: '정해진 시간에 돌리기', mode: 'text',
   tutorSummary: "정해진 시간에 스크립트 돌리기. Windows 작업 스케줄러(taskschd.msc) → 기본 작업 만들기 → 트리거(매주 월 09:00) → 동작 「프로그램 시작」: 프로그램/스크립트 = 가상 환경의 .venv\\Scripts\\pythonw.exe(창 없음, print 는 어디에도 안 나가 로그 파일이 유일한 기록, 경로는 sys.executable 로 확인), 인수 = weekly.py, 시작 위치 = 스크립트 폴더(비우면 C:\\Windows\\System32 에서 돌아 스크립트를 못 찾아 0x2). 「실행」 → F5 → 마지막 실행 결과 0x0(끝 코드 0) · 0x1(return 1 · 잡지 못한 에러) · 0x2(파일 못 찾음 · argparse 거절) · 0x41301(도는 중) · 0x41303(아직 안 돎). 「모든 작업 기록 사용」 으로 기록 탭 켜기. 속성: 조건 탭 AC 전원 칸 해제(노트북), 설정 탭 「예약된 시작 시간을 놓친 경우 가능한 대로 빨리 작업 시작」 체크, 이미 실행 중이면 새 인스턴스 시작 안 함, 오래 돌면 중지. 명령: schtasks /Create /SC WEEKLY /D MON /ST 09:00 /TN \"햇살공방\\월요일비서\" /TR \"pythonw.exe 전체경로 스크립트 전체경로\" /F · /Query /V /FO LIST · /Run · /Delete /F — schtasks 에는 시작 위치가 없어 전체 경로 + Path(__file__).parent 기준. macOS · 리눅스는 cron(리눅스 교과서 U14), PATH 가 짧아 sys.executable 의 절대 경로를 적는다. 파이썬 쪽은 표준만: next_run(now, \"09:00\", weekdays={0, 1, 2, 3, 4}) — 오늘 그 시각에서 시작해 t <= now 이거나 요일이 아니면 timedelta(days=1) 씩, 월말은 calendar.monthrange(연, 월) = (1일의 요일, 날 수), 마지막 평일은 말일에서 주말을 거꾸로 건너뜀. 놓친 실행: last_run.json 에 마지막 성공 시각(isoformat · datetime.fromisoformat), due(last, now) = last 가 None 이거나 next_run(last) <= now, 놓친 횟수 missed, 따라잡기는 한 번에 기간을 넓혀서. while True + time.sleep 이나 schedule 패키지는 프로그램이 계속 켜져 있어야 해서 맛보기만 — 기다리기는 OS, 판단은 파이썬.",
   terms: {"작업 스케줄러": "Windows 에 들어 있는 예약 실행 프로그램(taskschd.msc). 정한 때에 프로그램을 대신 실행해 줘요", "트리거": "작업을 언제 시작할지 정한 조건 — 매일 · 매주 · 매월 · 로그온할 때 등", "동작": "트리거가 오면 할 일. 파이썬 스크립트는 늘 「프로그램 시작」 이에요"},
