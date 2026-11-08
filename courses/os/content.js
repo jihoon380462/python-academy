@@ -573,9 +573,9 @@ for _ in range(5):
     recent.append(b"x" * (10 * 1024 * 1024))
 kept = rss_mb() - start
 print("다 모으면 40MB 넘게 늘었나요?", leak &gt; 40)
-print("최근 2개만 두면 30MB 안쪽인가요?", kept &lt; 30)</pre>
+print("최근 2개만 두면 35MB 안쪽인가요?", kept &lt; 35)</pre>
 <p><code>deque(maxlen=2)</code> 는 3번째를 넣으면 가장 오래된 것을 스스로 버려요. 딕셔너리로 만든 캐시라면 딕셔너리가 넣은 순서를 기억하니까, 너무 커질 때 <code>next(iter(cache))</code>(가장 먼저 넣은 키)를 <code>del cache[key]</code> 로 지우면 같은 효과예요. 도는 프로그램이 새는지는 터미널에서 <code>watch -n 1 grep VmRSS /proc/PID/status</code> 로 1초마다 RSS 를 보면 알 수 있어요 — 일이 끝나도 숫자가 계속 오르기만 하면 의심해요.</p>` + OS_DATE,
-      example: { code: 'from collections import deque\ndef rss_mb():\n    with open("/proc/self/status") as f:\n        for line in f:\n            if line.startswith("VmRSS:"):\n                return int(line.split()[1]) / 1024\nstart = rss_mb()\nhistory = []\nfor _ in range(5):\n    history.append(b"x" * (10 * 1024 * 1024))\nleak = rss_mb() - start\nhistory = None\nstart = rss_mb()\nrecent = deque(maxlen=2)\nfor _ in range(5):\n    recent.append(b"x" * (10 * 1024 * 1024))\nkept = rss_mb() - start\nprint("다 모으면 40MB 넘게 늘었나요?", leak > 40)\nprint("최근 2개만 두면 30MB 안쪽인가요?", kept < 30)' } },
+      example: { code: 'from collections import deque\ndef rss_mb():\n    with open("/proc/self/status") as f:\n        for line in f:\n            if line.startswith("VmRSS:"):\n                return int(line.split()[1]) / 1024\nstart = rss_mb()\nhistory = []\nfor _ in range(5):\n    history.append(b"x" * (10 * 1024 * 1024))\nleak = rss_mb() - start\nhistory = None\nstart = rss_mb()\nrecent = deque(maxlen=2)\nfor _ in range(5):\n    recent.append(b"x" * (10 * 1024 * 1024))\nkept = rss_mb() - start\nprint("다 모으면 40MB 넘게 늘었나요?", leak > 40)\nprint("최근 2개만 두면 35MB 안쪽인가요?", kept < 35)' } },
   ],
   summary: ['free -h 의 available 이 진짜 여유 · vmstat 1 의 si/so 가 계속이면 스래싱', 'RAM + 스왑이 바닥나면 OOM killer 가 oom_score 큰 프로세스를 SIGKILL(journalctl -k)', '누수 = 계속 넣기만 하는 목록·딕셔너리 → VmRSS 가 계속 오름 · deque(maxlen=) 로 크기 제한'] },
 
