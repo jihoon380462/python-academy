@@ -2,25 +2,25 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.42.0',
+  APP_VERSION: '2.42.1',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
   // v2.40.0 허브 분류(사용자 「코스랑 공용 이렇게 밖에 없는데 좀 더 나누고 코스별 분류 정리해」) — 목적별 7묶음, 묶음 안은 추천 순서.
   //   새 코스를 만들면 여기 courses 에 id 를 넣어요. 빠뜨리면 허브 맨 끝 「기타」 에 나와요(사라지지 않게). 설계 중인 코스는 specs/courses-python-next.md
-  CATEGORIES: [
+  CATEGORIES: [ // v2.42.1: 순서를 로드맵(specs/roadmap.md)대로 — 주 길(처음 시작 → 파이썬 실력 → 갈래 넷) 다음에 곁길(개발 도구). 리눅스는 컴퓨터 깊이의 2번(CS 다음)
     { id: 'start', icon: '🐍', name: '처음 시작', sub: '여기서부터 — 파이썬 하나로 프로그래밍의 기본을', courses: ['python'] },
-    { id: 'tools', icon: '🧰', name: '개발 도구', sub: '어느 코스를 하든 같이 쓰는 도구 — 언제든', courses: ['terminal-git', 'github', 'vim', 'linux'] },
-    { id: 'pyskill', icon: '💪', name: '파이썬 실력 키우기', sub: '파이썬 다음 — 버그 잡기 · 설계 · 알고리즘', courses: ['debug', 'oop', 'algo'] },
-    { id: 'make', icon: '🛠', name: '파이썬으로 만들기', sub: '데이터 파일 · 업무 자동화 · 크롤링 · 게임(크롤링부터는 만드는 중)', courses: ['files', 'auto'] },
-    { id: 'webdev', icon: '🌐', name: '웹과 서비스', sub: '화면 · 서버 · API · 데이터베이스', courses: ['web', 'api', 'sql'] },
-    { id: 'data', icon: '📊', name: '데이터와 AI', sub: '수학부터 데이터 분석 · 머신러닝 · 언어 모델까지', courses: ['math', 'data', 'ml', 'llm', 'ai'] },
-    { id: 'deep', icon: '⚙️', name: '컴퓨터 깊이', sub: '컴퓨터가 실제로 어떻게 돌아가나 — 리눅스 다음', courses: ['cs', 'os', 'asm'] },
+    { id: 'pyskill', icon: '💪', name: '파이썬 실력 키우기', sub: '파이썬 다음 — 버그 잡기 · 설계 · 알고리즘(알고리즘은 파이썬 챕터 3 뒤부터 나란히)', courses: ['debug', 'oop', 'algo'] },
+    { id: 'make', icon: '🛠', name: '파이썬으로 만들기', sub: '갈래 · 일 자동화 — 데이터 파일 → 업무 자동화(크롤링 · 게임은 만드는 중)', courses: ['files', 'auto'] },
+    { id: 'webdev', icon: '🌐', name: '웹과 서비스', sub: '갈래 · 웹 서비스 — 화면 → API → 데이터베이스(웹 · SQL 은 파이썬 챕터 2 · 3 뒤부터 나란히)', courses: ['web', 'api', 'sql'] },
+    { id: 'data', icon: '📊', name: '데이터와 AI', sub: '갈래 · 수학부터 데이터 분석 · 머신러닝 · 언어 모델까지(데이터 분석 전에 SQL 이 편해요)', courses: ['math', 'data', 'ml', 'llm', 'ai'] },
+    { id: 'deep', icon: '⚙️', name: '컴퓨터 깊이', sub: '갈래 · 컴퓨터가 실제로 어떻게 도나 — CS 부터, 운영체제 · 어셈블리어는 리눅스 연습장이 먼저', courses: ['cs', 'linux', 'os', 'asm'] },
+    { id: 'tools', icon: '🧰', name: '개발 도구', sub: '곁길 — 주 길과 나란히 언제든(파이썬 챕터 2 뒤부터). GitHub 은 터미널·Git 다음', courses: ['terminal-git', 'github', 'vim'] },
   ],
   COURSE_ID_PATTERNS: { python: '^(L|B|X)\\d+[A-Z]?([PD]\\d+)?$', algo: '^(A|AB|E)\\d+[A-Z]?([PD]\\d+)?$', math: '^M\\d+_', 'terminal-git': '^(T|TB)\\d+(P\\d+)?$', vim: '^(V|VB)\\d+(P\\d+)?$', github: '^(G|GB)\\d+(P\\d+)?$', sql: '^(S|SB)\\d+(P\\d+)?$', web: '^(W|WB)\\d+[A-Z]?(P\\d+)?$', api: '^(H|HB)\\d+(P\\d+)?$', linux: '^(U|UB)\\d+(P\\d+)?$', os: '^(K|KB)\\d+(P\\d+)?$', asm: '^(R|RB)\\d+(P\\d+)?$', cs: '^(C|CB)\\d+(P\\d+)?$', llm: '^(N|NB)\\d+(P\\d+)?$', debug: '^(D|DB)\\d+(P\\d+)?$', data: '^(P|PB)\\d+(P\\d+)?$', oop: '^(O|OB)\\d+(P\\d+)?$', ml: '^(I|IB)\\d+(P\\d+)?$', ai: '^(Z|ZB)\\d+(P\\d+)?$', files: '^(F|FB)\\d+(P\\d+)?$', auto: '^(J|JB)\\d+(P\\d+)?$' },
   COURSES: [                              // 허브 코스 카드 순서. path는 허브 기준 상대 경로
     { id: 'python', short: '파이썬', name: '파이썬', icon: '🐍', desc: '문법 설명을 읽고 VS Code 에서 직접 만들어 보는 파이썬 교과서', path: 'courses/python/', color: '#2bb673', ready: true, lessons: 100, book: true /* v2.10.1: 교과서 코스 — 허브 카드는 문제 수 대신 「읽은 레슨」(lessons = 열린 레슨 수, check_book 이 맞는지 검사) */ },
-    { id: 'algo', short: '알고리즘', name: '알고리즘·자료구조', icon: '🧭', desc: '그림으로 돌아가는 모습을 보며 읽고, VS Code 에서 직접 풀어 보는 알고리즘 교과서 — 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, lessons: 36, book: true, bookNote: '그림으로 보기 · 모의고사 15문제' /* v2.15.0 N5: 교과서 */ },
+    { id: 'algo', short: '알고리즘', name: '알고리즘·자료구조', icon: '🧭', desc: '그림으로 돌아가는 모습을 보며 읽고, VS Code 에서 직접 풀어 보는 알고리즘 교과서 — 코딩테스트 입문까지', path: 'courses/algo/', color: '#2196f3', ready: true, lessons: 36, book: true, bookNote: '그림으로 보기 · 모의고사 10문제' /* v2.15.0 N5: 교과서 */ },
     { id: 'terminal-git', short: '터미널·Git', name: '터미널·Git', icon: '🎧', desc: 'Git Bash 에서 직접 쳐 보는 터미널·Git 교과서', path: 'courses/terminal-git/', color: '#607d8b', ready: true, book: true, bookNote: '명령어 편 + Git 편 · 실제 GitHub 까지', lessons: 20 /* v2.10.0 명령어 편 T0~T5·TB1 + v2.12.0 Git 편 T6~TB3 */ },
     { id: 'github', short: 'GitHub', name: 'GitHub', icon: '🐙', desc: '내 진짜 GitHub 계정으로 저장소·Pull Request·Actions·Pages — 협업하고 공개하는 교과서', path: 'courses/github/', color: '#8250df', ready: true, book: true, lessons: 22, bookNote: '터미널·Git 다음 · PR·Actions·Pages 까지 내 계정으로' /* v2.16.0 N6 설계 specs/github-course.md — 챕터 1 부터 */ },
     { id: 'sql', short: 'SQL', name: '데이터베이스(SQL)', icon: '🗄️', desc: 'DB Browser 에서 동네 카페 데이터로 직접 쿼리하는 SQL 교과서', path: 'courses/sql/', color: '#f4511e', ready: true, book: true, bookNote: 'SELECT 부터 JOIN·설계·파이썬 sqlite3 까지', lessons: 17 /* v2.13.0 S0~S13 + 보스 3 */ },

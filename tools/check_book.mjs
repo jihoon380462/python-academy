@@ -139,6 +139,9 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
 { const cx = { window: {} }; vm.createContext(cx); vm.runInContext(fs.readFileSync(R + '/core/config.js', 'utf8').replace(/^(const|let) /gm, 'var '), cx); const cc = (cx.CONFIG.COURSES || []).find(c => c.id === cid);
   const open = LESSONS.filter(l => (!l.mock || ((BOOK.tasks || {})[l.id] || []).length) /* 모의고사는 교과서가 문제를 채웠을 때만(화면 lessonsOf 와 같게, v2.15.0) */ && (!l.draft || (BOOK.lessonPages || {})[l.id] || ((BOOK.tasks || {})[l.id] || []).length)).length;
   if (!cc || !cc.book || !cc.ready) bad(`config.js COURSES 의 ${cid} 에 ready:true, book:true 가 있어야 해요(허브 카드가 「읽은 레슨」으로 보이게)`); else if (cc.lessons !== open) bad(`config.js ${cid}.lessons = ${cc.lessons} 인데 열린 레슨은 ${open}개 — 허브 카드 숫자를 맞추세요`);
+  /* v2.42.1: 허브 카드 글의 「모의고사 N문제」 가 실제 모의고사 문제 수와 같은지(v2.42.0 에 15 → 10 으로 줄이고 카드 글은 15 로 남았던 것, LESSON.md R2) */
+  if (cc) { const mockN = LESSONS.filter(l => l.mock).reduce((n, l) => n + ((BOOK.tasks || {})[l.id] || []).length, 0);
+    for (const m of JSON.stringify(cc).matchAll(/모의고사\s*(\d+)\s*문제/g)) if (+m[1] !== mockN) bad(`config.js ${cid} 카드 글 「${m[0]}」 인데 모의고사 문제는 ${mockN}개 — 카드 글을 맞추세요`); }
   if (cc && /가상|시뮬레이터|브라우저에서 바로/.test(cc.desc || '')) bad(`config.js ${cid}.desc 가 교과서와 안 맞아요: ${cc.desc}`); }
 // ⑫ 챕터 만들어 보기 = 챕터 복습(v2.42.0 사용자 「해당 챕터의 만들어보기만 해도 복습이 될 수 있게 … 5개 이상 10개 이하」):
 //    만들어 보기 레슨마다 문제 5~10개, 한 챕터의 만들어 보기 문제들이 「필요한 코드」 로 그 챕터의 열린 레슨을 모두 한 번 이상 가리킴
