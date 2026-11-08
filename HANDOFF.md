@@ -1,6 +1,6 @@
 # HANDOFF — 다음 작업 세션 인수인계
 
-> 새 채팅은 **「HANDOFF.md 읽고 TODO 대로 진행」** 으로 시작한다. 읽는 순서: **이 파일 → [`specs/site-intent.md`](specs/site-intent.md)(무엇이 정상·버그인가) → [`TODO.md`](TODO.md)(지금 할 일 · 예정 코스)**.
+> 새 채팅은 **「HANDOFF.md 읽고 TODO 대로 진행」** 으로 시작한다. 읽는 순서: **[`LESSON.md`](LESSON.md)(실패 기록 — 1절 작업 전 점검표) → 이 파일 → [`specs/site-intent.md`](specs/site-intent.md)(무엇이 정상·버그인가) → [`TODO.md`](TODO.md)(지금 할 일 · 예정 코스)**.
 > 2026-11-06 v2.17.1 시점에 다시 썼고, 2026-11-07 v2.28.1 시점에 최신화했다(사용자 「HANDOFF.md 와 TODO.md 최신화」). 그 전 내용은 [`docs/archive/HANDOFF-2026-11-06-old.md`](docs/archive/HANDOFF-2026-11-06-old.md)(권한·머지 규칙 등이 지금과 다름). 버전별로 무엇이 바뀌었는지는 [`CHANGELOG.md`](CHANGELOG.md).
 
 ## 0. 상태판 (배포할 때마다 갱신)
@@ -31,9 +31,9 @@
 2. 고치기. 화면이 바뀌면 `core/config.js` 의 **`APP_VERSION` 을 올리고** `node tools/stamp.mjs`(모든 `?v=` · `sw.js` 미리 캐시 목록). 허브 카드의 레슨 수·문구는 `CONFIG.COURSES`(`lessons` · `bookNote` · `short`)에 손으로 — 교과서 레슨 수를 바꾸면 같은 PR 에서.
 3. 검사 전부(= CI `verify`, 명령은 `README.md` 「작업 방법」 · 설명은 `specs/site-intent.md` 7절). `python3 tools/regress.py` 끝 줄 **FAILS 0**.
 4. **QA 를 직접**: Playwright 로 휴대폰 390 · PC 1440 화면을 찍어 **눈으로** 보기(가로 넘침 · pageerror 0), 「이 시점의 초보자가 따라 할 수 있나」. 사이트 전체(또는 코스 몇 개)는 **`python3 tools/qa_screens.py --out /tmp/qa_pc`**(PC) · `--w 390 --h 844`(폰) · `--theme light` · `--font 3` — 모든 쪽을 열어 대비·글자 크기·누를 곳·가로 넘침을 재고 캡처를 남긴다(쓰는 법은 파일 맨 위 주석, `specs/qa-team.md`).
-5. 문서: **이 파일 0절 상태판** + `CHANGELOG.md` 새 항목(+ 바뀐 규칙이면 `specs/site-intent.md`, 할 일이면 `TODO.md`).
+5. 문서: **이 파일 0절 상태판** + `CHANGELOG.md` 새 항목(+ 바뀐 규칙이면 `specs/site-intent.md`, 할 일이면 `TODO.md`). 이번 작업에서 실패가 있었으면(CI 빨강 · 사용자 지적 · 검사가 놓친 것 · 도구가 깨뜨린 것) **[`LESSON.md`](LESSON.md) 최신화**.
 6. 커밋(끝에 세션 지침의 Co-Authored-By · Claude-Session 줄) → push → PR(본문 끝에 🤖 Generated with Claude Code 줄 + 세션 주소). **도구**: `gh` CLI 가 있으면 `gh api repos/jihoon380462/python-academy/pulls …`, 클라우드 세션(claude.ai/code)이면 GitHub MCP 도구(`create_pull_request` · `pull_request_read`(get_check_runs) · `merge_pull_request`(squash, `expectedHeadSha` 40자) · `actions_list`).
-7. **사용자에게 「CI 기다리는 중」 이라고 먼저 말하고** check-run `verify` 가 success 될 때까지 기다림(클라우드 세션은 `subscribe_pr_activity` 로 CI 결과가 저절로 옴 — 기다리며 다음 챕터를 미리 만들어 둬도 됨, 단 커밋은 머지 뒤) → squash 머지. 빨가면 로그(`get_job_logs`)로 원인을 찾아 고쳐 push(예: v2.28.1 은 CI 에 `requests` 가 없어 실패 → ci.yml 설치 줄에 더함).
+7. **사용자에게 「CI 기다리는 중」 이라고 먼저 말하고** check-run `verify` 가 success 될 때까지 기다림(클라우드 세션은 `subscribe_pr_activity` 로 CI 결과가 저절로 옴 — 기다리며 다음 챕터를 미리 만들어 둬도 됨, 단 커밋은 머지 뒤) → squash 머지. 빨가면 로그(`get_job_logs`)로 원인을 찾아 고쳐 push(예: v2.28.1 은 CI 에 `requests` 가 없어 실패 → ci.yml 설치 줄에 더함). **그리고 같은 PR 에서 [`LESSON.md`](LESSON.md) 에 기록**(무슨 일 · 진짜 원인 · 막는 장치).
 8. main 의 새 SHA 로 배포 run(「Deploy to GitHub Pages」)이 success 인지 확인 → 작업 브랜치를 main 으로 되돌림(`git checkout -B <브랜치> origin/main`). 같은 이름의 원격 브랜치에 squash 전 커밋이 남아 있으면 force push 대신 `git merge -s ours origin/<브랜치>` 로 이어 붙이고 push(클라우드 세션은 force push 가 막혀 있음).
 9. 사용자에게: 무엇이 바뀌었나(짧게) + **다음 선택지 목록**.
 
@@ -84,6 +84,8 @@
 
 | 문서 | 용도 |
 | --- | --- |
+| **`LESSON.md`** | **실패 기록**(사용자 11/8 지시) — 작업 전에 1절 점검표를 읽고, 실패가 생기면 같은 PR 에서 최신화. `CLAUDE.md` 도 이 파일을 가리킴 |
+| `CLAUDE.md` | Claude Code 가 세션마다 저절로 읽는 짧은 안내 — LESSON.md · 이 파일을 읽으라는 것과 꼭 지킬 것 |
 | `TODO.md` | 지금 할 일(1절) · 사용자 결정(3절) · **예정 코스**(남은 것: 공용 T1 CS · T10 어셈블리어 · T11 LLM, 코스 T3~T7) |
 | `specs/site-intent.md` | 사이트 의도 · 코스별 정상 동작 · 자동 검사 — QA 기준 |
 | `specs/workflow.md` · `specs/qa-team.md` | 작업 규칙 · QA 채팅 지시서(QA 는 직접 플레이 → `qa-reports/` 에 PR, 화면 검수 도구 `tools/qa_screens.py`) |
