@@ -58,7 +58,7 @@ ld hello.o -o hello
   tasks: {
     R0: [
       { title: '종료 코드 42 로 끝나는 프로그램', text: '1쪽의 예제를 <code>~/asm/exit42.asm</code> 으로 만들어 빌드하고 <code>./exit42; echo $?</code> 로 실행해 보세요. 복사해도 되지만, 세 줄뿐이니 <b>직접 쳐 보면</b> 더 좋아요(빈칸 4개 들여쓰기 · 쉼표까지). <code>42</code> 가 보이면 첫 어셈블리 프로그램 완성이에요. 다 되면 42 를 다른 수로 바꿔 다시 빌드해 보세요.', echoExit: true,
-        needs: [['mov rax, 60   mov rdi, 42   syscall', 'R0/0', '끝내면서 42 남기기'], ['nasm -f elf64 exit42.asm -o exit42.o', 'R0/1', '어셈블(글자 → 기계어 조각)'], ['ld exit42.o -o exit42', 'R0/1', '링크(조각 → 실행 파일)']],
+        needs: [['mov rax, 60\nmov rdi, 42\nsyscall', 'R0/0', '끝내면서 42 남기기'], ['nasm -f elf64 exit42.asm -o exit42.o', 'R0/1', '어셈블(글자 → 기계어 조각)'], ['ld exit42.o -o exit42', 'R0/1', '링크(조각 → 실행 파일)']],
         io: [{ output: '42' }],
         answer: 'section .text\nglobal _start\n_start:\n    mov rax, 60         ; 60 = 끝내기(exit)\n    mov rdi, 42         ; 종료 코드\n    syscall             ; 커널에게 부탁!' },
       { title: '기계어 바이트 보기: objdump -d', text: '1번에서 만든 <code>exit42</code> 를 <code>objdump -d -M intel exit42</code> 로 열어, 1쪽 표의 기계어 바이트를 찾아보세요. 그다음 <code>-M intel</code> 을 빼고 <code>objdump -d exit42</code> 로 한 번 더 — 같은 명령이 AT&amp;T 문법으로 어떻게 보이는지 비교해요.', noRun: true,
@@ -72,11 +72,11 @@ ld hello.o -o hello
     ],
     R1: [
       { title: '16진수를 종료 코드로 보기', text: 'rbx 에 <b>16진수</b> <code>0x64</code> 를 넣고, 그 값을 rdi 로 옮겨 끝내세요. <code>echo $?</code> 는 10진수로 보여 줘요 — 몇이 나올지 먼저 맞혀 보고 실행해요.', echoExit: true,
-        needs: [['mov rbx, 0x64', 'R1/1', '16진수로 넣기'], ['mov rdi, rbx', 'R1/1', '레지스터 복사(받는쪽, 주는쪽)'], ['mov rax, 60   syscall', 'R1/3', '끝내기 세 줄']],
+        needs: [['mov rbx, 0x64', 'R1/1', '16진수로 넣기'], ['mov rdi, rbx', 'R1/1', '레지스터 복사(받는쪽, 주는쪽)'], ['mov rax, 60\nsyscall', 'R1/3', '끝내기 세 줄']],
         io: [{ output: '100' }],
         answer: 'section .text\nglobal _start\n_start:\n    mov rbx, 0x64       ; 16진수 64 = 10진수 100\n\n    mov rax, 60         ; 끝내기(exit)\n    mov rdi, rbx        ; 종료 코드 = rbx\n    syscall' },
       { title: '두 레지스터의 값 바꾸기', text: 'rax 에 10, rbx 에 20 을 넣은 뒤 두 값을 <b>서로 바꾸세요</b>. 파이썬의 <code>a, b = b, a</code> 같은 명령은 없어서, 빈 레지스터 하나(rcx)에 잠깐 맡겨야 해요. 바꾼 뒤 rax 를 종료 코드로 남기면 <code>20</code> 이 나와야 해요. (끝내기 번호를 넣기 <b>전에</b> rax 를 rdi 로!)', echoExit: true,
-        needs: [['mov rcx, rax', 'R1/1', '잠깐 맡기기(복사)'], ['mov rdi, rax   mov rax, 60', 'R1/3', '결과를 먼저 rdi 로']],
+        needs: [['mov rcx, rax', 'R1/1', '잠깐 맡기기(복사)'], ['mov rdi, rax\nmov rax, 60', 'R1/3', '결과를 먼저 rdi 로']],
         io: [{ output: '20' }],
         answer: 'section .text\nglobal _start\n_start:\n    mov rax, 10\n    mov rbx, 20\n    mov rcx, rax        ; rcx = 10 (잠깐 맡기기)\n    mov rax, rbx        ; rax = 20\n    mov rbx, rcx        ; rbx = 10\n\n    mov rdi, rax        ; 결과를 먼저 rdi 로\n    mov rax, 60         ; 끝내기(exit)\n    syscall' },
       { title: '큰 수가 잘리는 것 보기', text: '종료 코드로 <code>1000</code> 을 남겨 보세요. 0~255 만 되니까 1000 그대로는 안 나와요. 무엇이 나올지 <code>python3 -c "print(1000 % 256)"</code> 로 먼저 계산해 보고 맞는지 확인해요.', echoExit: true,
@@ -86,36 +86,36 @@ ld hello.o -o hello
     ],
     R2: [
       { title: 'Hello, World!', text: '화면에 <code>Hello, World!</code> 를 한 줄 찍고 종료 코드 0 으로 끝나는 프로그램을 만드세요. 1쪽의 <code>hello.asm</code> 에서 글자만 바꾸면 돼요 — 길이는 <code>equ $ - msg</code> 가 알아서 세요.',
-        needs: [['msg db "Hello, World!", 10', 'R2/1', '글자 + 줄바꿈 놓기'], ['len equ $ - msg', 'R2/1', '길이 세기'], ['mov rax, 1   mov rdi, 1   mov rsi, msg   mov rdx, len   syscall', 'R2/2', 'write 부탁'], ['nasm -f elf64 hello.asm -o hello.o', 'R2/3', '빌드 세 줄']],
+        needs: [['msg db "Hello, World!", 10', 'R2/1', '글자 + 줄바꿈 놓기'], ['len equ $ - msg', 'R2/1', '길이 세기'], ['mov rax, 1\nmov rdi, 1\nmov rsi, msg\nmov rdx, len\nsyscall', 'R2/2', 'write 부탁'], ['nasm -f elf64 hello.asm -o hello.o', 'R2/3', '빌드 세 줄']],
         io: [{ output: 'Hello, World!' }],
         answer: 'section .data\nmsg db "Hello, World!", 10\nlen equ $ - msg\n\nsection .text\nglobal _start\n_start:\n    mov rax, 1          ; write\n    mov rdi, 1          ; 화면\n    mov rsi, msg        ; 무엇을\n    mov rdx, len        ; 몇 바이트\n    syscall\n\n    mov rax, 60         ; exit\n    mov rdi, 0          ; 잘 끝남\n    syscall' },
       { title: '두 줄 찍기: write 두 번', text: '첫 줄 <code>어셈블리</code>, 둘째 줄 <code>재밌어요</code> 를 찍으세요. 글자 묶음을 <b>두 개</b>(<code>msg1</code> · <code>msg2</code>, 길이도 <code>len1</code> · <code>len2</code>) 만들고 <code>write</code> 를 <b>두 번</b> 불러요. 시스템 콜이 돌아오면 rax 가 바뀌어 있으니, 두 번째 write 앞에서도 <code>mov rax, 1</code> 을 다시 해야 해요.',
-        needs: [['msg2 db "재밌어요", 10   len2 equ $ - msg2', 'R2/1', '두 번째 글자 묶음 · 그 길이'], ['mov rax, 1   syscall', 'R2/2', 'write 다시 부르기(rax 는 결과로 바뀜)']],
+        needs: [['msg2 db "재밌어요", 10\nlen2 equ $ - msg2', 'R2/1', '두 번째 글자 묶음 · 그 길이'], ['mov rax, 1\nsyscall', 'R2/2', 'write 다시 부르기(rax 는 결과로 바뀜)']],
         io: [{ output: '어셈블리\n재밌어요' }],
         answer: 'section .data\nmsg1 db "어셈블리", 10\nlen1 equ $ - msg1         ; msg1 바로 아래\nmsg2 db "재밌어요", 10\nlen2 equ $ - msg2         ; msg2 바로 아래\n\nsection .text\nglobal _start\n_start:\n    mov rax, 1          ; write — 첫 줄\n    mov rdi, 1\n    mov rsi, msg1\n    mov rdx, len1\n    syscall             ; 돌아오면 rax = 찍은 바이트 수\n\n    mov rax, 1          ; write — 둘째 줄(rax 를 다시 1 로)\n    mov rdi, 1\n    mov rsi, msg2\n    mov rdx, len2\n    syscall\n\n    mov rax, 60         ; exit\n    mov rdi, 0\n    syscall' },
       { title: '찍고 나서 종료 코드 3 으로 끝내기', text: '<code>끝!</code> 한 줄을 찍고 <b>종료 코드 3</b> 으로 끝나는 프로그램을 만드세요. <code>./end; echo $?</code> 로 실행하면 글자 아래에 3 이 보여야 해요.', echoExit: true,
-        needs: [['mov rax, 60   mov rdi, 3   syscall', 'R2/2', 'exit 부탁(rdi = 종료 코드)'], ['./end; echo $?', 'R2/3', '실행하고 종료 코드 보기']],
+        needs: [['mov rax, 60\nmov rdi, 3\nsyscall', 'R2/2', 'exit 부탁(rdi = 종료 코드)'], ['./end; echo $?', 'R2/3', '실행하고 종료 코드 보기']],
         io: [{ output: '끝!\n3' }],
         answer: 'section .data\nmsg db "끝!", 10\nlen equ $ - msg\n\nsection .text\nglobal _start\n_start:\n    mov rax, 1          ; write\n    mov rdi, 1\n    mov rsi, msg\n    mov rdx, len\n    syscall\n\n    mov rax, 60         ; exit\n    mov rdi, 3          ; 종료 코드 3\n    syscall' },
       { title: '에러 세 개 고치기', text: '아래 코드는 빌드도 안 되고, 고쳐서 빌드해도 실행하면 <code>Segmentation fault</code> 가 나요. nasm 이 알려 주는 <b>줄 번호</b>를 따라 하나씩 고치고, 마지막에 무엇이 빠졌는지 찾아 <code>고쳤어요!</code> 가 찍히고 잘 끝나게 만드세요. (틀린 곳: 명령 이름 오타 하나 · 쉼표 하나 · 빠진 것 하나)',
         given: 'section .data\nmsg db "고쳤어요!", 10\nlen equ $ - msg\n\nsection .text\nglobal _start\n_start:\n    mov rax, 1\n    mvo rdi, 1\n    mov rsi msg\n    mov rdx, len\n    syscall',
-        needs: [['error: parser: instruction expected', 'R2/4', 'nasm 에러의 줄 번호 읽기'], ['mov rax, 60   syscall', 'R2/4', 'exit 을 빼면 Segmentation fault']],
+        needs: [['error: parser: instruction expected', 'R2/4', 'nasm 에러의 줄 번호 읽기'], ['mov rax, 60\nsyscall', 'R2/4', 'exit 을 빼면 Segmentation fault']],
         io: [{ output: '고쳤어요!' }],
         answer: 'section .data\nmsg db "고쳤어요!", 10\nlen equ $ - msg\n\nsection .text\nglobal _start\n_start:\n    mov rax, 1\n    mov rdi, 1          ; mvo → mov\n    mov rsi, msg        ; 쉼표 빠짐\n    mov rdx, len\n    syscall\n\n    mov rax, 60         ; 빠진 것: exit\n    mov rdi, 0\n    syscall' },
     ],
     R3: [
       { title: '사칙연산 한 줄을 종료 코드로', text: '((7 + 5) × 3 − 6) ÷ 4 를 계산해 종료 코드로 보여 주세요. 나누기는 몫만 남겨요(파이썬의 <code>//</code>). 순서대로 한 줄씩 — 괄호 안부터.',
-        needs: [['add rax, 5', 'R3/0', '더하기 · 빼기는 sub'], ['imul rax, 3', 'R3/1', '곱하기'], ['cqo   idiv rbx', 'R3/2', '나누기 — 몫은 rax'], ['mov rdi, rax   mov rax, 60   syscall', 'R3/0', '결과를 종료 코드로']],
+        needs: [['add rax, 5', 'R3/0', '더하기 · 빼기는 sub'], ['imul rax, 3', 'R3/1', '곱하기'], ['cqo\nidiv rbx', 'R3/2', '나누기 — 몫은 rax'], ['mov rdi, rax\nmov rax, 60\nsyscall', 'R3/0', '결과를 종료 코드로']],
         echoExit: true,
         io: [{ output: '7' }],
         answer: 'section .text\nglobal _start\n_start:\n    mov rax, 7\n    add rax, 5          ; 12\n    imul rax, 3         ; 36\n    sub rax, 6          ; 30\n    mov rbx, 4\n    cqo\n    idiv rbx            ; 몫 7 (나머지 2 는 rdx)\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall' },
       { title: '섭씨 37도는 화씨로 몇 도', text: '화씨 = 섭씨 × 9 ÷ 5 + 32 예요. 섭씨 37 을 화씨로 바꿔 종료 코드로 보여 주세요(나누기는 몫만). 곱하기를 나누기보다 <b>먼저</b> 해야 버려지는 부분이 적어요 — 37 ÷ 5 를 먼저 하면 7 이 되어 버려요.',
-        needs: [['imul rax, 9', 'R3/1', '× 9'], ['cqo   idiv rbx', 'R3/2', '÷ 5 — rbx 에 5'], ['add rax, 32', 'R3/0', '+ 32']],
+        needs: [['imul rax, 9', 'R3/1', '× 9'], ['cqo\nidiv rbx', 'R3/2', '÷ 5 — rbx 에 5'], ['add rax, 32', 'R3/0', '+ 32']],
         echoExit: true,
         io: [{ output: '98' }],
         answer: 'section .text\nglobal _start\n_start:\n    mov rax, 37         ; 섭씨\n    imul rax, 9         ; 333\n    mov rbx, 5\n    cqo\n    idiv rbx            ; 66 (나머지 3 은 버림)\n    add rax, 32         ; 98\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall' },
       { title: '137초는 몇 분 몇 초', text: '137 을 60 으로 나눠 몫(분)과 나머지(초)를 구하고, 「분 × 100 + 초」 를 종료 코드로 보여 주세요. 2분 17초면 <code>217</code> 처럼 읽혀요.',
-        needs: [['cqo   idiv rbx', 'R3/2', '몫 rax · 나머지 rdx'], ['imul rax, 100', 'R3/1', '분을 백의 자리로'], ['add rax, rdx', 'R3/0', '나머지(초) 더하기']],
+        needs: [['cqo\nidiv rbx', 'R3/2', '몫 rax · 나머지 rdx'], ['imul rax, 100', 'R3/1', '분을 백의 자리로'], ['add rax, rdx', 'R3/0', '나머지(초) 더하기']],
         echoExit: true,
         io: [{ output: '217' }],
         answer: 'section .text\nglobal _start\n_start:\n    mov rax, 137        ; 초\n    mov rbx, 60\n    cqo\n    idiv rbx            ; rax = 2 (분), rdx = 17 (초)\n    imul rax, 100       ; 200\n    add rax, rdx        ; 217\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall' },
@@ -150,14 +150,14 @@ ld hello.o -o hello
         answer: 'section .text\nglobal _start\n_start:\n    mov rax, \'G\'        ; \'g\' 로 바꿔도 71\n    and al, 0xDF        ; 0x20 자리 끄기 → 늘 대문자\n    mov rdi, rax        ; 결과를 종료 코드로\n    mov rax, 60         ; exit\n    syscall' },
     ],
     RB1: [
-      { title: "복습 — 고치기 — 평균을 종료 코드로(Segmentation fault 139)", text: "<p>계산 결과 알림을 만들기 전에 챕터 1 을 되짚어요. a = 60 · b = 45 의 <b>평균</b>(몫만)을 <code>cqo</code> · <code>idiv</code> 로 구하고, 제목을 찍은 뒤 평균을 종료 코드로 남기려는 <code>avg.asm</code> 이에요. 그런데 끝내기를 빠뜨려서 이렇게 끝나요.</p><pre>$ ./avg; echo $?\n계산 결과 알림\nSegmentation fault (core dumped)\n139</pre><p>끝에 exit 시스템 콜을 더해 평균 52 로 끝나게 고치세요. 그냥 <code>mov rdi, rax</code> 로 끝내면 52 가 아니라 <b>21</b> 이 나와요. 왜 그런지도 생각해 보세요. 힌트는 write 가 돌아올 때 <code>rax</code> 에 넣어 주는 값이에요.</p>", needs: [["mov rax, 60   syscall", "R2/4", "exit 을 빼면 Segmentation fault(139)"], ["cqo   idiv rbx", "R3/2", "몫은 rax, 나머지는 rdx"], ["syscall — 결과는 rax", "R2/2", "write 는 찍은 바이트 수를 돌려줘요"], ["mov r15, rax", "R1/1", "오래 둘 값은 다른 레지스터에 복사"]], echoExit: true, given: "section .data\ntitle     db \"계산 결과 알림\", 10\ntitle_len equ $ - title\n\nsection .text\nglobal _start\n_start:\n    mov r8, 60          ; a\n    mov r9, 45          ; b\n    mov rax, r8\n    add rax, r9         ; rax = 합 105\n    mov rbx, 2\n    cqo\n    idiv rbx            ; rax = 평균(몫) 52, rdx = 나머지 1\n\n    ; 제목 한 줄\n    mov rsi, title\n    mov rdx, title_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall", answer: "section .data\ntitle     db \"계산 결과 알림\", 10\ntitle_len equ $ - title\n\nsection .text\nglobal _start\n_start:\n    mov r8, 60          ; a\n    mov r9, 45          ; b\n    mov rax, r8\n    add rax, r9         ; rax = 합 105\n    mov rbx, 2\n    cqo\n    idiv rbx            ; rax = 평균(몫) 52, rdx = 나머지 1\n    mov r15, rax        ; 평균을 r15 에 간직(write 가 rax 를 덮어써요)\n\n    ; 제목 한 줄\n    mov rsi, title\n    mov rdx, title_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall\n\n    mov rdi, r15        ; 평균을 종료 코드로\n    mov rax, 60         ; exit\n    syscall", io: [{ output: "계산 결과 알림\n52" }] },
+      { title: "복습 — 고치기 — 평균을 종료 코드로(Segmentation fault 139)", text: "<p>계산 결과 알림을 만들기 전에 챕터 1 을 되짚어요. a = 60 · b = 45 의 <b>평균</b>(몫만)을 <code>cqo</code> · <code>idiv</code> 로 구하고, 제목을 찍은 뒤 평균을 종료 코드로 남기려는 <code>avg.asm</code> 이에요. 그런데 끝내기를 빠뜨려서 이렇게 끝나요.</p><pre>$ ./avg; echo $?\n계산 결과 알림\nSegmentation fault (core dumped)\n139</pre><p>끝에 exit 시스템 콜을 더해 평균 52 로 끝나게 고치세요. 그냥 <code>mov rdi, rax</code> 로 끝내면 52 가 아니라 <b>21</b> 이 나와요. 왜 그런지도 생각해 보세요. 힌트는 write 가 돌아올 때 <code>rax</code> 에 넣어 주는 값이에요.</p>", needs: [["mov rax, 60\nsyscall", "R2/4", "exit 을 빼면 Segmentation fault(139)"], ["cqo\nidiv rbx", "R3/2", "몫은 rax, 나머지는 rdx"], ["syscall — 결과는 rax", "R2/2", "write 는 찍은 바이트 수를 돌려줘요"], ["mov r15, rax", "R1/1", "오래 둘 값은 다른 레지스터에 복사"]], echoExit: true, given: "section .data\ntitle     db \"계산 결과 알림\", 10\ntitle_len equ $ - title\n\nsection .text\nglobal _start\n_start:\n    mov r8, 60          ; a\n    mov r9, 45          ; b\n    mov rax, r8\n    add rax, r9         ; rax = 합 105\n    mov rbx, 2\n    cqo\n    idiv rbx            ; rax = 평균(몫) 52, rdx = 나머지 1\n\n    ; 제목 한 줄\n    mov rsi, title\n    mov rdx, title_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall", answer: "section .data\ntitle     db \"계산 결과 알림\", 10\ntitle_len equ $ - title\n\nsection .text\nglobal _start\n_start:\n    mov r8, 60          ; a\n    mov r9, 45          ; b\n    mov rax, r8\n    add rax, r9         ; rax = 합 105\n    mov rbx, 2\n    cqo\n    idiv rbx            ; rax = 평균(몫) 52, rdx = 나머지 1\n    mov r15, rax        ; 평균을 r15 에 간직(write 가 rax 를 덮어써요)\n\n    ; 제목 한 줄\n    mov rsi, title\n    mov rdx, title_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall\n\n    mov rdi, r15        ; 평균을 종료 코드로\n    mov rax, 60         ; exit\n    syscall", io: [{ output: "계산 결과 알림\n52" }] },
       { title: '합 · 차 · 곱 — 합은 종료 코드로', text: '챕터 1 을 묶어 「계산 결과 알림」 프로그램 <code>calc.asm</code> 을 만들어요. 세 문제에 걸쳐 조금씩 키워요.<ol><li>두 수 a = 60 은 <code>r8</code>, b = 45 는 <code>r9</code> 에 넣어요.</li><li>합 · 차 · 곱을 각각 <code>r12</code> · <code>r13</code> · <code>r14</code> 에 계산해요(a · b 는 그대로 두고 복사해서).</li><li>제목 <code>계산 결과 알림</code> 한 줄을 write 로 찍어요.</li><li>합을 종료 코드로 끝내요.</li></ol><div class="bk-warn"><b>syscall 은 rcx 와 r11 을 망가뜨려요</b> — 커널이 돌아올 자리를 거기에 적어 두거든요. 그리고 rax 에는 결과(write 는 쓴 바이트 수)가 들어와요. 오래 둘 값은 rbx · r8 ~ r10 · r12 ~ r15 에 두세요.</div>',
-        needs: [['title db "…", 10   title_len equ $ - title', 'R2/1', '글자와 길이'], ['mov rax, 1   mov rdi, 1   syscall', 'R2/2', 'write — 1번(화면)에 쓰기'], ['mov r12, r8   add r12, r9', 'R3/0', '복사해서 더하기 · 빼기는 sub'], ['imul r14, r9', 'R3/1', '곱하기']],
+        needs: [['title db "…", 10\ntitle_len equ $ - title', 'R2/1', '글자와 길이'], ['mov rax, 1\nmov rdi, 1\nsyscall', 'R2/2', 'write — 1번(화면)에 쓰기'], ['mov r12, r8\nadd r12, r9', 'R3/0', '복사해서 더하기 · 빼기는 sub'], ['imul r14, r9', 'R3/1', '곱하기']],
         echoExit: true,
         io: [{ output: '계산 결과 알림\n105' }],
         answer: 'section .data\ntitle     db "계산 결과 알림", 10\ntitle_len equ $ - title\n\nsection .text\nglobal _start\n_start:\n    mov r8, 60          ; a\n    mov r9, 45          ; b\n    mov r12, r8\n    add r12, r9         ; r12 = 합\n    mov r13, r8\n    sub r13, r9         ; r13 = 차\n    mov r14, r8\n    imul r14, r9        ; r14 = 곱\n\n    ; 제목 한 줄\n    mov rsi, title\n    mov rdx, title_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall\n\n    mov rdi, r12        ; 합을 종료 코드로\n    mov rax, 60         ; exit\n    syscall' },
       { title: '합이 100 을 넘었나 — 점프 없이 고르기', text: '「합이 100 을 넘으면 <code>합은 100 넘음</code>, 아니면 <code>합은 100 이하</code>」 를 찍어요. 갈래(점프)는 [[레슨:R5]] 에서 배우니, 여기서는 <b>계산으로 고르는</b> 방법을 써요.<ol><li>두 메시지를 <b>같은 길이로</b> 나란히 적어요(「이하」 와 「넘음」 은 둘 다 6바이트라 한 줄이 18바이트).</li><li><code>100 − 합</code> 을 계산해요. 합이 100 보다 크면 음수라 맨 왼쪽 비트가 1 이에요([[레슨:R3]] 2의 보수).</li><li><code>shr rax, 63</code> 으로 맨 왼쪽 비트만 남기면 넘었을 때 1, 아니면 0.</li><li>그 0 · 1 에 한 줄 길이를 곱해 메시지 주소에 더하면, 찍을 줄의 주소가 돼요.</li></ol><pre>msg_sum → 합은 100 이하\\n 합은 100 넘음\\n\n          ↑ +0            ↑ +18</pre>',
-        needs: [['sub rax, r12', 'R3/3', '100 − 합 — 넘으면 음수'], ['shr rax, 63', 'R4/2', '맨 왼쪽(부호) 비트만 남기기'], ['imul rax, sum_len', 'R3/1', '0 또는 한 줄 길이'], ['mov rsi, msg_sum   add rsi, rax', 'R2/2', '찍을 줄의 주소']],
+        needs: [['sub rax, r12', 'R3/3', '100 − 합 — 넘으면 음수'], ['shr rax, 63', 'R4/2', '맨 왼쪽(부호) 비트만 남기기'], ['imul rax, sum_len', 'R3/1', '0 또는 한 줄 길이'], ['mov rsi, msg_sum\nadd rsi, rax', 'R2/2', '찍을 줄의 주소']],
         echoExit: true,
         io: [{ output: '계산 결과 알림\n합은 100 넘음\n105' }],
         answer: 'section .data\ntitle     db "계산 결과 알림", 10\ntitle_len equ $ - title\nmsg_sum   db "합은 100 이하", 10     ; 0번 줄\nsum_len   equ $ - msg_sum             ; 한 줄 길이(18바이트)\n          db "합은 100 넘음", 10     ; 1번 줄 — 길이가 똑같아야 해요\n\nsection .text\nglobal _start\n_start:\n    mov r8, 60          ; a\n    mov r9, 45          ; b\n    mov r12, r8\n    add r12, r9         ; r12 = 합\n    mov r13, r8\n    sub r13, r9         ; r13 = 차\n    mov r14, r8\n    imul r14, r9        ; r14 = 곱\n\n    ; 제목 한 줄\n    mov rsi, title\n    mov rdx, title_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall\n\n    ; 합이 100 을 넘었나: 100 - 합 이 음수면 맨 왼쪽 비트가 1\n    mov rax, 100\n    sub rax, r12        ; 100 - 합\n    shr rax, 63         ; 맨 왼쪽 비트만 → 넘으면 1, 아니면 0\n    imul rax, sum_len   ; 0 또는 18\n    mov rsi, msg_sum\n    add rsi, rax        ; 고른 줄의 주소\n    mov rdx, sum_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall\n\n    mov rdi, r12        ; 합을 종료 코드로\n    mov rax, 60         ; exit\n    syscall' },
@@ -168,30 +168,30 @@ ld hello.o -o hello
         answer: 'section .data\ntitle     db "계산 결과 알림", 10\ntitle_len equ $ - title\nmsg_sum   db "합은 100 이하", 10     ; 0번 줄\nsum_len   equ $ - msg_sum             ; 한 줄 길이(18바이트)\n          db "합은 100 넘음", 10     ; 1번 줄 — 길이가 똑같아야 해요\nmsg_diff  db "차는 짝수", 10\ndiff_len  equ $ - msg_diff\n          db "차는 홀수", 10\nmsg_prod  db "곱은 1000 이하", 10\nprod_len  equ $ - msg_prod\n          db "곱은 1000 넘음", 10\n\nsection .text\nglobal _start\n_start:\n    mov r8, 60          ; a\n    mov r9, 45          ; b\n    mov r12, r8\n    add r12, r9         ; r12 = 합\n    mov r13, r8\n    sub r13, r9         ; r13 = 차\n    mov r14, r8\n    imul r14, r9        ; r14 = 곱\n\n    ; 제목 한 줄\n    mov rsi, title\n    mov rdx, title_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall\n\n    ; 합이 100 을 넘었나: 100 - 합 이 음수면 맨 왼쪽 비트가 1\n    mov rax, 100\n    sub rax, r12        ; 100 - 합\n    shr rax, 63         ; 맨 왼쪽 비트만 → 넘으면 1, 아니면 0\n    imul rax, sum_len   ; 0 또는 18\n    mov rsi, msg_sum\n    add rsi, rax        ; 고른 줄의 주소\n    mov rdx, sum_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall\n\n    ; 차의 홀짝: 맨 오른쪽 비트\n    mov rax, r13\n    and rax, 1          ; 홀수면 1\n    imul rax, diff_len\n    mov rsi, msg_diff\n    add rsi, rax\n    mov rdx, diff_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall\n\n    ; 곱이 1000 을 넘었나\n    mov rax, 1000\n    sub rax, r14        ; 1000 - 곱\n    shr rax, 63\n    imul rax, prod_len\n    mov rsi, msg_prod\n    add rsi, rax\n    mov rdx, prod_len\n    mov rax, 1          ; write\n    mov rdi, 1          ; 1 = 화면(stdout)\n    syscall\n\n    mov rdi, r12        ; 합을 종료 코드로\n    mov rax, 60         ; exit\n    syscall' },
       { title: '숫자를 바꿔 다시 돌려 보기', text: '완성한 <code>calc.asm</code> 의 a · b 두 줄만 바꿔 다시 빌드 · 실행해 보세요. 점프 없이 고른 메시지가 숫자에 따라 바뀌는지, 종료 코드는 어떻게 보이는지 확인해요.',
         noRun: true,
-        needs: [['mov r8, 30   mov r9, 20', 'R1/1', 'a · b 바꾸기'], ['and rax, 1', 'R4/3', '음수도 맨 오른쪽 비트로 홀짝'], ['sub rax, 5', 'R3/3', '음수 결과 — 2의 보수']],
+        needs: [['mov r8, 30\nmov r9, 20', 'R1/1', 'a · b 바꾸기'], ['and rax, 1', 'R4/3', '음수도 맨 오른쪽 비트로 홀짝'], ['sub rax, 5', 'R3/3', '음수 결과 — 2의 보수']],
         checks: [{ text: 'a = 30, b = 20 이면 `합은 100 이하` · `차는 짝수` · `곱은 1000 이하` 가 나오고 `echo $?` 는 50 이에요' }, { text: 'a = 200, b = 100 이면 `합은 100 넘음` 인데 `echo $?` 는 300 이 아니라 44 예요(종료 코드는 아래 8비트만 — 300 − 256)' }, { text: 'a = 5, b = 9 면 차가 −4 여도 `차는 짝수` 가 나와요(2의 보수에서도 맨 오른쪽 비트가 홀짝)' }, { text: 'a = 50, b = 50 이면 합이 딱 100 이라 `합은 100 이하` 예요(100 − 100 = 0 은 음수가 아니니까)' }],
         answer: 'nasm -f elf64 calc.asm -o calc.o && ld calc.o -o calc && ./calc; echo $?\n# a = 30, b = 20 으로 바꾼 뒤\n계산 결과 알림\n합은 100 이하\n차는 짝수\n곱은 1000 이하\n50' },
     ],
     R5: [
       { title: "큰 수 고르기",
         text: "<code>rax</code> 에 23, <code>rbx</code> 에 58 을 넣고 둘 중 <b>큰 수</b>를 종료 코드로 돌려주세요. 두 값을 바꿔 넣어도(58, 23) 똑같이 58 이 나와야 해요.",
-        needs: [["cmp rax, rbx   jge done", "R5/2", "부호 있게 「크거나 같으면」 점프"], ["mov rdi, rax", "R5/1", "일단 하나를 답으로 두고, 아니면 고치기"], ["jmp done   done:", "R5/0", "라벨로 건너뛰기"]],
+        needs: [["cmp rax, rbx\njge done", "R5/2", "부호 있게 「크거나 같으면」 점프"], ["mov rdi, rax", "R5/1", "일단 하나를 답으로 두고, 아니면 고치기"], ["jmp done\ndone:", "R5/0", "라벨로 건너뛰기"]],
         echoExit: true,
         io: [{"output": "58"}],
         answer: "section .text\nglobal _start\n_start:\n    mov rax, 23\n    mov rbx, 58\n    mov rdi, rax        ; 일단 rax 가 크다고 보고\n    cmp rax, rbx\n    jge done            ; rax >= rbx 면 그대로\n    mov rdi, rbx        ; 아니면 rbx 가 답\ndone:\n    mov rax, 60\n    syscall" },
       { title: "짝수면 「짝수」 출력",
         text: "<code>rax</code> 의 수(14)가 짝수면 <code>짝수</code>, 홀수면 <code>홀수</code> 를 출력하세요. 맨 끝 비트만 남기는 <code>and rax, 1</code>([[레슨:R4]]) 바로 뒤에 점프해요 — <code>and</code> 도 플래그를 바꾸니까요. 15 로 바꿔 넣으면 <code>홀수</code> 가 나와야 해요.",
-        needs: [["and rax, 1   jnz odd", "R5/1", "계산도 플래그를 바꿔요 — 0 이 아니면 점프"], ["jmp print", "R5/3", "if 쪽 끝에서 else 건너뛰기"], ["mov rsi, msg   mov rdx, len", "R5/3", "갈래마다 찍을 것만 정하고 write 는 한 번"]],
+        needs: [["and rax, 1\njnz odd", "R5/1", "계산도 플래그를 바꿔요 — 0 이 아니면 점프"], ["jmp print", "R5/3", "if 쪽 끝에서 else 건너뛰기"], ["mov rsi, msg\nmov rdx, len", "R5/3", "갈래마다 찍을 것만 정하고 write 는 한 번"]],
         io: [{"output": "짝수"}],
         answer: "section .data\neven_msg db \"짝수\", 10\neven_len equ $ - even_msg\nodd_msg db \"홀수\", 10\nodd_len equ $ - odd_msg\n\nsection .text\nglobal _start\n_start:\n    mov rax, 14\n    and rax, 1          ; 맨 끝 비트만 (0 이면 짝수)\n    jnz odd             ; 0 이 아니면 홀수\n    mov rsi, even_msg\n    mov rdx, even_len\n    jmp print\nodd:\n    mov rsi, odd_msg\n    mov rdx, odd_len\nprint:\n    mov rax, 1          ; write\n    mov rdi, 1\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall" },
       { title: "세 갈래: 얼음 · 물 · 수증기",
         text: "<code>rax</code> 의 온도(25)가 0 보다 작으면 <code>얼음</code>, 100 이상이면 <code>수증기</code>, 나머지는 <code>물</code> 을 출력하세요. 파이썬의 <code>if</code> · <code>elif</code> · <code>else</code> 예요 — <code>cmp</code> 와 점프를 두 번 써요. -5 와 120 으로도 바꿔 넣어 보세요.",
-        needs: [["cmp rax, 0   jl ice", "R5/2", "부호 있게 「작으면」 — 음수도 맞게"], ["cmp rax, 100   jge steam", "R5/2", "「크거나 같으면」"], ["jmp print", "R5/3", "갈래 끝에서 나머지 건너뛰기"]],
+        needs: [["cmp rax, 0\njl ice", "R5/2", "부호 있게 「작으면」 — 음수도 맞게"], ["cmp rax, 100\njge steam", "R5/2", "「크거나 같으면」"], ["jmp print", "R5/3", "갈래 끝에서 나머지 건너뛰기"]],
         io: [{"output": "물"}],
         answer: "section .data\nice_msg   db \"얼음\", 10\nice_len   equ $ - ice_msg\nwater_msg db \"물\", 10\nwater_len equ $ - water_msg\nsteam_msg db \"수증기\", 10\nsteam_len equ $ - steam_msg\n\nsection .text\nglobal _start\n_start:\n    mov rax, 25         ; 온도\n    cmp rax, 0\n    jl  ice             ; 0 보다 작으면 얼음\n    cmp rax, 100\n    jge steam           ; 100 이상이면 수증기\n    mov rsi, water_msg  ; 나머지는 물\n    mov rdx, water_len\n    jmp print\nice:\n    mov rsi, ice_msg\n    mov rdx, ice_len\n    jmp print\nsteam:\n    mov rsi, steam_msg\n    mov rdx, steam_len\nprint:\n    mov rax, 1          ; write\n    mov rdi, 1\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall" },
       { title: "고치기: 빚이 있는데 「괜찮아요」",
         text: "잔액이 -3000 원인데 아래 코드는 <code>괜찮아요</code> 를 찍어요. 점프 명령 하나만 고쳐서 <code>빚이 있어요</code> 가 나오게 하세요. 힌트: -3000 을 부호 없이 보면 아주 큰 수예요.",
-        needs: [["cmp rax, 0   jl minus", "R5/2", "less 는 부호 있음, below 는 부호 없음"]],
+        needs: [["cmp rax, 0\njl minus", "R5/2", "less 는 부호 있음, below 는 부호 없음"]],
         given: "section .data\ndebt_msg db \"빚이 있어요\", 10\ndebt_len equ $ - debt_msg\nok_msg   db \"괜찮아요\", 10\nok_len   equ $ - ok_msg\n\nsection .text\nglobal _start\n_start:\n    mov rax, -3000      ; 잔액\n    cmp rax, 0\n    jb  minus           ; 0 보다 작으면?\n    mov rsi, ok_msg\n    mov rdx, ok_len\n    jmp print\nminus:\n    mov rsi, debt_msg\n    mov rdx, debt_len\nprint:\n    mov rax, 1\n    mov rdi, 1\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall",
         io: [{"output": "빚이 있어요"}],
         answer: "section .data\ndebt_msg db \"빚이 있어요\", 10\ndebt_len equ $ - debt_msg\nok_msg   db \"괜찮아요\", 10\nok_len   equ $ - ok_msg\n\nsection .text\nglobal _start\n_start:\n    mov rax, -3000      ; 잔액\n    cmp rax, 0\n    jl  minus           ; 부호 있게 보고 0 보다 작으면\n    mov rsi, ok_msg\n    mov rdx, ok_len\n    jmp print\nminus:\n    mov rsi, debt_msg\n    mov rdx, debt_len\nprint:\n    mov rax, 1\n    mov rdi, 1\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall" },
@@ -199,23 +199,23 @@ ld hello.o -o hello
     R6: [
       { title: "1~100 합",
         text: "1 부터 100 까지 더해서 합이 5050 이면 <code>합은 5050</code>, 아니면 <code>틀렸어요</code> 를 출력하세요. 5050 은 255 보다 커서 종료 코드로는 안 보여요(256 으로 나눈 나머지 186 이 나와요). 그래서 <code>cmp</code> 로 맞는지 확인해요.",
-        needs: [["add rax, rcx   dec rcx   jnz sum", "R6/2", "카운터를 줄이며 더하기"], ["cmp rax, 5050   jne wrong", "R5/1", "같은지 보고 두 갈래"]],
+        needs: [["add rax, rcx\ndec rcx\njnz sum", "R6/2", "카운터를 줄이며 더하기"], ["cmp rax, 5050\njne wrong", "R5/1", "같은지 보고 두 갈래"]],
         io: [{"output": "합은 5050"}],
         answer: "section .data\nok_msg  db \"합은 5050\", 10\nok_len  equ $ - ok_msg\nbad_msg db \"틀렸어요\", 10\nbad_len equ $ - bad_msg\n\nsection .text\nglobal _start\n_start:\n    mov rcx, 100        ; 100, 99, …, 1\n    mov rax, 0          ; 합\nsum:\n    add rax, rcx\n    dec rcx\n    jnz sum\n    cmp rax, 5050\n    jne wrong\n    mov rsi, ok_msg\n    mov rdx, ok_len\n    jmp print\nwrong:\n    mov rsi, bad_msg\n    mov rdx, bad_len\nprint:\n    mov rax, 1          ; write\n    mov rdi, 1\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall" },
       { title: "별 n 개 찍기",
         text: "<code>rbx</code> 에 n = 7 을 넣고 <code>*</code> 를 7 개 한 줄로 찍은 뒤 줄을 바꾸세요. <code>write</code> 로 1바이트(<code>*</code>)를 7 번, 마지막에 줄바꿈 1바이트를 한 번 써요. n 을 3 으로 바꾸면 <code>***</code>.",
-        needs: [["mov rbx, 7   dec rbx   jnz stars", "R6/0", "n 번 반복 — 카운터는 syscall 이 안 바꾸는 rbx"], ["mov rax, 1   syscall", "R6/0", "반복 안에서 rax 를 매번 다시"], ["mov rdx, 1", "R6/0", "1바이트만 쓰기"]],
+        needs: [["mov rbx, 7\ndec rbx\njnz stars", "R6/0", "n 번 반복 — 카운터는 syscall 이 안 바꾸는 rbx"], ["mov rax, 1\nsyscall", "R6/0", "반복 안에서 rax 를 매번 다시"], ["mov rdx, 1", "R6/0", "1바이트만 쓰기"]],
         io: [{"output": "*******"}],
         answer: "section .data\nstar    db \"*\"\nnl      db 10\n\nsection .text\nglobal _start\n_start:\n    mov rbx, 7          ; n\nstars:\n    mov rax, 1          ; write — 반복 안에서 매번\n    mov rdi, 1\n    mov rsi, star\n    mov rdx, 1          ; 1바이트\n    syscall\n    dec rbx\n    jnz stars\n    mov rax, 1          ; 마지막에 줄바꿈\n    mov rdi, 1\n    mov rsi, nl\n    mov rdx, 1\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall" },
       { title: "팩토리얼",
         text: "5! = 5 × 4 × 3 × 2 × 1 을 반복으로 계산해 종료 코드로 돌려주세요. 6! = 720 은 255 를 넘어서 종료 코드로는 208(720 을 256 으로 나눈 나머지)이 보여요.",
-        needs: [["imul rax, rcx", "R6/2", "거듭제곱처럼 곱하기를 반복"], ["dec rcx   jnz fact", "R6/2", "rcx 가 0 이 될 때까지"]],
+        needs: [["imul rax, rcx", "R6/2", "거듭제곱처럼 곱하기를 반복"], ["dec rcx\njnz fact", "R6/2", "rcx 가 0 이 될 때까지"]],
         echoExit: true,
         io: [{"output": "120"}],
         answer: "section .text\nglobal _start\n_start:\n    mov rcx, 5          ; 5, 4, 3, 2, 1\n    mov rax, 1          ; 결과\nfact:\n    imul rax, rcx       ; rax = rax × rcx\n    dec rcx\n    jnz fact\n    mov rdi, rax        ; 종료 코드 = 120\n    mov rax, 60\n    syscall" },
       { title: "고치기: 끝나지 않는 「야옹」",
         text: "「야옹」 을 세 번 찍으려던 코드인데 끝없이 찍혀요. <kbd>Ctrl</kbd>+<kbd>C</kbd> 로 멈추고(또는 <code>timeout 3 ./meow</code>), 왜 안 끝나는지 찾아 고치세요.",
-        needs: [["syscall", "R6/3", "rax · rcx · r11 을 바꿔요"], ["mov rbx, 3   dec rbx   jnz again", "R6/0", "syscall 이 안 바꾸는 레지스터를 카운터로"]],
+        needs: [["syscall", "R6/3", "rax · rcx · r11 을 바꿔요"], ["mov rbx, 3\ndec rbx\njnz again", "R6/0", "syscall 이 안 바꾸는 레지스터를 카운터로"]],
         given: "section .data\nmsg     db \"야옹\", 10\nlen     equ $ - msg\n\nsection .text\nglobal _start\n_start:\n    mov rcx, 3          ; 세 번\nagain:\n    mov rax, 1\n    mov rdi, 1\n    mov rsi, msg\n    mov rdx, len\n    syscall\n    dec rcx\n    jnz again\n    mov rax, 60\n    mov rdi, 0\n    syscall",
         io: [{"output": "야옹\n야옹\n야옹"}],
         answer: "section .data\nmsg     db \"야옹\", 10\nlen     equ $ - msg\n\nsection .text\nglobal _start\n_start:\n    mov rbx, 3          ; 세 번 — syscall 이 rcx 를 바꾸니 rbx 로\nagain:\n    mov rax, 1\n    mov rdi, 1\n    mov rsi, msg\n    mov rdx, len\n    syscall\n    dec rbx\n    jnz again\n    mov rax, 60\n    mov rdi, 0\n    syscall" },
@@ -223,7 +223,7 @@ ld hello.o -o hello
     R7: [
       { title: "두 변수 바꾸기",
         text: "<code>a dq 3</code>, <code>b dq 8</code> 의 값을 서로 바꾸세요(파이썬의 <code>a, b = b, a</code>). 메모리 → 메모리는 안 되니 레지스터 두 개를 거쳐요. 확인은 종료 코드 <b>a × 10 + b</b> — 바꿨으면 83, 그대로면 38 이에요(곱하기는 [[레슨:R3]] 의 <code>imul</code>).",
-        needs: [["mov rax, [a]   mov [b], rax", "R7/1", "메모리 읽기 · 쓰기"], ["add rdi, [b]", "R7/1", "계산에 메모리 값을 바로"], ["default rel", "R7/4", "파일 맨 위 한 줄"]],
+        needs: [["mov rax, [a]\nmov [b], rax", "R7/1", "메모리 읽기 · 쓰기"], ["add rdi, [b]", "R7/1", "계산에 메모리 값을 바로"], ["default rel", "R7/4", "파일 맨 위 한 줄"]],
         echoExit: true,
         io: [{"output": "83"}],
         answer: "default rel\n\nsection .data\na       dq 3\nb       dq 8\n\nsection .text\nglobal _start\n_start:\n    mov rax, [a]            ; rax = 3\n    mov rbx, [b]            ; rbx = 8\n    mov [a], rbx            ; a = 8\n    mov [b], rax            ; b = 3\n    mov rdi, [a]            ; 확인: a × 10 + b\n    mov rcx, 10\n    imul rdi, rcx\n    add rdi, [b]\n    mov rax, 60\n    syscall" },
@@ -247,23 +247,23 @@ ld hello.o -o hello
         io: [{ output: "75" }],
         answer: `default rel\nsection .data\nnums dq 12, 7, 30, 5, 21\nn    equ ($ - nums) / 8\n\nsection .text\nglobal _start\n_start:\n    lea rbx, [nums]\n    mov rdi, 0              ; 합\n    mov rcx, 0              ; 칸 번호\n.loop:\n    cmp rcx, n\n    jge .done\n    add rdi, [rbx + rcx*8]  ; 합 += nums[rcx]\n    inc rcx\n    jmp .loop\n.done:\n    mov rax, 60             ; 종료 코드 = 합\n    syscall` },
       { title: "영하의 날 중 가장 따뜻한 날", text: "어느 주의 아침 기온이 <code>temps dq -5, -12, -3, -40, -8</code> 이에요. 가장 높은 기온을 찾아 종료 코드로 돌려주세요. 답은 -3 인데, 종료 코드는 0~255 라 <b>253</b> 으로 보여요([[레슨:R3]] 의 2의 보수). 「지금까지 가장 큰 값」 을 0 으로 시작하면 왜 틀리는지도 생각해 봐요.",
-        needs: [["mov rdi, [rbx]", "R8/1", "0 이 아니라 0번 칸에서 시작"], ["cmp rax, rdi   jle .skip", "R8/1", "부호 있는 비교로 건너뛰기"]],
+        needs: [["mov rdi, [rbx]", "R8/1", "0 이 아니라 0번 칸에서 시작"], ["cmp rax, rdi\njle .skip", "R8/1", "부호 있는 비교로 건너뛰기"]],
         echoExit: true,
         io: [{ output: "253" }],
         answer: `default rel\nsection .data\ntemps dq -5, -12, -3, -40, -8\nn     equ ($ - temps) / 8\n\nsection .text\nglobal _start\n_start:\n    lea rbx, [temps]\n    mov rdi, [rbx]          ; 0 이 아니라 0번 칸에서 시작\n    mov rcx, 1\n.loop:\n    cmp rcx, n\n    jge .done\n    mov rax, [rbx + rcx*8]\n    cmp rax, rdi\n    jle .skip               ; 부호 있는 비교(jle)\n    mov rdi, rax\n.skip:\n    inc rcx\n    jmp .loop\n.done:\n    mov rax, 60             ; -3 → 종료 코드 253\n    syscall` },
       { title: "두 문자열의 길이 합", text: "<code>s1 db \"hello\", 0</code> 과 <code>s2 db \"assembly\", 0</code> 의 길이를 각각 0 바이트까지 세어, 둘을 더한 값을 종료 코드로 돌려주세요(0 바이트는 안 세요).",
-        needs: [["cmp byte [rbx + rcx], 0", "R8/2", "0 바이트면 끝"], ["inc rcx   jmp .count", "R8/2", "한 칸 더"], ["lea rbx, [s2]", "R8/0", "두 번째 문자열로 바꾸기"]],
+        needs: [["cmp byte [rbx + rcx], 0", "R8/2", "0 바이트면 끝"], ["inc rcx\njmp .count", "R8/2", "한 칸 더"], ["lea rbx, [s2]", "R8/0", "두 번째 문자열로 바꾸기"]],
         echoExit: true,
         io: [{ output: "13" }],
         answer: `default rel\nsection .data\ns1 db "hello", 0\ns2 db "assembly", 0\n\nsection .text\nglobal _start\n_start:\n    mov rdi, 0              ; 두 길이의 합\n    lea rbx, [s1]\n    mov rcx, 0\n.count1:\n    cmp byte [rbx + rcx], 0\n    je .done1\n    inc rcx\n    jmp .count1\n.done1:\n    add rdi, rcx            ; + 5\n    lea rbx, [s2]\n    mov rcx, 0\n.count2:\n    cmp byte [rbx + rcx], 0\n    je .done2\n    inc rcx\n    jmp .count2\n.done2:\n    add rdi, rcx            ; + 8\n    mov rax, 60\n    syscall` },
       { title: "대소문자 뒤집기", text: "<code>msg db \"Hello, ASM World 2026!\", 10, 0</code> 에서 대문자는 소문자로, 소문자는 대문자로 바꿔 출력하세요. 숫자 · 기호 · 빈칸은 그대로예요. 두 범위(<code>'A'</code>~<code>'Z'</code>, <code>'a'</code>~<code>'z'</code>) 중 하나에 들면 <code>xor al, 0x20</code> 하나로 뒤집혀요.",
-        needs: [["mov al, [rbx + rcx]", "R8/3", "한 글자 읽기"], ["cmp al, 'a'   jb .keep", "R8/3", "범위 밖이면 건너뛰기"], ["xor al, 0x20", "R8/3", "대 ↔ 소 뒤집기"], ["mov [rbx + rcx], al", "R8/3", "제자리에 쓰기"]],
+        needs: [["mov al, [rbx + rcx]", "R8/3", "한 글자 읽기"], ["cmp al, 'a'\njb .keep", "R8/3", "범위 밖이면 건너뛰기"], ["xor al, 0x20", "R8/3", "대 ↔ 소 뒤집기"], ["mov [rbx + rcx], al", "R8/3", "제자리에 쓰기"]],
         io: [{ output: "hELLO, asm wORLD 2026!" }],
         answer: `default rel\nsection .data\nmsg db "Hello, ASM World 2026!", 10, 0\n\nsection .text\nglobal _start\n_start:\n    lea rbx, [msg]\n    mov rcx, 0\n.next:\n    mov al, [rbx + rcx]\n    cmp al, 0\n    je .print\n    cmp al, 'A'\n    jb .keep                ; 'A' 보다 작으면 글자가 아님\n    cmp al, 'Z'\n    jbe .flip               ; 'A'~'Z' 면 뒤집기\n    cmp al, 'a'\n    jb .keep                ; 'Z' 와 'a' 사이의 기호\n    cmp al, 'z'\n    ja .keep\n.flip:\n    xor al, 0x20            ; 대 ↔ 소(0x20 자리 비트 하나 뒤집기)\n    mov [rbx + rcx], al\n.keep:\n    inc rcx\n    jmp .next\n.print:\n    mov rax, 1\n    mov rdi, 1\n    mov rsi, rbx\n    mov rdx, rcx\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall` },
     ],
     R9: [
       { title: "이름 받아 인사하기", text: "<code>이름이 뭐예요? </code> 를 찍고 이름 한 줄을 받아 <code>안녕하세요, 이름님!</code> 을 출력하세요. read 가 받은 글자 끝에는 줄바꿈이 붙어 있으니, 마지막 바이트가 10 이면 길이에서 1 을 빼고 찍어요. 고정 글자 세 개(<code>이름이 뭐예요? </code> · <code>안녕하세요, </code> · <code>님!</code>+줄바꿈)는 <code>section .data</code> 에 <code>equ $ - 이름</code> 길이와 함께 두세요. 터미널에서는 내가 친 이름도 보이지만 출력 예에는 프로그램이 찍은 것만 있어요.",
-        needs: [["mov rax, 0   mov rdi, 0   syscall", "R9/0", "read — 표준 입력에서 받기"], ["cmp byte [rbx + r12 - 1], 10", "R9/0", "끝의 줄바꿈 빼기"], ["mov rax, 1   syscall", "R9/1", "write 를 세 번"]],
+        needs: [["mov rax, 0\nmov rdi, 0\nsyscall", "R9/0", "read — 표준 입력에서 받기"], ["cmp byte [rbx + r12 - 1], 10", "R9/0", "끝의 줄바꿈 빼기"], ["mov rax, 1\nsyscall", "R9/1", "write 를 세 번"]],
         io: [{ input: "민수\n", output: "이름이 뭐예요? 안녕하세요, 민수님!" }, { input: "Ada\n", output: "이름이 뭐예요? 안녕하세요, Ada님!" }],
         answer: `default rel\nsection .data\nask     db "이름이 뭐예요? "\nask_len equ $ - ask\nhi      db "안녕하세요, "\nhi_len  equ $ - hi\ntail    db "님!", 10\ntail_len equ $ - tail\n\nsection .bss\nname resb 64\n\nsection .text\nglobal _start\n_start:\n    mov rax, 1              ; 묻기\n    mov rdi, 1\n    lea rsi, [ask]\n    mov rdx, ask_len\n    syscall\n    mov rax, 0              ; read(0, name, 64)\n    mov rdi, 0\n    lea rsi, [name]\n    mov rdx, 64\n    syscall\n    mov r12, rax            ; 받은 길이\n    lea rbx, [name]\n    cmp byte [rbx + r12 - 1], 10\n    jne .greet              ; 끝이 줄바꿈이 아니면 그대로\n    dec r12                 ; 줄바꿈은 빼기\n.greet:\n    mov rax, 1\n    mov rdi, 1\n    lea rsi, [hi]\n    mov rdx, hi_len\n    syscall\n    mov rax, 1\n    mov rdi, 1\n    lea rsi, [name]\n    mov rdx, r12\n    syscall\n    mov rax, 1\n    mov rdi, 1\n    lea rsi, [tail]\n    mov rdx, tail_len\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall` },
       { title: "고치기: 한 글자만 찍히는 echo", text: "아래 프로그램은 받은 줄을 그대로 찍으려는 건데, 무엇을 넣어도 <b>첫 글자 하나만</b> 나와요. 줄 하나만 고쳐서 받은 줄이 전부 나오게 하세요.",
@@ -272,33 +272,33 @@ ld hello.o -o hello
         io: [{ input: "hello, read\n", output: "hello, read" }],
         answer: `default rel\nsection .bss\nbuf resb 64\n\nsection .text\nglobal _start\n_start:\n    mov rax, 0              ; read(0, buf, 64)\n    mov rdi, 0\n    lea rsi, [buf]\n    mov rdx, 64\n    syscall\n    mov rdx, rax            ; 받은 길이를 먼저 rdx 로\n    mov rax, 1              ; 그다음에 rax 를 write 번호로\n    mov rdi, 1\n    lea rsi, [buf]\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall` },
       { title: "두 수 더하기", text: "한 줄에 빈칸으로 나눈 두 수(예: <code>37 45</code>)를 받아 합을 10진으로 출력하세요. 첫 수는 숫자가 아닌 글자(빈칸)에서 멈추고, 그 빈칸 하나를 건너뛴 뒤 같은 방법으로 둘째 수를 만들어요. 출력은 [[레슨:R9]] 의 숫자 출력 덩어리를 그대로 붙여 써요.",
-        needs: [["movzx rdx, byte [rbx + rcx]", "R9/2", "글자 1바이트 읽기"], ["sub rdx, '0'   imul r12, 10   add r12, rdx", "R9/2", "글자 → 정수"], ["sub rsp, 32 … div rcx … add rsp, 32", "R9/4", "숫자 출력 덩어리 — rdi 를 10진으로"]],
+        needs: [["movzx rdx, byte [rbx + rcx]", "R9/2", "글자 1바이트 읽기"], ["sub rdx, '0'\nimul r12, 10\nadd r12, rdx", "R9/2", "글자 → 정수"], ["sub rsp, 32 … div rcx … add rsp, 32", "R9/4", "숫자 출력 덩어리 — rdi 를 10진으로"]],
         io: [{ input: "37 45\n", output: "82" }, { input: "99 99\n", output: "198" }],
         answer: `default rel\nsection .bss\nbuf resb 64\n\nsection .text\nglobal _start\n_start:\n    mov rax, 0              ; read(0, buf, 64) — 예: "37 45\\n"\n    mov rdi, 0\n    lea rsi, [buf]\n    mov rdx, 64\n    syscall\n    lea rbx, [buf]\n    mov rcx, 0              ; 몇 번째 글자\n    mov r12, 0              ; 첫 수\n.first:\n    movzx rdx, byte [rbx + rcx]\n    cmp rdx, '0'\n    jb .gap\n    cmp rdx, '9'\n    ja .gap\n    sub rdx, '0'\n    imul r12, 10\n    add r12, rdx\n    inc rcx\n    jmp .first\n.gap:\n    inc rcx                 ; 사이의 빈칸 하나 건너뛰기\n    mov r13, 0              ; 둘째 수\n.second:\n    movzx rdx, byte [rbx + rcx]\n    cmp rdx, '0'\n    jb .add\n    cmp rdx, '9'\n    ja .add\n    sub rdx, '0'\n    imul r13, 10\n    add r13, rdx\n    inc rcx\n    jmp .second\n.add:\n    mov rdi, r12\n    add rdi, r13            ; rdi = 첫 수 + 둘째 수\n    ; ---- 숫자 출력: rdi 를 10진 글자 + 줄바꿈으로 ----\n    sub rsp, 32             ; 글자 버퍼 32바이트(스택)\n    mov rax, rdi\n    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움\n    mov byte [rsi], 10      ; 맨 끝은 줄바꿈\n    mov r8, 1               ; 지금까지 글자 수\n    mov rcx, 10\n    test rax, rax\n    jns .digits\n    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'\n.digits:\n    xor edx, edx\n    div rcx                 ; rax = 몫, rdx = 나머지(0~9)\n    add dl, '0'\n    dec rsi\n    mov [rsi], dl\n    inc r8\n    test rax, rax\n    jnz .digits\n    test rdi, rdi\n    jns .write\n    dec rsi\n    mov byte [rsi], '-'\n    inc r8\n.write:\n    mov rax, 1              ; write(1, rsi, r8)\n    mov rdx, r8\n    mov rdi, 1\n    syscall\n    add rsp, 32\n    ; ---- 여기까지 ----\n    mov rax, 60\n    mov rdi, 0\n    syscall` },
       { title: "1 부터 n 까지 더하기", text: "수 n 을 한 줄 받아 1 + 2 + … + n 을 출력하세요. 100 이면 5050 처럼 255 보다 큰 수가 나오니 종료 코드 말고 숫자 출력 덩어리로 찍어요.",
-        needs: [["movzx rdx, byte [rbx + rcx]   sub rdx, '0'", "R9/2", "n 만들기"], ["cmp rcx, r12   jg .print", "R9/4", "반복 — i 가 n 을 넘으면 끝"], ["sub rsp, 32 … div rcx … add rsp, 32", "R9/4", "숫자 출력 덩어리 — rdi 를 10진으로"]],
+        needs: [["movzx rdx, byte [rbx + rcx]\nsub rdx, '0'", "R9/2", "n 만들기"], ["cmp rcx, r12\njg .print", "R9/4", "반복 — i 가 n 을 넘으면 끝"], ["sub rsp, 32 … div rcx … add rsp, 32", "R9/4", "숫자 출력 덩어리 — rdi 를 10진으로"]],
         io: [{ input: "100\n", output: "5050" }, { input: "10\n", output: "55" }],
         answer: `default rel\nsection .bss\nbuf resb 64\n\nsection .text\nglobal _start\n_start:\n    mov rax, 0              ; read(0, buf, 64)\n    mov rdi, 0\n    lea rsi, [buf]\n    mov rdx, 64\n    syscall\n    lea rbx, [buf]\n    mov rcx, 0\n    mov r12, 0              ; n\n.digit:\n    movzx rdx, byte [rbx + rcx]\n    cmp rdx, '0'\n    jb .sum\n    cmp rdx, '9'\n    ja .sum\n    sub rdx, '0'\n    imul r12, 10\n    add r12, rdx\n    inc rcx\n    jmp .digit\n.sum:\n    mov rdi, 0              ; 합\n    mov rcx, 1              ; i = 1\n.add:\n    cmp rcx, r12\n    jg .print               ; i 가 n 을 넘으면 끝\n    add rdi, rcx\n    inc rcx\n    jmp .add\n.print:\n    ; ---- 숫자 출력: rdi 를 10진 글자 + 줄바꿈으로 ----\n    sub rsp, 32             ; 글자 버퍼 32바이트(스택)\n    mov rax, rdi\n    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움\n    mov byte [rsi], 10      ; 맨 끝은 줄바꿈\n    mov r8, 1               ; 지금까지 글자 수\n    mov rcx, 10\n    test rax, rax\n    jns .digits\n    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'\n.digits:\n    xor edx, edx\n    div rcx                 ; rax = 몫, rdx = 나머지(0~9)\n    add dl, '0'\n    dec rsi\n    mov [rsi], dl\n    inc r8\n    test rax, rax\n    jnz .digits\n    test rdi, rdi\n    jns .write\n    dec rsi\n    mov byte [rsi], '-'\n    inc r8\n.write:\n    mov rax, 1              ; write(1, rsi, r8)\n    mov rdx, r8\n    mov rdi, 1\n    syscall\n    add rsp, 32\n    ; ---- 여기까지 ----\n    mov rax, 60\n    mov rdi, 0\n    syscall` },
     ],
     RB2: [
-      { title: "복습 — 점프 다섯 개 · 출력 예측(종료 코드)", text: "<p>숫자를 출력하는 프로그램을 만들기 전에 챕터 2 를 되짚어요. 먼저 레슨 5 의 조건 점프예요. <code>r12 = -3</code> 을 다섯 번 비교하고, 점프할 때마다 그 자리의 값(1 · 2 · 4 · 8 · 16)을 <code>rdi</code> 에 더해요. 마지막 <code>rdi</code> 가 종료 코드예요.</p><p>돌리기 전에 <code>echo $?</code> 에 나올 수를 먼저 예상해 보고, 우분투에서 빌드해 돌려 맞았는지 확인해 보세요. 부호 있는 점프(<code>jl</code> · <code>jg</code>)와 부호 없는 점프(<code>jb</code> · <code>ja</code>)가 −3 을 어떻게 보는지가 핵심이에요.</p>", needs: [["cmp r12, 10   jl .a", "R5/1", "cmp 다음에 조건 점프"], ["jl · jg · jb · ja", "R5/2", "부호 있음 · 부호 없음"], ["je .c", "R5/1", "같으면 점프"], ["jmp .done", "R5/0", "라벨과 무조건 점프"]], predict: true, echoExit: true, answer: "section .text\nglobal _start\n_start:\n    mov r12, -3\n    mov rdi, 0\n\n    cmp r12, 10\n    jl .a               ; ① -3 < 10 (부호 있게)?\n    jmp .b\n.a:\n    add rdi, 1\n.b:\n    cmp r12, 10\n    jb .b_yes           ; ② -3 < 10 (부호 없이)?\n    jmp .c\n.b_yes:\n    add rdi, 2\n.c:\n    cmp r12, -3\n    je .c_yes           ; ③ 같나?\n    jmp .d\n.c_yes:\n    add rdi, 4\n.d:\n    cmp r12, -5\n    jg .d_yes           ; ④ -3 > -5 (부호 있게)?\n    jmp .e\n.d_yes:\n    add rdi, 8\n.e:\n    cmp r12, -5\n    ja .e_yes           ; ⑤ -3 > -5 (부호 없이)?\n    jmp .done\n.e_yes:\n    add rdi, 16\n.done:\n    mov rax, 60         ; exit(rdi)\n    syscall", explain: "<p>① 부호 있게 보면 −3 &lt; 10 이라 <code>jl</code> 은 점프해요(+1). ② 부호 없이 보면 −3 은 <code>0xFFFFFFFFFFFFFFFD</code>, 아주 큰 수라 10 보다 작지 않아요. <code>jb</code> 는 점프하지 않아요(+0). ③ 같으니 <code>je</code> 는 점프(+4). ④ −3 &gt; −5 라 <code>jg</code> 도 점프(+8). ⑤ 부호 없이 보면 −3 은 <code>…FFFD</code>, −5 는 <code>…FFFB</code> 라서 −3 쪽이 더 커요. 그래서 <code>ja</code> 도 점프해요(+16). 둘 다 음수면 부호 없이 봐도 순서가 같아요. 합은 1 + 4 + 8 + 16 = <b>29</b>. 음수가 나올 수 있는 값에는 <code>jl</code> · <code>jg</code> 쪽을 써요.</p>", io: [{ output: "29" }] },
+      { title: "복습 — 점프 다섯 개 · 출력 예측(종료 코드)", text: "<p>숫자를 출력하는 프로그램을 만들기 전에 챕터 2 를 되짚어요. 먼저 레슨 5 의 조건 점프예요. <code>r12 = -3</code> 을 다섯 번 비교하고, 점프할 때마다 그 자리의 값(1 · 2 · 4 · 8 · 16)을 <code>rdi</code> 에 더해요. 마지막 <code>rdi</code> 가 종료 코드예요.</p><p>돌리기 전에 <code>echo $?</code> 에 나올 수를 먼저 예상해 보고, 우분투에서 빌드해 돌려 맞았는지 확인해 보세요. 부호 있는 점프(<code>jl</code> · <code>jg</code>)와 부호 없는 점프(<code>jb</code> · <code>ja</code>)가 −3 을 어떻게 보는지가 핵심이에요.</p>", needs: [["cmp r12, 10\njl .a", "R5/1", "cmp 다음에 조건 점프"], ["jl · jg · jb · ja", "R5/2", "부호 있음 · 부호 없음"], ["je .c", "R5/1", "같으면 점프"], ["jmp .done", "R5/0", "라벨과 무조건 점프"]], predict: true, echoExit: true, answer: "section .text\nglobal _start\n_start:\n    mov r12, -3\n    mov rdi, 0\n\n    cmp r12, 10\n    jl .a               ; ① -3 < 10 (부호 있게)?\n    jmp .b\n.a:\n    add rdi, 1\n.b:\n    cmp r12, 10\n    jb .b_yes           ; ② -3 < 10 (부호 없이)?\n    jmp .c\n.b_yes:\n    add rdi, 2\n.c:\n    cmp r12, -3\n    je .c_yes           ; ③ 같나?\n    jmp .d\n.c_yes:\n    add rdi, 4\n.d:\n    cmp r12, -5\n    jg .d_yes           ; ④ -3 > -5 (부호 있게)?\n    jmp .e\n.d_yes:\n    add rdi, 8\n.e:\n    cmp r12, -5\n    ja .e_yes           ; ⑤ -3 > -5 (부호 없이)?\n    jmp .done\n.e_yes:\n    add rdi, 16\n.done:\n    mov rax, 60         ; exit(rdi)\n    syscall", explain: "<p>① 부호 있게 보면 −3 &lt; 10 이라 <code>jl</code> 은 점프해요(+1). ② 부호 없이 보면 −3 은 <code>0xFFFFFFFFFFFFFFFD</code>, 아주 큰 수라 10 보다 작지 않아요. <code>jb</code> 는 점프하지 않아요(+0). ③ 같으니 <code>je</code> 는 점프(+4). ④ −3 &gt; −5 라 <code>jg</code> 도 점프(+8). ⑤ 부호 없이 보면 −3 은 <code>…FFFD</code>, −5 는 <code>…FFFB</code> 라서 −3 쪽이 더 커요. 그래서 <code>ja</code> 도 점프해요(+16). 둘 다 음수면 부호 없이 봐도 순서가 같아요. 합은 1 + 4 + 8 + 16 = <b>29</b>. 음수가 나올 수 있는 값에는 <code>jl</code> · <code>jg</code> 쪽을 써요.</p>", io: [{ output: "29" }] },
       { title: "복습 — 고치기 — 5 + 7 이 1804?", text: "<p>이번엔 레슨 7 의 메모리예요. 메모리의 두 수 <code>a</code> · <code>b</code> 를 더해 <code>total</code> 에 저장하고, 「누적 합」 문제의 숫자 출력 덩어리로 찍는 프로그램인데, 12 가 아니라 이렇게 나와요.</p><pre>1804</pre><p><code>a</code> · <code>b</code> 를 몇 바이트로 만들었는지, <code>mov rdi, [a]</code> 는 몇 바이트를 읽는지 비교해 보세요. 1804 는 16진수로 <code>0x070C</code> 예요. <code>0x0705</code>(a 와 그 뒤의 b)에 7 을 더하면? 자리를 만드는 두 줄만 고쳐서 12 가 나오게 하세요.</p>", needs: [["a db 5 · a dq 5", "R7/0", "1바이트 자리 · 8바이트 자리"], ["mov rax, [n]", "R7/2", "rax 로 읽으면 8바이트 — 이웃까지 딸려 와요"], ["mov rdi, [a]", "R7/1", "메모리에서 읽기"], ["default rel", "R7/4", "rip 기준 주소"]], given: "default rel\nsection .data\na     db 5\nb     db 7\ntotal dq 0\n\nsection .text\nglobal _start\n_start:\n    mov rdi, [a]\n    add rdi, [b]\n    mov [total], rdi\n    ; ---- 숫자 출력: rdi 를 10진 글자 + 줄바꿈으로 ----\n    sub rsp, 32             ; 글자 버퍼 32바이트(스택)\n    mov rax, rdi\n    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움\n    mov byte [rsi], 10      ; 맨 끝은 줄바꿈\n    mov r8, 1               ; 지금까지 글자 수\n    mov rcx, 10\n    test rax, rax\n    jns .digits\n    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'\n.digits:\n    xor edx, edx\n    div rcx                 ; rax = 몫, rdx = 나머지(0~9)\n    add dl, '0'\n    dec rsi\n    mov [rsi], dl\n    inc r8\n    test rax, rax\n    jnz .digits\n    test rdi, rdi\n    jns .write\n    dec rsi\n    mov byte [rsi], '-'\n    inc r8\n.write:\n    mov rax, 1              ; write(1, rsi, r8)\n    mov rdx, r8\n    mov rdi, 1\n    syscall\n    add rsp, 32\n    ; ---- 여기까지 ----\n    mov rax, 60\n    mov rdi, 0\n    syscall", answer: "default rel\nsection .data\na     dq 5              ; 8바이트 자리 — rdi 로 읽는 크기와 같게\nb     dq 7\ntotal dq 0\n\nsection .text\nglobal _start\n_start:\n    mov rdi, [a]\n    add rdi, [b]\n    mov [total], rdi\n    ; ---- 숫자 출력: rdi 를 10진 글자 + 줄바꿈으로 ----\n    sub rsp, 32             ; 글자 버퍼 32바이트(스택)\n    mov rax, rdi\n    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움\n    mov byte [rsi], 10      ; 맨 끝은 줄바꿈\n    mov r8, 1               ; 지금까지 글자 수\n    mov rcx, 10\n    test rax, rax\n    jns .digits\n    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'\n.digits:\n    xor edx, edx\n    div rcx                 ; rax = 몫, rdx = 나머지(0~9)\n    add dl, '0'\n    dec rsi\n    mov [rsi], dl\n    inc r8\n    test rax, rax\n    jnz .digits\n    test rdi, rdi\n    jns .write\n    dec rsi\n    mov byte [rsi], '-'\n    inc r8\n.write:\n    mov rax, 1              ; write(1, rsi, r8)\n    mov rdx, r8\n    mov rdi, 1\n    syscall\n    add rsp, 32\n    ; ---- 여기까지 ----\n    mov rax, 60\n    mov rdi, 0\n    syscall", io: [{ output: "12" }] },
       { title: "누적 합을 한 줄씩", text: "챕터 2 묶기예요. <code>nums dq 15, -7, 300, 0, -1024</code> 를 앞에서부터 더해 가며, 더할 때마다 <b>지금까지의 합</b>을 한 줄씩 출력하세요. 숫자 출력 덩어리는 반복 안에 <b>한 번만</b> 두고, 칸 번호 · 배열 주소 · 합은 덩어리가 안 건드리는 <code>rbx</code> · <code>r12</code> · <code>r13</code> 에 둬요. 음수도 <code>-716</code> 처럼 나와야 해요.",
-        needs: [["add r13, [rbx + r12*8]", "R8/1", "칸 값을 합에 더하기"], ["mov rdi, r13", "R9/4", "찍을 수는 rdi 에"], ["test rax, rax   jns .digits   neg rax", "R9/4", "음수 처리"], ["inc r12   cmp r12, n   jl .next", "R9/4", "덩어리를 반복 안에"], ["cmp r12, n   jl .next", "R6/1", "몸통 아래에서 검사하고 위로 — 다섯 칸 반복"]],
+        needs: [["add r13, [rbx + r12*8]", "R8/1", "칸 값을 합에 더하기"], ["mov rdi, r13", "R9/4", "찍을 수는 rdi 에"], ["test rax, rax\njns .digits\nneg rax", "R9/4", "음수 처리"], ["inc r12\ncmp r12, n\njl .next", "R9/4", "덩어리를 반복 안에"], ["cmp r12, n\njl .next", "R6/1", "몸통 아래에서 검사하고 위로 — 다섯 칸 반복"]],
         io: [{ output: "15\n8\n308\n308\n-716" }],
         answer: `default rel\nsection .data\nnums dq 15, -7, 300, 0, -1024\nn    equ ($ - nums) / 8\n\nsection .text\nglobal _start\n_start:\n    lea rbx, [nums]         ; rbx · r12 · r13 은 숫자 출력 덩어리가 안 건드려요\n    mov r12, 0              ; 칸 번호\n    mov r13, 0              ; 누적 합\n.next:\n    add r13, [rbx + r12*8]  ; 합 += nums[r12]\n    mov rdi, r13\n    ; ---- 숫자 출력: rdi 를 10진 글자 + 줄바꿈으로 ----\n    sub rsp, 32             ; 글자 버퍼 32바이트(스택)\n    mov rax, rdi\n    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움\n    mov byte [rsi], 10      ; 맨 끝은 줄바꿈\n    mov r8, 1               ; 지금까지 글자 수\n    mov rcx, 10\n    test rax, rax\n    jns .digits\n    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'\n.digits:\n    xor edx, edx\n    div rcx                 ; rax = 몫, rdx = 나머지(0~9)\n    add dl, '0'\n    dec rsi\n    mov [rsi], dl\n    inc r8\n    test rax, rax\n    jnz .digits\n    test rdi, rdi\n    jns .write\n    dec rsi\n    mov byte [rsi], '-'\n    inc r8\n.write:\n    mov rax, 1              ; write(1, rsi, r8)\n    mov rdx, r8\n    mov rdi, 1\n    syscall\n    add rsp, 32\n    ; ---- 여기까지 ----\n    inc r12\n    cmp r12, n\n    jl .next\n    mov rax, 60\n    mov rdi, 0\n    syscall` },
       { title: "한 줄을 거꾸로", text: "한 줄을 받아 글자 순서를 거꾸로 뒤집어 출력하세요(끝의 줄바꿈은 뒤집지 말고 빼 둔 뒤, 출력 끝에 다시 하나). 받은 버퍼 <code>line</code> 을 뒤에서부터 읽어 다른 버퍼 <code>back</code> 에 앞에서부터 쓰면 돼요. 영어 · 숫자 · 기호만 넣어요 — 한글은 한 글자가 3바이트라 바이트를 뒤집으면 글자가 깨져요([[레슨:R10]] 에서 스택으로도 뒤집어 봐요).",
-        needs: [["mov rax, 0   syscall", "R9/0", "한 줄 받기"], ["cmp byte [rbx + rcx - 1], 10", "R9/0", "끝의 줄바꿈 빼기"], ["mov al, [rbx + rcx]   mov [rdi + r8], al", "R8/3", "한 바이트씩 옮기기"], ["back resb 65", "R9/0", "뒤집은 줄을 담을 버퍼"], ["cmp rcx, 0   je .print   …   jmp .copy", "R6/1", "위에서 검사 — 반대 조건으로 빠져나가는 while"]],
+        needs: [["mov rax, 0\nsyscall", "R9/0", "한 줄 받기"], ["cmp byte [rbx + rcx - 1], 10", "R9/0", "끝의 줄바꿈 빼기"], ["mov al, [rbx + rcx]\nmov [rdi + r8], al", "R8/3", "한 바이트씩 옮기기"], ["back resb 65", "R9/0", "뒤집은 줄을 담을 버퍼"], ["cmp rcx, 0\nje .print\n…\njmp .copy", "R6/1", "위에서 검사 — 반대 조건으로 빠져나가는 while"]],
         io: [{ input: "Hello, asm 2026\n", output: "6202 msa ,olleH" }, { input: "abc\n", output: "cba" }],
         answer: `default rel\nsection .bss\nline resb 64                ; 받은 줄\nback resb 65                ; 뒤집은 줄 + 줄바꿈\n\nsection .text\nglobal _start\n_start:\n    mov rax, 0              ; read(0, line, 64)\n    mov rdi, 0\n    lea rsi, [line]\n    mov rdx, 64\n    syscall\n    mov rcx, rax            ; rcx = 받은 길이\n    lea rbx, [line]\n    cmp rcx, 0\n    je .ready               ; 아무것도 없으면 줄바꿈만\n    cmp byte [rbx + rcx - 1], 10\n    jne .ready\n    dec rcx                 ; 끝의 줄바꿈은 빼고 뒤집기\n.ready:\n    lea rdi, [back]\n    mov r8, 0               ; back 에 쓸 자리(앞에서부터)\n.copy:\n    cmp rcx, 0\n    je .print\n    dec rcx                 ; line 은 뒤에서부터\n    mov al, [rbx + rcx]\n    mov [rdi + r8], al\n    inc r8\n    jmp .copy\n.print:\n    mov byte [rdi + r8], 10 ; 끝에 줄바꿈\n    inc r8\n    mov rax, 1              ; write(1, back, r8)\n    mov rsi, rdi\n    mov rdi, 1\n    mov rdx, r8\n    syscall\n    mov rax, 60\n    mov rdi, 0\n    syscall` },
       { title: "정수 계산기: 합 · 차 · 곱", text: "한 줄에 빈칸으로 나눈 두 정수 a b 를 받아 <code>a + b</code>, <code>a - b</code>, <code>a × b</code> 를 한 줄씩 출력하세요. 수 앞에 <code>-</code> 가 올 수 있어요 — 첫 글자가 <code>'-'</code> 면 표시해 두고 건너뛴 뒤 숫자를 만들고, 다 만든 뒤 <code>neg</code>. 두 수는 <code>vals resq 2</code> 에, 세 결과는 <code>res resq 3</code> 에 저장한 다음 반복으로 하나씩 찍어요.",
-        needs: [["cmp byte [rbx + rcx], '-'", "R9/2", "부호 글자 보기"], ["movzx rdx, byte [rbx + rcx]   imul rax, 10", "R9/2", "글자 → 정수"], ["mov [rsi + r12*8], rax", "R8/0", "배열 칸에 저장"], ["imul rax, [rsi + 8]", "R8/0", "메모리 값과 곱하기"], ["sub rsp, 32 … div rcx … add rsp, 32", "R9/4", "숫자 출력 덩어리 — rdi 를 10진으로"]],
+        needs: [["cmp byte [rbx + rcx], '-'", "R9/2", "부호 글자 보기"], ["movzx rdx, byte [rbx + rcx]\nimul rax, 10", "R9/2", "글자 → 정수"], ["mov [rsi + r12*8], rax", "R8/0", "배열 칸에 저장"], ["imul rax, [rsi + 8]", "R8/0", "메모리 값과 곱하기"], ["sub rsp, 32 … div rcx … add rsp, 32", "R9/4", "숫자 출력 덩어리 — rdi 를 10진으로"]],
         io: [{ input: "-15 4\n", output: "-11\n-19\n-60" }, { input: "123 -45\n", output: "78\n168\n-5535" }],
         answer: `default rel\nsection .bss\nbuf  resb 64\nvals resq 2                 ; 읽은 두 수\nres  resq 3                 ; 합 · 차 · 곱\n\nsection .text\nglobal _start\n_start:\n    mov rax, 0              ; read(0, buf, 64) — 예: "-15 4\\n"\n    mov rdi, 0\n    lea rsi, [buf]\n    mov rdx, 64\n    syscall\n    lea rbx, [buf]\n    mov rcx, 0              ; 몇 번째 글자\n    mov r12, 0              ; 몇 번째 수(0, 1)\n.number:\n    mov rax, 0              ; 만드는 수\n    mov r9, 0               ; 1 이면 음수\n    cmp byte [rbx + rcx], '-'\n    jne .digit\n    mov r9, 1\n    inc rcx                 ; '-' 건너뛰기\n.digit:\n    movzx rdx, byte [rbx + rcx]\n    cmp rdx, '0'\n    jb .end\n    cmp rdx, '9'\n    ja .end\n    sub rdx, '0'\n    imul rax, 10\n    add rax, rdx\n    inc rcx\n    jmp .digit\n.end:\n    cmp r9, 0\n    je .store\n    neg rax\n.store:\n    lea rsi, [vals]\n    mov [rsi + r12*8], rax\n    inc rcx                 ; 빈칸(또는 줄바꿈) 건너뛰기\n    inc r12\n    cmp r12, 2\n    jl .number\n\n    lea rsi, [vals]         ; 계산해서 res 에 저장\n    lea rdi, [res]\n    mov rax, [rsi]\n    add rax, [rsi + 8]\n    mov [rdi], rax          ; 합\n    mov rax, [rsi]\n    sub rax, [rsi + 8]\n    mov [rdi + 8], rax      ; 차\n    mov rax, [rsi]\n    imul rax, [rsi + 8]\n    mov [rdi + 16], rax     ; 곱\n\n    lea rbx, [res]\n    mov r12, 0\n.next:\n    mov rdi, [rbx + r12*8]\n    ; ---- 숫자 출력: rdi 를 10진 글자 + 줄바꿈으로 ----\n    sub rsp, 32             ; 글자 버퍼 32바이트(스택)\n    mov rax, rdi\n    lea rsi, [rsp + 31]     ; 버퍼 끝에서부터 거꾸로 채움\n    mov byte [rsi], 10      ; 맨 끝은 줄바꿈\n    mov r8, 1               ; 지금까지 글자 수\n    mov rcx, 10\n    test rax, rax\n    jns .digits\n    neg rax                 ; 음수면 양수로 바꿔 두고 나중에 '-'\n.digits:\n    xor edx, edx\n    div rcx                 ; rax = 몫, rdx = 나머지(0~9)\n    add dl, '0'\n    dec rsi\n    mov [rsi], dl\n    inc r8\n    test rax, rax\n    jnz .digits\n    test rdi, rdi\n    jns .write\n    dec rsi\n    mov byte [rsi], '-'\n    inc r8\n.write:\n    mov rax, 1              ; write(1, rsi, r8)\n    mov rdx, r8\n    mov rdi, 1\n    syscall\n    add rsp, 32\n    ; ---- 여기까지 ----\n    inc r12\n    cmp r12, 3\n    jl .next\n    mov rax, 60\n    mov rdi, 0\n    syscall` },
     ],
     R10: [
       { title: '두 레지스터 바꾸기', text: `<code>rax = 7</code>, <code>rbx = 3</code> 에서 시작해 <b>스택만 써서</b> 둘을 바꾸세요(<code>rax = 3</code>, <code>rbx = 7</code>). 확인은 종료 코드 <code>rax × 10 + rbx</code> 로 해요. 바뀌었으면 37 이에요.`, echoExit: true,
-        needs: [['push rax   push rbx   pop rax   pop rbx', 'R10/1', '나중에 넣은 것이 먼저 나와요'], ['mov rax, 60   syscall', 'R10/0', 'rdi 가 종료 코드']],
+        needs: [['push rax\npush rbx\npop rax\npop rbx', 'R10/1', '나중에 넣은 것이 먼저 나와요'], ['mov rax, 60\nsyscall', 'R10/0', 'rdi 가 종료 코드']],
         io: [{ output: `37` }],
         answer: `section .text
 global _start
@@ -316,7 +316,7 @@ _start:
     mov rax, 60
     syscall` },
       { title: '세 값 거꾸로', text: `<code>rax = 1</code>, <code>rbx = 2</code>, <code>rcx = 3</code> 을 스택으로 거꾸로(<code>rax = 3</code> · <code>rbx = 2</code> · <code>rcx = 1</code>) 바꾼 뒤, 세 숫자를 글자로 바꿔(<code>add al, '0'</code>) <code>buf</code> 에 차례로 넣고 줄바꿈과 함께 <code>write</code> 하세요.`,
-        needs: [['push rax   push rbx   push rcx', 'R10/1', '세 개 쌓기'], ['pop rax   pop rbx   pop rcx', 'R10/1', '마지막에 넣은 3 이 rax 로']],
+        needs: [['push rax\npush rbx\npush rcx', 'R10/1', '세 개 쌓기'], ['pop rax\npop rbx\npop rcx', 'R10/1', '마지막에 넣은 3 이 rax 로']],
         io: [{ output: `321` }],
         answer: `default rel
 section .bss
@@ -373,7 +373,7 @@ again:
     mov rax, 60
     mov rdi, 0
     syscall`,
-        needs: [['push rcx   syscall   pop rcx', 'R10/2', 'syscall 은 rcx · r11 을 바꿔요']],
+        needs: [['push rcx\nsyscall\npop rcx', 'R10/2', 'syscall 은 rcx · r11 을 바꿔요']],
         io: [{ output: `*****` }],
         answer: `default rel
 section .data
@@ -402,7 +402,7 @@ again:
     mov rdi, 0
     syscall` },
       { title: '스택으로 한 줄 뒤집기', text: `<code>read</code> 로 한 줄(영어 · 숫자, 64바이트 안)을 받아, 끝의 줄바꿈은 빼고 글자를 하나씩 <code>push</code> 했다가 <code>pop</code> 해서 거꾸로 찍으세요. 끝에는 줄바꿈 하나.`,
-        needs: [['mov al, [rsi + rcx]   push rax', 'R10/3', '앞에서부터 쌓기'], ['pop rax   mov [rdi + rcx], al', 'R10/3', '꺼내면 거꾸로']],
+        needs: [['mov al, [rsi + rcx]\npush rax', 'R10/3', '앞에서부터 쌓기'], ['pop rax\nmov [rdi + rcx], al', 'R10/3', '꺼내면 거꾸로']],
         io: [{ input: `hello\n`, output: `olleh` }, { input: `abc 123\n`, output: `321 cba` }, { input: `x\n`, output: `x` }],
         answer: `default rel
 section .bss
@@ -450,7 +450,7 @@ pop_loop:
     ],
     R11: [
       { title: 'print_int 로 제곱 다섯 줄', text: `<code>square</code> 함수(<code>rdi</code> 를 받아 제곱을 <code>rax</code> 로)를 만들고, 1 부터 5 까지 제곱을 <code>print_int</code> 로 한 줄씩 찍으세요. 반복 횟수를 지키는 것도 잊지 말고요. <code>print_int</code> 는 레슨 그대로 붙여 써요.`,
-        needs: [['call square   mov rdi, rax', 'R11/1', '인자 rdi, 결과 rax'], ['call print_int', 'R11/2', '숫자 한 줄 출력'], ['push rcx   call print_int   pop rcx', 'R11/3', '반복 횟수 맡기기']],
+        needs: [['call square\nmov rdi, rax', 'R11/1', '인자 rdi, 결과 rax'], ['call print_int', 'R11/2', '숫자 한 줄 출력'], ['push rcx\ncall print_int\npop rcx', 'R11/3', '반복 횟수 맡기기']],
         io: [{ output: `1
 4
 9
@@ -510,7 +510,7 @@ print_int:
     add rsp, 32
     ret` },
       { title: 'strlen 함수', text: `0 으로 끝나는 글자의 주소를 <code>rdi</code> 로 받아 길이(0 앞까지의 바이트 수)를 <code>rax</code> 로 돌려주는 <code>strlen</code> 을 만드세요. <code>"hello"</code> 와 <code>"어셈블리어"</code> 의 길이를 찍어요. 한글은 한 글자가 3바이트예요.`,
-        needs: [['strlen:   …   ret', 'R11/0', '함수 = ret 으로 끝나는 라벨'], ['lea rdi, [s1]   call strlen', 'R11/1', '인자는 rdi, 결과는 rax'], ['mov rdi, rax   call print_int', 'R11/2', '길이 찍기']],
+        needs: [['strlen:\n…\nret', 'R11/0', '함수 = ret 으로 끝나는 라벨'], ['lea rdi, [s1]\ncall strlen', 'R11/1', '인자는 rdi, 결과는 rax'], ['mov rdi, rax\ncall print_int', 'R11/2', '길이 찍기']],
         io: [{ output: `5
 15` }],
         answer: `default rel
@@ -573,7 +573,7 @@ print_int:
     add rsp, 32
     ret` },
       { title: '재귀 팩토리얼', text: `자기 자신을 부르는 <code>fact</code> 로 5!, 10!, 20! 을 한 줄씩 찍으세요. 20! 은 64비트에 들어가는 가장 큰 팩토리얼이에요(21! 은 넘쳐요).`,
-        needs: [['push rdi   dec rdi   call fact   pop rdi', 'R11/4', '내 n 을 맡기고 자신을 부르기'], ['imul rax, rdi', 'R11/4', 'n × (n-1)!']],
+        needs: [['push rdi\ndec rdi\ncall fact\npop rdi', 'R11/4', '내 n 을 맡기고 자신을 부르기'], ['imul rax, rdi', 'R11/4', 'n × (n-1)!']],
         io: [{ output: `120
 3628800
 2432902008176640000` }],
@@ -689,7 +689,7 @@ print_int:
     syscall
     add rsp, 32
     ret`,
-        needs: [['push rbx   …   pop rbx   ret', 'R11/3', 'ret 앞에서 스택을 제자리로'], ['ret', 'R11/0', '꼭대기를 꺼내 점프']],
+        needs: [['push rbx\n…\npop rbx\nret', 'R11/3', 'ret 앞에서 스택을 제자리로'], ['ret', 'R11/0', '꼭대기를 꺼내 점프']],
         io: [{ output: `42` }],
         answer: `section .text
 global _start
@@ -744,7 +744,7 @@ print_int:
     ],
     R12: [
       { title: '인자 3개: clamp(x, lo, hi)', text: `<code>clamp(x, lo, hi)</code> 를 만드세요. x 가 lo 보다 작으면 lo, hi 보다 크면 hi, 아니면 x 를 <code>rax</code> 로 돌려줘요. <code>clamp(15, 0, 10)</code> · <code>clamp(-3, 0, 10)</code> · <code>clamp(7, 0, 10)</code> 을 찍어요.`,
-        needs: [['mov rdi, 15   mov rsi, 0   mov rdx, 10   call clamp', 'R12/0', '인자 1 · 2 · 3 = rdi · rsi · rdx'], ['mov rax, rdi   …   ret', 'R12/0', '결과는 rax']],
+        needs: [['mov rdi, 15\nmov rsi, 0\nmov rdx, 10\ncall clamp', 'R12/0', '인자 1 · 2 · 3 = rdi · rsi · rdx'], ['mov rax, rdi\n…\nret', 'R12/0', '결과는 rax']],
         io: [{ output: `10
 0
 7` }],
@@ -816,7 +816,7 @@ print_int:
     add rsp, 32
     ret` },
       { title: '지역 변수 두 칸: print_hms', text: `초를 받아 시 · 분 · 초를 한 줄씩 찍는 <code>print_hms(초)</code> 를 만드세요. <code>print_int</code> 를 부르면 레지스터가 바뀌니까, 남은 초는 스택 프레임의 지역 변수(<code>[rbp - 8]</code> · <code>[rbp - 16]</code>)에 둬요. 3725 초와 86399 초를 찍어요.`,
-        needs: [['push rbp   mov rbp, rsp   sub rsp, 16', 'R12/2', '스택 프레임 만들기'], ['mov [rbp - 8], rdx   mov rax, [rbp - 8]', 'R12/2', '지역 변수에 두고 꺼내기'], ['leave   ret', 'R12/2', '프레임 정리하고 돌아가기']],
+        needs: [['push rbp\nmov rbp, rsp\nsub rsp, 16', 'R12/2', '스택 프레임 만들기'], ['mov [rbp - 8], rdx\nmov rax, [rbp - 8]', 'R12/2', '지역 변수에 두고 꺼내기'], ['leave\nret', 'R12/2', '프레임 정리하고 돌아가기']],
         io: [{ output: `1
 2
 5
@@ -942,7 +942,7 @@ print_int:
     syscall
     add rsp, 32
     ret`,
-        needs: [['push rbx   …   pop rbx', 'R12/1', 'rbx 는 불리는 쪽이 지킴']],
+        needs: [['push rbx\n…\npop rbx', 'R12/1', 'rbx 는 불리는 쪽이 지킴']],
         io: [{ output: `14` }],
         answer: `section .text
 global _start
@@ -1003,7 +1003,7 @@ print_int:
     ],
     R13: [
       { title: '구구단 7단', text: `<code>printf</code> 로 <code>7 x 1 = 7</code> 부터 <code>7 x 9 = 63</code> 까지 찍으세요. 단(7)과 곱하는 수는 <code>printf</code> 를 불러도 지켜지는 레지스터에 두고, push 수로 정렬을 맞춰요. 빌드는 <code>gcc -no-pie</code>.`,
-        needs: [['extern printf   global main', 'R13/0', 'C 라이브러리 쓰기 · main 에서 시작'], ['lea rdi, [fmt]   xor eax, eax   call printf', 'R13/1', '형식 주소 · 가변 인자 규칙'], ['push rbp   push rbx   push r12', 'R13/3', 'push 홀수 번 = 16바이트 정렬']],
+        needs: [['extern printf\nglobal main', 'R13/0', 'C 라이브러리 쓰기 · main 에서 시작'], ['lea rdi, [fmt]\nxor eax, eax\ncall printf', 'R13/1', '형식 주소 · 가변 인자 규칙'], ['push rbp\npush rbx\npush r12', 'R13/3', 'push 홀수 번 = 16바이트 정렬']],
         io: [{ output: `7 x 1 = 7
 7 x 2 = 14
 7 x 3 = 21
@@ -1042,7 +1042,7 @@ again:
     xor eax, eax
     ret` },
       { title: '배열을 printf 로', text: `<code>arr dq 3, 1, 4, 1, 5, 9</code> 의 칸을 <code>arr[번호] = 값</code> 모양으로 한 줄씩 찍고, 마지막 줄에 <code>합 = …</code> 을 찍으세요.`,
-        needs: [['fmt db "arr[%ld] = %ld", 10, 0', 'R13/1', '%ld 두 개 = rsi · rdx'], ['push rbp   push rbx   push r12', 'R13/3', '번호 · 합을 지켜지는 레지스터에']],
+        needs: [['fmt db "arr[%ld] = %ld", 10, 0', 'R13/1', '%ld 두 개 = rsi · rdx'], ['push rbp\npush rbx\npush r12', 'R13/3', '번호 · 합을 지켜지는 레지스터에']],
         io: [{ output: `arr[0] = 3
 arr[1] = 1
 arr[2] = 4
@@ -1086,7 +1086,7 @@ again:
     xor eax, eax
     ret` },
       { title: '글자 길이 printf', text: `글자 하나를 받아 <code>글자: 길이 바이트</code> 한 줄을 찍는 함수 <code>show</code> 를 만들고, <code>main</code> 에서 <code>"hello"</code> · <code>"안녕"</code> · <code>"x86-64"</code> 로 불러요. 길이는 C 라이브러리의 <code>strlen</code> 으로. <code>show</code> 에 들어온 순간의 정렬도 따져 봐요.`,
-        needs: [['extern printf, strlen', 'R13/2', '여럿을 한 줄에'], ['"%s: %ld 바이트", 10, 0', 'R13/1', '%s 에는 주소'], ['push rbx   …   pop rbx', 'R13/3', '들어오면 16의 배수 + 8 → push 한 번']],
+        needs: [['extern printf, strlen', 'R13/2', '여럿을 한 줄에'], ['"%s: %ld 바이트", 10, 0', 'R13/1', '%s 에는 주소'], ['push rbx\n…\npop rbx', 'R13/3', '들어오면 16의 배수 + 8 → push 한 번']],
         io: [{ output: `hello: 5 바이트
 안녕: 6 바이트
 x86-64: 6 바이트` }],
@@ -1136,7 +1136,7 @@ main:
     mov rax, 60             ; exit(7)
     mov rdi, 7
     syscall`,
-        needs: [['pop rbp   mov eax, 7   ret', 'R13/2', 'main 의 rax = 종료 코드'], ['printf', 'R13/2', '글자를 모아 뒀다가 내보냄(버퍼)']],
+        needs: [['pop rbp\nmov eax, 7\nret', 'R13/2', 'main 의 rax = 종료 코드'], ['printf', 'R13/2', '글자를 모아 뒀다가 내보냄(버퍼)']],
         io: [{ output: `끝까지 보여요?
 7` }],
         answer: `default rel
@@ -1155,9 +1155,9 @@ main:
     ret` },
     ],
     RB3: [
-      { title: "복습 — 스택에 쌓고 꺼내면 · 출력 예측", text: "<p>함수 모음을 만들기 전에 레슨 10 의 스택을 되짚어요. 글자 <code>a</code> · <code>s</code> · <code>m</code> 을 차례로 <code>push</code> 하고, 세 번 <code>pop</code> 하면서 꺼낸 순서대로 <code>buf</code> 에 적어 찍어요. 세 번 쌓은 뒤 <code>rsp</code> 가 얼마나 내려갔는지는 종료 코드로 남겨요.</p><p>돌리기 전에 출력 한 줄과 <code>echo $?</code> 의 수를 먼저 예상해 보고, 우분투에서 빌드해 돌려 맞았는지 확인해 보세요.</p>", needs: [["push rax · pop rbx", "R10/1", "나중에 넣은 것이 먼저 나와요"], ["mov rbx, rsp", "R10/0", "rsp 는 하나 쌓을 때마다 8 작아져요"], ["pop rax   mov [rdi], al", "R10/3", "쌓았다가 거꾸로 꺼내 buf 에 — 스택으로 뒤집기"], ["mov [rdi + 1], al", "R8/3", "한 바이트씩 쓰기"]], predict: true, echoExit: true, answer: "default rel\nsection .bss\nbuf resb 4\n\nsection .text\nglobal _start\n_start:\n    mov r12, rsp        ; 처음 rsp\n    push 'a'\n    push 's'\n    push 'm'\n    mov r13, r12\n    sub r13, rsp        ; 처음 − 지금 = 얼마나 내려갔나\n    lea rdi, [buf]\n    pop rax\n    mov [rdi], al\n    pop rax\n    mov [rdi + 1], al\n    pop rax\n    mov [rdi + 2], al\n    mov byte [rdi + 3], 10\n    mov rax, 1          ; write(1, buf, 4)\n    mov rsi, rdi\n    mov rdi, 1\n    mov rdx, 4\n    syscall\n    mov rdi, r13        ; 내려간 바이트 수를 종료 코드로\n    mov rax, 60\n    syscall", explain: "<p>① 마지막에 넣은 <code>m</code> 이 꼭대기라 먼저 나와요. 그래서 <code>buf</code> 에는 <code>m</code> · <code>s</code> · <code>a</code> 순서로 적혀 <b>msa</b> 가 찍혀요. 넣은 순서가 거꾸로 되는 게 스택으로 뒤집기의 원리예요. ② <code>push</code> 는 늘 8바이트라 세 번이면 <code>rsp</code> 가 <b>24</b> 내려가요. ③ 세 번 넣고 세 번 꺼냈으니 끝에서 <code>rsp</code> 는 처음 자리로 돌아와 있어요. 함수에서 push 한 만큼 pop 해야 <code>ret</code> 이 제자리로 돌아가는 것도 이 때문이에요.</p>", io: [{ output: "msa\n24" }] },
+      { title: "복습 — 스택에 쌓고 꺼내면 · 출력 예측", text: "<p>함수 모음을 만들기 전에 레슨 10 의 스택을 되짚어요. 글자 <code>a</code> · <code>s</code> · <code>m</code> 을 차례로 <code>push</code> 하고, 세 번 <code>pop</code> 하면서 꺼낸 순서대로 <code>buf</code> 에 적어 찍어요. 세 번 쌓은 뒤 <code>rsp</code> 가 얼마나 내려갔는지는 종료 코드로 남겨요.</p><p>돌리기 전에 출력 한 줄과 <code>echo $?</code> 의 수를 먼저 예상해 보고, 우분투에서 빌드해 돌려 맞았는지 확인해 보세요.</p>", needs: [["push rax · pop rbx", "R10/1", "나중에 넣은 것이 먼저 나와요"], ["mov rbx, rsp", "R10/0", "rsp 는 하나 쌓을 때마다 8 작아져요"], ["pop rax\nmov [rdi], al", "R10/3", "쌓았다가 거꾸로 꺼내 buf 에 — 스택으로 뒤집기"], ["mov [rdi + 1], al", "R8/3", "한 바이트씩 쓰기"]], predict: true, echoExit: true, answer: "default rel\nsection .bss\nbuf resb 4\n\nsection .text\nglobal _start\n_start:\n    mov r12, rsp        ; 처음 rsp\n    push 'a'\n    push 's'\n    push 'm'\n    mov r13, r12\n    sub r13, rsp        ; 처음 − 지금 = 얼마나 내려갔나\n    lea rdi, [buf]\n    pop rax\n    mov [rdi], al\n    pop rax\n    mov [rdi + 1], al\n    pop rax\n    mov [rdi + 2], al\n    mov byte [rdi + 3], 10\n    mov rax, 1          ; write(1, buf, 4)\n    mov rsi, rdi\n    mov rdi, 1\n    mov rdx, 4\n    syscall\n    mov rdi, r13        ; 내려간 바이트 수를 종료 코드로\n    mov rax, 60\n    syscall", explain: "<p>① 마지막에 넣은 <code>m</code> 이 꼭대기라 먼저 나와요. 그래서 <code>buf</code> 에는 <code>m</code> · <code>s</code> · <code>a</code> 순서로 적혀 <b>msa</b> 가 찍혀요. 넣은 순서가 거꾸로 되는 게 스택으로 뒤집기의 원리예요. ② <code>push</code> 는 늘 8바이트라 세 번이면 <code>rsp</code> 가 <b>24</b> 내려가요. ③ 세 번 넣고 세 번 꺼냈으니 끝에서 <code>rsp</code> 는 처음 자리로 돌아와 있어요. 함수에서 push 한 만큼 pop 해야 <code>ret</code> 이 제자리로 돌아가는 것도 이 때문이에요.</p>", io: [{ output: "msa\n24" }] },
       { title: 'strlen · print_str · print_int', text: `챕터 3 의 함수 모음을 만들어요. 모두 <b>호출 규약대로</b>(인자 <code>rdi</code>, 결과 <code>rax</code>, <code>rbx</code> 를 쓰면 <code>push</code> · <code>pop</code>). 시작은 <code>global main</code>, 빌드는 <code>gcc -no-pie</code>, 끝은 <code>ret</code>.<ul><li><code>strlen(s)</code> → 0 앞까지의 바이트 수</li><li><code>print_str(s)</code> → s 와 줄바꿈을 <code>write</code></li><li><code>show_len(s)</code> → s 한 줄, 길이 한 줄(<code>print_int</code>)</li></ul><code>main</code> 에서 <code>"hello"</code> · <code>"어셈블리"</code> · 빈 글자(0 하나)로 <code>show_len</code> 을 불러요. C 라이브러리에도 <code>strlen</code> 이 있지만, <code>global</code> 을 안 붙인 라벨은 이 파일 안에서만 쓰여서 부딪치지 않아요.`,
-        needs: [['strlen:   …   ret', 'R11/0', '함수 = ret 으로 끝나는 라벨'], ['push rbx   mov rbx, rdi   …   pop rbx', 'R12/1', '부르는 동안 인자 간직하기'], ['call print_int', 'R11/2', '숫자 출력 함수'], ['global main   ret', 'R13/0', 'gcc -no-pie 로 빌드']],
+        needs: [['strlen:\n…\nret', 'R11/0', '함수 = ret 으로 끝나는 라벨'], ['push rbx\nmov rbx, rdi\n…\npop rbx', 'R12/1', '부르는 동안 인자 간직하기'], ['call print_int', 'R11/2', '숫자 출력 함수'], ['global main\nret', 'R13/0', 'gcc -no-pie 로 빌드']],
         io: [{ output: `hello
 5
 어셈블리
@@ -1251,7 +1251,7 @@ print_int:
     add rsp, 32
     ret` },
       { title: 'to_upper: 한 줄을 대문자로', text: `<code>to_upper(s)</code> 를 만드세요. s 의 <code>a</code>~<code>z</code> 를 <b>그 자리에서</b> <code>A</code>~<code>Z</code> 로 바꾸고, 다른 바이트(숫자 · 기호 · 한글)는 그대로 둬요. <code>main</code> 은 <code>read</code> 로 한 줄을 받아 끝의 줄바꿈을 0 으로 바꾸고, <code>to_upper</code> → ② 의 <code>print_str</code> 순서로 불러요.`,
-        needs: [['to_upper:   …   ret', 'R11/0', '함수로 만들기'], ['lea rdi, [buf]   call to_upper', 'R11/1', '인자는 rdi(글자의 주소)'], ['global main', 'R13/0', 'main 에서 시작']],
+        needs: [['to_upper:\n…\nret', 'R11/0', '함수로 만들기'], ['lea rdi, [buf]\ncall to_upper', 'R11/1', '인자는 rdi(글자의 주소)'], ['global main', 'R13/0', 'main 에서 시작']],
         io: [{ input: `hello, asm!\n`, output: `HELLO, ASM!` }, { input: `Ubuntu 24.04 LTS\n`, output: `UBUNTU 24.04 LTS` }, { input: `안녕 abc\n`, output: `안녕 ABC` }],
         answer: `default rel
 section .data
@@ -1321,7 +1321,7 @@ print_str:                  ; print_str(s): s 와 줄바꿈을 write
     pop rbx
     ret` },
       { title: 'max_of(arr, n)', text: `qword 배열의 주소와 칸 수를 받아 가장 큰 값을 돌려주는 <code>max_of(arr, n)</code> 을 만드세요(음수도 있어요, n 은 1 이상). <code>[3, -7, 12, 5]</code> · <code>[-5, -2, -9]</code> · <code>[42]</code> 로 불러 <code>print_int</code> 로 찍어요.`,
-        needs: [['lea rdi, [arr1]   mov rsi, 4   call max_of', 'R12/0', '인자 1 = rdi, 인자 2 = rsi'], ['mov rdi, rax   call print_int', 'R11/2', '결과 찍기']],
+        needs: [['lea rdi, [arr1]\nmov rsi, 4\ncall max_of', 'R12/0', '인자 1 = rdi, 인자 2 = rsi'], ['mov rdi, rax\ncall print_int', 'R11/2', '결과 찍기']],
         io: [{ output: `12
 -2
 42` }],
@@ -1400,7 +1400,7 @@ print_int:
     add rsp, 32
     ret` },
       { title: '모두 모아 printf 한 줄', text: `<code>"hello asm"</code> 을 <code>to_upper</code> 로 바꾸고, <code>strlen</code> 으로 길이를, <code>max_of</code> 로 <code>nums dq 4, 8, -15, 16, 23, -42</code> 의 최댓값을 구해 <code>printf</code> 한 번으로 찍으세요. 함수를 부르는 동안 길이 · 최댓값은 <code>rbx</code> · <code>r12</code> 에 간직하고, push 수로 정렬을 맞춰요.<br><span class="muted small">이 문제는 숫자를 <code>printf</code> 로만 찍어요. <code>write</code> 로 바로 쓰는 <code>print_int</code> 와 글자를 모아 뒀다 쓰는 <code>printf</code> 를 섞으면 나오는 순서가 뒤바뀔 수 있어요.</span>`,
-        needs: [['push rbp   push rbx   push r12', 'R13/3', 'push 세 번 = 정렬 · 지킬 레지스터 맡기기'], ['mov rbx, rax', 'R12/1', '부르는 동안 간직할 값은 rbx · r12'], ['lea rdi, [fmt]   lea rsi, [name]   mov rdx, rbx   mov rcx, r12   xor eax, eax   call printf', 'R13/1', '인자 넷: 형식 · %s · %ld · %ld']],
+        needs: [['push rbp\npush rbx\npush r12', 'R13/3', 'push 세 번 = 정렬 · 지킬 레지스터 맡기기'], ['mov rbx, rax', 'R12/1', '부르는 동안 간직할 값은 rbx · r12'], ['lea rdi, [fmt]\nlea rsi, [name]\nmov rdx, rbx\nmov rcx, r12\nxor eax, eax\ncall printf', 'R13/1', '인자 넷: 형식 · %s · %ld · %ld']],
         io: [{ output: `HELLO ASM / 9 글자 / 최댓값 23` }],
         answer: `default rel
 section .data
@@ -1506,7 +1506,7 @@ sub:                        ; rdi = a, rsi = b → rax = a - b
     sub rax, rsi
     ret` },
       { title: '배열 합: sum(long *arr, long n)', text: '<code>long sum(long *arr, long n)</code> 을 어셈블리로 만드세요 — 배열의 앞 <code>n</code> 칸을 더해 돌려줘요. <code>main.c</code> 에서 <code>long a[5] = {3, 1, 4, 1, 5};</code> · <code>long b[3] = {1000000000000, -2, 3};</code> 를 만들고 <code>sum(a, 5)</code> · <code>sum(b, 3)</code> · <code>sum(a, 0)</code> 을 찍어요. 칸이 0개면 0 이어야 해요.',
-        needs: [['long sum(long *arr, long n);', 'R14/3', '배열 = 첫 칸의 주소'], ['add rax, [rdi + rcx*8]', 'R14/3', 'rcx 번째 칸(8바이트씩)'], ['cmp rcx, rsi   jge .done', 'R14/3', 'n 칸 다 했으면 끝'], ['long a[5] = {3, 1, 4, 1, 5};', 'R14/3', 'C 배열 만들기']],
+        needs: [['long sum(long *arr, long n);', 'R14/3', '배열 = 첫 칸의 주소'], ['add rax, [rdi + rcx*8]', 'R14/3', 'rcx 번째 칸(8바이트씩)'], ['cmp rcx, rsi\njge .done', 'R14/3', 'n 칸 다 했으면 끝'], ['long a[5] = {3, 1, 4, 1, 5};', 'R14/3', 'C 배열 만들기']],
         io: [{ output: '14\n1000000000001\n0' }],
         answer: `// ==== 파일: main.c ====
 #include <stdio.h>
@@ -1536,7 +1536,7 @@ sum:                        ; rdi = 배열 주소, rsi = 칸 수 → rax = 합
 .done:
     ret` },
       { title: '문자열 거꾸로: reverse(char *s)', text: '<code>void reverse(char *s)</code> 를 어셈블리로 만드세요. 문자열을 <b>그 자리에서</b> 거꾸로 뒤집는데, 맨 끝의 줄바꿈(10)은 제자리에 둬요(줄바꿈이나 0 을 만나기 전까지만 뒤집기). <code>main.c</code> 는 <code>fgets</code> 로 한 줄씩 읽어 <code>reverse</code> 를 부르고 <code>printf("%s", line)</code> 로 찍어요. 방법: 앞 손가락 <code>rdi</code>, 끝 손가락 <code>rsi</code>(마지막 글자)를 두고 두 바이트를 바꾼 뒤 서로 한 칸씩 다가가요. 만나거나 지나치면 끝. 한글은 한 글자가 3바이트라 뒤집으면 깨지니 영어로만 해 봐요.',
-        needs: [['fgets(line, sizeof line, stdin)', 'R14/4', 'C 가 한 줄 읽기(끝이면 NULL)'], ['void reverse(char *s);', 'R14/4', '문자열 = 첫 글자의 주소'], ['mov al, [rdi]   mov [rdi], al', 'R14/4', '바이트 읽고 그 자리에 쓰기'], ['cmp rdi, rsi   jae .done', 'R14/4', '두 손가락이 만나면 끝(주소는 부호 없는 비교)']],
+        needs: [['fgets(line, sizeof line, stdin)', 'R14/4', 'C 가 한 줄 읽기(끝이면 NULL)'], ['void reverse(char *s);', 'R14/4', '문자열 = 첫 글자의 주소'], ['mov al, [rdi]\nmov [rdi], al', 'R14/4', '바이트 읽고 그 자리에 쓰기'], ['cmp rdi, rsi\njae .done', 'R14/4', '두 손가락이 만나면 끝(주소는 부호 없는 비교)']],
         io: [{ input: 'hello\nasm and C\nracecar\n', output: 'olleh\nC dna msa\nracecar' }],
         answer: `// ==== 파일: main.c ====
 #include <stdio.h>
@@ -1642,7 +1642,7 @@ int main(void) {
     return 0;
 }` },
       { title: '어셈블리를 읽고 C 로: for', text: '이번엔 반복이 있는 <code>long mystery2(long n)</code> 이에요(같은 명령으로 만든 <code>-O0</code> 결과). 읽고 같은 일을 하는 C 를 쓴 뒤 <code>mystery2(0)</code> · <code>mystery2(4)</code> · <code>mystery2(10)</code> 을 찍으세요.<pre>mystery2:\n    endbr64\n    push    rbp\n    mov     rbp, rsp\n    mov     QWORD PTR -24[rbp], rdi\n    mov     QWORD PTR -16[rbp], 1\n    mov     QWORD PTR -8[rbp], 0\n    jmp     .L5\n.L6:\n    mov     rdx, QWORD PTR -16[rbp]\n    mov     rax, rdx\n    add     rax, rax\n    add     rax, rdx\n    mov     QWORD PTR -16[rbp], rax\n    add     QWORD PTR -8[rbp], 1\n.L5:\n    mov     rax, QWORD PTR -8[rbp]\n    cmp     rax, QWORD PTR -24[rbp]\n    jl      .L6\n    mov     rax, QWORD PTR -16[rbp]\n    pop     rbp\n    ret</pre>변수 셋: <code>-24[rbp]</code> = n, <code>-16[rbp]</code> = 결과(처음 1), <code>-8[rbp]</code> = 반복 번호(처음 0). <code>.L6</code> 의 세 줄 <code>mov rax, rdx</code> · <code>add rax, rax</code> · <code>add rax, rdx</code> 는 결과에 무엇을 곱하는 걸까요?',
-        needs: [['for (long i = 0; i < n; i++)', 'R15/1', 'for → 초기화 · jmp 검사 · 몸통 · i++ · 검사'], ['add QWORD PTR -8[rbp], 1', 'R15/1', 'i++'], ['cmp rax, QWORD PTR -24[rbp]   jl .L6', 'R15/1', '조건이 맞으면 위로']],
+        needs: [['for (long i = 0; i < n; i++)', 'R15/1', 'for → 초기화 · jmp 검사 · 몸통 · i++ · 검사'], ['add QWORD PTR -8[rbp], 1', 'R15/1', 'i++'], ['cmp rax, QWORD PTR -24[rbp]\njl .L6', 'R15/1', '조건이 맞으면 위로']],
         io: [{ output: '1\n81\n59049' }],
         answer: `// ==== 파일: main.c ====
 #include <stdio.h>
@@ -1668,7 +1668,7 @@ int main(void) {
     R16: [
       { title: 'gdb 로 레지스터 따라가기', text: '아래 <code>trace.asm</code> 을 <code>-g -F dwarf</code> 로 빌드해 gdb 에서 <code>break _start</code> → <code>run</code> 한 뒤, <code>stepi</code> 를 한 번씩 할 때마다 <code>rax</code> · <code>rbx</code> · <code>rcx</code> 가 어떻게 바뀌는지 따라가 보세요. <b>stepi 전에 값을 먼저 짐작</b>하고 확인하면 좋아요.<pre class="code">section .text\nglobal _start\n_start:\n    mov rax, 5\n    mov rbx, 3\n    add rax, rbx\n    imul rax, rax\n    mov rcx, rax\n    shr rcx, 2\n    sub rax, rcx\n    mov rdi, rax\n    mov rax, 60\n    syscall</pre>',
         noRun: true,
-        needs: [['nasm -f elf64 -g -F dwarf trace.asm -o trace.o', 'R16/0', '줄 번호 정보 넣기'], ['break _start   run   stepi', 'R16/1', '멈추고 한 명령씩'], ['info registers rax rbx', 'R16/1', '레지스터 보기'], ['p $rax', 'R16/1', '10진으로 하나만']],
+        needs: [['nasm -f elf64 -g -F dwarf trace.asm -o trace.o', 'R16/0', '줄 번호 정보 넣기'], ['break _start\nrun\nstepi', 'R16/1', '멈추고 한 명령씩'], ['info registers rax rbx', 'R16/1', '레지스터 보기'], ['p $rax', 'R16/1', '10진으로 하나만']],
         checks: [{ text: '`run` 직후 멈춘 줄이 `trace.asm:4` 의 `mov rax, 5` 예요(아직 실행 전)' }, { text: '`stepi` 3번 뒤(`imul` 줄에서 멈춤) `info registers rax rbx` 가 `rax 0x8 8` · `rbx 0x3 3` 이에요' }, { text: '한 번 더 `stepi` 하면 `p $rax` 가 `64`, 두 번 더 하면 `info registers rcx` 가 `0x10 16` 이에요' }, { text: '`sub` 뒤 `p $rax` 가 `48`, `continue` 하면 `exited with code 060`(8진수 = 48)이고 터미널에서 `./trace; echo $?` 도 `48` 이에요' }],
         answer: 'nasm -f elf64 -g -F dwarf trace.asm -o trace.o\nld trace.o -o trace\ngdb ./trace\n(gdb) break _start\n(gdb) run\n(gdb) stepi            ← 3번\n(gdb) info registers rax rbx\n(gdb) stepi\n(gdb) p $rax\n(gdb) stepi            ← 2번\n(gdb) info registers rcx\n(gdb) stepi\n(gdb) p $rax\n(gdb) continue' },
       { title: '폴트 난 줄 찾기', text: '아래 <code>strbug.asm</code> 은 <code>"hello"</code> 의 길이 5 를 종료 코드로 돌려주려는데 <code>Segmentation fault</code> 로 죽어요. 아직 고치지 말고, gdb 로 <b>어느 줄에서</b> · <b>누가 불러서</b> · <b>어떤 레지스터 값 때문에</b> 죽는지 찾아보세요.<pre class="code">default rel\n\nsection .data\nmsg:    db "hello", 0\n\nsection .text\nglobal _start\nstrlen:                     ; rdi = 0 으로 끝나는 문자열 주소 → rax = 길이\n    xor eax, eax\n.next:\n    cmp byte [rdi + rax], 0\n    je .done\n    inc rax\n    jmp .next\n.done:\n    ret\n_start:\n    mov rdi, [msg]          ; 문자열을 strlen 에게\n    call strlen\n    mov rdi, rax            ; exit(길이)\n    mov rax, 60\n    syscall</pre>',
@@ -1685,10 +1685,10 @@ int main(void) {
     ],
     RB4: [
       { title: "복습 — 어셈블리를 읽고 C 로: 글자 세기", text: "<p>단어 세기를 만들기 전에 레슨 15 를 되짚어요. 친구가 「wc 에 더할 함수」 라며 <code>gcc -S -O0 -masm=intel -fno-asynchronous-unwind-tables</code> 결과만 보내 줬어요. 읽고 <b>같은 일을 하는 C 함수</b> <code>long mystery3(char *s)</code> 를 쓴 뒤, <code>main</code> 에서 <code>\"banana\"</code> · <code>\"abracadabra\"</code> · <code>\"\"</code> 로 불러 찍으세요. (C 파일 하나라 빌드는 <code>gcc -no-pie main.c -o main</code>.)</p><pre>mystery3:\n    endbr64\n    push    rbp\n    mov     rbp, rsp\n    mov     QWORD PTR -24[rbp], rdi\n    mov     QWORD PTR -16[rbp], 0\n    mov     QWORD PTR -8[rbp], 0\n    jmp     .L2\n.L4:\n    mov     rdx, QWORD PTR -8[rbp]\n    mov     rax, QWORD PTR -24[rbp]\n    add     rax, rdx\n    movzx   eax, BYTE PTR [rax]\n    cmp     al, 97\n    jne     .L3\n    add     QWORD PTR -16[rbp], 1\n.L3:\n    add     QWORD PTR -8[rbp], 1\n.L2:\n    mov     rdx, QWORD PTR -8[rbp]\n    mov     rax, QWORD PTR -24[rbp]\n    add     rax, rdx\n    movzx   eax, BYTE PTR [rax]\n    test    al, al\n    jne     .L4\n    mov     rax, QWORD PTR -16[rbp]\n    pop     rbp\n    ret</pre><p>변수 셋: <code>-24[rbp]</code> = s, <code>-16[rbp]</code> = 센 수(처음 0), <code>-8[rbp]</code> = 칸 번호(처음 0). 97 은 어떤 글자일까요? <code>s[i]</code> 는 「s 주소 + i」 의 한 바이트예요.</p>", needs: [["for (long i = 0; s[i] != 0; i++)", "R15/1", "for → jmp 검사 · 몸통 · i++ · 검사"], ["if (s[i] == 'a')", "R15/1", "if 는 cmp + 반대 조건 점프(jne)"], ["QWORD PTR -8[rbp]", "R15/0", "-O0 은 변수를 스택에 두고 꺼내 써요"], ["long count_words(char *s);", "R14/4", "문자열 = 첫 글자의 주소"]], answer: "// ==== 파일: main.c ====\n#include <stdio.h>\n\nlong mystery3(char *s) {\n    long n = 0;\n    for (long i = 0; s[i] != 0; i++) {\n        if (s[i] == 'a')\n            n++;\n    }\n    return n;\n}\n\nint main(void) {\n    printf(\"%ld\\n\", mystery3(\"banana\"));\n    printf(\"%ld\\n\", mystery3(\"abracadabra\"));\n    printf(\"%ld\\n\", mystery3(\"\"));\n    return 0;\n}", io: [{ output: "3\n5\n0" }] },
-      { title: "복습 — 에러 읽기 — undefined reference", text: "<p>이번엔 레슨 14 의 「선언과 global」 이에요. wc 에 줄마다 <b>숫자 글자</b>(<code>0</code>~<code>9</code>) 수를 세는 <code>long count_digits(char *s)</code> 를 어셈블리로 더했는데, <code>gcc -no-pie main.c digits.o -o wc</code> 에서 이렇게 멈췄어요(앞의 GNU-stack 경고 두 줄은 빼고, <code>/tmp/cc…o</code> 이름은 그때그때 달라요).</p><pre>/usr/bin/ld: /tmp/ccnogbM0.o: in function `main':\nmain.c:(.text+0x36): undefined reference to `count_digits'\ncollect2: error: ld returned 1 exit status</pre><p>nasm 은 에러 없이 <code>digits.o</code> 를 만들었어요. 그런데 링커는 왜 <code>count_digits</code> 를 못 찾을까요? <code>digits.asm</code> 에 <b>한 줄</b>을 더해 고치고, 아래 입력으로 <code>숫자: 11</code> 이 나오는지 확인하세요.</p>", needs: [["global add", "R14/0", "다른 파일이 찾을 수 있게 이름을 내놓기"], ["long add(long a, long b);", "R14/0", "C 쪽 선언"], ["gcc -no-pie main.c add.o", "R14/1", "묶기"], ["cmp dl, '0'   jb .skip", "R5/2", "부호 없는 비교로 범위 보기"]], given: "// ==== 파일: main.c ====\n#include <stdio.h>\n\nlong count_digits(char *s);\n\nint main(void) {\n    char line[256];\n    long digits = 0;\n    while (fgets(line, sizeof line, stdin) != NULL)\n        digits += count_digits(line);\n    printf(\"숫자: %ld\\n\", digits);\n    return 0;\n}\n; ==== 파일: digits.asm ====\nsection .text\n\ncount_digits:               ; rdi = 0 으로 끝나는 문자열 → rax = 숫자 글자 수\n    xor eax, eax\n.next:\n    mov dl, [rdi]\n    cmp dl, 0\n    je .done\n    cmp dl, '0'\n    jb .skip\n    cmp dl, '9'\n    ja .skip\n    inc rax\n.skip:\n    inc rdi\n    jmp .next\n.done:\n    ret", io: [{ input: "2026년 11월 8일\n버전 2.42.0\n", output: "숫자: 11" }], answer: "// ==== 파일: main.c ====\n#include <stdio.h>\n\nlong count_digits(char *s);\n\nint main(void) {\n    char line[256];\n    long digits = 0;\n    while (fgets(line, sizeof line, stdin) != NULL)\n        digits += count_digits(line);\n    printf(\"숫자: %ld\\n\", digits);\n    return 0;\n}\n; ==== 파일: digits.asm ====\nsection .text\nglobal count_digits\n\ncount_digits:               ; rdi = 0 으로 끝나는 문자열 → rax = 숫자 글자 수\n    xor eax, eax\n.next:\n    mov dl, [rdi]\n    cmp dl, 0\n    je .done\n    cmp dl, '0'\n    jb .skip\n    cmp dl, '9'\n    ja .skip\n    inc rax\n.skip:\n    inc rdi\n    jmp .next\n.done:\n    ret" },
+      { title: "복습 — 에러 읽기 — undefined reference", text: "<p>이번엔 레슨 14 의 「선언과 global」 이에요. wc 에 줄마다 <b>숫자 글자</b>(<code>0</code>~<code>9</code>) 수를 세는 <code>long count_digits(char *s)</code> 를 어셈블리로 더했는데, <code>gcc -no-pie main.c digits.o -o wc</code> 에서 이렇게 멈췄어요(앞의 GNU-stack 경고 두 줄은 빼고, <code>/tmp/cc…o</code> 이름은 그때그때 달라요).</p><pre>/usr/bin/ld: /tmp/ccnogbM0.o: in function `main':\nmain.c:(.text+0x36): undefined reference to `count_digits'\ncollect2: error: ld returned 1 exit status</pre><p>nasm 은 에러 없이 <code>digits.o</code> 를 만들었어요. 그런데 링커는 왜 <code>count_digits</code> 를 못 찾을까요? <code>digits.asm</code> 에 <b>한 줄</b>을 더해 고치고, 아래 입력으로 <code>숫자: 11</code> 이 나오는지 확인하세요.</p>", needs: [["global add", "R14/0", "다른 파일이 찾을 수 있게 이름을 내놓기"], ["long add(long a, long b);", "R14/0", "C 쪽 선언"], ["gcc -no-pie main.c add.o", "R14/1", "묶기"], ["cmp dl, '0'\njb .skip", "R5/2", "부호 없는 비교로 범위 보기"]], given: "// ==== 파일: main.c ====\n#include <stdio.h>\n\nlong count_digits(char *s);\n\nint main(void) {\n    char line[256];\n    long digits = 0;\n    while (fgets(line, sizeof line, stdin) != NULL)\n        digits += count_digits(line);\n    printf(\"숫자: %ld\\n\", digits);\n    return 0;\n}\n; ==== 파일: digits.asm ====\nsection .text\n\ncount_digits:               ; rdi = 0 으로 끝나는 문자열 → rax = 숫자 글자 수\n    xor eax, eax\n.next:\n    mov dl, [rdi]\n    cmp dl, 0\n    je .done\n    cmp dl, '0'\n    jb .skip\n    cmp dl, '9'\n    ja .skip\n    inc rax\n.skip:\n    inc rdi\n    jmp .next\n.done:\n    ret", io: [{ input: "2026년 11월 8일\n버전 2.42.0\n", output: "숫자: 11" }], answer: "// ==== 파일: main.c ====\n#include <stdio.h>\n\nlong count_digits(char *s);\n\nint main(void) {\n    char line[256];\n    long digits = 0;\n    while (fgets(line, sizeof line, stdin) != NULL)\n        digits += count_digits(line);\n    printf(\"숫자: %ld\\n\", digits);\n    return 0;\n}\n; ==== 파일: digits.asm ====\nsection .text\nglobal count_digits\n\ncount_digits:               ; rdi = 0 으로 끝나는 문자열 → rax = 숫자 글자 수\n    xor eax, eax\n.next:\n    mov dl, [rdi]\n    cmp dl, 0\n    je .done\n    cmp dl, '0'\n    jb .skip\n    cmp dl, '9'\n    ja .skip\n    inc rax\n.skip:\n    inc rdi\n    jmp .next\n.done:\n    ret" },
       { title: '단어 세기: count_words(char *s)', text: '<b>C 와 어셈블리로 작은 <code>wc</code></b>를 만들어요. 일은 이렇게 나눠요.<ol><li><code>main.c</code>: <code>fgets</code> 로 stdin 을 한 줄씩 읽어, 줄 수를 세고 <code>count_words(line)</code> 이 돌려준 값을 더해요. 다 읽으면 <code>printf</code> 로 <code>줄: n</code> · <code>단어: n</code>. 더하기는 파이썬처럼 <code>words += count_words(line);</code></li><li><code>count.asm</code>: <code>long count_words(char *s)</code> — 0 으로 끝나는 문자열에서 <b>단어</b>(빈칸 · 줄바꿈(10) · 탭(9)이 아닌 글자가 이어진 덩어리) 수를 돌려줘요. 「지금 단어 안에 있나」 를 레지스터 하나(예: <code>rcx</code> 0/1)에 두고, 단어 밖에서 글자를 만나는 순간 하나 세요.</li></ol>빌드 · 실행은 <code>nasm -f elf64 count.asm -o count.o</code> → <code>gcc -no-pie main.c count.o -o wc</code> → <code>./wc &lt; words.txt</code>(아래 준비 파일). 빈칸이 두 개 겹쳐도, 빈 줄이어도, 한글이어도 맞게 세야 해요.',
         prep: { name: 'words.txt', text: 'the quick brown fox\njumps over  the lazy dog\n\n안녕 어셈블리 그리고 C\n' },
-        needs: [['while (fgets(line, sizeof line, stdin) != NULL)', 'R14/4', '한 줄씩 끝까지 읽기'], ['long count_words(char *s);', 'R14/4', '문자열 = 첫 글자의 주소'], ['mov dl, [rdi]   cmp dl, 0', 'R14/4', '한 바이트 읽고 끝(0)인지'], ['gcc -no-pie main.c count.o -o wc', 'R14/1', 'C 와 묶기'], ['printf("단어: %ld\\n", words);', 'R14/0', 'long 출력']],
+        needs: [['while (fgets(line, sizeof line, stdin) != NULL)', 'R14/4', '한 줄씩 끝까지 읽기'], ['long count_words(char *s);', 'R14/4', '문자열 = 첫 글자의 주소'], ['mov dl, [rdi]\ncmp dl, 0', 'R14/4', '한 바이트 읽고 끝(0)인지'], ['gcc -no-pie main.c count.o -o wc', 'R14/1', 'C 와 묶기'], ['printf("단어: %ld\\n", words);', 'R14/0', 'long 출력']],
         io: [{ input: 'the quick brown fox\njumps over  the lazy dog\n\n안녕 어셈블리 그리고 C\n', output: '줄: 4\n단어: 13' }, { input: '   hello    world  \n\n\tasm\tand\tC\n', output: '줄: 3\n단어: 5' }],
         answer: `// ==== 파일: main.c ====
 #include <stdio.h>
@@ -1809,7 +1809,7 @@ count_char:                 ; rdi = 문자열, esi = 찾을 글자(int) → rax 
 .done:
     ret` },
       { title: 'gdb 로 count_char 안 들여다보기', text: '완성한 <code>wc</code> 를 <code>-g</code> 로 다시 빌드해 「단어 세기: count_words(char *s)」 문제의 <code>words.txt</code> 를 넣고 gdb 에서 <code>count_char</code> 가 불릴 때 멈추고, C 가 넘겨준 인자와 돌려받는 값을 직접 보세요.', noRun: true,
-        needs: [['gcc -g -no-pie main.c count.o -o wc', 'R16/4', '양쪽 다 -g'], ['break count_char', 'R16/4', '어셈블리 함수에서 멈추기'], ['run < words.txt', 'R16/1', '입력을 파일에서'], ['x/s $rdi', 'R16/2', '넘어온 문자열 보기'], ['finish   p $rax', 'R16/4', '돌려준 값']],
+        needs: [['gcc -g -no-pie main.c count.o -o wc', 'R16/4', '양쪽 다 -g'], ['break count_char', 'R16/4', '어셈블리 함수에서 멈추기'], ['run < words.txt', 'R16/1', '입력을 파일에서'], ['x/s $rdi', 'R16/2', '넘어온 문자열 보기'], ['finish\np $rax', 'R16/4', '돌려준 값']],
         checks: [{ text: '`run < words.txt` 하면 `Breakpoint 1, count_char () at count.asm:…` 에서 멈춰요' }, { text: '`bt` 의 `#1` 이 `main () at main.c:…` — `e += count_char(line, \'e\');` 줄이에요' }, { text: '`info registers rsi` 가 `0x65 101`, `p/c $rsi` 가 `101 \'e\'` 예요' }, { text: '`x/s $rdi` 가 첫 줄 `"the quick brown fox\\n"` 이에요' }, { text: '`finish` 뒤 `p $rax` 가 `1`(첫 줄의 e 는 the 의 하나), 한 번 `continue` 하면 이번엔 `rsi` 가 `0x6f`(\'o\')예요' }],
         answer: 'nasm -f elf64 -g -F dwarf count.asm -o count.o\ngcc -g -no-pie main.c count.o -o wc\ngdb ./wc\n(gdb) break count_char\n(gdb) run < words.txt\n(gdb) bt\n(gdb) info registers rdi rsi\n(gdb) p/c $rsi\n(gdb) x/s $rdi\n(gdb) finish\n(gdb) p $rax\n(gdb) continue\n(gdb) info registers rsi' },
     ],
