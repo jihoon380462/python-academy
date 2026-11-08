@@ -6,7 +6,7 @@
 const WEATHER_SAMPLE = '{\n  "latitude": 37.55, "longitude": 127.0, "timezone": "Asia/Seoul",\n  "current_units": {"temperature_2m": "°C"},\n  "current": {"time": "2026-11-07T15:00", "temperature_2m": 12.3},\n  "daily_units": {"temperature_2m_max": "°C", "precipitation_probability_max": "%"},\n  "daily": {"time": ["2026-11-07"], "temperature_2m_max": [15.1], "temperature_2m_min": [6.2], "precipitation_probability_max": [20]}\n}';
 const BOOK = {
   check: 'api',
-  meta: {
+  meta: { preSyntaxOk: ["H15/0 본문 코드 1", "H15/1 본문 코드 1"] /* v2.43.3 check_book ⑭: 일부러 틀린 코드 · 클래스 밖 코드와 메서드 조각을 한 상자에 보여 줌 */,
     prereq: [
       { lessons: ['H0', 'H1', 'HB1'], chapters: [1], ref: 'SETUP/0', btn: '시작하기 1 · 준비물 보기',
         title: '먼저 꼭! 파이썬 + requests, 그리고 PowerShell 에서는 curl.exe',

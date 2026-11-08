@@ -115,9 +115,9 @@ _start:
    +--------------+---------+------+------+
    |              |         |      |  al  |
    +--------------+---------+------+------+
-   |<------------------ rax (64) -------->|
-                  |<-------- eax (32) --->|
-                            |<-- ax (16)->|
+   |&lt;------------------ rax (64) -------->|
+                  |&lt;-------- eax (32) --->|
+                            |&lt;-- ax (16)->|
                                    |<al 8>|</pre>
 <table class="kb"><tbody><tr><td><b>64비트</b></td><td><code>rax</code></td><td><code>rbx</code></td><td><code>rcx</code></td><td><code>rdi</code></td><td><code>r8</code></td></tr><tr><td><b>32비트</b></td><td><code>eax</code></td><td><code>ebx</code></td><td><code>ecx</code></td><td><code>edi</code></td><td><code>r8d</code></td></tr><tr><td><b>16비트</b></td><td><code>ax</code></td><td><code>bx</code></td><td><code>cx</code></td><td><code>di</code></td><td><code>r8w</code></td></tr><tr><td><b>8비트</b></td><td><code>al</code></td><td><code>bl</code></td><td><code>cl</code></td><td><code>dil</code></td><td><code>r8b</code></td></tr></tbody></table>
 <p>작은 이름에 값을 쓸 때 <b>위쪽이 어떻게 되는지</b>가 이름마다 달라요. 꼭 기억할 규칙은 하나예요.</p>

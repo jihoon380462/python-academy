@@ -413,7 +413,7 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 .bk-nav{display:flex;justify-content:space-between;gap:10px;margin-top:26px}.bk-nav .btn{min-height:46px;flex:1;max-width:260px}
 .bk-step-box{border-left:3px solid var(--primary);padding:6px 0 6px 14px;margin:12px 0}
 .bk-warn{border-left:3px solid var(--gold);padding:6px 0 6px 14px;margin:12px 0}
-.bk-art kbd{font-family:var(--mono);font-size:.88em;padding:1px 6px;border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;background:var(--surface2)}
+.bk-art kbd{font-family:var(--mono);font-size:max(13px,.88em);padding:1px 6px;border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;background:var(--surface2)}
 .bk-copy{white-space:nowrap;flex:none}.btn.xs.bk-copy{font-size:12.5px} /* v2.22.1 PC QA: 📋 복사 글자 10.9px → 읽기 쉽게 */.bk-code-h span{min-width:0}.bk-step-box pre,.bk-warn pre{margin:8px 0}
 .bk-needs{flex-direction:column;align-items:stretch;gap:6px}.bk-needs .lbl{margin:0 0 2px}
 .bk-need{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font:inherit;text-align:left;cursor:pointer}.bk-need:hover{border-color:var(--primary)}
@@ -500,7 +500,7 @@ pre.code.more-r{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40p
 .book-mode .lp-kicker{text-transform:none;letter-spacing:.02em}
 /* A9 경로 줄은 한 줄 — 긴 레슨 이름은 말줄임, 📚 도감은 늘 오른쪽 */
 .bk-crumb{flex-wrap:nowrap}
-.bk-crumb>.lnk{flex:none;white-space:nowrap}
+.bk-crumb>.lnk{flex:none;white-space:nowrap;min-height:24px;display:inline-flex;align-items:center} /* v2.43.3 QA: PC 에서 23px 이라 누를 곳 24px 에 모자랐음 */
 .bk-crumb>span:not(.muted):not(.grow){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bk-next-hint .nw{white-space:nowrap}
 /* A10 도감 분류 칩: PC 는 여러 줄로(잘리지 않게), 폰은 옆으로 밀기 + 얇은 스크롤바 */
