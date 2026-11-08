@@ -304,8 +304,10 @@ LESSONS.push(
       example:{ code:`s = "Hello"\nprint(s.upper())\nprint(s.lower())\nprint(s)\nprint(s[-3:].upper())`, trace:true } },
     { title:'replace: 글자 바꾸기', html:`<p><code>replace(a, b)</code>는 문자열 안의 a를 <b>모두 b로 바꾼</b> 새 문자열을 돌려줘요.</p><pre>s = "I like cats"\nprint(s.replace("cats", "dogs"))   # I like dogs</pre><p>바꿀 것이 앞, 새것이 뒤예요. 바꿀 것이 없으면 그대로 돌려줘요.</p>`,
       example:{ code:`s = "I like cats"\nprint(s.replace("cats", "dogs"))\nprint("a-b-c".replace("-", " "))`, trace:true } },
-    { title:'strip: 양끝 공백 지우기', html:`<p><code>strip()</code>은 문자열 <b>양끝의 공백</b>을 지운 새 문자열을 돌려줘요. 가운데 띄어쓰기는 그대로예요.</p><pre>s = "  토끼  "\nprint("[" + s.strip() + "]")   # [토끼]</pre><p>입력 앞뒤에 실수로 들어간 빈칸을 없앨 때 써요. 대괄호는 공백이 지워진 걸 보려고 <code>+</code>로 이어 붙였어요.</p>`,
-      example:{ code:`s = "  토끼  "\nprint("[" + s + "]")\nprint("[" + s.strip() + "]")`, trace:true } },
+    { title:'strip: 양끝 공백 지우기', html:`<p><code>strip()</code>은 문자열 <b>양끝의 공백</b>을 지운 새 문자열을 돌려줘요. 가운데 띄어쓰기는 그대로예요.</p><pre>s = "  토끼  "\nprint("[" + s.strip() + "]")   # [토끼]</pre><p>입력 앞뒤에 실수로 들어간 빈칸을 없앨 때 써요. 대괄호는 공백이 지워진 걸 보려고 <code>+</code>로 이어 붙였어요.</p><p>한쪽만 지우려면 <code>rstrip()</code>(오른쪽 = 끝)이나 <code>lstrip()</code>(왼쪽 = 앞)을 써요. 괄호 안에 글자를 주면 공백 대신 그 글자를 지워요.</p><pre>print("[" + s.rstrip() + "]")   # [  토끼]
+print("[" + s.lstrip() + "]")   # [토끼  ]
+print("2026-11-08!!".rstrip("!"))   # 2026-11-08</pre>`,
+      example:{ code:`s = "  토끼  "\nprint("[" + s + "]")\nprint("[" + s.strip() + "]")\nprint("[" + s.rstrip() + "]")\nprint("[" + s.lstrip() + "]")\nprint("2026-11-08!!".rstrip("!"))`, trace:true } },
     { title:'split: 단어로 쪼개기', html:`<p><code>split()</code>('쪼개다')은 문자열을 <b>띄어쓰기마다 잘라 리스트</b>로 만들어요.</p><pre>sentence = "나는 파이썬을 배워요"\nwords = sentence.split()\nprint(words)        # ['나는', '파이썬을', '배워요']\nprint(len(words))   # 3 — 단어 수</pre><p>같은 len이라도 <b>문자열</b>에 쓰면 글자 수(<code>len(sentence)</code>는 11), <b>리스트</b>에 쓰면 칸 수예요. 입력한 문장도 <code>input().split()</code>으로 쪼개요.</p>`,
       example:{ code:`sentence = input()\nwords = sentence.split()\nprint(words)\nprint("첫 단어:", words[0])\nprint("단어 수:", len(words))`, stdin:'나는 파이썬을 배워요', trace:true } },
     { title:'f-string: 값 끼워 넣기', html:`<p>[[f-string]]은 따옴표 앞에 <code>f</code>를 붙이고 중괄호 <code>{ }</code> 안에 변수를 넣어 <b>값을 문장에 끼워 넣는</b> 방법이에요.</p><pre>name = "민수"\nage = 12\nprint(f"{name}님, {age}살이시군요")   # 민수님, 12살이시군요\nprint(f"내년엔 {age + 1}살")           # 내년엔 13살</pre><p>중괄호 안에서 계산도 돼요(<code>{len(name)}</code>도요). <b>f를 빼먹으면</b> 중괄호가 그대로 <code>{name}님</code>으로 나와요.</p><details class="lp-more"><summary>💡 더 알아보기</summary><p>다른 방법과 비교하면: <code>print(name, "님")</code>은 쉼표 자리에 한 칸이 생겨 <code>민수 님</code>, <code>print(name + "님")</code>은 딱 붙여 <code>민수님</code>이에요.</p></details>`,
@@ -414,8 +416,19 @@ LESSONS.push(
       example:{ code:`nums = [int(x) for x in input().split()]\nprint(nums)\nprint(sorted(nums))`, stdin:'10 2 33' , trace:true } },
     { title:'리스트를 한 줄로 출력: join', html:`<p><code>" ".join(리스트)</code>는 리스트 안 글자들을 <b>빈칸 하나씩 끼워 한 줄로</b> 이어요.</p><pre>print(" ".join(["a", "b", "c"]))   # a b c\nprint("-".join(["a", "b", "c"]))   # a-b-c</pre><p>따옴표 안에 넣은 글자가 사이에 들어가요. 단, join은 <b>글자만</b> 이을 수 있어서 숫자 리스트는 먼저 <code>str()</code>로 글자로 바꿔요.</p><pre>nums = [2, 10, 33]\nwords = [str(x) for x in nums]\nprint(" ".join(words))   # 2 10 33</pre>`,
       example:{ code:`print(" ".join(["a", "b", "c"]))\nprint("-".join(["a", "b", "c"]))\nnums = [2, 10, 33]\nwords = [str(x) for x in nums]\nprint(" ".join(words))` , trace:true } },
+    { title:'딕셔너리 · 집합 컴프리헨션', html:`<p>대괄호 대신 <b>중괄호</b>로 감싸면 딕셔너리나 집합도 한 줄로 만들어요. 모양은 리스트 컴프리헨션과 같고, 담는 그릇만 달라요.</p><pre>names = ["토끼", "고양이", "개"]
+lengths = {name: len(name) for name in names}
+print(lengths)   # {'토끼': 2, '고양이': 3, '개': 1}
+
+scores = {"민수": 72, "지아": 95, "현우": 88}
+passed = {name: s for name, s in scores.items() if s >= 80}
+print(passed)    # {'지아': 95, '현우': 88}</pre><p><code>키: 값</code> 처럼 콜론이 있으면 <b>딕셔너리</b>, 값만 있으면 <b>집합</b>([[레슨:L11B]])이에요. 집합이라 같은 값은 한 번만 남아요. 집합은 순서가 없어서 볼 때는 <code>sorted()</code>로 늘어놓아요.</p><pre>words = ["cat", "Cat", "CAT", "dog"]
+kinds = {w.lower() for w in words}
+print(len(kinds))      # 2
+print(sorted(kinds))   # ['cat', 'dog']</pre>`,
+      example:{ code:`names = ["토끼", "고양이", "개"]\nlengths = {name: len(name) for name in names}\nprint(lengths)\nscores = {"민수": 72, "지아": 95, "현우": 88}\npassed = {name: s for name, s in scores.items() if s >= 80}\nprint(passed)\nwords = ["cat", "Cat", "CAT", "dog"]\nkinds = {w.lower() for w in words}\nprint(len(kinds))\nprint(sorted(kinds))`, trace:true } },
   ],
-  summary:['[식 for x in 목록 if 조건]','[int(x) for x in input().split()] 로 입력을 숫자 리스트로','" ".join(글자 리스트) 로 한 줄 출력'] },
+  summary:['[식 for x in 목록 if 조건]','[int(x) for x in input().split()] 로 입력을 숫자 리스트로','" ".join(글자 리스트) 로 한 줄 출력','{키: 값 for …} 는 딕셔너리, {값 for …} 는 집합'] },
 
 { id:'L12', ch:3, n:22, title:'리스트 안의 딕셔너리', mode:'text',
   tutorSummary:'리스트 안의 딕셔너리 [{"name":..}, ...]. 바깥 인덱스 먼저, 안쪽 키 다음: students[1]["name"]. for s in students: 로 한 명씩, append({...}) 로 추가. round(값, 자릿수)로 반올림 — 딱 .5 는 짝수 쪽(round(2.5) 는 2). 보여 주기만 할 땐 f"{x:.2f}"(L9C).',
@@ -651,8 +664,10 @@ LESSONS.push(
       example:{ code:`with open("a.txt", "w", encoding="utf-8") as f:\n    f.write("사과\\n배\\n")\nwith open("a.txt", "r", encoding="utf-8") as f:\n    for line in f:\n        print(line.strip())`, trace:true } },
     { title:'readlines: 줄 목록', html:`<p><code>f.readlines()</code>는 줄들을 <b>리스트로</b> 돌려줘요. <code>len()</code>으로 줄 수를 셀 수 있어요.</p><pre>with open("a.txt", "r", encoding="utf-8") as f:\n    lines = f.readlines()\nprint(lines)        # ['사과&#92;n', '배&#92;n']\nprint(len(lines))   # 2</pre><p>칸마다 줄 끝의 <code>&#92;n</code>까지 들어 있어요.</p>`,
       example:{ code:`with open("a.txt", "w", encoding="utf-8") as f:\n    f.write("사과\\n배\\n")\nwith open("a.txt", "r", encoding="utf-8") as f:\n    lines = f.readlines()\nprint(lines)\nprint(len(lines))`, trace:true } },
-    { title:'읽은 줄을 리스트로', html:`<p>컴프리헨션([[레슨:L11C]])으로 <b>줄바꿈을 뗀 리스트</b>를 한 줄에 만들 수 있어요.</p><pre>with open("a.txt", "r", encoding="utf-8") as f:\n    saved = [line.strip() for line in f]\nprint(saved)   # ['사과', '배']</pre><p>리스트가 되면 <code>sorted(saved)</code>로 정렬하거나 for로 하나씩 출력할 수 있어요.</p>`,
-      example:{ code:`with open("a.txt", "w", encoding="utf-8") as f:\n    f.write("포도\\n사과\\n배\\n")\nwith open("a.txt", "r", encoding="utf-8") as f:\n    saved = [line.strip() for line in f]\nprint(saved)\nprint(sorted(saved))`, trace:true } },
+    { title:'읽은 줄을 리스트로', html:`<p>컴프리헨션([[레슨:L11C]])으로 <b>줄바꿈을 뗀 리스트</b>를 한 줄에 만들 수 있어요.</p><pre>with open("a.txt", "r", encoding="utf-8") as f:\n    saved = [line.strip() for line in f]\nprint(saved)   # ['사과', '배']</pre><p>리스트가 되면 <code>sorted(saved)</code>로 정렬하거나 for로 하나씩 출력할 수 있어요.</p><p>파일 전체를 <code>f.read()</code>로 읽고 <code>.splitlines()</code>를 붙여도 돼요. 줄마다 끊으면서 줄바꿈 글자 <code>\\n</code>을 떼어 줘요. 줄 안의 앞뒤 빈칸은 그대로라서, 그것까지 지우려면 위처럼 strip 을 써요.</p><pre>with open("a.txt", "r", encoding="utf-8") as f:
+    lines = f.read().splitlines()
+print(lines)   # ['포도', '사과', '배']</pre>`,
+      example:{ code:`with open("a.txt", "w", encoding="utf-8") as f:\n    f.write("포도\\n사과\\n배\\n")\nwith open("a.txt", "r", encoding="utf-8") as f:\n    saved = [line.strip() for line in f]\nprint(saved)\nprint(sorted(saved))\nwith open("a.txt", "r", encoding="utf-8") as f:\n    lines = f.read().splitlines()\nprint(lines)`, trace:true } },
     { title:'파일이 없을 때', html:`<p>"r"은 없는 파일을 만들어 주지 않아요. 없는 파일을 읽으면 <code>FileNotFoundError</code>가 나서, [[레슨:L13]]의 try/except로 받아 줘요.</p><pre>try:\n    with open("없는파일.txt", "r", encoding="utf-8") as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print("파일이 없어요")</pre><p>저장 파일이 아직 없는 첫 실행에 자주 써요. except 안에서 「빈 목록으로 시작」처럼 기본값을 정해 둬요.</p>`,
       example:{ code:`try:\n    with open("없는파일.txt", "r", encoding="utf-8") as f:\n        print(f.read())\nexcept FileNotFoundError:\n    print("파일이 없어요")`, trace:true } },
   ],
@@ -708,8 +723,13 @@ LESSONS.push(
       example:{ code:`names = ["민수", "영희"]\nscores = [90, 85]\nfor n, s in zip(names, scores):\n    print(n, s)`, trace:true } },
     { title:'max·min: 가장 큰 값·작은 값', html:`<p><code>max()</code>는 <b>가장 큰 값</b>, <code>min()</code>은 <b>가장 작은 값</b>을 돌려줘요.</p><pre>scores = [90, 85, 70]\nprint(max(scores))   # 90\nprint(min(scores))   # 70\nprint(min(30, 42))   # 30</pre><p>리스트 대신 값을 여러 개 바로 넣어도 돼요. [[레슨:L7B]]에서 for로 직접 찾던 일을 한 줄로 해 줘요.</p><p><code>max(names, key=len)</code>처럼 기준을 줄 수도 있어요. 가장 긴 이름을 골라요.</p>`,
       example:{ code:`scores = [90, 85, 70]\nprint(max(scores))\nprint(min(scores))\nprint(min(30, 42))`, trace:true } },
+    { title:'any · all: 하나라도 · 모두', html:`<p><code>any(목록)</code>은 <b>하나라도</b> 참이면 True, <code>all(목록)</code>은 <b>모두</b> 참이어야 True 예요. 목록에는 보통 컴프리헨션([[레슨:L11C]])으로 만든 True · False 리스트를 넣어요.</p><pre>scores = [72, 95, 58, 88]
+print(any([s < 60 for s in scores]))    # True — 60점 아래가 하나 있어요
+print(all([s >= 50 for s in scores]))   # True — 모두 50점 이상
+print(all([s >= 60 for s in scores]))   # False</pre><p>for 와 if 로 하나씩 보던 일을 한 줄로 해 줘요. 빈 목록이면 <code>any([])</code>는 False, <code>all([])</code>는 True 예요. 「틀린 게 하나도 없다」 고 보기 때문이에요.</p>`,
+      example:{ code:`scores = [72, 95, 58, 88]\nprint(any([s < 60 for s in scores]))\nprint(all([s >= 50 for s in scores]))\nprint(all([s >= 60 for s in scores]))\nprint(any([]), all([]))`, trace:true } },
   ],
-  summary:['map 은 모두에 적용, filter 는 골라내기 — list() 로 감싸기','enumerate 는 번호와 함께, zip 은 짝짓기','max·min 으로 가장 큰·작은 값'] },
+  summary:['map 은 모두에 적용, filter 는 골라내기 — list() 로 감싸기','enumerate 는 번호와 함께, zip 은 짝짓기','max·min 으로 가장 큰·작은 값','any 는 하나라도, all 은 모두 참인지'] },
 
 { id:'L18C', ch:5, n:41, title:'반복자와 제너레이터', mode:'text',
   tutorSummary:'for 는 iter(목록) 으로 반복자를 받고 next() 로 하나씩 꺼내다가 StopIteration 이 나면 끝낸다. next(it, 기본값) 은 끝이면 기본값. 반복자(map·filter·zip 결과도)는 앞으로만 가서 한 번 다 쓰면 비어 있다 — 다시 쓰려면 list() 로 담아 둔다. yield 가 있는 함수는 제너레이터 — 불러도 바로 안 돌고, next 마다 yield 까지 돌아 값 하나를 내보내고 멈췄다가 다음에 그 자리부터 이어서 돈다. 필요할 때만 계산해 메모리를 아끼고 while True 로 끝없는 것도 된다. 제너레이터 식 (x * x for x in …) 은 컴프리헨션의 [] 를 () 로 바꾼 것, sum·max·join 에 바로 넣는다. for line in f 는 큰 파일도 한 줄씩 읽고, 제너레이터를 이어 붙여 읽기→고르기를 흘려보낸다. yield from 목록 은 for x in 목록: yield x 를 줄인 것.',
