@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export function courses() { return fs.readdirSync(path.join(ROOT, 'courses')).filter(d => fs.existsSync(path.join(ROOT, 'courses', d, 'content.js'))); }
 export function loadCourse(id) {
-  const files = ['core/config.js', 'shared/errors.js', 'shared/glossary.js', `courses/${id}/content.js`] /* v2.19.0 N13: shared/badges.js 는 archive/classic */.map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+  const files = ['core/config.js', 'shared/errors.js', 'shared/glossary.js', ...(fs.existsSync(path.join(ROOT, 'courses', id, 'datasets.js')) ? [`courses/${id}/datasets.js`] : []) /* v2.41.0 레슨 예제가 쓰는 데이터 상수(files) */, `courses/${id}/content.js`] /* v2.19.0 N13: shared/badges.js 는 archive/classic */.map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
   const ctx = {}; vm.createContext(ctx);
   vm.runInContext(files + '\n;this.__out={CONFIG,LESSONS,PROBLEMS,DRILLS:typeof DRILLS!=="undefined"?DRILLS:[],CHAPTERS,GUIDES:typeof GUIDES!=="undefined"?GUIDES:{},GUIDES_TEXT:typeof GUIDES_TEXT!=="undefined"?GUIDES_TEXT:{},ERRORS,GLOSSARY};', ctx, { filename: id + '/content.js' });
   const meta = JSON.parse(fs.readFileSync(path.join(ROOT, `courses/${id}/course.json`), 'utf8'));

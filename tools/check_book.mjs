@@ -5,6 +5,12 @@ import fs from 'fs'; import vm from 'vm'; import os from 'os'; import path from 
 const R = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 // v2.39.0: 예시 답 하나의 제한 시간 — 무한 반복을 잡는 용도. check_book_par 로 교과서 여럿을 동시에 돌리면 CPU 를 나눠 써서 학습 예제(LLM NB2#4 등)가 8초를 넘을 수 있어 30초로
 const RUN_TIMEOUT = +process.env.CHECK_BOOK_TIMEOUT || 30000;
+// v2.41.0: 준비 파일 — 하나({name, text}) 또는 여럿([…]), 이름에 하위 폴더 가능(templates/index.html), run:true 면 답 · 예제보다 먼저 python3 로 한 번 실행(엑셀 예제를 만드는 스크립트 등)
+const prepList = (prep) => (Array.isArray(prep) ? prep : prep ? [prep] : []).filter(f => f && f.name);
+function writePreps(dir, prep) {
+  for (const f of prepList(prep)) { const fp = path.join(dir, f.name); fs.mkdirSync(path.dirname(fp), { recursive: true }); fs.writeFileSync(fp, f.text || ''); }
+  for (const f of prepList(prep)) if (f.run) execFileSync('python3', [f.name], { cwd: dir, encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] });
+}
 const want = process.argv[2]; const courses = fs.readdirSync(R + '/courses').filter(d => fs.existsSync(`${R}/courses/${d}/book.js`) && (!want || d === want));
 let total = 0;
 for (const cid of courses) total += checkCourse(cid);
@@ -39,7 +45,7 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
     if (SHELL) { if (!t.setup) bad(`${id}: 준비 명령(setup) 없음`); for (const c of io) runShell(id, t, answer, c); return; }
     for (const c of io) {
       if (c.output == null) { bad(`${id}: 출력 예 없음`); continue; }
-      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'book-')); const up = p && p.files && p.files.upload; if (up && up.sample) fs.writeFileSync(path.join(dir, up.name), up.sample); if (t.prep) fs.writeFileSync(path.join(dir, t.prep.name), t.prep.text);
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'book-')); const up = p && p.files && p.files.upload; if (up && up.sample) fs.writeFileSync(path.join(dir, up.name), up.sample); writePreps(dir, t.prep);
       fs.writeFileSync(path.join(dir, 'main.py'), answer + pyCheck);
       let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: c.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); continue; }
       ran++; const norm = (s) => String(s).replace(/\r/g, '').split('\n').map(x => x.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
@@ -90,7 +96,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
     if (ASMEX && code) { const r = asmRun(code, ex.stdin, ex.echoExit); if (r.error) { if (!((BOOK.meta && BOOK.meta.exampleErrorsOk) || []).includes(`${l.id}/${i}`)) bad(`${l.id}/${i} 「${pg.title}」 예제 ${r.stage} 에서 에러: ${String(r.error).split('\n').slice(0, 2).join(' / ')}`); return; } ran++; const o = sq(r.out); for (const v of claims) if (!o.includes(sq(v))) bad(`${l.id}/${i} 「${pg.title}」: 본문은 「실행하면 ${v}」 인데 예제 출력에 없어요 — 실제 출력 ${JSON.stringify(r.out.slice(0, 160))}`); return; } // v2.31.0 어셈블리 예제는 전부 빌드 · 실행
     if (!code || !(PYEX || SQLEX)) return; if (PYEX && /^\s*(import turtle|from turtle)/m.test(code)) return; /* 거북이는 창이 필요해서(CI 에 화면 없음) 안 돌림 */ if (!claims.length && !PYEX) return; // 파이썬 예제는 주장이 없어도 전부 돌려 봄(에러 나는 예제 찾기, BOOK.meta.exampleErrorsOk 는 일부러 에러)
     const errOk = ((BOOK.meta && BOOK.meta.exampleErrorsOk) || []).includes(`${l.id}/${i}`);
-    let out = ''; try { if (PYEX) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ex-')); fs.writeFileSync(path.join(dir, 'main.py'), code); out = execFileSync('python3', ['main.py'], { cwd: dir, input: ex.stdin || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); }
+    let out = ''; try { if (PYEX) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ex-')); writePreps(dir, ex.prep); fs.writeFileSync(path.join(dir, 'main.py'), code); out = execFileSync('python3', ['main.py'], { cwd: dir, input: ex.stdin || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); }
       else { const r = JSON.parse(execFileSync('python3', [R + '/tools/sql_book_run.py'], { input: JSON.stringify({ dataset: ctx.SQL_DATASETS[ex.db || 'cafe'], answer: code }), encoding: 'utf8', timeout: RUN_TIMEOUT })); if (r.error) return bad(`${l.id}/${i} 예제 실행 에러: ${r.error}`); out = r.out || r.output || ''; } }
     catch (e) { const em = String(e.stderr || e.message); if (PYEX && e.status && (errOk || /No module named '(tkinter|_tkinter|turtle)'/.test(em))) out = String(e.stdout || '') + em; /* 에러를 보여 주는 예제(트레이스백 레슨)·거북이(Windows 파이썬엔 있음) */ else return bad(`${l.id}/${i} 「${pg.title}」 예제 실행 에러: ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
     ran++; const o = sq(out); for (const v of claims) if (!o.includes(sq(v))) bad(`${l.id}/${i} 「${pg.title}」: 본문은 「실행하면 ${v}」 인데 예제 출력에 없어요 — 실제 출력 ${JSON.stringify(out.slice(0, 160))}`); });

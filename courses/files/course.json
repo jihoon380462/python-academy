@@ -1,0 +1,1 @@
+{"id": "files", "name": "데이터 파일 다루기", "icon": "🗂️", "desc": "JSON · JSON Lines · TOML · 엑셀(openpyxl)을 파이썬으로 읽고 · 검사하고 · 바꾸고 · 보기 좋은 엑셀 보고서로 내보내는 교과서", "runner": "python", "mapColor": "#2e7d32", "mascotGear": null}

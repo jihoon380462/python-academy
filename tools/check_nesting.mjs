@@ -4,10 +4,10 @@
 //   사용: node tools/check_nesting.mjs            → 파이썬·알고 모두 검사, 하나라도 있으면 exit 1 (CI 게이트)
 //         node tools/check_nesting.mjs python list → 그 코스의 걸린 줄 목록
 import fs from 'node:fs'; import vm from 'node:vm';
-const courses = process.argv[2] ? [process.argv[2]] : ['python', 'algo']; let total = 0;
+const courses = process.argv[2] ? [process.argv[2]] : ['python', 'algo', 'files']; let total = 0; // v2.41.0 files 더함(다른 교과서는 아직 걸린 줄이 있어 TODO)
 for (const course of courses) {
   const ctx = { window: {}, console }; vm.createContext(ctx);
-vm.runInContext(fs.readFileSync(`courses/${course}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var '), ctx);
+vm.runInContext((fs.existsSync(`courses/${course}/datasets.js`) ? fs.readFileSync(`courses/${course}/datasets.js`, 'utf8') + '\n' : '') /* v2.41.0 */ + fs.readFileSync(`courses/${course}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var '), ctx);
 // HTML(문제 설명·레슨 본문)에서만 태그를 벗긴다 — 태그는 글자로 시작하는 것만(코드의 a <= b 비교를 지우지 않게, v2.8.5 수정)
 const dec = (s) => s.replace(/<br\s*\/?>/g, '\n').replace(/<\/?[a-zA-Z][^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
 // 호출 깊이: 이름( 로 여는 괄호만 호출로 셈(문자열 안은 건너뜀)
