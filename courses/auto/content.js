@@ -2781,7 +2781,7 @@ with tempfile.TemporaryDirectory() as tmp:
     again = make_message("hello@example.com", "sky@example.com", "같은 메일", "본문", attachments=[pdf])
     twin = make_message("hello@example.com", "sky@example.com", "같은 메일", "본문", attachments=[pdf])
     print(again.as_bytes() == twin.as_bytes())     # 내용이 같아도 원문은 달라요`, prep: [SAMPLES_PREP] } },
-    { title: "받은 메일: iter_attachments() 로 첨부 꺼내기", html: `<p>거꾸로, 받은 메일에서 첨부를 꺼내요. 메일 앱에서 메일을 <code>.eml</code> 로 저장하거나 폴더로 끌어다 놓으면 파일이 돼요. 연습 재료 <code>make_eml</code> 이 숲속목재가 보낸 견적서 메일 한 통을 만들어 줘요.</p>
+    { title: "첨부 꺼내기: iter_attachments()", html: `<p>거꾸로, 받은 메일에서 첨부를 꺼내요. 메일 앱에서 메일을 <code>.eml</code> 로 저장하거나 폴더로 끌어다 놓으면 파일이 돼요. 연습 재료 <code>make_eml</code> 이 숲속목재가 보낸 견적서 메일 한 통을 만들어 줘요.</p>
 <table class="kb"><tbody><tr><th>코드</th><th>뜻</th></tr><tr><td><code>parseaddr(msg["From"])</code></td><td>보낸 사람 (이름, 주소)</td></tr><tr><td><code>msg.iter_attachments()</code></td><td>첨부 조각만 차례로</td></tr><tr><td><code>part.get_filename()</code></td><td>첨부 이름</td></tr><tr><td><code>part.get_content()</code></td><td>첨부 내용 — <code>application/…</code> · <code>image/…</code> 는 <code>bytes</code>, <code>text/…</code> 는 <code>str</code></td></tr></tbody></table>
 <div class="bk-warn"><b>남이 정한 첨부 이름</b> — 첨부 이름은 보낸 사람이 정해요. <code>../../</code> 처럼 폴더가 섞여 오면 엉뚱한 곳에 써질 수 있어서, <code>Path(이름).name</code> 으로 이름 부분만 떼어 써요. 이름이 같은 첨부가 둘이면 덮어쓰니, 그럴 땐 [[레슨:J1]] 처럼 이름을 바꿔요.</div>
 <p>꺼낸 PDF 를 읽는 건 [[레슨:J4]] 의 <code>PdfReader</code> 예요. 받은편지함을 직접 여는 <code>imaplib</code> 은 이름만 알아 두세요. 이 교과서는 저장한 <code>.eml</code> 로 다뤄요.</p>`,
