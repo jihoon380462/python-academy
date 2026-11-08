@@ -34,7 +34,7 @@
 5. 문서: **이 파일 0절 상태판** + `CHANGELOG.md` 새 항목(+ 바뀐 규칙이면 `specs/site-intent.md`, 할 일이면 `TODO.md`). 이번 작업에서 실패가 있었으면(CI 빨강 · 사용자 지적 · 검사가 놓친 것 · 도구가 깨뜨린 것) **[`LESSON.md`](LESSON.md) 최신화**.
 6. 커밋(끝에 세션 지침의 Co-Authored-By · Claude-Session 줄) → push → PR(본문 끝에 🤖 Generated with Claude Code 줄 + 세션 주소). **도구**: `gh` CLI 가 있으면 `gh api repos/jihoon380462/python-academy/pulls …`, 클라우드 세션(claude.ai/code)이면 GitHub MCP 도구(`create_pull_request` · `pull_request_read`(get_check_runs) · `merge_pull_request`(squash, `expectedHeadSha` 40자) · `actions_list`).
 7. **사용자에게 「CI 기다리는 중」 이라고 먼저 말하고** check-run `verify` 가 success 될 때까지 기다림(클라우드 세션은 `subscribe_pr_activity` 로 CI 결과가 저절로 옴 — 기다리며 다음 챕터를 미리 만들어 둬도 됨, 단 커밋은 머지 뒤) → squash 머지. 빨가면 로그(`get_job_logs`)로 원인을 찾아 고쳐 push(예: v2.28.1 은 CI 에 `requests` 가 없어 실패 → ci.yml 설치 줄에 더함). **그리고 같은 PR 에서 [`LESSON.md`](LESSON.md) 에 기록**(무슨 일 · 진짜 원인 · 막는 장치).
-8. main 의 새 SHA 로 배포 run(「Deploy to GitHub Pages」)이 success 인지 확인 → 작업 브랜치를 main 으로 되돌림(`git checkout -B <브랜치> origin/main`). 같은 이름의 원격 브랜치에 squash 전 커밋이 남아 있으면 force push 대신 `git merge -s ours origin/<브랜치>` 로 이어 붙이고 push(클라우드 세션은 force push 가 막혀 있음).
+8. main 의 새 SHA 로 배포 run(「Deploy to GitHub Pages」)이 success 인지 확인 — **GitHub 자체 빌드 「pages build and deployment」 도 success 인지 같이**(v2.40.0 ~ v2.42.1 다섯 번 실패를 아무도 몰랐음, LESSON.md R11) → 작업 브랜치를 main 으로 되돌림(`git checkout -B <브랜치> origin/main`). 같은 이름의 원격 브랜치에 squash 전 커밋이 남아 있으면 force push 대신 `git merge -s ours origin/<브랜치>` 로 이어 붙이고 push(클라우드 세션은 force push 가 막혀 있음).
 9. 사용자에게: 무엇이 바뀌었나(짧게) + **다음 선택지 목록**.
 
 ## 3. 사용자의 작업 선호 (반복해서 지적한 것 — 꼭 지키기)
