@@ -478,14 +478,380 @@ for name in ["SUM", "SUMM", "AVERAGE", "IF", "XLOOKUP"]:
     print(name, name in FORMULAE)` } },
   ],
   summary: ['수식은 "=" 로 시작하는 글자로 넣어요 — f"=B{r}*C{r}" · f"=SUM(D2:D{last})", 함수 이름은 영어 · 구분은 쉼표, 다시 읽으면 수식 글자 그대로', 'openpyxl 은 수식을 계산하지 않아요 — data_only=True 는 엑셀이 저장해 둔 값을 읽을 뿐이라, openpyxl 로 만든 파일은 None', '해결은 ① 파이썬이 계산한 값 쓰기 ② 수식 + 파이썬 계산으로 검사 ③ 엑셀에서 한 번 열어 저장 — 그리고 data_only=True 로 연 것을 save 하면 수식이 사라져요'] },
-{ id: 'F10', ch: 2, n: 10, title: '꾸미기: 서식 · 차트 맛보기', mode: 'text', draft: true,
-  tutorSummary: 'Font · number_format · BarChart',
-  pages: FILES_TODO('Font · number_format · BarChart'), summary: ["Font", "number_format", "BarChart"] },
-{ id: 'F11', ch: 2, n: 11, title: '여러 시트 · 여러 파일 합치기', mode: 'text', draft: true,
-  tutorSummary: 'for ws in wb · glob · 머리줄 맞추기',
-  pages: FILES_TODO('for ws in wb · glob · 머리줄 맞추기'), summary: ["for ws in wb", "glob", "머리줄 맞추기"] },
-{ id: 'FB2', ch: 2, boss: true, title: '만들어 보기: 월별 매출 보고서', mode: 'text', draft: true,
-  tutorSummary: '만들어 보기: 월별 매출 보고서', pages: [], summary: [] },
+{ id: 'F10', ch: 2, n: 10, title: "꾸미기: 서식 · 차트 맛보기", mode: 'text',
+  tutorSummary: "openpyxl 꾸미기. 서식은 칸의 값을 바꾸지 않고 보이는 모양만 정한다. from openpyxl.styles import Font, PatternFill, Border, Side, Alignment — c.font = Font(bold=True, color=\"FFFFFF\") · c.fill = PatternFill(\"solid\", fgColor=\"4472C4\")(\"solid\" 를 빼면 fill_type 이 None 이라 안 칠해짐) · c.border = Border(bottom=Side(\"thin\")) · c.alignment = Alignment(horizontal=\"center\"). 머리줄은 for c in ws[1]:. 서식 객체는 고쳐 쓸 수 없다: c.font.bold = True 는 AttributeError(Style objects are immutable) — 새 Font 를 통째로 넣는다(정하지 않은 것은 기본값으로 돌아감). 색은 \"RRGGBB\", 다시 읽으면 \"004472C4\" 여덟 자리. 숫자 모양 c.number_format = \"#,##0\" · '#,##0\"원\"' · \"0.0%\"(값 0.358 → 35.8%, 35.8 을 넣으면 3580.0%) · \"yyyy-mm-dd\" · \"mm-dd\" — 값은 그대로라 합계 · 정렬 · 차트가 된다. f\"{n:,}원\" 글자를 넣으면 숫자가 아니다. 열 하나 전체는 ws[\"B\"], 머리줄 빼고 ws[\"B\"][1:]. 보기: ws.column_dimensions[\"A\"].width = 12(한글은 넉넉히) · ws.row_dimensions[1].height · ws.freeze_panes = \"A2\"(준 칸의 위 줄 · 왼쪽 열이 고정, \"B2\" 는 1행 + A 열, None 은 풀기) · ws.auto_filter.ref = ws.dimensions(머리줄에 필터 단추). 차트: from openpyxl.chart import BarChart, Reference — Reference(ws, min_col, min_row, max_col, max_row), data 는 머리줄부터 + add_data(data, titles_from_data=True), set_categories(cats) 는 2행부터, chart.title · chart.y_axis.title, 쌓기 chart.grouping = \"stacked\" + chart.overlap = 100, ws.add_chart(chart, \"D2\"), 크기 chart.width · height(cm). LineChart · PieChart 도 같은 방법. 확인: 다시 load_workbook 해서 font.b · fill.fgColor.rgb · number_format · width · freeze_panes 찍기, .xlsx 는 zip 이라 zipfile.ZipFile(p).namelist() 에 xl/charts/chart1.xml 이 있으면 차트가 들어 있다(ws._charts 같은 밑줄 이름은 쓰지 않음). 색 · 차트 모양 · 수식 결과는 엑셀(LibreOffice)에서 열어 눈으로.",
+  terms: {"서식": "칸의 값은 그대로 두고 보이는 모양(글꼴 · 색 · 테두리 · 숫자 모양)만 정한 것", "틀 고정": "아래 · 옆으로 스크롤해도 위 몇 줄 · 왼쪽 몇 열이 화면에 붙어 있게 하는 엑셀 기능"},
+  pages: [
+    { title: "머리줄 꾸미기 Font · PatternFill", html: `<p>복습: [[레슨:F8]] 에서 <code>Workbook()</code> · <code>append</code> · <code>save</code> 로 표를 만들었어요. 이번엔 사람이 보기 좋게 꾸며요. 꾸미기([[서식]])는 칸의 값을 바꾸지 않고 <b>보이는 모양</b>만 정해요.</p>
+<pre>from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
+
+for c in ws[1]:                       # 1행(머리줄)의 칸들
+    c.font = Font(bold=True, color="FFFFFF")
+    c.fill = PatternFill("solid", fgColor="4472C4")
+    c.border = Border(bottom=Side("thin"))
+    c.alignment = Alignment(horizontal="center")</pre>
+<table class="kb"><tbody><tr><th>무엇</th><th>쓰는 법</th><th>자주 쓰는 값</th></tr>
+<tr><td>글꼴</td><td><code>c.font = Font(…)</code></td><td><code>bold=True</code> · <code>italic=True</code> · <code>size=12</code> · <code>color="C00000"</code></td></tr>
+<tr><td>칠하기</td><td><code>c.fill = PatternFill("solid", fgColor=…)</code></td><td><code>"4472C4"</code>(파랑) · <code>"FFF2CC"</code>(연노랑)</td></tr>
+<tr><td>테두리</td><td><code>c.border = Border(bottom=Side("thin"))</code></td><td><code>left</code> · <code>right</code> · <code>top</code> · <code>bottom</code>, 굵기 <code>"thin"</code> · <code>"medium"</code> · <code>"thick"</code></td></tr>
+<tr><td>맞춤</td><td><code>c.alignment = Alignment(…)</code></td><td><code>horizontal="center"</code> · <code>"right"</code>, <code>wrap_text=True</code>(칸 안에서 줄 바꿈)</td></tr></tbody></table>
+<ul><li><code>ws[1]</code> 은 1행의 칸들이에요. 머리줄을 꾸밀 때 for 로 돌아요</li><li>색은 <code>"RRGGBB"</code> 16진수 여섯 자리예요. 다시 읽으면 앞에 <code>00</code> 이 붙은 여덟 자리 <code>"004472C4"</code> 로 나와요</li><li>같은 서식을 여러 칸에 줄 때는 <code>HEAD = Font(bold=True)</code> 처럼 한 번 만들어 같이 써도 돼요</li></ul>
+<div class="bk-warn"><b>"solid" 를 빼면 안 칠해져요</b> — <code>PatternFill(fgColor="FFC000")</code> 은 에러가 없지만 칠하는 방식 <code>fill_type</code> 이 <code>None</code> 이라 엑셀에서 아무 색도 안 보여요.</div>
+<div class="bk-warn"><b>서식은 고쳐 쓸 수 없어요</b> — <code>c.font.bold = True</code> 는 <code>AttributeError: Style objects are immutable</code> 이에요. 늘 <code>c.font = Font(bold=True)</code> 처럼 새로 만들어 통째로 넣어요. 새 Font 는 정하지 않은 것(크기 · 색)을 기본값으로 돌려요.</div>`,
+      example: { code: `from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
+
+wb = Workbook()
+ws = wb.active
+ws.append(["품목", "분류", "매출"])
+ws.append(["소금빵", "빵", 262400])
+ws.append(["라테", "음료", 206400])
+
+for c in ws[1]:
+    c.font = Font(bold=True, color="FFFFFF")
+    c.fill = PatternFill("solid", fgColor="4472C4")
+    c.border = Border(bottom=Side("thin"))
+    c.alignment = Alignment(horizontal="center")
+ws["A3"].fill = PatternFill(fgColor="FFC000")   # "solid" 를 빼면?
+wb.save("꾸밈.xlsx")
+
+ws = load_workbook("꾸밈.xlsx").active
+for name in ["A1", "A2", "A3"]:
+    c = ws[name]
+    print(name, c.value, "| 굵게", c.font.b, "| 칠", c.fill.fill_type, c.fill.fgColor.rgb)
+print("A1 글자색:", ws["A1"].font.color.rgb)
+print("A1 아래 줄:", ws["A1"].border.bottom.style, "| 맞춤:", ws["A1"].alignment.horizontal)
+
+try:
+    ws["A2"].font.bold = True
+except AttributeError as e:
+    print("AttributeError:", e)` } },
+    { title: "number_format = \"#,##0\" — 값은 그대로", html: `<p>[[서식]]의 하나인 <code>number_format</code> 은 숫자 · 날짜가 <b>어떻게 보일지</b>만 정해요. 칸 안의 값은 그대로라서 엑셀에서 합계 · 정렬 · 차트가 그대로 돼요.</p>
+<table class="kb"><tbody><tr><th>number_format</th><th>넣은 값</th><th>엑셀에 보이는 모양</th></tr>
+<tr><td><code>"#,##0"</code></td><td><code>1015800</code></td><td>1,015,800</td></tr>
+<tr><td><code>'#,##0"원"'</code></td><td><code>1015800</code></td><td>1,015,800원</td></tr>
+<tr><td><code>"0.0%"</code></td><td><code>0.358</code></td><td>35.8%</td></tr>
+<tr><td><code>"yyyy-mm-dd"</code></td><td><code>date(2026, 9, 1)</code></td><td>2026-09-01</td></tr>
+<tr><td><code>"mm-dd"</code></td><td><code>date(2026, 9, 1)</code></td><td>09-01</td></tr></tbody></table>
+<pre>for c in ws["B"]:                     # B 열 전체(머리줄 칸까지)
+    c.number_format = "#,##0"
+for c in ws["C"][1:]:                 # 머리줄은 빼고
+    c.number_format = "0.0%"</pre>
+<ul><li><code>ws["B"]</code> 는 B 열의 칸들이에요. <code>[1:]</code> 로 머리줄을 빼요. 글자 칸(머리줄)에 숫자 모양을 줘도 아무 일 없어요</li><li>모양 안에 글자를 넣을 땐 큰따옴표로 감싸요: <code>'#,##0"원"'</code>. 파이썬 쪽은 작은따옴표로 감싸면 편해요</li><li>비율은 <code>0.358</code> 을 넣고 <code>"0.0%"</code> 로 보여요. <code>35.8</code> 을 넣으면 3580.0% 가 돼요</li><li>날짜를 넣으면 openpyxl 이 <code>"yyyy-mm-dd"</code> 를 알아서 줘요. 다시 읽으면 <code>datetime</code> 이에요(복습: [[레슨:F7]])</li></ul>
+<div class="bk-warn"><b>f"{n:,}원" 글자를 넣지 마세요</b> — <code>"1,015,800원"</code> 은 숫자가 아니라 글자예요. 엑셀에서 왼쪽에 붙고, 더하기 · 정렬이 안 돼요. 카드사 파일이 이런 모양이라 다시 읽을 때 고생해요([[레슨:FB3]]). 값은 숫자로 넣고, 모양은 <code>number_format</code> 으로 줘요.</div>`,
+      example: { code: `from datetime import date
+from openpyxl import Workbook, load_workbook
+
+wb = Workbook()
+ws = wb.active
+ws.append(["날짜", "매출", "비율", "글자로 넣은 매출"])
+ws.append([date(2026, 9, 1), 1015800, 0.358, f"{1015800:,}원"])
+ws.append([date(2026, 9, 2), 864900, 0.305, f"{864900:,}원"])
+
+for c in ws["A"][1:]:
+    c.number_format = "mm-dd"
+for c in ws["B"][1:]:
+    c.number_format = '#,##0"원"'
+for c in ws["C"][1:]:
+    c.number_format = "0.0%"
+wb.save("모양.xlsx")
+
+ws = load_workbook("모양.xlsx").active
+for c in ws[2]:
+    print(c.coordinate, repr(c.value), "|", c.number_format)
+print("B 열 합계:", sum(c.value for c in ws["B"][1:]))
+print("D 열 값의 종류:", type(ws["D2"].value).__name__)` } },
+    { title: "열 너비 · freeze_panes · 필터 단추", html: `<p>표가 길어지면 보는 법도 정해 줘요. 열 너비 · [[틀 고정]] · 필터 단추예요. 다 시트(<code>ws</code>)에 정해요.</p>
+<pre>ws.column_dimensions["A"].width = 12     # A 열 너비(글자 수쯤)
+ws.row_dimensions[1].height = 24         # 1행 높이(포인트)
+ws.freeze_panes = "A2"                   # 1행 고정
+ws.auto_filter.ref = ws.dimensions       # 머리줄에 필터 단추</pre>
+<ul><li><b>너비</b> — 숫자는 대략 영어 글자 몇 개가 들어가는지예요. 한글은 한 글자가 두 칸쯤이라 넉넉히 줘요. 열이 많으면 <code>get_column_letter(i)</code> 로 열 글자를 만들어 for 로 돌아요(복습: [[레슨:F7]])</li><li><b>틀 고정</b> — 준 칸의 <b>위 줄들과 왼쪽 열들</b>이 고정돼요. <code>"A2"</code> 는 1행, <code>"B2"</code> 는 1행과 A 열, <code>None</code> 은 풀기예요</li><li><b>필터</b> — <code>ws.dimensions</code> 는 값이 든 범위 글자(<code>"A1:E31"</code>)예요. 그 범위의 머리줄에 ▼ 단추가 생겨서, 엑셀에서 「빵만 보기」 같은 걸 할 수 있어요. 단추만 다는 것이고 파이썬이 줄을 거르는 건 아니에요</li></ul>`,
+      example: { code: `from openpyxl import Workbook, load_workbook
+from openpyxl.utils import get_column_letter
+
+wb = Workbook()
+ws = wb.active
+ws.append(["날짜", "품목", "분류", "단가", "수량"])
+for day in range(1, 31):
+    ws.append([f"9월 {day}일", "소금빵", "빵", 3200, day % 7 + 3])
+
+widths = [12, 14, 8, 10, 8]
+for i, w in enumerate(widths, 1):
+    ws.column_dimensions[get_column_letter(i)].width = w
+ws.row_dimensions[1].height = 24
+ws.freeze_panes = "A2"
+ws.auto_filter.ref = ws.dimensions
+wb.save("보기.xlsx")
+
+ws = load_workbook("보기.xlsx").active
+print("너비:", [ws.column_dimensions[get_column_letter(i)].width for i in range(1, 6)])
+print("1행 높이:", ws.row_dimensions[1].height)
+print("틀 고정:", ws.freeze_panes)
+print("필터:", ws.auto_filter.ref, "| 표 범위:", ws.dimensions)` } },
+    { title: "차트 맛보기 BarChart · Reference", html: `<p>엑셀 차트는 「어느 칸들을 그릴지」 를 가리켜서 만들어요. 값을 복사하지 않아서, 엑셀에서 숫자를 고치면 막대도 따라 바뀌어요.</p>
+<pre>from openpyxl.chart import BarChart, Reference
+
+chart = BarChart()
+chart.title = "월별 매출"
+chart.y_axis.title = "원"
+data = Reference(ws, min_col=2, min_row=1, max_row=4)   # B1:B4 — 머리줄부터
+cats = Reference(ws, min_col=1, min_row=2, max_row=4)   # A2:A4 — 막대 이름
+chart.add_data(data, titles_from_data=True)
+chart.set_categories(cats)
+ws.add_chart(chart, "D2")</pre>
+<ul><li><code>Reference(ws, min_col, min_row, max_col, max_row)</code> — 칸 범위를 번호로 줘요. <code>max_col</code> 을 빼면 열 하나예요</li><li><code>titles_from_data=True</code> — 범위의 첫 칸(B1 「매출」)을 계열 이름(범례)으로 써요. 그래서 <code>data</code> 는 <b>머리줄부터</b>, <code>cats</code> 는 <b>2행부터</b>예요. <code>cats</code> 를 1행부터 잡으면 첫 막대 이름이 「월」 이 되고 하나씩 밀려요</li><li><code>min_col=2, max_col=4</code> 처럼 여러 열을 주면 열마다 계열이 하나씩 생겨요(분류마다 다른 색 막대)</li><li>계열을 한 막대에 쌓으려면 <code>chart.grouping = "stacked"</code> 와 <code>chart.overlap = 100</code></li><li><code>ws.add_chart(chart, "D2")</code> — 차트의 왼쪽 위를 D2 칸에 놓아요. 크기는 <code>chart.width = 18</code> · <code>chart.height = 9</code>(cm)</li><li>선 그래프 <code>LineChart</code> · 원 그래프 <code>PieChart</code> 도 import 만 바꾸면 같은 방법이에요</li></ul>`,
+      example: { code: `from openpyxl import Workbook
+from openpyxl.chart import BarChart, Reference
+
+wb = Workbook()
+ws = wb.active
+ws.title = "요약"
+ws.append(["월", "매출"])
+for row in [["7월", 957400], ["8월", 864900], ["9월", 1015800]]:
+    ws.append(row)
+
+chart = BarChart()
+chart.title = "월별 매출"
+chart.y_axis.title = "원"
+data = Reference(ws, min_col=2, min_row=1, max_row=4)
+cats = Reference(ws, min_col=1, min_row=2, max_row=4)
+chart.add_data(data, titles_from_data=True)
+chart.set_categories(cats)
+ws.add_chart(chart, "D2")
+wb.save("차트.xlsx")
+
+print("그릴 값:", data)
+print("막대 이름:", cats)
+print("저장했어요: 차트.xlsx")` } },
+    { title: "zipfile 로 차트 확인 · 다시 읽어 찍기", html: `<p>이 코스의 습관이에요. <b>저장 → 다시 열어 찍기 → 엑셀에서 열어 눈으로 ☐</b>. 서식도 다시 읽으면 파이썬으로 확인할 수 있어요.</p>
+<table class="kb"><tbody><tr><th>확인할 것</th><th>다시 읽어 찍기</th></tr>
+<tr><td>굵게 · 글자색</td><td><code>c.font.b</code> · <code>c.font.color.rgb</code></td></tr>
+<tr><td>칠하기</td><td><code>c.fill.fill_type</code> · <code>c.fill.fgColor.rgb</code></td></tr>
+<tr><td>숫자 모양</td><td><code>c.number_format</code></td></tr>
+<tr><td>너비 · 틀 고정 · 필터</td><td><code>ws.column_dimensions["A"].width</code> · <code>ws.freeze_panes</code> · <code>ws.auto_filter.ref</code></td></tr>
+<tr><td>수식</td><td><code>c.value</code> 는 수식 글자 <code>"=SUM(B2:B3)"</code>, <code>data_only=True</code> 로 열면 <code>None</code>(복습: [[레슨:F9]])</td></tr>
+<tr><td>차트</td><td>zip 목록에 <code>xl/charts/chart1.xml</code></td></tr></tbody></table>
+<p>차트는 왜 zip 으로 볼까요? <code>.xlsx</code> 는 사실 <b>zip 압축 파일</b>이에요. 안에 시트마다 xml 글자 파일이 들어 있고, 차트가 하나 들어가면 <code>xl/charts/chart1.xml</code> 이 생겨요. 파이썬에 들어 있는 <code>zipfile</code> 로 목록을 봐요.</p>
+<pre>import zipfile
+
+with zipfile.ZipFile("확인.xlsx") as z:
+    names = z.namelist()
+print("xl/charts/chart1.xml" in names)</pre>
+<ul><li>openpyxl 의 <code>ws._charts</code> 처럼 밑줄로 시작하는 이름은 속사정이라 판이 바뀌면 달라질 수 있어요. 그래서 파일 자체를 봐요</li><li>파일 이름 끝을 <code>.zip</code> 으로 바꿔 탐색기에서 열어 봐도 같은 폴더들이 보여요(다 보면 다시 <code>.xlsx</code> 로)</li></ul>
+<p>색이 알맞은지, 막대가 그럴듯한지, 수식 칸에 맞는 합계가 보이는지는 파이썬이 못 봐요. 엑셀(또는 LibreOffice Calc)에서 열어 <b>눈으로</b> 확인해요. 「만들어 보기」 의 「내 화면에서 확인할 것」 ☐ 이 그거예요.</p>`,
+      example: { code: `import zipfile
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Font
+from openpyxl.chart import BarChart, Reference
+
+wb = Workbook()
+ws = wb.active
+ws.append(["월", "매출"])
+ws.append(["7월", 957400])
+ws.append(["8월", 864900])
+ws["A4"] = "합계"
+ws["B4"] = "=SUM(B2:B3)"
+ws["A1"].font = Font(bold=True)
+for c in ws["B"][1:]:
+    c.number_format = "#,##0"
+chart = BarChart()
+chart.add_data(Reference(ws, min_col=2, min_row=1, max_row=3), titles_from_data=True)
+ws.add_chart(chart, "D2")
+wb.save("확인.xlsx")
+
+
+def check(path):
+    ws = load_workbook(path).active
+    print("A1 굵게:", ws["A1"].font.b)
+    print("B2 모양:", ws["B2"].number_format)
+    print("B4 수식:", ws["B4"].value)
+    print("B4 값(data_only):", load_workbook(path, data_only=True).active["B4"].value)
+    print("파이썬 합계:", ws["B2"].value + ws["B3"].value)
+    with zipfile.ZipFile(path) as z:
+        names = z.namelist()
+    print("차트 파일:", [n for n in names if n.startswith("xl/charts/")])
+    print("시트 파일:", [n for n in names if n.startswith("xl/worksheets/sheet")])
+
+
+check("확인.xlsx")` } },
+  ],
+  summary: ["서식은 보이는 모양만 — c.font = Font(bold=True) · PatternFill(\"solid\", fgColor=…) 처럼 늘 새로 만들어 통째로 넣어요(\"solid\" 를 빼면 안 칠해져요)", "number_format(\"#,##0\" · \"0.0%\" · \"yyyy-mm-dd\")은 값을 그대로 두니 숫자는 숫자로 넣어요 — 보기는 column_dimensions · freeze_panes · auto_filter", "차트는 Reference(데이터는 머리줄부터 · 이름은 2행부터) + add_chart — 확인은 다시 읽어 찍기 + zip 목록의 xl/charts/chart1.xml, 겉모양은 엑셀에서 ☐"] },
+{ id: 'F11', ch: 2, n: 11, title: "여러 시트 · 여러 파일 합치기", mode: 'text',
+  tutorSummary: "여러 시트 · 여러 파일을 한 표로. for ws in wb: 는 wb.sheetnames 순서로 시트를 준다 — it = ws.iter_rows(values_only=True), header = next(it), 나머지 줄은 dict(zip(header, row)) 에 rec[\"월\"] = ws.title 처럼 시트 이름을 값으로 더한다. 메모 시트는 if not ws.title.endswith(\"월\"): continue. 여러 파일: for p in sorted(Path(\"지점\").glob(\"*.xlsx\")):(glob 은 순서가 없어 sorted, p.stem 이 출처 이름, 하위 폴더까지는 rglob). Windows 에서 엑셀이 파일을 열고 있으면 같은 폴더에 숨은 잠금 파일 ~$강남.xlsx 가 생긴다(엑셀이 갑자기 꺼지면 남음) — 진짜 엑셀이 아니라 load_workbook 하면 zipfile.BadZipFile: File is not a zip file 이므로 p.name.startswith(\"~$\") 면 건너뛴다. 열 순서가 다른 파일(판교: 품목 · 날짜 · 수량 · 단가 · 분류)은 자리(row[3])로 꺼내면 엉뚱한 값이 들어가거나 TypeError — 머리줄 이름으로 맞춘다: COLUMNS 를 정하고 [rec.get(c) for c in COLUMNS], 머리줄 글자는 str(h).strip(). 빠진 열은 멈추지 말고 경고만 하고 None(엑셀에서 빈칸). 합친 결과는 새 통합 문서의 「전체」 시트에 맨 앞 「출처」 열과 함께, 요약은 wb.create_sheet(\"요약\", 0)(0 = 맨 앞). wb.active 는 「몇 번째 시트」 라서 맨 앞에 끼우면 끼운 시트가 처음 보인다. 요약의 합계는 파이썬이 계산한 값으로(수식이면 data_only 로도 None). pandas 로는 pd.read_excel(sheet_name=None) + pd.concat — 데이터 분석 교과서 P5.",
+  terms: {"출처": "합친 표에서 그 줄이 어느 파일 · 시트에서 왔는지 적어 둔 칸", "잠금 파일": "엑셀이 파일을 열고 있는 동안 같은 폴더에 만드는 숨은 파일(~$이름.xlsx). 진짜 엑셀 파일이 아니다"},
+  pages: [
+    { title: "for ws in wb: — 시트 이름을 「월」 칸으로", html: `<p>복습: [[레슨:F7]] 의 <code>iter_rows(values_only=True)</code> 와 <code>dict(zip(header, row))</code> 예요. 이번엔 시트 <b>여러 개</b>를 한 번에 읽어 한 표로 모아요. 빵집 파일처럼 「7월 · 8월 · 9월」 시트가 같은 모양일 때예요.</p>
+<pre>rows = []
+for ws in wb:                            # 시트를 순서대로
+    it = ws.iter_rows(values_only=True)
+    header = next(it)                    # 첫 줄 = 머리줄
+    for row in it:
+        rec = dict(zip(header, row))
+        rec["월"] = ws.title             # 시트 이름을 값으로
+        rows.append(rec)</pre>
+<ul><li><code>for ws in wb:</code> 는 <code>wb.sheetnames</code> 순서대로 시트를 하나씩 줘요. 이름만 필요하면 <code>wb.sheetnames</code> 예요</li><li><code>next(it)</code> 는 줄을 하나 꺼내요. 머리줄을 꺼내고 나면 <code>for row in it</code> 은 2행부터 돌아요(<a href="../python/#lesson/L18C" target="_blank" rel="noopener">파이썬 교과서 「반복자와 제너레이터」 ↗</a>)</li><li>시트 이름이 곧 데이터예요. 합치면 어느 시트에서 왔는지 사라지니까 <code>rec["월"] = ws.title</code> 로 칸을 하나 더 만들어 둬요</li><li>메모 · 설명 시트가 섞여 있으면 걸러요: <code>if not ws.title.endswith("월"): continue</code></li></ul>`,
+      example: { code: `from openpyxl import Workbook, load_workbook
+
+wb = Workbook()
+wb.active.title = "7월"
+wb.create_sheet("8월")
+wb.create_sheet("메모")
+wb["7월"].append(["품목", "수량"])
+wb["7월"].append(["소금빵", 8])
+wb["7월"].append(["라테", 19])
+wb["8월"].append(["품목", "수량"])
+wb["8월"].append(["소금빵", 10])
+wb["메모"].append(["8월 15일은 쉬는 날"])
+wb.save("월별.xlsx")
+
+wb = load_workbook("월별.xlsx")
+print("시트:", wb.sheetnames)
+rows = []
+for ws in wb:
+    if not ws.title.endswith("월"):
+        print("건너뜀:", ws.title)
+        continue
+    it = ws.iter_rows(values_only=True)
+    header = next(it)
+    for row in it:
+        rec = dict(zip(header, row))
+        rec["월"] = ws.title
+        rows.append(rec)
+for rec in rows:
+    print(rec)` } },
+    { title: "glob(\"*.xlsx\") · ~$ 잠금 파일 건너뛰기", html: `<p>지점마다 파일을 따로 받는 일이 많아요. <code>지점</code> 폴더의 엑셀을 다 돌 때는 pathlib 의 <code>glob</code> 을 써요(복습: <a href="../python/#lesson/L27" target="_blank" rel="noopener">파이썬 교과서 「폴더와 파일 정리: pathlib · shutil」 ↗</a>).</p>
+<pre>from pathlib import Path
+
+for p in sorted(Path("지점").glob("*.xlsx")):
+    if p.name.startswith("~$"):
+        print("건너뜀:", p.name)
+        continue
+    ws = load_workbook(p).active
+    print(p.stem, ws.max_row - 1, "줄")</pre>
+<ul><li><code>sorted</code> — glob 이 주는 순서는 정해져 있지 않아요. 늘 같은 순서로 돌게 정렬해요</li><li><code>p.stem</code> 은 확장자를 뺀 이름(<code>"강남"</code>)이에요. [[출처]] 칸에 그대로 써요</li><li>하위 폴더까지 다 찾으려면 <code>rglob("*.xlsx")</code> 예요</li></ul>
+<div class="bk-warn"><b>~$ 로 시작하는 파일</b> — Windows 에서 엑셀이 <code>강남.xlsx</code> 를 열고 있으면, 같은 폴더에 숨은 [[잠금 파일]] <code>~$강남.xlsx</code> 가 생겨요. 엑셀을 닫으면 사라지지만, 엑셀이 갑자기 꺼지면 남기도 해요. 이름은 <code>.xlsx</code> 인데 진짜 엑셀이 아니라서 <code>load_workbook</code> 하면 <code>zipfile.BadZipFile: File is not a zip file</code> 이에요. 이름만 보고 건너뛰어요.</div>`,
+      example: { code: `from pathlib import Path
+from openpyxl import Workbook, load_workbook
+
+folder = Path("지점")
+folder.mkdir(exist_ok=True)
+for name, qty in [("강남", 11), ("홍대", 18)]:
+    wb = Workbook()
+    wb.active.append(["품목", "수량"])
+    wb.active.append(["소금빵", qty])
+    wb.save(folder / f"{name}.xlsx")
+(folder / "~$강남.xlsx").write_text("엑셀이 열려 있을 때 생기는 잠금 파일 흉내", encoding="utf-8")
+
+for p in sorted(folder.glob("*.xlsx")):
+    if p.name.startswith("~$"):
+        print("건너뜀:", p.name)
+        continue
+    ws = load_workbook(p).active
+    print(p.stem, "|", p.name, "| 수량", ws["B2"].value)
+
+try:
+    load_workbook(folder / "~$강남.xlsx")
+except Exception as e:
+    print("안 건너뛰면:", type(e).__name__, "-", e)` } },
+    { title: "COLUMNS 순서로 열 맞추기 · 빠진 열 경고", html: `<p>판교 파일만 열 순서가 <code>품목 · 날짜 · 수량 · 단가 · 분류</code> 예요. 자리로(<code>row[1]</code>) 꺼내면 판교에서는 품목 자리에 날짜가 들어와요. 에러도 안 나서 더 무서워요. 그래서 <b>머리줄 이름으로</b> 꺼내요.</p>
+<pre>COLUMNS = ["날짜", "품목", "분류", "단가", "수량"]
+
+def read_table(ws, source):
+    it = ws.iter_rows(values_only=True)
+    header = [str(h).strip() for h in next(it)]
+    missing = [c for c in COLUMNS if c not in header]
+    if missing:
+        print(f"경고: {source} 파일에 {', '.join(missing)} 열이 없어요")
+    out = []
+    for row in it:
+        rec = dict(zip(header, row))
+        out.append([source] + [rec.get(c) for c in COLUMNS])
+    return out</pre>
+<ul><li>내가 원하는 열 순서 <code>COLUMNS</code> 를 정해 두고, 줄마다 이름표(딕셔너리)를 만든 뒤 그 순서로 다시 줄 세워요. 파일의 열 순서와 상관없어져요</li><li><code>str(h).strip()</code> — 머리줄에 <code>" 수량 "</code> 처럼 빈칸이 붙어 오는 일이 흔해요</li><li>빠진 열에서 멈추지 말고 <b>경고</b>만 하고, <code>rec.get(c)</code> 로 <code>None</code>(엑셀에서 빈칸)을 넣어요. 어느 파일에 무엇이 빠졌는지 한 번에 보여요</li><li><code>COLUMNS</code> 에 없는 열(예: 「메모」)은 버려져요. 필요하면 그것도 알려 줘요</li></ul>`,
+      example: { code: `from openpyxl import Workbook
+
+COLUMNS = ["날짜", "품목", "분류", "단가", "수량"]
+
+
+def read_table(ws, source):
+    it = ws.iter_rows(values_only=True)
+    header = [str(h).strip() for h in next(it)]
+    missing = [c for c in COLUMNS if c not in header]
+    if missing:
+        print(f"경고: {source} 파일에 {', '.join(missing)} 열이 없어요")
+    out = []
+    for row in it:
+        rec = dict(zip(header, row))
+        out.append([source] + [rec.get(c) for c in COLUMNS])
+    return out
+
+
+wb = Workbook()
+a = wb.active
+a.append(["날짜", "품목", "분류", "단가", "수량"])
+a.append(["09-01", "크루아상", "빵", 3800, 11])
+b = wb.create_sheet()
+b.append(["품목", "날짜", "수량", "단가", "분류"])
+b.append(["식빵", "09-05", 14, 4500, "빵"])
+c = wb.create_sheet()
+c.append(["날짜", "품목", "단가", " 수량 "])
+c.append(["09-07", "라테", 4800, 3])
+
+row = next(b.iter_rows(min_row=2, values_only=True))
+print("판교를 자리로 꺼낸 품목:", row[1])
+for source, ws in [("강남", a), ("판교", b), ("분당", c)]:
+    for r in read_table(ws, source):
+        print(r)` } },
+    { title: "「출처」 열 · create_sheet(\"요약\", 0)", html: `<p>합친 결과는 새 통합 문서에 써요. 모든 줄 맨 앞에 [[출처]] 칸을 두고, 맨 앞에는 한눈에 보는 요약 시트를 둬요.</p>
+<pre>out = Workbook()
+ws = out.active
+ws.title = "전체"
+ws.append(["출처"] + COLUMNS)
+for r in all_rows:
+    ws.append(r)
+
+summary = out.create_sheet("요약", 0)    # 0 = 맨 앞 자리
+summary.append(["출처", "줄 수", "매출"])
+for r in summary_rows:
+    summary.append(r)
+out.save("합친.xlsx")</pre>
+<ul><li><code>create_sheet(이름, 자리)</code> — 자리 <code>0</code> 은 맨 앞이에요. 빼면 맨 뒤예요</li><li>파일을 열면 처음 보이는 시트는 <code>wb.active</code> 예요. 「몇 번째 시트」 로 기억해서, 맨 앞에 끼우면 끼운 시트가 처음 보여요</li><li>요약의 합계는 파이썬이 계산한 값으로 써요. 수식으로 넣으면 다시 읽을 때 <code>data_only=True</code> 로도 <code>None</code> 이에요(복습: [[레슨:F9]])</li><li>출처 칸이 있으면 이상한 줄을 봤을 때 어느 파일을 열어 볼지 바로 알아요</li></ul>
+<p>pandas 로도 돼요 — <code>pd.read_excel(…, sheet_name=None)</code> 로 시트를 다 읽고 <code>pd.concat</code> 으로 이어요. <a href="../data/#lesson/P5" target="_blank" rel="noopener">데이터 분석 교과서 「합치기 merge · concat」 ↗</a></p>`,
+      example: { code: `from openpyxl import Workbook, load_workbook
+
+tables = {
+    "강남": [["크루아상", 3800, 11], ["아메리카노", 4000, 18]],
+    "홍대": [["식빵", 4500, 14]],
+}
+out = Workbook()
+ws = out.active
+ws.title = "전체"
+ws.append(["출처", "품목", "단가", "수량"])
+summary_rows = []
+for source, rows in tables.items():
+    total = 0
+    for name, price, qty in rows:
+        ws.append([source, name, price, qty])
+        total += price * qty
+    summary_rows.append([source, len(rows), total])
+
+summary = out.create_sheet("요약", 0)
+summary.append(["출처", "줄 수", "매출"])
+for r in summary_rows:
+    summary.append(r)
+summary.append(["합계", sum(r[1] for r in summary_rows), sum(r[2] for r in summary_rows)])
+out.save("합친.xlsx")
+
+wb = load_workbook("합친.xlsx")
+print(wb.sheetnames, "| 처음 보이는 시트:", wb.active.title)
+for row in wb["요약"].iter_rows(values_only=True):
+    print(row)
+print("전체 시트 3행:", [c.value for c in wb["전체"][3]])` } },
+  ],
+  summary: ["for ws in wb: 로 시트를 돌고, 합칠 땐 rec[\"월\"] = ws.title 처럼 시트 · 파일 이름을 칸으로 남겨요", "sorted(Path(\"지점\").glob(\"*.xlsx\")) 로 파일을 돌되 ~$ 잠금 파일은 이름만 보고 건너뛰어요(안 그러면 BadZipFile)", "열 순서는 믿지 말고 머리줄 이름으로 맞추고(빠진 열은 경고 + 빈칸), 결과는 「출처」 열 + create_sheet(\"요약\", 0)"] },
+{ id: 'FB2', ch: 2, boss: true, title: "만들어 보기: 월별 매출 보고서", mode: 'text', pages: [], summary: [],
+  tutorSummary: "챕터 2 만들어 보기. 빵집_매출.xlsx(시트 7월 · 8월 · 9월, 날짜 · 품목 · 분류 · 단가 · 수량 20줄씩, 매출 = 단가 × 수량)로 3분기 매출 보고서를 만든다. ① read_sales(path) — for ws in wb + dict(zip(header, row)) + 월 · 매출 칸, 월별 합계(7월 957,400 · 8월 864,900 · 9월 1,015,800 · 합계 2,838,100) ② 분류별 합계(빵 · 케이크 · 음료)와 비율, 품목 매출 TOP 3(딸기케이크 · 식빵 · 크루아상) ③ 매출_보고서.xlsx 「요약」 시트: 월 × 분류 표(값은 파이썬 계산) + 합계 열 =SUM(B2:D2) · 합계 줄 =SUM(B2:B4) 수식 + 머리줄 색 · #,##0 · 열 너비 · 틀 고정 B2, 다시 읽어 찍고 data_only=True 의 E5 는 None ④ 분류를 쌓은 월별 막대 차트(grouping stacked · overlap 100, G2), zip 목록의 xl/charts/chart1.xml 로 확인 ⑤ make_report(src, dst) 함수(report.py, if __name__ == \"__main__\")로 묶어 「요약」 + 「품목」(순위 · TOP 3 칠) 시트를 쓰고 결과 딕셔너리를 돌려줌, check_report 로 다시 읽어 시트 순서 · 수식 글자 · data_only None · 파이썬 합계 · TOP 3 · 차트 파일을 assert, 그리고 엑셀에서 열어 ☐(색 · 차트 · 수식 결과가 파이썬 합계와 같은지). 업무 자동화 교과서가 make_report 를 불러 쓴다." },
 { id: 'F12', ch: 3, n: 12, title: 'JSON ↔ CSV ↔ 엑셀', mode: 'text', draft: true,
   tutorSummary: '잃는 것 · 바꿀 함수표 · 왕복',
   pages: FILES_TODO('잃는 것 · 바꿀 함수표 · 왕복'), summary: ["잃는 것", "바꿀 함수표", "왕복"] },
