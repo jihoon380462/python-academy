@@ -4,7 +4,7 @@
 //   사용: node tools/check_nesting.mjs            → 파이썬·알고 모두 검사, 하나라도 있으면 exit 1 (CI 게이트)
 //         node tools/check_nesting.mjs python list → 그 코스의 걸린 줄 목록
 import fs from 'node:fs'; import vm from 'node:vm';
-const courses = process.argv[2] ? [process.argv[2]] : ['python', 'algo', 'files']; let total = 0; // v2.41.0 files 더함(다른 교과서는 아직 걸린 줄이 있어 TODO)
+const courses = process.argv[2] ? [process.argv[2]] : ['python', 'algo', 'files', 'debug', 'data', 'oop', 'ml', 'ai', 'cs', 'llm', 'api', 'os']; let total = 0; // v2.41.0 파이썬 계열 교과서 전부(전엔 python · algo 만 봐서 다른 교과서에 181줄이 쌓였음)
 for (const course of courses) {
   const ctx = { window: {}, console }; vm.createContext(ctx);
 vm.runInContext((fs.existsSync(`courses/${course}/datasets.js`) ? fs.readFileSync(`courses/${course}/datasets.js`, 'utf8') + '\n' : '') /* v2.41.0 */ + fs.readFileSync(`courses/${course}/content.js`, 'utf8').replace(/^(const|let) /gm, 'var '), ctx);
@@ -26,13 +26,16 @@ function depth(line) {
 const out = [];
 const scan = (where, text, html = false) => { if (!text) return; for (const raw of (html ? dec(String(text)) : String(text)).split('\n')) { const l = raw.trim(); if (!l) continue; const d = depth(l); if (d >= 3) out.push({ where, d, line: l }); } };
 for (const p of ctx.PROBLEMS) {
-  const codes = (p.prompt || '').match(/<(code|pre)>[\s\S]*?<\/\1>/g) || []; codes.forEach(c => scan(p.id + ' prompt', c, true));
+  const codes = (p.prompt || '').match(/<(code|pre)(?:\s[^>]*)?>[\s\S]*?<\/\1>/g) || []; codes.forEach(c => scan(p.id + ' prompt', c, true));
   scan(p.id + ' solution', p.solution); scan(p.id + ' starter', p.starter);
   (p.hints || []).forEach((h, i) => scan(p.id + ' hint' + (i + 1), h));
   if (p.fill) scan(p.id + ' fill', p.fill.code); if (p.quiz && p.quiz.code) scan(p.id + ' quizcode', p.quiz.code);
   if (p.bug) scan(p.id + ' bug', p.bug.code || '');
 }
-for (const l of ctx.LESSONS) (l.pages || []).forEach((pg, i) => { if (pg.example) scan(`${l.id} p${i + 1} example`, pg.example.code); ((pg.html || '').match(/<(code|pre)>[\s\S]*?<\/\1>/g) || []).forEach(c => scan(`${l.id} p${i + 1} html`, c, true)); });
+for (const l of ctx.LESSONS) (l.pages || []).forEach((pg, i) => { if (pg.example) scan(`${l.id} p${i + 1} example`, pg.example.code); ((pg.html || '').match(/<(code|pre)(?:\s[^>]*)?>[\s\S]*?<\/\1>/g) || []).forEach(c => scan(`${l.id} p${i + 1} html`, c, true)); });
+// v2.41.0 교과서의 만들어 보기 예시 답 · 고칠 코드(book.js tasks)도 — 전엔 안 봐서 예시 답에 3겹 줄이 남았음
+if (fs.existsSync(`courses/${course}/book.js`)) { try { vm.runInContext(fs.readFileSync(`courses/${course}/book.js`, 'utf8').replace(/^(const|let) /gm, 'var '), ctx); } catch (e) { console.log(`✗ check_nesting ${course}: book.js 를 못 읽어요 — ${e.message}`); process.exit(1); } /* 못 읽으면 실패(조용히 0개로 통과하지 않게) */
+  if (ctx.BOOK && ctx.BOOK.check !== 'web') for (const [lid, ts] of Object.entries(ctx.BOOK.tasks || {})) (ts || []).forEach((t, k) => { scan(`${lid}#${k + 1} answer`, t.answer); scan(`${lid}#${k + 1} given`, t.given); }); }
 const byP = {}; out.forEach(o => { const k = o.where.split(' ')[0]; byP[k] = (byP[k] || 0) + 1; });
 console.log((out.length ? '✗' : '✓') + ' check_nesting ' + course + ': 호출 3겹 이상 줄 ' + out.length + '개' + (out.length ? ' (' + Object.keys(byP).join(', ') + ')' : ''));
 if (process.argv[3] === 'list' || (out.length && !process.argv[3])) out.forEach(o => console.log(`  ${o.d}겹 ${o.where}: ${o.line}`));
