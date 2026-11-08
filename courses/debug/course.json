@@ -1,1 +1,1 @@
-{"id": "debug", "name": "디버깅·테스트", "icon": "🐞", "desc": "트레이스백 · 범위 좁히기 · 디버거 · pytest · TDD · 회귀 테스트를 내 VS Code 에서 직접 해 보는 교과서", "runner": "python", "mapColor": "#e65100", "mascotGear": null}
+{"id": "debug", "name": "디버깅·테스트", "icon": "🐞", "desc": "트레이스백 · 범위 좁히기 · 디버거 · pytest · TDD · 회귀 테스트를 내 VS Code 에서 직접 해 보는 교과서", "runner": "python", "mapColor": "#e65100", "mascotGear": null, "requires": {"course": "python", "boss": "B5"}}

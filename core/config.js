@@ -10,7 +10,7 @@ const CONFIG = {
   //   새 코스를 만들면 여기 courses 에 id 를 넣어요. 빠뜨리면 허브 맨 끝 「기타」 에 나와요(사라지지 않게). 설계 중인 코스는 specs/courses-python-next.md
   CATEGORIES: [ // v2.42.1: 순서를 로드맵(specs/roadmap.md)대로 — 주 길(처음 시작 → 파이썬 실력 → 갈래 넷) 다음에 곁길(개발 도구). 리눅스는 컴퓨터 깊이의 2번(CS 다음)
     { id: 'start', icon: '🐍', name: '처음 시작', sub: '여기서부터 — 파이썬 하나로 프로그래밍의 기본을', courses: ['python'] },
-    { id: 'pyskill', icon: '💪', name: '파이썬 실력 키우기', sub: '파이썬 다음 — 버그 잡기 · 설계 · 알고리즘(알고리즘은 파이썬 챕터 3 뒤부터 나란히)', courses: ['debug', 'oop', 'algo'] },
+    { id: 'pyskill', icon: '💪', name: '파이썬 실력 키우기', sub: '버그 잡기 · 설계 · 알고리즘 — 디버깅 · 객체지향은 파이썬 챕터 5 뒤, 알고리즘은 챕터 3 뒤부터 나란히', courses: ['debug', 'oop', 'algo'] },
     { id: 'make', icon: '🛠', name: '파이썬으로 만들기', sub: '갈래 · 일 자동화 — 데이터 파일 → 업무 자동화(크롤링 · 게임은 만드는 중)', courses: ['files', 'auto'] },
     { id: 'webdev', icon: '🌐', name: '웹과 서비스', sub: '갈래 · 웹 서비스 — 화면 → API → 데이터베이스(웹 · SQL 은 파이썬 챕터 2 · 3 뒤부터 나란히)', courses: ['web', 'api', 'sql'] },
     { id: 'data', icon: '📊', name: '데이터와 AI', sub: '갈래 · 수학부터 데이터 분석 · 머신러닝 · 언어 모델까지(데이터 분석 전에 SQL 이 편해요)', courses: ['math', 'data', 'ml', 'llm', 'ai'] },
