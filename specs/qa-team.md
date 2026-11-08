@@ -1,5 +1,7 @@
 # QA팀 지시서 (Opus) — 파이썬 아카데미
 
+> ⚠ **낡은 문서예요(v2.10 시절).** 허브 카드 수 · 머지 권한 · 체크리스트가 지금과 달라요. **파이썬 교과서 QA 는 [`specs/qa-python.md`](qa-python.md)** 를 보세요. 1절의 `tools/qa_screens.py` 쓰는 법은 지금도 맞아요.
+
 읽는 순서: **specs/site-intent.md(사이트 의도 — 무엇이 정상이고 무엇이 버그인가, 11/6)** → HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **main 은 보호 브랜치 — 브랜치에 올리고 PR, 머지는 사용자(workflow 8절). 권한 구분 없음(11/6, workflow 1절).** 고칠 수 있는 것은 직접 고친다(core 포함) — 못 고치면 docs/QA.md 에 적는다.
 
 ## 1. 환경과 도구
