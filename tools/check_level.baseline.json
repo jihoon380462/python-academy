@@ -1,16 +1,66 @@
 {
   "note": "check_level.mjs 래칫 기준. 걸린 수가 이보다 늘면 --gate 가 exit 1. 줄였으면 --update-baseline 으로 갱신.",
-  "updated": "2026-11-06",
+  "updated": "2026-11-08",
   "courses": {
+    "ai": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
     "algo": {
       "outside": 0,
       "combo": 0,
       "first": 7
     },
+    "api": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
+    "cs": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
+    "data": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
+    "debug": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
+    "files": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
+    "llm": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
+    "ml": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
+    "oop": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
+    "os": {
+      "outside": 0,
+      "combo": 0,
+      "first": 0
+    },
     "python": {
       "outside": 0,
       "combo": 0,
-      "first": 5
+      "first": 4
     }
   }
 }
