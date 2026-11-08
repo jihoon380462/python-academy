@@ -35,7 +35,7 @@ with sync_playwright() as p:
     check(r['cards']==8 and r['ready']==8, f"코스 카드 8개(코스 6 + 공용 2: 수학 공간·Vim), 열린 것 8개 = 전부(v2.16.0 GitHub 교과서까지) (cards={r['cards']}, ready={r['ready']})")
     check(r['cont'] and '#' in r['cont'], '이어서 하기 링크: '+str(r['cont']))
     check('이어서 하기' in (r['today'] or '') and r['stats']==0 and '오늘의 도전' not in (r['today'] or ''), '이어서 하기 상자(v2.17.1: 문제집 코스(수학)를 시작하기 전엔 「오늘 n/5 문제·복습」 줄 없음): '+(r['today'] or '').replace('\n',' '))
-    # v2.10.1 사용자 「메인화면은 수정 안 했는데」 — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
+    # v2.10.1 사용자 지적(허브 화면은 안 고쳐졌음) — 교과서 코스 카드는 문제 수가 아니라 「읽은 레슨」, 터미널 문구는 Git Bash 교과서
     hb=pg.evaluate("(()=>{ const t=(id)=>{ const a=document.querySelector(`a.hc[href*=\"courses/${id}/\"]`); return a? a.innerText.replace(/\\n/g,' ') : ''; }; return {py:t('python'), tg:t('terminal-git'), al:t('algo'), lead:(document.querySelector('.hub-lead')||{}).textContent||''}; })()")
     check('읽은 레슨' in hb['py'] and '남은 문제' not in hb['py'] and '/45' in hb['py'], '허브 파이썬 카드: 교과서 · 읽은 레슨 n/45 (문제 수 없음) (%s)' % hb['py'][:80])
     check('Git Bash' in hb['tg'] and '읽은 레슨' in hb['tg'] and '/20' in hb['tg'] and 'Git 편' in hb['tg'] and '시뮬레이터' not in hb['tg'] and '준비 중 ·' not in hb['tg'], '허브 터미널 카드: Git Bash 교과서 · 읽은 레슨 n/20 · 명령어 편 + Git 편 (%s)' % hb['tg'][:90])
@@ -315,7 +315,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('dogam')"); pg.wait_for_timeout(300); check(pg.inner_text('.tb-title')=='수학 도감' and pg.locator('.bk-dex-e').count()>=80 and pg.evaluate("document.documentElement.scrollWidth")<=390, '수학 도감: 식과 코드 80개 이상 · 폰 가로 넘침 없음')
     merr=errors[m0:]; check(not merr, '수학 교과서 pageerror 0 (%s)' % (merr[:2] or 'OK'))
     pg.goto(HUB); pg.wait_for_timeout(600); check(pg.locator('.hub-spaces .hc').count()==2 and '수학 공간' in pg.locator('.hub-spaces').inner_text() and 'Vim 에디터' in pg.locator('.hub-spaces').inner_text(), '허브: 「공용」 구역에 수학 공간 + Vim 에디터 카드')
-    check('공용' in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')") and '공간 ' not in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')"), 'v2.11.0 사용자 「공간을 공용으로 변경」: 허브 구역 이름 「공용」')
+    check('공용' in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')") and '공간 ' not in pg.evaluate("[...document.querySelectorAll('.hub-h')].map(h=>h.textContent).join('|')"), 'v2.11.0 사용자 요청(공간 → 공용): 허브 구역 이름 「공용」')
     check('코스 순서와 무관' not in pg.locator('.hub-spaces .hc').first.inner_text(), '허브 수학 카드 문구 중복 없음 (QA #12)')
     print('[모바일 390px]'); pg.set_viewport_size({'width':390,'height':800})
     pg.goto(HUB); pg.wait_for_timeout(500); check(pg.evaluate('document.documentElement.scrollWidth')<=390, '허브 가로 스크롤 없음'); pg.screenshot(path=SHOT+'/hub_m.png', full_page=True)
@@ -495,7 +495,7 @@ with sync_playwright() as p:
     pg.goto(HUB); pg.wait_for_timeout(300); pg.goto(BOOKURL+'#problem/L4P2'); pg.wait_for_timeout(1200); bk=pg.evaluate("[UI.view, UI.params.lessonId, document.querySelectorAll('.bk-tab.make.on').length, location.hash]"); check(bk[:3]==['lesson','L4',1], '옛 문제 주소 #problem/L4P2 → 레슨 4 「만들어 보기」 %s' % bk)
     pg.evaluate("UI.go('lesson',{lessonId:'B3',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-task').count()==4 and '가계부' in pg.inner_text('.bk-art'), '보스(B3) = 챕터 「만들어 보기」 큰 문제 2개 + 🏠 생활형 2개')
     pg.evaluate("UI.go('lesson',{lessonId:'X1',page:8})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prep').count()==1 and 'data.csv' in pg.inner_text('.bk-prep'), '실전 프로젝트: 준비 파일(data.csv) 내용 보여 주기')
-    # v2.9.4 문법 도감 + 「갔으면 돌아올 수 있게」(사용자: 갈 수 있게만 하지 말고 다시 올 수 있게 해)
+    # v2.9.4 문법 도감 + 돌아오기 버튼(사용자 요청)
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(200); pg.click('#bkDex'); pg.wait_for_timeout(300); check(pg.locator('.bk-dex-e').count()>=200, '문법 도감: 레슨 쪽 문법 200개 이상')
     pg.fill('#dexQ','split'); pg.wait_for_timeout(400); n_split=pg.locator('.bk-dex-e').count(); check(0<n_split<30, '문법 도감 검색 split → %d개' % n_split)
     pg.click('.bk-dex-go >> nth=0'); pg.wait_for_timeout(300); check('도감으로 돌아가기' in pg.inner_text('#bkBack'), '도감 → 레슨: 「도감으로 돌아가기」 버튼')
@@ -518,7 +518,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==1 and 'PATH' in pg.inner_text('.bk-prereq'), 'v2.12.2 파이썬 목차: 「시작하기 1~3 먼저(PATH·Python 확장)」 경고')
     pg.evaluate("UI.go('lesson',{lessonId:'L5',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==0, '파이썬 L5 에는 경고 없음(처음 레슨만)')
     berr=[e for e in errors[n0:] if 'Py' not in e]; check(not berr, '교과서 모드 pageerror 0 (%s)' % (berr[:2] or 'OK'))
-    # ===== [터미널·Git 교과서 v2.10.0] 사용자 「2번(SQL·터미널·웹 교과서) 해 · 내 컴퓨터 도구로 · 터미널·Git 먼저」 — Git Bash 기준, 명령어 편(T0~T5·TB1)
+    # ===== [터미널·Git 교과서 v2.10.0] 사용자 결정: SQL · 터미널 · 웹 교과서를 내 컴퓨터 도구로, 터미널·Git 먼저 — Git Bash 기준, 명령어 편(T0~T5·TB1)
     print('[터미널·Git 교과서 v2.10.0]'); t0=len(errors); TGB='file://'+os.path.join(ROOT,'courses/terminal-git/index.html')
     pg.goto(TGB); pg.wait_for_timeout(1000); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
     th=pg.evaluate("({v:UI.view, book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, open:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, kick:(document.querySelector('.bk-hero .lp-kicker')||{}).textContent||'', dex:(document.querySelector('#bkDex')||{}).textContent||''})")
@@ -537,8 +537,8 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('lesson',{lessonId:'T0',page:2})"); pg.wait_for_timeout(300); pg.click('#bkDexL'); pg.wait_for_timeout(300); check(pg.evaluate("UI.view")=='dogam' and '돌아가기' in pg.inner_text('#bkBack') and pg.inner_text('.tb-title')=='터미널·Git 명령 도감', '레슨 → 📚 명령 도감(제목) + 돌아가기')
     pg.fill('#dexQ','grep'); pg.wait_for_timeout(400); dx=pg.evaluate("[...document.querySelectorAll('.bk-dex-e h3')].map(h=>h.textContent)"); check(len(dx)>=2 and any('grep' in x for x in dx) and pg.locator('[data-ch=\"builtin\"]').count()==0, '명령 도감 검색 grep (내장 함수 칩 없음) (%s)' % dx[:3])
     pg.locator('.bk-dex-go').first.click(); pg.wait_for_timeout(300); check('도감으로 돌아가기' in pg.inner_text('#bkBack'), '도감 → 레슨 → 「도감으로 돌아가기」')
-    # v2.12.0 Git 편 (사용자 「2번 진행」 = N1 2차)
-    # v2.12.1 사용자 「나중에 할 거니까 레슨 6번은 설정을 해야 한다고 강조해」
+    # v2.12.0 Git 편 (사용자 선택 = N1 2차)
+    # v2.12.1 사용자 요청: 레슨 6 의 처음 설정을 강조
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==2 and '레슨 6' in pg.locator('.bk-prereq').nth(1).inner_text() and 'Git Bash' in pg.locator('.bk-prereq').nth(0).inner_text(), '터미널 목차: 챕터 1 위 「시작하기 먼저」 + Git 챕터 위 「레슨 6 설정 필수」 (v2.12.2 경고 2개)')
     pg.evaluate("UI.go('lesson',{lessonId:'T9',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==1, 'Git 레슨(T9) 1쪽 맨 위에 경고')
     pg.evaluate("UI.go('lesson',{lessonId:'T9',page:1})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==0, 'Git 레슨 2쪽부터는 경고 없음(1쪽·만들어 보기만)')
@@ -560,7 +560,7 @@ with sync_playwright() as p:
     pg.set_viewport_size({'width':390,'height':800}); [ (pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp), pg.wait_for_timeout(250), check(pg.evaluate("document.documentElement.scrollWidth")<=390, '터미널 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)) for lp in [('SETUP',0),('T1',1),('T4',2),('T5',4),('TB1',0)] ]
     pg.set_viewport_size({'width':1280,'height':900})
     terr=errors[t0:]; check(not terr, '터미널 교과서 pageerror 0 (%s)' % (terr[:2] or 'OK'))
-    # ===== [Vim 교과서 v2.11.0] 사용자 「공용에 windows 버전 vim 에디터 설치 및 사용법 그리고 단축키 교과서 … 파이썬과 연결하고 자동 띄어쓰기 및 자동완성까지」
+    # ===== [Vim 교과서 v2.11.0] 사용자 요청 11/6: 공용 Windows Vim 설치 · 사용법 · 단축키, 파이썬 연결 · 자동 들여쓰기 · 자동완성까지
     print('[Vim 교과서 v2.11.0]'); v0=len(errors); VIMB='file://'+os.path.join(ROOT,'courses/vim/index.html')
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(VIMB); pg.wait_for_timeout(1000); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
     vh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, kick:(document.querySelector('.bk-hero .lp-kicker')||{}).textContent||'', dex:(document.querySelector('#bkDex')||{}).textContent||''})")
@@ -580,7 +580,7 @@ with sync_playwright() as p:
     pg.evaluate("UI.go('home')"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()==2, 'Vim 목차: 챕터 1(설치)·챕터 2(_vimrc) 위에 경고')
     pg.locator('.bk-prereq-go').nth(1).click(); pg.wait_for_timeout(300); check('기본 설정' in pg.evaluate("document.querySelector('.bk-art h1').textContent") and '목차로 돌아가기' in pg.inner_text('#bkBack'), 'Vim 경고 단추 → 레슨 6 기본 설정 쪽 + 목차로 돌아가기')
     pg.set_viewport_size({'width':1280,'height':900})
-    # ===== [SQL 교과서 v2.13.0] 사용자 「2번(SQL·터미널·웹 교과서)」 · 「필수 사항은 강조하고 계속 다음 진행해」 = N2
+    # ===== [SQL 교과서 v2.13.0] 사용자 결정 11/6: 필수 사항 강조 = N2
     print('[SQL 교과서 v2.13.0]'); q0=len(errors); SQB='file://'+os.path.join(ROOT,'courses/sql/index.html')
     pg.goto(SQB); pg.wait_for_timeout(1000); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
     qh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, pre:document.querySelectorAll('.bk-prereq').length})")
@@ -625,7 +625,7 @@ with sync_playwright() as p:
     pg.goto('file://'+os.path.join(ROOT,'courses/terminal-git/index.html')+'#lesson/SETUP'); pg.wait_for_timeout(900); check(pg.evaluate("UI.view")=='lesson' and pg.evaluate("(UI.params||{}).lessonId")=='SETUP', '딥링크 #lesson/SETUP → 교과서 시작하기 쪽(목차 아님) — GitHub 시작하기의 「터미널·Git 교과서 시작하기 ↗」 (v2.17.2 N11)')
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); ghc=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/github/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
     check('읽은 레슨' in ghc and '/22' in ghc and 'GitHub' in ghc, '허브 GitHub 카드: 교과서 · 읽은 레슨 n/22 (%s)' % ghc[:90]); gerr=errors[g0:]; check(not gerr, 'GitHub 교과서 pageerror 0 (%s)' % (gerr[:2] or 'OK'))
-    # v2.15.3 사용자 「방향키 ← 이전 · → 다음 · 만들어 보기에서 목차로 가는 건 키 없이」
+    # v2.15.3 사용자 요청: 방향키 ← 이전 · → 다음, 만들어 보기에서 목차로 가는 키는 없음
     print('[교과서 ← → 키 v2.15.3]'); PYB='file://'+os.path.join(ROOT,'courses/python/index.html'); pg.goto(PYB); pg.wait_for_timeout(800); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
     pg.evaluate("UI.go('lesson',{lessonId:'L2',page:4})"); pg.wait_for_timeout(250); pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(150); k1=pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")
     pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(150); k2=pg.evaluate("document.querySelector('.bk-tab.on').dataset.pg")

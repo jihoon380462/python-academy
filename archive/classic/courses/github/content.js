@@ -1,4 +1,4 @@
-// courses/github/content.js — 「GitHub 교과서」 (v2.16.0, 사용자 「T8 GitHub 가장 중요」 11/3 · 「1」 = 설계대로 만들기 11/6). 설계: specs/github-course.md
+// courses/github/content.js — 「GitHub 교과서」 (v2.16.0, 사용자 결정: T8 GitHub 가 가장 중요 11/3 · 설계대로 만들기 선택 11/6). 설계: specs/github-course.md
 // 처음부터 교과서 모드(book.js + core/ui-views-book.js). 문제·채점 없음(PROBLEMS 빈 배열). 연습은 사용자의 진짜 GitHub 계정(github.com) + Git Bash + VS Code.
 // 화면 이름은 docs.github.com 원문(github/docs 저장소, 2026-11)으로 확인한 영어 글자 그대로 + 괄호 안 한국어 뜻. GitHub 화면이 바뀌면 여기를 고치고 QA 문서에 적어요.
 // 레슨 쪽 example.shell = Git Bash 에 칠 명령. 「만들어 보기」·시작하기·도감 도구 상자는 book.js. 검사: node tools/check_book.mjs github

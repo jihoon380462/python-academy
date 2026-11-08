@@ -1,4 +1,4 @@
-// courses/cs/content.js — 「CS 교과서」 (v2.32.0, 사용자 공용 코스 T1 「컴퓨터가 실제로 어떻게 돌아가나 · 운영체제는 맛보기」 · 다음 코스 「1번진행」 11/7). 설계: specs/cs-course.md
+// courses/cs/content.js — 「CS 교과서」 (v2.32.0, 사용자 결정: 공용 코스 T1 은 컴퓨터가 실제로 도는 원리 · 운영체제는 맛보기 · 다음 코스로 선택 11/7). 설계: specs/cs-course.md
 // 교과서 모드. 연습은 내 PC 의 VS Code + 파이썬. example.code = 파이썬(check_book 이 python3 로 실제 실행).
 const COURSE = { id: 'cs', name: 'CS', runner: 'python', bench: false,
   tutorPersona: '너는 파이썬을 아는 성인에게 CS 을 작은 파이썬 코드로 직접 만들어 보며 가르치는 선생님이다. 원리를 말한 뒤 꼭 코드가 찍는 값으로 보여 준다.' };

@@ -1,4 +1,4 @@
-// courses/api/content.js — 「HTTP·API·SDK 교과서」 (v2.27.0, 사용자 11/7 D15 「HTTP-API-SDK 는 서로 연결되니까 같이 묶을 거야」 · 「ㄱ」). 설계: specs/http-api-course.md
+// courses/api/content.js — 「HTTP·API·SDK 교과서」 (v2.27.0, 사용자 결정 11/7 D15: 서로 이어진 HTTP · API · SDK 를 한 교과서로). 설계: specs/http-api-course.md
 // 처음부터 교과서 모드(book.js + core/ui-views-book.js). 문제·채점 없음(PROBLEMS 빈 배열). 연습은 사용자 PC 의 VS Code + 파이썬(requests) + 터미널 curl + 브라우저 F12.
 // 레슨 쪽 example.code = 인터넷 없이 도는 파이썬(check_book 이 python3 로 실제 실행) · example.shell = curl 명령 · 인터넷을 부르는 파이썬 · 브라우저 JS(사이트 검사에서 안 돌림 — CI 는 인터넷 API 를 부르지 않아요, 설계 6절)
 // 본문의 응답 예는 httpbin(로컬에서 같은 프로그램을 띄워 실제로 받은 모양) · jsonplaceholder · Open-Meteo 의 2026-11 모양. Host · Date · origin 같은 줄은 사람마다 달라요.

@@ -176,7 +176,7 @@ const WORKER_SRC = `
 const PYODIDE_URL=${JSON.stringify(CONFIG.PYODIDE_URL)}, INDEX=${JSON.stringify(CONFIG.PYODIDE_INDEX)};
 const PRELUDE=${JSON.stringify(PY_PRELUDE)};
 let pyodide=null, inputLines=[], inputIdx=0, curId=null;
-/* QA #123(사용자 11/5 「무한루프 막는 장치 없어?」): 출력은 8KB 씩 묶어 보내고(수십만 번 메시지로 화면이 굳던 것), 한 번 실행에 MAX_OUT 글자를 넘으면 멈춰요 */
+/* QA #123(사용자 11/5: 무한 루프를 막는 장치 요청): 출력은 8KB 씩 묶어 보내고(수십만 번 메시지로 화면이 굳던 것), 한 번 실행에 MAX_OUT 글자를 넘으면 멈춰요 */
 const MAX_OUT_DEFAULT=${JSON.stringify(CONFIG.MAX_OUTPUT_CHARS || 1000000)}; let outBuf='', outN=0, outW=0, outMax=0, outCut=false, lastFlush=0;
 /* QA #150: 처음 200번의 write 와 그 뒤 50ms 마다는 바로 보내고(시간 초과·⏹ 로 워커가 꺼져도 앞 출력이 남게), 그 뒤만 8KB 씩 묶는다 */
 function flushOut(){ if(outBuf){ postMessage({type:'out',id:curId,text:outBuf}); outBuf=''; } lastFlush=Date.now(); }

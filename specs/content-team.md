@@ -1,57 +1,225 @@
 # 콘텐츠팀 지시서 (Opus) — 파이썬 아카데미
 
-읽는 순서: HANDOFF.md → specs/workflow.md(1·3·7·**8절**) → 이 파일. **권한 구분 없음(11/6)**: 과제에 필요한 것은 무엇이든(콘텐츠·core·tools·문서·버전·릴리스 PR) 직접 한다. main 은 보호 브랜치라 브랜치 `content/<주제>` 에 올리고 PR → 사용자가 머지. 과제가 끝나면 릴리스 PR 까지(workflow 7절). 알아 둘 사실: 기존 문제·레슨 id 를 바꾸면 그 문제의 진행 기록이 끊긴다.
+옛 문제집 화면 시절, 콘텐츠를 맡은 Opus 채팅이 레슨 · 문제를 채울 때 따르던 지시서예요. 스키마 · 검증 순서 · 과제 목록 · 코스별 채우기 규칙이 들어 있어요.
+
+## 지금 상태
+
+| 항목 | 값 |
+|---|---|
+| 상태 | **지금은 쓰지 않아요** — 기록용 |
+| 까닭 | v2.19.0(TODO D12 · N13)에 옛 문제집 화면(문제 풀기 · 채점 · 가짜 셸 · 브라우저 SQL · 웹 편집기)을 사이트에서 빼서 [`archive/classic/`](../archive/classic/README.md) 에 보관했어요 |
+| 지금 사이트 | 21개 코스 전부 교과서. 연습은 내 PC 의 도구(VS Code · Git Bash · DB Browser)로 해요 |
+| 지금 따를 규칙 | [`CLAUDE.md`](../CLAUDE.md) → [`HANDOFF.md`](../HANDOFF.md) · [`specs/site-intent.md`](site-intent.md) · [`LESSON.md`](../LESSON.md) |
+
+이 문서에 나오는 파일이 지금 있는 곳 (11/8 확인)
+
+| 이 문서의 경로 | 지금 |
+|---|---|
+| `core/runners/shell.js` · `core/runners/sql.js` | `archive/classic/core/runners/` |
+| `core/ui-views-shell.js` · `core/ui-views-sql.js` · `core/ui-views-web.js` | `archive/classic/core/` |
+| `core/runners/web.js` (미리보기 · `Web.check`) | 검사 도구 `tools/web-preview.js` 로 옮김 |
+| `courses/web/course.css` · `courses/sql/course.css` 등 옛 화면 CSS | `archive/classic/courses/` |
+| `tools/test_shell.mjs` · `tools/run_shell_solutions.mjs` · `tools/run_sql_solutions.py` | `archive/classic/tools/` |
+| `tools/validate/web.mjs` · `sql.mjs` · `terminal-git.mjs` · `tools/run_web_solutions.py` · `tools/gen_sql_dataset.py` · `tools/check_level.mjs` · `courses/sql/datasets.js` · `shared/errors.js` | 그대로 있어요 |
+
+- 옛 화면을 통째로 보려면 `classic-v2.18.0` 브랜치예요(`archive/classic/README.md`).
+- 아래 본문은 그때 모양 그대로예요. 절 번호 · 절 이름(3절 · 3-2절 · C-W · C-T · C-S)은 다른 문서 · 코드 주석이 가리켜서 바꾸지 않았어요.
+
+그때의 읽는 순서와 권한
+- 읽는 순서: HANDOFF.md → specs/workflow.md(1 · 3 · 7 · **8절**) → 이 파일.
+- **권한 구분 없음(11/6)**: 과제에 필요한 것은 무엇이든 직접 해요(콘텐츠 · core · tools · 문서 · 버전 · 릴리스 PR).
+- main 은 보호 브랜치라 브랜치 `content/<주제>` 에 올리고 PR → 사용자가 머지했어요. 지금은 Claude 가 머지까지 해요(CLAUDE.md 4절).
+- 과제가 끝나면 릴리스 PR 까지 해요(workflow 7절).
+- 알아 둘 사실: 기존 문제 · 레슨 id 를 바꾸면 그 문제의 진행 기록이 끊겨요.
 
 ## 1. 스키마 (고치지 말고 그대로 쓴다)
 
-- 파이썬·알고리즘: `courses/python/content.js` 맨 위 주석 + `courses/algo/content.js` 맨 위 주석. 레슨 `{id, ch, n, title, mode, terms, pages[{title, html, example}], summary}` · 문제 `type: quiz|fill|bug|parsons|block|code` (+ 알고 `kind`, `tests[{call,ret}|{input,output}]`, `visualize`, `limits`).
-- 수학: `courses/math/content.js` 맨 위 주석. 노드 = 레슨 + `subtitle/level/stars/prereq/star/icon/params[]`, `pages[0].figure`(필수, kind는 `core/figure.js` 주석의 16종만) · `observe` 2~3 · `pages[1].formula/example`. 문제 `quiz kind:'explore' requireInteract` · `num answer:{value,tol,unit,why}`+solution · `match` · `pair` · `code`.
-- 규칙: 문제마다 힌트 **정확히 3개**(방향 → 구체 → 거의 정답), 태그 1개 이상(코스의 `WEAKNESS_TAGS` 안에서), 실행형은 테스트 ≥ 4(경계값 포함, 마지막 1개는 숨김), 보스 ≥ 5. `[[용어]]`는 레슨 `terms` 나 `shared/glossary.js`에 있어야 한다. 정답 코드는 CPython으로 돌려 통과해야 한다(`run_solutions.py`). 말투 ~해요체, 초보 기준 비유 먼저.
-- 추가 위치: 파일 **끝에** `LESSONS.push(...)`, `PROBLEMS.push(...)`(파이썬·알고리즘) / 수학은 배열 안에 영역별로. `CONFIG.COURSES[].total/lessons`(core/config.js의 숫자 두 개)는 **콘텐츠 수와 같아야 validate가 통과** — 이 숫자 수정은 허용(값만).
+**파이썬 · 알고리즘**
+- 정의: `courses/python/content.js` 맨 위 주석 + `courses/algo/content.js` 맨 위 주석.
+- 레슨: `{id, ch, n, title, mode, terms, pages[{title, html, example}], summary}`
+- 문제: `type: quiz|fill|bug|parsons|block|code`
+  - 알고리즘은 여기에 `kind` · `tests[{call,ret}|{input,output}]` · `visualize` · `limits` 가 더해져요.
 
-## 2. 검증·배포 (푸시 전 필수)
+**수학**
+- 정의: `courses/math/content.js` 맨 위 주석.
+- 노드 = 레슨 + `subtitle/level/stars/prereq/star/icon/params[]`
+  - `pages[0].figure` 필수. kind 는 `core/figure.js` 주석의 16종만.
+  - `observe` 2~3 · `pages[1].formula/example`.
+- 문제: `quiz kind:'explore' requireInteract` · `num answer:{value,tol,unit,why}`+solution · `match` · `pair` · `code`.
 
-`node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py` → 통과하면 docs/archive/PROBLEMS.md 표 추가 → CHANGELOG 맨 위 `## 미배포` 절에 항목 추가(버전 머리글 없이) → `[content] C4: …` 커밋 → `git push -u origin content/C4-…` → `gh pr create --base main --fill`. **(11/6 개정) 과제가 끝나면 Opus 가 직접 패치 릴리스 PR 을 낸다**(`specs/workflow.md` 7절·`specs/archive/schedule-week.md` 4절 5번: `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG 머리글 → HANDOFF 상태판 → `release/vX.Y.Z` PR → 사용자 머지). ~~`APP_VERSION`·stamp·HANDOFF 상태판은 건드리지 않는다**(릴리스 때 Fable). 가능하면 `python3 tools/regress.py`. PR 의 `PR Check` 가 초록이어야 병합된다.
+**규칙**
+- 문제마다 힌트 **정확히 3개**(방향 → 구체 → 거의 정답).
+- 태그 1개 이상(코스의 `WEAKNESS_TAGS` 안에서).
+- 실행형은 테스트 ≥ 4(경계값 포함, 마지막 1개는 숨김). 보스는 ≥ 5.
+- `[[용어]]` 는 레슨 `terms` 나 `shared/glossary.js` 에 있어야 해요.
+- 정답 코드는 CPython 으로 돌려 통과해야 해요(`run_solutions.py`).
+- 말투는 해요체, 초보 기준으로 비유 먼저.
+
+**추가 위치**
+- 파이썬 · 알고리즘: 파일 **끝에** `LESSONS.push(...)` · `PROBLEMS.push(...)`.
+- 수학: 배열 안에 영역별로.
+- `CONFIG.COURSES[].total/lessons`(core/config.js 의 숫자 두 개)는 **콘텐츠 수와 같아야 validate 가 통과**해요. 이 숫자 수정은 허용(값만).
+
+## 2. 검증 · 배포 (푸시 전 필수)
+
+1. `node tools/validate_content.mjs && node tools/extract.mjs tools/.out && python3 tools/run_solutions.py`
+2. 통과하면 docs/archive/PROBLEMS.md 에 표를 더해요.
+3. CHANGELOG 맨 위 `## 미배포` 절에 항목을 더해요(버전 머리글 없이).
+4. `[content] C4: …` 처럼 커밋해요.
+5. `git push -u origin content/C4-…` → `gh pr create --base main --fill`.
+6. 가능하면 `python3 tools/regress.py`. PR 의 `PR Check` 가 초록이어야 병합돼요.
+
+**(11/6 개정) 과제가 끝나면 Opus 가 직접 패치 릴리스 PR 을 내요.**
+- 근거: `specs/workflow.md` 7절 · `specs/archive/schedule-week.md` 4절 5번.
+- 순서: `APP_VERSION` 패치 +1 → `node tools/stamp.mjs` → CHANGELOG 머리글 → HANDOFF 상태판 → `release/vX.Y.Z` PR → 사용자 머지.
+- ~~옛 규칙: `APP_VERSION` · stamp · HANDOFF 상태판은 건드리지 않는다(릴리스 때 Fable).~~
 
 ## 3. 과제 목록 (위에서부터, 하나씩 배포)
 
-| # | 과제 | 범위 | 완료 기준 |
-| --- | --- | --- | --- |
-| C1 ✅ v2.3.2 | **수학 영역 1·3·5 보강 노드** — 기존 그림 16종만으로 만들 수 있는 것: 1-10 「약수의 개수와 완전수」(sieve/bars), 3-9 「기하분포: 몇 번 만에 성공하나」(hist, sim = 첫 성공까지 횟수), 5-9 「두 점 사이 거리와 충돌 판정」(vector, 원 두 개 겹침 판정은 숫자 답·코드로) | `courses/math/content.js`, prereq 는 기존 노드, 노드당 4문제(탐구 2·num 1·code 1) | validate(첫 그림·observe·탐구 퀴즈) 통과, config 총계 갱신 |
-| C2 ✅ v2.3.4 | **파이썬 챕터 7 연습 보강** — L19~L23 각 레슨에 `bug` 또는 `fill` 1문제씩(현재 code·quiz 위주) | `courses/python/content.js` 끝 | 힌트 3·테스트 통과 |
-| C3 ✅ v2.3.5 | **알고리즘 챕터 6 추적 퀴즈** — A16~A20 각 1문제 `kind:'trace'` + `visualize`(기존 kind: bars/table/grid/callstack) | `courses/algo/content.js` 끝 | 시각화 버튼 동작(QA 확인) |
-| C4 | **용어집 보강** — 수학 노드 `terms` 중 공용 가치가 있는 것(나머지·소수·벡터·내적·확률·기댓값 등 20개)을 `shared/glossary.js`로 옮기고 레슨 `terms` 중복 제거 | `shared/glossary.js` | validate 용어 검사 통과 |
-| C5 | **힌트 품질 점검** — 파이썬 L0~L8 문제의 힌트 3단계가 "방향→구체→거의 정답" 순서인지, 3단계가 정답 코드와 변수명이 같은지 전수 점검·수정 | `courses/python/content.js` | docs/QA.md에 점검 결과 요약 |
+과제마다 지금 어떻게 됐는지 (11/8 CHANGELOG 로 확인)
 
-| C6 | **파이썬 L9~L18 힌트 품질 점검** — C5와 같은 기준(방향→구체→거의 정답, 3단계 = 정답 코드와 같은 변수명) | `courses/python/content.js` 기존 힌트 줄만 | docs/QA.md에 C5 형식으로 표 추가 |
-| C7 | **알고리즘 A0~A15·AB1~AB3 힌트 품질 점검** — 같은 기준 + `kind:'ct'` 문제는 힌트 3이 입출력 형식까지 | `courses/algo/content.js` 기존 힌트 줄만 | docs/QA.md 표 추가 |
-| C8 | **알고리즘 실전 E1~E6 연습 문제** — 실전 레슨마다 프로젝트 전에 푸는 작은 `code` 문제 1개(프로젝트의 한 단계만 떼어낸 것, 테스트 4개) | `courses/algo/content.js` 끝에 push, config algo total(값만) | validate·run_solutions 통과 |
-| **C10** (v2.7.0, 사용자 11/5 「콘텐츠는 Opus」) | **「풀 수 있나」 맞추기 — TODO ★4-2·★4-3·★4-4.** ① `node tools/check_level.mjs` 표(파이썬 30·알고 7)에 걸린 문제를 3-2절 규칙대로 고친다. 우선순위: B5P1·B5P2(`is None`·삼항 — 본문에 없음), B7P2(`not in`·`.endswith`), AB5P1(`chr/ord` — A16 본문에 한 쪽 추가), L17(5문제 중 4개가 새 기능 3~5개 — 쉬운 것부터 계단), L4(전 문제가 if/else/비교 3~4개 — 첫 문제는 if 하나만), L14, L15P1·L6P1·L9P1(첫 문제가 가장 무거움 — 순서 바꾸기), X1·X3·X5·X6 프로젝트(새 기능 3~4 — starter 에 더 적어 두기). `(지문○)` 표시는 지문에만 있는 것 — 본문에 한 줄 넣을지 판단. 고친 뒤 `node tools/check_level.mjs --update-baseline`. ② 긴 코드 줄 약 230개(74쪽, L17·X1~X4)를 줄 나눠 쓰기(상자 안 가로 스크롤 없애기). ③ QA-OPEN 파이썬 「중」 #128~#139·타자 연습 #139·#144. | `courses/python/content.js`·`courses/algo/content.js` 내용만 | check_level 걸린 수 감소(baseline 갱신)·validate·run_solutions·regress 통과·고친 레슨은 직접 풀어 보기 |
-| **C11** (v2.7.0) | **레슨 나누기 2차**(★2 규칙: 한 레슨 = 개념 하나~둘, 5~6쪽 이하, 문제 3~5개) — 파이썬 L1(7쪽)·L2(8)·L4(7)·L5(8, 종합 점검 1 위치 같이)·L9(8)·L13(7)·L17(8)·L19(7, L16B 와 겹침 → 줄이기)·L20(8)·L21(7)·L18B(개념 5 → map·filter / enumerate·zip·max); 알고리즘 6쪽 레슨 A6·A16·A18·A19. **v2.5.0 방식 그대로**: 문제 id 는 안 바꾸고 lesson 만 옮김, 새 레슨 id 는 알파벳 접미(L4B), n 다시 매김, 본문의 「레슨 N」은 `[[레슨:ID]]` 토큰, CHECKUPS after 갱신, config total/lessons 값. 실전 X1·X3·X4 의 새 문법 쪽은 앞 레슨으로. | `courses/python/content.js`·`courses/algo/content.js` | validate(레슨 토큰)·regress 통과, CHANGELOG 「미배포」에 항목 |
-| **C12** (v2.7.0) | **수학 「상」 #145~#147** — M5_eigen 절댓값·바늘 그림, M4_ease 문장(docs/QA.md 고칠 내용대로) → 수학 「중」(11/4 검수: 그림 겹침·점선·숫자 답 안내·퀴즈 정답 첫 보기). 그림 kind 가 새로 필요하면 Fable 에게. | `courses/math/content.js` 값·문구만 | docs/QA.md 닫힘 표시 |
-| C9 | **수학 난이도·범위 표기 재점검**(QA #33) — 28노드 `level`(고1/고2/대학)·`stars` 기준을 docs/archive/PROBLEMS.md 수학 절에 적고 맞추기 | `courses/math/content.js` level/stars 값만 — **Fable M2 작업 중이면 M2 배포 뒤에** | QA #33 닫힘 |
+| # | 과제 | 상태 |
+| --- | --- | --- |
+| C1 | 수학 영역 1 · 3 · 5 보강 노드 | ✅ v2.3.2 |
+| C2 | 파이썬 챕터 7 연습 보강 | ✅ v2.3.4 |
+| C3 | 알고리즘 챕터 6 추적 퀴즈 | ✅ v2.3.5 |
+| C4 | 용어집 보강 | ✅ v2.3.6 |
+| C5 | 힌트 품질 점검(파이썬 L0~L8) | ✅ v2.3.6 |
+| C6 | 힌트 품질 점검(파이썬 L9~L18) | ✅ v2.3.8 |
+| C7 | 힌트 품질 점검(알고리즘) | ✅ v2.3.9 |
+| C8 | 알고리즘 실전 E1~E6 연습 문제 | ✅ v2.3.9 |
+| C9 | 수학 난이도 · 범위 표기 재점검 | ✅ v2.3.12 |
+| C10 | 「풀 수 있나」 맞추기 | 우선 문제는 v2.8.6 에 고침. 다 끝났는지는 확인 못 함 |
+| C11 | 레슨 나누기 2차 | 확인 못 함 |
+| C12 | 수학 「상」 #145~#147 | #145 · #147 은 고쳐져 있음, #146 은 TODO 1-3 |
 
-C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(새 코스 채우기, 아래 절) → C11 → C12 → C6~C9 순.** 사용자 결정(11/5): 콘텐츠는 전부 Opus, core 는 Fable. 한 과제 = 한 브랜치 = PR 하나(버전은 릴리스 때 Fable이). 수학 `content.js`는 Fable 이 M2 로 고치는 동안(HANDOFF 상태판 확인) 건드리지 않는다 — C9는 그 뒤. 과제를 끝내면 HANDOFF "다음 후보"의 콘텐츠 줄을 갱신하고 다음 과제로.
+옛 문제집 화면이 없어져서, 남은 과제도 지금은 할 일이 아니에요.
 
-## 3-2. 문제 난이도 규칙 (2026-11-05 추가, QA #160)
+### 과제마다 범위와 완료 기준
 
-- 레슨 안 문제는 **쉬운 것 → 합친 것** 순서로 배열한다(배열 순서 = 화면 순서). 첫 문제는 레슨 기능 하나만.
-- 정답·힌트 3 은 **본문에서 가르친 꼴**로만 쓴다(접힌 「더 알아보기」만 있는 꼴 금지). 더 짧은 꼴이 있어도 배운 꼴을 쓴다.
-- 레슨 기능 3개 이상을 합친 문제는 starter 에 대부분을 적어 두고 학습자가 쓸 줄을 지문에 「가운데 한 줄만」처럼 콕 집는다.
-- (v2.4.0) 블록·`dual` 은 없다 — 전부 타자. 새 문제는 `type:'code'` 로, 레슨 앞 두 문제는 starter 에 틀을 적고 지문에 쓸 줄을 콕 집는다. **(v2.8.1, 사용자 11/6) 파이썬·알고·수학에 `type:'parsons'`(순서 맞추기)는 쓰지 않는다** — 터미널·Git 의 명령 순서 문제만 예외.
-- (v2.8.2, 사용자 11/6) **함수 호출 3겹 이상 줄 금지**(`print(sorted(set(nums)))` ✗) — 한 줄에 한 단계씩 변수에 담기. `node tools/check_nesting.mjs` 가 CI 게이트.
-- 새 문제를 넣은 뒤 그 레슨을 **처음부터 직접 풀어 본다**(힌트 없이). 막히면 문제를 고친다.
-- (v2.7.0) `node tools/check_level.mjs` 가 위 규칙을 자동으로 잰다(①본문 밖 기능 ②합친 새 기능 3+ ③첫 문제가 가장 무거움, DESIGN 14-2절). 걸린 레슨은 `node tools/check_level.mjs --lesson L11` 로 근거(어느 기능이 정답 몇 줄에서 쓰였고 본문 어디서 처음 나왔는지)를 보고 고친다 — 본문에 그 꼴을 넣거나, 문제 순서를 바꾸거나, starter 에 적어 두고 지문에서 쓸 줄을 콕 집는다. 고친 뒤 `node tools/check_level.mjs --update-baseline` 으로 `tools/check_level.baseline.json` 을 내려 잡고 같이 커밋한다(CI 의 `--gate` 는 걸린 수가 **늘면** 실패). 정규식 측정이라 오탐이 있을 수 있다 — 명백한 오탐은 고치지 말고 PR 에 적어 두면 Fable 이 카탈로그를 손본다.
+**C1 ✅ v2.3.2 — 수학 영역 1 · 3 · 5 보강 노드**
+- 기존 그림 16종만으로 만들 수 있는 것:
+  - 1-10 「약수의 개수와 완전수」(sieve/bars)
+  - 3-9 「기하분포: 몇 번 만에 성공하나」(hist, sim = 첫 성공까지 횟수)
+  - 5-9 「두 점 사이 거리와 충돌 판정」(vector, 원 두 개 겹침 판정은 숫자 답 · 코드로)
+- 범위: `courses/math/content.js`. prereq 는 기존 노드, 노드당 4문제(탐구 2 · num 1 · code 1).
+- 완료 기준: validate(첫 그림 · observe · 탐구 퀴즈) 통과, config 총계 갱신.
+
+**C2 ✅ v2.3.4 — 파이썬 챕터 7 연습 보강**
+- L19~L23 각 레슨에 `bug` 또는 `fill` 1문제씩(그때는 code · quiz 위주).
+- 범위: `courses/python/content.js` 끝. 완료 기준: 힌트 3 · 테스트 통과.
+
+**C3 ✅ v2.3.5 — 알고리즘 챕터 6 추적 퀴즈**
+- A16~A20 각 1문제 `kind:'trace'` + `visualize`(기존 kind: bars/table/grid/callstack).
+- 범위: `courses/algo/content.js` 끝. 완료 기준: 시각화 버튼 동작(QA 확인).
+
+**C4 — 용어집 보강**
+- 수학 노드 `terms` 중 공용 가치가 있는 것(나머지 · 소수 · 벡터 · 내적 · 확률 · 기댓값 등 20개)을 `shared/glossary.js` 로 옮기고 레슨 `terms` 중복을 지워요.
+- 범위: `shared/glossary.js`. 완료 기준: validate 용어 검사 통과.
+
+**C5 — 힌트 품질 점검(파이썬 L0~L8)**
+- 힌트 3단계가 「방향 → 구체 → 거의 정답」 순서인지, 3단계가 정답 코드와 변수명이 같은지 전수 점검 · 수정.
+- 범위: `courses/python/content.js`. 완료 기준: docs/QA.md 에 점검 결과 요약.
+
+**C6 — 파이썬 L9~L18 힌트 품질 점검**
+- C5 와 같은 기준(방향 → 구체 → 거의 정답, 3단계 = 정답 코드와 같은 변수명).
+- 범위: `courses/python/content.js` 기존 힌트 줄만. 완료 기준: docs/QA.md 에 C5 형식으로 표 추가.
+
+**C7 — 알고리즘 A0~A15 · AB1~AB3 힌트 품질 점검**
+- 같은 기준 + `kind:'ct'` 문제는 힌트 3이 입출력 형식까지.
+- 범위: `courses/algo/content.js` 기존 힌트 줄만. 완료 기준: docs/QA.md 표 추가.
+
+**C8 — 알고리즘 실전 E1~E6 연습 문제**
+- 실전 레슨마다 프로젝트 전에 푸는 작은 `code` 문제 1개(프로젝트의 한 단계만 떼어 낸 것, 테스트 4개).
+- 범위: `courses/algo/content.js` 끝에 push, config algo total(값만). 완료 기준: validate · run_solutions 통과.
+
+**C10 (v2.7.0) — 「풀 수 있나」 맞추기 (TODO ★4-2 · ★4-3 · ★4-4)**
+- 콘텐츠는 Opus 가 맡는다는 사용자 결정(11/5)에 따른 과제예요.
+- 할 일 ① `node tools/check_level.mjs` 표(파이썬 30 · 알고 7)에 걸린 문제를 3-2절 규칙대로 고쳐요. 우선순위:
+  - B5P1 · B5P2(`is None` · 삼항 — 본문에 없음)
+  - B7P2(`not in` · `.endswith`)
+  - AB5P1(`chr/ord` — A16 본문에 한 쪽 추가)
+  - L17(5문제 중 4개가 새 기능 3~5개 — 쉬운 것부터 계단)
+  - L4(전 문제가 if/else/비교 3~4개 — 첫 문제는 if 하나만)
+  - L14
+  - L15P1 · L6P1 · L9P1(첫 문제가 가장 무거움 — 순서 바꾸기)
+  - X1 · X3 · X5 · X6 프로젝트(새 기능 3~4 — starter 에 더 적어 두기)
+  - `(지문○)` 표시는 지문에만 있는 것 — 본문에 한 줄 넣을지 판단해요.
+  - 고친 뒤 `node tools/check_level.mjs --update-baseline`.
+- 할 일 ② 긴 코드 줄 약 230개(74쪽, L17 · X1~X4)를 줄 나눠 쓰기(상자 안 가로 스크롤 없애기).
+- 할 일 ③ QA-OPEN 파이썬 「중」 #128~#139 · 타자 연습 #139 · #144.
+- 범위: `courses/python/content.js` · `courses/algo/content.js` 내용만.
+- 완료 기준: check_level 걸린 수 감소(baseline 갱신) · validate · run_solutions · regress 통과 · 고친 레슨은 직접 풀어 보기.
+
+**C11 (v2.7.0) — 레슨 나누기 2차**
+- ★2 규칙: 한 레슨 = 개념 하나~둘, 5~6쪽 이하, 문제 3~5개.
+- 파이썬: L1(7쪽) · L2(8) · L4(7) · L5(8, 종합 점검 1 위치 같이) · L9(8) · L13(7) · L17(8) · L19(7, L16B 와 겹침 → 줄이기) · L20(8) · L21(7) · L18B(개념 5 → map · filter / enumerate · zip · max).
+- 알고리즘: 6쪽 레슨 A6 · A16 · A18 · A19.
+- **v2.5.0 방식 그대로**
+  - 문제 id 는 안 바꾸고 lesson 만 옮겨요.
+  - 새 레슨 id 는 알파벳 접미(L4B), n 다시 매김.
+  - 본문의 「레슨 N」 은 `[[레슨:ID]]` 토큰으로.
+  - CHECKUPS after 갱신, config total/lessons 값.
+  - 실전 X1 · X3 · X4 의 새 문법 쪽은 앞 레슨으로.
+- 범위: `courses/python/content.js` · `courses/algo/content.js`.
+- 완료 기준: validate(레슨 토큰) · regress 통과, CHANGELOG 「미배포」 에 항목.
+
+**C12 (v2.7.0) — 수학 「상」 #145~#147**
+- M5_eigen 절댓값 · 바늘 그림, M4_ease 문장(docs/QA.md 고칠 내용대로) → 수학 「중」(11/4 검수: 그림 겹침 · 점선 · 숫자 답 안내 · 퀴즈 정답 첫 보기).
+- 그림 kind 가 새로 필요하면 Fable 에게.
+- 범위: `courses/math/content.js` 값 · 문구만. 완료 기준: docs/QA.md 닫힘 표시.
+
+**C9 — 수학 난이도 · 범위 표기 재점검(QA #33)**
+- 28노드 `level`(고1/고2/대학) · `stars` 기준을 docs/archive/PROBLEMS.md 수학 절에 적고 맞추기.
+- 범위: `courses/math/content.js` level/stars 값만. **Fable M2 작업 중이면 M2 배포 뒤에**.
+- 완료 기준: QA #33 닫힘.
+
+### 그때의 순서와 나눔
+
+- C1~C5 완료(v2.3.6).
+- **v2.7.0 부터는 C10(풀 수 있나) → C-T · C-S · C-W(새 코스 채우기, 아래 절) → C11 → C12 → C6~C9 순.**
+- 사용자 결정(11/5): 콘텐츠는 전부 Opus, core 는 Fable.
+- 한 과제 = 한 브랜치 = PR 하나(버전은 릴리스 때 Fable 이).
+- 수학 `content.js` 는 Fable 이 M2 로 고치는 동안(HANDOFF 상태판 확인) 건드리지 않아요. C9 는 그 뒤.
+- 과제를 끝내면 HANDOFF 「다음 후보」 의 콘텐츠 줄을 갱신하고 다음 과제로.
+
+## 3-2. 문제 난이도 규칙 (11/5 추가, QA #160)
+
+- 레슨 안 문제는 **쉬운 것 → 합친 것** 순서로 배열해요(배열 순서 = 화면 순서). 첫 문제는 레슨 기능 하나만.
+- 정답 · 힌트 3 은 **본문에서 가르친 꼴**로만 써요.
+  - 접힌 「더 알아보기」 에만 있는 꼴은 안 돼요.
+  - 더 짧은 꼴이 있어도 배운 꼴을 써요.
+- 레슨 기능 3개 이상을 합친 문제는 starter 에 대부분을 적어 두고, 학습자가 쓸 줄을 지문에 「가운데 한 줄만」 처럼 콕 집어요.
+- (v2.4.0) 블록 · `dual` 은 없어요 — 전부 타자.
+  - 새 문제는 `type:'code'` 로.
+  - 레슨 앞 두 문제는 starter 에 틀을 적고 지문에 쓸 줄을 콕 집어요.
+- (v2.8.1, 사용자 결정 11/6) **파이썬 · 알고 · 수학에 `type:'parsons'`(순서 맞추기)는 쓰지 않아요.** 터미널 · Git 의 명령 순서 문제만 예외.
+- (v2.8.2, 사용자 결정 11/6) **함수 호출 3겹 이상 줄 금지**(`print(sorted(set(nums)))` ✗).
+  - 한 줄에 한 단계씩 변수에 담아요.
+  - `node tools/check_nesting.mjs` 가 CI 게이트예요.
+- 새 문제를 넣은 뒤 그 레슨을 **처음부터 직접 풀어 봐요**(힌트 없이). 막히면 문제를 고쳐요.
+- (v2.7.0) `node tools/check_level.mjs` 가 위 규칙을 자동으로 재요(DESIGN 14-2절).
+  - 재는 것: ① 본문 밖 기능 ② 합친 새 기능 3+ ③ 첫 문제가 가장 무거움.
+  - 걸린 레슨은 `node tools/check_level.mjs --lesson L11` 로 근거를 봐요(어느 기능이 정답 몇 줄에서 쓰였고 본문 어디서 처음 나왔는지).
+  - 고치는 법: 본문에 그 꼴을 넣거나, 문제 순서를 바꾸거나, starter 에 적어 두고 지문에서 쓸 줄을 콕 집어요.
+  - 고친 뒤 `node tools/check_level.mjs --update-baseline` 으로 `tools/check_level.baseline.json` 을 내려 잡고 같이 커밋해요.
+  - CI 의 `--gate` 는 걸린 수가 **늘면** 실패해요.
+  - 정규식 측정이라 오탐이 있을 수 있어요. 명백한 오탐은 고치지 말고 PR 에 적어 두면 Fable 이 카탈로그를 손봐요.
 
 ## 4. 하지 말 것
 
-- 레슨·문제 id 변경, 기존 문제 삭제(진행 데이터가 id로 저장됨). 고칠 땐 내용만.
-- `vary` 범위 밖 값, 테스트에 현재 시각·난수(시드 없는) 의존, 5초 넘게 도는 정답 코드.
-- (11/6) 그림 kind·문제 type 도 필요하면 새로 만든다(DESIGN 에 한 줄, validate·regress 검사 추가).
+- 레슨 · 문제 id 변경, 기존 문제 삭제(진행 데이터가 id 로 저장됨). 고칠 땐 내용만.
+- `vary` 범위 밖 값, 테스트에 현재 시각 · 난수(시드 없는) 의존, 5초 넘게 도는 정답 코드.
+- (11/6) 그림 kind · 문제 type 도 필요하면 새로 만들어요(DESIGN 에 한 줄, validate · regress 검사 추가).
 
-## C-W 웹·HTTP·API 채우기 (v2.7.0 뼈대 · Fable 2026-11-05)
+## C-W 웹·HTTP·API 채우기 (v2.7.0 뼈대 · Fable 11/5)
 
-코스 `courses/web/`(id `web`). 설계는 docs/EXPANSION.md 8절, 플러그인 계약은 docs/DESIGN.md 16절. **본보기는 레슨 `W0`(쪽 4 + 문제 4, 유형 전부 한 번씩)** — 그 모양 그대로 W1~W13·WB1~WB3 을 채우고 각 레슨의 `draft: true` 를 지운다. 이 절만 읽고 채울 수 있게 썼다.
+지금 상태: 웹은 v2.14.0 에 교과서가 되고 v2.26.0 에 34 레슨으로 완성됐어요. 아래 `type:'web'` 문제 · 미리보기 채점은 옛 화면 것이에요.
+
+- 코스 `courses/web/`(id `web`).
+- 설계는 docs/EXPANSION.md 8절, 플러그인 계약은 docs/DESIGN.md 16절.
+- **본보기는 레슨 `W0`(쪽 4 + 문제 4, 유형 전부 한 번씩)** — 그 모양 그대로 W1~W13 · WB1~WB3 을 채우고 각 레슨의 `draft: true` 를 지워요.
+- 이 절만 읽고 채울 수 있게 썼어요.
 
 ### 파일과 역할 (core 는 손대지 않는다)
 | 파일 | 역할 |
@@ -138,10 +306,31 @@ C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(�
 | `wait: ms` | 동작 뒤 기다리는 시간(기본 300, 가짜 서버 응답은 끝날 때까지 자동 대기, 최대 3000) | |
 | `viewport: 390` | 그 폭으로 미리보기를 바꾼 뒤 검사(반응형) | `css:{prop:'flex-direction', value:'column'}` 와 같이 |
 
-채점 방식: 「✔ 제출하기」 → 미리보기를 새로 그리고 checks 를 **순서대로** 실행 → 체크리스트(✓/✗ + 「지금: 실제값」) → 전부 ✓ 면 클리어. 실패 항목을 누르면 미리보기에서 그 요소가 빨간 테두리로 강조된다(`sel`·`then.sel`·`click` 대상). 힌트·정답 보기·XP 는 core 가 한다. `solution` 은 「정답 보기」가 그대로 보여 주므로 **학습자가 읽을 수 있게** 줄바꿈해서 쓴다.
+**채점 방식**
+1. 「✔ 제출하기」 → 미리보기를 새로 그리고 checks 를 **순서대로** 실행해요.
+2. 체크리스트(✓/✗ + 「지금: 실제값」)가 나와요. 전부 ✓ 면 클리어.
+3. 실패 항목을 누르면 미리보기에서 그 요소가 빨간 테두리로 강조돼요(`sel` · `then.sel` · `click` 대상).
+- 힌트 · 정답 보기 · XP 는 core 가 해요.
+- `solution` 은 「정답 보기」 가 그대로 보여 주므로 **학습자가 읽을 수 있게** 줄바꿈해서 써요.
 
 ### 가짜 API 서버 (`https://api.academy.local`, `Web.api.routes`)
-`GET /todos` · `POST /todos {title}`(201, 없으면 400) · `PUT /todos/:id {done,title}` · `DELETE /todos/:id`(204) · `GET /menu`(5개: 아메리카노 3000·카페라떼 3500·바닐라라떼 4000·녹차 3000·치즈케이크 5500) · `POST /orders {items:[{id,qty}]}`(201 {orderId,total}) · `GET /weather?city=서울`(서울·부산·대구·제주·강릉, 없으면 400/404) · `POST /login {user:'student', password:'academy'}`(200 {token}, 틀리면 401) · `GET /me`(헤더 `Authorization: Bearer <token>`). 모르는 주소는 404 `{error}`. 응답은 전부 JSON. 지연은 기본 300~800ms 무작위 — 채점용 문제는 `web.api.delay: 200` 처럼 고정. 에러 처리 레슨(W11·WB3)은 `api.failFirst: 1`(첫 요청만 500) 로 결정적으로. 다른 주소(진짜 인터넷)는 샌드박스라 대부분 실패하고 네트워크 탭에 「연결 실패」로 뜬다 — 지문에서 쓰지 말 것.
+
+| 주소 | 하는 일 |
+| --- | --- |
+| `GET /todos` | 할 일 목록 |
+| `POST /todos {title}` | 201, title 이 없으면 400 |
+| `PUT /todos/:id {done,title}` | 고치기 |
+| `DELETE /todos/:id` | 204 |
+| `GET /menu` | 5개: 아메리카노 3000 · 카페라떼 3500 · 바닐라라떼 4000 · 녹차 3000 · 치즈케이크 5500 |
+| `POST /orders {items:[{id,qty}]}` | 201 `{orderId,total}` |
+| `GET /weather?city=서울` | 서울 · 부산 · 대구 · 제주 · 강릉, 없으면 400/404 |
+| `POST /login {user:'student', password:'academy'}` | 200 `{token}`, 틀리면 401 |
+| `GET /me` | 헤더 `Authorization: Bearer <token>` |
+
+- 모르는 주소는 404 `{error}`. 응답은 전부 JSON.
+- 지연은 기본 300~800ms 무작위예요. 채점용 문제는 `web.api.delay: 200` 처럼 고정해요.
+- 에러 처리 레슨(W11 · WB3)은 `api.failFirst: 1`(첫 요청만 500)로 결정적으로 해요.
+- 다른 주소(진짜 인터넷)는 샌드박스라 대부분 실패하고 네트워크 탭에 「연결 실패」 로 떠요. 지문에서 쓰지 마요.
 
 ### 레슨별 무엇을 쓸지 (EXPANSION 8절 표 · 각 레슨 쪽 4~5 + 문제 4~5, 총 65문제 이상)
 | 레슨 | 쪽(개념) | 문제(유형) |
@@ -159,9 +348,14 @@ C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(�
 | WB2 보스 | — | web 1개(추가·완료·삭제·저장 체인 8 안팎) |
 | W10 HTTP | 요청/응답 구조·메서드 4·상태 코드 5·헤더·JSON | quiz×2(메서드·상태 코드), fill(JSON), web(네트워크 탭 읽기: fetch 하고 상태를 `#status` 에 쓰기 → equals '200'), web(404 를 받아 `#msg` 에 쓰기) |
 | W11 fetch | 비동기 이유·async/await·res.json·로딩 표시·에러 처리·POST | web(GET 목록), web(로딩 글자 → 결과), web(POST 201 → 응답 id 표시), web(failFirst:1 → 「다시 시도」 click 뒤 성공), quiz |
-| W12 파이썬 requests | requests.get/post/json/status_code·API 키·공개 API 읽기 | quiz×2, fill(requests.get(url).json()), parsons(요청→확인→파싱 5줄). **코드 실행 문제(type:'code')를 넣으려면 Pyodide 가 필요** — `courses/web/index.html` 에 `core/runners/python.js` 를 web.js 앞에 추가하고 Fable 에게 「Pyodide 쪽 requests 미니 모듈(가짜 서버로 가는)」을 core 요청으로 올린다. 그 전엔 읽기·퀴즈·빈칸으로 |
+| W12 파이썬 requests | requests.get/post/json/status_code · API 키 · 공개 API 읽기 | quiz×2, fill(requests.get(url).json()), parsons(요청→확인→파싱 5줄). 코드 실행 문제는 아래 |
 | W13 REST·배포 | 자원+메서드 규칙·Flask 10줄 읽기·정적 사이트·GitHub Pages | quiz×3(좋은 주소·메서드 고르기·배포), fill(Flask 데코레이터), web(REST 주소 표를 표로 그리기 `count: tr`) |
 | WB3 보스 | — | web 1개(GET /menu → 표시 → click 주문 → POST /orders → `#result` contains '주문' + failFirst:1 재시도) |
+
+W12 에 코드 실행 문제(`type:'code'`)를 넣으려면
+- Pyodide 가 필요해요. `courses/web/index.html` 에 `core/runners/python.js` 를 web.js 앞에 더해요.
+- Fable 에게 「Pyodide 쪽 requests 미니 모듈(가짜 서버로 가는)」 을 core 요청으로 올려요.
+- 그 전엔 읽기 · 퀴즈 · 빈칸으로 내요.
 
 ### 검증 순서(푸시 전 필수)
 1. `node tools/validate_content.mjs` — web 규칙(`tools/validate/web.mjs`)까지 통과. draft 를 지운 레슨은 문제 3개 이상 경고.
@@ -177,24 +371,51 @@ C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(�
 - checks 한 항목에 검사 키 두 개(첫 것만 적용되고 경고), `text` 를 글자 비교로 쓰기(`equals`), `api.failRate`(무작위) 로 채점.
 - `<script>` 안에서 `</script>` 문자열, 진짜 인터넷 주소 fetch, `alert` 로 결과 보여 주기(출력창에만 뜨고 체크 불가 — DOM 에 쓰게).
 
-## C-T 터미널·Git 채우기 (v2.7.0 뼈대 · 2026-11-05, Fable)
+## C-T 터미널·Git 채우기 (v2.7.0 뼈대 · 11/5, Fable)
 
-코스 `courses/terminal-git/`(id `terminal-git`). 뼈대(엔진·화면·검증)는 다 있고 **레슨 본문·문제만** 채운다. 이 절만 읽고 작업할 수 있게 썼다. 본보기는 **T0(레슨 4쪽 + 문제 4개)** 와 **TB1P1(보스 미션)** — `courses/terminal-git/content.js` 를 먼저 읽을 것.
+지금 상태: 터미널·Git 은 v2.10.0 · v2.12.0 에 교과서가 됐어요. 연습은 진짜 Git Bash 에서 해요. 아래 가짜 셸 · 미션 채점은 옛 화면 것이에요.
+
+- 코스 `courses/terminal-git/`(id `terminal-git`).
+- 뼈대(엔진 · 화면 · 검증)는 다 있고 **레슨 본문 · 문제만** 채워요. 이 절만 읽고 작업할 수 있게 썼어요.
+- 본보기는 **T0(레슨 4쪽 + 문제 4개)** 와 **TB1P1(보스 미션)** 이에요. `courses/terminal-git/content.js` 를 먼저 읽어요.
 
 ### C-T.1 무엇이 있나 (건드리지 않는다)
-- `core/runners/shell.js` — 가상 FS·셸 20개 명령·Git 시뮬레이터. 지원 명령: `pwd ls(-l -a) cd mkdir(-p) touch cat echo rm(-r -f) cp(-r) mv head tail wc grep(-n -i -r) find(-name) tree history clear edit`, 파이프 `|`, `> >>`, `*`, `~ . ..`, `$HOME $USER`, `&&` `;`. Git: `init status add commit(-m -am --amend) log(--oneline --graph --all) diff(--staged) restore(--staged) reset(--soft --mixed --hard HEAD~n) branch(-d) switch(-c) checkout(-b) merge(--abort) rebase(--abort) stash(push pop list) remote(add -v) push(-u) pull clone tag`. **없는 명령은 쓰지 말 것**(`grep -l`, `git cherry-pick`, `git rebase -i`, `ls -R`, `sed`, `nano` 없음) — `tools/run_shell_solutions.mjs` 가 `command not found` 를 잡는다.
-- `core/ui-views-shell.js` — 화면: 터미널 창·파일 트리·Git 3칸 상태 뷰·커밋 그래프·목표 체크리스트·`edit` 편집창. `core/engine.js` 끝 `Grader.matchState` — 상태 비교 키.
-- 에러 문구는 실제 bash/git 영문 그대로 나오고 한국어 풀이는 `shared/errors.js` 의 `ERRORS_SHELL` 이 붙인다(본문에서 에러를 보여 줄 때 그 문구를 그대로 인용하면 된다).
+
+**`core/runners/shell.js`** — 가상 FS · 셸 20개 명령 · Git 시뮬레이터
+- 셸 명령: `pwd ls(-l -a) cd mkdir(-p) touch cat echo rm(-r -f) cp(-r) mv head tail wc grep(-n -i -r) find(-name) tree history clear edit`
+- 셸 문법: 파이프 `|` · `> >>` · `*` · `~ . ..` · `$HOME $USER` · `&&` `;`
+- Git: `init status add commit(-m -am --amend) log(--oneline --graph --all) diff(--staged) restore(--staged) reset(--soft --mixed --hard HEAD~n) branch(-d) switch(-c) checkout(-b) merge(--abort) rebase(--abort) stash(push pop list) remote(add -v) push(-u) pull clone tag`
+- **없는 명령은 쓰지 마요**: `grep -l` · `git cherry-pick` · `git rebase -i` · `ls -R` · `sed` · `nano` 가 없어요. `tools/run_shell_solutions.mjs` 가 `command not found` 를 잡아요.
+
+**`core/ui-views-shell.js`** — 화면
+- 터미널 창 · 파일 트리 · Git 3칸 상태 뷰 · 커밋 그래프 · 목표 체크리스트 · `edit` 편집창.
+- 상태 비교 키는 `core/engine.js` 끝 `Grader.matchState`.
+
+**에러 문구**
+- 실제 bash/git 영문 그대로 나오고, 한국어 풀이는 `shared/errors.js` 의 `ERRORS_SHELL` 이 붙여요.
+- 본문에서 에러를 보여 줄 때 그 문구를 그대로 옮기면 돼요.
 
 ### C-T.2 문제 유형 4개와 채점
-| type | 어디서 채점 | 필드 |
-| --- | --- | --- |
-| `mission` (미션, 메인 유형·문제의 절반 이상) | 명령마다 `Shell.state()` 를 `goals[].expect` 와 `Grader.matchState` 로 대조 → 체크리스트 ✓. 전부 달성해야 제출 버튼이 켜지고, 제출 시 `expect`(없으면 goals 합집합) + `forbid` 로 최종 판정 | `setup` `goals` `expect?` `forbid?` `solution` `xp`(선택, 기본 25) `grader:'state'` |
-| `quiz` + `kind:'cmd'` (명령 맞히기) | 기존 퀴즈 그대로(즉시 채점) | `quiz:{opts:[<code>명령</code>×4], ans, why}` |
-| `fill` (명령 빈칸) | 기존 빈칸 그대로 | `fill:{code:'터미널 장면', blanks:[{a:['pwd']}], why}` |
-| `parsons` (명령 순서) | 줄 순서만(들여쓰기 없음). 셸 실행 채점은 화면에서 하지 않는다 | `parsons:{solution}`(5줄 이상) = `solution`, `setup`, `tests:[{expect}]`(Node 검증 도구가 명령을 차례로 실행해 확인) |
 
-`kind:'cmd'` 가 아닌 일반 quiz(개념 퀴즈)도 된다. 다른 type(code·bug·num…)은 이 코스에서 금지(validate 가 막는다).
+**`mission` (미션)** — 메인 유형, 문제의 절반 이상
+- 채점: 명령마다 `Shell.state()` 를 `goals[].expect` 와 `Grader.matchState` 로 대조 → 체크리스트 ✓.
+- 전부 달성해야 제출 버튼이 켜져요. 제출하면 `expect`(없으면 goals 합집합) + `forbid` 로 최종 판정해요.
+- 필드: `setup` `goals` `expect?` `forbid?` `solution` `xp`(선택, 기본 25) `grader:'state'`
+
+**`quiz` + `kind:'cmd'` (명령 맞히기)**
+- 채점: 기존 퀴즈 그대로(즉시 채점).
+- 필드: `quiz:{opts:[<code>명령</code>×4], ans, why}`
+
+**`fill` (명령 빈칸)**
+- 채점: 기존 빈칸 그대로.
+- 필드: `fill:{code:'터미널 장면', blanks:[{a:['pwd']}], why}`
+
+**`parsons` (명령 순서)**
+- 채점: 줄 순서만(들여쓰기 없음). 셸 실행 채점은 화면에서 하지 않아요.
+- 필드: `parsons:{solution}`(5줄 이상) = `solution`, `setup`, `tests:[{expect}]`(Node 검증 도구가 명령을 차례로 실행해 확인)
+
+- `kind:'cmd'` 가 아닌 일반 quiz(개념 퀴즈)도 돼요.
+- 다른 type(code · bug · num …)은 이 코스에서 금지예요(validate 가 막아요).
 
 ### C-T.3 스키마 — 필드별 예시 (전부 선언형: 함수·정규식 금지)
 ```js
@@ -227,13 +448,31 @@ C1~C5 완료(v2.3.6). **v2.7.0 부터는 C10(풀 수 있나) → C-T·C-S·C-W(�
   parsons: { solution: 'git init\ngit status\ngit add main.py\ngit status\ngit commit -m "첫 커밋"', distractors: ['git push'] }, solution: 'git init\ngit status\ngit add main.py\ngit status\ngit commit -m "첫 커밋"',
   tests: [{ expect: { commits: 1, clean: true } }], hints: ['init 이 가장 먼저', 'add 한 뒤에 commit', 'init → status → add → status → commit'] }
 ```
-`expect` 키 전부(`Grader.matchState`): `cwd cwdStartsWith files dirs noFiles git commits branchCommits branches noBranches head staged stagedEmpty clean noConflictMarkers tags messages lastMessage remoteBranches pushed stash forbid historyIncludes`.
-- `files: { 경로: 내용(끝 공백 무시) | null(없어야 함) | {includes} | {excludes} | {lines:n} }`, `commits: 2 | {min:2}`(저장소의 모든 커밋 객체 수 — reset 으로 떼어 낸 커밋도 센다), `branchCommits: 2`(지금 브랜치에서 닿는 커밋 수 — 되돌리기 문제는 이것), `messages:['init','fix']`(순서대로 포함), `remoteBranches:{origin:['main']}`, `pushed:true`(현재 브랜치가 origin 과 같음), `historyIncludes:['git log']`(명령을 썼는지), `forbid:['rm -rf']`(쓰면 실패).
+
+**`expect` 키 전부** (`Grader.matchState`)
+- `cwd cwdStartsWith files dirs noFiles git commits branchCommits branches noBranches head staged stagedEmpty clean noConflictMarkers tags messages lastMessage remoteBranches pushed stash forbid historyIncludes`
+
+자주 쓰는 키의 모양
+- `files: { 경로: 내용(끝 공백 무시) | null(없어야 함) | {includes} | {excludes} | {lines:n} }`
+- `commits: 2 | {min:2}` — 저장소의 모든 커밋 객체 수. reset 으로 떼어 낸 커밋도 세요.
+- `branchCommits: 2` — 지금 브랜치에서 닿는 커밋 수. 되돌리기 문제는 이것.
+- `messages:['init','fix']` — 순서대로 포함.
+- `remoteBranches:{origin:['main']}` · `pushed:true`(현재 브랜치가 origin 과 같음)
+- `historyIncludes:['git log']`(명령을 썼는지) · `forbid:['rm -rf']`(쓰면 실패)
+
+경로 · goals · 레슨 규칙
 - 절대 경로는 `/home/me/...`. Git 미션에서 상대 경로는 저장소 루트 기준, Git 없는 미션에서는 `/home/me/` 기준.
-- **goals 는 2~5개, 작은 단계로**(초보자가 한 칸씩 ✓ 보는 것이 보상). 시작 상태에서 이미 달성되는 goal 은 피한다(전부 달성이면 검증 도구가 실패시킨다).
-- 레슨 예제: `pages[].example = { shell: 'mkdir a\ncd a\npwd', setup: {...} }`. `example.code`(파이썬) 금지. 의도적으로 에러를 보여 주는 예제는 `expectErrors: true`.
-- 레슨 공통: `pages` 3~5쪽(개념 → 명령 → 실수와 에러), `summary` 3줄, `tutorSummary`, 용어는 `terms:{}` 에 넣고 본문에서 `[[용어]]`. 레슨당 문제 4~5개(미션 2 + 나머지 2~3), 보스 레슨(TB*)은 `boss:true` 미션 1개(goals 3개 이상, `tests` 없음).
-- 채우면 그 레슨의 `draft: true` 를 지운다. id 규칙 `T<n>`·`T<n>P<k>`·`TB<n>`·`TB<n>P1`.
+- **goals 는 2~5개, 작은 단계로** — 초보자가 한 칸씩 ✓ 보는 것이 보상이에요.
+  - 시작 상태에서 이미 달성되는 goal 은 피해요(전부 달성이면 검증 도구가 실패시켜요).
+- 레슨 예제: `pages[].example = { shell: 'mkdir a\ncd a\npwd', setup: {...} }`.
+  - `example.code`(파이썬) 금지.
+  - 일부러 에러를 보여 주는 예제는 `expectErrors: true`.
+- 레슨 공통
+  - `pages` 3~5쪽(개념 → 명령 → 실수와 에러) · `summary` 3줄 · `tutorSummary`.
+  - 용어는 `terms:{}` 에 넣고 본문에서 `[[용어]]`.
+  - 레슨당 문제 4~5개(미션 2 + 나머지 2~3).
+  - 보스 레슨(TB*)은 `boss:true` 미션 1개(goals 3개 이상, `tests` 없음).
+- 채우면 그 레슨의 `draft: true` 를 지워요. id 규칙 `T<n>` · `T<n>P<k>` · `TB<n>` · `TB<n>P1`.
 
 ### C-T.4 레슨별 무엇을 쓸지 (docs/EXPANSION.md 6절 표 + content.js tutorSummary)
 | 레슨 | 제목 | 쓸 것 (tutorSummary 그대로) |
@@ -275,7 +514,19 @@ python3 tools/regress.py                 # 브라우저 회귀(terminal-git 절 
 
 ## C-S 데이터베이스(SQL) 채우기 (v2.7.0 뼈대 → 콘텐츠, Opus)
 
-뼈대(Fable, 11/5)가 세운 것: `courses/sql/`(course.json·index.html·content.js·course.css·datasets.js), `core/runners/sql.js`(sql.js 1.13.0 CDN 로더, 한국어 에러 풀이), `core/ui-views-sql.js`(쿼리 작업판·결과 표·스키마 패널·채점), `tools/validate/sql.mjs`, `tools/run_sql_solutions.py`, `tools/gen_sql_dataset.py`. **S0 가 완성본이자 본보기** — 쪽 4개(개념 → 표·행·열 → 첫 SELECT(example.sql) → 정리), 문제 4개(sql rows / quiz 결과 예측 / fill 키워드 빈칸 / sql rows WHERE). 나머지 S1~S13·SB1~SB3 는 `draft: true` 로 제목·tutorSummary·「무엇을 쓸지」(pages[0].html 의 TODO 줄)만 있다. 설계 원문은 docs/EXPANSION.md 7절, 플러그인 계약은 docs/DESIGN.md 16절.
+지금 상태: SQL 은 v2.13.0 에 교과서가 됐어요. 연습은 DB Browser for SQLite 와 `cafe.db` 로 해요. 아래 브라우저 SQL 채점은 옛 화면 것이에요.
+
+뼈대(Fable, 11/5)가 세운 것
+- `courses/sql/`(course.json · index.html · content.js · course.css · datasets.js)
+- `core/runners/sql.js`(sql.js 1.13.0 CDN 로더, 한국어 에러 풀이)
+- `core/ui-views-sql.js`(쿼리 작업판 · 결과 표 · 스키마 패널 · 채점)
+- `tools/validate/sql.mjs` · `tools/run_sql_solutions.py` · `tools/gen_sql_dataset.py`
+
+**S0 가 완성본이자 본보기**
+- 쪽 4개: 개념 → 표 · 행 · 열 → 첫 SELECT(example.sql) → 정리
+- 문제 4개: sql rows / quiz 결과 예측 / fill 키워드 빈칸 / sql rows WHERE
+- 나머지 S1~S13 · SB1~SB3 는 `draft: true` 로 제목 · tutorSummary · 「무엇을 쓸지」(pages[0].html 의 TODO 줄)만 있어요.
+- 설계 원문은 docs/EXPANSION.md 7절, 플러그인 계약은 docs/DESIGN.md 16절.
 
 ### 스키마 (content.js 머리 주석과 같음 — 필드별 예시 한 벌)
 
@@ -319,12 +570,35 @@ python3 tools/regress.py                 # 브라우저 회귀(terminal-git 절 
 
 ### 채점 방식 (core/ui-views-sql.js `SqlUI.grade`)
 
-- `kind:'rows'`: 깨끗한 DB 두 개에 내 쿼리와 `solution`(또는 `expect.query`)을 각각 실행해 **결과 집합**을 비교. 기본은 열 순서·행 순서 무시(열 이름이 같으면 이름으로 맞추고, 다르면 행 안의 값으로 비교), 실수는 소수 2자리 반올림. `ordered:true` 면 행 순서 검사(ORDER BY 문제만), `columns:true` 면 열 이름(대소문자 무시) 검사(AS 문제만). 열 개수·행 수가 다르면 「n행이 더/덜 나왔어요 — WHERE 를 보세요」 자동 힌트, 값이 다르면 「기대 / 내 결과」 표를 나란히 + 다른 셀 빨강.
-- `kind:'state'`: 내 쿼리(여러 문장 가능, `;` 로 구분)를 실행한 뒤 `expect.table` 의 `SELECT *` 전체 행을 정답 실행 뒤와 비교(행 순서 무시, 열 이름 검사). INSERT·UPDATE·DELETE·CREATE TABLE·트랜잭션 문제에 쓴다. 문제마다 **항상 새 DB** 로 채점하니 「앞 문제에서 넣은 행」은 없다 — 지문도 그렇게 쓴다.
-- 외래 키 검사는 **켜져 있다**(`PRAGMA foreign_keys = ON`, 브라우저·CI 동일). order_items 가 가리키는 menu 행을 DELETE 하면 `FOREIGN KEY constraint failed` 가 난다 — S8 의 DELETE 문제는 참조되지 않는 행(예: 새로 INSERT 한 행, shifts)으로 내거나 그 에러 자체를 가르친다.
-- 실행 화면의 DB 는 실행 사이에 유지된다(INSERT 뒤 SELECT 로 확인 가능). WHERE 없는 DELETE/UPDATE 도 실행되며 「모든 행이 바뀌었어요!」 경고 + 데이터 초기화 버튼이 뜬다(S8 의 포인트). 채점은 늘 새 DB.
-- quiz·fill·parsons 는 기존 core 채점(SQL 을 실행하지 않음). **bug 유형과 code(파이썬) 유형은 이 코스에서 금지**(validate 가 막음) — 틀린 곳 고치기는 `sql` + starter, S13(파이썬 sqlite3)은 quiz·fill 로 내고 실행형은 HANDOFF 「Fable 작업」으로 적는다.
-- `xp` 는 선택(없으면 CONFIG.XP.sql = 25). 기준: rows 20~30, state 30, JOIN·서브쿼리 35, 보스 40~50.
+**`kind:'rows'`**
+- 깨끗한 DB 두 개에 내 쿼리와 `solution`(또는 `expect.query`)을 각각 실행해 **결과 집합**을 비교해요.
+- 기본은 열 순서 · 행 순서 무시. 열 이름이 같으면 이름으로 맞추고, 다르면 행 안의 값으로 비교해요.
+- 실수는 소수 2자리로 반올림해요.
+- `ordered:true` 면 행 순서 검사(ORDER BY 문제만), `columns:true` 면 열 이름(대소문자 무시) 검사(AS 문제만).
+- 자동 힌트
+  - 열 개수 · 행 수가 다르면 「n행이 더/덜 나왔어요 — WHERE 를 보세요」.
+  - 값이 다르면 「기대 / 내 결과」 표를 나란히 + 다른 셀 빨강.
+
+**`kind:'state'`**
+- 내 쿼리(여러 문장 가능, `;` 로 구분)를 실행한 뒤 `expect.table` 의 `SELECT *` 전체 행을 정답 실행 뒤와 비교해요(행 순서 무시, 열 이름 검사).
+- INSERT · UPDATE · DELETE · CREATE TABLE · 트랜잭션 문제에 써요.
+- 문제마다 **항상 새 DB** 로 채점하니 「앞 문제에서 넣은 행」 은 없어요. 지문도 그렇게 써요.
+
+**외래 키 검사는 켜져 있어요** (`PRAGMA foreign_keys = ON`, 브라우저 · CI 동일)
+- order_items 가 가리키는 menu 행을 DELETE 하면 `FOREIGN KEY constraint failed` 가 나요.
+- 그래서 S8 의 DELETE 문제는 참조되지 않는 행(예: 새로 INSERT 한 행, shifts)으로 내거나, 그 에러 자체를 가르쳐요.
+
+**실행 화면의 DB**
+- 실행 사이에 유지돼요(INSERT 뒤 SELECT 로 확인 가능).
+- WHERE 없는 DELETE/UPDATE 도 실행되고, 「모든 행이 바뀌었어요!」 경고 + 데이터 초기화 버튼이 떠요(S8 의 포인트).
+- 채점은 늘 새 DB.
+
+**다른 유형**
+- quiz · fill · parsons 는 기존 core 채점이에요(SQL 을 실행하지 않음).
+- **bug 유형과 code(파이썬) 유형은 이 코스에서 금지**(validate 가 막음).
+  - 틀린 곳 고치기는 `sql` + starter 로.
+  - S13(파이썬 sqlite3)은 quiz · fill 로 내고, 실행형은 HANDOFF 「Fable 작업」 으로 적어요.
+- `xp` 는 선택(없으면 CONFIG.XP.sql = 25). 기준: rows 20~30, state 30, JOIN · 서브쿼리 35, 보스 40~50.
 
 ### 레슨별 「무엇을 쓸지」
 
@@ -347,7 +621,11 @@ python3 tools/regress.py                 # 브라우저 회귀(terminal-git 절 
 | S13 파이썬 sqlite3 | connect/execute/fetch → 결과 리스트 → 인젝션 → ? 바인딩 → commit | quiz 2 · fill 2 | 실행형은 Fable 요청(코스 페이지에 Pyodide 병행) |
 | SB3 보스 | 안내 1쪽 | sql state 2 · rows 2 · fill 1 | `ledger` 데이터셋을 datasets.js 에 추가(아래) |
 
-데이터셋: `cafe` 는 지금 뼈대 크기(menu 10·customers 8·orders 30·order_items 60·staff 4·shifts 12). EXPANSION 크기로 키우려면 `python3 tools/gen_sql_dataset.py --full`(시드 고정, 결정적) — 키운 뒤 `run_sql_solutions.py` 를 다시 돌려 0행 문제가 없는지 본다. `school`·`ledger` 는 datasets.js 에 같은 꼴(`키: \`SQL\``)로 추가하면 validate 가 자동 인식한다(SQL 안에 백틱·`${` 금지).
+**데이터셋**
+- `cafe` 는 지금 뼈대 크기예요: menu 10 · customers 8 · orders 30 · order_items 60 · staff 4 · shifts 12.
+- EXPANSION 크기로 키우려면 `python3 tools/gen_sql_dataset.py --full`(시드 고정, 결정적).
+  - 키운 뒤 `run_sql_solutions.py` 를 다시 돌려 0행 문제가 없는지 봐요.
+- `school` · `ledger` 는 datasets.js 에 같은 꼴(`키: \`SQL\``)로 더하면 validate 가 저절로 알아봐요(SQL 안에 백틱 · `${` 금지).
 
 ### 검증 명령 순서
 

@@ -70,7 +70,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
   if (VIM || SHELL || ['github', 'linux', 'os', 'api', 'asm'].includes(BOOK.check)) return; // 단축키·명령·Markdown 모음은 실행 결과가 없음(운영체제 도구 상자도 터미널 명령)
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
   ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
-// v2.15.1 사용자 「3, 4」(알고 교과서 자체 QA 에서 손으로 찾은 두 종류를 CI 로):
+// v2.15.1 사용자 선택(알고 교과서 자체 QA 에서 손으로 찾은 두 종류를 CI 로):
 // ⑤ 레슨 본문의 「실행하면 <code>값</code>」 이 그 쪽 예제를 실제로 돌린 출력에 있는지 — 파이썬 예제는 python3, SQL 예제는 tools/sql_book_run.py(cafe)
 //    본문 속 <code> 가 예제 코드에 그대로 있으면(「실행하면 heappop(h)[2] 로 …」 처럼 코드를 가리키는 말) 출력 주장이 아니라서 건너뜀. 화살표 →/-> 와 공백은 같게 보지 않음(그게 이번 버그)
 // ⑥ 필요한 문법의 코드 속 낱말(3글자 이상 이름) 중 하나라도 링크된 쪽(제목·본문·예제)에 나오는지 — 하나도 없으면 다른 쪽을 가리키는 것
@@ -126,7 +126,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
       spawnSync('vim', ['-N', '-u', path.join(home, 'vimrc'), '-i', 'NONE', '-n', '-es', '-S', path.join(home, 's.vim')], { cwd: home, env: { PATH: process.env.PATH, HOME: home, LANG: 'C.UTF-8' }, timeout: RUN_TIMEOUT }); ran++;
       const o = fs.existsSync(path.join(home, 'o.txt')) ? fs.readFileSync(path.join(home, 'o.txt'), 'utf8') : ''; fs.rmSync(path.join(home, 'o.txt'), { force: true });
       if (/E(492|518|474|488):/.test(o)) bad(`${w}: Vim 명령 「${cmd}」 이 vim 에서 에러 — ${(o.match(/ERR\[(.*)\]/) || [])[1]}`); } }
-  // ⑪ 거북이(turtle) 코드는 마지막에 turtle.done()(또는 mainloop·exitonclick) — VS Code 에서는 없으면 창이 깜빡 뜨고 바로 닫힘(예전 화면은 브라우저 캔버스라 필요 없었음). v2.16.2 사용자 「이 turtle 있으면 안 되는 거 아니야?」
+  // ⑪ 거북이(turtle) 코드는 마지막에 turtle.done()(또는 mainloop·exitonclick) — VS Code 에서는 없으면 창이 깜빡 뜨고 바로 닫힘(예전 화면은 브라우저 캔버스라 필요 없었음). v2.16.2 사용자가 turtle.done() 이 필요한지 물음
   if (PYEX) { const tdone = (code) => !/^\s*(import turtle|from turtle)/m.test(code) || /turtle\.(done|mainloop|exitonclick)\(\)|^\s*(done|mainloop|exitonclick)\(\)/m.test(code);
     for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const pg = bookPage(l.id, i); const codes = [...pg.html.matchAll(/<pre[^>]*>([\s\S]*?)<\/pre>/g)].map(m => ent(m[1])); if (pg.example && pg.example.code) codes.push(pg.example.code); codes.forEach(c => { if (!tdone(c)) bad(`${l.id}/${i} 「${pg.title}」: 거북이 코드에 turtle.done() 이 없어요 — VS Code 에서는 창이 바로 닫혀요`); }); });
     for (const [lid, tasks] of Object.entries(BOOK.tasks)) tasks.forEach((t, ti) => { const a = ctx.BookDerive.task(t, t.pid ? P[t.pid] : null, BOOK).answer; if (!tdone(a)) bad(`${lid}#${ti + 1} ${t.title}: 거북이 예시 답에 turtle.done() 이 없어요`); }); }
@@ -135,7 +135,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
   for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const t = ent(bookPage(l.id, i).html); const m = t.match(new RegExp('.{0,30}(?:' + OLDW.source + ').{0,30}')); if (m) bad(`${l.id}/${i}: 예전 문제집 화면 말이 남았어요 「${m[0]}」 — BOOK.pages 의 rep 로 교과서 말로 바꾸세요`); });
   for (const [lid, tasks] of Object.entries(BOOK.tasks)) tasks.forEach((t, ti) => (t.needs || []).forEach(([syn, ref]) => { const [nl, np] = String(ref).split('/'); const pg = bookPage(nl, +np); if (!pg) return; const hay = ent(pg.title + '\n' + pg.html) + '\n' + Object.values(pg.example || {}).filter(x => typeof x === 'string').join('\n');
     const words = needWords(String(syn), new Set([...String(ctx.BookDerive.task(t, t.pid ? P[t.pid] : null, BOOK).answer + '\n' + (t.text || '') + '\n' + ((t.pid && P[t.pid] && P[t.pid].prompt) || '')).matchAll(/(?:def\s+|<code>)([A-Za-z_]\w*)\(/g)].map(m => m[1]))); if (words.length && !words.some(w => hay.includes(w))) bad(`${lid}#${ti + 1} ${t.title}: 필요한 문법 「${syn}」 → ${ref} 「${pg.title}」 쪽에 그 코드 낱말(${words.join(', ')})이 하나도 없어요 — 설명이 있는 쪽으로 링크를 바꾸세요`); })); }
-// 허브 카드(v2.10.1 사용자 「메인화면은 수정 안 했는데」): config.js 의 이 코스가 book:true 이고 lessons 가 열린 레슨 수와 같은지 — 허브는 book.js 를 안 읽어서 손으로 맞춰야 함
+// 허브 카드(v2.10.1 사용자 지적: 허브 화면은 안 고쳐졌음): config.js 의 이 코스가 book:true 이고 lessons 가 열린 레슨 수와 같은지 — 허브는 book.js 를 안 읽어서 손으로 맞춰야 함
 { const cx = { window: {} }; vm.createContext(cx); vm.runInContext(fs.readFileSync(R + '/core/config.js', 'utf8').replace(/^(const|let) /gm, 'var '), cx); const cc = (cx.CONFIG.COURSES || []).find(c => c.id === cid);
   const open = LESSONS.filter(l => (!l.mock || ((BOOK.tasks || {})[l.id] || []).length) /* 모의고사는 교과서가 문제를 채웠을 때만(화면 lessonsOf 와 같게, v2.15.0) */ && (!l.draft || (BOOK.lessonPages || {})[l.id] || ((BOOK.tasks || {})[l.id] || []).length)).length;
   if (!cc || !cc.book || !cc.ready) bad(`config.js COURSES 의 ${cid} 에 ready:true, book:true 가 있어야 해요(허브 카드가 「읽은 레슨」으로 보이게)`); else if (cc.lessons !== open) bad(`config.js ${cid}.lessons = ${cc.lessons} 인데 열린 레슨은 ${open}개 — 허브 카드 숫자를 맞추세요`);
@@ -143,7 +143,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
   if (cc) { const mockN = LESSONS.filter(l => l.mock).reduce((n, l) => n + ((BOOK.tasks || {})[l.id] || []).length, 0);
     for (const m of JSON.stringify(cc).matchAll(/모의고사\s*(\d+)\s*문제/g)) if (+m[1] !== mockN) bad(`config.js ${cid} 카드 글 「${m[0]}」 인데 모의고사 문제는 ${mockN}개 — 카드 글을 맞추세요`); }
   if (cc && /가상|시뮬레이터|브라우저에서 바로/.test(cc.desc || '')) bad(`config.js ${cid}.desc 가 교과서와 안 맞아요: ${cc.desc}`); }
-// ⑫ 챕터 만들어 보기 = 챕터 복습(v2.42.0 사용자 「해당 챕터의 만들어보기만 해도 복습이 될 수 있게 … 5개 이상 10개 이하」):
+// ⑫ 챕터 만들어 보기 = 챕터 복습(v2.42.0 사용자 요청: 그 챕터의 만들어 보기만 풀어도 복습이 되게, 문제 5~10개):
 //    만들어 보기 레슨마다 문제 5~10개, 한 챕터의 만들어 보기 문제들이 「필요한 코드」 로 그 챕터의 열린 레슨을 모두 한 번 이상 가리킴
 { const isOpen = (l) => !l.draft || (BOOK.lessonPages || {})[l.id] || ((BOOK.tasks || {})[l.id] || []).length;
   const bossL = LESSONS.filter(l => l.boss && isOpen(l));

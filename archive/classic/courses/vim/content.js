@@ -1,4 +1,4 @@
-// courses/vim/content.js — 공용 「Vim 에디터 교과서」 (v2.11.0, 사용자 요청 2026-11-06 「공용에 windows 버전 vim 에디터 설치 및 사용법 그리고 단축키 교과서 만들어, 파이썬과 연결하고 자동 띄어쓰기 및 자동완성 기능까지」)
+// courses/vim/content.js — 공용 「Vim 에디터 교과서」 (v2.11.0, 사용자 요청 11/6: 공용 Windows Vim 설치 · 사용법 · 단축키, 파이썬 연결 · 자동 들여쓰기 · 자동완성까지)
 // 처음부터 교과서 모드(book.js + core/ui-views-book.js). 문제·채점 없음(PROBLEMS 빈 배열). 연습은 사용자 PC 의 gVim(Windows).
 // 레슨 쪽 example.code = 따라 칠 키(설명 주석 포함). 「만들어 보기」·준비 명령·단축키 도감은 book.js. 검사: node tools/check_book.mjs (진짜 vim 으로 키를 넣어 결과 파일 비교)
 const COURSE = { id: 'vim', name: 'Vim 에디터', runner: 'none', bench: false,

@@ -40,7 +40,7 @@ Views.settings = (root) => {
 };
 
 // ---------- 용어집 / 에러 사전 ----------
-// 돌아가기(사용자 「갈 수 있게만 하지 말고 다시 올 수 있게」): 들어온 화면이 params.back 을 주면 맨 위에 「← 그 화면으로」, 용어집에서 레슨으로 갈 때도 돌아오는 버튼을 넘김
+// 돌아가기(사용자 요청: 간 화면에서 돌아올 길도 있게): 들어온 화면이 params.back 을 주면 맨 위에 「← 그 화면으로」, 용어집에서 레슨으로 갈 때도 돌아오는 버튼을 넘김
 const backBtn = (back) => back ? `<button class="btn bk-back" id="pgBack">← ${esc(back.label)}</button>` : '';
 const bindBackBtn = (root, back) => { const b = $('#pgBack', root); if (b && back) b.onclick = () => UI.go(back.view, back.params || {}); };
 Views.glossary = (root, { back = null } = {}) => { const learned = Store.data.lessons.terms || {}; const where = {}; LESSONS.forEach(l => (l.pages || []).forEach((pg, i) => (String(pg.html || '').match(/\[\[([^\]]+)\]\]/g) || []).forEach(m => { const t = m.slice(2, -2); (where[t] = where[t] || []); if (!where[t].some(x => x[0] === l)) where[t].push([l, i]); })));

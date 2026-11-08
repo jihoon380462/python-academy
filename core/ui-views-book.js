@@ -1,7 +1,7 @@
 // core/ui-views-book.js — 「교과서」 모드 (v2.9.0, 사용자 결정 2026-11-06)
 // 코스 폴더에 book.js 가 있고 전역 BOOK 이 정의돼 있으면 켜진다(파이썬 v2.9.0 · 터미널·Git v2.10.0). 코스마다 다른 글귀는 BOOK.meta, 빈 레슨 쪽은 BOOK.lessonPages. book.js 가 없는 코스는 이 파일을 불러오지 않는다.
-//   사용자 말: 「학습은 repeat 만 있고 완강해도 혼자 create 는 못 할 것 같다 · 메인은 파이썬 설치와 VS Code 실행법 · 챕터는 문법 설명과 예제(문장으로 된 문제)만 ·
-//              문제와 그에 필요한 문법을 나열 · 어차피 나만 쓸 건데 억지로 붙잡을 필요 없다」
+//   사용자 결정: 반복 연습만으로는 혼자 만들 힘이 안 생김 → 메인은 파이썬 설치 · VS Code 실행법, 챕터는 문법 설명 · 예제(문장으로 된 문제) · 문제와 필요한 문법 목록만.
+//              혼자 쓰는 사이트라 붙잡아 두는 장치는 뺌.
 //   → 문제·채점·타자 연습·복습·XP·잠금은 v2.19.0(N13)에 archive/classic/ 로 옮겼다. 실행은 사용자의 VS Code 에서.
 // BOOK = { setup: { title, pages:[{title, html}] }, tasks: { 레슨id: [{ title, text, needs:[[이름, '레슨id/쪽'], ...], io?:[{input, output}], pid?, answer? }] } }
 //   pid 가 있으면 그 문제의 첫 테스트를 입력 예·출력 예로, solution 을 예시 답으로 쓴다(정답 검증은 run_solutions 가 이미 함).
@@ -31,17 +31,17 @@
   const lName = (l) => l.boss ? `「${lTitle(l)}」` : `레슨 ${l.n ?? ''} 「${l.title}」`;
   const chName = (ch) => ((CHAPTERS || []).find(c => c.ch === ch) || {}).name || '';
   const lessonsOf = (ch) => LESSONS.filter(l => l.ch === ch && (!l.mock || ((BOOK.tasks || {})[l.id] || []).length)).sort((a, b) => !!a.boss - !!b.boss); // v2.22.5 N15 B2·C1: 챕터 끝 「만들어 보기」(boss) 는 늘 그 챕터 맨 뒤 // 모의고사는 교과서가 문제를 채웠을 때만(v2.15.0 알고리즘: 코딩테스트 15문제)
-  // 「필요한 문법」 = [실제 문법(코드), '레슨/쪽', 설명] — v2.9.2 사용자 「분명히 필요 문법을 넣으라고 했다」(별명 대신 실제 코드)
+  // 「필요한 문법」 = [실제 문법(코드), '레슨/쪽', 설명] — v2.9.2 사용자 지적(별명 대신 실제 코드)
   const pageLink = (ref) => { const [lid, pg] = String(ref).split('/'); return { lid, pg: +pg || 0 }; };
   const tasksOf = (l) => ((BOOK.tasks || {})[l.id] || []).map(t => BookDerive.task(t, t.pid ? Content.problem(t.pid) : null, BOOK)); // v2.15.0: 모양 바꾸기는 core/book-derive.js(검사 tools/check_book.mjs 와 같은 함수)
   // 본문 속 「▶ 실행해 보기」 같은 이 앱 버튼 안내는 VS Code 기준으로
   const bookText = (html) => String(html || '')
     .replace(/<b>▶?\s*실행해 보기<\/b>/g, '<b>VS Code 에서 실행</b>').replace(/▶\s*실행해 보세요/g, 'VS Code 에서 실행해 보세요').replace(/아래 예제를\s*(?:<b>)?▶?\s*실행(?:<\/b>)?해 보세요/g, '아래 예제를 VS Code 에 붙여 실행해 보세요')
     .replace(/<b>한 줄씩 보기<\/b>/g, '한 줄씩 따라가 보기')
-    .replace(/<details class="lp-more"><summary>([^<]*)<\/summary>/g, '<div class="bk-more"><div class="bk-more-h">$1</div>').replace(/<\/details>/g, '</div>'); // v2.9.4 사용자 「문법을 숨길 필요 없잖아, 실전은 오픈북」: 접힌 더 알아보기를 펼쳐서
-  // prereq(v2.12.1, 사용자 「나중에 할 거니까 레슨 6번은 설정을 해야 한다고 강조해」): BOOK.meta.prereq = { lessons:[…], chapters:[…], ref:'T6/2', title, html }
+    .replace(/<details class="lp-more"><summary>([^<]*)<\/summary>/g, '<div class="bk-more"><div class="bk-more-h">$1</div>').replace(/<\/details>/g, '</div>'); // v2.9.4 사용자 요청(실전은 오픈북이라 문법을 숨기지 않음): 접힌 더 알아보기를 펼쳐서
+  // prereq(v2.12.1, 사용자 요청: 레슨 6 의 처음 설정을 강조): BOOK.meta.prereq = { lessons:[…], chapters:[…], ref:'T6/2', title, html }
   //   → 그 레슨의 1쪽·만들어 보기 맨 위와 그 챕터 목차 위에 경고 상자 + 「설정 쪽 보기」 단추(돌아오기 있음)
-  //   v2.12.2 사용자 「필수 사항은 강조하고」 — 여러 개(배열)도 됨: 코스마다 「먼저 할 것」 이 여럿(설치 · 설정 파일 · 다른 교과서의 설치)
+  //   v2.12.2 사용자 요청(필수 사항 강조) — 여러 개(배열)도 됨: 코스마다 「먼저 할 것」 이 여럿(설치 · 설정 파일 · 다른 교과서의 설치)
   // v2.13.0 SQL 교과서: 결과가 「열 | 열」 표면 진짜 표로(DB Browser 결과 칸처럼). meta.outTable 일 때만
   const resBox = (out, raw) => { const ls = String(out).split('\n'); if (!M.outTable || raw || ls.length < 2) return `<pre class="code">${esc(out)}</pre>`; const cell = (r, tag) => `<tr>${r.split(' | ').map(x => `<${tag}${x === 'NULL' ? ' class="null"' : ''}>${esc(x)}</${tag}>`).join('')}</tr>`; return `<div class="bk-res-w"><table class="bk-res"><thead>${cell(ls[0], 'th')}</thead><tbody>${ls.slice(1).map(r => cell(r, 'td')).join('')}</tbody></table><div class="muted small">${ls.length - 1}행</div></div>`; };
   const PRES = [].concat(M.prereq || []);
@@ -81,11 +81,11 @@
     $('#bkDex').onclick = () => UI.go('dogam');
     bindPre(root, { label: '☰ 목차로 돌아가기', view: 'home', params: {} });
     $$('[data-sp]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: SETUP_ID, page: +b.dataset.sp }));
-    $$('[data-l]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.l, page: 0 })); /* v2.9.1 사용자 「왜 1번부터가 아니라 이상한 곳부터」: 예전 문제집 화면이 남긴 쪽 번호(요약 쪽 = 마지막+1)로 열리던 것 — 목차에서는 늘 1쪽부터 */
+    $$('[data-l]', root).forEach(b => b.onclick = () => UI.go('lesson', { lessonId: b.dataset.l, page: 0 })); /* v2.9.1 사용자 제보(목차에서 1쪽이 아닌 곳부터 열림): 예전 문제집 화면이 남긴 쪽 번호(요약 쪽 = 마지막+1)로 열리던 것 — 목차에서는 늘 1쪽부터 */
   };
 
   // ---------- 레슨: 설명 쪽들 + 마지막 「만들어 보기」 ----------
-  // 돌아가기(v2.9.4 사용자 「갈 수 있게만 하지 말고 다시 올 수 있게 해」): 다른 화면으로 보내는 버튼은 params.back = { label, view, params } 을 같이 넘기고, 받는 화면은 맨 위에 「← label」 을 그린다
+  // 돌아가기(v2.9.4 사용자 요청: 간 화면에서 돌아올 길도 있게): 다른 화면으로 보내는 버튼은 params.back = { label, view, params } 을 같이 넘기고, 받는 화면은 맨 위에 「← label」 을 그린다
   // v2.15.0 알고리즘 교과서(BOOK.meta.viz): 예제 코드 + 입력 예 + 「👀 그림으로 보기」(정렬·탐색 애니메이션) · 「👣 한 줄씩 보기」(줄마다 변수 표)
   //   예전 문제집 화면의 시각화를 그대로 씀(core/visualize.js Viz.runAndShow · core/ui-views-main.js TracePanel). 누를 때만 파이썬 엔진을 받아 이 예제 코드를 브라우저에서 돌림
   //   코드 칸은 줄마다 나눠서 지금 실행 중인 줄을 칠함(예전 화면의 에디터 대신 — setTraceLine 만 있으면 됨)
@@ -107,7 +107,7 @@
   };
   const backBar = (back) => back ? `<button class="btn bk-back" id="bkBack">← ${esc(back.label)}</button>` : '';
   const bindBack = (back) => { const b = $('#bkBack'); if (b && back) b.onclick = () => UI.go(back.view, back.params || {}); };
-  // v2.15.3 사용자 「방향키 ← 누르면 이전, → 누르면 다음 · 만들어 보기에서 목차로 가는 건 키를 넣지 말고」: 레슨·시작하기 쪽에서 ← → 로 쪽 넘기기
+  // v2.15.3 사용자 요청(← 이전 · → 다음, 만들어 보기에서 목차로 가는 키는 없음): 레슨·시작하기 쪽에서 ← → 로 쪽 넘기기
   //   입력칸·그림 플레이어의 슬라이더(input)·창(modal)·Ctrl/Alt/⌘ 조합일 때는 그대로 둠. 리스너는 하나만(화면이 바뀌면 bkKeys.root 가 화면에서 빠져 아무것도 안 함)
   let bkKeys = null;
   document.addEventListener('keydown', (e) => { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; if (!bkKeys || UI.view !== 'lesson' || !bkKeys.root.isConnected || !bkKeys.root.querySelector('.bk-lesson')) return;
@@ -161,7 +161,7 @@
     };
     render();
   };
-  // ---------- 파이썬 문법 도감 (v2.9.4 사용자 「문법을 숨길 필요 없잖아, 어차피 실전은 전부 오픈북이니까. 파이썬 문법 도감 만들어」) ----------
+  // ---------- 파이썬 문법 도감 (v2.9.4 사용자 요청: 실전은 오픈북이라 문법을 숨기지 않고 도감으로) ----------
   // 항목 = 코드가 있는 레슨 쪽 하나. 이름 = 쪽 제목(BOOK.titles 적용), 설명 = 본문 첫 문단, 예제 = 본문 첫 코드 상자(없으면 예제 코드). 레슨을 고치면 도감도 같이 바뀜.
   const deHtml = (h) => String(h || '').replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '').replace(/\[\[레슨:([A-Za-z0-9_]+)\]\]/g, (m, id) => { const l = Content.lessonMap && Content.lessonMap[id]; return l ? (l.n != null ? `레슨 ${l.n}` : `「${l.title}」`) : '레슨'; }).replace(/\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g, '$1').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#92;/g, '\\').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&');
   let _dex = null;

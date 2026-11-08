@@ -1,4 +1,4 @@
-// courses/asm/content.js — 「어셈블리어 교과서」 (v2.31.0, 사용자 공용 코스 T10 「x86-64 · NASM · 우분투」 11/6 · 다음 코스 「1」 11/7). 설계: specs/asm-course.md
+// courses/asm/content.js — 「어셈블리어 교과서」 (v2.31.0, 사용자 결정: 공용 코스 T10 은 x86-64 · NASM · 우분투 11/6 · 다음 코스로 선택 11/7). 설계: specs/asm-course.md
 // 처음부터 교과서 모드(book.js + core/ui-views-book.js). 문제·채점 없음(PROBLEMS 빈 배열). 연습은 리눅스 교과서에서 만든 우분투 VM(x86-64) 안의 nasm · ld · gcc · gdb.
 // 레슨 쪽 example.code = NASM 소스(check_book 이 tools/asm_book_run.py 로 nasm · ld 또는 gcc -no-pie 로 빌드해 실제 실행 — CI 우분투 x86-64) · example.shell = 터미널 명령(안 돌림).
 //   여러 파일이면 「; ==== 파일: add.asm ====」 · 「// ==== 파일: main.c ====」 줄로 나눔. example.echoExit: true 면 출력 뒤에 echo $? 의 숫자.

@@ -1,4 +1,4 @@
-// courses/math/book.js — 「수학 교과서」 (v2.18.0, N12 — 사용자 11/7: 「VS Code 파이썬 과제」 · 「옛 문제는 화면에서만 숨기기」 · 「다른 교과서처럼 목록」)
+// courses/math/book.js — 「수학 교과서」 (v2.18.0, N12 — 사용자 결정 11/7: VS Code 파이썬 과제 · 옛 문제는 화면에서만 숨기기 · 다른 교과서처럼 목록)
 // 레슨 쪽은 content.js 그대로(1쪽 만지는 그림 · 2쪽 식과 코드 · 3쪽 한 단계씩) — 교과서 화면(core/ui-views-book.js)이 그림(core/figure.js)·식(KaTeX)도 그림(meta.fig).
 // 만들어 보기 = 레슨마다 옛 문제 중 「숫자 답」 1 + 「코드」 1 을 VS Code 과제로(pid). 숫자 답 문제는 출력 예를 python3 로 미리 계산해 io 에 적음(검사: node tools/check_book.mjs math).
 // 옛 탐구 퀴즈·그림 맞추기·채점·XP 는 주소 끝 ?classic=1 에서만(예전 지식 지도 화면).

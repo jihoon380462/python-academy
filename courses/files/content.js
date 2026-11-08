@@ -1,4 +1,4 @@
-// courses/files/content.js — 「데이터 파일 다루기 교과서」 (v2.41.0, 사용자 「1」 → 설계 순서대로 만들기). 설계: specs/courses-python-next.md
+// courses/files/content.js — 「데이터 파일 다루기 교과서」 (v2.41.0, 사용자 선택: 설계 순서대로 만들기). 설계: specs/courses-python-next.md
 // 교과서 모드. 연습은 내 PC 의 VS Code + 파이썬 + openpyxl. example.code = 파이썬(check_book 이 python3 로 실제 실행).
 const COURSE = { id: 'files', name: '데이터 파일 다루기', runner: 'python', bench: false,
   tutorPersona: '너는 파이썬을 아는 성인에게 JSON · 엑셀 같은 데이터 파일을 파이썬으로 다루는 법을 작은 코드로 직접 해 보며 가르치는 선생님이다.' };

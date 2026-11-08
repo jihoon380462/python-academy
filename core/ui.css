@@ -281,7 +281,7 @@ img.aimg.ch-img{width:32px;height:32px;margin-right:6px}span.ch-img{display:none
 .rv-sum{display:flex;flex-direction:column;gap:6px;margin:10px 0}.rv-row{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.rv-row .ok{color:var(--success)}.rv-row .warn{color:var(--muted);font-weight:600} /* QA #149: 「✓ N번 틀린 뒤 · 힌트」는 --gold(라이트 2.27:1 → v2.6.0 3.8:1) 대신 --muted(라이트 5.4:1·다크 5.5:1) — --gold 는 힌트·별에만 쓰는 토큰(v2.6.0 D1) */.rv-weak{margin-top:8px}.rv-weak .chip{margin:2px}
 /* QA #117(사용자 제보 11/4): 레슨 설명 안의 코드·출력 상자(<pre>)가 글과 구분이 안 되던 것 — 지문 상자와 같은 모양(세 코스 레슨 12곳) */
 .lp-html pre{background:var(--ed-bg);color:var(--ed-fg);padding:8px 12px;border-radius:8px;margin:6px 0;white-space:pre;overflow-wrap:normal;word-break:normal;overflow-x:auto;-webkit-overflow-scrolling:touch;font-family:var(--mono);font-size:var(--code-size);line-height:1.5}.lp-html pre code{white-space:inherit;overflow-wrap:normal}
-/* 사용자 제보 11/5(폰 「코드 가독성」): 레슨 코드 상자·편집기는 줄을 접지 않고 상자 안에서 옆으로 넘겨 봐요 — 낱말 중간에서 끊기고 줄 번호와 어긋나던 것 */
+/* 사용자 제보 11/5(폰에서 코드가 읽기 어려움): 레슨 코드 상자·편집기는 줄을 접지 않고 상자 안에서 옆으로 넘겨 봐요 — 낱말 중간에서 끊기고 줄 번호와 어긋나던 것 */
 .ted-ta{white-space:pre;overflow-wrap:normal;word-break:normal;overflow-x:auto}
 .lp-more{margin:10px 0 2px;border:1px dashed var(--border);border-radius:8px;padding:6px 12px}.lp-more summary{cursor:pointer;color:var(--muted);font-weight:700}.lp-more[open] summary{margin-bottom:4px}
 /* QA #122(사용자 제보 11/4): 줄 앞 공백을 한 칸마다 점으로 — 4칸인지 3·5칸인지 바로 보이게. 4의 배수가 아니면 빨간 바탕 */
@@ -359,7 +359,7 @@ html.game-off .bosshp{display:none}html.game-off .lc.boss .lc-n{background:var(-
 
 /* v2.7.0 뼈대 코스: 준비 중 레슨 */
 .lc.draft,.tr-l.draft{opacity:.55}.lc-st.draft{color:var(--muted)}.lc.draft .lc-n{border-style:dashed}
-/* v2.8.4 넓은 화면 대응 (사용자 요청 11/6 「2K 화면까지 지원」): 1920px↑ 글자 ×1.125·내용 폭 1600, 2400px↑(2K·QHD) ×1.25·1840, 3400px↑(4K) ×1.5·2200. 1919px 이하는 그대로 */
+/* v2.8.4 넓은 화면 대응 (사용자 요청 11/6: 2K 화면까지 지원): 1920px↑ 글자 ×1.125·내용 폭 1600, 2400px↑(2K·QHD) ×1.25·1840, 3400px↑(4K) ×1.5·2200. 1919px 이하는 그대로 */
 /* 상단바 아이콘(svg width=20)·높이도 같은 비율 */
 .ico{width:calc(20px * var(--wide));height:calc(20px * var(--wide))}#topbar{min-height:calc(52px * var(--wide))}
 @media (min-width:1920px){:root{--wide:1.125}#view{max-width:1600px}.page{max-width:1040px}.lesson.lp2{max-width:1600px}#view.view-problem{max-width:1880px}.ex3-cols{grid-template-columns:280px minmax(0,1fr) 340px}}
