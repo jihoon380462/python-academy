@@ -75,7 +75,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
 //    본문 속 <code> 가 예제 코드에 그대로 있으면(「실행하면 heappop(h)[2] 로 …」 처럼 코드를 가리키는 말) 출력 주장이 아니라서 건너뜀. 화살표 →/-> 와 공백은 같게 보지 않음(그게 이번 버그)
 // ⑥ 필요한 문법의 코드 속 낱말(3글자 이상 이름) 중 하나라도 링크된 쪽(제목·본문·예제)에 나오는지 — 하나도 없으면 다른 쪽을 가리키는 것
 { const PYEX = !COURSE || !COURSE.runner || COURSE.runner === 'python'; const SQLEX = COURSE && COURSE.runner === 'sql'; const ASMEX = BOOK.check === 'asm';
-  const ent = (x) => String(x).replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#92;/g, '\\').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
+  const ent = (x) => String(x).replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#92;/g, '\\').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
   const bookPage = (lid, i) => { const pg = (pagesOf(lid) || [])[i]; if (!pg) return null; const o = (BOOK.pages || {})[`${lid}/${i}`]; let html = (o && o.html) || pg.html || ''; ((o && o.rep) || []).forEach(([a, b]) => { html = html.split(a).join(b); }); return { title: (o && o.title) || (BOOK.titles || {})[`${lid}/${i}`] || pg.title || '', html, example: (o && o.example) || pg.example || null }; };
   const sq = (x) => x.replace(/\s+/g, ' ').trim();
   //   ⑥ 의 「코드 낱말」: 파이썬이면 함수·메서드 이름(뒤에 ( · 앞에 .)과 키워드·모듈만 — score·total 같은 변수 이름은 문제마다 달라서 안 봄(대문자로 시작하는 내 클래스 이름도)
@@ -115,7 +115,17 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
   // ⑨ 본문 <pre> 코드와 예제의 「print(x)   # 결과」 주석이 실제 출력과 같은지(tools/pre_claims.py — 값처럼 생긴 주석만, 반복은 「0, 1, 2」 로 이어서) v2.15.4
   if (PYEX) { const items = []; for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const pg = bookPage(l.id, i); let k = 0; for (const m of pg.html.matchAll(/<pre[^>]*>([\s\S]*?)<\/pre>/g)) items.push({ id: `${l.id}/${i} 본문 코드 ${++k}`, code: ent(m[1].replace(/<br\s*\/?>/g, '\n')) }); if (pg.example && pg.example.code) items.push({ id: `${l.id}/${i} 예제`, code: pg.example.code }); });
     let r = []; try { r = JSON.parse(execFileSync('python3', [R + '/tools/pre_claims.py'], { input: JSON.stringify(items), encoding: 'utf8', timeout: 120000 })); } catch (e) { bad(`pre_claims.py 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); } ran += items.length;
-    for (const x of r) bad(`${x.id}: 「${x.line}」 의 주석은 「${x.claim}」 인데 실제로는 「${x.got}」 이 나와요`); }
+    for (const x of r) bad(`${x.id}: 「${x.line}」 의 주석은 「${x.claim}」 인데 실제로는 「${x.got}」 이 나와요`);
+    // ⑭ v2.43.3: 본문 <pre> 중 파이썬 코드로 시작하는 블록이 문법에 맞는지(tools/pre_syntax.py) — 파이썬 QA 에서 L18B/5 `any([s = 50 …])` SyntaxError 를 아무 검사도 못 잡음(LESSON.md R14)
+    //    일부러 틀린 코드를 보여 주는 블록은 BOOK.meta.preSyntaxOk 에 「레슨/쪽 본문 코드 n」 으로
+    let sx = []; try { sx = JSON.parse(execFileSync('python3', [R + '/tools/pre_syntax.py'], { input: JSON.stringify(items.filter(x => / 본문 코드 /.test(x.id))), encoding: 'utf8', timeout: 120000 })); } catch (e) { bad(`pre_syntax.py 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
+    const sxOk = new Set((BOOK.meta && BOOK.meta.preSyntaxOk) || []); for (const x of sx) if (!sxOk.has(x.id)) bad(`${x.id}: 파이썬 코드가 문법에 안 맞아요(${x.msg}) 「${x.line}」 — 그대로 치면 SyntaxError. 일부러 틀린 코드면 BOOK.meta.preSyntaxOk 에`); }
+  // ⑮ v2.43.3: 옛 이름 — 화면 배지는 「만들어 보기 n」 인데 글이 「몸풀기 1」 처럼 옛 이름을 씀(파이썬 X14 · X16, ⑬ 이 못 잡았음)
+  for (const [lid, ts] of Object.entries(BOOK.tasks || {})) (ts || []).forEach((t, i) => { const m = JSON.stringify([t.title, t.text, t.answer, t.needs, t.checks]).match(/.{0,20}몸풀기.{0,20}/); if (m) bad(`${lid}#${i + 1} 「${t.title}」: 옛 이름 「몸풀기」 — 화면 배지는 「만들어 보기 n」 이에요 「${m[0]}」`); });
+  for (const l of LESSONS) (pagesOf(l.id) || []).forEach((_, i) => { const m = ent(bookPage(l.id, i).html).match(/.{0,20}몸풀기.{0,20}/); if (m) bad(`${l.id}/${i}: 옛 이름 「몸풀기」 「${m[0]}」`); });
+  // ⑯ v2.43.3: 「필요한 문법」 칩 코드에서 여러 문장을 공백 두세 칸으로 한 줄에 이음 — 칩은 white-space:pre-wrap 이라 \n 이 줄바꿈. 한 줄로 치면 SyntaxError 인 모양(파이썬 QA 패턴 1, 교과서 12개 547곳)
+  //    따옴표 안 공백 · 뒤에 붙인 「# 주석」 · 「(설명)」 은 괜찮음. 기호만 늘어놓은 것은 「 · 」 로
+  for (const [lid, ts] of Object.entries(BOOK.tasks || {})) (ts || []).forEach((t, ti) => (t.needs || []).forEach(([syn]) => { const x = String(syn).replace(/"""[\s\S]*?"""|"[^"\n]*"|'[^'\n]*'/g, '""'); if (/\S {2,}(?![#(;\s])\S/.test(x)) bad(`${lid}#${ti + 1} ${t.title}: 필요한 문법 「${syn}」 이 여러 문장을 공백으로 한 줄에 이었어요 — 문장 사이는 \\n(줄바꿈)으로`); }));
   // ⑩ Vim 교과서: 본문·예제에 나오는 「:명령」 을 진짜 vim(교과서 기본 _vimrc)에서 하나씩 실행해 「없는 명령(E492)·없는 설정(E518)·잘못된 값(E474)·뒤에 남은 글자(E488)」 가 안 나는지. 끝내기(:q …)·플러그인 명령·한글 자리표시(:e 파일)는 건너뜀 v2.15.4
   if (VIM) { const home = fs.mkdtempSync(path.join(os.tmpdir(), 'vimex-')); fs.mkdirSync(path.join(home, 'vim-study')); fs.writeFileSync(path.join(home, 'vimrc'), ctx.VIMRC_BASE_TEXT);
     fs.writeFileSync(path.join(home, 'vim-study', 'play.txt'), Array.from({ length: 12 }, (_, k) => `line${k + 1} cat a i`).join('\n') + '\n');

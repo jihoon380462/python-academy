@@ -1,7 +1,7 @@
 // courses/debug/book.js — 「디버깅·테스트 교과서」 데이터 (v2.33.0, 설계 specs/courses-t3-t7.md). 화면은 core/ui-views-book.js.
 // 연습: 내 PC 의 VS Code + 파이썬 + pytest. 예시 답은 check_book 이 python3 로 실제 실행해 출력 예와 비교(파이썬 기본 검사).
 const BOOK = {
-  meta: {
+  meta: { preSyntaxOk: ["D0/0 본문 코드 1"] /* v2.43.3 check_book ⑭: 일부러 틀린 코드 · 클래스 밖 코드와 메서드 조각을 한 상자에 보여 줌 */,
     prereq: [
       { lessons: ['D0'], chapters: [0], ref: 'SETUP/0', btn: '시작하기 · 준비물 보기',
         title: '먼저 꼭! 파이썬 교과서 「시작하기」 · 가상 환경 · pytest 설치',

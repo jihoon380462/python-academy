@@ -177,8 +177,8 @@ print("받은 시그널:", signal.Signals(-code).name)</pre>
     { title: '파일 디스크립터 0 · 1 · 2', html: `<p>프로세스가 연 파일·터미널·파이프에는 커널이 <b>번호</b>를 붙여요. 이 번호가 <b>파일 디스크립터</b>(fd)예요. 모든 프로세스는 처음부터 세 개를 열고 태어나요.</p>
 <table class="kb"><tbody><tr><td><b>0</b> stdin</td><td>입력 — 보통 키보드(터미널). <code>input()</code> · <code>sys.stdin.readline()</code> 이 여기서 읽어요</td></tr><tr><td><b>1</b> stdout</td><td>출력 — 보통 화면. <code>print</code> 가 여기로 써요</td></tr><tr><td><b>2</b> stderr</td><td>에러 출력 — 보통 화면. 에러 글은 여기로</td></tr></tbody></table>
 <pre class="code">import os, sys
-os.write(1, "1번(stdout)에 바로 쓰기\n".encode())
-os.write(2, "2번(stderr)에 쓰기\n".encode())
+os.write(1, "1번(stdout)에 바로 쓰기\\n".encode())
+os.write(2, "2번(stderr)에 쓰기\\n".encode())
 print("0번이 터미널인가요?", sys.stdin.isatty())</pre>
 <ul><li><code>os.write(번호, 바이트)</code> 는 print 를 거치지 않고 그 번호에 바로 써요(그래서 글자를 <code>.encode()</code> 로 바이트로). <code>print(…, file=sys.stderr)</code> 는 print 를 2번으로 보내요 — 에러 글은 이쪽으로.</li><li><code>sys.stdin.readline()</code> 은 0번에서 <b>한 줄</b>을 읽어요. 입력이 끝나면(파이프가 끝나거나 <kbd>Ctrl</kbd>+<kbd>D</kbd>) 빈 글자 <code>""</code> 를 돌려줘요.</li><li><code>sys.stdin.isatty()</code> 는 「0번이 사람이 치는 터미널인가」. 터미널에서 그냥 돌리면 <code>True</code>, <code>echo 값 | python3 파일.py</code> 처럼 파이프로 넣으면 <code>False</code> 예요.</li></ul>
 <p><code>ls -l /proc/self/fd</code> 로 보면 0·1·2 가 모두 지금 터미널(<code>/dev/pts/0</code> 같은 것)을 가리켜요.</p>` + OS_DATE,
@@ -590,7 +590,7 @@ write(1, "hi\\n", 3)                       = 3
 <p><code>strace</code> 는 프로그램이 부르는 시스템 콜을 하나하나 보여 줘요(없으면 <code>sudo apt install strace</code>). <code>write(1, "hi\\n", 3) = 3</code> 은 「1번(stdout)에 3바이트를 써 줘 → 3바이트 썼어요」.</p>
 <p>파이썬의 <code>os.write</code> 는 이 부탁을 거의 그대로 해요. 돌려주는 값은 <b>실제로 쓴 바이트 수</b>예요.</p>
 <pre class="code">import os
-n = os.write(1, "안녕\n".encode())
+n = os.write(1, "안녕\\n".encode())
 print("쓴 바이트:", n)</pre>
 <p>실행하면 <code>안녕</code> 다음에 <code>쓴 바이트: 7</code>. 한글은 UTF-8 로 한 글자에 3바이트라서 「안녕」 6 + 줄바꿈 1 이에요.</p>` + OS_DATE,
       example: { code: 'import os\nn = os.write(1, "안녕\\n".encode())\nprint("쓴 바이트:", n)' } },
@@ -670,7 +670,7 @@ f.close()</pre>
 <p>이름은 <b>폴더</b> 안에 있어요. 폴더는 사실 「이름 → inode 번호」 줄들의 목록이에요. 그래서 이름을 바꾸는 건 폴더의 한 줄만 고치는 거라 아무리 큰 파일도 순식간이에요.</p>
 <pre class="code">import os
 with open("a.txt", "w") as f:
-    f.write("안녕\n")
+    f.write("안녕\\n")
 before = os.stat("a.txt").st_ino
 os.rename("a.txt", "b.txt")
 print("이름을 바꿔도 inode 가 같나요?", os.stat("b.txt").st_ino == before)
@@ -684,7 +684,7 @@ for name in ("a.txt", "hard.txt", "soft.txt"):
     if os.path.lexists(name):
         os.remove(name)
 with open("a.txt", "w") as f:
-    f.write("안녕\n")
+    f.write("안녕\\n")
 os.link("a.txt", "hard.txt")
 os.symlink("a.txt", "soft.txt")
 print("하드 링크는 같은 inode:", os.stat("hard.txt").st_ino == os.stat("a.txt").st_ino)
@@ -698,7 +698,7 @@ print("심볼릭 링크는 깨졌나요?", not os.path.exists("soft.txt"))</pre>
     { title: '지우기 = 링크 수 줄이기 · df -i', html: `<p><code>rm</code> · <code>os.remove</code> 는 사실 「폴더에서 이름 한 줄을 지우고 링크 수를 1 줄이기」 예요(시스템 콜 이름도 <code>unlink</code>). 공간이 진짜로 비워지는 건 <b>링크 수가 0 이고, 그 파일을 열고 있는 프로세스도 없을 때</b>예요.</p>
 <pre class="code">import os
 with open("log.txt", "w") as f:
-    f.write("아직 읽을 수 있어요\n")
+    f.write("아직 읽을 수 있어요\\n")
 f = open("log.txt")
 os.remove("log.txt")
 print("이름은 사라졌나요?", not os.path.exists("log.txt"))
