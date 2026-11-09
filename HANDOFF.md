@@ -317,6 +317,7 @@
 | `specs/linux-course.md` | 리눅스 교과서 설계(VirtualBox + 우분투 26.04). 운영체제(T2) · 어셈블리어(T10)의 선수 |
 | `specs/os-course.md` | 운영체제 교과서 설계 |
 | `specs/github-course.md` | GitHub 교과서 설계. 새 코스 설계 문서의 본보기 |
+| `specs/ai-harness.md` | AI와 협업 챕터 4 「하네스 꾸리기」 설계(레슨 Z13 ~ Z18 + 보스 ZB4). 공식 문서에서 확인한 사실표(F1 ~ F19) 포함. 만드는 중 |
 | `specs/web-course.md` · `specs/http-api-course.md` | 웹 교과서(34 레슨, 화면만) · HTTP·API·SDK 교과서(21 레슨) 설계. 둘 다 완성 |
 | `docs/` | 설계 결정 · 확장 지시서(EXPANSION) · QA 기록 · `VISUAL-REVIEW-2026-11-07.md`(N15 기록, ✅ 끝남). 끝난 기록은 `docs/archive/` |
 | `archive/classic/` | 보관: 예전 문제집 화면(코드 · 그림 · 옛 문제 · 검사 도구). `README.md` 에 무엇이 어디 있는지 · 되돌리는 법 |
