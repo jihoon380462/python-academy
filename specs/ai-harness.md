@@ -8,7 +8,7 @@ AI와 협업 교과서(`courses/ai/`)에 챕터 4 를 더하는 설계 기록이
 
 | 항목 | 값 |
 |---|---|
-| 상태 | ⏳ 만드는 중 (v2.45.0 에 넣을 예정) |
+| 상태 | ⏳ 만드는 중 — 레슨 Z13 ~ Z18 은 만들었고 보스 ZB4 와 허브 숫자 · 문서가 남음 (v2.45.0 에 넣을 예정) |
 | 레슨 | 새 레슨 6개 `Z13` ~ `Z18` + 보스 `ZB4` = **7개** (AI와 협업 16 → 23) |
 | 챕터 | 4 「하네스 꾸리기」 (기존 0 · 1 · 2 · 3 에 이어서) |
 
@@ -41,7 +41,7 @@ AI와 협업 교과서(`courses/ai/`)에 챕터 4 를 더하는 설계 기록이
 | F2 | 일의 한 바퀴는 세 단계: 맥락 모으기(gather context) → 행동하기(take action) → 결과 확인하기(verify results). 단계들은 섞이고, 도구는 내내 써요. | `how-claude-code-works` |
 | F3 | 도구가 없으면 글로만 답해요. 도구가 있으면 코드 읽기 · 파일 고치기 · 명령 실행 · 검색이 돼요. | `how-claude-code-works` |
 | F4 | 세션은 새 맥락 창(context window)으로 시작해요. 세션을 넘어 이어 주는 것은 둘: 내가 쓰는 지침 파일(`CLAUDE.md`)과 AI 가 스스로 적는 메모(auto memory). | `memory` |
-| F5 | 지침 파일은 `CLAUDE.md`. 저장소에 `AGENTS.md` 가 있으면 `CLAUDE.md` 대신 그것을 읽을 수 있어요. | `memory` |
+| F5 | 지침 파일은 `CLAUDE.md`. **작업 폴더나 그 위에 `CLAUDE.md`(`.claude/CLAUDE.md` · `CLAUDE.local.md` 포함)가 없고 `AGENTS.md` 만 있으면** 기본으로 `AGENTS.md` 를 읽어요. 둘 다 있으면 `CLAUDE.md` 만 읽어요(`CLAUDE.md` 가 `AGENTS.md` 를 가져오게 할 수도 있어요). | `memory` |
 | F6 | 위치: 프로젝트 `./CLAUDE.md` 또는 `./.claude/CLAUDE.md`(팀과 공유), 내 모든 프로젝트 `~/.claude/CLAUDE.md`, 내 프로젝트 전용 `./CLAUDE.local.md`(`.gitignore` 에 적어요). | `memory` |
 | F7 | 지침 파일 크기 목표는 파일 하나에 **200줄 미만**. 길면 맥락을 더 쓰고 지키는 정도가 떨어져요. 제목과 불릿으로 묶으면 덩어리 문단보다 따르기 쉬워요. | `memory` |
 | F8 | 지침 파일은 **맥락(context)이지 강제 설정이 아니에요.** 더 구체적이고 짧을수록 더 잘 따라요. 어떤 행동을 AI 가 무엇을 정하든 막으려면 훅(PreToolUse)을 써요. | `memory` |
@@ -52,10 +52,10 @@ AI와 협업 교과서(`courses/ai/`)에 챕터 4 를 더하는 설계 기록이
 | F13 | 명령 훅은 이벤트 정보를 **JSON 으로 표준 입력(stdin)** 에 받아요. 결과는 종료 코드와 표준 출력으로 돌려줘요. 종료 코드 0 에 출력이 없으면 「결정 없음」 이라 평소 권한 흐름으로 가요. | `hooks` |
 | F14 | **종료 코드 2 는 막기**예요. PreToolUse 훅이 2 로 끝나면 그 도구 호출이 막혀요. 막는 이유는 훅이 stderr 에 쓴 글이에요. 2 로 끝나면 JSON 으로 allow 를 내도 못 뚫어요. | `hooks` |
 | F15 | PreToolUse 훅은 JSON 으로 `permissionDecision: "deny"` 와 이유를 출력해도 막아요(예: 명령에 `rm -rf` 가 있으면). | `hooks` |
-| F16 | Stop 훅 입력에는 `stop_hook_active`(이미 훅 때문에 이어 가는 중이면 true)와 `last_assistant_message`(AI 의 마지막 글)가 있어요. Stop 훅이 막으면 AI 는 멈추지 못하고 다시 일해요. 스크립트는 `stop_hook_active` 를 봐서 이미 한 번 막았으면 또 막지 않아야 해요. Claude Code 는 8번 연달아 막은 뒤엔 훅을 무시해요. | `hooks` · `hooks-guide` |
+| F16 | Stop 훅 입력에는 `stop_hook_active`(이미 훅 때문에 이어 가는 중이면 true)와 `last_assistant_message`(AI 의 마지막 글)가 있어요. Stop 훅이 막으면 AI 는 멈추지 못하고 다시 일해요. 스크립트는 `stop_hook_active` 를 봐서 이미 한 번 막았으면 또 막지 않아야 해요. Claude Code 는 **연달아 8번** 이어 가게 한 뒤에는 다음 막기를 무시하고 턴을 끝내요. AI 가 도구를 한 번 부르면 연달아 세기는 0 으로 돌아가요. | `hooks` · `hooks-guide` |
 | F17 | 권한 규칙은 **deny → ask → allow 순서로 평가하고 처음 맞은 것이 결과**예요. 더 구체적이라고 순서가 바뀌지 않아요. 넓은 deny(`Bash(aws *)`)는 더 좁은 allow(`Bash(aws s3 ls)`)가 있어도 막아요. allow 는 deny 의 예외를 만들지 못해요. | `permissions` |
-| F18 | 규칙 모양 예: `Bash(git *)` 는 `git` 으로 시작하는 명령에 맞아요. | `permissions` · 이 저장소의 `.claude/settings.json` 에서도 써요 |
-| F19 | 서브에이전트는 **자기 맥락 창 · 자기 시스템 프롬프트 · 정해진 도구 · 독립 권한**으로 일해요. 검색 결과 · 로그 · 파일 내용이 내 대화를 가득 채울 때 맡겨요. | `sub-agents` |
+| F18 | 규칙 모양 예: `Bash(git *)` 는 `git` 으로 시작하는 명령에 맞아요. **끝의 `*` 앞에 공백이 있으면 맨 명령에도 맞아요**(`Bash(ls *)` 는 `ls` 에도). 공백이 없는 `Bash(ls*)` 는 `lsof` 에도 맞아요. Bash 규칙은 같은 프로그램을 다른 모양으로 부르면 못 막아서 보안 경계가 아니에요. | `permissions` |
+| F19 | 서브에이전트는 **자기 맥락 창 · 자기 시스템 프롬프트 · 정해진 도구 · 독립 권한**으로 일해요. 검색 결과 · 로그 · 파일 내용이 내 대화를 가득 채울 때 맡기면, 그 일을 자기 맥락에서 하고 **요약만 돌려줘요.** | `sub-agents` |
 
 ### 이 저장소의 실제 이야기 (예제 재료)
 
