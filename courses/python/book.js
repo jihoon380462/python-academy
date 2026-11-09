@@ -975,7 +975,7 @@ const BOOK = {
         io: [{"output": "테스트 통과\n12⌫3 → 13\n12+×3= → 36\n5-+-2= → 3"}] },
       { title: "모든 버튼이 + 만 눌러요",
         text: "<p>창 없이 버튼 네 개를 흉내 낸 코드예요. <code>actions</code> 딕셔너리에 키마다 누를 때 부를 함수를 담았어요. 그런데 <code>7</code> · <code>8</code> · <code>+</code> 를 눌렀더니 이렇게 나와요.</p><pre class=\"code\">['+', '+', '+']</pre><p>먼저 말해 보세요: lambda 는 key 를 <b>언제</b> 찾을까요? 그때 key 는 무엇일까요? 한 곳만 고쳐서 출력 예처럼 나오게 하세요. 창의 <code>command=</code> 도 똑같이 고쳐요.</p>",
-        needs: [["command=lambda k=key: on_press(k)", "X14/2", "만들 때 값을 담기"], ["def make_adder(n):\n    def add(x):", "L18D/0", "클로저 — 바깥 변수를 나중에 찾기"], ["def greet(name, end=\"!\"):", "L8B/0", "기본값"]],
+        needs: [["command=lambda k=key: on_press(k)", "X14/2", "만들 때 값을 담기"], ["def make_adder(n):\n    def add(x):", "L18D/0", "클로저 — 바깥 변수를 나중에 찾기"], ["def greet(name, mark=\"!\"):", "L8B/0", "기본값"]],
         given: "pressed = []\n\n\ndef on_press(key):\n    pressed.append(key)\n\n\nactions = {}\nfor key in [\"7\", \"8\", \"9\", \"+\"]:\n    actions[key] = lambda: on_press(key)\n\nactions[\"7\"]()\nactions[\"8\"]()\nactions[\"+\"]()\nprint(pressed)\n",
         answer: "pressed = []\n\n\ndef on_press(key):\n    pressed.append(key)\n\n\nactions = {}\nfor key in [\"7\", \"8\", \"9\", \"+\"]:\n    actions[key] = lambda k=key: on_press(k)\n\nactions[\"7\"]()\nactions[\"8\"]()\nactions[\"+\"]()\nprint(pressed)\n",
         io: [{"output": "['7', '8', '+']"}] },
