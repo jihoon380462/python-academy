@@ -2,7 +2,7 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.44.2',
+  APP_VERSION: '2.45.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
@@ -37,7 +37,7 @@ const CONFIG = {
     { id: 'data', short: '데이터', name: '데이터 분석', icon: '📊', desc: 'pandas 로 표 데이터를 읽고 정리 · 요약하고 matplotlib 로 그려 분석 보고서까지 쓰는 교과서', path: 'courses/data/', color: '#0277bd', ready: true, book: true, bookNote: '파이썬 다음 — pandas · matplotlib', lessons: 18 /* v2.33.0 데이터 분석 교과서 완성 — 18 전부 */ },
     { id: 'oop', short: '설계', name: '객체지향·설계', icon: '🧱', desc: '캡슐화 · 합성 · 다형성 · 설계 원칙 · 디자인 패턴 · 리팩터링으로 고치기 쉬운 파이썬 코드를 짜는 교과서', path: 'courses/oop/', color: '#5d4037', ready: true, book: true, bookNote: '파이썬 다음 — 클래스를 나누는 법', lessons: 17 /* v2.33.0 객체지향·설계 교과서 완성 — 17 전부 */ },
     { id: 'ml', short: '머신러닝', name: 'AI·머신러닝 기초', icon: '🧠', desc: '선형 회귀 · 경사하강 · k-NN · 로지스틱 회귀 · 결정 트리 · 평가 지표 · k-평균을 numpy 와 scikit-learn 으로 직접 만드는 교과서', path: 'courses/ml/', color: '#00695c', ready: true, book: true, bookNote: '파이썬 다음 — numpy · scikit-learn', lessons: 16 /* v2.33.0 AI·머신러닝 기초 교과서 완성 — 16 전부 */ },
-    { id: 'ai', short: 'AI 협업', name: 'AI와 협업', icon: '🤝', desc: '좋은 요청 · 단계 나누기 · AI 코드 검증 · 환각 알아보기 · 개인정보 · 저작권까지 AI 도구와 일하는 법을 익히는 교과서', path: 'courses/ai/', color: '#ad1457', ready: true, book: true, bookNote: '파이썬 다음 — AI 도구 잘 쓰기', lessons: 16 /* v2.33.0 AI와 협업 교과서 완성 — 16 전부 */ },
+    { id: 'ai', short: 'AI 협업', name: 'AI와 협업', icon: '🤝', desc: '좋은 요청 · 단계 나누기 · AI 코드 검증 · 환각 알아보기 · 개인정보 · 저작권 · 지침 파일 · 훅 · 권한까지 AI 도구와 일하는 법을 익히는 교과서', path: 'courses/ai/', color: '#ad1457', ready: true, book: true, bookNote: '파이썬 다음 — AI 도구 잘 쓰기', lessons: 23 /* v2.33.0 AI와 협업 교과서 완성 16 → v2.45.0 챕터 4 「하네스 꾸리기」 7개 더해 23 */ },
     { id: 'files', short: '데이터 파일', name: '데이터 파일 다루기', icon: '🗂️', desc: 'JSON · JSON Lines · TOML · 엑셀(openpyxl)을 파이썬으로 읽고 · 검사하고 · 바꾸고 · 보기 좋은 엑셀 보고서로 내보내는 교과서', path: 'courses/files/', color: '#2e7d32', ready: true, book: true, bookNote: '파이썬 다음 — JSON · 엑셀', lessons: 18 /* v2.41.0 데이터 파일 다루기 교과서 — 18 전부 */ },
     { id: 'auto', short: '업무 자동화', name: '파이썬 업무 자동화', icon: '📎', desc: '파일 · 폴더 일괄 처리 · 백업 · 압축, PDF · 워드 문서, 템플릿과 이메일, 정해진 시간에 혼자 돌아가는 스크립트까지 내 사무 일을 파이썬으로 자동화하는 교과서', path: 'courses/auto/', color: '#6a1b9a', ready: true, book: true, bookNote: '파이썬 다음 — 사무 일 자동화', lessons: 18 /* v2.42.0 파이썬 업무 자동화 교과서 — 18 전부 */ },
   ],

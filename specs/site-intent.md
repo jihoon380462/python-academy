@@ -31,7 +31,7 @@ QA · 새 세션이 먼저 읽는 기준 문서예요. 화면에서 본 것이 �
 | 코스 | 폴더 | 레슨 | 연습 도구 | 교과서가 된 때 |
 | --- | --- | --- | --- | --- |
 | 파이썬 | `courses/python/` | 100 | 사용자 PC 의 VS Code + 파이썬 | v2.9.0 (100 레슨은 v2.38.0) |
-| 디버깅·테스트 · 데이터 분석 · 객체지향·설계 · AI·머신러닝 기초 · AI와 협업 | `courses/debug · data · oop · ml · ai/` | 18 · 18 · 17 · 16 · 16 | VS Code + 파이썬 (+ pytest · pandas · matplotlib · numpy · scikit-learn) | v2.33.0 (T3~T7) |
+| 디버깅·테스트 · 데이터 분석 · 객체지향·설계 · AI·머신러닝 기초 · AI와 협업 | `courses/debug · data · oop · ml · ai/` | 18 · 18 · 17 · 16 · 23 | VS Code + 파이썬 (+ pytest · pandas · matplotlib · numpy · scikit-learn) | v2.33.0 (T3~T7) |
 | 알고리즘 | `courses/algo/` | 36 | VS Code + 파이썬 + 레슨 예제의 👀 · 👣 그림(브라우저) | v2.15.0 (N5) |
 | 데이터 파일 다루기 | `courses/files/` | 18 | VS Code + 파이썬 + openpyxl | v2.41.0 |
 | 파이썬 업무 자동화 | `courses/auto/` | 18 | VS Code + 파이썬 + pypdf · python-docx · reportlab | v2.42.0 |

@@ -8,14 +8,14 @@
 
 ## 코스
 
-교과서 21개 · 레슨 533 (`core/config.js` 의 `COURSES`). 모두 📖 교과서예요. 순서는 허브 묶음 순서예요.
+교과서 21개 · 레슨 540 (`core/config.js` 의 `COURSES`). 모두 📖 교과서예요. 순서는 허브 묶음 순서예요.
 
 | 묶음 | 코스 | 주소 | 레슨 | 연습 도구 |
 | --- | --- | --- | --- | --- |
 | 🐍 처음 시작 | 파이썬 | `/courses/python/` | 100 | VS Code + 파이썬 |
 | 💪 파이썬 실력 키우기 | 디버깅·테스트 | `/courses/debug/` | 18 | VS Code + 파이썬 + pytest |
 | 〃 | 객체지향·설계 | `/courses/oop/` | 17 | VS Code + 파이썬 |
-| 〃 | AI와 협업 | `/courses/ai/` | 16 | VS Code + 파이썬 + 내가 쓰는 AI 도구 |
+| 〃 | AI와 협업 | `/courses/ai/` | 23 | VS Code + 파이썬 + 내가 쓰는 AI 도구 |
 | 〃 | 알고리즘·자료구조 | `/courses/algo/` | 36 (👀 그림으로 보기) | VS Code + 파이썬 |
 | 🛠 파이썬으로 만들기 | 데이터 파일 다루기 | `/courses/files/` | 18 | VS Code + 파이썬 + openpyxl |
 | 〃 | 파이썬 업무 자동화 | `/courses/auto/` | 18 | VS Code + 파이썬 + pypdf · python-docx · reportlab |
