@@ -36,7 +36,7 @@
 | id | 제목(가) | 다루는 것 |
 |---|---|---|
 | L24 | 소수 오차와 Decimal | `0.1 + 0.2` · `round` 의 한계 · `decimal.Decimal("0.1")` · 돈 계산 · `fractions` 맛보기 |
-| L25 | collections 더: defaultdict · deque · namedtuple | 빈 칸 기본값 · 앞뒤로 넣고 빼기(큐 · 최근 n개) · 이름 붙은 튜플 · `copy.deepcopy` 한 쪽 |
+| L25 | defaultdict · deque · namedtuple · deepcopy | 빈 칸 기본값 · 앞뒤로 넣고 빼기(큐 · 최근 n개) · 이름 붙은 튜플 · `copy.deepcopy` 한 쪽 |
 | L26 | 시간 재기: time | `time.time` · `time.sleep` · `time.perf_counter` 로 걸린 시간 · 진행 표시 |
 | L27 | 폴더와 파일 정리: pathlib · shutil | `iterdir` · `glob` · `suffix` · `stem` · `mkdir(exist_ok)` · `rename` · `shutil.copy/move` · 지우기 전 확인 |
 | L28 | 환경 변수와 다른 프로그램: os · subprocess | `os.environ.get` · API 키는 코드 밖에 · `subprocess.run([...], capture_output=True, text=True)` |

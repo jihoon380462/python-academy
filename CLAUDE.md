@@ -5,7 +5,7 @@ Claude Code 가 세션마다 저절로 읽는 짧은 안내예요.
 **파이썬 아카데미**: 사용자 본인이 쓰는 초보자용 학습 사이트예요.
 - 교과서 21개 · 레슨 533
 - GitHub Pages 로 배포해요(빌드 없음).
-- 지금 v2.43.2
+- 지금 v2.44.1
 
 ## 1. 이 방이 무슨 방인지에 따라
 
@@ -54,4 +54,4 @@ Claude Code 가 세션마다 저절로 읽는 짧은 안내예요.
 
 - 순서는 [`HANDOFF.md`](HANDOFF.md) 2절.
 - 권한 구분 없이 Claude 가 PR → CI → 머지 → 배포 확인까지 해요.
-- 배포할 때마다 고칠 것: `HANDOFF.md` 0절 상태판 · `CHANGELOG.md` · `TODO.md` 맨 위 버전
+- 배포할 때마다 고칠 것: `HANDOFF.md` 0절 상태판 · `CHANGELOG.md` · `TODO.md` 맨 위 버전 · 이 파일의 「지금 v…」(`validate_content` 가 맞는지 검사해요)
