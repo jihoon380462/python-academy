@@ -471,14 +471,14 @@ with sync_playwright() as p:
     print('[AI와 협업 교과서 v2.33.0]'); z0=len(errors); ZB='file://'+os.path.join(ROOT,'courses/ai/index.html')
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(ZB); pg.wait_for_timeout(900); pg.evaluate("document.querySelectorAll('.modal-ov').forEach(e=>e.remove())")
     zh=pg.evaluate("({book:document.documentElement.classList.contains('book-mode'), steps:document.querySelectorAll('.bk-step').length, ls:document.querySelectorAll('button.bk-l').length, soon:document.querySelectorAll('.bk-l.soon').length, chs:document.querySelectorAll('.bk-ch').length})")
-    check(zh['book'] and zh['steps']==1 and zh['ls']==16 and zh['soon']==0 and zh['chs']==4, 'AI와 협업 교과서 홈: 시작하기 1 · 열린 레슨 16 · 준비 중 0 · 챕터 4 (%s)' % zh)
+    check(zh['book'] and zh['steps']==1 and zh['ls']==23 and zh['soon']==0 and zh['chs']==5, 'AI와 협업 교과서 홈: 시작하기 1 · 열린 레슨 23 · 준비 중 0 · 챕터 5 (%s)' % zh)
     pg.evaluate("UI.go('lesson',{lessonId:'Z0',page:0})"); pg.wait_for_timeout(300); check(pg.locator('.bk-prereq').count()>=1 and '파이썬 교과서' in pg.inner_text('.bk-prereq'), 'Z0 1쪽: 「먼저 꼭」 파이썬 교과서')
-    for bid in ['ZB1', 'ZB2', 'ZB3']:
+    for bid in ['ZB1', 'ZB2', 'ZB3', 'ZB4']:
         pg.evaluate("UI.go('lesson',{lessonId:'%s',page:0})" % bid); pg.wait_for_timeout(250); check(pg.locator('.bk-task').count()>=1 and pg.locator('.bk-ans').count()>=1 and pg.evaluate("document.querySelector('.bk-art h1').textContent").startswith('🛠 만들어 보기: '), 'AI와 협업 %s: 만들어 보기 문제 + 예시 답' % bid)
     pg.set_viewport_size({'width':390,'height':800}); zlp=[('SETUP',i) for i in range(1)]+[(l, p) for l, p in pg.evaluate("LESSONS.flatMap(l=>{ const n=(BOOK.lessonPages&&BOOK.lessonPages[l.id]||l.pages||[]).length; return Array.from({length:n+1},(_,i)=>[l.id,i]); })")]
     for lp in zlp: pg.evaluate("UI.go('lesson',{lessonId:'%s',page:%d})" % lp); pg.wait_for_timeout(120); check(pg.evaluate("document.documentElement.scrollWidth")<=390, 'AI와 협업 교과서 폰 390px 가로 넘침 없음 %s/%d' % lp)
     pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(600); zc=pg.evaluate("(()=>{ const a=document.querySelector('a.hc[href*=\"courses/ai/\"]'); return a ? a.innerText.replace(/\\n/g,' ') : ''; })()")
-    check('읽은 레슨' in zc and '/16' in zc, '허브 「코스」 칸에 AI와 협업 카드 · 읽은 레슨 n/16 (%s)' % zc[-60:])
+    check('읽은 레슨' in zc and '/23' in zc, '허브 「코스」 칸에 AI와 협업 카드 · 읽은 레슨 n/23 (%s)' % zc[-60:])
     zerr=errors[z0:]; check(not zerr, 'AI와 협업 교과서 pageerror 0 (%s)' % (zerr[:2] or 'OK'))
     # ===== [HTTP·API·SDK 교과서 v2.27.0] D15 — curl · requests · F12 로 남의 API, 설계 specs/http-api-course.md (사용자 선택 11/7)
     print('[HTTP·API·SDK 교과서 v2.27.0]'); h0=len(errors); APB='file://'+os.path.join(ROOT,'courses/api/index.html')

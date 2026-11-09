@@ -8,7 +8,7 @@ const BOOK = {
         html: '이 교과서의 예제와 「만들어 보기」 는 전부 <b>내 PC 의 VS Code + 파이썬</b> 으로 돌려요. 아직이면 <a href="../python/" target="_blank" rel="noopener">파이썬 교과서 「시작하기」 ↗</a> 부터. 문법은 파이썬 교과서 챕터 4(클래스 · 예외 · 모듈)까지 알면 편해요.' },
     ],
     kicker: '🤝 AI와 협업 교과서', hero: 'AI 에게 잘 시키고, 의심하고, 책임 있게',
-    heroP: '챗봇 · 코딩 도우미와 <b>같이 일하는 법</b> — 좋은 요청을 쓰고, AI 가 준 코드를 <b>테스트로 검증</b>하고, 개인정보 · 저작권을 지키며 쓰는 법을 익혀요. 어떤 AI 도구를 써도 돼요.',
+    heroP: '챗봇 · 코딩 도우미와 <b>같이 일하는 법</b> — 좋은 요청을 쓰고, AI 가 준 코드를 <b>테스트로 검증</b>하고, 개인정보 · 저작권을 지키며 쓰는 법을 익혀요. 끝에서는 AI 가 도구를 쥐고 일하게 하는 <b>하네스</b>(지침 파일 · 훅 · 권한 · 서브에이전트)를 직접 꾸려 봐요. 어떤 AI 도구를 써도 돼요.',
     dexName: 'AI 협업 도감', dexShort: '도감', dexWhat: '코드·개념', dexHint: '한국어로도 찾기',
     dexExamples: '<code>help()</code>, <code>dir()</code>, <code>assert</code>, <code>환각</code>', dexPlaceholder: '🔍 찾기 …', dexAlt: '',
     dexDocs: '파이썬 공식 문서 <a href="https://docs.python.org/ko/3/" target="_blank" rel="noopener">docs.python.org</a>',
