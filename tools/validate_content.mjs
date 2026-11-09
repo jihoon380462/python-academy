@@ -74,6 +74,11 @@ for (const id of courses()) {
 const cfg = fs.readFileSync(path.join(ROOT, 'core/config.js'), 'utf8'); const ver = (cfg.match(/APP_VERSION:\s*'([^']+)'/) || [])[1];
 const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.name.startsWith('.') || e.name === 'node_modules' || e.name === 'legacy' || e.name === 'archive' ? [] : e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith('.html') ? [path.join(d, e.name)] : []);
 for (const f of walk(ROOT)) { const s = fs.readFileSync(f, 'utf8'); for (const m of s.matchAll(/\?v=([0-9.]+)/g)) if (m[1] !== ver) err(`${path.relative(ROOT, f)}: ?v=${m[1]} ≠ APP_VERSION ${ver} (node tools/stamp.mjs 실행)`); }
+// v2.44.1: 문서가 말하는 「지금 버전 · 교과서 수 · 레슨 수」 가 데이터와 같은지 — 파이썬 QA 2회차에서 CLAUDE.md 가 v2.43.2 로 낡아 있던 것(LESSON.md R10 · R15). 숫자는 core/config.js 에서 뽑아요.
+{ const cx = { window: {} }; vm.createContext(cx); vm.runInContext(cfg.replace(/^(const|let) /gm, 'var '), cx); const ready = (cx.CONFIG.COURSES || []).filter(x => x.ready); const nC = ready.length, nL = ready.reduce((n, x) => n + x.lessons, 0);
+  for (const [f, verRe] of [['CLAUDE.md', /지금 v([\d.]+)/], ['HANDOFF.md', /배포된 버전\*{0,2} \| \*{0,2}v([\d.]+)/], ['TODO.md', /배포된 버전\*{0,2} \| \*{0,2}v([\d.]+)/], ['README.md', null]]) {
+    const t = fs.readFileSync(path.join(ROOT, f), 'utf8'); const v = verRe && t.match(verRe); if (verRe && !v) err(`${f}: 「지금 버전」 줄을 못 찾았어요 — 이 검사가 읽는 모양(${verRe})`); else if (v && v[1] !== ver) err(`${f}: 문서의 버전 v${v[1]} ≠ APP_VERSION ${ver} (배포할 때 CLAUDE.md · HANDOFF.md 0절 · TODO.md 를 같이 고쳐요)`);
+    const n = t.match(/(\d+)개 · 레슨 (\d+)/); if (!n) err(`${f}: 「N개 · 레슨 M」 줄을 못 찾았어요`); else if (+n[1] !== nC || +n[2] !== nL) err(`${f}: 문서의 「${n[1]}개 · 레슨 ${n[2]}」 ≠ 실제 코스 ${nC}개 · 레슨 ${nL} (core/config.js 의 COURSES)`); } }
 console.log(`APP_VERSION ${ver} · 총 레슨 ${totals.lessons} · 문제 ${totals.problems}`);
 warns.forEach(w => console.log('  ⚠ ' + w));
 if (errors.length) { console.error(`✗ 에러 ${errors.length}개`); errors.forEach(e => console.error('  ' + e)); process.exit(1); }
