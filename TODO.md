@@ -47,6 +47,8 @@
 ### 1-4. 사람이 직접 볼 것
 
 - [ ] 파이썬 tkinter 레슨(실전 13 「tkinter 첫 창」 · 실전 14 「tkinter 계산기」)의 창 겉모양을 Windows 에서 한 번 보기 — Claude 환경에서는 창을 못 띄워요
+  - 실전 13 쪽 8 증상 표에 더한 `entry = tk.Entry(root).pack()` → `AttributeError: 'NoneType' object has no attribute 'get'` 줄도 같이(v2.44.1)
+- [ ] 파이썬 레슨 15 「문자열 더 다루기: 찾기 · 검사」 맨 위 제목에 세로선이 보이는지 사용자 PC 에서 보기 — Claude 환경은 한글 글꼴이 없어 `찾기 | find` 처럼 보여요(글자에는 없음, 11/9 QA)
 
 ### 1-5. 보류
 
