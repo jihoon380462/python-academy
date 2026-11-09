@@ -7,6 +7,7 @@ const CHAPTERS = [
   { ch: 1, name: '잘 시키기', color: '#4f6bed' },
   { ch: 2, name: '의심하고 검증하기', color: '#2ea043' },
   { ch: 3, name: '책임 있게', color: '#d97706' },
+  { ch: 4, name: '하네스 꾸리기', color: '#00897b' },
 ];
 const AI_TODO = (t) => [{ title: '준비 중', html: `<p>TODO: ${t}</p>` }]; // v2.33.0 뼈대 — draft:true 라 목차에 「준비 중」
 const LESSONS = [
@@ -191,5 +192,44 @@ const LESSONS = [
   summary: ["한 바퀴: 요청 → 읽기 → 테스트 → (실패하면 고치기) → 정리, 체크리스트로 적어 두고 매번 봐요", "기계가 볼 수 있는 건 코드로(precheck), 맞는지의 기준은 먼저 적어 둔 테스트(run_cases)로", "AI 에 맡기기 전 커밋 → git diff 로 바뀐 줄 읽기 → 테스트 통과하면 커밋, 아니면 git restore"] },
 { id: 'ZB3', ch: 3, boss: true, title: "만들어 보기: AI 와 함께 작은 프로그램", mode: 'text',
   tutorSummary: "챕터 3 만들어 보기. 내 AI 도구와 대화하며 「가계부 정리기」(날짜,분류,금액,메모 줄을 읽어 분류별 합계 · 건너뛴 줄 · 가장 큰 지출, 메모의 이메일 · 전화는 가리기)를 단계별로 만든다. 대화는 log.md 에 기록(☐), 각 단계의 프로그램은 주어진 입력 · 출력 예를 그대로 통과해야 한다(자동). 마지막엔 summarize(lines) 로 나누고 내 테스트로 지킨다.", pages: [], summary: [] },
+{ id: 'Z13', ch: 4, n: 13, draft: true, title: "하네스: 모델 + 도구", mode: 'text',
+  tutorSummary: "(만드는 중 — specs/ai-harness.md)",
+  terms: {},
+  pages: [],
+  summary: [] },
+
+{ id: 'Z14', ch: 4, n: 14, draft: true, title: "지침 파일: 매번 저절로 읽는 안내", mode: 'text',
+  tutorSummary: "(만드는 중 — specs/ai-harness.md)",
+  terms: {},
+  pages: [],
+  summary: [] },
+
+{ id: 'Z15', ch: 4, n: 15, draft: true, title: "기록 남기기: 인수인계 · 실패 기록", mode: 'text',
+  tutorSummary: "(만드는 중 — specs/ai-harness.md)",
+  terms: {},
+  pages: [],
+  summary: [] },
+
+{ id: 'Z16', ch: 4, n: 16, draft: true, title: "규칙보다 검사: 훅", mode: 'text',
+  tutorSummary: "(만드는 중 — specs/ai-harness.md)",
+  terms: {},
+  pages: [],
+  summary: [] },
+
+{ id: 'Z17', ch: 4, n: 17, draft: true, title: "권한과 되돌리기", mode: 'text',
+  tutorSummary: "(만드는 중 — specs/ai-harness.md)",
+  terms: {},
+  pages: [],
+  summary: [] },
+
+{ id: 'Z18', ch: 4, n: 18, draft: true, title: "여럿에게 맡기기: 서브에이전트", mode: 'text',
+  tutorSummary: "(만드는 중 — specs/ai-harness.md)",
+  terms: {},
+  pages: [],
+  summary: [] },
+
+{ id: 'ZB4', ch: 4, boss: true, draft: true, title: "만들어 보기: 내 프로젝트에 하네스 달기", mode: 'text',
+  tutorSummary: "(만드는 중 — specs/ai-harness.md)",
+  pages: [], summary: [] },
 ];
 const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)
