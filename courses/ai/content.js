@@ -282,8 +282,8 @@ const LESSONS = [
   ],
   summary: ["서브에이전트는 자기 맥락 창 · 시스템 프롬프트 · 도구 · 권한으로 일해요. 큰 조사 · 로그가 내 대화를 채울 때 맡기고, 한두 줄 고치는 일은 직접 해요", "나눠 줄 땐 담당 범위가 겹치지 않고(find_overlap) 빠지지도 않게(find_gaps) 확인해요", "보고는 주장이지 증거가 아니에요. 돌린 명령과 출력을 요구하고, 몇 곳은 데이터에서 직접 대조해요(verify_reports)", "각자 통과해도 합치면 깨질 수 있어요. 합친 뒤 전체 검사를 한 번 더 돌려요"] },
 
-{ id: 'ZB4', ch: 4, boss: true, draft: true, title: "만들어 보기: 내 프로젝트에 하네스 달기", mode: 'text',
-  tutorSummary: "(만드는 중 — specs/ai-harness.md)",
+{ id: 'ZB4', ch: 4, boss: true, title: "만들어 보기: 내 프로젝트에 하네스 달기", mode: 'text',
+  tutorSummary: "챕터 4 만들어 보기. 가상의 「사진 이름 정리기」(폰에서 옮긴 사진 이름 IMG_4821.jpg 를 찍은 날 이름 2026-11-03_001.jpg 로 바꾸는 작은 프로그램)에 하네스를 하나씩 단다. ①(Z13) 도구 둘(list_photos · rename_photo)을 쥐여 주고 parse_action · run_tool 로 실행하며 단계마다 로그 한 줄. ②(Z14) lint_instructions 로 지침 파일 초안을 점검하고(검사: 줄이 없으면 경고 하나 더) 통과하면 build_messages 로 맨 앞에 붙인다. ③(Z15) 인수인계 문서 HANDOFF.md 를 공개 저장소에 올리기 전에 빈 칸(empty_sections) · 숫자(check_doc: 버전 · 형식 수) · 가릴 것(scrub)으로 점검한다. ④(Z16) 원본 폴더를 rm · mv 로 건드리는 명령을 막는 pre_tool_hook(종료 코드 2 는 막기, 0 은 결정 없음). ⑤(Z13 · Z16 · Z17) 도구 요청 → 훅 → decide 권한 규칙 → 실행, done 은 stop_hook(stop_hook_active 로 끝없이 막지 않기)이 확인하는 run_agent 한 바퀴. ⑥(Z18) 서브에이전트 둘에게 폴더를 나눠 맡기고 find_overlap · find_gaps · verify_reports 로 합치기 전에 겹침 · 빠짐 · 보고를 데이터와 대조. ⑦ 내 PC 의 작은 프로젝트에 지침 파일 · HANDOFF.md · 훅이나 deny 규칙을 달고, 막히는지 시험하고, 끝났다는 말 대신 돌린 명령과 출력으로 확인(☐). 연습은 가짜 모델 · 가짜 입력이고, 지침 파일은 권고라서 예외 없이 지킬 것은 훅 · deny 규칙으로 옮긴다는 흐름.",
   pages: [], summary: [] },
 ];
 const PROBLEMS = []; // 교과서 전용 코스 — 문제·채점 없음(「만들어 보기」는 book.js)
