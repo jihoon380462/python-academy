@@ -98,3 +98,23 @@
 - 발견:
   - F1 · L16E/2 · 🟡 · 「하나씩 꺼내 주는 모양이라 list() 로 감싸야 한눈에 보여요」 라고만 하고, 감싸지 않고 print 하면 어떻게 보이는지는 안 보여 줘요. 학생이 `print(combinations(names, 2))` 를 해 보면 `<itertools.combinations object at 0x…>` 가 나와요(U8 「무엇을 돌려주나」) · 근거: python3.13 실행 결과 `<itertools.combinations object at 0x7fecc3cdd170>` · 직접 확인
   - F2 · L16E#3 · 🟡 · 「표가 많은 2개」 인데 표 수가 같을 때 누구를 먼저 보여 줄지(동점 규칙)가 문제 글에 없어요. 출력 예 두 개는 동점이 없어서 가려지지만, `most_common` 은 동점이면 먼저 나온 것이 앞이라(`짜장 짬뽕 볶음밥 탕수육 짬뽕 짜장 탕수육` → 짜장 2 · 짬뽕 2) 학생 답이 달라질 수 있어요 · 근거: 문제 글 「표가 많은 2개를」, python3.13 `Counter(…).most_common(2)` 동점 결과 · 직접 확인
+
+### [L16D] 레슨 35 · pip 와 가상 환경
+읽은 쪽 (증거 — 인용은 dump 원문에서 글자 그대로):
+- L16D/0 「표준 라이브러리에 없는 것은」 PyPI · pip, python -m pip install, list · show · uninstall · 버전 정해 깔기, (접힘) 깔 때 나오는 글 · [notice] 줄
+- L16D/1 「터미널에서 차례로 쳐요」 python -m venv .venv, 켜기(PowerShell · Git Bash · Mac) · 끄기, sys.prefix 와 sys.base_prefix, (접힘) PowerShell 실행 정책
+- L16D/2 「다른 폴더에서는 가상 환경을 새로 만들어 켜고」 VS Code 인터프리터 고르기, pip freeze > requirements.txt 와 install -r, .gitignore 에 .venv
+- 만들어 보기 L16D#1 「가상 환경 만들고 requests 깔기」
+- 만들어 보기 L16D#2 「requirements.txt 로 다른 폴더에 똑같이」
+- 만들어 보기 L16D#3 「requests 가 없다고 할 때」
+- 만들어 보기 L16D#4 「requirements.txt 줄 읽기」
+본 화면: L16D_0_s1 L16D_0_s2 L16D_1_s1 L16D_1_s2 L16D_2_s1 L16D_2_s2 L16D_3_s1 L16D_3_s2 L16D_3_s3 L16D_3_s4
+- 가독성: 중 — 「무엇을 · 왜 · 어떻게」 세 줄 불릿이 쪽마다 반복되고 터미널 입력 · 결과를 코드 상자로 보여 줘서 절차는 따라 하기 쉬워요. 반면 쪽 하나에 설명 글만 약 920~1020자(코드 제외)이고, L16D/2 는 ① 인터프리터 ② requirements.txt ③ .gitignore 세 주제가 한 쪽에 있어 길게 스크롤해야 해요. 쪽 제목이 길어 L16D/0 · L16D/2 는 PC 폭에서 두 줄로 접히고 둘째 줄에 「show」 「.gitignore」 한 단어만 남아요(F3). 쓰지 않은 Git 이 처음 나오는 점은 F1.
+- 난이도: ↑↑ — 직전 L16E 에 비해 본문 2688→5408자(2.0배), 쪽당 설명 글 최대 약 630→1020자(1.6배), 칩 평균 3.0→4.0, 정답 줄 평균 7.3→11.8(1.6배, 최대 9→15; 단 4문제 중 3개는 터미널 명령이라 파이썬 줄이 아님). 지표상 새 호출은 4개뿐이지만 도구 개념이 많아요: pip · PyPI · install/list/show/uninstall/==, venv · 켜기(세 가지 셸) · deactivate, sys.prefix/base_prefix, VS Code 인터프리터, freeze 와 `>`, requirements.txt 와 `-r`, .gitignore(여기서 처음 나오는 Git). 올라가는 곳: L16D/0(pip 하위 명령 네 개 + importlib.metadata 예제), L16D/1(셸별 켜기 + sys 변수), L16D/2(세 주제), L16D#2(폴더 만들기 · 복사 · 새 가상 환경 · 목록 비교 · .gitignore 를 한 문제에서). 파이썬 언어가 아니라 환경 · 도구 이야기라 앞 레슨들의 코드 연습과 결이 달라요.
+- 만들어 보기: 문제마다 칩 점검 — #1(noRun) 칩 5개로 터미널 명령 · `check.py`(준비 파일 제공)를 다 덮어요. #2(noRun) 칩 4개 외에 예시 답이 쓰는 `mkdir` · `cd ..` · `Copy-Item weather\requirements.txt weather2\` 는 칩에도 본문에도 없지만 「폴더 만들기와 복사는 파일 탐색기에서 해도 돼요」 라고 문제 글이 빠져나갈 길을 줘요. #3 칩 3개에 `import requests` 를 try 안에 넣는 모양과 `except ModuleNotFoundError` 이름은 없어요(`ModuleNotFoundError` 글자는 L16D/0 에 있음, import 를 try 로 감싸는 예는 어디에도 없음, F4). #4 칩 4개 + `.strip()` · `"==" in line` · `name, ver = …` 는 L9 · L11 에 있어 칩 밖 문법 없음. 첫 문제는 환경 만들기라 이전 레슨들의 첫 문제(1~3줄)보다 무겁지만(터미널 5단계) 쪽 설명과 순서가 같아요. 문제 순서는 환경(#1) → 환경(#2) → 코드(#3) → 코드(#4)로 이어지고 예시 답은 15 · 14줄 등 챕터 평균 대비 긴 편이에요. 출력 예는 python3.13 으로 확인: #1 가상 환경에서 `requests 2.32.5` · `True`, #3 가상 환경 안 `requests 2.32.5 (가상 환경 안)` · 바깥(site-packages 제외) `requests 가 없어요 (가상 환경 밖) — .venv 를 켰는지 보세요`, #4 일치. #2 의 pip list 출력 예는 F2.
+- 총평: 설명은 친절하고 절차가 정확하지만(pip install · freeze · -r · venv · 3.13 에서 직접 해 보니 모두 문서대로 동작) 이 챕터에서 분량 · 도구 개념이 가장 많은 레슨이라 보스 직전의 큰 고개예요. Git 을 안 가르치고 쓴 점만 짚어요.
+- 발견:
+  - F1 · L16D/1 · L16D/2 · 🟠 · 「Git Bash」(L16D/1) · 「.gitignore 에 .venv — … Git 에 올리지 않아요」(L16D/2) · 확인 목록의 `git status` 가 나오는데, 이 교과서에서 Git 이 무엇인지 풀이한 곳이 앞에 없어요. 시작하기(SETUP)에도 챕터 0~3 에도 Git 설치 · 설명이 없고 이 레슨이 처음이에요. 초보자는 「Git」 이 뭔지 모른 채 `.gitignore` 를 만들게 되고, 「Git Bash 로 열고」 는 Git 을 깐 적이 없으면 따라 할 수 없어요 · 근거: dump(`_setup.md` · 챕터 0~3)에서 `Git` · `.gitignore` 를 찾으면 0건, ch04 에서는 L16D 와 B4 에만 나옴 · 직접 확인(도감에 풀이가 있는지는 확인 못 함, 본문 안 연결은 없음)
+  - F2 · L16D#2 · 🟡 · 출력 예의 pip list 표에서 `Version` 칸 밑줄이 `---------`(9개)인데, 칸 폭은 가장 긴 버전 글자(`2025.8.3`, 8자)에 맞춰져서 실제로는 8개예요. 같은 버전들(pip 25.2 · certifi 2025.8.3 · charset-normalizer 3.4.3 · idna 3.10 · requests 2.32.5 · urllib3 2.5.0)을 깔아 돌린 결과와 한 칸 달라요(눈으로 맞춰 보는 noRun 문제라 막힘은 아님) · 근거: 실행 결과 `------------------ --------` · 직접 확인
+  - F3 · L16D/0 · L16D/2 · 🟡 · 쪽 제목 「python -m pip install requests · pip list · pip show」 와 「requirements.txt · VS Code 인터프리터 · .gitignore」 가 PC 폭에서 두 줄로 접히고 둘째 줄이 한 단어(「show」 · 「.gitignore」)뿐이에요 · 근거: 화면 L16D_0_s1 · L16D_2_s1(`_pc_measure.tsv` 제목 2줄) · 직접 확인
+  - F4 · L16D#3 · 🟡 · 문제는 「이 코드를 고쳐서, 멈추지 않고 알려 주는」 이라 하는데, 멈추는 줄이 `import requests`(둘째 줄)라서 try 를 import 에 씌워야 해요. 칩의 try/except 는 일반 모양(L13)이고 L16D/0 의 try 는 `version(name)` 호출을 감싸는 것이어서 import 를 try 안에 넣는 모양은 본문 · 칩 어디에도 없어요. print 줄만 감싸면 멈춰서 막힐 수 있어요 · 근거: 예시 답 「try:\n    import requests」, 칩 「try: … except 에러이름:」 · 직접 확인
