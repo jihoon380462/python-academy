@@ -582,6 +582,9 @@ with sync_playwright() as p:
     vr=pg.evaluate("({h:[...document.querySelectorAll('.vr')].map(b=>Math.round(b.getBoundingClientRect().height)), sw:document.documentElement.scrollWidth, show:document.querySelectorAll('.vc-sense').length})")
     pg.click('#tbSettings'); pg.wait_for_timeout(150); vm_=pg.evaluate("({r:Math.round(document.querySelector('.modal').getBoundingClientRect().right), sw:document.documentElement.scrollWidth, reset:!!document.querySelector('#vsReset')})"); pg.keyboard.press('Escape'); pg.wait_for_timeout(100)
     check(not vbig and len(vr['h'])==4 and min(vr['h'])>=44 and vr['sw']<=390 and vr['show']>=1 and vm_['r']<=390 and vm_['sw']<=390 and vm_['reset'], '단어장 폰 390: 덱 목록 · 개요 · 찾아보기 · 카드 앞뒤 · 설정 창 가로 넘침 없음, 네 버튼 높이 44 이상 (%s · %s)' % (vbig or 'OK', vr['h']))
+    # v2.46.5: 끝에 ! ? . ' 가 붙은 말(속어 덱의 Freeze! · I'm good. · bussin')도 예문에서 굵게 — 전에는 고르는 단계에서 빠졌어요
+    hlx=pg.evaluate("[VocabApp.hl('Freeze! Police!', {w:'Freeze!'}), VocabApp.hl(\"I'm good, thanks.\", {w:\"I'm good.\"}), VocabApp.hl('That burger is bussin.', {w:\"bussin'\"}), VocabApp.hl('Happy 420!', {w:'420'})]")
+    check(all('<b>' in h for h in hlx), '단어장 예문 굵게: 끝에 ! ? . 가 붙은 말 · 숫자 말도 굵게 (%s)' % hlx)
     pg.evaluate("VocabCore.clockOffset=0"); pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(500)
     ha=pg.evaluate("document.querySelector('.hub-cat a.hc').innerText.replace(/\\n/g,' ')"); check('오늘 할 카드' in ha and '시작 전' not in ha, '허브 카드: 학습한 뒤에는 「오늘 할 카드」 를 보여 줌 (%s)' % ha[-40:])
     verr=errors[v0:]; check(not verr, '영어 단어장 pageerror 0 (%s)' % (verr[:2] or 'OK'))

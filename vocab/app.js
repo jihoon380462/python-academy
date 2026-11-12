@@ -34,7 +34,8 @@ const VocabApp = {
   cnt(n, cls, cur) { return `<span class="vn ${cls}${n ? '' : ' zero'}${cur ? ' cur' : ''}">${n}</span>`; },
   // 예문에서 단어(와 forms 의 다른 모양)를 굵게. 글자는 조각마다 이스케이프해요
   hl(en, note) {
-    const forms = [note.w, ...(note.forms || [])].filter(x => /^[A-Za-z][A-Za-z' -]*$/.test(x)).sort((a, b) => b.length - a.length);
+    // v2.46.5: 끝의 문장 부호 · '(Freeze! · I'm good. · bussin')를 떼고 골라요 — 속어 덱의 말이 예문에서 굵게 안 보이던 것
+    const forms = [note.w, ...(note.forms || [])].map(x => String(x).replace(/[.!?,']+$/, '')).filter(x => /^[A-Za-z0-9][A-Za-z0-9' -]*$/.test(x)).sort((a, b) => b.length - a.length);
     if (!forms.length) return esc(en);
     const re = new RegExp('\\b(' + forms.map(f => f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'gi');
     let out = '', last = 0, m;
