@@ -2,6 +2,7 @@
 // === SYNC ===  기기 연동 (PC ↔ 모바일). GitHub Gist(비공개)에 진행 데이터를 저장해 여러 기기에서 이어서 한다.
 //   - 토큰(classic, gist 권한)만 있으면 됨. 두 번째 기기는 "연동 코드"(토큰+gist id) 붙여넣기 한 번으로 끝.
 //   - 저장할 때마다(디바운스 3초) 올리고, 앱 시작·화면 복귀 때 내려받아 합친다. 클로드 API 키는 동기화하지 않는다.
+//   - v2.46.0: 영어 단어장 조각(academy.vocab)도 같이 오간다 — 복습 기록은 mergeVocab 으로 따로 합친다.
 // =====================================================================
 const Sync = {
   KEY: 'academy.sync', FILE: 'python_academy_save.json', DESC: '파이썬 아카데미 진행 데이터 (자동 동기화 · 지우지 마세요)',
@@ -30,7 +31,37 @@ const Sync = {
   // ----- 데이터 -----
   // QA #67: 예전에는 지금 열린 코스 하나의 Store.data 를 올려서, 다른 코스 페이지가 받으면 그 코스 기록에 섞였다.
   //   형식 2 = 모든 코스 묶음 { format, updatedAt, profile, courses:{id:조각}, tutor:{id:대화}, works }. 옛 형식(problems 가 맨 위)도 받아서 id 로 코스를 나눠 합친다.
-  bundle() { try { Store.split(); } catch (e) {} const courses = {}, tutor = {}; Store.keysWithPrefix('academy.course.').forEach(c => courses[c] = Store._get(Store.KEYS.course(c)) || {}); Store.keysWithPrefix('academy.tutor.').forEach(c => tutor[c] = Store._get(Store.KEYS.tutor(c)) || {}); const profile = Store._get(Store.KEYS.profile) || {}; return { format: this.FORMAT, updatedAt: profile.updatedAt || 0, profile, courses, tutor, works: Store._get(Store.KEYS.works) || [] }; },
+  bundle() { try { Store.split(); } catch (e) {} const courses = {}, tutor = {}; Store.keysWithPrefix('academy.course.').forEach(c => courses[c] = Store._get(Store.KEYS.course(c)) || {}); Store.keysWithPrefix('academy.tutor.').forEach(c => tutor[c] = Store._get(Store.KEYS.tutor(c)) || {}); const profile = Store._get(Store.KEYS.profile) || {}; const b = { format: this.FORMAT, updatedAt: profile.updatedAt || 0, profile, courses, tutor, works: Store._get(Store.KEYS.works) || [] }; const vocab = Store._get(this.VOCAB_KEY); if (vocab) b.vocab = vocab; /* v2.46.0 영어 단어장 조각 — 어느 페이지에서 올려도 빠지지 않게 여기서 같이 묶어요 */ return b; },
+  // ----- 영어 단어장 (v2.46.0, specs/vocab.md 5절) -----
+  //   단어장 조각 = { v, mt 바뀐 시각, resetAt 초기화 시각, cfg 설정, log: { 카드 id: 사건 문자열 } }. 사건 = 시각 6글자(36진수) + 종류 1글자(vocab/core.js).
+  //   두 기기의 기록은 사건의 합집합이에요: 같은 시각의 사건이 양쪽에 있으면 「되돌림(0)」 이 이기고, 초기화 시각보다 앞선 사건은 버려요.
+  //   합치기가 순서 · 횟수와 무관해서(몇 번을 어느 쪽부터 합쳐도 같은 결과) 복습 기록이 사라지거나 두 번 세어지지 않아요.
+  VOCAB_KEY: 'academy.vocab', VOCAB_CACHE: 'academy.vocab.cache',
+  vocabMt() { return (Store._get(this.VOCAB_KEY) || {}).mt || 0; },
+  mergeVocabLog(a, b, resetAt = 0) {
+    if (a === b && !resetAt) return a || '';
+    const m = new Map();
+    for (const s of [a, b]) for (let i = 0; s && i + 7 <= s.length; i += 7) { const t = s.slice(i, i + 6), c = s[i + 6]; if (parseInt(t, 36) <= resetAt) continue; const p = m.get(t); m.set(t, p === undefined ? c : (p === '0' || c === '0') ? '0' : (p > c ? p : c)); }
+    return [...m.keys()].sort().map(t => t + m.get(t)).join('');
+  },
+  mergeVocab(a, b) {
+    if (!a || !a.log) return b && b.log ? b : (a || b || null); if (!b || !b.log) return a;
+    const resetAt = Math.max(a.resetAt || 0, b.resetAt || 0); const newerB = ((b.cfg || {}).t || 0) > ((a.cfg || {}).t || 0);
+    const out = { v: 1, mt: Math.max(a.mt || 0, b.mt || 0), resetAt, cfg: (newerB ? b.cfg : a.cfg) || {}, log: {} };
+    for (const id of [...new Set([...Object.keys(a.log), ...Object.keys(b.log)])].sort()) { const s = this.mergeVocabLog(a.log[id], b.log[id], resetAt); if (s) out.log[id] = s; } // 카드 순서를 고정(어느 쪽부터 합쳐도 저장되는 글자가 같게)
+    return out;
+  },
+  // 내려받은 단어장 조각을 로컬과 합쳐 저장. 바뀌었으면 상태 캐시에 「낡음」 표시를 남기고(허브 카드가 봄) 단어장 페이지에 알려요. 돌려주는 값: 기록이 바뀌었는지
+  applyVocab(remote) {
+    if (!remote || !remote.log) return false; const local = Store._get(this.VOCAB_KEY); const merged = this.mergeVocab(local, remote);
+    const logSig = (v) => JSON.stringify([(v || {}).resetAt || 0, (v || {}).cfg || {}, Object.entries((v || {}).log || {}).sort()]);
+    if (logSig(merged) === logSig(local)) return false;                                   // 원격이 새로 준 것이 없음
+    if (logSig(merged) !== logSig(remote)) merged.mt = Math.max(Date.now(), merged.mt + 1); // 로컬만 가진 것도 있었음 → 새 도장을 찍어 다른 기기가 알아채게
+    Store._set(this.VOCAB_KEY, merged);
+    try { const c = Store._get(this.VOCAB_CACHE); if (c) { c.stale = 1; Store._set(this.VOCAB_CACHE, c); } } catch (e) {}
+    try { window.dispatchEvent(new CustomEvent('academy:vocab')); } catch (e) {}
+    return true;
+  },
   payload() { const b = JSON.parse(JSON.stringify(this.bundle())); if (b.profile.settings) delete b.profile.settings.apiKey; b.syncDevice = this.deviceName(); return b; },
   fromLegacy(r) { // 옛 형식(Store.data 한 덩어리) → 묶음. 문제·레슨·선생님 대화는 id 로 코스를 나누고, 나머지 코스 칸(체크업 등)은 파이썬으로
     const F = Store.COURSE_FIELDS; const profile = {}; const courses = {}; const tutor = {}; const put = (c, f, k, v) => { const o = courses[c] || (courses[c] = {}); (o[f] || (o[f] = {}))[k] = v; };
@@ -73,11 +104,12 @@ const Sync = {
     const w = fresh ? (R.works || L.works) : this.merge({ works: L.works || [], updatedAt: lt }, { works: R.works || [], updatedAt: rt }).works; Store._set(Store.KEYS.works, w || []);
     try { Store.untangle(); } catch (e) {} // 옛 형식이 섞어 둔 것까지 정리
     const d = Store.assemble(); Store.data = Object.assign(Store.blank(), d); Store.data.settings = Object.assign(Store.blank().settings, d.settings || {}); Store.data.settings.apiKey = apiKey; Store.migrate(); Store.save({ silent: true });
+    const vocabChanged = this.applyVocab(R.vocab); /* v2.46.0 영어 단어장 — 복습 기록은 따로 합쳐요(위 mergeVocab) */
     this.lastPullProgress = this.progressSig() !== sigBefore; /* 사용자 요청(11/5): 토스트는 진행이 실제로 들어왔을 때만 */
-    return strip(Store.data) !== before;
+    return strip(Store.data) !== before || vocabChanged;
   },
   // 다른 기기에서 「진행」이 들어왔는지 보는 서명 — 클리어 수·별 합·XP·작품 수 (설정·키 순서·메타가 바뀐 건 세지 않음)
-  progressSig() { try { let clears = 0, stars = 0; Store.keysWithPrefix('academy.course.').forEach(c => { const o = Store._get(Store.KEYS.course(c)) || {}; for (const id in (o.problems || {})) { const r = o.problems[id]; if (r && r.status === 'clear') { clears++; stars += r.stars || 0; } } }); const prof = Store._get(Store.KEYS.profile) || {}; const w = Store._get(Store.KEYS.works); return `${clears}|${stars}|${prof.xp || 0}|${Array.isArray(w) ? w.length : 0}`; } catch (e) { return ''; } },
+  progressSig() { try { let clears = 0, stars = 0; Store.keysWithPrefix('academy.course.').forEach(c => { const o = Store._get(Store.KEYS.course(c)) || {}; for (const id in (o.problems || {})) { const r = o.problems[id]; if (r && r.status === 'clear') { clears++; stars += r.stars || 0; } } }); const prof = Store._get(Store.KEYS.profile) || {}; const w = Store._get(Store.KEYS.works); let ev = 0; const vl = (Store._get(this.VOCAB_KEY) || {}).log || {}; for (const id in vl) ev += vl[id].length; return `${clears}|${stars}|${prof.xp || 0}|${Array.isArray(w) ? w.length : 0}|${ev}`; } catch (e) { return ''; } },
 
   // ----- 연결 -----
   async connect(text) {
@@ -95,18 +127,19 @@ const Sync = {
     const g = await this.api('GET', '/gists/' + this.cfg.gistId); const f = g.files && g.files[this.FILE]; if (!f) throw new Error('NOTFOUND');
     let text = f.content; if (f.truncated) { const r = await fetch(f.raw_url); text = await r.text(); }
     let remote; try { remote = JSON.parse(text); } catch (e) { return false; } if (!remote || typeof remote !== 'object' || !(remote.format === this.FORMAT || 'problems' in remote)) return false;
-    if ((remote.updatedAt || 0) === this.cfg.lastRemoteUpdated && (Store.data.updatedAt || 0) <= this.cfg.lastLocalUpdated) return false; // 양쪽 다 그대로
-    const changed = this.apply(remote); this.cfg.lastRemoteUpdated = remote.updatedAt || 0; this.saveCfg(); return changed;
+    const rvm = (remote.vocab && remote.vocab.mt) || 0; // 단어장은 프로필과 따로 도장(mt)을 봐요 — 복습만 한 기기의 설정이 「더 최근」 으로 잘못 이기지 않게
+    if ((remote.updatedAt || 0) === this.cfg.lastRemoteUpdated && (Store.data.updatedAt || 0) <= this.cfg.lastLocalUpdated && rvm === (this.cfg.lastRemoteVocab || 0) && this.vocabMt() <= (this.cfg.lastLocalVocab || 0)) return false; // 양쪽 다 그대로
+    const changed = this.apply(remote); this.cfg.lastRemoteUpdated = remote.updatedAt || 0; this.cfg.lastRemoteVocab = rvm; this.saveCfg(); return changed;
   },
   async push() {
     const data = this.payload(); await this.api('PATCH', '/gists/' + this.cfg.gistId, { files: { [this.FILE]: { content: JSON.stringify(data) } } });
-    this.cfg.lastRemoteUpdated = data.updatedAt || 0; this.cfg.lastLocalUpdated = data.updatedAt || 0; this.cfg.lastSyncAt = Date.now(); this.saveCfg();
+    this.cfg.lastRemoteUpdated = data.updatedAt || 0; this.cfg.lastLocalUpdated = data.updatedAt || 0; const vm = (data.vocab && data.vocab.mt) || 0; this.cfg.lastRemoteVocab = vm; this.cfg.lastLocalVocab = vm; this.cfg.lastSyncAt = Date.now(); this.saveCfg();
   },
   async syncNow(force = false) { // 내려받아 합치고, 로컬이 바뀌었으면 올린다
     if (!this.on) return false; if (this.busy) { this.pending = true; return false; } this.busy = true; clearTimeout(this.timer);
     try {
       this.set('syncing'); const changed = await this.pull();
-      if (force || (Store.data.updatedAt || 0) > this.cfg.lastLocalUpdated || changed) await this.push();
+      if (force || (Store.data.updatedAt || 0) > this.cfg.lastLocalUpdated || this.vocabMt() > (this.cfg.lastLocalVocab || 0) || changed) await this.push();
       this.cfg.lastSyncAt = Date.now(); this.saveCfg(); this.set('ok');
       if (changed) { if (!this._quiet && this.lastPullProgress && this.toastOk()) UI.toast('☁ 다른 기기의 진행 상황을 가져왔어요', 1500); if (UI.view && !['problem', 'lesson'].includes(UI.view)) UI.go(UI.view, UI.params, false); else UI.renderTopbar(); }
       return changed;
@@ -116,7 +149,7 @@ const Sync = {
   // 사용자 요청(11/5: 팝업은 적당히): 진행이 실제로 들어온 때만, 한 기기에서 10분에 한 번만
   toastOk() { const KEY = 'pa_sync_toast_at'; let last = 0; try { last = +localStorage.getItem(KEY) || 0; } catch (e) {} if (Date.now() - last < 10 * 60 * 1000) return false; try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {} return true; },
   async quietSync() { this._quiet = true; try { return await this.syncNow(); } finally { this._quiet = false; } }, // 복귀·온라인 복구 때는 토스트 없이
-  schedulePush() { if (!this.on) return; clearTimeout(this.timer); this.state = 'dirty'; this.timer = setTimeout(() => this.syncNow(), this.DEBOUNCE_MS); },
+  schedulePush(ms = this.DEBOUNCE_MS) { if (!this.on) return; clearTimeout(this.timer); this.state = 'dirty'; this.timer = setTimeout(() => this.syncNow(), ms); }, // v2.46.0: 단어장은 ms 를 길게(카드마다 올리지 않고 쉬는 틈에 한 번)
   flush() { if (!this.on || this.state !== 'dirty') return; clearTimeout(this.timer); this.syncNow(); },
   ago() { const t = this.cfg && this.cfg.lastSyncAt; if (!t) return '아직 안 함'; const s = Math.round((Date.now() - t) / 1000); return s < 60 ? '방금' : s < 3600 ? Math.round(s / 60) + '분 전' : s < 86400 ? Math.round(s / 3600) + '시간 전' : Math.round(s / 86400) + '일 전'; },
   icon() { return { off: '', idle: '☁', dirty: '☁', syncing: '🔄', ok: '☁', err: '⚠' }[this.state] || '☁'; },

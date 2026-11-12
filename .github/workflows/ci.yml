@@ -35,6 +35,8 @@ jobs:
         run: node tools/check_level.mjs --gate
       - name: check_nesting (괄호 지옥 — 함수 호출 3겹 이상 줄 0개, v2.8.2)
         run: node tools/check_nesting.mjs
+      - name: check_vocab · test_vocab (영어 단어장 — 덱 데이터 모양 · 코어 단위 검사, v2.46.0)
+        run: node tools/check_vocab.mjs && node tools/test_vocab.mjs
       - name: 설치(nasm · 파이썬 패키지)
         run: |
           sudo apt-get install -y -qq nasm  # v2.31.0~ 어셈블리어 교과서: 예시 답 · 예제를 nasm · ld · gcc 로 진짜 빌드 · 실행(tools/asm_book_run.py)

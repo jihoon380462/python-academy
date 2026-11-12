@@ -10,6 +10,8 @@
 
 교과서 21개 · 레슨 540 (`core/config.js` 의 `COURSES`). 모두 📖 교과서예요. 순서는 허브 묶음 순서예요.
 
+허브 맨 위 「🎓 필수교양」 에는 영어 단어장(`/vocab/`)이 있어요. 교과서가 아니라 Anki 방식 단어장이에요(설계 [`specs/vocab.md`](specs/vocab.md)).
+
 | 묶음 | 코스 | 주소 | 레슨 | 연습 도구 |
 | --- | --- | --- | --- | --- |
 | 🐍 처음 시작 | 파이썬 | `/courses/python/` | 100 | VS Code + 파이썬 |
@@ -55,6 +57,7 @@
 | `index.html` · `core/hub.js` | 허브(메인 화면) |
 | `core/` | 공통 바탕 (아래 목록) |
 | `courses/<id>/` | 코스 페이지(`index.html`) · 콘텐츠(`content.js`) · 교과서 데이터(`book.js`) |
+| `vocab/` | 영어 단어장(필수교양): 페이지 · 간격 계산 `fsrs.js` · 코어 `core.js` · 화면 `app.js` · 덱 `decks/` |
 | `shared/` | 에러 사전 · 용어집 |
 | `archive/classic/` | 보관: 예전 문제집 화면의 코드 · 그림 · 옛 문제 · 검사 도구(v2.19.0 까지, 사이트는 안 불러옴) |
 | `tools/` | 검사 · 도구 (아래 「작업 방법」) |
@@ -90,6 +93,7 @@
 - 푸시 전 검사 (Actions `verify` 와 같아요)
   ```bash
   node tools/validate_content.mjs && node tools/check_level.mjs --gate && node tools/check_nesting.mjs
+  node tools/check_vocab.mjs && node tools/test_vocab.mjs   # 영어 단어장: 덱 데이터 모양 · 코어 단위 검사
   node tools/check_book_par.mjs                   # 교과서: 예시 답 · 예제 실행, 「필요한 문법」, 옛 문구 (교과서마다 동시에)
   node tools/extract.mjs tools/.out && python3 tools/run_solutions.py
   python3 tools/regress.py && python3 tools/run_web_solutions.py   # Playwright

@@ -32,10 +32,28 @@ const Hub = {
       <div class="muted small center hub-foot">${T.appName} v${CONFIG.APP_VERSION} · <b>완전 무료</b> · 사이트 가입 없음 · 진행은 내 기기에만 저장(설정에서 백업·기기 연동) · 한 번 연 뒤엔 오프라인도 OK</div>
     </div>`;
   },
+  // v2.46.0 영어 단어장 카드(필수교양): 단어장 페이지가 상태 캐시에 남긴 요약(sum)으로 「오늘 할 카드」 를 세요. 허브는 덱 데이터 · 간격 계산기를 불러오지 않아요.
+  //   sum = { day 요약을 만든 날, tz, roll, maxRev, decks: { 덱: { total, unseen, newPerDay, extra, intro, rev, learn, due: { 하루 번호: 복습 장 수 } } } } (vocab/core.js summary)
+  vocabToday(sum, now = Date.now()) {
+    const T = Math.floor((now + sum.tz * 60000 - sum.roll * 3600000) / 86400000); const same = sum.day === T; const out = { new: 0, learn: 0, rev: 0, total: 0, seen: 0 };
+    for (const id in sum.decks) {
+      const o = sum.decks[id]; let due = 0; for (const k in o.due) if (+k <= T) due += o.due[k];
+      out.new += Math.min(o.unseen, Math.max(0, o.newPerDay + (same ? o.extra - o.intro : 0)));   // 「오늘만 더」 와 「오늘 이미 배운 수」 는 요약을 만든 날에만 뜻이 있어요
+      out.rev += Math.max(0, Math.min(due, sum.maxRev - (same ? o.rev : 0))); out.learn += o.learn; out.total += o.total; out.seen += o.total - o.unseen;
+    }
+    return out;
+  },
+  deckBody(c) {
+    let cache = null; try { cache = JSON.parse(localStorage.getItem('academy.vocab.cache') || 'null'); } catch (e) {}
+    const t = cache && cache.sum ? this.vocabToday(cache.sum) : null; const todo = t ? t.new + t.learn + t.rev : 0; const pct = t && t.total ? Math.round(100 * t.seen / t.total) : 0;
+    const l1 = !t ? '아직 시작 전' : cache.stale ? '다른 기기의 기록을 받았어요' : todo ? `오늘 할 카드 ${todo}장` : '오늘 할 카드를 다 했어요 🎉';
+    const l2 = !t ? (c.deckNote || '') : cache.stale ? '열면 오늘 할 카드를 다시 계산해요' : todo ? `새 카드 ${t.new} · 학습 ${t.learn} · 복습 ${t.rev}` : `본 카드 ${t.seen}/${t.total}`;
+    return `<div class="hc-body">${this.ring(pct, 'var(--primary)')}<div class="hc-txt"><div class="hc-sub">🗂 단어장 · ${esc(l1)}</div><div class="hc-sub muted">${esc(l2)}</div></div></div>`;
+  },
   courseCard(c) {
-    const bp = this.bookProgress(c);
-    const body = `<div class="hc-body">${this.ring(bp.pct, 'var(--primary)')}<div class="hc-txt"><div class="hc-sub">📖 교과서 · 읽은 레슨 ${bp.read}/${bp.total}</div><div class="hc-sub muted">${c.bookNote ? esc(c.bookNote) : bp.read >= bp.total ? '다 읽었어요 🎉' : '채점 없이 읽고 내 컴퓨터에서 만들어 보기'}</div></div></div>`;
-    const glyph = { python: 'Py', algo: 'Al', 'terminal-git': '>_', sql: 'SQL', web: '</>', api: '{ }', math: '∑', vim: 'Vi', github: 'Gh', linux: 'Lx', os: 'OS', asm: 'As', cs: 'CS', llm: 'AI', debug: 'Db', data: 'Da', oop: 'OO', ml: 'ML', ai: 'AC', files: 'Fi', auto: 'Au' }[c.id] || (c.name || '?').slice(0, 1); const inner = `<div class="hc-head"><span class="hc-glyph" aria-hidden="true">${esc(glyph)}</span><span class="hc-name">${esc(c.name)}</span></div><div class="hc-desc muted small">${esc(c.desc)}${c.hubLabel ? ` · ${esc(c.hubLabel)}` : ''}</div>${body}`;
+    const bp = c.deck ? null : this.bookProgress(c);
+    const body = c.deck ? this.deckBody(c) : `<div class="hc-body">${this.ring(bp.pct, 'var(--primary)')}<div class="hc-txt"><div class="hc-sub">📖 교과서 · 읽은 레슨 ${bp.read}/${bp.total}</div><div class="hc-sub muted">${c.bookNote ? esc(c.bookNote) : bp.read >= bp.total ? '다 읽었어요 🎉' : '채점 없이 읽고 내 컴퓨터에서 만들어 보기'}</div></div></div>`;
+    const glyph = { python: 'Py', algo: 'Al', 'terminal-git': '>_', sql: 'SQL', web: '</>', api: '{ }', math: '∑', vim: 'Vi', github: 'Gh', linux: 'Lx', os: 'OS', asm: 'As', cs: 'CS', llm: 'AI', debug: 'Db', data: 'Da', oop: 'OO', ml: 'ML', ai: 'AC', files: 'Fi', auto: 'Au', vocab: 'En' }[c.id] || (c.name || '?').slice(0, 1); const inner = `<div class="hc-head"><span class="hc-glyph" aria-hidden="true">${esc(glyph)}</span><span class="hc-name">${esc(c.name)}</span></div><div class="hc-desc muted small">${esc(c.desc)}${c.hubLabel ? ` · ${esc(c.hubLabel)}` : ''}</div>${body}`;
     return c.ready ? `<a class="card hc ready" href="${this.courseUrl(c)}" style="--hc:var(--primary)">${inner}</a>` : `<div class="card hc soon">${inner}</div>`;
   },
 };

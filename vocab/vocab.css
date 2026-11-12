@@ -1,0 +1,111 @@
+/* vocab/vocab.css — 영어 단어장 화면(v2.46.0). 바탕 색 · 글자 크기 · 버튼은 core/ui.css 것을 그대로 쓰고, 여기는 단어장에만 있는 것.
+   세 가지 수의 색은 Anki 와 같아요: 새 카드 파랑 · 학습 빨강 · 복습 초록. 테마마다 바탕과의 대비 4.5:1 이상(tools/qa_screens.py 가 재요) */
+:root[data-theme=dark]{--v-new:#7cb4ff;--v-learn:#ff8f8f;--v-rev:#5fd97a;--v-hard:#e3a92a}
+:root[data-theme=light]{--v-new:#0f4fa8;--v-learn:#b3261e;--v-rev:#176b33;--v-hard:#8a5300}
+:root[data-contrast="1"][data-theme=dark]{--v-new:#9cc6ff;--v-learn:#ffa3a3;--v-rev:#7ee895;--v-hard:#ffd166}
+:root[data-contrast="1"][data-theme=light]{--v-new:#0b3f8a;--v-learn:#8f1d17;--v-rev:#0f5226;--v-hard:#6b4000}
+
+/* 상단바의 글자 탭(덱 · 찾아보기) */
+.vt-tab{font-size:1em;font-weight:700;padding:0 12px;text-decoration:none;color:var(--muted);white-space:nowrap}
+.vt-tab.on{color:var(--text);box-shadow:inset 0 -3px 0 var(--primary);border-radius:10px 10px 0 0}
+
+.vocab a.btn,.v-study a.btn{text-decoration:none}
+.vocab .v-h{margin:.2em 0 .15em}
+.vocab .v-lead{margin:0 0 14px}
+.vn{font-weight:800;font-variant-numeric:tabular-nums;text-align:center}
+.vn.new{color:var(--v-new)}.vn.learn{color:var(--v-learn)}.vn.rev{color:var(--v-rev)}
+.vn.zero{color:var(--muted);font-weight:600}
+.vn.cur{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
+
+/* 덱 목록 — Anki 의 덱 화면처럼 덱 이름 옆에 수 셋 */
+.v-decks{padding:0;overflow:hidden}
+.vd-row{display:grid;grid-template-columns:minmax(0,1fr) repeat(3,3.4em);align-items:center;gap:4px;padding:12px 14px;border-top:1px solid var(--border);color:var(--text);text-decoration:none;min-height:60px}
+.vd-row:first-child{border-top:0}
+.vd-head{min-height:0;padding:8px 14px;font-size:.85em;font-weight:600;color:var(--muted)}
+.vd-head span{white-space:nowrap}.vd-head span + span{text-align:center}
+a.vd-row:hover{background:var(--surface2)}
+.vd-name{font-weight:700;min-width:0}
+.vd-desc{display:block;font-weight:normal;font-size:.85em;color:var(--muted);margin-top:2px}
+.vd-row.soon .vd-name{color:var(--muted)}
+.vd-soon{grid-column:2/-1;text-align:center;font-size:.85em;color:var(--muted)}
+.vd-tag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;border:1px solid var(--border);font-size:max(.75em,13px);font-weight:600;color:var(--muted);vertical-align:middle}
+.v-foot{margin:10px 2px}
+.v-how summary{cursor:pointer;font-weight:700;min-height:32px}
+.v-how ol{margin:8px 0 0;padding-left:1.3em}.v-how li{margin:4px 0}
+
+/* 덱 개요 */
+.v-over{text-align:center;padding:22px 16px}
+.v-over h2{margin:0 0 4px}
+.v-cnt{display:flex;justify-content:center;gap:22px;margin:16px 0 18px}
+.v-cnt div{display:flex;flex-direction:column;align-items:center;gap:2px}
+.v-cnt .vn{font-size:1.5em}
+.v-cnt small{color:var(--muted);font-size:.85em}
+.v-over .btn.big{min-width:220px}
+
+/* 학습 — 카드는 가운데, 버튼은 아래에 붙어요 */
+.v-study{max-width:720px;margin:0 auto;display:flex;flex-direction:column;min-height:calc(100vh - 82px);min-height:calc(100dvh - 82px)}
+.v-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;min-width:0}
+.v-top .v-deckname{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.v-stage{flex:1;display:flex;flex-direction:column}
+.v-card{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px;margin:0;min-height:260px}
+.vc-kind{font-size:.85em;color:var(--muted);margin-bottom:10px}
+.vc-word{font-size:2.4em;font-weight:800;line-height:1.2;overflow-wrap:anywhere}
+.vc-say{margin-top:10px;min-width:48px;min-height:48px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1.2em}
+.vc-say{display:inline-flex;align-items:center;justify-content:center}.vc-say svg,.v-ico{display:block;flex:none}
+.vc-say:hover{border-color:var(--primary)}
+.vc-say.sm{min-width:36px;min-height:36px;margin:0 0 0 6px;vertical-align:middle}
+.vc-hint{margin-top:10px;font-size:.92em;color:var(--muted)}
+.vc-hr{width:100%;border:0;border-top:1px solid var(--border);margin:18px 0 14px}
+.vc-sense{font-size:1.3em;margin:4px 0;line-height:1.4}
+.vc-pos{display:inline-block;margin-right:6px;padding:1px 8px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);font-size:max(.6em,13px);font-weight:700;color:var(--muted);vertical-align:middle}
+.vc-ex{margin-top:16px;max-width:34em}
+.vc-ex-en{font-size:1.08em;line-height:1.5}.vc-ex-en b{color:var(--primary-text)}
+.vc-ex-ko{color:var(--muted);margin-top:2px}
+.vc-note{margin-top:14px;padding:8px 12px;border-radius:8px;background:var(--surface2);font-size:.95em;max-width:34em}
+.vc-pron{margin-top:6px;color:var(--muted);font-size:.95em}
+.vc-type{max-width:22em;margin-top:16px;text-align:center;font-family:var(--mono);font-size:1.15em}
+.vc-typed{margin-top:8px;font-family:var(--mono)}
+.vc-typed .bad{color:var(--v-learn);text-decoration:line-through}.vc-typed .good{color:var(--v-rev);font-weight:700}
+.v-bar{position:sticky;bottom:0;background:var(--bg);padding:10px 0 calc(8px + env(safe-area-inset-bottom,0px))}
+.v-counts{text-align:center;margin-bottom:8px}
+.v-counts .plus{color:var(--muted);margin:0 6px}
+.v-show{width:100%}
+.v-rate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.vr{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:58px;padding:6px 2px;border-radius:10px;border:1px solid var(--border);border-bottom-width:3px;background:var(--surface2);color:var(--text)}
+.vr:hover{filter:brightness(1.1)}.vr:active{transform:scale(.97)}
+.vr small{font-size:max(.8em,12.5px);color:var(--muted);font-variant-numeric:tabular-nums}
+.vr b{font-weight:700;white-space:nowrap}
+.vr.again{border-bottom-color:var(--v-learn)}.vr.hard{border-bottom-color:var(--v-hard)}.vr.good{border-bottom-color:var(--v-rev)}.vr.easy{border-bottom-color:var(--v-new)}
+.v-tools{display:flex;justify-content:space-between;gap:8px;margin-top:8px}
+.v-done{text-align:center;padding:28px 16px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.v-done h2{margin:0 0 6px}
+
+/* 찾아보기 */
+.vb-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.vb-list{padding:0;overflow:hidden}
+.vb-row{display:grid;grid-template-columns:minmax(5.5em,1fr) minmax(0,2fr) 5.5em;gap:10px;align-items:center;width:100%;text-align:left;padding:10px 14px;border:0;border-top:1px solid var(--border);background:transparent;color:var(--text);min-height:50px}
+.vb-row:first-child{border-top:0}.vb-row:hover{background:var(--surface2)}
+.vb-w{font-weight:700;overflow-wrap:anywhere}.vb-tpl{font-weight:normal;color:var(--muted);font-size:max(.8em,12.5px)}
+.vb-ko{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vb-st{font-size:.85em;white-space:nowrap;text-align:right}
+.vb-st small{display:block;color:var(--muted);font-size:max(.9em,12.5px)}
+
+.v-chip{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.92em;min-height:40px}
+.v-chip:hover{border-color:var(--primary)}.v-chip.on{background:var(--primary);border-color:transparent;color:var(--on-primary);font-weight:700}
+
+/* 카드 정보 · 설정 창 */
+.vi-table{width:100%;border-collapse:collapse;margin-top:10px}
+.vi-table td{padding:5px 4px;border-top:1px solid var(--border);vertical-align:top}.vi-table td:first-child{color:var(--muted);white-space:nowrap;width:7.5em}
+.vs-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px;padding:8px 0;border-top:1px solid var(--border)}
+.vs-row > span{flex:1 1 8em;min-width:0}.vs-row .seg button{white-space:nowrap}
+.vs-row:first-child{border-top:0}
+.vs-row .input{width:5.5em;text-align:center}
+.vs-h{font-weight:700;margin:14px 0 2px}
+
+@media (max-width:560px){
+  .vd-row{grid-template-columns:minmax(0,1fr) repeat(3,3em);padding:12px 10px}
+  .vc-word{font-size:2em}.vc-sense{font-size:1.15em}
+  .v-card{padding:18px 12px}
+  .vb-row{grid-template-columns:minmax(4.5em,1fr) minmax(0,1.6fr) 5em;padding:10px}
+  .vt-tab{padding:0 8px}
+}

@@ -5,6 +5,8 @@
 //   academy.works            내 작품 (공통)
 //   academy.backup.v1        v1(python_academy_save) 원본 보관 — 마이그레이션 후에도 지우지 않음
 //   academy.sync             기기 연동 설정 (core/sync.js가 관리, 동기화 대상 아님)
+//   academy.vocab            영어 단어장 복습 기록·설정 (v2.46.0, vocab/core.js 가 관리 — 기기 연동·백업에 들어감)
+//   academy.vocab.cache      단어장 상태 캐시·허브 카드 요약 (이 기기만, 기록에서 다시 만들 수 있음)
 // v1 키 `python_academy_save`가 있고 v2가 없으면 첫 load()에서 자동 마이그레이션한다.
 const Store = {
   data: null, course: 'python',
@@ -76,7 +78,7 @@ const Store = {
   setCode(id, code, mode) { const p = this.prob(id); if (code != null && byteLen(code) <= CONFIG.MAX_CODE_SAVE_BYTES) { p.code = code; p.mode = mode; } this.save(); },
   exportJSON() { return JSON.stringify(this.data, null, 1); },
   // 모든 코스 묶음 백업 (v2.2.4, docs/archive/NEXT.md F8): localStorage의 academy.* 전부 (API 키·연동 토큰은 제외)
-  exportBundle() { const keys = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (!k || !k.startsWith('academy.') || k === this.KEYS.backup || k === 'academy.sync') continue; const v = this._get(k); if (v == null) continue; if (k === this.KEYS.profile && v.settings) { v.settings = Object.assign({}, v.settings); delete v.settings.apiKey; } keys[k] = v; } return JSON.stringify({ format: 'academy-bundle', v: CONFIG.SCHEMA_VERSION, app: CONFIG.APP_VERSION, at: Date.now(), keys }, null, 1); },
+  exportBundle() { const keys = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (!k || !k.startsWith('academy.') || k === this.KEYS.backup || k === 'academy.sync' || k === 'academy.vocab.cache' /* v2.46.0: 단어장 상태 캐시는 기록(academy.vocab)에서 다시 만들 수 있어 백업에 안 넣어요 */) continue; const v = this._get(k); if (v == null) continue; if (k === this.KEYS.profile && v.settings) { v.settings = Object.assign({}, v.settings); delete v.settings.apiKey; } keys[k] = v; } return JSON.stringify({ format: 'academy-bundle', v: CONFIG.SCHEMA_VERSION, app: CONFIG.APP_VERSION, at: Date.now(), keys }, null, 1); },
   importBundle(text) { const b = JSON.parse(text); if (b && b.format === 'academy-bundle' && b.keys) { const apiKey = this.data.settings.apiKey; for (const [k, v] of Object.entries(b.keys)) if (k.startsWith('academy.') && k !== 'academy.sync') this._set(k, v); this.load(this.course); if (apiKey && !this.data.settings.apiKey) { this.data.settings.apiKey = apiKey; this.save(); } return 'bundle'; } this.importJSON(text); return 'single'; },
   importJSON(text) { const d = JSON.parse(text); if (!d || typeof d !== 'object' || !('problems' in d)) throw new Error('형식이 맞지 않아요'); this.data = Object.assign(this.blank(), d); this.data.settings = Object.assign(this.blank().settings, d.settings || {}); this.migrate(); this.save(); },
   reset() { this.data = this.blank(); this.data.resetAt = Date.now(); this.save(); },
