@@ -2,13 +2,14 @@
 // === CONFIG ===  (수치·CDN 주소·모델명. 수정을 맡길 때 APP_VERSION을 올린다)
 // =====================================================================
 const CONFIG = {
-  APP_VERSION: '2.45.0',
+  APP_VERSION: '2.46.0',
   HUB_PATH: '../../index.html',             // 코스 페이지에서 허브로 (상대 경로)
   SCHEMA_VERSION: 2,                      // 2 = academy.* 조각 저장 (core/storage.js)
   // 문제·레슨 id 로 코스를 알아내는 규칙 (QA #67: 기기 연동이 섞어 놓은 기록을 제자리로 — Store.untangle·Sync). 새 코스·새 id 모양을 만들면 여기에도 (validate 가 검사)
   // v2.40.0 허브 분류(사용자 요청: 코스 · 공용 두 갈래를 더 나누고 코스별로 정리) — 목적별 7묶음, 묶음 안은 추천 순서.
   //   새 코스를 만들면 여기 courses 에 id 를 넣어요. 빠뜨리면 허브 맨 끝 「기타」 에 나와요(사라지지 않게). 설계 중인 코스는 specs/courses-python-next.md
   CATEGORIES: [ // v2.42.1: 순서를 로드맵(specs/roadmap.md)대로 — 주 길(처음 시작 → 파이썬 실력 → 갈래 넷) 다음에 곁길(개발 도구). 리눅스는 컴퓨터 깊이의 2번(CS 다음)
+    { id: 'liberal', icon: '🎓', name: '필수교양', sub: '코딩보다 먼저 — 영어 문서 · 강의 · 에러 메시지를 읽고 듣는 바탕. 매일 조금씩, 다른 코스와 나란히', courses: ['vocab'] }, // v2.46.0 사용자 결정 D27: 「처음 시작」 위. 교과서가 아니라 단어장(deck) — specs/vocab.md
     { id: 'start', icon: '🐍', name: '처음 시작', sub: '여기서부터 — 파이썬 하나로 프로그래밍의 기본을', courses: ['python'] },
     { id: 'pyskill', icon: '💪', name: '파이썬 실력 키우기', sub: '버그 잡기 · 설계 · AI 와 일하기 · 알고리즘 — 디버깅 · 객체지향은 파이썬 챕터 5 뒤, AI와 협업은 디버깅 다음, 알고리즘은 챕터 3 뒤부터 나란히', courses: ['debug', 'oop', 'ai', 'algo'] },
     { id: 'make', icon: '🛠', name: '파이썬으로 만들기', sub: '갈래 · 일 자동화 — 데이터 파일 → 업무 자동화(크롤링 · 게임은 만드는 중)', courses: ['files', 'auto'] },
@@ -40,6 +41,8 @@ const CONFIG = {
     { id: 'ai', short: 'AI 협업', name: 'AI와 협업', icon: '🤝', desc: '좋은 요청 · 단계 나누기 · AI 코드 검증 · 환각 알아보기 · 개인정보 · 저작권 · 지침 파일 · 훅 · 권한까지 AI 도구와 일하는 법을 익히는 교과서', path: 'courses/ai/', color: '#ad1457', ready: true, book: true, bookNote: '파이썬 다음 — AI 도구 잘 쓰기', lessons: 23 /* v2.33.0 AI와 협업 교과서 완성 16 → v2.45.0 챕터 4 「하네스 꾸리기」 7개 더해 23 */ },
     { id: 'files', short: '데이터 파일', name: '데이터 파일 다루기', icon: '🗂️', desc: 'JSON · JSON Lines · TOML · 엑셀(openpyxl)을 파이썬으로 읽고 · 검사하고 · 바꾸고 · 보기 좋은 엑셀 보고서로 내보내는 교과서', path: 'courses/files/', color: '#2e7d32', ready: true, book: true, bookNote: '파이썬 다음 — JSON · 엑셀', lessons: 18 /* v2.41.0 데이터 파일 다루기 교과서 — 18 전부 */ },
     { id: 'auto', short: '업무 자동화', name: '파이썬 업무 자동화', icon: '📎', desc: '파일 · 폴더 일괄 처리 · 백업 · 압축, PDF · 워드 문서, 템플릿과 이메일, 정해진 시간에 혼자 돌아가는 스크립트까지 내 사무 일을 파이썬으로 자동화하는 교과서', path: 'courses/auto/', color: '#6a1b9a', ready: true, book: true, bookNote: '파이썬 다음 — 사무 일 자동화', lessons: 18 /* v2.42.0 파이썬 업무 자동화 교과서 — 18 전부 */ },
+    // v2.46.0 영어 단어장(필수교양) — 교과서가 아니라 Anki 방식 단어장이라 book 이 아니라 deck. 레슨 수가 없고, 허브 카드는 「오늘 할 카드」 를 보여 줘요(core/hub.js deckBody). 문서의 「교과서 N개」 에는 세지 않아요(validate_content)
+    { id: 'vocab', short: '영어 단어', name: '영어 단어장', icon: '🔤', desc: '영어 문서 · 강의 · 에러 메시지에 나오는 단어를 Anki 방식 간격 복습으로 외우는 단어장', path: 'vocab/', color: '#1f6feb', ready: true, deck: true, deckNote: '카드를 보고 떠올린 뒤 넷 중 하나 — 잊을 때쯤 다시 나와요' },
   ],
 
   // --- 외부 라이브러리 (버전 고정) ---

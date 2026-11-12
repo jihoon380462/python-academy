@@ -5,7 +5,7 @@
 #       python3 tools/qa_screens.py --out /tmp/qa_m --w 390 --h 844              (폰)
 #       python3 tools/qa_screens.py --out /tmp/qa_l --theme light --shots 0      (라이트 대비만)
 #       python3 tools/qa_screens.py --out /tmp/qa_b --w 390 --font 3 --shots 0   (폰 + 글자 아주 크게)
-#       뒤에 코스 id 를 붙이면 그 코스만(예: ... linux sql). 결과 요약은 표준 출력, 화면별 값은 <out>/<코스>/report.json
+#       뒤에 코스 id 를 붙이면 그 코스만(예: ... linux sql). 영어 단어장은 vocab. 결과 요약은 표준 출력, 화면별 값은 <out>/<코스>/report.json
 #   「overflow」 에 dogam chip-btn · sql bk-res 가 나오는 건 가로 스크롤 상자라 정상. 필요: playwright + /usr/bin/google-chrome
 import json, sys, os
 from playwright.sync_api import sync_playwright
@@ -45,7 +45,8 @@ EXTRA=r"""() => { const o={h1lines:0, chipTall:[], emptyBox:[], imgBroken:0};
 import argparse
 ap=argparse.ArgumentParser(); ap.add_argument('--out'); ap.add_argument('--w',type=int,default=1440); ap.add_argument('--h',type=int,default=900); ap.add_argument('--theme',default='dark'); ap.add_argument('--font',default='1'); ap.add_argument('--shots',type=int,default=1); ap.add_argument('courses',nargs='*')
 A=ap.parse_args(); OUT=A.out
-courses=A.courses or ['python','algo','math','terminal-git','github','sql','web','vim','linux','os','asm','cs','llm','api','debug','data','oop','ml','ai','files','auto']
+want_vocab=(not A.courses) or ('vocab' in A.courses)  # v2.46.0: 영어 단어장은 교과서가 아니라 아래에서 따로 봐요(코스 id 자리에 vocab)
+courses=[c for c in (A.courses or ['python','algo','math','terminal-git','github','sql','web','vim','linux','os','asm','cs','llm','api','debug','data','oop','ml','ai','files','auto']) if c!='vocab']
 with sync_playwright() as p:
     b=p.chromium.launch(executable_path='/usr/bin/google-chrome',args=['--no-sandbox'])
     for c in courses:
@@ -81,6 +82,21 @@ with sync_playwright() as p:
         print('  tiny', len(tiny), list(tiny.items())[:6])
         print('  smallTargets', len(small), [k for k in small][:8])
         print('  chipTall', len(chip), chip[:5]); print('  h1>=3lines', len(h1), h1[:5]); print('  empty', len(empty), empty[:4]); print('  overflow', len(over), over[:4], 'imgBroken', img)
+    # v2.46.0 영어 단어장(교과서가 아니라 화면이 따로): 덱 목록 · 덱 개요 · 카드 앞 · 카드 뒤 · 찾아보기를 재고, 설정 창은 캡처만
+    if want_vocab:
+        os.makedirs(f'{OUT}/vocab',exist_ok=True); verrs=[]; vrep={}
+        pg=b.new_page(viewport={'width':A.w,'height':A.h}); pg.on('pageerror',lambda e:verrs.append(str(e)[:120]))
+        pg.goto(f'file://{ROOT}/vocab/index.html'); pg.wait_for_timeout(800); pg.evaluate(f"document.documentElement.dataset.theme='{A.theme}'; document.documentElement.dataset.font='{A.font}'")
+        def vshot(name, measure=True):
+            pg.wait_for_timeout(200); pg.evaluate("window.scrollTo(0,0)")
+            if measure: m=pg.evaluate(MEASURE); m['docOver']=pg.evaluate('document.documentElement.scrollWidth')>A.w; vrep[name]=m
+            if A.shots: pg.screenshot(path=f'{OUT}/vocab/{name}.png', full_page=True)
+        vshot('decks'); pg.evaluate("location.hash='#deck/base'"); vshot('deck'); pg.evaluate("location.hash='#study/base'"); vshot('front'); pg.keyboard.press('Space'); vshot('back')
+        pg.evaluate("location.hash='#browse'"); vshot('browse'); pg.click('#tbSettings'); vshot('settings', False); pg.keyboard.press('Escape'); pg.close()
+        json.dump(vrep, open(f'{OUT}/vocab/report.json','w'), ensure_ascii=False)
+        print(f'== vocab: views {len(vrep)} errs {len(verrs)} {verrs[:2]}')
+        for key in ['lowContrast','tiny','smallTargets','overflow']: print('  '+key, {k:m[key][:4] for k,m in vrep.items() if m[key]})
+        print('  docOver', [k for k,m in vrep.items() if m['docOver']])
     # hub & app views
     pg=b.new_page(viewport={'width':A.w,'height':A.h}); pg.goto(f'file://{ROOT}/index.html'); pg.wait_for_timeout(800)
     pg.screenshot(path=f'{OUT}/hub.png', full_page=True); m=pg.evaluate(MEASURE); print('== hub', {k:(v[:5] if isinstance(v,list) else v) for k,v in m.items()})
