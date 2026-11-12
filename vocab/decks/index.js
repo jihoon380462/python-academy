@@ -7,6 +7,7 @@
 //   노트가 하나도 없는 덱은 화면에 「준비 중」 으로 나와요. 채우는 법과 품질 기준: specs/vocab.md
 VocabDecks.add({ id: 'base', name: '기초 일반 단어', desc: '영어 글과 말의 뼈대가 되는, 가장 자주 쓰이는 단어', tpl: ['r'], newPerDay: 10, sample: true,
   credit: '단어와 차례: New General Service List 1.2 · NGSL-Spoken 1.2 (Browne, Culligan & Phillips) — CC BY-SA 4.0. 뜻과 예문은 이 사이트가 썼어요.' });
+VocabDecks.add({ id: 'slang', name: '속어 · 거친 말', desc: '미국에서 들으면 알아들어야 하는 말 — 욕 · 비하어 · 성 · 마약 · 술 · 범죄와 사기 · 일상 속어', tpl: ['r', 'l'], newPerDay: 5 });
 VocabDecks.add({ id: 'listen', name: '듣기', desc: '강의에서 들리는 말 — 기호와 코드 읽는 법 · 강의 말버릇 · 외래어와 소리가 다른 단어', tpl: ['l'], newPerDay: 5 });
 VocabDecks.add({ id: 'dev', name: '개발 단어', desc: '용어의 영어 이름 · 개발 뜻이 따로 있는 단어 · 에러와 문서 단어 · 줄임말 · 접두사와 접미사', tpl: ['r'], newPerDay: 5 });
 VocabDecks.add({ id: 'acad', name: '학술 단어', desc: '대학 강의와 논문에 자주 나오는 단어', tpl: ['r'], newPerDay: 5 });
