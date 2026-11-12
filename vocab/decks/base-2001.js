@@ -3,7 +3,7 @@
 //   뜻 · 예문 · 쓰임은 이 사이트가 직접 쓴 것이고, 목록을 바탕으로 만든 이 덱도 같은 CC BY-SA 4.0 조건을 따라요.
 // 이 파일의 틀은 `node tools/vocab_base_order.mjs --file 2001` 가 만들어요. id · w · rank 는 차례표 그대로라 고치지 않아요. 채울 칸은 ko · ex(· forms · note).
 VocabDecks.notes('base', [
-  { id: 'lean', w: 'lean', rank: 2001, ko: [['v', '기대다'], ['v', '(몸을) 숙이다, 기울이다']], ex: [["Don't lean against the wall. The paint is still wet.", '벽에 기대지 마세요. 페인트가 아직 안 말랐어요.'], ['She leaned forward to hear him better.', '그녀는 그의 말을 더 잘 들으려고 몸을 앞으로 숙였어요.']], forms: ['leaned'], note: 'lean on · against A: A에 기대다 · 영국에서는 과거를 leant 로도 써요 · (속어) 기침약을 섞어 마약처럼 마시는 음료' },
+  { id: 'lean', w: 'lean', rank: 2001, ko: [['v', '기대다'], ['v', '(몸을) 숙이다, 기울이다']], ex: [["Don't lean against the wall. The paint is still wet.", '벽에 기대지 마세요. 페인트가 아직 안 말랐어요.'], ['She leaned forward to hear him better.', '그녀는 그의 말을 더 잘 들으려고 몸을 앞으로 숙였어요.']], forms: ['leaned'], note: 'lean on · against A: A에 기대다 · 형용사로 「기름기 적은, 군살 없는」: lean meat · (속어) 기침약을 섞은 마약 음료' },
   { id: 'dramatic', w: 'dramatic', rank: 2002, ko: [['adj', '극적인, 급격한'], ['adj', '과장된, 호들갑스러운']], ex: [['The movie has a dramatic ending.', '그 영화는 결말이 극적이에요.'], ["Stop being so dramatic. It's only a small cut.", '호들갑 그만 떠세요. 조금 베인 것뿐이에요.']], note: 'drama 의 형용사 · 가운데를 세게 읽어요: dra-MAT-ic' },
   { id: 'differ', w: 'differ', rank: 2003, ko: [['v', '다르다']], ex: [['My twin sister and I differ in many ways.', '쌍둥이 언니와 나는 여러 면에서 달라요.'], ['Prices differ from shop to shop.', '가게마다 값이 달라요.']], note: 'differ from A: A와 다르다 · 말에서는 be different 를 더 자주 써요' },
   { id: 'grateful', w: 'grateful', rank: 2004, ko: [['adj', '고마워하는, 감사하는']], ex: [["I'm grateful to my neighbor for watering my plants.", '화분에 물을 줘서 이웃에게 고마워요.']], note: 'be grateful to A for B: B 때문에 A에게 고마워하다 · thankful 과 비슷해요' },
