@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // tools/check_vocab.mjs — 영어 단어장 덱 데이터 검사(v2.46.0). 쓰기: node tools/check_vocab.mjs  (CI content 작업이 돌려요)
-//   ① 덱 노트 파일(vocab/decks/*.js)이 전부 vocab/index.html 에 올바른 순서로 들어 있는지 — 빠지면 그 노트가 화면에 안 나와요
+//   ① 덱 노트 파일(vocab/decks/*.js)이 전부 vocab/index.html 에 올바른 순서로 들어 있는지 — 빠지면 그 노트가 화면에 안 나와요.
+//      스크립트 · 스타일 줄의 ?v= 가 모두 지금 APP_VERSION 인지(아니면 stamp 가 못 바꿔 오프라인 캐시가 낡아요)
 //   ② 덱 · 노트의 칸 모양(specs/vocab.md 3절): id · 품사 · 뜻 · 예문 · 순위 · forms(예문에 나온 모양만). 한 줄이라도 틀리면 어느 덱 어느 노트인지 알려 줘요
 //   ③ 허브 설정: 「필수교양」 이 맨 앞 묶음이고 단어장이 deck 으로 들어 있는지
 //   ④ 지시서(specs/vocab.md)의 덱별 노트 수 표가 실제와 같은지(문서 숫자가 낡지 않게 — LESSON.md R15),
@@ -19,6 +20,8 @@ try {
   // ① 파일과 불러오는 순서
   const files = fs.readdirSync(path.join(ROOT, 'vocab/decks')).filter(f => f.endsWith('.js')).sort();
   const html = read('vocab/index.html'); const srcs = [...html.matchAll(/<script src="([^"?]+)/g)].map(m => m[1]);
+  { const ver = (read('core/config.js').match(/APP_VERSION:\s*'([^']+)'/) || [])[1];
+    for (const m of html.matchAll(/<(?:script src|link rel="stylesheet" href)="([^"]+)"/g)) { const v = /\?v=([0-9.]+)$/.exec(m[1]); if (!v || v[1] !== ver) err(`vocab/index.html: ${m[1]} 의 ?v= 가 지금 버전(${ver})이 아니에요 — 줄을 ?v=${ver} 로 쓰고 node tools/stamp.mjs 를 돌려요`); } }
   const head = ['../core/config.js', '../core/util.js', '../core/storage.js', '../core/sync.js', '../core/ui-core.js', 'fsrs.js', 'core.js', 'decks/index.js'];
   if (JSON.stringify(srcs.slice(0, head.length)) !== JSON.stringify(head)) err(`vocab/index.html: 앞쪽 스크립트 순서가 달라요 — 기대 ${head.join(' → ')}`);
   if (srcs[srcs.length - 1] !== 'app.js') err('vocab/index.html: 마지막 스크립트는 app.js 여야 해요(덱 노트가 다 들어온 뒤 화면을 시작)');

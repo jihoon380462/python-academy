@@ -21,7 +21,7 @@
 
 | 덱 id | 이름 | 노트 수 | 상태 |
 |---|---|---|---|
-| `base` | 기초 일반 단어 | 210 | 채우는 중: 차례 1 ~ 200(`base-0001.js`) + 표본 10개. 정식 2,833개는 W1 |
+| `base` | 기초 일반 단어 | 408 | 채우는 중: 차례 1 ~ 400(`base-0001.js` · `base-0201.js`) + 표본 8개(`base-0401.js` · `base-0601.js` 에). 정식 2,833개는 W1 |
 | `listen` | 듣기 | 0 | 준비 중. W2 |
 | `dev` | 개발 단어 | 0 | 준비 중. W3 |
 | `acad` | 학술 단어 | 0 | 준비 중. W7(나중) |
@@ -163,6 +163,7 @@ VocabDecks.notes('base', [
 다른 모양 (`forms`)
 - **예문에 실제로 나온 모양만** 적어요(검사가 봐요). 예문에서 그 낱말을 굵게 보여 주는 데만 쓰여요. 예문에 `w` 그대로만 나오면 `forms` 를 쓰지 않아요.
 - 예문에 안 나온 모양은 `note` 에 적어요: 불규칙하게 바뀌는 모양(`go - went - gone`), 짝이 되는 낱말(`he` 의 him · his).
+- 차례표의 다른 모양 칸에 없는 모양이라도 예문에 나오면 적어요(예: `shoot` 의 `shot`).
 - 차례표의 `forms` 칸에는 줄임말의 조각(`m` · `s` · `re` · `t` · `ll`)도 섞여 있어요. 그대로 다 옮기지 않아요.
 
 쓰임 (`note`)
@@ -173,7 +174,7 @@ VocabDecks.notes('base', [
 
 차례표 앞쪽은 관사 · 대명사 · 전치사 · 조동사라서 뜻을 쓰기가 가장 어려워요. 아래 14줄은 `check_vocab` 을 통과한 본보기예요. 그 차례의 파일을 쓸 때 **이 줄을 그대로** 넣어요.
 
-- 앞의 아홉 줄(be ~ will)은 이미 덱에 들어 있어요(`base-0001.js`). 남은 다섯(right · yeah · two · mine · left)을 그 차례의 파일에 넣으면 돼요.
+- 덱에 이미 들어 있는 줄은 `check_vocab` 이 덱의 노트와 글자까지 대조해요(출력의 「덱에 든 N줄과 같음」). 아직 덱에 없는 줄은 그 차례의 파일을 쓸 때 그대로 넣어요.
 - 덱에 든 노트와 이 본보기는 글자까지 같아야 해요(검사가 봐요). 한쪽을 고치면 다른 쪽도 같이 고쳐요.
 - 대명사 · 전치사 · 접속사 · 물음말의 본보기가 더 필요하면 `base-0001.js` 를 봐요(it · that · there · what · if · at …).
 
@@ -187,11 +188,11 @@ VocabDecks.notes('base', [
   { id: 'not', w: 'not', rank: 11, ko: [['adv', '~이 아니다, ~하지 않다']], ex: [['I am not tired.', '나는 피곤하지 않아요.']], note: "줄이면 n't: isn't · don't · can't" },
   { id: 'like', w: 'like', rank: 27, ko: [['v', '좋아하다'], ['prep', '~처럼, ~같은']], ex: [['I like this song.', '나는 이 노래를 좋아해요.'], ['It looks like rain.', '비가 올 것 같아요.']] },
   { id: 'will', w: 'will', rank: 29, ko: [['aux', '~할 것이다 (앞으로의 일)']], ex: [['It will rain tomorrow.', '내일 비가 올 거예요.']], note: "줄이면 'll: I'll · 부정은 won't" },
-  { id: 'right', w: 'right', rank: 46, ko: [['adj', '옳은, 맞는'], ['n', '오른쪽'], ['adv', '바로']], ex: [["You're right.", '당신 말이 맞아요.'], ['Turn right at the corner.', '모퉁이에서 오른쪽으로 도세요.']] },
+  { id: 'right', w: 'right', rank: 46, ko: [['adj', '옳은, 맞는'], ['adv', '오른쪽으로'], ['n', '오른쪽']], ex: [["You're right.", '당신 말이 맞아요.'], ['Turn right at the corner.', '모퉁이에서 오른쪽으로 도세요.']], note: 'right now: 지금 바로 · right here: 바로 여기' },
   { id: 'yeah', w: 'yeah', rank: 66, ko: [['int', '응, 그래 (yes 의 편한 말)']], ex: [['Yeah, I think so.', '네, 그런 것 같아요.']] },
   { id: 'two', w: 'two', rank: 69, ko: [['num', '둘, 2']], ex: [['I have two brothers.', '나는 형제가 둘 있어요.']] },
   { id: 'mine', w: 'mine', rank: 416, ko: [['pron', '내 것'], ['n', '광산']], ex: [['This bag is mine.', '이 가방은 내 거예요.']], note: '광산이라는 뜻은 훨씬 드물어요' },
-  { id: 'left', w: 'left', rank: 1277, ko: [['adj', '왼쪽의'], ['n', '왼쪽']], ex: [['Turn left at the next street.', '다음 길에서 왼쪽으로 도세요.']], note: 'leave(떠나다)의 과거 모양도 left 예요' },
+  { id: 'left', w: 'left', rank: 1277, ko: [['adv', '왼쪽으로'], ['adj', '왼쪽의'], ['n', '왼쪽']], ex: [['Turn left at the next street.', '다음 길에서 왼쪽으로 도세요.'], ['He writes with his left hand.', '그는 왼손으로 글씨를 써요.']], note: 'leave(떠나다)의 과거 모양도 left 예요' },
 ```
 
 - 관사(`the` · `a`): 품사는 `art`. 뜻 칸에 하는 일을 괄호로 적고, 우리말로 옮기지 않는다는 것은 `note` 에 적어요.
@@ -199,6 +200,10 @@ VocabDecks.notes('base', [
 - 뜻이 품사마다 다른 단어(`like` · `right`): 칸을 나누고, 예문도 뜻마다 하나씩(둘까지) 써요.
 - 같은 글자가 다른 단어인 것(`mine` · `left` · `found` · `rose` · `wound`): 흔한 쪽을 첫 뜻으로, 다른 쪽은 둘째 칸이나 `note` 에 적어요.
 - 숫자(`two` …)는 품사 `num`. 말에서만 쓰는 낱말(`yeah` · `okay`)은 어떤 말의 편한 모양인지 괄호로 적어요.
+- 품사를 고르는 기준
+  - 대답으로도 쓰는 부사(`sure` · `exactly` · `absolutely`)는 `adv` 로 하고 뜻 앞에 「(대답)」 을 붙여요. `int` 는 감탄사로만 쓰는 낱말(`yes` · `no` · `yeah` · `okay` · `oh`)에.
+  - 구동사(`put on` · `drop off` · `fill out`)는 `v`. 동사가 아닌 묶음(`a lot` · `sort of` · `in detail` · `in fact`)은 `phr`.
+  - 예문이 굳은 표현(`in detail` · `in common`)을 보여 주면 그 표현을 `phr` 칸으로 적거나, 낱말 자체의 뜻을 보여 주는 예문으로 바꿔요.
 - 사용자가 이미 아는 단어는 「아는 단어 한꺼번에 넘기기」 화면(5절)에서 넘겨요. 그래도 덱에는 다 넣어요.
 
 ## 4. 간격 계산 규칙
@@ -339,7 +344,7 @@ VocabDecks.notes('base', [
    - 줄 끝의 「// 다른 모양: …」 은 참고용이에요. 예문에 쓴 모양만 `forms` 에 적고, 그 주석은 지워요.
    - 3절 「어려운 경우 본보기」 에 있는 단어는 그 줄을 그대로 넣어요.
 4. 다 못 채우고 멈춰야 하면, 채운 줄만 남기고 빈 틀 줄을 지워요. 빈 틀이 하나라도 남으면 검사가 실패해요. 다음에 2번을 다시 돌리면 빈 틀이 다시 생겨요.
-5. 파일을 처음 만들었으면 `vocab/index.html` 의 「덱 노트」 자리에 차례 순서대로 한 줄을 넣고 `node tools/stamp.mjs` 를 돌려요. `sw.js`(오프라인 캐시 목록)도 같이 바뀌어요.
+5. 파일을 처음 만들었으면 `vocab/index.html` 의 「덱 노트」 자리에 차례 순서대로 한 줄을 넣고 `node tools/stamp.mjs` 를 돌려요. 넣을 줄은 2번의 `--file` 이 버전까지 적어 알려 줘요(그대로 붙여요). `sw.js`(오프라인 캐시 목록)도 같이 바뀌어요.
 6. 0절 표의 `base` 노트 수를 고치고 검사를 돌려요. 통과할 때까지 고쳐요. 고칠 수는 실패 글에 나와요(「노트 수 10 ≠ 실제 50」 처럼).
    ```bash
    node tools/check_vocab.mjs
@@ -458,7 +463,9 @@ python3 tools/qa_screens.py --out /tmp/qa_vm --w 390 --h 844 vocab # 폰
   - 맡은 파일 이름과 차례 범위
   - 3절의 노트 모양과 품질 기준, 본보기 파일
   - 끝 검사: `node tools/check_vocab.mjs`
+  - 임시 파일(노트 데이터 · 스크립트)은 scratchpad 안의 맡은 파일 이름 하위 폴더(`w0801/` 처럼)에만. 여럿이 같은 폴더를 쓰면 같은 이름의 파일을 서로 덮어써요
 - `vocab/index.html` · `vocab/decks/index.js` · 이 문서의 표는 나눠 맡기지 않고 합치는 사람이 고쳐요.
+  - 작업자는 자기 작업 폴더에서 검사를 통과시키려고 `index.html` 의 한 줄 · 0절 표의 숫자를 고쳐도 돼요. 합치는 사람은 덱 파일만 가져와요.
 - 합친 뒤에는 파일마다 위 「검수」 를 하고, 합치는 사람도 파일마다 30개쯤을 직접 읽어 봐요(LESSON.md R9).
   - 어디서 옮겨 온 문장 같지 않은가도 봐요.
 - 숫자는 `check_vocab` 출력에서 복사해요(LESSON.md R10).

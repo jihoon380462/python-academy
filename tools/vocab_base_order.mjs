@@ -129,6 +129,6 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.join(ROOT, 'tools/
     let plan; try { plan = planFile(+arg('--file'), b.rows, loadBase()); } catch (e) { console.error('✗ ' + e.message); process.exit(1); }
     fs.writeFileSync(path.join(DECKS, plan.f), plan.text);
     console.log(`${plan.f} 를 썼어요: 차례 ${+arg('--file')} ~ ${plan.end}, 이미 쓴 노트 ${plan.kept}개는 그대로 · 채울 빈 틀 ${plan.blanks}개`);
-    if (!fs.readFileSync(path.join(ROOT, 'vocab/index.html'), 'utf8').includes(`decks/${plan.f}`)) console.log(`  vocab/index.html 의 「덱 노트」 자리에 차례대로 넣어요: <script src="decks/${plan.f}?v=…"></script> (넣고 node tools/stamp.mjs)`);
+    if (!fs.readFileSync(path.join(ROOT, 'vocab/index.html'), 'utf8').includes(`decks/${plan.f}`)) { const ver = (fs.readFileSync(path.join(ROOT, 'core/config.js'), 'utf8').match(/APP_VERSION:\s*'([^']+)'/) || [])[1]; console.log(`  vocab/index.html 의 「덱 노트」 자리에 차례대로 이 줄을 그대로 넣어요: <script src="decks/${plan.f}?v=${ver}"></script>`); }
   } else { fs.writeFileSync(OUT, b.text); console.log('vocab/sources/base-order.tsv 를 썼어요'); }
 }
