@@ -442,18 +442,45 @@ VocabDecks.notes('base', [
 
 ### W3. 개발 단어 덱 (`dev`)
 
-- 갈래 다섯
-  1. 용어의 영어 이름: 변수 = variable. 재료는 `shared/glossary.js`(94항목 중 영어가 같이 적힌 것은 36개)
-  2. 원래 뜻과 개발 뜻이 다른 단어: argument · string · raise · yield · branch · commit. `note` 에 「원래 뜻: …」 을 적어요
-  3. 에러 메시지와 공식 문서 단어: invalid · unexpected · missing · required · denied · exceeded · deprecated. 재료는 `shared/errors.js` 와 파이썬이 실제로 내는 에러 글
-  4. 줄임말 풀이: `str` = string · `len` = length · `mkdir` = make directory. `note` 에 풀어 쓴 말을 적어요
-  5. 접두사와 접미사: un- · re- · sub- · -able. 예로 `iterable` · `callable` · `unsupported`
-- 단어는 감으로 고르지 않고 데이터에서 뽑아요.
-  - 교과서 21개의 `content.js` · `book.js` 에 실제로 나오는 영어 낱말을 스크립트로 세요.
-  - 파이썬 키워드와 내장 이름은 `keyword.kwlist` · `dir(builtins)` 로 뽑아요.
-- 차례: 파이썬 교과서 진도 순서(그 낱말이 처음 나오는 레슨 순서)로 매겨요.
-- 카드 종류: 덱 기본은 `r`. 코드에 직접 치는 이름(`length` · `append` 같은 것)은 `tpl: ['r', 't']` 로 철자 카드도 만들어요.
-- 기초 덱과 같은 단어가 나와도 돼요. 개발 덱에는 개발 뜻을 적어요.
+코드 · 에러 메시지 · 공식 문서를 읽을 때 만나는 말이에요. 갈래 다섯, 노트 약 340개(실제 수는 0절 표).
+
+1. **용어의 영어 이름** (약 80): 우리말로 배운 개념의 영어 이름이에요. 변수 variable · 매개변수 parameter · 들여쓰기 indentation · 예외 exception · 상속 inheritance
+   - 외래어로 배워 영어가 뻔한 것(리스트 · 튜플)과 입력 · 출력처럼 쉬운 것은 빼요.
+2. **원래 뜻과 개발 뜻이 다른 단어** (약 80): print(인쇄하다 → 출력하다) · return · raise · yield · branch · commit · execute(처형하다 → 실행하다) · kill
+3. **에러 메시지와 공식 문서 단어** (약 80): invalid · unexpected · missing · required · exceeded · deprecated · subscriptable · untracked · detached · fatal
+4. **줄임말 풀이** (약 80): def · len · elif · args · kwargs · cwd · pid · fd · repr · enum · sudo · chmod · grep
+5. **접두사와 접미사** (18): un- · re- · sub- · de- · im- · -able · -er · -ize · -ify
+
+고른 근거 (2026-11-12 에 셈)
+- 갈래 1: 용어집(`shared/glossary.js`)과 레슨 terms 의 「한글 (영어)」 짝을 봤어요. 그 한글 용어가 교과서에 나오는 횟수도 셌어요.
+- 갈래 2 ~ 4: 교과서 21개의 코드 · 글에 나오는 횟수를 셌어요.
+- 갈래 3 은 실제로 돌려 모은 메시지의 낱말 횟수예요.
+  - 흔한 실수 코드 87개를 파이썬 3.13 으로 돌린 에러 마지막 줄
+  - git · 셸 · pip 이 낸 메시지
+  - 파이썬 내장 함수 · 메서드의 공식 설명글(docstring) 853개
+- 갈래 5: 위 낱말들에 실제로 붙어 있는 접사를 골랐어요.
+- 한 낱말은 한 갈래에만 둬요. argument · object 는 갈래 2, permission · conflict 는 갈래 3 이에요.
+
+차례와 파일
+- 덱 전체를 파이썬 교과서 진도 순서로 매겨요. 기준은 그 말이 처음 나오는 레슨이에요(파이썬 교과서 다음은 허브의 교과서 차례). 갈래를 따로 섞지 않아도 진도에 맞춰 섞여요.
+- 교과서에 없는 말(실제 에러 글에만 나오는 말)은 맨 뒤에 둬요. 메시지 · 설명글 횟수 순이에요.
+- 갈래 5 는 예로 든 낱말 가운데 가장 먼저 나오는 레슨을 따라요.
+- 합치는 사람이 차례대로 `dev-001.js` · `dev-101.js` · `dev-201.js` · `dev-301.js` 로 나눠요. `rank` 는 쓰지 않아요.
+
+노트 모양
+- 카드: 덱 기본은 읽기(`r`)예요. 코드에 직접 치는 이름(파이썬 키워드 · 내장 함수 · 자주 쓰는 메서드 · 셸 명령 · 줄임말)은 `tpl: ['r', 't']` 예요. 뜻을 보고 철자를 쳐요.
+- 뜻은 개발 뜻을 첫 칸에 적어요.
+  - 갈래 2 는 원래 뜻을 둘째 칸이나 `note` 에 적어요: 「원래 뜻: 인쇄하다」.
+  - 갈래 4 는 뜻 칸에 우리말 뜻과 풀어 쓴 영어를 같이 적어요: 「길이 (length 의 줄임)」.
+  - 갈래 5 는 `w` 에 접사(`un-` · `-able`), 품사는 `affix`, 뜻은 접사의 뜻이에요. 예문에는 그 접사가 붙은 낱말을 넣고 `forms` 에 적어요.
+- `pron` 은 쓰지 않아요. 듣기 덱에서만 써요(검사가 봐요).
+- 예문은 실제 에러 메시지나 문서에 나올 법한 문장이에요(3절).
+  - 실제 메시지를 따옴표로 인용해도 돼요: `Python says "NameError: name 'x' is not defined"`
+  - 16낱말 안이에요.
+- 기초 · 듣기 덱과 같은 단어가 나와도 돼요. 개발 덱에는 개발 뜻을 적어요. 듣기 덱은 소리, 개발 덱은 뜻 · 철자를 가르쳐요.
+- 검사(`check_vocab` ⑥)
+  - 듣기 덱 말고는 `pron` 이 없는지 봐요.
+  - 접사 노트(`w` 가 `-` 로 시작하거나 끝남)에 품사 `affix` 와 `forms` 가 있는지 봐요.
 
 ### W4. 아는 단어 한꺼번에 넘기기 — ✅ 끝남 (v2.46.1)
 
