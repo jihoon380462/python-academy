@@ -11,7 +11,7 @@
 //      채우는 중인 덱(sample)이 없는데 그 두 줄이나 지시서 0절에 「채우는 중」 이 남았는지(LESSON.md R15 두 번째)
 //   ⑤ 기초 덱: 차례표(vocab/sources/base-order.tsv)가 원문 목록과 맞는지, 노트의 rank · id · w 가 차례표와 같은지, 출처 표기가 있는지,
 //      노트가 제 차례의 파일(base-NNNN.js)에 들어 있는지, 예문이 쉬운지(14낱말까지 · 차례표 밖 낱말은 예문마다 1개까지)
-//   ⑥ 듣기 덱(specs/vocab.md W2): pron 은 듣기 덱에서만(W3), 접사 노트는 affix 품사와 forms(W3), 듣기 덱의 pron 이 「강세 대문자 철자 [한글 소리]」 모양인지, say 가 있으면 카드가 읽기 · 듣기 둘인지,
+//   ⑥ 듣기 덱(specs/vocab.md W2): pron 은 듣기 덱에서만(W3), 접사 노트는 affix 품사와 forms(W3), 쓰기 카드의 뜻 칸에 답(w)이 없는지(W3), 듣기 덱의 pron 이 「강세 대문자 철자 [한글 소리]」 모양인지, say 가 있으면 카드가 읽기 · 듣기 둘인지,
 //      낱말이 아닌 w(기호 · 식)에 say 가 있는지, 예문이 16낱말까지인지
 //   ⑦ 한 덱 파일 안에서 같은 첫 두 낱말로 시작하는 예문이 12개까지인지(3절 — 같은 문장 틀만 되풀이하지 않게)
 //   빈 틀(ko: [], ex: [] — tools/vocab_base_order.mjs --file 이 만든 것)이 남아 있으면 덱마다 한 줄로 알려 줘요
@@ -112,6 +112,8 @@ try {
     // W3: pron(소리 적기)은 듣기 덱에서만 · 개발 덱의 접사 노트(w 가 un- · -able 모양)는 품사 affix 와 예문 속 낱말(forms)
     for (const d of D.list) for (const n of d.notes) { if (!n || isBlank(n)) continue; const w = `${d.id}/${n.id}`;
       if (d.id !== 'listen' && n.pron !== undefined) err(`${w}: pron(소리 적기)은 듣기 덱에서만 써요(W2 · W3)`);
+      { const tp = n.tpl || d.tpl; if (tp.includes('t') && typeof n.w === 'string' && Array.isArray(n.ko)) { const re = new RegExp('(?<![A-Za-z])' + n.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z])', 'i');
+        if (n.ko.some(k => Array.isArray(k) && re.test(String(k[1])))) err(`${w}: 쓰기 카드는 앞면에 뜻만 보여요 — 뜻 칸에 답 「${n.w}」 이 들어 있으면 안 돼요(W3)`); } }
       if (d.id === 'dev' && typeof n.w === 'string' && /^[a-z]+-$|^-[a-z]+$/.test(n.w) && (!Array.isArray(n.ko) || !n.ko.some(k => Array.isArray(k) && k[0] === 'affix') || !Array.isArray(n.forms) || !n.forms.length)) err(`${w}: 접사 노트 「${n.w}」 는 품사 affix 와, 예문에 나온 낱말을 적은 forms 가 있어야 해요(W3)`); }
     if (L) console.log(`듣기 덱 규칙(W2): 노트 ${n6}개 — pron 모양 · say 와 카드 종류 · 예문 16낱말`); }
   // ⑦ 한 파일 안에서 같은 첫 두 낱말로 시작하는 예문은 12개까지(3절). 갈래를 섞어 합친 파일에서 한 문장 틀이 몰리지 않게
