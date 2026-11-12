@@ -11,6 +11,9 @@
 //      채우는 중인 덱(sample)이 없는데 그 두 줄이나 지시서 0절에 「채우는 중」 이 남았는지(LESSON.md R15 두 번째)
 //   ⑤ 기초 덱: 차례표(vocab/sources/base-order.tsv)가 원문 목록과 맞는지, 노트의 rank · id · w 가 차례표와 같은지, 출처 표기가 있는지,
 //      노트가 제 차례의 파일(base-NNNN.js)에 들어 있는지, 예문이 쉬운지(14낱말까지 · 차례표 밖 낱말은 예문마다 1개까지)
+//   ⑥ 듣기 덱(specs/vocab.md W2): pron 이 「강세 대문자 철자 [한글 소리]」 모양인지, say 가 있으면 카드가 읽기 · 듣기 둘인지,
+//      낱말이 아닌 w(기호 · 식)에 say 가 있는지, 예문이 16낱말까지인지
+//   ⑦ 한 덱 파일 안에서 같은 첫 두 낱말로 시작하는 예문이 12개까지인지(3절 — 같은 문장 틀만 되풀이하지 않게)
 //   빈 틀(ko: [], ex: [] — tools/vocab_base_order.mjs --file 이 만든 것)이 남아 있으면 덱마다 한 줄로 알려 줘요
 //   파일을 못 읽거나 실행하다 에러가 나면 통과가 아니라 실패예요(LESSON.md R6). 코어의 계산은 tools/test_vocab.mjs 가 봐요.
 import fs from 'node:fs'; import path from 'node:path'; import vm from 'node:vm';
@@ -96,6 +99,22 @@ try {
       for (const e of n.ex) { if (!Array.isArray(e) || typeof e[0] !== 'string') continue; const k = e[0].toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim(); const at = `${d.id}/${n.id}`;
         if (seen.has(k)) err(`예문이 겹쳐요: 「${e[0]}」 (${seen.get(k)} · ${at}) — 한쪽을 다른 문장으로 바꿔요`); else seen.set(k, at); } }
     console.log(`예문 ${seen.size}개 겹침 검사 · 뜻이 둘 이상인데 예문이 하나뿐인 노트 ${one}개`); }
+
+  // ⑥ 듣기 덱(specs/vocab.md W2)
+  { const L = D.byId.listen; let n6 = 0;
+    if (L) for (const n of L.notes) { if (!n || isBlank(n)) continue; const w = `listen/${n.id}`; n6++;
+      if (typeof n.pron !== 'string') err(`${w}: 듣기 덱 노트는 pron 이 있어야 해요(「pa-RAM-e-ter [퍼래미러]」 모양 — W2)`);
+      else if (!/^[^\[\]]*[A-Z][^\[\]]* \[[^\[\]]*[가-힣][^\[\]]*\]$/.test(n.pron)) err(`${w}: pron 은 「강세 음절을 대문자로 쓴 철자 [한글 소리]」 모양이에요(지금 「${n.pron}」)`);
+      const tpl = n.tpl || L.tpl;
+      if (n.say !== undefined && !(tpl.includes('r') && tpl.includes('l'))) err(`${w}: say 가 있는 노트(기호 · 식 · 코드)는 tpl: ['r', 'l'] 이에요`);
+      if (typeof n.w === 'string' && !/^[A-Za-z][A-Za-z' -]*[.?!]?$/.test(n.w) && n.say === undefined) err(`${w}: 낱말이 아닌 w 「${n.w}」 에는 강의에서 읽는 말(say)이 있어야 해요`);
+      for (const e of n.ex || []) if (Array.isArray(e) && typeof e[0] === 'string' && e[0].split(/\s+/).filter(Boolean).length > 16) err(`${w}: 예문이 16낱말을 넘어요 「${e[0]}」`); }
+    if (L) console.log(`듣기 덱 규칙(W2): 노트 ${n6}개 — pron 모양 · say 와 카드 종류 · 예문 16낱말`); }
+  // ⑦ 한 파일 안에서 같은 첫 두 낱말로 시작하는 예문은 12개까지(3절). 갈래를 섞어 합친 파일에서 한 문장 틀이 몰리지 않게
+  { const by = new Map(); for (const d of D.list) for (const n of d.notes) { const f = fileOfNote.get(n); if (!f || !n || !Array.isArray(n.ex)) continue;
+      for (const e of n.ex) { if (!Array.isArray(e) || typeof e[0] !== 'string') continue; const k = e[0].toLowerCase().replace(/[^a-z0-9' ]/g, ' ').trim().split(/\s+/).slice(0, 2).join(' '); const key = f + '\t' + k; by.set(key, (by.get(key) || 0) + 1); } }
+    let top = 0; for (const [key, c] of by) { top = Math.max(top, c); if (c > 12) { const [f, k] = key.split('\t'); err(`decks/${f}: 「${k} …」 로 시작하는 예문이 ${c}개예요 — 한 파일에 12개까지(같은 문장 틀만 되풀이하지 않게, 3절)`); } }
+    console.log(`예문 첫 두 낱말: 한 파일 안에서 가장 많이 겹친 것 ${top}개(12개까지)`); }
 
   // ⑤ 기초 덱과 차례표
   { const b = buildBaseOrder(); const tsv = path.join(ROOT, 'vocab/sources/base-order.tsv');
