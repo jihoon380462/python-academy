@@ -134,14 +134,19 @@ section('오늘 볼 카드 — 기초 덱 표본');
   eq(ses.done, lim * 2, '누른 횟수');
   const sum = C.summary(t);
   eq([sum.decks.base.total, sum.decks.base.unseen, sum.decks.base.intro], [n, n - lim, lim], '요약: 전체 · 안 본 카드 · 오늘 배운 카드');
-  eq(Hub.vocabToday(sum, t), { new: 0, learn: 0, rev: 0, total: n, seen: lim }, '허브 요약(오늘): 할 카드 없음');
+  // v2.46.5: 카드가 있는 덱이 여럿이면 허브는 모두를 합쳐 세요 — 비교도 카드가 있는 모든 덱을 훑은 값으로(덱 수와 상관없게)
+  const all = Object.keys(sum.decks).filter(id => sum.decks[id].total > 0);
+  eq(C.scan(['base'], t).counts, { new: 0, learn: 0, rev: 0 }, '기초 덱: 오늘 할 카드 없음');
+  const scT = C.scan(all, t);
+  eq(Hub.vocabToday(sum, t), { new: scT.counts.new, learn: scT.counts.learn, rev: scT.counts.rev, total: all.reduce((a, id) => a + sum.decks[id].total, 0), seen: lim }, '허브 요약(오늘) = 모든 덱을 훑은 수 · 본 카드는 기초 덱에서 누른 만큼');
   // 다음 복습 날
   const firstDue = Math.min(...Object.keys(sum.decks.base.due).map(Number));
   const at = C.dayStart(firstDue) + 6 * 3600000;   // 그날 오전 10시
   const sc = C.scan(['base'], at);
   ok(sc.review.length > 0 && sc.counts.learn === 0, `복습 날이 되면 복습 카드가 나옴(${sc.review.length}장)`);
-  eq(Hub.vocabToday(sum, at).rev, sc.counts.rev, '허브 요약(나중 날) = 실제 훑은 수');
-  eq(Hub.vocabToday(sum, at).new, sc.counts.new, '허브 요약의 새 카드 수 = 실제 훑은 수');
+  const scAll = C.scan(all, at);
+  eq(Hub.vocabToday(sum, at).rev, scAll.counts.rev, '허브 요약(나중 날) = 모든 덱을 실제 훑은 수');
+  eq(Hub.vocabToday(sum, at).new, scAll.counts.new, '허브 요약의 새 카드 수 = 모든 덱을 실제 훑은 수');
   const rv = C.pick(C.session(['base']), at);
   eq(rv.kind, n > lim ? rv.kind : 'rev', '복습 카드를 고름');
   ok(/일$/.test(C.preview(sc.review[0].id, at)[3]) && /^<10분$/.test(C.preview(sc.review[0].id, at)[1]), '복습 카드의 버튼 글자: 다시 <10분 · 알맞음 n일');
