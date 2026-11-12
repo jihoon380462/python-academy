@@ -4,5 +4,5 @@
 // 이 파일의 틀은 `node tools/vocab_base_order.mjs --file 201` 가 만들어요. id · w · rank 는 차례표 그대로라 고치지 않아요. 채울 칸은 ko · ex(· forms · note).
 VocabDecks.notes('base', [
   { id: 'whether', w: 'whether', rank: 211, ko: [['conj', '~인지 (아닌지)']], ex: [["I don't know whether he will come.", '그가 올지 안 올지 모르겠어요.']] },
-  { id: 'example', w: 'example', rank: 291, ko: [['n', '예, 본보기']], ex: [['Can you give me an example?', '예를 하나 들어 줄래요?']], forms: ['examples'], note: 'for example: 예를 들어' },
+  { id: 'example', w: 'example', rank: 291, ko: [['n', '예, 본보기']], ex: [['Can you give me an example?', '예를 하나 들어 줄래요?']], note: 'for example: 예를 들어' },
 ]);

@@ -88,6 +88,7 @@ a.vd-row:hover{background:var(--surface2)}
 .vk-warn{border-color:var(--warn);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
 .vk-skip{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0}
 .vk-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.vk-act .btn{flex:1 1 auto;min-height:48px}
+@media (min-width:600px){.vk-act .btn{flex:0 1 auto;min-width:220px}}
 .v-known{margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:6px}
 
 /* 찾아보기 */

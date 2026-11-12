@@ -5,5 +5,5 @@
 VocabDecks.notes('base', [
   { id: 'instead', w: 'instead', rank: 626, ko: [['adv', '대신에']], ex: [['There was no coffee, so I had tea instead.', '커피가 없어서 대신 차를 마셨어요.']], note: 'instead of A: A 대신' },
   { id: 'several', w: 'several', rank: 675, ko: [['det', '몇몇의, 여러']], ex: [['I have read this book several times.', '나는 이 책을 여러 번 읽었어요.']] },
-  { id: 'require', w: 'require', rank: 704, ko: [['v', '필요로 하다, 요구하다']], ex: [['This job requires a lot of experience.', '이 일에는 경험이 많이 필요해요.']], forms: ['requires', 'required', 'requiring'], note: 'required: 꼭 있어야 하는(필수)' },
+  { id: 'require', w: 'require', rank: 704, ko: [['v', '필요로 하다, 요구하다']], ex: [['This job requires a lot of experience.', '이 일에는 경험이 많이 필요해요.']], forms: ['requires'], note: 'required: 꼭 있어야 하는(필수)' },
 ]);
