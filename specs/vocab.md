@@ -200,7 +200,7 @@ VocabDecks.notes('base', [
   { id: 'not', w: 'not', rank: 11, ko: [['adv', '~이 아니다, ~하지 않다']], ex: [['I am not tired.', '나는 피곤하지 않아요.']], note: "줄이면 n't: isn't · don't · can't" },
   { id: 'like', w: 'like', rank: 27, ko: [['v', '좋아하다'], ['prep', '~처럼, ~같은']], ex: [['I like this song.', '나는 이 노래를 좋아해요.'], ['It looks like rain.', '비가 올 것 같아요.']] },
   { id: 'will', w: 'will', rank: 29, ko: [['aux', '~할 것이다 (앞으로의 일)']], ex: [['It will rain tomorrow.', '내일 비가 올 거예요.']], note: "줄이면 'll: I'll · 부정은 won't" },
-  { id: 'right', w: 'right', rank: 46, ko: [['adj', '옳은, 맞는'], ['adv', '오른쪽으로'], ['n', '오른쪽']], ex: [["You're right.", '당신 말이 맞아요.'], ['Turn right at the corner.', '모퉁이에서 오른쪽으로 도세요.']], note: 'right now: 지금 바로 · right here: 바로 여기' },
+  { id: 'right', w: 'right', rank: 46, ko: [['adj', '옳은, 맞는'], ['adv', '오른쪽으로'], ['n', '오른쪽']], ex: [["You're right.", '당신 말이 맞아요.'], ['Turn right at the corner.', '모퉁이에서 오른쪽으로 도세요.']], note: 'right now: 지금 바로 · right here: 바로 여기 · 명사로 「권리」: human rights(인권)' },
   { id: 'yeah', w: 'yeah', rank: 66, ko: [['int', '응, 그래 (yes 의 편한 말)']], ex: [['Yeah, I think so.', '네, 그런 것 같아요.']] },
   { id: 'two', w: 'two', rank: 69, ko: [['num', '둘, 2']], ex: [['I have two brothers.', '나는 형제가 둘 있어요.']] },
   { id: 'mine', w: 'mine', rank: 416, ko: [['pron', '내 것'], ['n', '광산']], ex: [['This bag is mine.', '이 가방은 내 거예요.']], note: '광산이라는 뜻은 훨씬 드물어요' },
