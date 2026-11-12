@@ -20,7 +20,7 @@ function load(p) {
 const args = process.argv.slice(2);
 if (args.length !== 2) { console.error('쓰는 법: node tools/vocab_diff.mjs <전 파일> <후 파일>'); process.exit(1); }
 const [a, b] = args.map(load);
-const show = (x) => `${x.ko.map(([p, k]) => `${p}:${k}`).join(' / ')} | ${x.ex.map(([e, k]) => `${e} ＝ ${k}`).join(' ‖ ')}${x.forms ? ' | forms ' + x.forms.join(',') : ''}${x.note ? ' | ' + x.note : ''}`;
+const show = (x) => `${x.ko.map(([p, k]) => `${p}:${k}`).join(' / ')} | ${x.ex.map(([e, k]) => `${e} ＝ ${k}`).join(' ‖ ')}${x.forms ? ' | forms ' + x.forms.join(',') : ''}${x.note ? ' | ' + x.note : ''}${x.say ? ' | say ' + x.say : ''}${x.pron ? ' | 소리 ' + x.pron : ''}${x.tpl ? ' | tpl ' + x.tpl.join(',') : ''}`;   // say · pron · tpl 도 찍어요(듣기 덱은 소리 칸만 바뀌기도 해요)
 let n = 0;
 for (const [k, y] of b) {
   const x = a.get(k); if (x && JSON.stringify(x) === JSON.stringify(y)) continue; n++;
