@@ -74,6 +74,8 @@ for (const id of courses()) {
 const cfg = fs.readFileSync(path.join(ROOT, 'core/config.js'), 'utf8'); const ver = (cfg.match(/APP_VERSION:\s*'([^']+)'/) || [])[1];
 const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.name.startsWith('.') || e.name === 'node_modules' || e.name === 'legacy' || e.name === 'archive' ? [] : e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith('.html') ? [path.join(d, e.name)] : []);
 for (const f of walk(ROOT)) { const s = fs.readFileSync(f, 'utf8'); for (const m of s.matchAll(/\?v=([0-9.]+)/g)) if (m[1] !== ver) err(`${path.relative(ROOT, f)}: ?v=${m[1]} ≠ APP_VERSION ${ver} (node tools/stamp.mjs 실행)`); }
+// v2.46.4: 페이지마다 아이콘 줄 — 없으면 브라우저가 도메인 맨 위 /favicon.ico 를 찾다가 404 를 콘솔에 남겨요(LESSON.md R20). data:, 는 빈 아이콘이라 화면은 그대로예요
+for (const f of walk(ROOT)) { const s = fs.readFileSync(f, 'utf8'); if (/<head>/i.test(s) && !/<link rel="icon"/.test(s)) err(`${path.relative(ROOT, f)}: 아이콘 줄이 없어요 — <head> 안에 <link rel="icon" href="data:,"> 를 넣어요`); }
 // v2.44.1: 문서가 말하는 「지금 버전 · 교과서 수 · 레슨 수」 가 데이터와 같은지 — 파이썬 QA 2회차에서 CLAUDE.md 가 v2.43.2 로 낡아 있던 것(LESSON.md R10 · R15). 숫자는 core/config.js 에서 뽑아요.
 { const cx = { window: {} }; vm.createContext(cx); vm.runInContext(cfg.replace(/^(const|let) /gm, 'var '), cx); const ready = (cx.CONFIG.COURSES || []).filter(x => x.ready && x.book) /* v2.46.0: 교과서만 — 영어 단어장(deck)은 레슨 수가 없어 세지 않아요 */; const nC = ready.length, nL = ready.reduce((n, x) => n + x.lessons, 0);
   for (const [f, verRe] of [['CLAUDE.md', /지금 v([\d.]+)/], ['HANDOFF.md', /배포된 버전\*{0,2} \| \*{0,2}v([\d.]+)/], ['TODO.md', /배포된 버전\*{0,2} \| \*{0,2}v([\d.]+)/], ['README.md', null]]) {
