@@ -47,12 +47,14 @@ try {
 
   // ② 덱 · 노트
   const IDRE = /^[a-z0-9][a-z0-9-]*$/; const counts = {};
-  const text = (where, v, max, what) => { if (typeof v !== 'string' || !v.trim()) { err(`${where}: ${what} 가 비었어요`); return false; } if (v !== v.trim()) err(`${where}: ${what} 앞뒤에 빈칸이 있어요`); if (v.length > max) err(`${where}: ${what} 가 너무 길어요(${v.length}자 > ${max}자)`); if (/<[a-zA-Z/]/.test(v)) err(`${where}: ${what} 에 HTML 태그를 쓰지 않아요(글자 그대로 보여요)`); if (/TODO|\?\?\?|…{2,}/.test(v)) err(`${where}: ${what} 에 덜 쓴 표시(TODO · ???)가 남았어요`); return true; };
+  // 덜 쓴 표시: TODO · ??? · ……. 다만 TODO 를 가르치는 노트(w 가 TODO — 개발 단어 덱)는 그 노트 글의 TODO 가 내용이라 TODO 만 봐주고 ??? · …… 는 그대로 잡아요
+  let curW = '';
+  const text = (where, v, max, what) => { if (typeof v !== 'string' || !v.trim()) { err(`${where}: ${what} 가 비었어요`); return false; } if (v !== v.trim()) err(`${where}: ${what} 앞뒤에 빈칸이 있어요`); if (v.length > max) err(`${where}: ${what} 가 너무 길어요(${v.length}자 > ${max}자)`); if (/<[a-zA-Z/]/.test(v)) err(`${where}: ${what} 에 HTML 태그를 쓰지 않아요(글자 그대로 보여요)`); if (/\?\?\?|…{2,}/.test(v) || (/TODO/.test(v) && curW !== 'TODO')) err(`${where}: ${what} 에 덜 쓴 표시(TODO · ???)가 남았어요`); return true; };
   if (!D.list.length) err('덱이 하나도 없어요(vocab/decks/index.js)');
   for (const d of D.list) {
     const dw = `덱 ${d.id}`;
     if (!IDRE.test(d.id || '')) err(`${dw}: id 는 영어 소문자 · 숫자 · 하이픈`);
-    text(dw, d.name, 20, 'name'); text(dw, d.desc, 80, 'desc');
+    curW = ''; text(dw, d.name, 20, 'name'); text(dw, d.desc, 80, 'desc');
     if (!Array.isArray(d.tpl) || !d.tpl.length || d.tpl.some(t => !TPL.includes(t)) || new Set(d.tpl).size !== d.tpl.length) err(`${dw}: tpl 은 ${TPL.join(' · ')} 중에서 겹치지 않게`);
     if (!Number.isInteger(d.newPerDay) || d.newPerDay < 1 || d.newPerDay > 100) err(`${dw}: newPerDay 는 1~100 의 정수`);
     if (d.sample && d.notes.length > 50 && d.id !== 'base') err(`${dw}: 노트가 ${d.notes.length}개인데 sample(표본) 표시가 남아 있어요 — 정식으로 채웠으면 vocab/decks/index.js 에서 sample 을 지워요`);
@@ -61,7 +63,7 @@ try {
     { const blanks = d.notes.filter(isBlank); if (blanks.length) err(`${dw}: 빈 틀 ${blanks.length}개가 남았어요 — ko · ex 를 채워요(첫 빈 틀: ${fileOfNote.get(blanks[0])} 의 ${blanks[0].id})`); }
     if (ranked && ranked !== d.notes.length) err(`${dw}: rank 는 모든 노트에 있거나 모두 없어야 해요(${ranked}/${d.notes.length})`);
     for (const n of d.notes) {
-      const w = `${d.id}/${n && n.id}`;
+      const w = `${d.id}/${n && n.id}`; curW = n && typeof n.w === 'string' ? n.w : '';
       if (!n || !IDRE.test(n.id || '')) { err(`${w}: 노트 id 는 영어 소문자 · 숫자 · 하이픈`); continue; }
       if (ids.has(n.id)) err(`${w}: 노트 id 가 겹쳐요`); ids.add(n.id);
       if (isBlank(n)) continue;   // 빈 틀은 위에서 한 줄로 알렸어요
