@@ -160,8 +160,9 @@ VocabDecks.notes('base', [
 - 정치 · 종교 · 성 · 폭력 · 마약 · 범죄, 실제 사람이나 상표를 다루는 문장은 쓰지 않아요.
   - 그런 뜻이 가장 흔한 낱말(`steal` · `elect` · `religion` …)은 일상 장면의 쓰임을 예문으로 골라요(고양이가 생선을 훔침 · 반장 선거).
   - 안전한 예문을 못 만드는 뜻은 `ko` 칸이나 `note` 에만 둬요(둘째 칸이어도 돼요). 낱말의 주된 뜻이 카드 어디에도 없게 되면 안 돼요.
-  - 뜻 자체가 정치 · 종교인 낱말(`politician` · `democracy` · `church`)은 누구 편도 들지 않는 사실 문장으로 써요(역사 수업 · 견학 · 옛 건물).
+  - 뜻 자체가 정치 · 종교인 낱말이나 민감한 뜻 하나뿐인 낱말(`politician` · `democracy` · `church` · `abortion`)은 누구 편도 들지 않는 사실 문장으로 써요(역사 수업 · 견학 · 옛 건물).
 - 기초 덱은 일상 문장, 개발 덱은 실제 에러 메시지나 문서에 나올 법한 문장으로 써요.
+- 철자 · 낱말은 미국식이 기본이에요(color · neighbor · center · apartment). 영국에서 다르게 쓰면 `note` 에 「영국에서는 …」 으로 적어요.
 
 다른 모양 (`forms`)
 - **예문에 실제로 나온 모양만** 적어요(검사가 봐요). 예문에서 그 낱말을 굵게 보여 주는 데만 쓰여요. 예문에 `w` 그대로만 나오면 `forms` 를 쓰지 않아요.
@@ -210,7 +211,7 @@ VocabDecks.notes('base', [
   - 다른 쪽이 다른 동사의 과거 모양이면(`left` ← leave · `found` ← find · `rose` ← rise) `ko` 에는 차례표에 든 그 낱말 자신의 뜻만 두고, 과거 모양이라는 것은 `note` 에 적어요(본보기 `left`). 과거 모양은 leave · find · rise 의 카드에서 배워요.
 - 숫자(`two` …)는 품사 `num`. 말에서만 쓰는 낱말(`yeah` · `okay`)은 어떤 말의 편한 모양인지 괄호로 적어요.
 - 품사를 고르는 기준
-  - 대답으로도 쓰는 부사(`sure` · `exactly` · `absolutely`)는 `adv` 로 하고 뜻 앞에 「(대답)」 을 붙여요. `int` 는 감탄사로만 쓰는 낱말(`yes` · `no` · `yeah` · `okay` · `oh`)에.
+  - 대답으로도 쓰는 부사(`sure` · `exactly` · `absolutely`)는 `adv` 로 하고 뜻 앞에 「(대답)」 을 붙여요. `int` 는 감탄으로 쓰는 뜻의 칸에 둬요(`yes` · `oh`, `well` 의 「음, 글쎄」, `welcome` 의 「어서 오세요」). 다른 품사로도 쓰는 낱말이라도 그 뜻이 감탄이면 `int` 칸이에요.
   - 구동사(`put on` · `drop off` · `fill out`)는 `v`. 동사가 아닌 묶음(`a lot` · `sort of` · `in detail` · `in fact`)은 `phr`.
   - 묶음을 뜻 칸에 적을 때는 표제어가 아니라 **묶음의 모양**으로 품사를 골라요.
     - 동사 + 전치사 · 부사(`depend on` · `go ahead` · `put away` · `look forward to`), 동사 + 목적어 틀(`regard A as B` · `remind A of B`)은 `v`.
