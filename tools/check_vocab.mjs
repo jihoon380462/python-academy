@@ -8,7 +8,8 @@
 //   ④ 지시서(specs/vocab.md)의 덱별 노트 수 표가 실제와 같은지(문서 숫자가 낡지 않게 — LESSON.md R15),
 //      지시서의 「어려운 경우 본보기」 줄이 덱에 든 같은 노트와 글자까지 같은지
 //   ④-3 상태 문장: 지시서 덱 표의 상태 칸이 데이터(노트 수 · sample)와 맞는지, HANDOFF · TODO 0절 「영어 단어장」 줄에 덱마다 「이름 N개」 가 실제 수로 있는지,
-//      채우는 중인 덱(sample)이 없는데 그 두 줄이나 지시서 0절에 「채우는 중」 이 남았는지(LESSON.md R15 두 번째)
+//      채우는 중인 덱(sample)이 없는데 그 두 줄이나 지시서 0절에 「채우는 중」 이 남았는지(LESSON.md R15 두 번째),
+//      site-intent 의 「노트가 없는 덱(…)」 괄호에 실제로 노트가 없는 덱만 다 있는지(R15 세 번째)
 //   ⑤ 기초 덱: 차례표(vocab/sources/base-order.tsv)가 원문 목록과 맞는지, 노트의 rank · id · w 가 차례표와 같은지, 출처 표기가 있는지,
 //      노트가 제 차례의 파일(base-NNNN.js)에 들어 있는지, 예문이 쉬운지(14낱말까지 · 차례표 밖 낱말은 예문마다 1개까지)
 //   ⑥ 듣기 덱(specs/vocab.md W2): pron 은 듣기 덱에서만(W3), 접사 노트는 affix 품사와 forms(W3), 쓰기 카드의 뜻 칸에 답(w)이 없는지(W3), 듣기 덱의 pron 이 「강세 대문자 철자 [한글 소리]」 모양인지, say 가 있으면 카드가 읽기 · 듣기 둘인지,
@@ -178,7 +179,14 @@ try {
       if (line === undefined) { err(`${f}: 0절의 「| 영어 단어장 … | … |」 줄을 못 찾았어요`); continue; }
       for (const d of D.list) if (counts[d.id] && !line.includes(`${d.name} ${fmt(counts[d.id])}개`)) err(`${f}: 0절 「영어 단어장」 줄에 「${d.name} ${fmt(counts[d.id])}개」 가 없어요 — 덱을 채우면 이 줄도 같은 PR 에서 고쳐요`);
       if (!filling.length && line.includes('채우는 중')) err(`${f}: 0절 「영어 단어장」 줄에 「채우는 중」 이 남아 있어요 — 채우는 중인 덱(덱 정의에 sample)이 없어요`); }
-    console.log(`상태 문장: 지시서 덱 표의 상태 칸 · HANDOFF · TODO 0절 「영어 단어장」 줄 대조(채우는 중인 덱: ${filling.length ? filling.join(', ') : '없음'})`); }
+    // site-intent 의 「노트가 없는 덱(…)」(LESSON.md R15 세 번째): 듣기 덱을 채운 v2.46.6 뒤에도 괄호에 듣기가 남았어요.
+    //   덱 이름에 「 · 」 가 든 것(속어 · 거친 말)이 있어 괄호를 쪼개지 않고, 덱마다 이름이 들어 있는지로 대조해요
+    { const si = read('specs/site-intent.md'); const m = si.match(/노트가 없는 덱\(([^)\n]*)\)/); const empty = D.list.filter(d => !counts[d.id]);
+      if (!m) { if (empty.length) err(`specs/site-intent.md: 「노트가 없는 덱(…)」 을 못 찾았어요 — 노트가 없는 덱(${empty.map(d => d.name).join(' · ')})이 「준비 중」 으로 보이는 게 정상이라고 적어요`); }
+      else for (const d of D.list) { const has = m[1].includes(d.name);
+        if (counts[d.id] && has) err(`specs/site-intent.md: 「노트가 없는 덱(${m[1]})」 에 노트가 ${fmt(counts[d.id])}개인 「${d.name}」 덱이 들어 있어요 — 덱을 채우면 이 줄도 같은 PR 에서 고쳐요`);
+        if (!counts[d.id] && !has) err(`specs/site-intent.md: 「노트가 없는 덱(${m[1]})」 에 노트가 없는 「${d.name}」 덱이 빠졌어요`); } }
+    console.log(`상태 문장: 지시서 덱 표의 상태 칸 · HANDOFF · TODO 0절 「영어 단어장」 줄 · site-intent 「노트가 없는 덱」 대조(채우는 중인 덱: ${filling.length ? filling.join(', ') : '없음'})`); }
   console.log(`덱 ${D.list.length}개 · 노트 ${Object.values(counts).reduce((a, b) => a + b, 0)}개`);
 } catch (e) { err('검사하다 멈췄어요: ' + (e && e.stack || e)); }
 if (errors.length) { console.error(`✗ check_vocab 에러 ${errors.length}개`); errors.slice(0, 60).forEach(e => console.error('  ' + e)); if (errors.length > 60) console.error(`  … 외 ${errors.length - 60}개`); process.exit(1); }
