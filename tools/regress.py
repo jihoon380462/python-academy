@@ -585,6 +585,9 @@ with sync_playwright() as p:
     # v2.46.5: 끝에 ! ? . ' 가 붙은 말(속어 덱의 Freeze! · I'm good. · bussin')도 예문에서 굵게 — 전에는 고르는 단계에서 빠졌어요
     hlx=pg.evaluate("[VocabApp.hl('Freeze! Police!', {w:'Freeze!'}), VocabApp.hl(\"I'm good, thanks.\", {w:\"I'm good.\"}), VocabApp.hl('That burger is bussin.', {w:\"bussin'\"}), VocabApp.hl('Happy 420!', {w:'420'})]")
     check(all('<b>' in h for h in hlx), '단어장 예문 굵게: 끝에 ! ? . 가 붙은 말 · 숫자 말도 굵게 (%s)' % hlx)
+    # v2.46.6: 듣기 덱 기호 노트 — 듣기 카드는 w(기호)가 아니라 say(읽는 말)를 읽고, 읽기 카드 앞면에는 기호를 보여 줘요. 소리를 못 내는 브라우저에서도 보려고 읽기 함수를 잠깐 바꿔 끼워 무엇을 읽으려 했는지만 봐요
+    sx=pg.evaluate("(()=>{ const c=VocabDecks.card('listen/parentheses/l'), r=VocabDecks.card('listen/parentheses/r'); if(!c||!r) return null; const keep=VocabApp.tts.speak, old=VocabApp.cur; let said=null; VocabApp.tts.speak=t=>{said=t;return true}; try { VocabApp.cur={card:c,kind:'new',shown:false,typed:''}; VocabApp.say(); return {said, front:VocabApp.cardHtml({card:r,kind:'new',shown:false,typed:''}).includes('>( )<')}; } finally { VocabApp.cur=old; VocabApp.tts.speak=keep; } })()")
+    check(bool(sx) and sx['said']=='parentheses' and sx['front'], '듣기 덱: 기호 노트의 듣기 카드는 say(parentheses)를 읽고 읽기 카드 앞면에는 ( ) (%s)' % sx)
     pg.evaluate("VocabCore.clockOffset=0"); pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(500)
     ha=pg.evaluate("document.querySelector('.hub-cat a.hc').innerText.replace(/\\n/g,' ')"); check('오늘 할 카드' in ha and '시작 전' not in ha, '허브 카드: 학습한 뒤에는 「오늘 할 카드」 를 보여 줌 (%s)' % ha[-40:])
     verr=errors[v0:]; check(not verr, '영어 단어장 pageerror 0 (%s)' % (verr[:2] or 'OK'))
