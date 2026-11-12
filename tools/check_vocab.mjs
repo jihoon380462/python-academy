@@ -7,6 +7,8 @@
 //   ③ 허브 설정: 「필수교양」 이 맨 앞 묶음이고 단어장이 deck 으로 들어 있는지
 //   ④ 지시서(specs/vocab.md)의 덱별 노트 수 표가 실제와 같은지(문서 숫자가 낡지 않게 — LESSON.md R15),
 //      지시서의 「어려운 경우 본보기」 줄이 덱에 든 같은 노트와 글자까지 같은지
+//   ④-3 상태 문장: 지시서 덱 표의 상태 칸이 데이터(노트 수 · sample)와 맞는지, HANDOFF · TODO 0절 「영어 단어장」 줄에 덱마다 「이름 N개」 가 실제 수로 있는지,
+//      채우는 중인 덱(sample)이 없는데 그 두 줄이나 지시서 0절에 「채우는 중」 이 남았는지(LESSON.md R15 두 번째)
 //   ⑤ 기초 덱: 차례표(vocab/sources/base-order.tsv)가 원문 목록과 맞는지, 노트의 rank · id · w 가 차례표와 같은지, 출처 표기가 있는지,
 //      노트가 제 차례의 파일(base-NNNN.js)에 들어 있는지, 예문이 쉬운지(14낱말까지 · 차례표 밖 낱말은 예문마다 1개까지)
 //   빈 틀(ko: [], ex: [] — tools/vocab_base_order.mjs --file 이 만든 것)이 남아 있으면 덱마다 한 줄로 알려 줘요
@@ -136,6 +138,22 @@ try {
       const n = baseNotes.get(e.id); if (n && J(n) !== J(e)) err(`${w}: 덱에 든 노트와 달라요 — 한쪽을 고쳤으면 다른 쪽도 같이 고쳐요`);
       const all = (e.ex || []).map(x => x[0]).join(' \n '); for (const f of e.forms || []) if (!new RegExp('\\b' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(all)) err(`${w}: forms 의 「${f}」 가 예문에 없어요`); }
     if (list) console.log(`지시서 본보기 ${list.length}줄: 덱에 든 ${list.filter(e => baseNotes.has(e.id)).length}줄과 같음`); }
+  // ④-3 상태 문장(LESSON.md R15 두 번째): 기초 덱을 다 채운 뒤에도 TODO · 지시서 0절에 「채우는 중」 이 남았어요.
+  //      지시서 덱 표의 상태 칸, HANDOFF · TODO 0절 「영어 단어장」 줄의 「덱 이름 N개」 를 실제 덱과 대조해요
+  { const filling = D.list.filter(d => d.sample).map(d => d.id); const fmt = (x) => x.toLocaleString('en-US');
+    for (const m of spec.matchAll(/^\| `([a-z0-9-]+)` \|[^|\n]*\| \d+ \|([^|\n]*)\|/gm)) { const d = D.byId[m[1]]; if (!d) continue;
+      const st = m[2].trim(); const n = counts[m[1]] || 0;
+      if (!n && !st.startsWith('준비 중')) err(`specs/vocab.md: 덱 표 \`${m[1]}\` 줄 — 노트가 없으니 상태가 「준비 중」 으로 시작해요(지금 「${st}」)`);
+      if (n && !d.sample && !st.startsWith('다 채웠어요')) err(`specs/vocab.md: 덱 표 \`${m[1]}\` 줄 — 다 채운 덱(덱 정의에 sample 없음)이니 상태가 「다 채웠어요」 로 시작해요(지금 「${st}」)`);
+      if (d.sample && st.startsWith('다 채웠어요')) err(`specs/vocab.md: 덱 표 \`${m[1]}\` 줄 — 상태가 「다 채웠어요」 인데 덱 정의에 sample 이 남아 있어요. 다 채웠으면 sample 을 지워요`); }
+    const sec0 = spec.split(/^## 1\./m)[0].split(/^## 0\./m)[1];
+    if (sec0 === undefined) err('specs/vocab.md: 0절(「## 0.」)을 못 찾았어요');
+    else if (!filling.length && sec0.includes('채우는 중')) err('specs/vocab.md 0절: 채우는 중인 덱(덱 정의에 sample)이 없는데 「채우는 중」 이 남아 있어요');
+    for (const f of ['HANDOFF.md', 'TODO.md']) { const line = (read(f).match(/^\| 영어 단어장[^|\n]*\|([^\n]*)\|[ \t]*$/m) || [])[1];
+      if (line === undefined) { err(`${f}: 0절의 「| 영어 단어장 … | … |」 줄을 못 찾았어요`); continue; }
+      for (const d of D.list) if (counts[d.id] && !line.includes(`${d.name} ${fmt(counts[d.id])}개`)) err(`${f}: 0절 「영어 단어장」 줄에 「${d.name} ${fmt(counts[d.id])}개」 가 없어요 — 덱을 채우면 이 줄도 같은 PR 에서 고쳐요`);
+      if (!filling.length && line.includes('채우는 중')) err(`${f}: 0절 「영어 단어장」 줄에 「채우는 중」 이 남아 있어요 — 채우는 중인 덱(덱 정의에 sample)이 없어요`); }
+    console.log(`상태 문장: 지시서 덱 표의 상태 칸 · HANDOFF · TODO 0절 「영어 단어장」 줄 대조(채우는 중인 덱: ${filling.length ? filling.join(', ') : '없음'})`); }
   console.log(`덱 ${D.list.length}개 · 노트 ${Object.values(counts).reduce((a, b) => a + b, 0)}개`);
 } catch (e) { err('검사하다 멈췄어요: ' + (e && e.stack || e)); }
 if (errors.length) { console.error(`✗ check_vocab 에러 ${errors.length}개`); errors.slice(0, 60).forEach(e => console.error('  ' + e)); if (errors.length > 60) console.error(`  … 외 ${errors.length - 60}개`); process.exit(1); }

@@ -55,4 +55,4 @@ Claude Code 가 세션마다 저절로 읽는 짧은 안내예요.
 
 - 순서는 [`HANDOFF.md`](HANDOFF.md) 2절.
 - 권한 구분 없이 Claude 가 PR → CI → 머지 → 배포 확인까지 해요.
-- 배포할 때마다 고칠 것: `HANDOFF.md` 0절 상태판 · `CHANGELOG.md` · `TODO.md` 맨 위 버전 · 이 파일의 「지금 v…」(`validate_content` 가 맞는지 검사해요)
+- 배포할 때마다 고칠 것: `HANDOFF.md` 0절 상태판 · `CHANGELOG.md` · `TODO.md` 맨 위 버전과 「지금 상태」 표 · 이 파일의 「지금 v…」(버전 · 코스 수는 `validate_content`, 단어장 줄은 `check_vocab` 이 검사해요)
