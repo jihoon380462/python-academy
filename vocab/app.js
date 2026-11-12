@@ -1,8 +1,8 @@
 // vocab/app.js — 영어 단어장 화면: 덱 목록 · 덱 개요 · 학습(카드) · 찾아보기 · 설정. 계산은 vocab/core.js, 규칙과 남은 일은 specs/vocab.md
-//   주소(해시): (없음) 덱 목록 · #deck/<덱 id|all> 덱 개요 · #study/<덱 id|all> 학습 · #browse 찾아보기
+//   주소(해시): (없음) 덱 목록 · #deck/<덱 id|all> 덱 개요 · #study/<덱 id|all> 학습 · #known/<덱 id|all> 아는 단어 넘기기 · #browse 찾아보기
 //   화면 흐름은 Anki 와 같아요: 덱 → 지금 학습 → 카드 앞면 → 「정답 보기」 → 다시 · 어려움 · 알맞음 · 쉬움(버튼 위에 다음에 나올 때)
 const VocabApp = {
-  view: 'decks', sel: null, ses: null, cur: null, pickInfo: null, waitTimer: null,
+  view: 'decks', sel: null, ses: null, cur: null, pickInfo: null, waitTimer: null, kn: null,
   bq: '', bf: 'all', bn: 200,   // 찾아보기: 검색어 · 고른 상태 · 한 번에 그리는 줄 수
   RATES: [[1, 'again', '다시'], [2, 'hard', '어려움'], [3, 'good', '알맞음'], [4, 'easy', '쉬움']],
   KIND: { new: '새 카드', learn: '학습 중', rev: '복습' },
@@ -67,8 +67,9 @@ const VocabApp = {
   route() {
     const [v, id] = location.hash.slice(1).split('/'); clearTimeout(this.waitTimer); this.tts.stop();
     if (v === 'browse') this.view = 'browse';
-    else if ((v === 'deck' || v === 'study') && this.deckIds(id).length) { this.view = v; this.sel = id; }
+    else if ((v === 'deck' || v === 'study' || v === 'known') && this.deckIds(id).length) { this.view = v; this.sel = id; }
     else this.view = 'decks';
+    if (this.view !== 'known') this.kn = null;   // 넘기기 화면을 떠나면 고르던 것은 버려요(넘긴 것은 이미 저장됐어요)
     this.render();
   },
   render() {
@@ -76,10 +77,11 @@ const VocabApp = {
     if (this.view === 'browse') return this.viewBrowse();
     if (this.view === 'deck') return this.viewDeck();
     if (this.view === 'study') return this.viewStudy();
+    if (this.view === 'known') return this.viewKnown();
     return this.viewDecks();
   },
   // 기록이 밖에서 바뀌었을 때(기기 연동 · 다른 탭 · 설정) 지금 화면을 다시 그려요. 답을 보고 있는 카드는 건드리지 않아요
-  refresh() { if (this.view === 'study') { if (!this.cur || !this.cur.shown) this.nextCard(); } else this.render(); },
+  refresh() { if (this.view === 'study') { if (!this.cur || !this.cur.shown) this.nextCard(); } else if (this.view === 'known' && this.kn) this.knownRefresh(); else this.render(); },
 
   // ---------- 덱 목록 ----------
   viewDecks() {
@@ -100,7 +102,7 @@ const VocabApp = {
         <li><b>어려움</b>: 떠올리긴 했는데 오래 걸렸어요. 못 떠올렸으면 이것 말고 꼭 「다시」 를 눌러요.</li>
         <li><b>알맞음</b>: 떠올렸어요. 보통은 이걸 눌러요.</li>
         <li><b>쉬움</b>: 보자마자 알았어요. 훨씬 나중에 나와요.</li></ol>
-        <p class="muted small">버튼 위의 글자(예: &lt;10분, 4일)는 그 버튼을 누르면 카드가 다시 나오는 때예요. 이미 아는 단어는 카드의 「더 보기」 에서 넘길 수 있어요.</p></details>
+        <p class="muted small">버튼 위의 글자(예: &lt;10분, 4일)는 그 버튼을 누르면 카드가 다시 나오는 때예요. 이미 아는 단어는 덱을 눌러 「아는 단어 한꺼번에 넘기기」 로, 한 장씩은 카드의 「더 보기」 에서 넘길 수 있어요.</p></details>
     </div>`;
   },
 
@@ -109,13 +111,82 @@ const VocabApp = {
     const ids = this.deckIds(this.sel); const now = VocabCore.now(); const sc = VocabCore.scan(ids, now); const c = sc.counts; const todo = c.new + c.learn + c.rev;
     const cards = ids.flatMap(id => VocabDecks.cards(id)); const seen = cards.filter(x => this.stOf(x.id) !== 'new').length; const known = cards.filter(x => this.stOf(x.id) === 'known').length;
     const d = VocabDecks.byId[this.sel]; const desc = this.sel === 'all' ? '모든 덱을 섞어서 봐요' : d.desc;
+    const unseen = this.knownList(ids); const fresh = unseen.filter(x => !x.passed).length;   // fresh: 넘기기 화면에서 아직 안 보여 준 단어
     $('#view').innerHTML = `<div class="page vocab"><a class="btn sm" href="#">← 덱 목록</a>
       <div class="card v-over" style="margin-top:10px"><h2>${esc(this.deckName(this.sel))}</h2><div class="muted">${esc(desc)}</div>
         <div class="v-cnt"><div>${this.cnt(c.new, 'new')}<small>새 카드</small></div><div>${this.cnt(c.learn, 'learn')}<small>학습</small></div><div>${this.cnt(c.rev, 'rev')}<small>복습</small></div></div>
         ${todo ? `<a class="btn primary big" id="vStart" href="#study/${esc(this.sel)}">지금 학습</a>` : `<div><b>오늘 할 카드를 다 했어요 🎉</b></div>${sc.moreNew ? `<div class="row center"><button class="btn" id="vMoreNew">새 카드 ${Math.min(5, sc.moreNew)}장 더 하기</button></div>` : ''}`}
+        ${unseen.length ? `<div class="v-known"><a class="btn sm" id="vKnown" href="#known/${esc(this.sel)}">아는 단어 한꺼번에 넘기기</a>${fresh ? `<div class="muted small">아직 안 본 단어 ${fresh}개 — 아는 단어를 먼저 넘겨 두면 모르는 단어만 카드로 나와요.</div>` : ''}</div>` : ''}
         <div class="muted small" style="margin-top:14px">카드 ${cards.length}장 · 본 카드 ${seen}장${known ? ` · 아는 단어로 넘긴 카드 ${known}장` : ''}</div>
         ${d && d.credit ? `<div class="muted small" style="margin-top:6px">${esc(d.credit)}</div>` : ''}</div></div>`;
     const mn = $('#vMoreNew'); if (mn) mn.onclick = () => { VocabCore.addExtra(ids, Math.min(5, sc.moreNew)); location.hash = '#study/' + this.sel; };
+  },
+
+  // ---------- 아는 단어 한꺼번에 넘기기 ----------
+  //   아직 안 본 단어를 덱 순서대로 20개씩 보여 주고, 아는 것만 눌러 표시한 뒤 한꺼번에 「아는 단어」 로 넘겨요. 뜻은 일부러 안 보여 줘요(뜻을 보고 안다고 누르지 않게).
+  //   한 화면을 넘기면 표시한 단어는 's', 나머지는 'p'(보고 지나감)로 남아요(VocabCore.sweep). 그래서 덱에 단어가 더 들어온 뒤 다시 와도 지나간 단어는 빼고 이어서 보여 줘요.
+  //   「앞 화면으로」 는 그 화면에서 남긴 기록을 무효로 돌리고, 골랐던 그대로 다시 보여 줘요.
+  KNOWN_PAGE: 20,
+  // 넘기기 화면에 올릴 수 있는 노트: 아직 안 본 것 가운데 읽기 카드가 있는 것. 글자를 보고 고르는 화면이라, 소리로만 배우는 노트(듣기 덱)는 올리지 않아요
+  knownList(ids) { return VocabCore.unseenNotes(ids).filter(x => x.tpl.includes('r')); },
+  // again: 전에 보고 지나간 단어도 다시 보여 줘요
+  knownStart(again) {
+    const ids = this.deckIds(this.sel); const passed = this.knownList(ids).filter(x => x.passed).length;
+    this.kn = { sel: this.sel, ses: VocabCore.session(ids), again: !!again, skipped: again ? 0 : passed, shown: new Set(), picked: new Set(), page: null, low: 0, hist: [], total: 0 };
+  },
+  knownPage() { const kn = this.kn; return this.knownList(this.deckIds(kn.sel)).filter(x => !kn.shown.has(x.key) && (kn.again || !x.passed)).slice(0, this.KNOWN_PAGE); },
+  viewKnown() {
+    if (!this.kn || this.kn.sel !== this.sel) this.knownStart(false);
+    const kn = this.kn; if (!kn.page) kn.page = this.knownPage();
+    const page = kn.page; const sel = esc(this.sel);
+    const back = kn.hist.length ? '<div class="row"><button class="btn sm" id="vkBack">← 앞 화면으로</button></div>' : '';
+    const lead = kn.hist.length ? '뜻이 바로 떠오르는 단어만 눌러요.' : '뜻이 바로 떠오르는 단어만 눌러요. 헷갈리는 단어는 누르지 않아요 — 카드로 배우는 게 나아요. 넘긴 단어는 카드로 나오지 않고, 찾아보기의 「아는 단어」 에서 언제든 되돌릴 수 있어요.';
+    const again = kn.skipped ? `<button class="btn sm" id="vkAgain">지나간 단어 ${kn.skipped}개도 다시 보기</button>` : '';
+    const warn = kn.low >= 2 ? `<div class="card vk-warn"><span><b>여기부터는 모르는 단어가 더 많아 보여요.</b> 남은 단어는 카드로 배우는 게 좋아요.</span><a class="btn sm primary" href="#study/${sel}">지금 학습</a></div>` : '';
+    const body = page.length
+      ? `${kn.skipped ? `<div class="muted small vk-skip">전에 보고 지나간 단어 ${kn.skipped}개는 빼고 보여 줘요. ${again}</div>` : ''}${warn}
+        <div class="vk-grid">${page.map(x => `<button class="vk-w${kn.picked.has(x.key) ? ' on' : ''}" data-k="${esc(x.key)}" lang="en" aria-pressed="${kn.picked.has(x.key)}">${esc(x.note.w)}</button>`).join('')}</div>
+        <div class="muted small v-foot" id="vkCount"></div>
+        <div class="vk-act"><button class="btn" id="vkAll"></button><button class="btn primary" id="vkNext"></button></div>`
+      : `<div class="card v-done"><h2>${kn.hist.length ? '끝까지 봤어요' : '넘길 단어가 없어요'}</h2><p class="muted">${kn.hist.length ? `이번에 ${kn.total}개를 아는 단어로 넘겼어요. 나머지는 카드로 나와요.` : '아직 안 본 단어를 모두 한 번씩 봤어요.'}</p><div class="row center">${again}<a class="btn primary" href="#deck/${sel}">덱으로 돌아가기</a></div></div>`;
+    $('#view').innerHTML = `<div class="page vocab"><a class="btn sm" href="#deck/${sel}">← 덱</a>
+      <h1 class="v-h">아는 단어 넘기기</h1>
+      ${page.length ? `<p class="muted v-lead">${lead}</p>` : ''}
+      ${body}${back}</div>`;
+    const on = (id, fn) => { const el = $(id); if (el) el.onclick = fn; };
+    const labels = () => {
+      if (!page.length) return; const n = kn.picked.size;
+      $('#vkCount').textContent = `이 화면 ${page.length}개 중 ${n}개 표시 · 이번에 넘긴 단어 ${kn.total}개`;
+      $('#vkAll').textContent = n === page.length ? '표시 모두 지우기' : '이 화면 전부 알아요';
+      $('#vkNext').textContent = n ? `표시한 ${n}개 넘기고 다음` : '아는 단어 없음 · 다음';
+    };
+    const paint = () => { $$('.vk-w').forEach(b => { const v = kn.picked.has(b.dataset.k); b.classList.toggle('on', v); b.setAttribute('aria-pressed', v); }); labels(); };
+    // 표시는 화면을 다시 그리지 않고 그 단추만 바꿔요(키보드로 누를 때 초점이 그대로 있게)
+    $$('.vk-w').forEach(b => { b.onclick = () => { const k = b.dataset.k; if (kn.picked.has(k)) kn.picked.delete(k); else kn.picked.add(k); paint(); }; });
+    on('#vkAll', () => { if (kn.picked.size === page.length) kn.picked.clear(); else page.forEach(x => kn.picked.add(x.key)); paint(); });
+    on('#vkNext', () => {
+      const pick = page.filter(x => kn.picked.has(x.key)); const rest = page.filter(x => !kn.picked.has(x.key));
+      const wrote = VocabCore.sweep(kn.ses, pick.flatMap(x => x.cards), rest.flatMap(x => x.cards)); if (wrote) this.saved(VocabCore.saveOk);
+      kn.hist.push({ page, picked: kn.picked, n: pick.length, low: kn.low, wrote: !!wrote });
+      kn.total += pick.length; kn.low = pick.length * 2 < page.length ? kn.low + 1 : 0;   // 아는 단어가 절반이 안 되는 화면이 두 번 이어지면 그만하자고 알려요
+      page.forEach(x => kn.shown.add(x.key)); kn.picked = new Set(); kn.page = null; this.viewKnown(); window.scrollTo(0, 0);
+    });
+    on('#vkBack', () => {
+      const h = kn.hist.pop(); if (!h) return;
+      if (h.wrote) { VocabCore.undo(kn.ses); this.saved(VocabCore.saveOk); }
+      kn.total -= h.n; kn.low = h.low; h.page.forEach(x => kn.shown.delete(x.key)); kn.page = h.page; kn.picked = h.picked;
+      this.viewKnown(); window.scrollTo(0, 0); UI.toast(h.n ? `넘긴 ${h.n}개를 풀었어요` : '앞 화면으로 돌아왔어요', 1500);
+    });
+    on('#vkAgain', () => { this.knownStart(true); this.viewKnown(); });
+    labels();
+    const first = $('.vk-w'); if (first) try { first.focus({ preventScroll: true }); } catch (e) {}
+  },
+  // 기록이 밖에서 바뀌었을 때: 그사이 다른 기기에서 배웠거나 넘긴 단어를 지금 화면에서 빼요. 고른 것이 없으면 화면을 새로 뽑아요
+  knownRefresh() {
+    const kn = this.kn; const live = new Set(this.knownList(this.deckIds(kn.sel)).map(x => x.key));
+    for (const k of [...kn.picked]) if (!live.has(k)) kn.picked.delete(k);
+    if (kn.page) { kn.page = kn.picked.size ? kn.page.filter(x => live.has(x.key)) : null; if (kn.page && !kn.page.length) kn.page = null; }
+    this.viewKnown();
   },
 
   // ---------- 학습 ----------
@@ -216,7 +287,7 @@ const VocabApp = {
   // ---------- 카드 정보(학습 · 찾아보기 공용) ----------
   info(id) {
     const card = VocabDecks.card(id); if (!card) return; const n = card.note; const r = VocabCore.recs[id]; const now = VocabCore.now(); const st = this.stOf(id);
-    const names = { 1: '다시', 2: '어려움', 3: '알맞음', 4: '쉬움', 0: '(되돌림)', s: '아는 단어로 넘김', u: '넘김 풀기', f: '처음부터 다시' };
+    const names = { 1: '다시', 2: '어려움', 3: '알맞음', 4: '쉬움', 0: '(되돌림)', s: '아는 단어로 넘김', u: '넘김 풀기', f: '처음부터 다시', p: '넘기기 화면에서 지나감' };
     const hist = VocabCore.parse(VocabCore.data.log[id] || '').slice(-6).map(([t, c]) => `${this.dateText(VocabCore.abs(t))} ${names[c] || c}`).join('<br>');
     const rows = [['덱', esc(VocabDecks.byId[card.deck].name)], ['카드 종류', VocabDecks.TPL[card.tpl]], ['상태', this.stLabel(id)]];
     if (st === 'rev' || st === 'learn') rows.push(['다음에 볼 때', `${this.dueText(id, now)} (${this.dateText(r.due)})`]);

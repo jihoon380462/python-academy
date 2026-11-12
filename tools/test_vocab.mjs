@@ -259,5 +259,101 @@ section('저장 · 캐시');
   C.store = { get: () => null, set: () => { throw new Error('quota'); } }; eq(C.save(T0), false, '저장 실패를 알려 줌');
 }
 
+// ---------------------------------------------------------------- 아는 단어 한꺼번에 넘기기
+section('아는 단어 한꺼번에 넘기기');
+{
+  let w = start(deck('k', 8)); let C = w.VocabCore; let ses = C.session(['k']); const t = T0;
+  const look = (ids) => C.unseenNotes(ids).map(x => [x.note.id, x.passed]);
+  const fresh = (...ns) => ns.map(i => ['w' + i, false]);
+  eq(look(['k']), fresh(0, 1, 2, 3, 4, 5, 6, 7), '아직 안 본 노트를 덱 순서대로');
+  eq(C.unseenNotes(['k'])[0], { key: 'k/w0', deck: 'k', note: w.VocabDecks.byId.k.notes[0], cards: ['k/w0/r'], tpl: ['r'], passed: false }, '노트마다 열쇠 · 카드 · 카드 종류');
+  graduate(C, ses, 'k/w0/r', t); C.mark(null, ['k/w1/r'], 's', t);
+  eq(look(['k']), fresh(2, 3, 4, 5, 6, 7), '배운 노트 · 아는 단어로 넘긴 노트는 빠짐');
+  // 한 화면 넘기기: w2 · w3 은 아는 단어, w4 · w5 는 보고 지나감
+  const ks = C.session(['k']);
+  eq(C.sweep(ks, ['k/w2/r', 'k/w3/r'], ['k/w4/r', 'k/w5/r'], t + 1000), 4, '한 화면 = 표시한 것 s + 나머지 p, 사건 4개');
+  eq(look(['k']), [['w4', true], ['w5', true], ['w6', false], ['w7', false]], '넘긴 것은 빠지고, 지나간 것은 passed 로 남음');
+  eq([C.recs['k/w4/r'].st, C.recs['k/w4/r'].susp, C.kindOf('k/w4/r'), C.parse(C.data.log['k/w4/r']).map(x => x[1])], [0, 0, 'new', ['p']], '지나간 단어는 여전히 새 카드(p 는 간격 계산과 무관)');
+  ok(C.scan(['k'], t + 2000).fresh.some(c => c.id === 'k/w4/r') && !C.scan(['k'], t + 2000).fresh.some(c => c.id === 'k/w2/r'), '지나간 단어는 카드로 나오고, 넘긴 단어는 안 나옴');
+  eq([C.summary(t + 2000).decks.k.known, C.summary(t + 2000).decks.k.unseen], [3, 4], '요약: 아는 단어 3장 · 안 본 카드 4장');
+  eq([C.sweep(ks, [], ['k/w4/r', 'k/w5/r'], t + 3000), ks.undo.length, C.data.log['k/w4/r'].length], [0, 1, 7], '이미 지나간 단어에는 또 적지 않음(기록이 불어나지 않게) · 되돌릴 것도 안 쌓임');
+  ok(Object.keys(C.recs).every(id => JSON.stringify(C.recs[id]) === JSON.stringify(C.replay(C.data.log[id]))), '넘긴 뒤에도 상태 = 기록을 다시 계산한 값');
+  // 다시 열어도(캐시) 같은 목록
+  const again = world(deck('k', 8), w.mem); again.VocabCore.load();
+  eq(again.VocabCore.unseenNotes(['k']).map(x => [x.note.id, x.passed]), look(['k']), '다시 열어도 같은 목록');
+  // 되돌리기 한 번에 한 화면 전체
+  eq(C.undo(ks, t + 4000), 'k/w2/r', '되돌리기 한 번에 한 화면');
+  eq(look(['k']), fresh(2, 3, 4, 5, 6, 7), '되돌리면 그 화면의 넘김 · 지나감이 모두 풀림');
+  eq(C.undo(ks, t + 5000), null, '더 되돌릴 것 없음');
+  // 넘겼다가 푼 단어 · 학습 화면에서 되돌린 단어
+  C.mark(null, ['k/w2/r'], 's', t + 6000); C.mark(null, ['k/w2/r'], 'u', t + 7000);
+  eq(look(['k']).filter(x => x[1]).map(x => x[0]), ['w2'], '넘겼다가 푼 단어는 넘기기 화면에서 다시 묻지 않음');
+  C.mark(ses, ['k/w3/r'], 's', t + 8000); C.undo(ses, t + 9000);
+  eq(look(['k']).find(x => x[0] === 'w3'), ['w3', false], '넘기기를 되돌린(무효) 단어는 아직 안 물어본 단어');
+  // 다른 기기와 합치기: p 도 합집합 · 같은 시각이면 되돌림이 이김
+  const E = (tt, c) => C.enc(tt) + c;
+  eq([w.Sync.mergeVocabLog(E(1, 'p'), E(1, 'p') + E(5, 's')), w.Sync.mergeVocabLog(E(1, 'p'), E(1, '0'))], [E(1, 'p') + E(5, 's'), E(1, '0')], '지나감 표시도 다른 기록처럼 합쳐짐');
+  // 카드가 두 장인 노트(읽기 · 듣기): 둘 다 새 카드일 때만 「안 본 노트」
+  w = start(deck('kk', 3, ", tpl: ['r', 'l']")); C = w.VocabCore; ses = C.session(['kk']);
+  eq([C.unseenNotes(['kk']).length, C.unseenNotes(['kk'])[0].cards, C.unseenNotes(['kk'])[0].tpl], [3, ['kk/w0/r', 'kk/w0/l'], ['r', 'l']], '노트 하나에 카드 두 장');
+  C.answer(ses, 'kk/w0/l', 3, t); eq(C.unseenNotes(['kk']).map(x => x.note.id), ['w1', 'w2'], '한 장이라도 배운 노트는 빠짐');
+  eq(C.sweep(null, ['kk/w1/r', 'kk/w1/l'], ['kk/w2/r', 'kk/w2/l'], t + 1000), 4, '세션 없이도 남길 수 있음');
+  eq([C.unseenNotes(['kk']).map(x => [x.note.id, x.passed]), C.summary(t + 2000).decks.kk.known], [[['w2', true]], 2], '노트의 카드를 모두 넘김');
+  // 덱 여러 개: 덱 순서대로 이어 붙임
+  w = start(deck('a1', 2) + deck('a2', 2)); C = w.VocabCore;
+  eq(C.unseenNotes(['a1', 'a2']).map(x => x.key), ['a1/w0', 'a1/w1', 'a2/w0', 'a2/w1'], '여러 덱은 덱 순서대로');
+}
+
+// ---------------------------------------------------------------- 차례표 · 덱 파일 틀 (tools/vocab_base_order.mjs)
+section('기초 덱 차례표 · 덱 파일 틀');
+{
+  const T = await import('./vocab_base_order.mjs'); const b = T.build(); const rows = b.rows; const st = b.stats;
+  eq([rows.length, st.total, st.ngsl + st.spokenOnly], [2833, 2833, 2833], '차례표 = NGSL 전부 + NGSL-S 에만 있는 단어');
+  ok(rows.every((r, i) => r.no === i + 1), '차례는 1 부터 빠짐없이');
+  ok(new Set(rows.map(r => r.id)).size === rows.length && rows.every(r => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(r.id)), '노트 id 는 겹치지 않고, 소문자 · 숫자 · 붙임표만');
+  ok(new Set(rows.map(r => r.word.toLowerCase())).size === rows.length, '단어는 겹치지 않음');
+  const head = rows.slice(0, st.spokenFirst), tail = rows.slice(st.spokenFirst);
+  ok(head.every((r, i) => r.spoken !== '' && (i === 0 || r.spoken > head[i - 1].spoken)), `앞 ${st.spokenFirst}개는 말 목록 순위대로`);
+  ok(tail.every((r, i) => r.spoken === '' && r.ngsl !== '' && (i === 0 || r.ngsl > tail[i - 1].ngsl)), '나머지는 NGSL 순위대로');
+  eq(T.ARTIFACTS.map(a => { const r = rows.find(x => x.id === a); return [!!r && r.spoken === '', !!r && r.no > st.spokenFirst]; }), T.ARTIFACTS.map(() => [true, true]), '녹취 표시 낱말은 말 순위를 쓰지 않고 뒤쪽(NGSL 순위 자리)에');
+  eq([rows.slice(0, 5).map(r => r.word), rows[rows.length - 1].word], [['be', 'the', 'you', 'and', 'it'], 'thirst'], '맨 앞 다섯과 맨 끝');
+  eq(read('vocab/sources/base-order.tsv'), b.text, '저장된 차례표 = 원문에서 다시 만든 것');
+  eq([T.fileOf(1), T.fileOf(200), T.fileOf(201), T.fileOf(2833)], ['base-0001.js', 'base-0001.js', 'base-0201.js', 'base-2801.js'], '차례 → 덱 파일 이름');
+  // 노트 한 줄 쓰기 → 다시 읽기: 따옴표 · 역슬래시 · 줄바꿈 · 모든 칸
+  const parse = (text) => { const out = []; vm.runInNewContext(text, { VocabDecks: { notes: (id, arr) => out.push(...arr) } }); return out; };
+  const tricky = [
+    { id: 'do', w: 'do', rank: 1, ko: [['v', '하다'], ['aux', '(의문문 · 부정문을 만드는 말)']], ex: [["I don't know.", '저는 몰라요.'], ['He said "do it" twice.', '그는 「해」 라고 두 번 말했어요.']], forms: ['does', 'did', "don't"], note: "it's \"both\" kinds \\ of quotes", say: 'do', pron: '두', tpl: ['r', 'l'] },
+    { id: 'i', w: 'I', rank: 2, ko: [['pron', '나']], ex: [['I am here.', '저는 여기 있어요.']], note: 'line one\nline two' },
+  ];
+  eq(parse("VocabDecks.notes('base', [\n" + tricky.map(T.fmt).join('\n') + '\n]);'), tricky, '노트 쓰기 → 다시 읽기: 한 글자도 안 바뀜');
+  let threw = ''; try { T.fmt({ id: 'x', w: 'x', rank: 3, ko: [], ex: [], extra: 1 }); } catch (e) { threw = e.message; }
+  ok(threw.includes('extra'), '도구가 모르는 칸이 있으면 조용히 버리지 않고 멈춤');
+  // 덱 파일 틀: 이미 쓴 노트는 그대로, 나머지는 빈 틀
+  const n3 = { id: rows[2].id, w: rows[2].word, rank: 3, ko: [['pron', '너, 당신']], ex: [['You are right.', '당신 말이 맞아요.']] };
+  const made = parse(T.fileText(1, rows, new Map([[3, n3]])));
+  eq([made.length, made.map(n => n.rank).join() === rows.slice(0, 200).map(r => r.no).join(), made[2], made[0], made.filter(T.isBlank).length], [200, true, n3, { id: 'be', w: 'be', rank: 1, ko: [], ex: [] }, 199], '틀 = 차례 1 ~ 200, 쓴 노트는 그대로 · 나머지는 차례표의 id · 단어가 든 빈 틀');
+  eq(parse(T.fileText(2801, rows, new Map())).map(n => n.rank), rows.slice(2800).map(r => r.no), '마지막 파일은 남은 차례만(2801 ~ 2833)');
+  eq(parse(T.fileText(1, rows, new Map([[3, n3]]), false)), [n3], '빈 틀 없이 쓴 노트만');
+  // 진행 상황: 빈 틀은 채운 것으로 세지 않음
+  const s1 = T.status(rows, [...made], () => true);
+  eq([s1.files.length, s1.files[0], s1.done, s1.total, s1.next], [15, { f: 'base-0001.js', start: 1, end: 200, done: 1, total: 200, exists: true }, 1, 2833, 1], '빈 틀 199개는 안 채운 것 → 다음에 할 파일은 그대로 1');
+  const full = made.map(n => (T.isBlank(n) ? Object.assign({}, n, { ko: [['n', '뜻']], ex: [['An example.', '예문.']] }) : n));
+  eq([T.status(rows, full, () => true).files[0].done, T.status(rows, full, () => true).next], [200, 201], '다 채우면 다음 파일로');
+  // 덱 파일 다시 만들기: 여러 번 돌려도 같고, 채운 노트를 잃지 않음
+  const p1 = T.planFile(1, rows, { notes: made, byFile: { 'base-0001.js': made } });
+  eq([p1.f, p1.end, p1.kept, p1.blanks, parse(p1.text)], ['base-0001.js', 200, 1, 199, made], '채우다 만 파일에 다시 돌려도 그대로(쓴 것 1 · 빈 틀 199)');
+  const shuffled = [made[5], Object.assign({ ex: n3.ex, ko: n3.ko }, { id: n3.id, w: n3.w, rank: 3 }), made[0]];
+  eq(parse(T.planFile(1, rows, { notes: shuffled, byFile: { 'base-0001.js': shuffled } }).text), made, '순서가 섞였거나 칸 순서가 달라도 차례대로 다시 씀');
+  const fails2 = (fn) => { try { fn(); return ''; } catch (e) { return e.message; } };
+  ok(fails2(() => T.planFile(1, rows, { notes: [], byFile: { 'base-0201.js': [n3] } })).includes('다른 파일'), '같은 차례의 노트가 다른 파일에 있으면 멈춤');
+  ok(fails2(() => T.planFile(201, rows, { notes: [], byFile: { 'base-0201.js': [n3] } })).includes('범위'), '파일 범위 밖의 노트가 있으면 멈춤(조용히 버리지 않음)');
+  ok(fails2(() => T.planFile(1, rows, { notes: [], byFile: { 'base-0001.js': [n3, Object.assign({}, n3, { id: 'dup' })] } })).includes('두 번'), '차례가 같은 노트가 둘이면 멈춤');
+  ok(fails2(() => T.planFile(2, rows, { notes: [], byFile: {} })).includes('첫 차례') && fails2(() => T.planFile(NaN, rows, { notes: [], byFile: {} })).includes('첫 차례'), '파일의 첫 차례가 아니면 멈춤');
+  // 지금 저장소의 덱: 파일마다 다시 만들어도 채운 노트가 그대로
+  const deckNow = T.loadBase(); const stNow = T.status(rows, deckNow.notes);
+  eq(stNow.done, deckNow.notes.filter(n => !T.isBlank(n)).length, '지금 덱: 진행 상황의 합 = 채운 노트 수');
+  ok(Object.keys(deckNow.byFile).every(f => { const m = /^base-(\d{4})\.js$/.exec(f); if (!m) return false; const p = T.planFile(+m[1], rows, deckNow); return p.kept === deckNow.byFile[f].filter(n => !T.isBlank(n)).length; }), '지금 덱: 파일마다 다시 만들어도 채운 노트를 잃지 않음');
+}
+
 console.log(fails.length ? `✗ test_vocab 실패 ${fails.length}개 (통과 ${pass}개)` : `✓ test_vocab OK — ${pass}개 통과`);
 process.exit(fails.length ? 1 : 0);

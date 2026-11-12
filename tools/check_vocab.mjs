@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 // tools/check_vocab.mjs — 영어 단어장 덱 데이터 검사(v2.46.0). 쓰기: node tools/check_vocab.mjs  (CI content 작업이 돌려요)
 //   ① 덱 노트 파일(vocab/decks/*.js)이 전부 vocab/index.html 에 올바른 순서로 들어 있는지 — 빠지면 그 노트가 화면에 안 나와요
-//   ② 덱 · 노트의 칸 모양(specs/vocab.md 3절): id · 품사 · 뜻 · 예문 · 순위. 한 줄이라도 틀리면 어느 덱 어느 노트인지 알려 줘요
+//   ② 덱 · 노트의 칸 모양(specs/vocab.md 3절): id · 품사 · 뜻 · 예문 · 순위 · forms(예문에 나온 모양만). 한 줄이라도 틀리면 어느 덱 어느 노트인지 알려 줘요
 //   ③ 허브 설정: 「필수교양」 이 맨 앞 묶음이고 단어장이 deck 으로 들어 있는지
-//   ④ 지시서(specs/vocab.md)의 덱별 노트 수 표가 실제와 같은지(문서 숫자가 낡지 않게 — LESSON.md R15)
-//   ⑤ 기초 덱: 차례표(vocab/sources/base-order.tsv)가 원문 목록과 맞는지, 노트의 rank · id · w 가 차례표와 같은지, 출처 표기가 있는지
+//   ④ 지시서(specs/vocab.md)의 덱별 노트 수 표가 실제와 같은지(문서 숫자가 낡지 않게 — LESSON.md R15),
+//      지시서의 「어려운 경우 본보기」 줄이 덱에 든 같은 노트와 글자까지 같은지
+//   ⑤ 기초 덱: 차례표(vocab/sources/base-order.tsv)가 원문 목록과 맞는지, 노트의 rank · id · w 가 차례표와 같은지, 출처 표기가 있는지,
+//      노트가 제 차례의 파일(base-NNNN.js)에 들어 있는지, 예문이 쉬운지(14낱말까지 · 차례표 밖 낱말은 예문마다 1개까지)
+//   빈 틀(ko: [], ex: [] — tools/vocab_base_order.mjs --file 이 만든 것)이 남아 있으면 덱마다 한 줄로 알려 줘요
 //   파일을 못 읽거나 실행하다 에러가 나면 통과가 아니라 실패예요(LESSON.md R6). 코어의 계산은 tools/test_vocab.mjs 가 봐요.
 import fs from 'node:fs'; import path from 'node:path'; import vm from 'node:vm';
 import { ROOT } from './load_content.mjs';
-import { build as buildBaseOrder } from './vocab_base_order.mjs';
+import { build as buildBaseOrder, FILE_SIZE } from './vocab_base_order.mjs';
 const errors = []; const err = (m) => errors.push(m);
 const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
 const HANGUL = /[가-힣]/;
@@ -27,8 +30,10 @@ try {
 
   // 화면과 같은 순서로 실행해 덱을 읽어요
   const ctx = { console }; vm.createContext(ctx);
-  vm.runInContext([read('vocab/core.js'), ...deckSrcs.filter(s => files.includes(s.slice(6))).map(s => read('vocab/' + s)), ';this.__D = VocabDecks;'].join('\n'), ctx, { filename: 'vocab-decks.js' });
-  const D = ctx.__D; const POS = Object.keys(D.POS); const TPL = Object.keys(D.TPL);
+  vm.runInContext(read('vocab/core.js') + '\n;this.__D = VocabDecks;', ctx, { filename: 'vocab/core.js' });
+  const D = ctx.__D; const POS = Object.keys(D.POS); const TPL = Object.keys(D.TPL); const fileOfNote = new Map();   // 노트 → 그 노트가 든 덱 파일
+  for (const s of deckSrcs.filter(s => files.includes(s.slice(6)))) { const before = new Map(D.list.map(d => [d.id, d.notes.length])); vm.runInContext(read('vocab/' + s), ctx, { filename: 'vocab/' + s }); for (const d of D.list) for (const n of d.notes.slice(before.get(d.id) || 0)) fileOfNote.set(n, s.slice(6)); }
+  const isBlank = (n) => n && Array.isArray(n.ko) && !n.ko.length && Array.isArray(n.ex) && !n.ex.length;
 
   // ② 덱 · 노트
   const IDRE = /^[a-z0-9][a-z0-9-]*$/; const counts = {};
@@ -43,11 +48,13 @@ try {
     if (d.sample && d.notes.length > 50 && d.id !== 'base') err(`${dw}: 노트가 ${d.notes.length}개인데 sample(표본) 표시가 남아 있어요 — 정식으로 채웠으면 vocab/decks/index.js 에서 sample 을 지워요`);
     counts[d.id] = d.notes.length;
     const ids = new Set(), words = new Set(); let lastRank = 0; const ranked = d.notes.filter(n => n.rank != null).length;
+    { const blanks = d.notes.filter(isBlank); if (blanks.length) err(`${dw}: 빈 틀 ${blanks.length}개가 남았어요 — ko · ex 를 채워요(첫 빈 틀: ${fileOfNote.get(blanks[0])} 의 ${blanks[0].id})`); }
     if (ranked && ranked !== d.notes.length) err(`${dw}: rank 는 모든 노트에 있거나 모두 없어야 해요(${ranked}/${d.notes.length})`);
     for (const n of d.notes) {
       const w = `${d.id}/${n && n.id}`;
       if (!n || !IDRE.test(n.id || '')) { err(`${w}: 노트 id 는 영어 소문자 · 숫자 · 하이픈`); continue; }
       if (ids.has(n.id)) err(`${w}: 노트 id 가 겹쳐요`); ids.add(n.id);
+      if (isBlank(n)) continue;   // 빈 틀은 위에서 한 줄로 알렸어요
       if (!text(w, n.w, 40, 'w(단어)')) continue;
       const lw = n.w.toLowerCase(); if (words.has(lw)) err(`${w}: 같은 단어 「${n.w}」 가 이 덱에 또 있어요 — 뜻이 여럿이면 한 노트의 ko 에 모아요`); words.add(lw);
       if (!Array.isArray(n.ko) || n.ko.length < 1 || n.ko.length > 3) err(`${w}: ko(뜻)는 [[품사, 뜻], …] 1~3개`);
@@ -61,6 +68,11 @@ try {
         if (text(w, e[1], 80, `예문 ${i + 1} 의 한국어`) && !HANGUL.test(e[1])) err(`${w}: 예문의 한국어 칸에 한글이 없어요`);
         if (i === 0 && typeof e[0] === 'string') { const has = forms.some(f => /^[A-Za-z][A-Za-z' -]*$/.test(f) ? new RegExp('\\b' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(e[0]) : e[0].toLowerCase().includes(String(f).toLowerCase())); if (!has) err(`${w}: 첫 예문에 단어 「${n.w}」(또는 forms 의 모양)가 없어요 「${e[0]}」`); }
       });
+      // forms 는 예문에서 그 낱말을 굵게 보여 주는 데만 써요 → 예문에 실제로 나온 모양만(안 나온 모양은 note 에). 단어 자신은 적지 않아요
+      if (Array.isArray(n.forms) && Array.isArray(n.ex)) { const all = n.ex.map(e => (Array.isArray(e) && typeof e[0] === 'string' ? e[0] : '')).join(' \n ');
+        for (const f of n.forms) { if (typeof f !== 'string' || !f.trim()) continue;
+          const hit = /^[A-Za-z][A-Za-z' -]*$/.test(f) ? new RegExp('\\b' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(all) : all.toLowerCase().includes(f.toLowerCase());
+          if (f.toLowerCase() === n.w.toLowerCase()) err(`${w}: forms 에 단어 자신(「${f}」)은 적지 않아요`); else if (!hit) err(`${w}: forms 의 「${f}」 가 예문에 없어요 — forms 에는 예문에 나온 모양만 적어요(다른 모양은 note 에)`); } }
       for (const k of ['note', 'say', 'pron']) if (n[k] !== undefined) text(w, n[k], k === 'note' ? 90 : 60, k);
       if (n.tpl !== undefined && (!Array.isArray(n.tpl) || !n.tpl.length || n.tpl.some(t => !TPL.includes(t)))) err(`${w}: tpl 은 ${TPL.join(' · ')} 중에서`);
       if (n.rank != null) { if (!Number.isInteger(n.rank) || n.rank <= lastRank) err(`${w}: rank(순위)는 앞 노트(${lastRank})보다 큰 정수여야 해요 — 순위 순서대로 넣어요`); lastRank = n.rank; }
@@ -77,7 +89,17 @@ try {
     const base = D.byId.base; const byNo = new Map(b.rows.map(r => [r.no, r]));
     if (base && base.notes.length) {
       if (!/CC BY-SA 4\.0/.test(base.credit || '') || !/New General Service List/.test(base.credit || '')) err('덱 base: credit 에 목록 이름(New General Service List)과 라이선스(CC BY-SA 4.0)를 적어요 — 공개 목록의 조건이에요');
-      for (const n of base.notes) { const w = `base/${n.id}`; if (n.rank == null) { err(`${w}: 기초 덱의 노트에는 rank(차례표의 no)가 있어야 해요`); continue; } const r = byNo.get(n.rank); if (!r) err(`${w}: rank ${n.rank} 가 차례표에 없어요`); else if (r.id !== n.id || r.word !== n.w) err(`${w}: 차례표 ${n.rank}번은 id 「${r.id}」 · 단어 「${r.word}」 예요 — 노트의 id · w · rank 를 차례표 그대로 써요`); }
+      const known = new Set(); for (const r of b.rows) { known.add(r.word.toLowerCase()); for (const f of r.forms.split(',')) if (f) known.add(f.toLowerCase()); }
+      const inList = (t) => known.has(t) || t.split("'").every(p => !p || known.has(p));   // don't → don + t 처럼 줄임말은 조각마다
+      let oneOut = 0;
+      for (const n of base.notes) { const w = `base/${n.id}`; if (n.rank == null) { err(`${w}: 기초 덱의 노트에는 rank(차례표의 no)가 있어야 해요`); continue; } const r = byNo.get(n.rank); if (!r) err(`${w}: rank ${n.rank} 가 차례표에 없어요`); else if (r.id !== n.id || r.word !== n.w) err(`${w}: 차례표 ${n.rank}번은 id 「${r.id}」 · 단어 「${r.word}」 예요 — 노트의 id · w · rank 를 차례표 그대로 써요`);
+        const f = fileOfNote.get(n) || ''; const m = /^base-(\d{4})\.js$/.exec(f); if (!m || (+m[1] - 1) % FILE_SIZE !== 0 || n.rank < +m[1] || n.rank > +m[1] + FILE_SIZE - 1) err(`${w}: 차례 ${n.rank} 의 노트가 ${f} 에 있어요 — 기초 노트는 제 차례의 파일에 둬요(node tools/vocab_base_order.mjs --status 가 파일과 범위를 보여 줘요)`);
+        if (isBlank(n) || !Array.isArray(n.ex)) continue;
+        n.ex.forEach((e, i) => { if (!Array.isArray(e) || typeof e[0] !== 'string') return; const toks = e[0].match(/[A-Za-z]+(?:'[A-Za-z]+)*/g) || []; const own = new Set([n.w, ...(n.forms || [])].map(x => String(x).toLowerCase()));
+          const out = toks.filter((t, k) => !(k > 0 && /^[A-Z]/.test(t) && t !== 'I') /* 문장 가운데의 대문자 낱말은 이름으로 봐요 */).map(t => t.toLowerCase()).filter(t => !own.has(t) && !inList(t));
+          if (toks.length > 14) err(`${w}: 예문 ${i + 1} 이 ${toks.length}낱말이에요 — 14낱말까지(짧고 쉬운 문장으로)`);
+          if (out.length >= 2) err(`${w}: 예문 ${i + 1} 에 차례표 밖 낱말이 ${out.length}개예요(${out.join(', ')}) — 쉬운 낱말로 바꿔요(예문마다 1개까지)`); else if (out.length) oneOut++; }); }
+      console.log(`기초 예문: 차례표 밖 낱말이 하나 든 예문 ${oneOut}개(예문마다 1개까지 허용)`);
       if (!base.sample && base.notes.length !== b.rows.length) err(`덱 base: 노트 ${base.notes.length}개 ≠ 차례표 ${b.rows.length}개 — 다 채우지 않았으면 sample 표시를 남겨 둬요`);
     }
     console.log(`차례표: NGSL ${b.stats.ngsl}개 + NGSL-S 에만 있는 ${b.stats.spokenOnly}개 = ${b.stats.total}개 (둘 다에 있는 단어 ${b.stats.both}개)`); }
@@ -92,6 +114,15 @@ try {
   const spec = read('specs/vocab.md'); const rows = Object.fromEntries([...spec.matchAll(/^\| `([a-z0-9-]+)` \|[^|\n]*\| (\d+) \|/gm)].map(m => [m[1], +m[2]]));
   for (const id of Object.keys(counts)) { if (!(id in rows)) err(`specs/vocab.md: 덱 표에 \`${id}\` 줄이 없어요(모양: | \`${id}\` | 이름 | 노트 수 | …)`); else if (rows[id] !== counts[id]) err(`specs/vocab.md: 덱 표의 \`${id}\` 노트 수 ${rows[id]} ≠ 실제 ${counts[id]} — 덱을 채우면 표도 같이 고쳐요`); }
   for (const id of Object.keys(rows)) if (!(id in counts)) err(`specs/vocab.md: 덱 표에 없는 덱 \`${id}\` 가 있어요`);
+  // ④-2 지시서의 「어려운 경우 본보기」: 덱에 이미 든 노트와 글자까지 같은지(지시서와 덱이 따로 놀지 않게), 아직 없는 줄도 차례표 · forms 규칙에 맞는지
+  { const m = /### 어려운 경우 본보기[\s\S]*?```js\n([\s\S]*?)```/.exec(spec); let list = null;
+    if (m) { try { list = vm.runInNewContext('[' + m[1] + ']'); } catch (e) { err('specs/vocab.md: 「어려운 경우 본보기」 의 js 블록을 읽지 못했어요: ' + e.message); } } else err('specs/vocab.md: 「어려운 경우 본보기」 의 js 블록이 없어요');
+    const J = (n) => JSON.stringify(Object.keys(n).sort().map(k => [k, n[k]])); const baseNotes = new Map(((D.byId.base || {}).notes || []).map(n => [n.id, n])); const order = new Map(buildBaseOrder().rows.map(r => [r.no, r]));
+    for (const e of list || []) { const w = `specs/vocab.md 본보기 「${e && e.id}」`; const r = order.get(e.rank);
+      if (!r || r.id !== e.id || r.word !== e.w) { err(`${w}: id · w · rank 가 차례표와 달라요`); continue; }
+      const n = baseNotes.get(e.id); if (n && J(n) !== J(e)) err(`${w}: 덱에 든 노트와 달라요 — 한쪽을 고쳤으면 다른 쪽도 같이 고쳐요`);
+      const all = (e.ex || []).map(x => x[0]).join(' \n '); for (const f of e.forms || []) if (!new RegExp('\\b' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i').test(all)) err(`${w}: forms 의 「${f}」 가 예문에 없어요`); }
+    if (list) console.log(`지시서 본보기 ${list.length}줄: 덱에 든 ${list.filter(e => baseNotes.has(e.id)).length}줄과 같음`); }
   console.log(`덱 ${D.list.length}개 · 노트 ${Object.values(counts).reduce((a, b) => a + b, 0)}개`);
 } catch (e) { err('검사하다 멈췄어요: ' + (e && e.stack || e)); }
 if (errors.length) { console.error(`✗ check_vocab 에러 ${errors.length}개`); errors.slice(0, 60).forEach(e => console.error('  ' + e)); if (errors.length > 60) console.error(`  … 외 ${errors.length - 60}개`); process.exit(1); }
