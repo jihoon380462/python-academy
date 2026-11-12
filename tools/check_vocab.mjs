@@ -8,10 +8,11 @@
 //   ④ 지시서(specs/vocab.md)의 덱별 노트 수 표가 실제와 같은지(문서 숫자가 낡지 않게 — LESSON.md R15),
 //      지시서의 「어려운 경우 본보기」 줄이 덱에 든 같은 노트와 글자까지 같은지
 //   ④-3 상태 문장: 지시서 덱 표의 상태 칸이 데이터(노트 수 · sample)와 맞는지, HANDOFF · TODO 0절 「영어 단어장」 줄에 덱마다 「이름 N개」 가 실제 수로 있는지,
-//      채우는 중인 덱(sample)이 없는데 그 두 줄이나 지시서 0절에 「채우는 중」 이 남았는지(LESSON.md R15 두 번째)
+//      채우는 중인 덱(sample)이 없는데 그 두 줄이나 지시서 0절에 「채우는 중」 이 남았는지(LESSON.md R15 두 번째),
+//      site-intent 의 「노트가 없는 덱(…)」 괄호에 실제로 노트가 없는 덱만 다 있는지(R15 세 번째)
 //   ⑤ 기초 덱: 차례표(vocab/sources/base-order.tsv)가 원문 목록과 맞는지, 노트의 rank · id · w 가 차례표와 같은지, 출처 표기가 있는지,
 //      노트가 제 차례의 파일(base-NNNN.js)에 들어 있는지, 예문이 쉬운지(14낱말까지 · 차례표 밖 낱말은 예문마다 1개까지)
-//   ⑥ 듣기 덱(specs/vocab.md W2): pron 이 「강세 대문자 철자 [한글 소리]」 모양인지, say 가 있으면 카드가 읽기 · 듣기 둘인지,
+//   ⑥ 듣기 덱(specs/vocab.md W2): pron 은 듣기 덱에서만(W3), 접사 노트는 affix 품사와 forms(W3), 쓰기 카드의 뜻 칸에 답(w)이 없는지(W3), 듣기 덱의 pron 이 「강세 대문자 철자 [한글 소리]」 모양인지, say 가 있으면 카드가 읽기 · 듣기 둘인지,
 //      낱말이 아닌 w(기호 · 식)에 say 가 있는지, 예문이 16낱말까지인지
 //   ⑦ 한 덱 파일 안에서 같은 첫 두 낱말로 시작하는 예문이 12개까지인지(3절 — 같은 문장 틀만 되풀이하지 않게)
 //   빈 틀(ko: [], ex: [] — tools/vocab_base_order.mjs --file 이 만든 것)이 남아 있으면 덱마다 한 줄로 알려 줘요
@@ -46,12 +47,14 @@ try {
 
   // ② 덱 · 노트
   const IDRE = /^[a-z0-9][a-z0-9-]*$/; const counts = {};
-  const text = (where, v, max, what) => { if (typeof v !== 'string' || !v.trim()) { err(`${where}: ${what} 가 비었어요`); return false; } if (v !== v.trim()) err(`${where}: ${what} 앞뒤에 빈칸이 있어요`); if (v.length > max) err(`${where}: ${what} 가 너무 길어요(${v.length}자 > ${max}자)`); if (/<[a-zA-Z/]/.test(v)) err(`${where}: ${what} 에 HTML 태그를 쓰지 않아요(글자 그대로 보여요)`); if (/TODO|\?\?\?|…{2,}/.test(v)) err(`${where}: ${what} 에 덜 쓴 표시(TODO · ???)가 남았어요`); return true; };
+  // 덜 쓴 표시: TODO · ??? · ……. 다만 TODO 를 가르치는 노트(w 가 TODO — 개발 단어 덱)는 그 노트 글의 TODO 가 내용이라 TODO 만 봐주고 ??? · …… 는 그대로 잡아요
+  let curW = '';
+  const text = (where, v, max, what) => { if (typeof v !== 'string' || !v.trim()) { err(`${where}: ${what} 가 비었어요`); return false; } if (v !== v.trim()) err(`${where}: ${what} 앞뒤에 빈칸이 있어요`); if (v.length > max) err(`${where}: ${what} 가 너무 길어요(${v.length}자 > ${max}자)`); if (/<[a-zA-Z/]/.test(v)) err(`${where}: ${what} 에 HTML 태그를 쓰지 않아요(글자 그대로 보여요)`); if (/\?\?\?|…{2,}/.test(v) || (/TODO/.test(v) && curW !== 'TODO')) err(`${where}: ${what} 에 덜 쓴 표시(TODO · ???)가 남았어요`); return true; };
   if (!D.list.length) err('덱이 하나도 없어요(vocab/decks/index.js)');
   for (const d of D.list) {
     const dw = `덱 ${d.id}`;
     if (!IDRE.test(d.id || '')) err(`${dw}: id 는 영어 소문자 · 숫자 · 하이픈`);
-    text(dw, d.name, 20, 'name'); text(dw, d.desc, 80, 'desc');
+    curW = ''; text(dw, d.name, 20, 'name'); text(dw, d.desc, 80, 'desc');
     if (!Array.isArray(d.tpl) || !d.tpl.length || d.tpl.some(t => !TPL.includes(t)) || new Set(d.tpl).size !== d.tpl.length) err(`${dw}: tpl 은 ${TPL.join(' · ')} 중에서 겹치지 않게`);
     if (!Number.isInteger(d.newPerDay) || d.newPerDay < 1 || d.newPerDay > 100) err(`${dw}: newPerDay 는 1~100 의 정수`);
     if (d.sample && d.notes.length > 50 && d.id !== 'base') err(`${dw}: 노트가 ${d.notes.length}개인데 sample(표본) 표시가 남아 있어요 — 정식으로 채웠으면 vocab/decks/index.js 에서 sample 을 지워요`);
@@ -60,7 +63,7 @@ try {
     { const blanks = d.notes.filter(isBlank); if (blanks.length) err(`${dw}: 빈 틀 ${blanks.length}개가 남았어요 — ko · ex 를 채워요(첫 빈 틀: ${fileOfNote.get(blanks[0])} 의 ${blanks[0].id})`); }
     if (ranked && ranked !== d.notes.length) err(`${dw}: rank 는 모든 노트에 있거나 모두 없어야 해요(${ranked}/${d.notes.length})`);
     for (const n of d.notes) {
-      const w = `${d.id}/${n && n.id}`;
+      const w = `${d.id}/${n && n.id}`; curW = n && typeof n.w === 'string' ? n.w : '';
       if (!n || !IDRE.test(n.id || '')) { err(`${w}: 노트 id 는 영어 소문자 · 숫자 · 하이픈`); continue; }
       if (ids.has(n.id)) err(`${w}: 노트 id 가 겹쳐요`); ids.add(n.id);
       if (isBlank(n)) continue;   // 빈 틀은 위에서 한 줄로 알렸어요
@@ -109,6 +112,12 @@ try {
       if (n.say !== undefined && !(tpl.includes('r') && tpl.includes('l'))) err(`${w}: say 가 있는 노트(기호 · 식 · 코드)는 tpl: ['r', 'l'] 이에요`);
       if (typeof n.w === 'string' && !/^[A-Za-z][A-Za-z' -]*[.?!]?$/.test(n.w) && n.say === undefined) err(`${w}: 낱말이 아닌 w 「${n.w}」 에는 강의에서 읽는 말(say)이 있어야 해요`);
       for (const e of n.ex || []) if (Array.isArray(e) && typeof e[0] === 'string' && e[0].split(/\s+/).filter(Boolean).length > 16) err(`${w}: 예문이 16낱말을 넘어요 「${e[0]}」`); }
+    // W3: pron(소리 적기)은 듣기 덱에서만 · 개발 덱의 접사 노트(w 가 un- · -able 모양)는 품사 affix 와 예문 속 낱말(forms)
+    for (const d of D.list) for (const n of d.notes) { if (!n || isBlank(n)) continue; const w = `${d.id}/${n.id}`;
+      if (d.id !== 'listen' && n.pron !== undefined) err(`${w}: pron(소리 적기)은 듣기 덱에서만 써요(W2 · W3)`);
+      { const tp = n.tpl || d.tpl; if (tp.includes('t') && typeof n.w === 'string' && Array.isArray(n.ko)) { const re = new RegExp('(?<![A-Za-z])' + n.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z])', 'i');
+        if (n.ko.some(k => Array.isArray(k) && re.test(String(k[1])))) err(`${w}: 쓰기 카드는 앞면에 뜻만 보여요 — 뜻 칸에 답 「${n.w}」 이 들어 있으면 안 돼요(W3)`); } }
+      if (d.id === 'dev' && typeof n.w === 'string' && /^[a-z]+-$|^-[a-z]+$/.test(n.w) && (!Array.isArray(n.ko) || !n.ko.some(k => Array.isArray(k) && k[0] === 'affix') || !Array.isArray(n.forms) || !n.forms.length)) err(`${w}: 접사 노트 「${n.w}」 는 품사 affix 와, 예문에 나온 낱말을 적은 forms 가 있어야 해요(W3)`); }
     if (L) console.log(`듣기 덱 규칙(W2): 노트 ${n6}개 — pron 모양 · say 와 카드 종류 · 예문 16낱말`); }
   // ⑦ 한 파일 안에서 같은 첫 두 낱말로 시작하는 예문은 12개까지(3절). 갈래를 섞어 합친 파일에서 한 문장 틀이 몰리지 않게
   { const by = new Map(); for (const d of D.list) for (const n of d.notes) { const f = fileOfNote.get(n); if (!f || !n || !Array.isArray(n.ex)) continue;
@@ -172,7 +181,14 @@ try {
       if (line === undefined) { err(`${f}: 0절의 「| 영어 단어장 … | … |」 줄을 못 찾았어요`); continue; }
       for (const d of D.list) if (counts[d.id] && !line.includes(`${d.name} ${fmt(counts[d.id])}개`)) err(`${f}: 0절 「영어 단어장」 줄에 「${d.name} ${fmt(counts[d.id])}개」 가 없어요 — 덱을 채우면 이 줄도 같은 PR 에서 고쳐요`);
       if (!filling.length && line.includes('채우는 중')) err(`${f}: 0절 「영어 단어장」 줄에 「채우는 중」 이 남아 있어요 — 채우는 중인 덱(덱 정의에 sample)이 없어요`); }
-    console.log(`상태 문장: 지시서 덱 표의 상태 칸 · HANDOFF · TODO 0절 「영어 단어장」 줄 대조(채우는 중인 덱: ${filling.length ? filling.join(', ') : '없음'})`); }
+    // site-intent 의 「노트가 없는 덱(…)」(LESSON.md R15 세 번째): 듣기 덱을 채운 v2.46.6 뒤에도 괄호에 듣기가 남았어요.
+    //   덱 이름에 「 · 」 가 든 것(속어 · 거친 말)이 있어 괄호를 쪼개지 않고, 덱마다 이름이 들어 있는지로 대조해요
+    { const si = read('specs/site-intent.md'); const m = si.match(/노트가 없는 덱\(([^)\n]*)\)/); const empty = D.list.filter(d => !counts[d.id]);
+      if (!m) { if (empty.length) err(`specs/site-intent.md: 「노트가 없는 덱(…)」 을 못 찾았어요 — 노트가 없는 덱(${empty.map(d => d.name).join(' · ')})이 「준비 중」 으로 보이는 게 정상이라고 적어요`); }
+      else for (const d of D.list) { const has = m[1].includes(d.name);
+        if (counts[d.id] && has) err(`specs/site-intent.md: 「노트가 없는 덱(${m[1]})」 에 노트가 ${fmt(counts[d.id])}개인 「${d.name}」 덱이 들어 있어요 — 덱을 채우면 이 줄도 같은 PR 에서 고쳐요`);
+        if (!counts[d.id] && !has) err(`specs/site-intent.md: 「노트가 없는 덱(${m[1]})」 에 노트가 없는 「${d.name}」 덱이 빠졌어요`); } }
+    console.log(`상태 문장: 지시서 덱 표의 상태 칸 · HANDOFF · TODO 0절 「영어 단어장」 줄 · site-intent 「노트가 없는 덱」 대조(채우는 중인 덱: ${filling.length ? filling.join(', ') : '없음'})`); }
   console.log(`덱 ${D.list.length}개 · 노트 ${Object.values(counts).reduce((a, b) => a + b, 0)}개`);
 } catch (e) { err('검사하다 멈췄어요: ' + (e && e.stack || e)); }
 if (errors.length) { console.error(`✗ check_vocab 에러 ${errors.length}개`); errors.slice(0, 60).forEach(e => console.error('  ' + e)); if (errors.length > 60) console.error(`  … 외 ${errors.length - 60}개`); process.exit(1); }
