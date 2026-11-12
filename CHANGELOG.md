@@ -20,7 +20,7 @@
   - 기초 · 속어 덱을 다 채운 뒤에도 「채우는 중」 으로 남아 있던 줄을 고침: TODO 0절 · 지시서 0절 · site-intent
   - `check_vocab` ④-3: 지시서 덱 표의 상태 칸 · HANDOFF · TODO 0절 「영어 단어장」 줄의 「덱 이름 N개」 를 실제 덱과 대조
   - 배포 때 고칠 목록(CLAUDE.md 4절 · HANDOFF 2절)에 TODO 0절 「지금 상태」 표를 더함
-  - 기록: LESSON.md R15
+  - 기록: LESSON.md R15 · R22(PR 을 연 뒤 곧바로 커밋을 더해 앞 커밋의 검사가 취소됨)
 - 🔧 **`.nojekyll` 추가**(11/8 Opus)
   - 배포 설정만 · 화면 변화 없음 · 버전 그대로 v2.42.1
   - 저장소 맨 위에 `.nojekyll` 파일을 둠

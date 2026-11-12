@@ -172,6 +172,7 @@
 7. **CI 기다리기 → 머지**
    - 사용자에게 **「CI 기다리는 중」 이라고 먼저 말해요.**
    - check-run `verify` 가 success 가 될 때까지 기다려요.
+   - 기다리는 동안 이 PR 에 커밋을 더 올리지 않아요. 도는 중에 올리면 앞 검사가 취소되고 그 커밋의 `verify` 가 빨강으로 남아요. 더할 것은 앞 실행이 끝난 뒤 올려요(LESSON.md R22).
    - 클라우드 세션은 `subscribe_pr_activity` 로 CI 결과가 저절로 와요. 기다리며 다음 챕터를 미리 만들어 둬도 돼요(커밋은 머지 뒤).
    - success 면 squash 머지.
    - 빨가면 로그(`get_job_logs`)로 원인을 찾아 고쳐 push 해요. 예: v2.28.1 은 CI 에 `requests` 가 없어 실패 → ci.yml 설치 줄에 더함.
