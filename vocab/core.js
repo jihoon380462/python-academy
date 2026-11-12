@@ -5,6 +5,7 @@
 //                    종류: r 읽기(영어 → 뜻) · l 듣기(소리 → 뜻) · t 쓰기(뜻 → 철자)
 //   기록(log)        카드마다 「사건 문자열」 하나. 사건 = 시각 6글자(36진수, 2026-01-01 UTC 부터 흐른 초) + 종류 1글자
 //                    종류: 1 다시 · 2 어려움 · 3 알맞음 · 4 쉬움 · 0 되돌림(무효) · s 아는 단어로 넘김 · u 넘김 풀기 · f 처음부터 다시
+//                          p 넘기기 화면에서 보고 지나감(상태 계산은 모르는 글자를 건너뛰어요 — 넘기기 화면만 읽어요)
 //   상태(recs)       기록을 처음부터 다시 계산(replay)한 결과. 기록만 진짜고 상태는 언제든 다시 만들 수 있어요.
 //                    그래서 두 기기의 기록은 「합집합」 으로 합치면 끝나요(core/sync.js 의 mergeVocab).
 //   하루             한국 시간 새벽 4시에 바뀌어요(Anki 와 같은 방식 — cfg.tz 분 · cfg.roll 시).
@@ -17,7 +18,7 @@
 const VocabDecks = {
   list: [], byId: {}, _card: null,
   TPL: { r: '읽기', l: '듣기', t: '쓰기' },
-  POS: { n: '명사', v: '동사', adj: '형용사', adv: '부사', prep: '전치사', conj: '접속사', pron: '대명사', det: '한정사', aux: '조동사', num: '수사', int: '감탄사', phr: '표현', abbr: '줄임말', sym: '기호', affix: '접사' },
+  POS: { n: '명사', v: '동사', adj: '형용사', adv: '부사', prep: '전치사', conj: '접속사', pron: '대명사', det: '한정사', art: '관사', aux: '조동사', num: '수사', int: '감탄사', phr: '표현', abbr: '줄임말', sym: '기호', affix: '접사' },
   // 덱 정보 등록(vocab/decks/index.js). 노트가 없는 덱은 화면에 「준비 중」 으로 나와요
   add(meta) {
     if (this.byId[meta.id]) throw new Error('덱 id 가 겹쳐요: ' + meta.id);
@@ -216,6 +217,34 @@ const VocabCore = {
     this.save(now); return u.ev[0][0];
   },
   noteCards(card) { return VocabDecks.cards(card.deck).filter(c => c.key === card.key); },
+
+  // ----- 아는 단어 한꺼번에 넘기기 (화면: vocab/app.js 의 viewKnown) -----
+  has(str, code) { for (let i = 6; str && i < str.length; i += 7) if (str[i] === code) return true; return false; },
+  // 아직 한 장도 안 본 노트: 카드가 모두 새 카드이고 넘기지도 않은 것을 덱 순서대로
+  //   돌려주는 값: [{ key 노트 열쇠, deck, note, cards: [카드 id …], tpl: [카드 종류 …], passed }]
+  //   passed: 넘기기 화면에서 이미 보고 지나갔거나('p') 넘겼다가 푼('u') 단어. 화면은 이것을 빼고 이어서 보여 줘요
+  unseenNotes(deckIds) {
+    const out = [];
+    for (const id of deckIds) {
+      const by = new Map();
+      for (const c of VocabDecks.cards(id)) {
+        let g = by.get(c.key); if (!g) { g = { key: c.key, deck: id, note: c.note, cards: [], tpl: [], passed: false, fresh: true }; by.set(c.key, g); }
+        g.cards.push(c.id); g.tpl.push(c.tpl); const r = this.recs[c.id]; if (!r) continue;
+        if (r.st !== 0 || r.susp) g.fresh = false; else if (this.has(this.data.log[c.id], 'p') || this.has(this.data.log[c.id], 'u')) g.passed = true;
+      }
+      for (const g of by.values()) if (g.fresh) out.push({ key: g.key, deck: g.deck, note: g.note, cards: g.cards, tpl: g.tpl, passed: g.passed });
+    }
+    return out;
+  },
+  // 넘기기 화면의 한 화면을 한 묶음으로 남겨요: known 의 카드는 's'(아는 단어로 넘김), passed 의 카드는 'p'(보고 지나감 — 간격 계산과 무관).
+  //   되돌리기 한 번에 둘 다 풀려요. 이미 'p' 가 있는 카드에는 또 적지 않아요(기록이 불어나지 않게). 돌려주는 값: 남긴 사건 수
+  sweep(session, knownIds, passedIds, now = this.now()) {
+    const ev = knownIds.map(id => [id, this.put(id, 's', now)]);
+    for (const id of passedIds) if (!this.has(this.data.log[id], 'p')) ev.push([id, this.put(id, 'p', now)]);
+    if (!ev.length) return 0;
+    if (session) session.undo.push({ ev, kind: 'mark', sinceNew: session.sinceNew });
+    this.save(now); return ev.length;
+  },
 
   // ----- 허브 카드용 요약 (core/hub.js 가 캐시에서 읽어요 — 허브는 덱 데이터 · 계산기를 불러오지 않아요) -----
   //   due 는 복습 카드의 「하루 번호 → 장 수」 표라서, 허브는 날이 바뀌어도 오늘 몫을 셀 수 있어요

@@ -80,6 +80,16 @@ a.vd-row:hover{background:var(--surface2)}
 .v-done{text-align:center;padding:28px 16px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .v-done h2{margin:0 0 6px}
 
+/* 아는 단어 한꺼번에 넘기기 — 단어만 보여 주는 누름 단추 */
+.vk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin:12px 0}
+.vk-w{min-height:48px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:1.05em;font-weight:600;overflow-wrap:anywhere}
+.vk-w:hover{border-color:var(--primary)}
+.vk-w.on{background:var(--primary);border-color:transparent;color:var(--on-primary)}.vk-w.on::before{content:'✓ '}
+.vk-warn{border-color:var(--warn);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.vk-skip{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0}
+.vk-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.vk-act .btn{flex:1 1 auto;min-height:48px}
+.v-known{margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:6px}
+
 /* 찾아보기 */
 .vb-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
 .vb-list{padding:0;overflow:hidden}

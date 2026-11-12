@@ -82,7 +82,7 @@ with sync_playwright() as p:
         print('  tiny', len(tiny), list(tiny.items())[:6])
         print('  smallTargets', len(small), [k for k in small][:8])
         print('  chipTall', len(chip), chip[:5]); print('  h1>=3lines', len(h1), h1[:5]); print('  empty', len(empty), empty[:4]); print('  overflow', len(over), over[:4], 'imgBroken', img)
-    # v2.46.0 영어 단어장(교과서가 아니라 화면이 따로): 덱 목록 · 덱 개요 · 카드 앞 · 카드 뒤 · 찾아보기를 재고, 설정 창은 캡처만
+    # v2.46.0 영어 단어장(교과서가 아니라 화면이 따로): 덱 목록 · 덱 개요 · 아는 단어 넘기기(v2.46.1, 하나 표시한 채로) · 카드 앞 · 카드 뒤 · 찾아보기를 재고, 설정 창은 캡처만
     if want_vocab:
         os.makedirs(f'{OUT}/vocab',exist_ok=True); verrs=[]; vrep={}
         pg=b.new_page(viewport={'width':A.w,'height':A.h}); pg.on('pageerror',lambda e:verrs.append(str(e)[:120]))
@@ -91,7 +91,9 @@ with sync_playwright() as p:
             pg.wait_for_timeout(200); pg.evaluate("window.scrollTo(0,0)")
             if measure: m=pg.evaluate(MEASURE); m['docOver']=pg.evaluate('document.documentElement.scrollWidth')>A.w; vrep[name]=m
             if A.shots: pg.screenshot(path=f'{OUT}/vocab/{name}.png', full_page=True)
-        vshot('decks'); pg.evaluate("location.hash='#deck/base'"); vshot('deck'); pg.evaluate("location.hash='#study/base'"); vshot('front'); pg.keyboard.press('Space'); vshot('back')
+        vshot('decks'); pg.evaluate("location.hash='#deck/base'"); vshot('deck')
+        pg.evaluate("location.hash='#known/base'"); pg.wait_for_timeout(200); pg.click('.vk-w'); vshot('known')   # 표시만 하고 넘기지 않아요 — 기록은 그대로
+        pg.evaluate("location.hash='#study/base'"); vshot('front'); pg.keyboard.press('Space'); vshot('back')
         pg.evaluate("location.hash='#browse'"); vshot('browse'); pg.click('#tbSettings'); vshot('settings', False); pg.keyboard.press('Escape'); pg.close()
         json.dump(vrep, open(f'{OUT}/vocab/report.json','w'), ensure_ascii=False)
         print(f'== vocab: views {len(vrep)} errs {len(verrs)} {verrs[:2]}')
