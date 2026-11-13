@@ -244,6 +244,50 @@ section('하루 한도 정하기(v2.46.8 하루 한도 시트)');
   C.setMaxRev(300, t); eq(C.data.cfg.maxRev, 300, '복습 상한 300장');
 }
 
+section('통계(v2.47.0 통계 화면 — W5)');
+{
+  // 시험용 덱 둘(st · st2)에 같은 낱말 word0 … word4 가 들어 있어요
+  const w = start(deck('st', 20) + deck('st2', 5)); const C = w.VocabCore; const V = w.VocabDecks; const t = T0; const today = C.day(t);
+  let s = C.stats(t);
+  eq([s.days.length, s.days[0].d, s.days[29].d, s.today, s.due.length], [30, today - 29, today, today, 30], '최근 30일: 오래된 날부터 오늘까지 30칸 · 앞으로 30칸');
+  ok(s.days.every(x => x.new + x.learn + x.rev + x.again === 0) && s.due.every(v => v === 0), '기록이 없으면 누른 횟수 · 복습 예정이 모두 0');
+  eq(s.states, { new: 20, learn: 0, rev: 0, known: 0, total: 20 }, '카드 상태: 두 덱의 같은 낱말 5개는 한 장으로 셈(25장 → 20)');
+  // 첫날: w0 알맞음 → 10분 뒤 알맞음, w1 다시 → 알맞음 → 알맞음, w2 는 누르고 되돌림, w3 넘김(s), w4 보고 지나감(p)
+  const ses = C.session(['st']);
+  graduate(C, ses, 'st/w0/r', t);
+  C.answer(ses, 'st/w1/r', 1, t + MIN); C.answer(ses, 'st/w1/r', 3, t + 2 * MIN); C.answer(ses, 'st/w1/r', 3, t + 13 * MIN);
+  C.answer(ses, 'st/w2/r', 3, t + 14 * MIN); C.undo(ses, t + 14 * MIN);
+  C.mark(null, ['st/w3/r'], 's', t + 15 * MIN); C.sweep(null, [], ['st/w4/r'], t + 15 * MIN);
+  s = C.stats(t + 20 * MIN);
+  eq(s.days[29], { d: today, new: 2, learn: 3, rev: 0, again: 0 }, '첫날: 새 카드 2 · 학습 3 — 되돌린 누름 · 넘김(s) · 보고 지나감(p)은 안 셈');
+  eq(s.states, { new: 17, learn: 0, rev: 2, known: 1, total: 20 }, '카드 상태: 복습 2 · 아는 단어 1 · 새 카드 17');
+  const d0 = C.recs['st/w0/r'].due, d1 = C.recs['st/w1/r'].due; const off0 = C.day(d0) - today, off1 = C.day(d1) - today;
+  ok(off0 >= 1 && off1 >= 1 && s.due[off0] >= 1 && s.due[off1] >= 1 && s.due.reduce((a, b) => a + b, 0) === 2, `앞으로 30일: 졸업한 두 장이 나올 날 칸에(${off0}일 · ${off1}일 뒤)`);
+  // 복습 날: 둘 다 밀린 때. w0 다시 → 10분 뒤 알맞음(다시 학습), w1 알맞음
+  const tr = Math.max(d0, d1) + MIN; const rday = C.day(tr);
+  eq(C.stats(tr).due[0], 2, '밀린 복습은 오늘 칸(앞으로 30일의 첫 칸)에');
+  const ses2 = C.session(['st']);
+  C.answer(ses2, 'st/w0/r', 1, tr); C.answer(ses2, 'st/w0/r', 3, tr + 11 * MIN); C.answer(ses2, 'st/w1/r', 3, tr + 12 * MIN);
+  s = C.stats(tr + 20 * MIN);
+  eq(s.days[29], { d: rday, new: 0, learn: 1, rev: 2, again: 1 }, '복습 날: 복습 2(그중 다시 1 → 맞힌 비율 50%) · 다시 학습 1');
+  const first = s.days.find(x => x.d === today); eq(first && [first.new, first.learn, first.rev], [2, 3, 0], '첫날 기록은 그날 칸에 그대로');
+  // 처음부터 다시(f) 뒤의 첫 누름은 다시 새 카드
+  C.mark(null, ['st/w1/r'], 'f', tr + 21 * MIN); C.answer(ses2, 'st/w1/r', 3, tr + 22 * MIN);
+  eq(C.stats(tr + 23 * MIN).days[29].new, 1, '처음부터 다시 한 카드를 누르면 다시 새 카드로 셈');
+  // 기간: 30일이 지나면 첫날은 빠지고, n 으로 기간을 바꿈
+  const late = C.dayStart(today + 30) + 6 * 3600000; const sl = C.stats(late);
+  ok(sl.days.length === 30 && sl.days[0].d === today + 1 && !sl.days.some(x => x.d === today), '30일이 지난 날은 빠짐');
+  eq(C.stats(tr + 23 * MIN, 7).days.map(x => x.d), Array.from({ length: 7 }, (_, i) => rday - 6 + i), '기간을 7일로 바꾸면 7칸');
+  // 같은 낱말은 대표 카드의 상태를 따름 · 덱에서 빠진 카드의 지난 누름도 그날 누른 횟수에 들어감
+  eq([C.stateOf(V.card('st2/w0/r')), C.stateOf(V.card('st/w0/r'))], ['rev', 'rev'], '같은 낱말: 다른 덱의 같은 카드도 대표 카드의 상태(복습)');
+  C.data.log['st/gone/t'] = C.enc(C.rel(tr + 24 * MIN)) + '3';
+  eq(C.stats(tr + 25 * MIN).days[29].new, 2, '덱에서 빠진 카드(지난 쓰기 카드 등)의 누름도 그날 횟수에 들어감');
+  // 하루 경계: 새벽 4시 전에 누른 것은 전날, 4시부터는 그날
+  const w2 = start(deck('bd', 5)); const C2 = w2.VocabCore; const b = C2.dayStart(C2.day(T0) + 1); const s2 = C2.session(['bd']);
+  C2.answer(s2, 'bd/w0/r', 3, b - 1000); C2.answer(s2, 'bd/w1/r', 3, b);
+  const x2 = C2.stats(b + 1000).days; eq([x2[28].new, x2[29].new], [1, 1], '새벽 4시 전에 누른 것은 전날 칸, 4시부터는 오늘 칸');
+}
+
 // ---------------------------------------------------------------- 두 기기 기록 합치기
 section('기록 합치기(기기 연동)');
 {
