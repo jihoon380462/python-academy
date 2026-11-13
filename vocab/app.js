@@ -384,7 +384,7 @@ const VocabApp = {
     else buttons.push({ label: '아는 단어로 넘기기', onClick: () => { this.markKnown(card); } });
     if (r && r.n) buttons.push({ label: '처음부터 다시', onClick: () => { VocabCore.mark(null, [id], 'f'); done('새 카드로 돌렸어요'); } });
     buttons.push({ label: T.close, cls: 'primary' });
-    UI.modal({ title: '카드 정보', wide: true, body, buttons });
+    UI.modal({ title: '카드 정보', wide: true, body, buttons, onOpen: (ov) => { $$('[data-say]', ov).forEach(x => { x.onclick = () => this.tts.speak(x.dataset.say); }); } });   // 다른 덱 예문의 소리 단추(v2.46.9)
   },
 
   // ---------- 찾아보기 ----------
