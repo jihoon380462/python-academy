@@ -109,11 +109,13 @@ try {
       if (typeof n.pron !== 'string') err(`${w}: 듣기 덱 노트는 pron 이 있어야 해요(「pa-RAM-e-ter [퍼래미러]」 모양 — W2)`);
       else if (!/^[^\[\]]*[A-Z][^\[\]]* \[[^\[\]]*[가-힣][^\[\]]*\]$/.test(n.pron)) err(`${w}: pron 은 「강세 음절을 대문자로 쓴 철자 [한글 소리]」 모양이에요(지금 「${n.pron}」)`);
       const tpl = n.tpl || L.tpl;
-      if (n.say !== undefined && !(tpl.includes('r') && tpl.includes('l'))) err(`${w}: say 가 있는 노트(기호 · 식 · 코드)는 tpl: ['r', 'l'] 이에요`);
+      if (n.say !== undefined && !tpl.includes('l')) err(`${w}: say 가 있는 노트(기호 · 식 · 코드)는 듣기 카드(l)가 그 말을 읽어 줘요 — 카드 종류에 l`);
       if (typeof n.w === 'string' && !/^[A-Za-z][A-Za-z' -]*[.?!]?$/.test(n.w) && n.say === undefined) err(`${w}: 낱말이 아닌 w 「${n.w}」 에는 강의에서 읽는 말(say)이 있어야 해요`);
       for (const e of n.ex || []) if (Array.isArray(e) && typeof e[0] === 'string' && e[0].split(/\s+/).filter(Boolean).length > 16) err(`${w}: 예문이 16낱말을 넘어요 「${e[0]}」`); }
     // W3: pron(소리 적기)은 듣기 덱에서만 · 개발 덱의 접사 노트(w 가 un- · -able 모양)는 품사 affix 와 예문 속 낱말(forms)
     for (const d of D.list) for (const n of d.notes) { if (!n || isBlank(n)) continue; const w = `${d.id}/${n.id}`;
+      // v2.46.9 단어마다 딱 한 장(사용자 결정 D32): 한 노트에 카드 한 장 — 같은 단어의 둘째 카드(듣기 · 쓰기)를 다시 만들지 않게
+      { const tp = n.tpl || d.tpl; if (!Array.isArray(tp) || tp.length !== 1) err(`${w}: 한 노트에 카드는 한 장이에요(같은 단어의 둘째 카드 없음 — v2.46.9). 지금 ${JSON.stringify(tp)}`); }
       if (d.id !== 'listen' && n.pron !== undefined) err(`${w}: pron(소리 적기)은 듣기 덱에서만 써요(W2 · W3)`);
       { const tp = n.tpl || d.tpl; if (tp.includes('t') && typeof n.w === 'string' && Array.isArray(n.ko)) { const re = new RegExp('(?<![A-Za-z])' + n.w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z])', 'i');
         if (n.ko.some(k => Array.isArray(k) && re.test(String(k[1])))) err(`${w}: 쓰기 카드는 앞면에 뜻만 보여요 — 뜻 칸에 답 「${n.w}」 이 들어 있으면 안 돼요(W3)`); } }
