@@ -595,11 +595,12 @@ with sync_playwright() as p:
     LC="JSON.stringify([VocabCore.data.cfg.newPerDay, VocabCore.data.cfg.maxRev])"
     pg.evaluate("VocabCore.setCfg({newPerDay:{}, maxRev:200}); location.hash='#deck/dev'; VocabApp.route()"); pg.wait_for_timeout(150)
     l0=pg.inner_text('#vLimit'); pg.click('#vLimit'); pg.wait_for_timeout(150)
+    pg.evaluate("Promise.all(document.querySelector('.v-sheet .modal').getAnimations().map(a=>a.finished))")   # 올라오는 움직임이 끝난 뒤에 재요(고정 대기는 CI 에서 1/4 로 줄어요)
     lpos=pg.evaluate("(()=>{ const r=document.querySelector('.v-sheet .modal').getBoundingClientRect(); return {bottom:Math.round(innerHeight-r.bottom), w:Math.round(r.width), sw:document.documentElement.scrollWidth, on:[...document.querySelectorAll('#vlNew .on')].map(b=>b.dataset.n), saved:!document.querySelector('#vlSaved').hidden}; })()")
     ldays=pg.evaluate("Math.ceil(VocabDecks.cards('dev').filter(c=>VocabApp.stOf(c.id)==='new').length/10)")
     pg.click('#vlNew [data-n="10"]'); pg.wait_for_timeout(100); l1=[pg.evaluate(LC), pg.inner_text('.v-over .vn.new'), pg.inner_text('#vLimit'), pg.is_visible('#vlSaved'), ('약 %d일' % ldays) in pg.inner_text('#vlInfo')]
     pg.click('#vlUndo'); pg.wait_for_timeout(100); l2=pg.evaluate(LC)
-    pg.click('#vlNew [data-n="direct"]'); pg.fill('#vlInput','1'); pg.wait_for_timeout(150); pg.fill('#vlInput','12'); l3a=pg.evaluate(LC); pg.wait_for_timeout(700); l3=pg.evaluate(LC)
+    pg.click('#vlNew [data-n="direct"]'); pg.fill('#vlInput','1'); pg.wait_for_timeout(150); pg.fill('#vlInput','12'); l3a=pg.evaluate(LC); pg.wait_for_function("VocabCore.data.cfg.newPerDay.dev===12", timeout=3000); l3=pg.evaluate(LC)
     pg.fill('#vlInput','999'); pg.keyboard.press('Enter'); pg.wait_for_timeout(100); l4=[pg.evaluate(LC), pg.input_value('#vlInput')]
     pg.click('#vlAll'); pg.click('#vlRev [data-r="500"]'); pg.wait_for_timeout(100); l5=pg.evaluate("[VocabDecks.ready().every(d=>VocabCore.newLimit(d.id)===200), VocabCore.data.cfg.maxRev]")
     pg.fill('#vlInput','7'); pg.keyboard.press('Escape'); pg.wait_for_timeout(150); l6=[pg.evaluate("VocabCore.newLimit('dev')"), pg.locator('.v-sheet').count()]
@@ -609,6 +610,7 @@ with sync_playwright() as p:
     lall=pg.evaluate("[[...document.querySelectorAll('.v-limit [data-limit]')].map(b=>b.dataset.limit), VocabDecks.ready().map(d=>d.id)]"); pg.click('.v-limit [data-limit="slang"]'); pg.wait_for_timeout(150)
     lt=pg.inner_text('.v-sheet .modal-title'); pg.keyboard.press('Escape'); pg.wait_for_timeout(100)
     pg.set_viewport_size({'width':1280,'height':900}); pg.evaluate("location.hash='#deck/base'; VocabApp.route()"); pg.wait_for_timeout(150); pg.click('#vLimit'); pg.wait_for_timeout(150)
+    pg.evaluate("Promise.all(document.querySelector('.v-sheet .modal').getAnimations().map(a=>a.finished))")
     lpc=pg.evaluate("(()=>{ const r=document.querySelector('.v-sheet .modal').getBoundingClientRect(); return {top:Math.round(r.top), bottom:Math.round(innerHeight-r.bottom)}; })()"); pg.keyboard.press('Escape'); pg.wait_for_timeout(100)
     check(lall[0]==lall[1] and len(lall[0])>=4 and lt.startswith('속어 · 거친 말 · 하루 한도') and lpc['top']>40 and lpc['bottom']>40 and pg.evaluate(LC)=='[{},200]', '하루 한도 시트: 「전체」 화면은 덱마다 칩(누르면 그 덱의 시트) · PC 에서는 가운데 창 · 닫아도 바뀐 것 없음 (%s · %s)' % (lall[0], lpc))
     pg.evaluate("VocabCore.clockOffset=0"); pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(500)

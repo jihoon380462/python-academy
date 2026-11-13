@@ -142,7 +142,7 @@ const VocabApp = {
       <div class="chips" id="vlNew">${this.NEW_PICKS.map(n => `<button class="chip-btn" data-n="${n}">${n}</button>`).join('')}<button class="chip-btn" data-n="direct">직접…</button></div>
       <div class="vl-direct" id="vlDirect"><input class="input" id="vlInput" type="number" inputmode="numeric" min="0" max="${VocabCore.NEW_MAX}" aria-label="${esc(d.name)} 하루 새 카드"><span>장</span><span class="muted small">0 ~ ${VocabCore.NEW_MAX}</span></div>
       <div class="vl-info" id="vlInfo"></div>
-      <div class="vs-h">하루 복습 상한 <span class="muted small">(모든 덱 같음)</span></div>
+      <div class="vs-h">하루 복습 상한 <span class="muted small">(덱마다 · 모든 덱 같은 값)</span></div>
       <div class="chips" id="vlRev"></div>
       <div class="muted small vl-note">복습이 상한을 넘으면 남은 복습은 다음 날로 미뤄져요</div>
       <div class="row vl-all"><button class="btn" id="vlAll"></button></div>`;
