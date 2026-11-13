@@ -42,10 +42,13 @@ const VocabApp = {
     while ((m = re.exec(en))) { out += esc(en.slice(last, m.index)) + '<b>' + esc(m[0]) + '</b>'; last = m.index + m[0].length; }
     return out + esc(en.slice(last));
   },
-  stOf(id) { const r = VocabCore.recs[id]; return !r ? 'new' : r.susp ? 'known' : r.st === 0 ? 'new' : r.st === 2 ? 'rev' : 'learn'; },
-  stLabel(id) { const r = VocabCore.recs[id]; const s = this.stOf(id); return s === 'known' ? '아는 단어' : s === 'new' ? '새 카드' : s === 'rev' ? '복습' : r.st === 3 ? '다시 학습' : '학습 중'; },
+  // 같은 단어 한 장(v2.46.9): 다른 덱 카드로 보고 있는 단어는 그 대표 카드의 기록으로 상태를 보여요
+  recId(id) { const c = VocabDecks.card(id); const rep = c && VocabCore.covered(c) ? VocabCore.repOf(c) : null; return rep ? rep.id : id; },
+  deckShort(id) { return ({ base: '기초', slang: '속어', listen: '듣기', dev: '개발', acad: '학술' })[id] || VocabDecks.byId[id].name; },
+  stOf(id) { const r = VocabCore.recs[this.recId(id)]; return !r ? 'new' : r.susp ? 'known' : r.st === 0 ? 'new' : r.st === 2 ? 'rev' : 'learn'; },
+  stLabel(id) { const r = VocabCore.recs[this.recId(id)]; const s = this.stOf(id); return s === 'known' ? '아는 단어' : s === 'new' ? '새 카드' : s === 'rev' ? '복습' : r.st === 3 ? '다시 학습' : '학습 중'; },
   dueText(id, now) {
-    const r = VocabCore.recs[id]; const s = this.stOf(id); if (s === 'new' || s === 'known') return '';
+    const r = VocabCore.recs[this.recId(id)]; const s = this.stOf(id); if (s === 'new' || s === 'known') return '';
     if (s === 'learn') { const m = Math.ceil((r.due - now) / 60000); return m <= 0 ? '지금' : `${m}분 뒤`; }
     const d = VocabCore.day(r.due) - VocabCore.day(now); return d === 0 ? '오늘' : d < 0 ? `${-d}일 밀림` : `${d}일 뒤`;
   },
@@ -110,7 +113,8 @@ const VocabApp = {
   // ---------- 덱 개요 ----------
   viewDeck() {
     const ids = this.deckIds(this.sel); const now = VocabCore.now(); const sc = VocabCore.scan(ids, now); const c = sc.counts; const todo = c.new + c.learn + c.rev;
-    const cards = ids.flatMap(id => VocabDecks.cards(id)); const seen = cards.filter(x => this.stOf(x.id) !== 'new').length; const known = cards.filter(x => this.stOf(x.id) === 'known').length;
+    const wk = new Set(); const cards = ids.flatMap(id => VocabDecks.cards(id)).filter(x => { const k = VocabDecks.wordKey(x.note); if (wk.has(k)) return false; wk.add(k); return true; });   // 「전체」 에서도 같은 단어는 한 장(v2.46.9)
+    const seen = cards.filter(x => this.stOf(x.id) !== 'new').length; const known = cards.filter(x => this.stOf(x.id) === 'known').length; const shared = cards.filter(x => VocabDecks.group(x).some(y => y.deck !== x.deck)).length;
     const d = VocabDecks.byId[this.sel]; const desc = this.sel === 'all' ? '모든 덱을 섞어서 봐요' : d.desc;
     const unseen = this.knownList(ids); const fresh = unseen.filter(x => !x.passed).length;   // fresh: 넘기기 화면에서 아직 안 보여 준 단어
     $('#view').innerHTML = `<div class="page vocab"><a class="btn sm" href="#">← 덱 목록</a>
@@ -119,7 +123,7 @@ const VocabApp = {
         ${this.limitRow(ids)}
         ${todo ? `<a class="btn primary big" id="vStart" href="#study/${esc(this.sel)}">지금 학습</a>` : `<div><b>오늘 할 카드를 다 했어요 🎉</b></div>${sc.moreNew ? `<div class="row center"><button class="btn" id="vMoreNew">새 카드 ${Math.min(5, sc.moreNew)}장 더 하기</button></div>` : ''}`}
         ${unseen.length ? `<div class="v-known"><a class="btn sm" id="vKnown" href="#known/${esc(this.sel)}">아는 단어 한꺼번에 넘기기</a>${fresh ? `<div class="muted small">아직 안 본 단어 ${fresh}개 — 아는 단어를 먼저 넘겨 두면 모르는 단어만 카드로 나와요.</div>` : ''}</div>` : ''}
-        <div class="muted small" style="margin-top:14px">카드 ${cards.length}장 · 본 카드 ${seen}장${known ? ` · 아는 단어로 넘긴 카드 ${known}장` : ''}</div>
+        <div class="muted small" style="margin-top:14px">카드 ${cards.length}장 · 본 카드 ${seen}장${known ? ` · 아는 단어로 넘긴 카드 ${known}장` : ''}${shared ? `<br>다른 덱과 같은 단어 ${shared}개는 덱마다 따로 나오지 않고 한 장으로 봐요` : ''}</div>
         ${d && d.credit ? `<div class="muted small" style="margin-top:6px">${esc(d.credit)}</div>` : ''}</div></div>`;
     const mn = $('#vMoreNew'); if (mn) mn.onclick = () => { VocabCore.addExtra(ids, Math.min(5, sc.moreNew)); location.hash = '#study/' + this.sel; };
     const lb = $('#vLimit'); if (lb) lb.onclick = () => this.limitSheet(this.sel);
@@ -269,21 +273,30 @@ const VocabApp = {
     const word = `<div class="vc-word" lang="en">${esc(n.w)}</div>`;
     const sayBtn = can ? `<button class="vc-say" id="vSay" title="소리 듣기 (R)" aria-label="소리 듣기">${this.sound()}</button>` : '';
     const senses = n.ko.map(([pos, ko]) => `<div class="vc-sense"><span class="vc-pos">${esc(VocabDecks.POS[pos] || pos)}</span>${esc(ko)}</div>`).join('');
-    const kind = `<div class="vc-kind">${this.KIND[cur.kind]} · ${VocabDecks.TPL[t]}</div>`;
+    const kind = `<div class="vc-kind">${this.sel === 'all' ? esc(VocabDecks.byId[cur.card.deck].name) + ' · ' : ''}${this.KIND[cur.kind]} · ${VocabDecks.TPL[t]}</div>`;
     if (!cur.shown) {
       if (t === 'l') return kind + (can ? `<button class="btn big" id="vSay">${this.sound()} 소리 듣기</button><div class="vc-hint">소리를 듣고 뜻을 떠올려 보세요</div>` : word + '<div class="vc-hint">이 기기는 영어 소리를 낼 수 없어서 글자로 보여 줘요</div>');
       if (t === 't') return kind + senses + '<input class="input vc-type" id="vType" placeholder="영어 철자를 쳐 보세요" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" lang="en">';
       return kind + word + sayBtn;
     }
-    const ex = (n.ex || []).map(([en, ko]) => `<div class="vc-ex"><div class="vc-ex-en" lang="en">${this.hl(en, n)}${can ? `<button class="vc-say sm" data-say="${esc(en)}" title="예문 듣기" aria-label="예문 듣기">${this.sound(18)}</button>` : ''}</div><div class="vc-ex-ko">${esc(ko)}</div></div>`).join('');
+    const ex = this.exHtml(n); const more = this.otherDecks(cur.card); const own = more ? `<div class="vc-deckh">${esc(VocabDecks.byId[cur.card.deck].name)}</div>` : '';
     const tail = ex + (n.note ? `<div class="vc-note">${esc(n.note)}</div>` : '') + (n.pron ? `<div class="vc-pron">소리: ${esc(n.pron)}</div>` : '');
     const hr = '<hr class="vc-hr" id="vAnswer">';
     if (t === 't') {
       const typed = (cur.typed || '').trim(); const right = typed.toLowerCase() === String(n.w).toLowerCase();
       const cmp = !typed ? '' : right ? `<div class="vc-typed"><span class="good">✓ ${esc(typed)}</span></div>` : `<div class="vc-typed">내가 친 것: <span class="bad">${esc(typed)}</span></div>`;
-      return kind + senses + cmp + hr + word + sayBtn + tail;
+      return kind + senses + cmp + hr + word + sayBtn + tail + more;
     }
-    return kind + word + sayBtn + hr + senses + tail;
+    return kind + word + sayBtn + hr + own + senses + tail + more;
+  },
+  exHtml(n) { const can = this.tts.ok(); return (n.ex || []).map(([en, ko]) => `<div class="vc-ex"><div class="vc-ex-en" lang="en">${this.hl(en, n)}${can ? `<button class="vc-say sm" data-say="${esc(en)}" title="예문 듣기" aria-label="예문 듣기">${this.sound(18)}</button>` : ''}</div><div class="vc-ex-ko">${esc(ko)}</div></div>`).join(''); },
+  // 같은 단어 한 장(v2.46.9): 다른 덱에 있는 같은 단어의 뜻 · 예문 · 쓰임을 덱 이름 아래 모아요. 앞에서 나온 뜻과 글자까지 같은 뜻 줄은 한 번만
+  otherDecks(card) {
+    const others = VocabDecks.group(card).filter(x => x.deck !== card.deck); if (!others.length) return '';
+    const shown = new Set(card.note.ko.map(([p, k]) => p + '|' + k)); const done = new Set();
+    return others.map(x => { if (done.has(x.key)) return ''; done.add(x.key); const n = x.note;
+      const ko = n.ko.filter(([p, k]) => !shown.has(p + '|' + k)); ko.forEach(([p, k]) => shown.add(p + '|' + k));
+      return `<div class="vc-other"><div class="vc-deckh">${esc(VocabDecks.byId[x.deck].name)}</div>${ko.map(([pos, k]) => `<div class="vc-sense"><span class="vc-pos">${esc(VocabDecks.POS[pos] || pos)}</span>${esc(k)}</div>`).join('')}${this.exHtml(n)}${n.note ? `<div class="vc-note">${esc(n.note)}</div>` : ''}${n.pron ? `<div class="vc-pron">소리: ${esc(n.pron)}</div>` : ''}</div>`; }).join('');
   },
   renderStudy() {
     const p = this.pickInfo; const cur = this.cur; const c = p.counts; const ses = this.ses;
@@ -314,7 +327,9 @@ const VocabApp = {
     $$('[data-say]').forEach(b => { b.onclick = () => this.tts.speak(b.dataset.say); });
     const focus = $('#vType') || $('#vShow') || $('.vr.good'); if (focus) try { focus.focus({ preventScroll: true }); } catch (e) {}
   },
-  say() { if (this.cur) this.tts.speak(this.cur.card.note.say || this.cur.card.note.w); },
+  // 소리: 노트의 say(기호 · 식을 읽는 말), 없으면 같은 단어 무리(다른 덱)의 say, 없으면 낱말 그대로(v2.46.9)
+  sayText(card) { if (card.note.say) return card.note.say; const g = VocabDecks.group(card).find(x => x.note.say); return g ? g.note.say : card.note.w; },
+  say() { if (this.cur) this.tts.speak(this.sayText(this.cur.card)); },
   show() {
     if (!this.cur || this.cur.shown) return;
     const ty = $('#vType'); if (ty) this.cur.typed = ty.value;
@@ -350,16 +365,18 @@ const VocabApp = {
 
   // ---------- 카드 정보(학습 · 찾아보기 공용) ----------
   info(id) {
-    const card = VocabDecks.card(id); if (!card) return; const n = card.note; const r = VocabCore.recs[id]; const now = VocabCore.now(); const st = this.stOf(id);
+    if (!VocabDecks.card(id)) return; id = this.recId(id);   // 다른 덱 카드로 보는 같은 단어면 그 대표 카드의 기록 · 동작으로(v2.46.9)
+    const card = VocabDecks.card(id); const n = card.note; const r = VocabCore.recs[id]; const now = VocabCore.now(); const st = this.stOf(id);
     const names = { 1: '다시', 2: '어려움', 3: '알맞음', 4: '쉬움', 0: '(되돌림)', s: '아는 단어로 넘김', u: '넘김 풀기', f: '처음부터 다시', p: '넘기기 화면에서 지나감' };
     const hist = VocabCore.parse(VocabCore.data.log[id] || '').slice(-6).map(([t, c]) => `${this.dateText(VocabCore.abs(t))} ${names[c] || c}`).join('<br>');
     const rows = [['덱', esc(VocabDecks.byId[card.deck].name)], ['카드 종류', VocabDecks.TPL[card.tpl]], ['상태', this.stLabel(id)]];
+    { const ds = [...new Set(VocabDecks.group(card).map(x => x.deck))]; if (ds.length > 1) rows.push(['같은 단어', `${ds.map(x => esc(VocabDecks.byId[x].name)).join(' · ')} — 한 장으로 봐요`]); }
     if (st === 'rev' || st === 'learn') rows.push(['다음에 볼 때', `${this.dueText(id, now)} (${this.dateText(r.due)})`]);
     if (r && r.n) rows.push(['누른 횟수', `${r.n}번 · 틀린 횟수 ${r.lapses}번`]);
     if (r && r.st === 2) rows.push(['간격', VocabCore.daysLabel(r.sd)], ['안정도', `${r.s.toFixed(1)}일 (이만큼 지나면 떠올릴 확률 90%)`], ['난이도', `${r.d.toFixed(1)} / 10`]);
     if (hist) rows.push(['최근 기록', hist]);
     const body = `<div class="vc-word" style="font-size:1.6em" lang="en">${esc(n.w)}</div>${n.ko.map(([pos, ko]) => `<div><span class="vc-pos" style="font-size:.8em">${esc(VocabDecks.POS[pos] || pos)}</span>${esc(ko)}</div>`).join('')}
-      ${(n.ex || []).map(([en, ko]) => `<div style="margin-top:8px"><div lang="en">${this.hl(en, n)}</div><div class="muted">${esc(ko)}</div></div>`).join('')}${n.note ? `<div class="vc-note">${esc(n.note)}</div>` : ''}
+      ${(n.ex || []).map(([en, ko]) => `<div style="margin-top:8px"><div lang="en">${this.hl(en, n)}</div><div class="muted">${esc(ko)}</div></div>`).join('')}${n.note ? `<div class="vc-note">${esc(n.note)}</div>` : ''}${this.otherDecks(card)}
       <table class="vi-table">${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>`;
     const done = (msg) => { this.afterChange(); UI.toast(msg, 1800); if (this.view === 'study') this.nextCard(); else this.render(); };
     const buttons = [];
@@ -372,16 +389,18 @@ const VocabApp = {
 
   // ---------- 찾아보기 ----------
   viewBrowse() {
-    const all = VocabDecks.ready().flatMap(d => VocabDecks.cards(d.id)); const F = [['all', '전체'], ['new', '새 카드'], ['learn', '학습 중'], ['rev', '복습'], ['known', '아는 단어']];
+    const wk = new Set(); const all = [];   // 같은 단어는 한 줄(v2.46.9): 대표 카드(공부를 시작한 덱), 아직이면 먼저 나오는 덱의 카드
+    for (const d of VocabDecks.ready()) for (const c of VocabDecks.cards(d.id)) { const k = VocabDecks.wordKey(c.note); if (wk.has(k)) continue; wk.add(k); all.push(VocabCore.repOf(c) || c); }
+    const F = [['all', '전체'], ['new', '새 카드'], ['learn', '학습 중'], ['rev', '복습'], ['known', '아는 단어']];
     $('#view').innerHTML = `<div class="page vocab"><h1 class="v-h">찾아보기</h1><p class="muted v-lead">단어를 누르면 카드 정보가 열려요. 아는 단어로 넘긴 카드도 여기서 되돌릴 수 있어요.</p>
       <div class="vb-bar"><input class="input" id="vbQ" type="search" placeholder="단어나 뜻으로 찾기" value="${esc(this.bq)}" autocomplete="off" style="flex:1;min-width:180px"></div>
       <div class="vb-bar" id="vbF">${F.map(([k, l]) => `<button class="v-chip ${this.bf === k ? 'on' : ''}" data-f="${k}">${l}</button>`).join('')}</div>
       <div class="muted small v-foot" id="vbN"></div><div class="card vb-list" id="vbL"></div><div class="row center" id="vbMore"></div></div>`;
     const draw = () => {
       const now = VocabCore.now(); const q = this.bq.trim().toLowerCase();
-      const hit = all.filter(c => (this.bf === 'all' || this.stOf(c.id) === this.bf) && (!q || String(c.note.w).toLowerCase().includes(q) || c.note.ko.some(([, ko]) => ko.toLowerCase().includes(q))));
+      const hit = all.filter(c => (this.bf === 'all' || this.stOf(c.id) === this.bf) && (!q || String(c.note.w).toLowerCase().includes(q) || VocabDecks.group(c).some(x => x.note.ko.some(([, ko]) => ko.toLowerCase().includes(q)))));
       $('#vbN').textContent = `${hit.length}장${hit.length > this.bn ? ` 중 ${this.bn}장을 보여 줘요` : ''}`;
-      $('#vbL').innerHTML = hit.slice(0, this.bn).map(c => { const st = this.stOf(c.id); const due = this.dueText(c.id, now); return `<button class="vb-row" data-id="${esc(c.id)}"><span class="vb-w"><span lang="en">${esc(c.note.w)}</span>${c.tpl !== 'r' ? ` <small class="vb-tpl">${VocabDecks.TPL[c.tpl]}</small>` : ''}</span><span class="vb-ko">${esc(c.note.ko.map(([, ko]) => ko).join(' · '))}</span><span class="vb-st"><span class="vn ${st === 'known' ? 'zero' : st}">${this.stLabel(c.id)}</span>${due ? `<small>${due}</small>` : ''}</span></button>`; }).join('') || '<div class="muted" style="padding:14px">맞는 카드가 없어요.</div>';
+      $('#vbL').innerHTML = hit.slice(0, this.bn).map(c => { const st = this.stOf(c.id); const due = this.dueText(c.id, now); return `<button class="vb-row" data-id="${esc(c.id)}"><span class="vb-w"><span lang="en">${esc(c.note.w)}</span>${c.tpl !== 'r' ? ` <small class="vb-tpl">${VocabDecks.TPL[c.tpl]}</small>` : ''}${(() => { const ds = [...new Set(VocabDecks.group(c).map(x => x.deck))]; return ds.length > 1 ? ` <small class="vb-tpl">${ds.map(x => this.deckShort(x)).join(' · ')}</small>` : ''; })()}</span><span class="vb-ko">${esc(c.note.ko.map(([, ko]) => ko).join(' · '))}</span><span class="vb-st"><span class="vn ${st === 'known' ? 'zero' : st}">${this.stLabel(c.id)}</span>${due ? `<small>${due}</small>` : ''}</span></button>`; }).join('') || '<div class="muted" style="padding:14px">맞는 카드가 없어요.</div>';
       $('#vbMore').innerHTML = hit.length > this.bn ? '<button class="btn" id="vbMoreBtn">더 보기</button>' : '';
       const mb = $('#vbMoreBtn'); if (mb) mb.onclick = () => { this.bn += 200; draw(); };
       $$('.vb-row').forEach(b => { b.onclick = () => this.info(b.dataset.id); });

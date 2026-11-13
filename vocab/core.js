@@ -23,12 +23,12 @@ const VocabDecks = {
   add(meta) {
     if (this.byId[meta.id]) throw new Error('덱 id 가 겹쳐요: ' + meta.id);
     const d = Object.assign({ tpl: ['r'], newPerDay: 10, desc: '', credit: '' }, meta); d.notes = [];
-    this.list.push(d); this.byId[d.id] = d; this._card = null; return d;
+    this.list.push(d); this.byId[d.id] = d; this._card = null; this._group = null; return d;
   },
   // 노트 넣기(vocab/decks/<덱>*.js). 여러 파일로 나눠 넣어도 돼요 — 넣은 순서가 새 카드가 나오는 순서
   notes(deckId, arr) {
     const d = this.byId[deckId]; if (!d) throw new Error('없는 덱에 노트를 넣었어요: ' + deckId);
-    d.notes.push(...arr); d._cards = null; this._card = null;
+    d.notes.push(...arr); d._cards = null; this._card = null; this._group = null;
   },
   // 덱의 카드 목록: 노트 순서 → 카드 종류 순서
   cards(deckId) {
@@ -38,6 +38,13 @@ const VocabDecks = {
   },
   card(id) { if (!this._card) { this._card = {}; for (const d of this.list) for (const c of this.cards(d.id)) this._card[c.id] = c; } return this._card[id] || null; },
   ready() { return this.list.filter(d => d.notes.length); },
+  // 같은 단어 무리(v2.46.9 — 단어마다 딱 한 장): 덱이 달라도 같은 낱말(w, 앞뒤 빈칸 · 대소문자 무시)의 카드를 한 무리로 묶어요.
+  //   무리 안에서 공부가 먼저 시작된 카드 하나만 일정에 올라요(VocabCore.repOf · covered)
+  wordKey(n) { return String(n.w).trim().toLowerCase(); },
+  group(c) {
+    if (!this._group) { this._group = new Map(); for (const d of this.list) for (const x of this.cards(d.id)) { const k = this.wordKey(x.note); let g = this._group.get(k); if (!g) this._group.set(k, g = []); g.push(x); } }
+    return this._group.get(this.wordKey(c.note)) || [c];
+  },
 };
 
 // ---------- 코어 ----------
@@ -160,6 +167,7 @@ const VocabCore = {
       let newLeft = Math.max(0, this.newLimit(id) + this.extraFor(id, today) - intro); const revLeft = Math.max(0, cfg.maxRev - revDone);
       const due = []; const taken = new Set();
       for (const c of cards) {
+        if (this.covered(c)) continue;   // 같은 단어를 다른 덱 카드로 보고 있어요(v2.46.9)
         const r = this.recs[c.id];
         if (!r || (r.st === 0 && !r.susp)) { if (seen.has(c.key) || taken.has(c.key)) continue; if (newLeft > 0) { out.fresh.push(c); taken.add(c.key); newLeft--; } else out.moreNew++; continue; }
         if (r.susp) continue;
@@ -226,6 +234,17 @@ const VocabCore = {
     this.save(now); return u.ev[0][0];
   },
   noteCards(card) { return VocabDecks.cards(card.deck).filter(c => c.key === card.key); },
+  // 같은 단어 한 장(v2.46.9): 덱이 다른 같은 단어 카드 가운데 대표 하나만 일정에 올려요.
+  //   대표 = 공부를 시작한 카드 가운데 먼저 시작한 것(intro), 없으면 아는 단어로 넘긴 카드. 아무 덱도 시작 안 했으면 null.
+  //   두 덱에서 다 공부한 옛 기록이 있으면 먼저 시작한 쪽이 이어 나오고, 다른 쪽은 기록을 그대로 둔 채 일정에서 빠져요.
+  //   같은 노트의 다른 카드(형제)는 덮지 않아요 — 형제는 scan 의 「같은 날 겹쳐 내지 않기」 를 따라요
+  repOf(c) {
+    let best = null, known = null;
+    for (const x of VocabDecks.group(c)) { const r = this.recs[x.id]; if (!r) continue;
+      if (r.st !== 0) { if (!best || r.intro < this.recs[best.id].intro) best = x; } else if (r.susp && !known) known = x; }
+    return best || known;
+  },
+  covered(c) { const rep = this.repOf(c); return !!rep && rep.deck !== c.deck; },
 
   // ----- 아는 단어 한꺼번에 넘기기 (화면: vocab/app.js 의 viewKnown) -----
   has(str, code) { for (let i = 6; str && i < str.length; i += 7) if (str[i] === code) return true; return false; },
@@ -238,7 +257,7 @@ const VocabCore = {
       const by = new Map();
       for (const c of VocabDecks.cards(id)) {
         let g = by.get(c.key); if (!g) { g = { key: c.key, deck: id, note: c.note, cards: [], tpl: [], passed: false, fresh: true }; by.set(c.key, g); }
-        g.cards.push(c.id); g.tpl.push(c.tpl); const r = this.recs[c.id]; if (!r) continue;
+        g.cards.push(c.id); g.tpl.push(c.tpl); if (this.covered(c)) { g.fresh = false; continue; } const r = this.recs[c.id]; if (!r) continue;
         if (r.st !== 0 || r.susp) g.fresh = false; else if (this.has(this.data.log[c.id], 'p') || this.has(this.data.log[c.id], 'u')) g.passed = true;
       }
       for (const g of by.values()) if (g.fresh) out.push({ key: g.key, deck: g.deck, note: g.note, cards: g.cards, tpl: g.tpl, passed: g.passed });
@@ -260,9 +279,10 @@ const VocabCore = {
   summary(now = this.now()) {
     const cfg = this.data.cfg; const today = this.day(now); const sum = { day: today, tz: cfg.tz, roll: cfg.roll, maxRev: cfg.maxRev, decks: {} };
     for (const d of VocabDecks.ready()) {
-      const o = { name: d.name, total: 0, unseen: 0, known: 0, newPerDay: this.newLimit(d.id), extra: this.extraFor(d.id, today), intro: 0, rev: 0, learn: 0, due: {} };
+      const o = { name: d.name, total: 0, unseen: 0, known: 0, merged: 0, newPerDay: this.newLimit(d.id), extra: this.extraFor(d.id, today), intro: 0, rev: 0, learn: 0, due: {} };
       for (const c of VocabDecks.cards(d.id)) {
-        o.total++; const r = this.recs[c.id];
+        o.total++; if (this.covered(c)) { o.merged++; continue; }   // 다른 덱 카드로 보는 같은 단어(v2.46.9): 안 본 카드 · 복습에 넣지 않아요
+        const r = this.recs[c.id];
         if (!r) { o.unseen++; continue; }
         if (r.intro && this.day(r.intro) === today) o.intro++; if (r.rev && this.day(r.rev) === today) o.rev++;
         if (r.susp) { o.known++; continue; }

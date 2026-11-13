@@ -203,6 +203,28 @@ section('한도 · 섞기 · 형제 카드 · 되돌리기 · 표시');
   ok(C.append('', C.data.resetAt, '3').t > C.data.resetAt, '초기화 뒤의 사건은 초기화 시각보다 뒤');
 }
 
+section('같은 단어 한 장(v2.46.9 단어마다 딱 한 장)');
+{
+  // 시험용 덱 둘(a1 · b1)에 같은 낱말 word0 … word4 가 들어 있어요
+  const w = start(deck('a1', 5) + deck('b1', 5)); const C = w.VocabCore; const V = w.VocabDecks; const t = T0;
+  eq(V.group(V.card('a1/w0/r')).map(c => c.id), ['a1/w0/r', 'b1/w0/r'], '덱이 달라도 같은 낱말은 한 무리');
+  eq([C.repOf(V.card('a1/w0/r')), C.covered(V.card('b1/w0/r'))], [null, false], '아무 덱도 시작 안 했으면 대표 없음 · 덮이지 않음');
+  graduate(C, C.session(['b1']), 'b1/w0/r', t);
+  eq([C.repOf(V.card('a1/w0/r')).id, C.covered(V.card('a1/w0/r')), C.covered(V.card('b1/w0/r'))], ['b1/w0/r', true, false], '먼저 시작한 덱의 카드가 대표, 다른 덱의 같은 단어는 덮임');
+  const sc = C.scan(['a1'], t + 11 * MIN); ok(!sc.fresh.some(c => c.id === 'a1/w0/r') && sc.counts.new === 4, '덮인 카드는 새 카드로 안 나오고, 그 덱은 다음 카드를 꺼냄(새 카드 4장)');
+  const s = C.summary(t + 11 * MIN).decks.a1; eq([s.merged, s.unseen], [1, 4], '요약: 덮인 카드는 안 본 카드에서 빠짐(허브 숫자도 맞음)');
+  ok(!C.unseenNotes(['a1']).some(x => x.key === 'a1/w0'), '아는 단어 넘기기 목록에서도 빠짐');
+  // 옛 기록: 두 덱에서 다 공부했으면 먼저 시작한 쪽만 일정에
+  C.answer(C.session(['a1']), 'a1/w1/r', 3, t + 1000); C.answer(C.session(['b1']), 'b1/w1/r', 3, t + 2000);
+  eq([C.repOf(V.card('b1/w1/r')).id, C.covered(V.card('b1/w1/r'))], ['a1/w1/r', true], '두 덱 다 시작했으면 먼저 시작한 카드가 대표');
+  ok(!C.scan(['b1'], t + 30 * MIN).learn.some(c => c.id === 'b1/w1/r') && C.scan(['a1'], t + 30 * MIN).learn.some(c => c.id === 'a1/w1/r'), '늦게 시작한 쪽은 학습 · 복습 일정에서 빠짐(기록은 그대로)');
+  C.mark(null, ['a1/w2/r'], 's', t); ok(C.covered(V.card('b1/w2/r')), '한 덱에서 아는 단어로 넘기면 다른 덱의 같은 단어도 안 나옴');
+  C.mark(null, ['b1/w0/r'], 'f', t + 3000); eq(C.covered(V.card('a1/w0/r')), false, '대표를 처음부터 다시 하면 덮임이 풀림');
+  // 같은 노트의 형제 카드는 무리로 덮지 않음(같은 날 겹쳐 내지 않기 규칙만)
+  const w2 = start(deck('sb', 2, ", tpl: ['r', 'l']")); const C2 = w2.VocabCore; graduate(C2, C2.session(['sb']), 'sb/w0/r', t);
+  eq(C2.covered(w2.VocabDecks.card('sb/w0/l')), false, '같은 노트의 둘째 카드는 덮지 않음');
+}
+
 section('하루 한도 정하기(v2.46.8 하루 한도 시트)');
 {
   const w = start(deck('lim', 40) + deck('lim2', 6)); const C = w.VocabCore; let t = T0;

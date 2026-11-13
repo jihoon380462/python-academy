@@ -112,6 +112,9 @@ a.vd-row:hover{background:var(--surface2)}
 .vs-row:first-child{border-top:0}
 .vs-row .input{width:5.5em;text-align:center}
 .vs-h{font-weight:700;margin:14px 0 2px}
+/* 같은 단어 한 장(v2.46.9): 카드 뒷면에서 덱마다 뜻을 덱 이름 아래 모아요 */
+.vc-deckh{display:inline-block;margin:10px 0 4px;padding:1px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-size:.78em;font-weight:700;color:var(--muted)}
+.vc-other{margin-top:14px;padding-top:4px;border-top:1px dashed var(--border)}
 
 /* 하루 한도(v2.46.8): 덱 개요의 「하루 새 카드 n장 · 바꾸기」 줄과 시트. 폰에서는 아래에 붙어 올라오는 시트, 넓은 화면에서는 가운데 창 */
 .v-limit{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;margin:2px 0 14px}
