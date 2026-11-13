@@ -203,6 +203,25 @@ section('한도 · 섞기 · 형제 카드 · 되돌리기 · 표시');
   ok(C.append('', C.data.resetAt, '3').t > C.data.resetAt, '초기화 뒤의 사건은 초기화 시각보다 뒤');
 }
 
+section('하루 한도 정하기(v2.46.8 하루 한도 시트)');
+{
+  const w = start(deck('lim', 40) + deck('lim2', 6)); const C = w.VocabCore; let t = T0;
+  ok(C.setNewLimit('lim', 3, t) === true, '하루 새 카드 정하기: 저장되면 true');
+  eq([C.newLimit('lim'), C.data.cfg.newPerDay.lim, C.data.cfg.t], [3, 3, t], '덱 하나의 하루 새 카드를 3장으로(바꾼 시각도 남겨 기기 연동 때 새 설정이 이김)');
+  C.setNewLimit('lim', 10, t); eq(['lim' in C.data.cfg.newPerDay, C.newLimit('lim')], [false, 10], '덱 기본값(10)과 같으면 사용자 칸에서 지워 기본을 따름');
+  C.setNewLimit('lim', 999, t); eq(C.newLimit('lim'), 200, '200장보다 크면 200');
+  C.setNewLimit('lim', -4, t); eq(C.newLimit('lim'), 0, '0보다 작으면 0');
+  C.setNewLimit('lim', '7', t); eq(C.newLimit('lim'), 7, '글자로 온 수도 받음');
+  C.setNewLimit(['lim', 'lim2', 'nope'], 6, t); eq([C.newLimit('lim'), C.newLimit('lim2'), 'nope' in C.data.cfg.newPerDay], [6, 6, false], '여러 덱을 한 번에(없는 덱은 건너뜀)');
+  // 하루 중간에 바꾸기: 오늘 4장 본 뒤 2장으로 줄이면 오늘은 0장, 8장으로 늘리면 바로 4장
+  const ses = C.session(['lim']); for (let i = 0; i < 4; i++) { const p = C.pick(ses, t); graduate(C, ses, p.card.id, t); t += 1000; }
+  C.setNewLimit('lim', 2, t); eq(C.scan(['lim'], t + 11 * MIN).counts.new, 0, '오늘 4장 본 뒤 2장으로 줄이면 오늘은 새 카드가 더 안 나옴');
+  C.setNewLimit('lim', 8, t); eq(C.scan(['lim'], t + 11 * MIN).counts.new, 4, '8장으로 늘리면 바로 4장 더');
+  C.setMaxRev(5, t); eq(C.data.cfg.maxRev, 10, '복습 상한은 10장보다 작게 못 함');
+  C.setMaxRev(1e9, t); eq(C.data.cfg.maxRev, 9999, '복습 상한은 9999장보다 크게 못 함(9999 = 제한 없음)');
+  C.setMaxRev(300, t); eq(C.data.cfg.maxRev, 300, '복습 상한 300장');
+}
+
 // ---------------------------------------------------------------- 두 기기 기록 합치기
 section('기록 합치기(기기 연동)');
 {

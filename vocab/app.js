@@ -116,11 +116,74 @@ const VocabApp = {
     $('#view').innerHTML = `<div class="page vocab"><a class="btn sm" href="#">← 덱 목록</a>
       <div class="card v-over" style="margin-top:10px"><h2>${esc(this.deckName(this.sel))}</h2><div class="muted">${esc(desc)}</div>
         <div class="v-cnt"><div>${this.cnt(c.new, 'new')}<small>새 카드</small></div><div>${this.cnt(c.learn, 'learn')}<small>학습</small></div><div>${this.cnt(c.rev, 'rev')}<small>복습</small></div></div>
+        ${this.limitRow(ids)}
         ${todo ? `<a class="btn primary big" id="vStart" href="#study/${esc(this.sel)}">지금 학습</a>` : `<div><b>오늘 할 카드를 다 했어요 🎉</b></div>${sc.moreNew ? `<div class="row center"><button class="btn" id="vMoreNew">새 카드 ${Math.min(5, sc.moreNew)}장 더 하기</button></div>` : ''}`}
         ${unseen.length ? `<div class="v-known"><a class="btn sm" id="vKnown" href="#known/${esc(this.sel)}">아는 단어 한꺼번에 넘기기</a>${fresh ? `<div class="muted small">아직 안 본 단어 ${fresh}개 — 아는 단어를 먼저 넘겨 두면 모르는 단어만 카드로 나와요.</div>` : ''}</div>` : ''}
         <div class="muted small" style="margin-top:14px">카드 ${cards.length}장 · 본 카드 ${seen}장${known ? ` · 아는 단어로 넘긴 카드 ${known}장` : ''}</div>
         ${d && d.credit ? `<div class="muted small" style="margin-top:6px">${esc(d.credit)}</div>` : ''}</div></div>`;
     const mn = $('#vMoreNew'); if (mn) mn.onclick = () => { VocabCore.addExtra(ids, Math.min(5, sc.moreNew)); location.hash = '#study/' + this.sel; };
+    const lb = $('#vLimit'); if (lb) lb.onclick = () => this.limitSheet(this.sel);
+    $$('#view [data-limit]').forEach(b => { b.onclick = () => this.limitSheet(b.dataset.limit); });
+  },
+  // 덱 개요의 하루 한도 줄: 덱 하나는 단추 하나, 「전체」 는 덱마다 칩(누르면 그 덱의 시트)
+  limitRow(ids) {
+    if (this.sel !== 'all') return `<div class="v-limit"><button class="btn sm" id="vLimit">하루 새 카드 ${VocabCore.newLimit(this.sel)}장 · 바꾸기 ›</button></div>`;
+    return `<div class="v-limit"><span class="muted small">하루 새 카드 — 누르면 바꿔요</span>${ids.map(id => `<button class="chip-btn" data-limit="${esc(id)}">${esc(VocabDecks.byId[id].name)} ${VocabCore.newLimit(id)}장</button>`).join('')}</div>`;
+  },
+
+  // ---------- 하루 한도 시트(v2.46.8 — 사용자가 고른 시안: 저장 단추 없이 누르거나 치면 바로 저장) ----------
+  //   폰에서는 아래에서 올라오는 시트, 넓은 화면에서는 가운데 창(vocab.css .v-sheet). 「✓ 저장됨 · 되돌리기」 는 바로 앞 값으로 돌려요.
+  //   직접 친 수는 치다 멈추면(0.5초) · Enter · 칸을 벗어날 때 · 창을 닫을 때 저장해요(15 를 치는 도중의 1 을 저장하지 않게)
+  NEW_PICKS: [5, 10, 15, 20, 30], REV_PICKS: [[100, '100'], [200, '200'], [500, '500'], [9999, '제한 없음']],
+  limitSheet(id) {
+    const d = VocabDecks.byId[id]; if (!d) return; const cfg = VocabCore.data.cfg;
+    let prev = null, timer = 0, direct = !this.NEW_PICKS.includes(VocabCore.newLimit(id));
+    const body = `<div class="vs-h">하루 새 카드 <span class="muted small">(누르면 바로 저장)</span></div>
+      <div class="chips" id="vlNew">${this.NEW_PICKS.map(n => `<button class="chip-btn" data-n="${n}">${n}</button>`).join('')}<button class="chip-btn" data-n="direct">직접…</button></div>
+      <div class="vl-direct" id="vlDirect"><input class="input" id="vlInput" type="number" inputmode="numeric" min="0" max="${VocabCore.NEW_MAX}" aria-label="${esc(d.name)} 하루 새 카드"><span>장</span><span class="muted small">0 ~ ${VocabCore.NEW_MAX}</span></div>
+      <div class="vl-info" id="vlInfo"></div>
+      <div class="vs-h">하루 복습 상한 <span class="muted small">(덱마다 · 모든 덱 같은 값)</span></div>
+      <div class="chips" id="vlRev"></div>
+      <div class="muted small vl-note">복습이 상한을 넘으면 남은 복습은 다음 날로 미뤄져요</div>
+      <div class="row vl-all"><button class="btn" id="vlAll"></button></div>`;
+    const title = `<span>${esc(d.name)} · 하루 한도</span><span class="vl-saved" id="vlSaved" hidden>✓ 저장됨<button class="lnk" id="vlUndo">되돌리기</button></span>`;
+    UI.modal({ title, body, buttons: [{ label: T.close }], onOpen: (ov) => {
+      ov.classList.add('v-sheet'); const inp = $('#vlInput', ov);
+      const paint = () => {
+        const n = VocabCore.newLimit(id); const now = VocabCore.now(); const today = VocabCore.day(now); const cards = VocabDecks.cards(id);
+        $$('#vlNew [data-n]', ov).forEach(b => b.classList.toggle('on', b.dataset.n === 'direct' ? direct : !direct && +b.dataset.n === n));
+        $('#vlDirect', ov).hidden = !direct; if (direct && document.activeElement !== inp) inp.value = n;
+        const left = cards.filter(c => this.stOf(c.id) === 'new').length;
+        const intro = cards.filter(c => { const r = VocabCore.recs[c.id]; return r && r.intro && VocabCore.day(r.intro) === today; }).length;
+        $('#vlInfo', ov).innerHTML = (!left ? '이 덱의 새 카드를 다 봤어요' : !n ? '새 카드를 꺼내지 않아요(복습만 해요)' : `새 카드 <b>${n}장</b>이면 안 본 카드 ${left.toLocaleString()}장을 <b>약 ${Math.ceil(left / n)}일</b> 뒤에 다 봐요`)
+          + `<div class="muted small">오늘 이 덱에서 새 카드 ${intro}장을 봤어요 · 지금 남은 새 카드 ${VocabCore.scan([id], now).counts.new}장</div>`;
+        const rv = cfg.maxRev; const picks = this.REV_PICKS.some(([v]) => v === rv) ? this.REV_PICKS : [...this.REV_PICKS, [rv, String(rv)]];
+        $('#vlRev', ov).innerHTML = picks.map(([v, l]) => `<button class="chip-btn${v === rv ? ' on' : ''}" data-r="${v}">${l}</button>`).join('');
+        const same = VocabDecks.ready().every(x => VocabCore.newLimit(x.id) === n); const all = $('#vlAll', ov);
+        all.textContent = same ? `모든 덱이 ${n}장이에요` : `모든 덱을 ${n}장으로 맞추기`; all.disabled = same;
+        $('#vlSaved', ov).hidden = !prev;
+      };
+      const behind = () => { if (this.view === 'deck') this.viewDeck(); else this.refresh(); };   // 뒤의 덱 화면 숫자도 바로(맨 위로 튀지 않게 덱 화면만)
+      const apply = (fn) => { prev = { newPerDay: Object.assign({}, cfg.newPerDay), maxRev: cfg.maxRev }; this.saved(fn()); paint(); behind(); };
+      const commit = () => {
+        clearTimeout(timer); const s = inp.value.trim(); if (!/^[0-9]+$/.test(s)) return;
+        const n = Math.min(VocabCore.NEW_MAX, +s); if (String(n) !== s) inp.value = n;
+        if (n !== VocabCore.newLimit(id)) apply(() => VocabCore.setNewLimit(id, n));
+      };
+      $$('#vlNew [data-n]', ov).forEach(b => { b.onclick = () => {
+        if (b.dataset.n === 'direct') { direct = true; paint(); inp.value = VocabCore.newLimit(id); inp.focus(); inp.select(); return; }
+        direct = false; const n = +b.dataset.n; if (n !== VocabCore.newLimit(id)) apply(() => VocabCore.setNewLimit(id, n)); else paint();
+      }; });
+      inp.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(commit, 500); });
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
+      inp.addEventListener('change', commit);
+      $('#vlRev', ov).onclick = (e) => { const b = e.target.closest('[data-r]'); if (b && +b.dataset.r !== cfg.maxRev) apply(() => VocabCore.setMaxRev(+b.dataset.r)); };
+      $('#vlAll', ov).onclick = () => { const n = VocabCore.newLimit(id); apply(() => VocabCore.setNewLimit(VocabDecks.ready().map(x => x.id), n)); };
+      $('#vlUndo', ov).onclick = () => { if (!prev) return; const p = prev; prev = null; this.saved(VocabCore.setCfg(p)); direct = !this.NEW_PICKS.includes(VocabCore.newLimit(id)); paint(); behind(); };
+      // 창을 닫을 때(닫기 · 바깥 · Esc) 치던 수가 남았으면 저장
+      $$('.modal-btns button', ov).forEach(b => b.addEventListener('click', commit, true)); ov.addEventListener('click', (e) => { if (e.target === ov) commit(); }, true);
+      paint();
+    } });
   },
 
   // ---------- 아는 단어 한꺼번에 넘기기 ----------

@@ -133,6 +133,15 @@ const VocabCore = {
 
   // ----- 오늘 볼 카드 -----
   newLimit(deckId) { const v = this.data.cfg.newPerDay[deckId]; return Number.isFinite(v) ? v : VocabDecks.byId[deckId].newPerDay; },
+  // 하루 한도 정하기(v2.46.8 하루 한도 시트 · 설정 창): 새 카드는 덱마다 0 ~ 200장, 복습 상한은 모든 덱 같은 값 10 ~ 9999장(9999 = 제한 없음).
+  //   덱 기본값과 같으면 사용자 칸에서 지워 기본을 따르게 해요. setCfg 가 바꾼 시각(t)을 남겨 기기 연동 때 새 설정이 이겨요
+  NEW_MAX: 200, REV_MIN: 10, REV_MAX: 9999,
+  setNewLimit(deckIds, v, now = this.now()) {
+    const n = Math.min(this.NEW_MAX, Math.max(0, Math.round(+v) || 0)); const np = Object.assign({}, this.data.cfg.newPerDay);
+    for (const id of [].concat(deckIds)) { const d = VocabDecks.byId[id]; if (!d) continue; if (n === d.newPerDay) delete np[id]; else np[id] = n; }
+    return this.setCfg({ newPerDay: np }, now);
+  },
+  setMaxRev(v, now = this.now()) { return this.setCfg({ maxRev: Math.min(this.REV_MAX, Math.max(this.REV_MIN, Math.round(+v) || 200)) }, now); },
   extraFor(deckId, today) { return this.extra && this.extra.day === today ? (this.extra.by[deckId] || 0) : 0; },
   // 오늘만 새 카드를 n장 더(이 기기에서만 기억해요)
   addExtra(deckIds, n, now = this.now()) {

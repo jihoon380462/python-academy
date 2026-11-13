@@ -113,6 +113,23 @@ a.vd-row:hover{background:var(--surface2)}
 .vs-row .input{width:5.5em;text-align:center}
 .vs-h{font-weight:700;margin:14px 0 2px}
 
+/* 하루 한도(v2.46.8): 덱 개요의 「하루 새 카드 n장 · 바꾸기」 줄과 시트. 폰에서는 아래에 붙어 올라오는 시트, 넓은 화면에서는 가운데 창 */
+.v-limit{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;margin:2px 0 14px}
+.v-limit > .muted{flex-basis:100%;text-align:center}
+.v-sheet [hidden]{display:none!important}
+.v-sheet .modal-title{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 10px}
+.vl-saved{font-size:.78em;font-weight:600;color:var(--success);white-space:nowrap}.vl-saved .lnk{margin-left:4px;color:var(--primary-text)}
+.v-sheet .chip-btn{min-height:40px;padding:6px 14px;font-size:1em}
+.vl-direct{display:flex;align-items:center;gap:8px;margin-top:10px}.vl-direct .input{width:6em;text-align:center}
+.vl-info{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border)}
+.vl-note{margin-top:6px}.vl-all{margin-top:14px}
+@media (max-width:767px){
+  .modal-ov.v-sheet{align-items:flex-end;padding:0}
+  .v-sheet .modal{max-width:none;border-radius:20px 20px 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px);animation:vSheetUp .22s ease-out}
+}
+@keyframes vSheetUp{from{transform:translateY(48px);opacity:.5}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.v-sheet .modal{animation:none}}
+
 @media (max-width:560px){
   .vd-row{grid-template-columns:minmax(0,1fr) repeat(3,3em);padding:12px 10px}
   .vc-word{font-size:2em}.vc-sense{font-size:1.15em}
