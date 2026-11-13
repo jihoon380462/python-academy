@@ -503,6 +503,11 @@ with sync_playwright() as p:
     vd=pg.evaluate("({n:VocabDecks.byId.base.notes.length, lim:VocabCore.newLimit('base'), cnt:[...document.querySelectorAll('a.vd-row[data-deck=base] .vn')].map(e=>e.textContent), soon:document.querySelectorAll('.vd-row.soon').length, ready:VocabDecks.ready().length, all:VocabDecks.list.length, tts:VocabApp.tts.ok()})")
     vl=min(vd['n'],vd['lim']); vtouch=min(vd['n'],vl+1)  # 오늘 건드리는 카드: 새 카드 한도 + 아는 단어로 넘긴 1장
     check(vd['cnt']==[str(vl),'0','0'] and vd['soon']==vd['all']-vd['ready'], f"덱 목록: 기초 덱 새 카드 {vl} · 학습 0 · 복습 0, 노트 없는 덱은 「준비 중」 ({vd['cnt']}, 준비 중 {vd['soon']})")
+    # v2.47.0 통계(빈 기록): 상단바 「통계」 탭 · 그래프 셋 대신 안내 글 · 오늘 0 · 카드 상태는 모두 새 카드(단어마다 한 장 = 코어 계산)
+    pg.evaluate("location.hash='#stats'"); pg.wait_for_selector('#stToday')
+    se=pg.evaluate("({tab:[...document.querySelectorAll('#topbar .vt-tab')].map(a=>a.textContent+(a.classList.contains('on')?'*':'')), empty:document.querySelectorAll('.st-empty').length, charts:document.querySelectorAll('.st-chart').length, today:[...document.querySelectorAll('#stToday .st-num b')].map(b=>b.textContent), st:[...document.querySelectorAll('#stState .st-legend b')].map(b=>b.textContent), total:VocabCore.stats().states.total})")
+    check(se['tab']==['덱','찾아보기','통계*'] and se['empty']==3 and se['charts']==0 and se['today']==['0','0','0','–'] and se['st']==['0','0','0',f"{se['total']:,}"] and se['total']>3000, '통계(v2.47.0, 빈 기록): 상단바 통계 탭 · 그래프 셋 대신 안내 글 · 오늘 0 · 카드 상태는 모두 새 카드 (%s)' % se)
+    pg.evaluate("location.hash=''"); pg.wait_for_selector('a.vd-row[data-deck=base]')
     pg.click('a.vd-row[data-deck=base]'); pg.wait_for_timeout(150); check(pg.locator('#vStart').count()==1 and pg.evaluate("[...document.querySelectorAll('.v-cnt .vn')].map(e=>e.textContent)")==[str(vl),'0','0'], '덱 개요: 수 셋 + 「지금 학습」')
     pg.click('#vStart'); pg.wait_for_timeout(150)
     f1=pg.evaluate("({w:document.querySelector('.vc-word').textContent, sense:document.querySelectorAll('.vc-sense').length, show:!!document.querySelector('#vShow'), rate:document.querySelectorAll('.vr').length, first:VocabDecks.byId.base.notes[0].w, spoken:VocabApp.tts.spoken.slice(-1)[0]||null})")
@@ -619,6 +624,21 @@ with sync_playwright() as p:
     pg.evaluate("Promise.all(document.querySelector('.v-sheet .modal').getAnimations().map(a=>a.finished))")
     lpc=pg.evaluate("(()=>{ const r=document.querySelector('.v-sheet .modal').getBoundingClientRect(); return {top:Math.round(r.top), bottom:Math.round(innerHeight-r.bottom)}; })()"); pg.keyboard.press('Escape'); pg.wait_for_timeout(100)
     check(lall[0]==lall[1] and len(lall[0])>=4 and lt.startswith('속어 · 거친 말 · 하루 한도') and lpc['top']>40 and lpc['bottom']>40 and pg.evaluate(LC)=='[{},200]', '하루 한도 시트: 「전체」 화면은 덱마다 칩(누르면 그 덱의 시트) · PC 에서는 가운데 창 · 닫아도 바뀐 것 없음 (%s · %s)' % (lall[0], lpc))
+    # v2.47.0 통계: 화면 숫자 = 코어 계산(VocabCore.stats) · 최근 30일 막대 30칸, 오늘 막대에 그날 누른 수 · 그래프를 누르면 그날 숫자 · 키보드 ← 로 어제(숨은 알림 칸이 읽음) · 폰 390 가로 넘침 0
+    pg.set_viewport_size({'width':390,'height':844}); pg.evaluate("location.hash='#stats'"); pg.wait_for_selector('#stDays .st-chart')
+    sv=pg.evaluate("""(()=>{ const s=VocabCore.stats(VocabCore.now(),30), t=s.days[29], tot=t.new+t.learn+t.rev, q=x=>document.querySelector(x);
+      return {today:[...document.querySelectorAll('#stToday .st-num b')].map(b=>b.textContent), want:[String(tot), String(t.new), String(t.rev), t.rev?Math.round(100*(t.rev-t.again)/t.rev)+'%':'–'], tot,
+        cols:document.querySelectorAll('#stDays .st-col').length, lab:(q('#stDays .st-lab')||{}).textContent||'', st:[...document.querySelectorAll('#stState .st-legend b')].map(b=>b.textContent.replace(/,/g,'')),
+        stw:[s.states.rev,s.states.known,s.states.learn,s.states.new].map(String), sw:document.documentElement.scrollWidth-innerWidth}; })()""")
+    pg.click('#stDays .st-col:nth-child(30)'); tp=pg.evaluate("(document.querySelector('.st-tip')||{}).textContent||''")
+    pg.focus('#stDays .st-chart'); pg.keyboard.press('ArrowLeft'); tk=pg.evaluate("(()=>{ const cs=[...document.querySelectorAll('#stDays .st-col')]; return [document.querySelector('#stDays .st-live').textContent, cs.filter(c=>c.classList.contains('on')).length, cs.findIndex(c=>c.classList.contains('on')), (document.querySelector('.st-tip')||{}).textContent||'']; })()")
+    check(sv['tot']>0 and sv['today']==sv['want'] and sv['cols']==30 and sv['lab']==str(sv['tot']) and sv['st']==sv['stw'] and sv['sw']<=0, '통계(v2.47.0): 오늘 숫자 · 카드 상태가 코어 계산과 같음 · 최근 30일 막대 30칸, 오늘 막대에 그날 누른 수 · 폰 390 가로 넘침 0 (%s)' % sv)
+    check(tp.startswith('오늘 · ') and ('번 — 복습' in tp) and tk[1]==1 and tk[2]==28 and bool(tk[0]) and not tk[0].startswith('오늘') and tk[0]==tk[3].replace('\n',' '), '통계: 막대를 누르면 그날 숫자 · 키보드 ← 로 어제 칸, 숨은 알림 칸이 같은 글을 읽음 (%s · %s)' % (tp.replace('\n',' '), tk[:3]))
+    # 좁은 폰 상단바: 320px · 가장 큰 글자 · 기기 연동 아이콘에서도 탭 셋(덱 · 찾아보기 · 통계)이 한 줄에(연동 켜짐은 흉내만 — 바로 되돌려요)
+    pg.set_viewport_size({'width':320,'height':700}); pg.evaluate("window.__f=document.documentElement.dataset.font; window.__sc=Sync.cfg; document.documentElement.dataset.font='3'; Sync.cfg=Object.assign({}, Sync.cfg||{}, {token:'x', gistId:'y'}); VocabApp.topbar()")
+    nb=pg.evaluate("(()=>{ const tb=document.querySelector('#topbar'); return {over:tb.scrollWidth-tb.clientWidth, tabs:tb.querySelectorAll('.vt-tab').length, sync:!!tb.querySelector('.tb-sync'), doc:document.documentElement.scrollWidth-innerWidth}; })()")
+    pg.evaluate("Sync.cfg=window.__sc; document.documentElement.dataset.font=window.__f; VocabApp.topbar()")
+    check(nb['over']<=0 and nb['doc']<=0 and nb['tabs']==3 and nb['sync'], '상단바(v2.47.0): 320px · 가장 큰 글자 · 기기 연동 아이콘이 있어도 탭 셋이 한 줄에 · 넘침 0 (%s)' % nb)
     pg.evaluate("VocabCore.clockOffset=0"); pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(500)
     ha=pg.evaluate("document.querySelector('.hub-cat a.hc').innerText.replace(/\\n/g,' ')"); check('오늘 할 카드' in ha and '시작 전' not in ha, '허브 카드: 학습한 뒤에는 「오늘 할 카드」 를 보여 줌 (%s)' % ha[-40:])
     verr=errors[v0:]; check(not verr, '영어 단어장 pageerror 0 (%s)' % (verr[:2] or 'OK'))

@@ -94,7 +94,11 @@ with sync_playwright() as p:
         vshot('decks'); pg.evaluate("location.hash='#deck/base'"); vshot('deck')
         pg.evaluate("location.hash='#known/base'"); pg.wait_for_timeout(200); pg.click('.vk-w'); vshot('known')   # 표시만 하고 넘기지 않아요 — 기록은 그대로
         pg.evaluate("location.hash='#study/base'"); vshot('front'); pg.keyboard.press('Space'); vshot('back')
-        pg.evaluate("location.hash='#browse'"); vshot('browse'); pg.click('#tbSettings'); vshot('settings', False); pg.keyboard.press('Escape'); pg.close()
+        pg.evaluate("location.hash='#browse'"); vshot('browse')
+        # 통계(v2.47.0): 이 검사용 브라우저에만 7일치 누름을 남겨 그래프가 그려지게 해요(사용자 기록과 무관)
+        pg.evaluate("(()=>{ const C=VocabCore, s=C.session(['base']), now=C.now(); for(let k=6;k>=0;k--){ let t=k?C.dayStart(C.day(now)-k)+6*3600000:now-30*60000; for(let i=0;i<8;i++){ const p=C.pick(s,t); if(!p.card) break; C.answer(s,p.card.id,i%5?3:1,t); t+=60000; } } })()")
+        pg.evaluate("location.hash='#stats'"); vshot('stats')
+        pg.click('#tbSettings'); vshot('settings', False); pg.keyboard.press('Escape'); pg.close()
         json.dump(vrep, open(f'{OUT}/vocab/report.json','w'), ensure_ascii=False)
         print(f'== vocab: views {len(vrep)} errs {len(verrs)} {verrs[:2]}')
         for key in ['lowContrast','tiny','smallTargets','overflow']: print('  '+key, {k:m[key][:4] for k,m in vrep.items() if m[key]})

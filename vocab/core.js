@@ -9,6 +9,7 @@
 //   상태(recs)       기록을 처음부터 다시 계산(replay)한 결과. 기록만 진짜고 상태는 언제든 다시 만들 수 있어요.
 //                    그래서 두 기기의 기록은 「합집합」 으로 합치면 끝나요(core/sync.js 의 mergeVocab).
 //   하루             한국 시간 새벽 4시에 바뀌어요(Anki 와 같은 방식 — cfg.tz 분 · cfg.roll 시).
+//   통계(stats)      기록을 다시 따라가며 날마다 누른 횟수(새 카드 · 학습 · 복습) · 복습 맞힘 · 앞으로 복습 예정 · 카드 상태를 세요(v2.47.0)
 //
 // 저장 (localStorage)
 //   academy.vocab        { v, mt, resetAt, cfg, log }  — 기기 연동으로 오가는 것
@@ -292,4 +293,34 @@ const VocabCore = {
     }
     return sum;
   },
+
+  // ----- 통계 (화면: vocab/app.js 의 viewStats — specs/vocab.md W5) -----
+  // 날마다 누른 횟수를 「누르기 직전 상태」 로 나눠요(replay 와 같은 셈): new 처음 누름(처음부터 다시 뒤의 첫 누름도) · learn 학습 · 다시 학습 단계 · rev 복습.
+  //   되돌린 사건(0)과 표시(s · u · p)는 누름이 아니에요. again 은 복습 카드에서 「다시」 를 누른 수 — 복습 맞힌 비율 = (rev − again) ÷ rev
+  //   기록 전체를 세요: 기기 연동으로 합친 기록도, 덱에서 빠진 카드(예: v2.46.9 에 뺀 쓰기 카드)를 그날 누른 것도 들어가요
+  //   돌려주는 값: { today 오늘 번호, days: [{ d 하루 번호, new, learn, rev, again }] 오래된 날부터 n칸,
+  //                 due: [오늘(밀린 것 포함), 내일, …] n칸 — 복습 카드 장 수(summary 의 표와 같은 셈),
+  //                 states: { new, learn, rev, known, total } — 단어마다 한 장(덱 개요 「전체」 · 찾아보기와 같은 셈) }
+  stats(now = this.now(), n = 30) {
+    const today = this.day(now), from = today - n + 1, fromRel = this.rel(this.dayStart(from)); const by = {};
+    for (const id in this.data.log) {
+      const str = this.data.log[id]; if (this.lastRel(str) < fromRel) continue;   // 기간 안에 사건이 없는 카드는 건너뛰어요
+      let c = null;
+      for (const [rel, code] of this.parse(str)) {
+        if (code >= '1' && code <= '4') {
+          const ms = this.abs(rel), d = this.day(ms);
+          if (d >= from && d <= today) { const k = !c ? 'new' : c.state === 2 ? 'rev' : 'learn'; const o = by[d] || (by[d] = { new: 0, learn: 0, rev: 0, again: 0 }); o[k]++; if (k === 'rev' && code === '1') o.again++; }
+          c = this.eng.next(c, ms, +code);
+        } else if (code === 'f') c = null;
+      }
+    }
+    const days = []; for (let d = from; d <= today; d++) days.push(Object.assign({ d, new: 0, learn: 0, rev: 0, again: 0 }, by[d]));
+    const due = Array(n).fill(0); const sum = this.summary(now);
+    for (const id in sum.decks) { const tb = sum.decks[id].due; for (const k in tb) { const off = Math.max(0, +k - today); if (off < n) due[off] += tb[k]; } }
+    const states = { new: 0, learn: 0, rev: 0, known: 0, total: 0 }; const wk = new Set();
+    for (const d of VocabDecks.ready()) for (const c of VocabDecks.cards(d.id)) { const k = VocabDecks.wordKey(c.note); if (wk.has(k)) continue; wk.add(k); states[this.stateOf(c)]++; states.total++; }
+    return { today, days, due, states };
+  },
+  // 카드 하나의 상태: 'new' | 'learn' | 'rev' | 'known'. 같은 단어는 무리의 대표 카드를 따라요(v2.46.9)
+  stateOf(c) { const rep = this.covered(c) ? this.repOf(c) : null; const r = this.recs[(rep || c).id]; return !r ? 'new' : r.susp ? 'known' : r.st === 0 ? 'new' : r.st === 2 ? 'rev' : 'learn'; },
 };

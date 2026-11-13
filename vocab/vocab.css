@@ -5,7 +5,7 @@
 :root[data-contrast="1"][data-theme=dark]{--v-new:#9cc6ff;--v-learn:#ffa3a3;--v-rev:#7ee895;--v-hard:#ffd166}
 :root[data-contrast="1"][data-theme=light]{--v-new:#0b3f8a;--v-learn:#8f1d17;--v-rev:#0f5226;--v-hard:#6b4000}
 
-/* 상단바의 글자 탭(덱 · 찾아보기) */
+/* 상단바의 글자 탭(덱 · 찾아보기 · 통계) */
 .vt-tab{font-size:1em;font-weight:700;padding:0 12px;text-decoration:none;color:var(--muted);white-space:nowrap}
 .vt-tab.on{color:var(--text);box-shadow:inset 0 -3px 0 var(--primary);border-radius:10px 10px 0 0}
 
@@ -140,3 +140,43 @@ a.vd-row:hover{background:var(--surface2)}
   .vb-row{grid-template-columns:minmax(4.5em,1fr) minmax(0,1.6fr) 5em;padding:10px}
   .vt-tab{padding:0 8px}
 }
+@media (max-width:380px){   /* 좁은 폰(320 ~ 380): 탭 셋(덱 · 찾아보기 · 통계) · 허브 · 기기 연동 · 설정이 한 줄에 들어가게(v2.47.0). 글자 탭은 44px 최소 폭을 풀고 아이콘 단추는 그대로 */
+  #topbar{gap:2px}
+  .vt-tab{padding:0 6px;min-width:0;flex-shrink:0}
+}
+@media (max-width:340px){.vt-tab{padding:0 4px}}   /* 320px 폰 + 가장 큰 글자 + 기기 연동 아이콘까지 한 줄에 */
+
+/* 통계(v2.47.0 — specs/vocab.md W5). 차트 색은 차트 전용 단계: 라이트 · 다크 · 고대비 바탕에서 색약 검사(dataviz validate_palette)를 통과했어요.
+   쌓는 순서 복습 · 새 카드 · 학습, 상태 띠 순서 복습 · 아는 단어 · 학습 중 · 새 카드(맞닿는 색끼리 검사). 글자는 색 대신 글자 색 토큰을 써요.
+   눈금 자리(왼쪽 2.75em)와 글자는 em 이라 글자 크기 설정을 따라 커져요. 그래프 안 글자는 0.8em(12.8px) 이상 */
+:root[data-theme=dark]{--st-rev:#008300;--st-new:#3987e5;--st-learn:#e66767;--st-known:#9085e9}
+:root[data-theme=light]{--st-rev:#008300;--st-new:#2a78d6;--st-learn:#e34948;--st-known:#6250d6}
+.page.st-page{max-width:760px}
+.st-page .st-card{padding:14px}
+.st-h{font-size:1em;font-weight:800;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}.st-h small{font-weight:500;color:var(--muted);font-size:.8em;white-space:nowrap}
+.st-nums{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;text-align:center;margin-top:12px}.st-h+.st-nums{margin-top:0}
+.st-num b{display:block;font-size:1.4em;line-height:1.25;font-variant-numeric:tabular-nums}.st-num small{color:var(--muted);font-size:.8em}
+.st-big{font-size:2.1em;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}.st-meta{margin:4px 0 12px}.st-empty{margin:0}
+.st-chart{position:relative;border-radius:6px}.st-chart:focus{outline:none}.st-chart:focus-visible{outline:2px solid var(--primary);outline-offset:4px}
+.st-plot{position:relative;cursor:pointer}
+.st-bars{position:absolute;left:2.75em;right:0;bottom:0;top:16px;display:flex;justify-content:space-between;gap:2px;border-bottom:1px solid var(--border)}
+.st-col{flex:1;min-width:0;max-width:24px;display:flex;flex-direction:column;justify-content:flex-end;border-radius:4px 4px 0 0}
+.st-col.on{background:color-mix(in srgb,var(--text) 12%,transparent)}
+.st-stack{display:flex;flex-direction:column-reverse;gap:2px;position:relative}
+.st-seg{display:block;width:100%}.st-seg.top{border-radius:4px 4px 0 0}
+.st-seg.rev,.st-key.rev{background:var(--st-rev)}.st-seg.new,.st-key.new{background:var(--st-new)}.st-seg.learn,.st-key.learn{background:var(--st-learn)}.st-seg.known,.st-key.known{background:var(--st-known)}
+.st-lab{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:2px;font-style:normal;font-size:.8em;font-weight:700;color:var(--text);white-space:nowrap}
+.st-grid{position:absolute;left:2.75em;right:0;border-top:1px dashed var(--border)}
+.st-y{position:absolute;left:0;width:calc(2.75em / .8 - 6px);font-size:.8em;line-height:1;text-align:right;white-space:nowrap;color:var(--muted)}   /* 폭: 눈금 자리 2.75em(바깥 글자 기준) − 6px */
+.st-axis{display:flex;justify-content:space-between;margin-top:4px;padding-left:2.75em}.st-axis span{font-size:.8em;color:var(--muted)}
+.st-legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px;font-size:.84em}
+.st-key{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.st-state{display:flex;gap:2px;height:16px;border-radius:8px;overflow:hidden}.st-state .st-seg{height:100%}
+.st-area{position:absolute;left:2.75em;right:0;top:0;bottom:0}.st-area svg{display:block;position:absolute;inset:0;overflow:visible}
+.st-goal,.st-base,.st-line{vector-effect:non-scaling-stroke}.st-goal{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4}.st-base{stroke:var(--border);stroke-width:1}
+.st-line{fill:none;stroke:var(--st-new);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.st-pt{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--st-new);transform:translate(-50%,-50%);pointer-events:none}.st-pt.end{width:8px;height:8px;box-shadow:0 0 0 2px var(--surface)}
+.st-hits{position:absolute;inset:0;display:flex}.st-hit{flex:1;min-width:0;position:relative}
+.st-hit.on::after{content:'';position:absolute;left:50%;top:4px;bottom:4px;border-left:1px solid var(--muted)}
+.st-live{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.st-tip{position:absolute;top:0;transform:translateY(calc(-100% - 6px));z-index:3;pointer-events:none;max-width:100%;box-sizing:border-box;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:6px 10px;font-size:.8em;line-height:1.45;white-space:pre-line;box-shadow:var(--shadow)}

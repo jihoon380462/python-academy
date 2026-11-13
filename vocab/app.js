@@ -1,5 +1,5 @@
-// vocab/app.js — 영어 단어장 화면: 덱 목록 · 덱 개요 · 학습(카드) · 찾아보기 · 설정. 계산은 vocab/core.js, 규칙과 남은 일은 specs/vocab.md
-//   주소(해시): (없음) 덱 목록 · #deck/<덱 id|all> 덱 개요 · #study/<덱 id|all> 학습 · #known/<덱 id|all> 아는 단어 넘기기 · #browse 찾아보기
+// vocab/app.js — 영어 단어장 화면: 덱 목록 · 덱 개요 · 학습(카드) · 찾아보기 · 통계 · 설정. 계산은 vocab/core.js, 규칙과 남은 일은 specs/vocab.md
+//   주소(해시): (없음) 덱 목록 · #deck/<덱 id|all> 덱 개요 · #study/<덱 id|all> 학습 · #known/<덱 id|all> 아는 단어 넘기기 · #browse 찾아보기 · #stats 통계
 //   화면 흐름은 Anki 와 같아요: 덱 → 지금 학습 → 카드 앞면 → 「정답 보기」 → 다시 · 어려움 · 알맞음 · 쉬움(버튼 위에 다음에 나올 때)
 const VocabApp = {
   view: 'decks', sel: null, ses: null, cur: null, pickInfo: null, waitTimer: null, kn: null,
@@ -45,7 +45,7 @@ const VocabApp = {
   // 같은 단어 한 장(v2.46.9): 다른 덱 카드로 보고 있는 단어는 그 대표 카드의 기록으로 상태를 보여요
   recId(id) { const c = VocabDecks.card(id); const rep = c && VocabCore.covered(c) ? VocabCore.repOf(c) : null; return rep ? rep.id : id; },
   deckShort(id) { return ({ base: '기초', slang: '속어', listen: '듣기', dev: '개발', acad: '학술' })[id] || VocabDecks.byId[id].name; },
-  stOf(id) { const r = VocabCore.recs[this.recId(id)]; return !r ? 'new' : r.susp ? 'known' : r.st === 0 ? 'new' : r.st === 2 ? 'rev' : 'learn'; },
+  stOf(id) { const c = VocabDecks.card(id); return c ? VocabCore.stateOf(c) : 'new'; },   // 상태 셈은 코어 한 곳(통계도 같은 셈)
   stLabel(id) { const r = VocabCore.recs[this.recId(id)]; const s = this.stOf(id); return s === 'known' ? '아는 단어' : s === 'new' ? '새 카드' : s === 'rev' ? '복습' : r.st === 3 ? '다시 학습' : '학습 중'; },
   dueText(id, now) {
     const r = VocabCore.recs[this.recId(id)]; const s = this.stOf(id); if (s === 'new' || s === 'known') return '';
@@ -58,9 +58,9 @@ const VocabApp = {
 
   // ---------- 상단바 ----------
   topbar() {
-    const br = this.view === 'browse';
+    const br = this.view === 'browse', st = this.view === 'stats';
     $('#topbar').innerHTML = `<a class="tb-btn tb-hub" href="../index.html" title="아카데미 허브로" aria-label="아카데미 허브로">${UI.icon('hub')}</a>
-      <a class="tb-btn vt-tab ${br ? '' : 'on'}" href="#">덱</a><a class="tb-btn vt-tab ${br ? 'on' : ''}" href="#browse">찾아보기</a><div class="tb-title"></div>
+      <a class="tb-btn vt-tab ${br || st ? '' : 'on'}" href="#">덱</a><a class="tb-btn vt-tab ${br ? 'on' : ''}" href="#browse">찾아보기</a><a class="tb-btn vt-tab ${st ? 'on' : ''}" href="#stats">통계</a><div class="tb-title"></div>
       ${Sync.on ? `<button class="tb-btn tb-sync ${Sync.state}" id="tbSync" title="기기 연동: ${Sync.state === 'err' ? esc(Sync.msg) : '마지막 동기화 ' + Sync.ago() + ' (누르면 지금 동기화)'}">${Sync.icon()}</button>` : ''}${UI.isMobile() ? '' : `<button class="tb-btn only-pc" id="tbKeys" title="키보드 단축키 (?)" aria-label="키보드 단축키">${UI.icon('keys')}</button>`}<button class="tb-btn" id="tbSettings" title="단어장 설정" aria-label="단어장 설정">${UI.icon('settings')}</button>`;
     $('#tbSettings').onclick = () => this.settings();
     const k = $('#tbKeys'); if (k) k.onclick = () => this.shortcuts();
@@ -70,7 +70,7 @@ const VocabApp = {
   // ---------- 길 찾기 ----------
   route() {
     const [v, id] = location.hash.slice(1).split('/'); clearTimeout(this.waitTimer); this.tts.stop();
-    if (v === 'browse') this.view = 'browse';
+    if (v === 'browse' || v === 'stats') this.view = v;
     else if ((v === 'deck' || v === 'study' || v === 'known') && this.deckIds(id).length) { this.view = v; this.sel = id; }
     else this.view = 'decks';
     if (this.view !== 'known') this.kn = null;   // 넘기기 화면을 떠나면 고르던 것은 버려요(넘긴 것은 이미 저장됐어요)
@@ -79,6 +79,7 @@ const VocabApp = {
   render() {
     this.topbar(); window.scrollTo(0, 0);
     if (this.view === 'browse') return this.viewBrowse();
+    if (this.view === 'stats') return this.viewStats();
     if (this.view === 'deck') return this.viewDeck();
     if (this.view === 'study') return this.viewStudy();
     if (this.view === 'known') return this.viewKnown();
@@ -408,6 +409,113 @@ const VocabApp = {
     let timer = null; $('#vbQ').oninput = (e) => { this.bq = e.target.value; this.bn = 200; clearTimeout(timer); timer = setTimeout(draw, 120); };
     $$('#vbF .v-chip').forEach(b => { b.onclick = () => { this.bf = b.dataset.f; this.bn = 200; $$('#vbF .v-chip').forEach(x => x.classList.toggle('on', x === b)); draw(); }; });
     draw();
+  },
+
+  // ---------- 통계 (specs/vocab.md W5 — 사용자가 고른 시안 「1 + 3」: 한 장 요약 + 날마다 맞힌 비율 선 그래프) ----------
+  // 위에서 아래로: 오늘 · 최근 30일 누른 횟수 · 복습 맞힌 비율 · 앞으로 30일 복습 · 카드 상태. 모든 덱을 합친 숫자예요. 계산은 VocabCore.stats
+  //   막대 · 날짜 칸을 누르면(PC 는 마우스를 올리면) 그날 숫자가 그래프 위에 떠요. 키보드는 ← → 로 옆 날짜
+  //   색은 차트 전용 토큰(--st-*, vocab.css): 라이트 · 다크 바탕에서 색약 검사를 통과한 단계. 쌓는 순서는 복습 · 새 카드 · 학습(빨강과 초록이 맞닿지 않게)
+  ST_DAYS: 30,
+  stDate(d, wd) { const x = new Date(d * VocabCore.DAY); return `${x.getUTCMonth() + 1}월 ${x.getUTCDate()}일${wd ? `(${'일월화수목금토'[x.getUTCDay()]})` : ''}`; },   // 하루 번호 → 그 공부 날의 달력 날짜
+  viewStats() {
+    const s = VocabCore.stats(VocabCore.now(), this.ST_DAYS); const D = s.days, t = D[D.length - 1], F = s.due, S = s.states;
+    const tot = (x) => x.new + x.learn + x.rev; const sum = (k) => D.reduce((a, x) => a + x[k], 0); const pct = (a, b) => Math.round(100 * a / b); const f = (n) => n.toLocaleString('ko-KR');
+    const all = sum('new') + sum('learn') + sum('rev'), rv = sum('rev'), ag = sum('again'); const lows = D.filter(x => x.rev >= 3).map(x => pct(x.rev - x.again, x.rev));
+    const sec = (id, title, small, body) => `<section class="card st-card" id="${id}"><h2 class="st-h">${title}${small ? `<small>${small}</small>` : ''}</h2>${body}</section>`;
+    const nums = (arr) => `<div class="st-nums">${arr.map(([v, l]) => `<div class="st-num"><b>${v}</b><small>${l}</small></div>`).join('')}</div>`;
+    const empty = (msg) => `<p class="muted small st-empty">${msg}</p>`;
+    $('#view').innerHTML = `<div class="page vocab st-page"><h1 class="v-h">통계</h1>
+      <p class="muted v-lead">날마다 얼마나 눌렀는지, 복습을 얼마나 맞혔는지, 앞으로 얼마나 나올지 봐요. 모든 덱을 합친 숫자예요.</p>
+      ${sec('stToday', '오늘', this.stDate(t.d, true), nums([[f(tot(t)), '누른 횟수'], [f(t.new), '새 카드'], [f(t.rev), '복습'], [t.rev ? pct(t.rev - t.again, t.rev) + '%' : '–', '복습 맞힘']]))}
+      ${sec('stDays', '최근 30일', all ? `모두 ${f(all)}번` : '', all ? this.stBars(D) + this.stLegend([['rev', '복습', sum('rev')], ['new', '새 카드', sum('new')], ['learn', '학습', sum('learn')]]) : empty('최근 30일에 누른 카드가 없어요. 덱에서 공부를 시작하면 날마다 여기에 쌓여요.'))}
+      ${sec('stAcc', '복습 맞힌 비율', '최근 30일', rv ? `<div class="st-big">${pct(rv - ag, rv)}%</div><p class="muted small st-meta">목표는 90%예요. 간격 계산기가 이만큼 기억하도록 다음 날짜를 정해요.</p>${this.stAcc(D)}${nums([[lows.length ? Math.min(...lows) + '%' : '–', '가장 낮은 날'], [f(ag) + '번', '다시 누름'], [f(rv) + '번', '복습']])}` : empty('아직 복습한 카드가 없어요. 새 카드를 배우고 하루 이틀 뒤부터 복습이 나와요.'))}
+      ${sec('stDue', '앞으로 30일 복습', F.some(v => v) ? `내일 ${f(F[1])}장` : '', F.some(v => v) ? this.stDue(F, s.today) : empty('나올 복습 카드가 아직 없어요.'))}
+      ${sec('stState', '카드 상태', `모두 ${f(S.total)}장`, this.stState(S))}
+    </div>`;
+    this.stTips($('#view .st-page'));
+  },
+  // 그래프 하나 = 누르는 곳 하나 · 키보드로 닿는 곳 하나(Tab 한 번). 날짜 칸은 단추가 아니에요 — 누른 자리에서 가장 가까운 날을 골라요(stTips).
+  //   cur: 키보드로 닿으면 먼저 보여 줄 칸(오늘 · 앞으로 30일은 내일). 고른 날의 숫자는 숨은 알림 칸(st-live)으로 화면 읽기 프로그램도 읽어요
+  stChart(label, cur, inner, cls = '') { return `<div class="st-chart${cls}" tabindex="0" role="group" aria-label="${esc(label)}. 왼쪽 · 오른쪽 화살표로 날짜를 옮기면 그날 숫자를 읽어 줘요" data-cur="${cur}">${inner}<div class="st-live" aria-live="polite"></div></div>`; },
+  // 막대 그래프 틀: 왼쪽 2.75em 은 눈금 글자 자리(막대 · 막대 위 숫자와 안 겹치게), 흐린 선은 맨 위 · 가운데만, 아래 끝에 처음 · 끝 날짜
+  stFrame(H, top, unit, cols, a, b) {
+    const yl = (at, s) => `<span class="st-y" style="bottom:${at - 6}px">${s}</span>`;
+    return `<div class="st-plot" aria-hidden="true" style="height:${H + 18}px"><div class="st-grid" style="bottom:${H}px"></div><div class="st-grid" style="bottom:${Math.round(H / 2)}px"></div>${yl(H, top + unit)}${yl(Math.round(H / 2), top / 2)}<div class="st-bars">${cols}</div></div>`
+      + `<div class="st-axis" aria-hidden="true"><span>${a}</span><span>${b}</span></div>`;
+  },
+  stCol(tip, inner) { return `<span class="st-col" data-tip="${esc(tip)}"><span class="st-stack">${inner}</span></span>`; },
+  // 최근 30일 누른 횟수: 쌓은 막대(아래부터 복습 · 새 카드 · 학습), 맨 위 칸만 둥근 끝, 오늘 막대에만 숫자
+  stBars(D) {
+    const tot = (x) => x.new + x.learn + x.rev; const top = Math.ceil(Math.max(1, ...D.map(tot)) / 10) * 10; const H = 112; const last = D.length - 1;
+    const cols = D.map((x, i) => {
+      const n = tot(x); const ks = ['rev', 'new', 'learn'].filter(k => x[k]);
+      const segs = ks.map((k, j) => `<i class="st-seg ${k}${j === ks.length - 1 ? ' top' : ''}" style="height:${Math.max(2, Math.round(x[k] / top * H))}px"></i>`).join('');
+      return this.stCol(`${i === last ? '오늘 · ' : ''}${this.stDate(x.d, true)}\n${n ? `${n}번 — 복습 ${x.rev} · 새 카드 ${x.new} · 학습 ${x.learn}` : '누른 카드 없음'}`, segs + (i === last && n ? `<em class="st-lab">${n}</em>` : ''));
+    }).join('');
+    return this.stChart('최근 30일 날마다 누른 횟수 막대그래프', last, this.stFrame(H, top, '번', cols, this.stDate(D[0].d), '오늘'));
+  },
+  // 앞으로 30일 복습: 날마다 나올 복습 카드(첫 칸은 오늘 — 밀린 것 포함), 내일 막대에만 숫자
+  stDue(F, today) {
+    const top = Math.ceil(Math.max(1, ...F) / 10) * 10; const H = 92;
+    const cols = F.map((v, i) => this.stCol(`${i === 0 ? '오늘(밀린 것 포함)' : (i === 1 ? '내일 · ' : '') + this.stDate(today + i, true)}\n복습 ${v}장`,
+      (v ? `<i class="st-seg rev top" style="height:${Math.max(2, Math.round(v / top * H))}px"></i>` : '') + (i === 1 && v ? `<em class="st-lab">${v}</em>` : ''))).join('');
+    return this.stChart('앞으로 30일 날마다 나올 복습 카드 막대그래프', 1, this.stFrame(H, top, '장', cols, '오늘', this.stDate(today + F.length - 1)));
+  },
+  // 복습 맞힌 비율 선: 복습이 3번 이상인 날만 잇고(적은 날은 들쭉날쭉해서 — 숫자는 누르면 보여요), 빈 날에서 끊겨요. 목표 90% 점선.
+  //   아래 끝은 가장 낮은 날보다 10% 아래, 많아야 70% — 선이 위에 몰리지 않게. 눈금 글자는 왼쪽 자리에 따로
+  //   선(svg)은 폭에 맞춰 늘이고 굵기는 그대로(non-scaling-stroke), 점 · 글자는 HTML 이라 찌그러지지 않아요. 높이는 h px 로 정해져 있어요
+  stAcc(D) {
+    const PW = 300, h = 140, last = D.length - 1; const P = D.map(x => x.rev >= 3 ? Math.round(100 * (x.rev - x.again) / x.rev) : null);
+    const lo = Math.max(0, Math.min(70, Math.floor((Math.min(100, ...P.filter(p => p !== null)) - 5) / 10) * 10));
+    const X = (i) => 4 + i * (PW - 8) / last, Y = (p) => Math.round(8 + (100 - Math.max(lo, p)) / (100 - lo) * (h - 16));
+    const pt = (i, p, cls = '') => `<i class="st-pt${cls}" style="left:${(X(i) / PW * 100).toFixed(2)}%;top:${Y(p)}px"></i>`;
+    const yl = (p, s, dy = 0) => `<span class="st-y" style="top:${Y(p) - 6 + dy}px">${s}</span>`;
+    let d = '', pts = '', end = -1;
+    P.forEach((p, i) => { if (p === null) return; const join = i > 0 && P[i - 1] !== null; d += `${join ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(p)} `; end = i; if (!join && (i === last || P[i + 1] === null)) pts += pt(i, p); });
+    const hits = D.map((x, i) => `<span class="st-hit" data-tip="${esc(`${i === last ? '오늘 · ' : ''}${this.stDate(x.d, true)}\n${x.rev ? `맞힘 ${Math.round(100 * (x.rev - x.again) / x.rev)}% — 복습 ${x.rev}번 중 다시 ${x.again}번${x.rev < 3 ? '(3번이 안 돼 선에서 뺐어요)' : ''}` : '복습 없음'}`)}"></span>`).join('');
+    return this.stChart('날마다 복습 맞힌 비율 선 그래프. 점선은 목표 90%', last, `<div class="st-plot" aria-hidden="true" style="height:${h}px">${yl(100, '100%')}${yl(90, '90%')}${yl(90, '목표', 13)}${yl(lo, lo + '%')}<div class="st-area">`
+      + `<svg viewBox="0 0 ${PW} ${h}" preserveAspectRatio="none" width="100%" height="${h}"><line class="st-goal" x1="0" x2="${PW}" y1="${Y(90)}" y2="${Y(90)}"/><line class="st-base" x1="0" x2="${PW}" y1="${Y(lo)}" y2="${Y(lo)}"/><path class="st-line" d="${d.trim()}"/></svg>`
+      + `${pts}${end >= 0 ? pt(end, P[end], ' end') : ''}<div class="st-hits">${hits}</div></div></div><div class="st-axis" aria-hidden="true"><span>${this.stDate(D[0].d)}</span><span>오늘</span></div>`, ' st-acc');
+  },
+  stLegend(items) { return `<div class="st-legend">${items.map(([k, l, n]) => `<span><i class="st-key ${k}"></i>${l} <b>${n.toLocaleString('ko-KR')}</b></span>`).join('')}</div>`; },
+  // 카드 상태 띠(복습 · 아는 단어 · 학습 중 · 새 카드 — 맞닿는 색끼리 색약 검사 통과). 0 이 아닌 칸은 아주 적어도 보이게 최소 폭
+  stState(S) {
+    const ks = [['rev', '복습'], ['known', '아는 단어'], ['learn', '학습 중'], ['new', '새 카드']]; const w = ks.map(([k]) => S[k] ? Math.max(1.5, 100 * S[k] / S.total) : 0); const sc = 100 / (w.reduce((a, b) => a + b, 0) || 1);
+    return `<div class="st-state" role="img" aria-label="${esc(ks.map(([k, l]) => `${l} ${S[k]}장`).join(', '))}">${ks.map(([k], i) => w[i] ? `<i class="st-seg ${k}" style="width:${(w[i] * sc).toFixed(2)}%"></i>` : '').join('')}</div>`
+      + this.stLegend(ks.map(([k, l]) => [k, l, S[k]]));
+  },
+  // 그래프를 누르면(PC 는 마우스를 올리면) 누른 자리에서 가장 가까운 날의 숫자를 그래프 위에 띄워요. 다른 곳을 누르거나 Esc 면 닫혀요.
+  //   키보드: 그래프에 Tab 으로 닿으면 cur 칸 숫자, ← → 로 옆 날짜, Home · End 로 처음 · 끝
+  stTips(root) {
+    let tip = null, cur = null;
+    const hide = () => { if (tip) tip.remove(); if (cur) cur.classList.remove('on'); tip = cur = null; };
+    const show = (c, say) => {
+      const box = c.closest('.st-chart');
+      if (c !== cur) {
+        hide(); cur = c; c.classList.add('on'); tip = document.createElement('div'); tip.className = 'st-tip'; tip.setAttribute('aria-hidden', 'true'); tip.textContent = c.dataset.tip; box.appendChild(tip);
+        const r = c.getBoundingClientRect(), br = box.getBoundingClientRect(); const x = r.left - br.left + r.width / 2;
+        tip.style.left = Math.round(Math.max(0, Math.min(box.clientWidth - tip.offsetWidth, x - tip.offsetWidth / 2))) + 'px';
+      }
+      if (say) box.querySelector('.st-live').textContent = c.dataset.tip.replace('\n', ' ');
+    };
+    const cells = (box) => [...box.querySelectorAll('[data-tip]')];
+    const near = (box, x) => { let best = null, bd = Infinity; for (const c of cells(box)) { const r = c.getBoundingClientRect(); const dd = Math.abs(r.left + r.width / 2 - x); if (dd < bd) { bd = dd; best = c; } } return best; };
+    const chartOf = (el) => (el && el.closest ? el.closest('.st-chart') : null);
+    root.addEventListener('click', (e) => { const box = chartOf(e.target); if (!box) { hide(); return; } const c = near(box, e.clientX); if (c) show(c, false); });
+    // 마우스를 올려 보기는 마우스가 있는 기기에서만(폰은 누르기만). 「숫자가 떠 있는 그래프」 를 떠날 때만 닫아요
+    if (window.matchMedia && matchMedia('(hover: hover)').matches) {
+      root.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') return; const box = chartOf(e.target); if (!box) return; const c = near(box, e.clientX); if (c) show(c, false); });
+      root.addEventListener('pointerout', (e) => { if (e.pointerType !== 'mouse' || !cur) return; const box = cur.closest('.st-chart'), to = e.relatedTarget; if (box.contains(e.target) && !(to && box.contains(to))) hide(); });
+    }
+    const isChart = (el) => !!(el && el.classList && el.classList.contains('st-chart'));
+    root.addEventListener('focusin', (e) => { const box = e.target; if (!isChart(box) || !box.matches(':focus-visible')) return; const cs = cells(box); show(cs[Math.max(0, Math.min(cs.length - 1, +box.dataset.cur))], true); });
+    root.addEventListener('focusout', (e) => { if (cur && e.target === cur.closest('.st-chart')) hide(); });
+    root.addEventListener('keydown', (e) => {
+      const box = e.target; if (!isChart(box)) return; if (e.key === 'Escape') { hide(); return; }
+      const cs = cells(box); const i = cur && box.contains(cur) ? cs.indexOf(cur) : +box.dataset.cur;
+      const j = e.key === 'ArrowLeft' ? i - 1 : e.key === 'ArrowRight' ? i + 1 : e.key === 'Home' ? 0 : e.key === 'End' ? cs.length - 1 : null; if (j === null) return;
+      e.preventDefault(); const k = Math.max(0, Math.min(cs.length - 1, j)); box.dataset.cur = k; show(cs[k], true);
+    });
   },
 
   // ---------- 설정 ----------
