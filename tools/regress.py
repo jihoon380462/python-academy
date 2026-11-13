@@ -590,6 +590,27 @@ with sync_playwright() as p:
     check(bool(sx) and sx['said']=='parentheses' and sx['front'], '듣기 덱: 기호 노트의 듣기 카드는 say(parentheses)를 읽고 읽기 카드 앞면에는 ( ) (%s)' % sx)
     dvc=pg.evaluate("(()=>{ const t=VocabDecks.card('dev/commit/t'), r=VocabDecks.card('dev/commit/r'), s=VocabDecks.card('dev/ssh/t'); if(!t||!r||!s) return null; const h=(c,o)=>VocabApp.cardHtml(Object.assign({card:c,kind:'new',shown:false,typed:''},o||{})); const f=h(t); const txt=f.replace(/<[^>]*>/g,' ').toLowerCase(); return {inp:f.includes('id=\"vType\"'), leak:txt.includes('commit'), sense:f.includes('커밋하다'), read:h(r).includes('>commit<'), ssh:h(s,{shown:true,typed:'ssh'}).includes('✓ ssh')}; })()")
     check(bool(dvc) and dvc['inp'] and not dvc['leak'] and dvc['sense'] and dvc['read'] and dvc['ssh'], '개발 덱(v2.46.7, 실제 데이터로 처음 나오는 쓰기 카드): 앞면은 뜻 + 철자 칸이고 답(commit)이 안 보임 · 읽기 카드 앞면엔 commit · 대문자 낱말(SSH)을 소문자로 쳐도 맞음 (%s)' % dvc)
+    # v2.46.8: 하루 한도 시트(사용자가 고른 시안) — 저장 단추 없이 누르면 바로 저장 · 되돌리기 · 직접 친 수는 멈추면 저장(15 를 치는 도중의 1 은 저장 안 함) · 200 넘으면 200
+    #   · 모든 덱 맞추기 · 복습 상한 · 치다가 Esc 로 닫아도 저장 · 「전체」 는 덱마다 칩 · 폰에서는 아래에 붙는 시트, PC 에서는 가운데 창
+    LC="JSON.stringify([VocabCore.data.cfg.newPerDay, VocabCore.data.cfg.maxRev])"
+    pg.evaluate("VocabCore.setCfg({newPerDay:{}, maxRev:200}); location.hash='#deck/dev'; VocabApp.route()"); pg.wait_for_timeout(150)
+    l0=pg.inner_text('#vLimit'); pg.click('#vLimit'); pg.wait_for_timeout(150)
+    lpos=pg.evaluate("(()=>{ const r=document.querySelector('.v-sheet .modal').getBoundingClientRect(); return {bottom:Math.round(innerHeight-r.bottom), w:Math.round(r.width), sw:document.documentElement.scrollWidth, on:[...document.querySelectorAll('#vlNew .on')].map(b=>b.dataset.n), saved:!document.querySelector('#vlSaved').hidden}; })()")
+    ldays=pg.evaluate("Math.ceil(VocabDecks.cards('dev').filter(c=>VocabApp.stOf(c.id)==='new').length/10)")
+    pg.click('#vlNew [data-n="10"]'); pg.wait_for_timeout(100); l1=[pg.evaluate(LC), pg.inner_text('.v-over .vn.new'), pg.inner_text('#vLimit'), pg.is_visible('#vlSaved'), ('약 %d일' % ldays) in pg.inner_text('#vlInfo')]
+    pg.click('#vlUndo'); pg.wait_for_timeout(100); l2=pg.evaluate(LC)
+    pg.click('#vlNew [data-n="direct"]'); pg.fill('#vlInput','1'); pg.wait_for_timeout(150); pg.fill('#vlInput','12'); l3a=pg.evaluate(LC); pg.wait_for_timeout(700); l3=pg.evaluate(LC)
+    pg.fill('#vlInput','999'); pg.keyboard.press('Enter'); pg.wait_for_timeout(100); l4=[pg.evaluate(LC), pg.input_value('#vlInput')]
+    pg.click('#vlAll'); pg.click('#vlRev [data-r="500"]'); pg.wait_for_timeout(100); l5=pg.evaluate("[VocabDecks.ready().every(d=>VocabCore.newLimit(d.id)===200), VocabCore.data.cfg.maxRev]")
+    pg.fill('#vlInput','7'); pg.keyboard.press('Escape'); pg.wait_for_timeout(150); l6=[pg.evaluate("VocabCore.newLimit('dev')"), pg.locator('.v-sheet').count()]
+    check(l0=='하루 새 카드 5장 · 바꾸기 ›' and lpos['bottom']==0 and lpos['w']>=388 and lpos['sw']<=390 and lpos['on']==['5'] and not lpos['saved'] and l1==['[{"dev":10},200]','10','하루 새 카드 10장 · 바꾸기 ›',True,True], '하루 한도 시트(v2.46.8): 폰에서는 아래에 붙고, 칩을 누르면 저장 단추 없이 바로 저장 · 뒤 덱 화면 숫자도 바뀜 (%s · %s · %s)' % (l0, lpos, l1))
+    check(l2=='[{},200]' and l3a=='[{},200]' and l3=='[{"dev":12},200]' and l4==['[{"dev":200},200]','200'] and l5==[True,500] and l6==[7,0], '하루 한도 시트: 되돌리기 · 치는 도중엔 저장 안 하고 멈추면 저장 · 200 넘으면 200 · 모든 덱 맞추기 · 복습 상한 · 치다가 Esc 로 닫아도 저장 (%s)' % [l2, l3a, l3, l4, l5, l6])
+    pg.evaluate("VocabCore.setCfg({newPerDay:{}, maxRev:200}); location.hash='#deck/all'; VocabApp.route()"); pg.wait_for_timeout(150)
+    lall=pg.evaluate("[[...document.querySelectorAll('.v-limit [data-limit]')].map(b=>b.dataset.limit), VocabDecks.ready().map(d=>d.id)]"); pg.click('.v-limit [data-limit="slang"]'); pg.wait_for_timeout(150)
+    lt=pg.inner_text('.v-sheet .modal-title'); pg.keyboard.press('Escape'); pg.wait_for_timeout(100)
+    pg.set_viewport_size({'width':1280,'height':900}); pg.evaluate("location.hash='#deck/base'; VocabApp.route()"); pg.wait_for_timeout(150); pg.click('#vLimit'); pg.wait_for_timeout(150)
+    lpc=pg.evaluate("(()=>{ const r=document.querySelector('.v-sheet .modal').getBoundingClientRect(); return {top:Math.round(r.top), bottom:Math.round(innerHeight-r.bottom)}; })()"); pg.keyboard.press('Escape'); pg.wait_for_timeout(100)
+    check(lall[0]==lall[1] and len(lall[0])>=4 and lt.startswith('속어 · 거친 말 · 하루 한도') and lpc['top']>40 and lpc['bottom']>40 and pg.evaluate(LC)=='[{},200]', '하루 한도 시트: 「전체」 화면은 덱마다 칩(누르면 그 덱의 시트) · PC 에서는 가운데 창 · 닫아도 바뀐 것 없음 (%s · %s)' % (lall[0], lpc))
     pg.evaluate("VocabCore.clockOffset=0"); pg.set_viewport_size({'width':1280,'height':900}); pg.goto(HUB); pg.wait_for_timeout(500)
     ha=pg.evaluate("document.querySelector('.hub-cat a.hc').innerText.replace(/\\n/g,' ')"); check('오늘 할 카드' in ha and '시작 전' not in ha, '허브 카드: 학습한 뒤에는 「오늘 할 카드」 를 보여 줌 (%s)' % ha[-40:])
     verr=errors[v0:]; check(not verr, '영어 단어장 pageerror 0 (%s)' % (verr[:2] or 'OK'))
