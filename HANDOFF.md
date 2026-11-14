@@ -68,7 +68,7 @@
   - 중고등 수학 처음부터, 2022 개정 순서, 먼저 중1 범위, 파이썬 없이.
   - 중1 목차 초안(35 레슨)은 [`TODO.md`](TODO.md) 1-1 에 있어요.
   - 다음은 화면 시안을 보여 드리고 고르기예요. 이 환경은 교육과정 원문 사이트(나무위키 · 교과서 출판사)가 막혀 있어서 검색 결과로 단원을 모았어요.
-- CI 줄이기(LESSON.md U16): 문서(.md)만 바뀐 PR 은 무거운 검사를 건너뛰어요(`tools/ci_changes.sh`). 문서 한 줄 PR 도 3분 15초 걸리던 것을 사용자가 짚어 분석했어요. 이어서 데이터 분석 · 머신러닝 · LLM · 파일 · 업무 자동화 교과서 예제는 무거운 모듈을 미리 불러 둔 파이썬에서 fork 해 실행해요(`tools/pyfork.py`, check_book 전체 112.9 → 66.9초). 남은 병목은 regress(2분 14초).
+- CI 줄이기(LESSON.md U16): 문서(.md)만 바뀐 PR 은 무거운 검사를 건너뛰어요(`tools/ci_changes.sh`). 문서 한 줄 PR 도 3분 15초 걸리던 것을 사용자가 짚어 분석했어요. 이어서 데이터 분석 · 머신러닝 · LLM · 파일 · 업무 자동화 교과서 예제는 무거운 모듈을 미리 불러 둔 파이썬에서 fork 해 실행해요(`tools/pyfork.py`, check_book 전체 112.9 → 66.9초). CI 실측(PR #198): 전체 2분 36초, check_book 103 → 59초. 남은 병목은 regress(2분 26초).
 
 ### 그 전 작업 (11/12 — 영어 단어장 뼈대와 덱 채우기)
 
@@ -193,7 +193,7 @@
    - 기다리는 동안 이 PR 에 커밋을 더 올리지 않아요. 도는 중에 올리면 앞 검사가 취소되고 그 커밋의 `verify` 가 빨강으로 남아요. 더할 것은 앞 실행이 끝난 뒤 올려요(LESSON.md R22).
    - 클라우드 세션은 `subscribe_pr_activity` 로 CI 결과가 저절로 와요. 기다리며 다음 챕터를 미리 만들어 둬도 돼요(커밋은 머지 뒤).
    - 기다릴 때는 **끝날 시각을 같이 알려요.** 지난 실행 시간은 `actions_list`(list_workflow_runs)로 봐요. 그 사이 배포 확인 준비나 다음 일을 하고, 멈춰 기다리지 않아요.
-     - 문서(.md)만 바뀐 PR 은 CI 가 무거운 단계(설치 · check_book · run_solutions · regress · web)를 건너뛰어요(`tools/ci_changes.sh`, 11/15).
+     - 문서(.md)만 바뀐 PR 은 CI 가 무거운 단계(설치 · check_book · run_solutions · regress · web)를 건너뛰어 약 20초면 끝나요(`tools/ci_changes.sh`, 11/15 — PR #199 실측 18초). 코드가 바뀐 PR 은 약 2분 40초(PR #198 실측 2분 36초).
      - 예상보다 늦으면 바로 `actions_list`(list_workflow_jobs — 단계별 시간) · `get_job_logs`(오래 걸린 곳)로 원인을 찾아 알려요 (LESSON.md U16).
    - success 면 squash 머지.
    - 빨가면 로그(`get_job_logs`)로 원인을 찾아 고쳐 push 해요. 예: v2.28.1 은 CI 에 `requests` 가 없어 실패 → ci.yml 설치 줄에 더함.

@@ -22,11 +22,13 @@
   - 시간(로컬, 다섯 교과서 동시): 데이터 분석 93.5 → 27.1초 · 머신러닝 86.1 → 30.5초 · LLM 73.2 → 35.9초 · 파일 48.5 → 16.4초 · 업무 자동화 41.2 → 25.6초. 교과서 20개 전체(check_book_par, 4개 동시): 112.9 → 66.9초
   - `CHECK_BOOK_FORK=0` 이면 예전 방식, `CHECK_BOOK_DUMP=<파일>` 이면 파이썬 실행마다 출력을 남겨요(비교용). 서버를 못 띄우면 예전 방식으로 돌아가고 한 줄 알려요
   - `check_book_par` 실행 순서를 새 측정값으로
+  - CI 실측(PR #198): 전체 2분 36초 · content 2분 1초(그중 check_book 59초 — #197 은 103초) · regress 2분 26초 · web 2분 5초
 
 - 🔧 **CI: 문서만 바뀐 PR 은 무거운 검사를 건너뛰어요**(11/15 Claude)
   - 설정 · 검사만 · 화면 변화 없음 · 버전 그대로 v2.48.0
   - 바뀐 파일이 모두 `.md` 면 설치 · check_book · run_solutions · regress · web 을 건너뛰고, 빠른 검사(validate_content · check_level · check_nesting · check_vocab · test_vocab)만 돌아요. 판단은 `tools/ci_changes.sh`(PR 의 merge 커밋을 main 끝과 비교). 건너뛴 단계는 성공으로 끝나 `verify` 는 그대로예요
   - 까닭: 문서 한 줄 PR 도 CI 가 3분 15초(PR #196). 무거운 검사와 사이트 코드는 .md 를 읽지 않아요(읽는 것은 늘 도는 validate_content · check_vocab 뿐)
+  - CI 실측: 문서만 바뀐 PR #199 는 18초(content 10초 · regress 11초 · web 5초, 무거운 단계는 「건너뜀」 · verify 초록)
   - `check_book_par` 실행 순서를 이번 CI 측정값(오래 걸린 순)으로. 끝에 vim · files · auto 셋이 남아 기다리던 것을 줄여요
   - 기록: LESSON U16 · HANDOFF 2절 7번 · 3절 · site-intent
 
