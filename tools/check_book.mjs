@@ -1,19 +1,54 @@
 // tools/check_book.mjs — 교과서(book.js) 검사 (v2.9.0 파이썬 · v2.10.0 터미널·Git). `node tools/check_book.mjs [코스id]` (없으면 book.js 가 있는 코스 전부)
 // ① 「필요한 문법」 링크가 있는 레슨·쪽을 가리키는지 ② pid 가 있는 문제인지 ③ 예시 답을 실제로 돌려 출력 예와 같은지 (noRun 은 건너뜀)
 //   파이썬 코스: python3 로 answer 실행 · 셸 코스(runner:'shell'): bash 로 setup → answer → check 실행(HOME 은 임시 폴더, 출력의 그 경로는 /c/Users/me 로 바꿔 비교)
-import fs from 'fs'; import vm from 'vm'; import os from 'os'; import path from 'path'; import { execFileSync, spawnSync } from 'child_process';
+import fs from 'fs'; import vm from 'vm'; import os from 'os'; import path from 'path'; import { execFileSync, spawnSync, spawn } from 'child_process';
 const R = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 // v2.39.0: 예시 답 하나의 제한 시간 — 무한 반복을 잡는 용도. check_book_par 로 교과서 여럿을 동시에 돌리면 CPU 를 나눠 써서 학습 예제(LLM NB2#4 등)가 8초를 넘을 수 있어 30초로
 const RUN_TIMEOUT = +process.env.CHECK_BOOK_TIMEOUT || 30000;
+// 11/15 CI 2단계(LESSON.md U16): 아래 교과서는 무거운 모듈을 미리 불러 둔 파이썬에서 예제마다 fork 해서 실행해요(tools/pyfork.py 맨 위 설명).
+//   예제마다 새 프로세스라 앞 예제의 상태가 남지 않고, 모듈 불러오기(pandas 0.44초 · scikit-learn 1.2초)만 빠져요. 출력 · 에러 글 · 종료 코드는 python3 main.py 와 같아요.
+//   목록은 그 교과서 예제 · 답이 실제로 import 하는 무거운 모듈(새 모듈을 쓰는 예제가 늘면 여기에 더해요 — 빠뜨려도 결과는 같고 느릴 뿐이에요).
+//   CHECK_BOOK_FORK=0 이면 예전처럼 예제마다 python3 를 새로 띄워요. CHECK_BOOK_DUMP=<파일> 이면 파이썬 실행마다 출력을 JSON 한 줄로 남겨요(두 방식 비교).
+const PRELOAD = {
+  data: ['numpy', 'pandas', 'matplotlib.pyplot'],
+  ml: ['numpy', 'sklearn.model_selection', 'sklearn.linear_model', 'sklearn.datasets', 'sklearn.neighbors', 'sklearn.metrics', 'sklearn.tree', 'sklearn.cluster', 'matplotlib.pyplot'],
+  llm: ['numpy'],
+  files: ['openpyxl', 'openpyxl.styles', 'openpyxl.chart', 'openpyxl.utils'],
+  auto: ['docx', 'docx.shared', 'docx.oxml.ns', 'pypdf', 'reportlab.pdfgen.canvas', 'reportlab.pdfbase.cidfonts'],
+};
+const DUMP = process.env.CHECK_BOOK_DUMP; let FORK = null;
+const sleepMs = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+function forkStart(cid) {
+  const mods = PRELOAD[cid]; if (!mods || process.env.CHECK_BOOK_FORK === '0') return;
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pyfork-')); const sock = path.join(dir, 's'); const errf = path.join(dir, 'err.txt'); const fd = fs.openSync(errf, 'w');
+  const p = spawn('python3', [path.join(R, 'tools/pyfork.py'), 'serve', sock, ...mods], { stdio: ['ignore', 'ignore', fd] }); fs.closeSync(fd);
+  for (const t0 = Date.now(); !fs.existsSync(sock) && !fs.existsSync(sock + '.fail') && Date.now() - t0 < 60000;) sleepMs(20);
+  if (fs.existsSync(sock)) { FORK = { sock, dir, pid: p.pid }; return; }
+  try { process.kill(p.pid); } catch (e) {} // 못 띄우면 예전 방식(예제마다 python3) — 결과는 같고 느릴 뿐
+  console.log(`   (${cid}: 미리 불러 두기 서버를 못 띄워 예제마다 python3 로 돌려요 — ${fs.readFileSync(errf, 'utf8').trim().split('\n').pop() || '60초 안에 준비 안 됨'})`);
+}
+function forkStop() { if (!FORK) return; try { process.kill(FORK.pid); } catch (e) {} fs.rmSync(FORK.dir, { recursive: true, force: true }); FORK = null; }
+process.on('exit', forkStop);
+// python3 <파일> 실행을 모두 여기로: 서버가 있으면 pyfork run(같은 출력 · 종료 코드), 없으면 예전 그대로 execFileSync
+const TMPRE = new RegExp(os.tmpdir().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/[\\w]+-[A-Za-z0-9]{6}', 'g');
+function py(args, opts) {
+  const cmd = FORK ? [path.join(R, 'tools/pyfork.py'), 'run', FORK.sock, String(Math.ceil((opts.timeout || RUN_TIMEOUT) / 1000) + 2), ...args] : args;
+  if (!DUMP) return execFileSync('python3', cmd, opts);
+  const r = spawnSync('python3', cmd, opts); const nm = (x) => String(x == null ? '' : x).replace(TMPRE, '<TMP>');
+  fs.appendFileSync(DUMP, JSON.stringify({ args, input: nm(opts.input || ''), status: r.status, signal: r.signal, out: nm(r.stdout), err: nm(r.stderr) }) + '\n');
+  if (r.error) throw Object.assign(r.error, { stdout: r.stdout, stderr: r.stderr });
+  if (r.status !== 0) throw Object.assign(new Error(`Command failed: python3 ${args.join(' ')}\n${r.stderr}`), { status: r.status, signal: r.signal, stdout: r.stdout, stderr: r.stderr });
+  return r.stdout;
+}
 // v2.41.0: 준비 파일 — 하나({name, text}) 또는 여럿([…]), 이름에 하위 폴더 가능(templates/index.html), run:true 면 답 · 예제보다 먼저 python3 로 한 번 실행(엑셀 예제를 만드는 스크립트 등)
 const prepList = (prep) => (Array.isArray(prep) ? prep : prep ? [prep] : []).filter(f => f && f.name);
 function writePreps(dir, prep) {
   for (const f of prepList(prep)) { const fp = path.join(dir, f.name); fs.mkdirSync(path.dirname(fp), { recursive: true }); fs.writeFileSync(fp, f.text || ''); }
-  for (const f of prepList(prep)) if (f.run) execFileSync('python3', [f.name], { cwd: dir, encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] });
+  for (const f of prepList(prep)) if (f.run) py([f.name], { cwd: dir, encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] });
 }
 const want = process.argv[2]; const courses = fs.readdirSync(R + '/courses').filter(d => fs.existsSync(`${R}/courses/${d}/book.js`) && (!want || d === want));
 let total = 0;
-for (const cid of courses) total += checkCourse(cid);
+for (const cid of courses) { forkStart(cid); try { total += checkCourse(cid); } finally { forkStop(); } }
 process.exit(total ? 1 : 0);
 function checkCourse(cid) {
 const ctx = { window: {}, console }; vm.createContext(ctx);
@@ -47,7 +82,7 @@ for (const [lid, tasks] of Object.entries(BOOK.tasks)) {
       if (c.output == null) { bad(`${id}: 출력 예 없음`); continue; }
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'book-')); const up = p && p.files && p.files.upload; if (up && up.sample) fs.writeFileSync(path.join(dir, up.name), up.sample); writePreps(dir, t.prep);
       fs.writeFileSync(path.join(dir, 'main.py'), answer + pyCheck);
-      let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: c.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); continue; }
+      let out; try { out = py(['main.py'], { cwd: dir, input: c.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); continue; }
       ran++; const norm = (s) => String(s).replace(/\r/g, '').split('\n').map(x => x.replace(/\s+$/, '')).join('\n').replace(/\n+$/, '');
       if (norm(out) !== norm(c.output)) bad(`${id}: 출력이 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(out))}`);
     }
@@ -68,7 +103,7 @@ for (const [k, o2] of Object.entries(BOOK.pages || {})) { const [pl, pi] = k.spl
 for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/'); if (!(pagesOf(tl) || [])[+ti]) bad(`titles ${k}: 없는 쪽`); }
 (BOOK.builtins || []).forEach((bi, i) => { n++; const id = `내장 함수 ${bi.name}`; if (bi.ref) { const [bl, bp] = bi.ref.split('/'); if (!(pagesOf(bl) || [])[+bp]) bad(`${id}: ref ${bi.ref} 가 없는 쪽`); }
   if (VIM || SHELL || ['github', 'linux', 'os', 'api', 'asm'].includes(BOOK.check)) return; // 단축키·명령·Markdown 모음은 실행 결과가 없음(운영체제 도구 상자도 터미널 명령)
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = execFileSync('python3', ['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bi-')); fs.writeFileSync(path.join(dir, 'main.py'), bi.code); let out; try { out = py(['main.py'], { cwd: dir, input: bi.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { bad(`${id}: 실행 에러`); return; }
   ran++; if (out.replace(/\n+$/, '') !== bi.output) bad(`${id}: 결과가 달라요\n      기대: ${JSON.stringify(bi.output)}\n      실제: ${JSON.stringify(out)}`); });
 // v2.15.1 사용자 선택(알고 교과서 자체 QA 에서 손으로 찾은 두 종류를 CI 로):
 // ⑤ 레슨 본문의 「실행하면 <code>값</code>」 이 그 쪽 예제를 실제로 돌린 출력에 있는지 — 파이썬 예제는 python3, SQL 예제는 tools/sql_book_run.py(cafe)
@@ -96,7 +131,7 @@ for (const k of Object.keys(BOOK.titles || {})) { const [tl, ti] = k.split('/');
     if (ASMEX && code) { const r = asmRun(code, ex.stdin, ex.echoExit); if (r.error) { if (!((BOOK.meta && BOOK.meta.exampleErrorsOk) || []).includes(`${l.id}/${i}`)) bad(`${l.id}/${i} 「${pg.title}」 예제 ${r.stage} 에서 에러: ${String(r.error).split('\n').slice(0, 2).join(' / ')}`); return; } ran++; const o = sq(r.out); for (const v of claims) if (!o.includes(sq(v))) bad(`${l.id}/${i} 「${pg.title}」: 본문은 「실행하면 ${v}」 인데 예제 출력에 없어요 — 실제 출력 ${JSON.stringify(r.out.slice(0, 160))}`); return; } // v2.31.0 어셈블리 예제는 전부 빌드 · 실행
     if (!code || !(PYEX || SQLEX)) return; if (PYEX && /^\s*(import turtle|from turtle)/m.test(code)) return; /* 거북이는 창이 필요해서(CI 에 화면 없음) 안 돌림 */ if (!claims.length && !PYEX) return; // 파이썬 예제는 주장이 없어도 전부 돌려 봄(에러 나는 예제 찾기, BOOK.meta.exampleErrorsOk 는 일부러 에러)
     const errOk = ((BOOK.meta && BOOK.meta.exampleErrorsOk) || []).includes(`${l.id}/${i}`);
-    let out = ''; try { if (PYEX) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ex-')); writePreps(dir, ex.prep); fs.writeFileSync(path.join(dir, 'main.py'), code); out = execFileSync('python3', ['main.py'], { cwd: dir, input: ex.stdin || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); }
+    let out = ''; try { if (PYEX) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ex-')); writePreps(dir, ex.prep); fs.writeFileSync(path.join(dir, 'main.py'), code); out = py(['main.py'], { cwd: dir, input: ex.stdin || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); }
       else { const r = JSON.parse(execFileSync('python3', [R + '/tools/sql_book_run.py'], { input: JSON.stringify({ dataset: ctx.SQL_DATASETS[ex.db || 'cafe'], answer: code }), encoding: 'utf8', timeout: RUN_TIMEOUT })); if (r.error) return bad(`${l.id}/${i} 예제 실행 에러: ${r.error}`); out = r.out || r.output || ''; } }
     catch (e) { const em = String(e.stderr || e.message); if (PYEX && e.status && (errOk || /No module named '(tkinter|_tkinter|turtle)'/.test(em))) out = String(e.stdout || '') + em; /* 에러를 보여 주는 예제(트레이스백 레슨)·거북이(Windows 파이썬엔 있음) */ else return bad(`${l.id}/${i} 「${pg.title}」 예제 실행 에러: ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
     ran++; const o = sq(out); for (const v of claims) if (!o.includes(sq(v))) bad(`${l.id}/${i} 「${pg.title}」: 본문은 「실행하면 ${v}」 인데 예제 출력에 없어요 — 실제 출력 ${JSON.stringify(out.slice(0, 160))}`); });
@@ -198,7 +233,7 @@ function runVim(id, t, answer, c) {
   ran++; let got; try { got = fs.readFileSync(path.join(home, 'vim-study', fname), 'utf8'); } catch (e) { return bad(`${id}: 결과 파일 ${fname} 없음`); }
   const norm = (s) => String(s).replace(/\r/g, '').replace(/\n+$/, '');
   if (norm(got) !== norm(c.output)) return bad(`${id}: 파일이 달라요\n      기대: ${JSON.stringify(norm(c.output))}\n      실제: ${JSON.stringify(norm(got))}`);
-  if (t.py) { let out; try { out = execFileSync('python3', [fname], { cwd: path.join(home, 'vim-study'), input: t.py.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { return bad(`${id}: 파이썬 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
+  if (t.py) { let out; try { out = py([fname], { cwd: path.join(home, 'vim-study'), input: t.py.input || '', encoding: 'utf8', timeout: RUN_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { return bad(`${id}: 파이썬 실행 에러 ${String(e.stderr || e.message).trim().split('\n').pop()}`); }
     ran++; if (norm(out) !== norm(t.py.output)) bad(`${id}: 실행 결과가 달라요\n      기대: ${JSON.stringify(norm(t.py.output))}\n      실제: ${JSON.stringify(norm(out))}`); }
 }
 function runSqlTask(id, t, answer, c) {

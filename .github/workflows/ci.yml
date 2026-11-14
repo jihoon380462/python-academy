@@ -3,6 +3,7 @@ name: PR Check
 # main 의 브랜치 보호 규칙에서 "verify" 체크를 필수로 걸면, 이 잡이 초록이 아닌 PR 은 병합할 수 없다 (specs/workflow.md 8절).
 # v2.39.0 CI 줄이기: 한 줄로 서 있던 단계를 작업 셋(content · regress · web)으로 나눠 동시에 돌리고, 맨 끝 verify 가 셋을 모아요.
 #   content — check_book 을 교과서마다 동시에(tools/check_book_par.mjs, CPU 수만큼) · pip 캐시
+#             11/15~ 무거운 모듈을 쓰는 교과서 예제는 미리 불러 둔 파이썬에서 fork 해 실행(tools/pyfork.py — check_book.mjs 의 PRELOAD)
 #   regress — 고정 대기를 REGRESS_WAIT_SCALE 로 줄임(tools/regress.py 맨 위 설명)
 # 11/15 문서만 바뀐 PR(바뀐 파일이 모두 .md): 무거운 단계(설치 · check_book · run_solutions · regress · web)를 건너뛰어요(LESSON U16).
 #   판단은 tools/ci_changes.sh(맨 위 설명). 늘 도는 빠른 검사(validate_content · check_level · check_nesting · check_vocab · test_vocab)가 문서 숫자 · 단어장 줄을 봐요.
