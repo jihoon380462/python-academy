@@ -1,0 +1,96 @@
+/* 수학 교과서 시안에만 있는 스타일 — 색 · 둥글기 · 글자는 모두 사이트(core/ui.css)의 변수를 써요 */
+/* 식 한 줄 */
+.mx-eq{margin:8px 0;padding:9px 14px;border-radius:8px;background:var(--surface2);font-size:1.06em;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.6}
+.mx-left{color:var(--warn)}
+.mx-m{white-space:nowrap;font-variant-numeric:tabular-nums}
+/* 그림 */
+.mx-figs{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.mx-fig{margin:0;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);max-width:100%}
+.mx-fig.wide{flex:1 1 100%}
+.mx-fig svg{display:block;max-width:100%;height:auto}
+.mx-fig.wide svg{width:100%;max-width:440px}
+.mx-fig figcaption{margin-top:8px;font-size:.88em;color:var(--muted)}
+.fg-dot{fill:var(--primary-text)}.fg-dot.left{fill:var(--warn)}
+.fg-box{fill:none;stroke:var(--border);stroke-width:1}.fg-box.left{stroke:var(--warn);stroke-dasharray:4 3}
+.fg-arc{fill:none;stroke:var(--primary-text);stroke-width:1.6}
+.fg-num{fill:var(--surface2);stroke:var(--border)}
+.fg-axis{stroke:var(--muted);stroke-width:1.2}
+.fg-t{fill:var(--text);font-family:var(--sans);font-size:13px;font-weight:700}.fg-t.on{fill:var(--primary-text)}.fg-t.dim{fill:var(--muted);font-weight:400}.fg-t.small{fill:var(--muted);font-size:10.5px;font-weight:600}
+/* 1 ~ 12 를 하나씩 나눠 본 표 */
+.mx-nums{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:12px 0}
+.mx-num{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 2px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)}
+.mx-num b{font-size:1.1em;color:var(--muted);font-weight:600}.mx-num small{font-size:.72em;color:var(--muted);white-space:nowrap}
+.mx-num.on{border-color:var(--primary);background:rgba(31,111,235,.16)}.mx-num.on b{color:var(--text);font-weight:800}.mx-num.on small{color:var(--primary-text);font-weight:700}
+@media (max-width:560px){.mx-nums{grid-template-columns:repeat(4,minmax(0,1fr))}}
+/* 12 = 3 × 4 를 두 방향에서 읽기 */
+.mx-rel{margin:12px 0;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);text-align:center}
+.mx-rel-eq{display:flex;justify-content:center;align-items:baseline;gap:12px;font-size:1.9em;font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums}
+.mx-rel-a{color:var(--gold)}.mx-rel-b{color:var(--primary-text)}
+.mx-rel-l{display:flex;flex-direction:column;gap:2px;margin-top:8px;font-size:.95em;color:var(--muted)}.mx-rel-l b{color:var(--text)}
+/* 예제: 문제 · 풀이 단계 · 답 */
+.mx-q{margin:4px 0 10px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-weight:700;font-size:1.04em}
+.mx-q-l{display:block;font-size:.78em;font-weight:800;color:var(--primary-text);margin-bottom:2px}
+.mx-steps{list-style:none;counter-reset:mxs;margin:10px 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.mx-steps li{counter-increment:mxs;display:flex;gap:10px;align-items:flex-start;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);line-height:1.6;font-variant-numeric:tabular-nums}
+.mx-steps li::before{content:counter(mxs);flex:none;width:22px;height:22px;margin-top:2px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--border);background:var(--surface);font-size:.78em;font-weight:800;color:var(--primary-text)}
+.mx-steps li>span{min-width:0}
+.mx-ans{display:flex;gap:10px;align-items:baseline;margin:10px 0;padding:10px 14px;border:1px solid var(--success);border-radius:8px;background:rgba(63,185,80,.10);font-weight:700;font-variant-numeric:tabular-nums}
+.mx-ans-l{flex:none;color:var(--success);font-weight:800}
+.mx-why{margin:10px 0;padding:8px 0 8px 14px;border-left:3px solid var(--border);color:var(--muted)}.mx-why b{color:var(--text)}
+.mx-line{margin:2px 0 6px}
+/* 연습 문제의 답 확인 단추들 */
+.mx-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.mx-see-w{margin-top:10px}.mx-see{font-size:.88em}
+.bk-task .lbl{margin-top:12px}
+.bk-task .mx-eq{margin:8px 0 0}
+.mx-h2{margin:34px 0 4px;font-size:1.35em}
+/* 자주 하는 실수 */
+.mx-misses{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.mx-miss{padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+.mx-miss-t{display:block;margin-bottom:8px}
+.mx-miss-r{display:flex;gap:10px;align-items:flex-start;padding:6px 10px;border-radius:8px;background:var(--surface2);margin-top:6px;font-variant-numeric:tabular-nums}
+.mx-mark{flex:none;width:20px;font-weight:800;text-align:center}
+.mx-miss-r.bad .mx-mark{color:var(--danger)}.mx-miss-r.good .mx-mark{color:var(--success)}
+.mx-miss-k{display:block;font-size:.78em;font-weight:700;color:var(--muted)}
+.mx-miss p{margin:8px 0 0}
+/* B. 한 장 스크롤 */
+.mxb-wrap{max-width:780px;margin:0 auto}
+.mxb-rail{display:none}
+.mxb-title{margin-bottom:4px!important}.mxb-sub{margin:0 0 10px}
+.mxb-bar{position:sticky;top:52px;z-index:20;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:8px 16px;background:var(--bg);border-bottom:1px solid var(--border)}
+.mxb-bar::-webkit-scrollbar{display:none}.mxb-bar .chip-btn{flex:none;font-size:.9em;padding:4px 14px}
+.mxb-sec{scroll-margin-top:112px}
+.mxb-h{margin:30px 0 10px;font-size:1.4em}.mxb-sec:first-child .mxb-h{margin-top:18px}
+.mxb-k{display:block;font-size:.58em;font-weight:800;color:var(--primary-text);letter-spacing:.02em;margin-bottom:2px}
+@media (min-width:1100px){
+  .mxb-wrap{max-width:1030px;display:grid;grid-template-columns:200px minmax(0,780px);gap:34px;align-items:start}
+  .mxb-rail{display:flex;flex-direction:column;gap:2px;position:sticky;top:78px;padding-top:54px}
+  .mxb-rl{display:block;width:100%;padding:7px 12px;border:0;border-left:2px solid var(--border);background:none;color:var(--muted);font:inherit;font-size:.92em;text-align:left;cursor:pointer}
+  .mxb-rl:hover{color:var(--text)}.mxb-rl.on{border-left-color:var(--primary);color:var(--text);font-weight:700}
+  .mxb-bar{display:none}.mxb-main{margin:0}.mxb-sec{scroll-margin-top:76px}
+}
+/* C. 단계 카드 */
+.mxc-prog{position:sticky;top:52px;z-index:20;display:flex;align-items:center;gap:12px;margin:0 -16px 12px;padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--border)}
+.mxc-count{flex:none;font-size:.9em;color:var(--muted);font-variant-numeric:tabular-nums}.mxc-count b{color:var(--text);font-size:1.15em}
+.mxc-bar{flex:1;height:6px;border-radius:99px;background:var(--surface2);overflow:hidden}.mxc-bar i{display:block;height:100%;border-radius:99px;background:var(--primary);transition:width .25s}
+.mxc-card{padding:16px;margin-bottom:12px;scroll-margin-top:112px}.mxc-card.cur{border-color:var(--primary)}
+.mxc-h{display:flex;gap:10px;align-items:center;margin-bottom:10px}.mxc-h h2{margin:0;font-size:1.25em;line-height:1.35;word-break:keep-all}
+.mxc-card .bk-tasks{margin-top:12px}.mxc-card .bk-task{background:var(--surface2)}.mxc-card .mx-steps li{background:var(--bg)}.mxc-card .bk-task .mx-steps li{background:var(--surface)}
+.mxc-card .mx-fig,.mxc-card .mx-q,.mxc-card .mx-rel,.mxc-card .mx-miss{background:var(--surface2)}.mxc-card .mx-eq,.mxc-card .mx-miss-r,.mxc-card .lp-scene{background:var(--bg)}
+.mxc-next{width:100%;min-height:52px;margin-top:4px;font-size:1.02em}
+.mxc-hint{text-align:center;margin:8px 0 0}
+@media (max-width:767px){.only-pc-hint{display:none}}
+/* 목차 ㄴ. 챕터 접기 */
+.mxt-list{display:flex;flex-direction:column;gap:8px}
+.mxt-ch{border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden}.mxt-ch.open{border-color:var(--primary)}
+.mxt-h{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:12px 14px;border:0;background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.mxt-h .bk-ch-n{flex:none;font-size:.95em}
+.mxt-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.mxt-t b{font-size:1.05em}.mxt-t .small{line-height:1.5}
+.mxt-r{flex:none;white-space:nowrap}.mxt-chev{flex:none;width:16px;color:var(--muted)}
+.mxt-ch .bk-list{padding:0 10px 10px}
+@media (max-width:560px){.mxt-r{display:none}}
+/* 시안 고르기 줄 — 실제 화면에는 없어요 */
+#mkSw{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 12px;border-bottom:2px dashed var(--gold);background:var(--bg);font-size:.86em}
+#mkSw b{color:var(--gold)}.mk-note{color:var(--muted);flex:1 1 220px}
+#mkSw label{display:inline-flex;align-items:center;gap:6px;color:var(--muted)}#mkSw select{min-height:36px;padding:4px 8px;font-size:1em}
+.mk-bare #mkSw{display:none}
