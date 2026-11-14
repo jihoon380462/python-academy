@@ -124,7 +124,7 @@ for (const f of walk(ROOT)) { const s = fs.readFileSync(f, 'utf8'); if (/<head>/
 // 11/15: specs/README.md(지시서 목록)가 specs/ 의 모든 .md 를 적고 있는지, 적힌 파일이 있는지 —
 //   목록이 문서 여덟만 적은 채 「시행 중 · 구현 전 · 덱 채우기 전」 으로 낡아 있었어요(LESSON.md R15). 지시서를 더하거나 지우면 목록도 같이 고쳐요
 { const dir = path.join(ROOT, 'specs'), t = fs.readFileSync(path.join(dir, 'README.md'), 'utf8');
-  const all = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? all(path.join(d, e.name)) : e.name.endsWith('.md') ? [path.relative(dir, path.join(d, e.name)).split(path.sep).join('/')] : []);
+  const all = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.name.startsWith('.') ? [] /* .out 같은 만든 파일 폴더(.gitignore)는 지시서가 아니에요 */ : e.isDirectory() ? all(path.join(d, e.name)) : e.name.endsWith('.md') ? [path.relative(dir, path.join(d, e.name)).split(path.sep).join('/')] : []);
   for (const rel of all(dir)) if (rel !== 'README.md' && !t.includes('`' + rel + '`')) err('specs/README.md: 목록에 없는 문서: `' + rel + '` — 지시서를 더하면 목록에도 한 줄 적어요');
   for (const m of t.matchAll(/^\| `([^`]+\.md)` \|/gm)) if (!fs.existsSync(path.join(dir, m[1]))) err('specs/README.md: 목록에 적힌 `' + m[1] + '` 파일이 없어요 — 지운 지시서는 목록에서도 빼요'); }
 // v2.48.0: 교과서 사이 링크(href="../<코스>/…")가 있는 코스 폴더를 가리키는지 — 수학 교과서를 지울 때 다른 교과서 23곳에 수학 링크가 있었어요(LESSON.md U15).
