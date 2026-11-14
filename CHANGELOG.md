@@ -15,6 +15,14 @@
   - 정정: 예전 글은 Fable 만 붙인다고 적었어요.
 - 아래 항목은 모두 문서 · 설정 · 검사만 바꾼 것이라 버전 없이 main 에 머지됐어요(맨 위 11/15 항목 다음부터 PR #188 · #169 · #128 · #122).
 
+- 🔧 **check_book: 무거운 모듈을 미리 불러 둔 파이썬에서 예제 실행**(11/15 Claude)
+  - 설정 · 검사만 · 화면 변화 없음 · 버전 그대로 v2.48.0
+  - 데이터 분석 · 머신러닝 · LLM · 파일 · 업무 자동화 교과서는 pandas · scikit-learn · numpy · openpyxl · docx 같은 모듈을 한 번 불러 둔 파이썬(`tools/pyfork.py`)에서, 예제마다 fork 한 새 프로세스로 실행해요. 예제마다 python3 를 새로 띄우며 모듈을 다시 불러오던 시간(pandas 0.44초 · scikit-learn 1.2초)이 빠져요
+  - 결과는 같아요: 다섯 교과서의 파이썬 실행 748번을 두 방식으로 돌려 출력 · 에러 글 · 종료 코드를 대조했어요. 다른 것은 예제가 tempfile 로 만든 무작위 폴더 이름 2개뿐(예전 방식끼리도 매번 달라요). `python3 main.py` 와 같게 맞춘 14가지(트레이스백 · 문법 에러 · sys.exit · atexit · 스레드 · 내 모듈 import 등)도 글자까지 같아요
+  - 시간(로컬, 다섯 교과서 동시): 데이터 분석 93.5 → 27.1초 · 머신러닝 86.1 → 30.5초 · LLM 73.2 → 35.9초 · 파일 48.5 → 16.4초 · 업무 자동화 41.2 → 25.6초. 교과서 20개 전체(check_book_par, 4개 동시): 112.9 → 66.9초
+  - `CHECK_BOOK_FORK=0` 이면 예전 방식, `CHECK_BOOK_DUMP=<파일>` 이면 파이썬 실행마다 출력을 남겨요(비교용). 서버를 못 띄우면 예전 방식으로 돌아가고 한 줄 알려요
+  - `check_book_par` 실행 순서를 새 측정값으로
+
 - 🔧 **CI: 문서만 바뀐 PR 은 무거운 검사를 건너뛰어요**(11/15 Claude)
   - 설정 · 검사만 · 화면 변화 없음 · 버전 그대로 v2.48.0
   - 바뀐 파일이 모두 `.md` 면 설치 · check_book · run_solutions · regress · web 을 건너뛰고, 빠른 검사(validate_content · check_level · check_nesting · check_vocab · test_vocab)만 돌아요. 판단은 `tools/ci_changes.sh`(PR 의 merge 커밋을 main 끝과 비교). 건너뛴 단계는 성공으로 끝나 `verify` 는 그대로예요

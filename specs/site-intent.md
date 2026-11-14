@@ -370,6 +370,7 @@ python3 tools/regress.py        # 화면 회귀(Playwright). 끝 줄 FAILS 0 이
 ```
 
 - CI 는 `check_book.mjs` 대신 `check_book_par.mjs`(교과서마다 동시에)를 써요. 검사 내용은 같아요.
+- check_book 은 데이터 분석 · 머신러닝 · LLM · 파일 · 업무 자동화 교과서의 파이썬 예제를, 무거운 모듈(pandas · scikit-learn …)을 미리 불러 둔 파이썬에서 예제마다 fork 해 실행해요(`tools/pyfork.py`, 목록은 check_book.mjs 의 `PRELOAD`). 정상이에요. 출력 · 에러 글 · 종료 코드는 `python3 main.py` 와 같아요. 결과가 이상하면 `CHECK_BOOK_FORK=0` 으로 예전 방식과 비교해요.
 - 문서(.md)만 바뀐 PR 은 CI 가 무거운 단계(설치 · check_book · run_solutions · regress · web)를 건너뛰어요(`tools/ci_changes.sh`). 정상이에요. 그 검사들과 사이트 코드는 .md 를 읽지 않고, 문서 숫자 · 단어장 줄은 늘 도는 validate_content · check_vocab 이 봐요.
 
 ### `check_book` 이 보는 것

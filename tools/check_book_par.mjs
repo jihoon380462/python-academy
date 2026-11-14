@@ -7,9 +7,10 @@
 import fs from 'fs'; import os from 'os'; import path from 'path'; import { spawn } from 'child_process';
 const R = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const N = Math.max(1, +process.argv[2] || os.cpus().length);
-// CI 기록에서 오래 걸린 순(11/15 PR #196 실행, 초): data 97.5 · ml 88.9 · python 58.4 · llm 47.3 · vim 33.5 · files 26.9 · auto 22.4 · debug 19.8 · asm 12.1 ·
-//   api 11.9 · cs 11.1 · os 8.7 · algo 7.9 · ai 4.8 · terminal-git 3.7 · oop 3.6 · github 3.3 · sql 3.1 · linux 1.2 · web 0.2. 예전 목록(v2.37.0)은 vim · files · auto 가 뒤에 있어 끝에 셋이 남아 기다렸어요.
-const HEAVY = ['data', 'ml', 'python', 'llm', 'vim', 'files', 'auto', 'debug', 'asm', 'api', 'cs', 'os', 'algo', 'ai', 'terminal-git', 'oop', 'github', 'sql', 'linux', 'web'];
+// 오래 걸린 순(11/15 pyfork 적용 뒤 로컬 측정, 초): python 49.3 · llm 41.7 · vim 33.5 · ml 29.0 · data 24.9 · files 12.4 · debug 11.8 · auto 11.0 · api 9.4 ·
+//   os 8.0 · asm 7.7 · cs 5.9 · algo 5.3 · ai 3.7 · oop 2.8 · terminal-git 2.6 · github 2.6 · sql 2.5 · linux 1.1 · web 0.1. 합 265초 ÷ 4 = 66초가 하한이라 순서는 거의 최선.
+//   (pyfork 전 CI 11/15: data 97.5 · ml 88.9 · python 58.4 · llm 47.3 · vim 33.5 … — 예전 목록(v2.37.0)은 vim · files · auto 가 뒤에 있어 끝에 셋이 남아 기다렸어요)
+const HEAVY = ['python', 'llm', 'vim', 'ml', 'data', 'files', 'debug', 'auto', 'api', 'os', 'asm', 'cs', 'algo', 'ai', 'oop', 'terminal-git', 'github', 'sql', 'linux', 'web'];
 const all = fs.readdirSync(R + '/courses').filter(d => fs.existsSync(`${R}/courses/${d}/book.js`));
 const queue = [...HEAVY.filter(c => all.includes(c)), ...all.filter(c => !HEAVY.includes(c))];
 let fails = 0; let running = 0; const t0 = Date.now();
