@@ -1,4 +1,4 @@
-// core/figure.js — 수학 공간 그림 엔진 (docs/EXPANSION.md 14절, M1 = v2.3.0). 파라미터 기반: 슬라이더·드래그·버튼이 바뀌면 JS만으로 즉시 다시 그린다(Pyodide 왕복 없음).
+// core/figure.js — 교과서 그림 엔진 (v2.3.0 수학 공간에서 시작, docs/EXPANSION.md 14절. 수학 교과서는 v2.48.0 에 지웠고 지금은 운영체제 교과서 그림이 써요). 파라미터 기반: 슬라이더·드래그·버튼이 바뀌면 JS만으로 즉시 다시 그린다(Pyodide 왕복 없음).
 //   Fig.mount(host, figure, params, { defs, onChange, static, height }) → { params, set(p), redraw(), state, destroy() }
 //   figure: { kind, ...옵션, note?:'그림 아래 한 줄', buttons?:[{label, act(state, p)}] }   params: { id: 값 }   defs(레슨 params[]): [{id,label,min,max,step,default,unit?}]
 //   kind 목록 (M1): modring sieve euclid bits floatline plot bars tree hist venn montecarlo cells scatter vector transform unitcircle

@@ -46,7 +46,7 @@ import argparse
 ap=argparse.ArgumentParser(); ap.add_argument('--out'); ap.add_argument('--w',type=int,default=1440); ap.add_argument('--h',type=int,default=900); ap.add_argument('--theme',default='dark'); ap.add_argument('--font',default='1'); ap.add_argument('--shots',type=int,default=1); ap.add_argument('courses',nargs='*')
 A=ap.parse_args(); OUT=A.out
 want_vocab=(not A.courses) or ('vocab' in A.courses)  # v2.46.0: 영어 단어장은 교과서가 아니라 아래에서 따로 봐요(코스 id 자리에 vocab)
-courses=[c for c in (A.courses or ['python','algo','math','terminal-git','github','sql','web','vim','linux','os','asm','cs','llm','api','debug','data','oop','ml','ai','files','auto']) if c!='vocab']
+courses=[c for c in (A.courses or ['python','algo','terminal-git','github','sql','web','vim','linux','os','asm','cs','llm','api','debug','data','oop','ml','ai','files','auto']) if c!='vocab']
 with sync_playwright() as p:
     b=p.chromium.launch(executable_path='/usr/bin/google-chrome',args=['--no-sandbox'])
     for c in courses:
@@ -62,7 +62,7 @@ with sync_playwright() as p:
         for lid,i in views:
             if lid in ('home','dogam'): pg.evaluate(f"UI.go('{lid}')")
             else: pg.evaluate(f"UI.go('lesson',{{lessonId:'{lid}',page:{i}}})")
-            pg.wait_for_timeout(90 if c!='math' else 250); pg.evaluate("window.scrollTo(0,0)")
+            pg.wait_for_timeout(90); pg.evaluate("window.scrollTo(0,0)")
             m=pg.evaluate(MEASURE); m.update(pg.evaluate(EXTRA)); m['docOver']=pg.evaluate('document.documentElement.scrollWidth')>A.w; rep[f'{lid}/{i}']=m
             (pg.screenshot(path=f'{OUT}/{c}/{lid}_{i}.png', full_page=True) if A.shots else None)
         pg.close()

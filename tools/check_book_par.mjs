@@ -7,7 +7,7 @@
 import fs from 'fs'; import os from 'os'; import path from 'path'; import { spawn } from 'child_process';
 const R = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const N = Math.max(1, +process.argv[2] || os.cpus().length);
-const HEAVY = ['data', 'ml', 'python', 'llm', 'debug', 'cs', 'algo', 'math', 'oop', 'ai', 'os', 'asm', 'api', 'vim']; // CI 기록(v2.37.0)에서 오래 걸린 순
+const HEAVY = ['data', 'ml', 'python', 'llm', 'debug', 'cs', 'algo', 'oop', 'ai', 'os', 'asm', 'api', 'vim']; // CI 기록(v2.37.0)에서 오래 걸린 순
 const all = fs.readdirSync(R + '/courses').filter(d => fs.existsSync(`${R}/courses/${d}/book.js`));
 const queue = [...HEAVY.filter(c => all.includes(c)), ...all.filter(c => !HEAVY.includes(c))];
 let fails = 0; let running = 0; const t0 = Date.now();

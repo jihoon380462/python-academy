@@ -38,7 +38,7 @@ const BOOK = {
     heroP: 'ChatGPT 같은 LLM 은 사실 <b>「다음 글자 맞히기」</b> 를 아주 크게 한 거예요. 글자 세기부터 시작해 확률 · 손실 · 경사하강 · 어텐션 · 트랜스포머까지, <b>numpy 로 처음부터 직접</b> 만들어 보고, 마지막엔 내가 학습시킨 작은 모델이 그럴듯한 문장을 지어내게 해요 — 「완벽하게가 아니라 이런 느낌으로 움직인다」 까지.',
     dexName: 'LLM 도감', dexShort: '도감', dexWhat: '코드·식', dexHint: '「손실」「어텐션」 처럼 한국어로도 찾기',
     dexExamples: '<code>softmax</code>, <code>@</code>, <code>random.choices</code>, <code>어텐션</code>', dexPlaceholder: '🔍 찾기 — softmax, 손실, 임베딩, 어텐션 …', dexAlt: '「점수 → 확률」 대신 <code>softmax</code>',
-    dexDocs: '<a href="https://numpy.org/doc/stable/" target="_blank" rel="noopener">numpy 문서</a> · 수학은 <a href="../math/" target="_blank" rel="noopener">수학 공간 ↗</a>(벡터 · 확률)',
+    dexDocs: '<a href="https://numpy.org/doc/stable/" target="_blank" rel="noopener">numpy 문서</a>',
     dexRun: '코드는 📋 복사해서 VS Code 의 .py 파일에 붙여 실행할 수 있고', builtinsName: '자주 보는 식', builtinsSub: '소프트맥스 · 손실 · 경사하강 · 어텐션', builtinsChip: '🧮 자주 보는 식',
     copyToast: '📋 복사했어요. VS Code 의 .py 파일에 붙여 넣어요 — 학습 글이 필요한 코드는 같은 폴더에 data.txt 가 있어야 해요',
     exampleLabel: '예제 코드 — VS Code 의 .py 파일로 실행',
