@@ -28,6 +28,7 @@
   - 설정 · 검사만 · 화면 변화 없음 · 버전 그대로 v2.48.0
   - 바뀐 파일이 모두 `.md` 면 설치 · check_book · run_solutions · regress · web 을 건너뛰고, 빠른 검사(validate_content · check_level · check_nesting · check_vocab · test_vocab)만 돌아요. 판단은 `tools/ci_changes.sh`(PR 의 merge 커밋을 main 끝과 비교). 건너뛴 단계는 성공으로 끝나 `verify` 는 그대로예요
   - 까닭: 문서 한 줄 PR 도 CI 가 3분 15초(PR #196). 무거운 검사와 사이트 코드는 .md 를 읽지 않아요(읽는 것은 늘 도는 validate_content · check_vocab 뿐)
+  - CI 실측: 문서만 바뀐 PR #199 는 18초(content 10초 · regress 11초 · web 5초, 무거운 단계는 「건너뜀」 · verify 초록)
   - `check_book_par` 실행 순서를 이번 CI 측정값(오래 걸린 순)으로. 끝에 vim · files · auto 셋이 남아 기다리던 것을 줄여요
   - 기록: LESSON U16 · HANDOFF 2절 7번 · 3절 · site-intent
 
