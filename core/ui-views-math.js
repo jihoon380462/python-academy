@@ -1,4 +1,4 @@
-// core/ui-views-math.js — 수학 교과서의 그림·식 (v2.3.0 수학 공간 → v2.19.0 N13: 교과서 화면에 쓰는 것만 남김)
+// core/ui-views-math.js — 교과서의 그림·식 (v2.3.0 수학 공간 → v2.19.0 N13: 교과서 화면에 쓰는 것만 남김 → v2.48.0 수학 교과서를 지운 뒤로는 운영체제 교과서 그림이 써요)
 //   MathUI.lessonFigure(host, lesson, page)  레슨 1쪽의 만지는 그림 + 파라미터 슬라이더(core/figure.js)
 //   MathUI.formula(host, list)  KaTeX(있으면) 또는 글자 수식
 //   예전 문제집 화면(지식 지도 · 탐구 퀴즈 · 숫자 답 · 그림 맞추기 · 짝짓기)은 archive/classic/core/ui-views-math.js

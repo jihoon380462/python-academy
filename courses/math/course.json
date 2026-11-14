@@ -1,1 +1,0 @@
-{ "id": "math", "name": "수학 공간", "icon": "📐", "desc": "프로그래머 수학 — 그림을 만지며 배우고, 계산은 파이썬이", "runner": "python", "mapColor": "#e91e63", "mascotGear": "gradcap", "map": "graph", "space": true }

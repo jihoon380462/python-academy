@@ -86,6 +86,10 @@ for (const f of walk(ROOT)) { const s = fs.readFileSync(f, 'utf8'); if (/<head>/
   for (const [f, verRe] of [['CLAUDE.md', /지금 v([\d.]+)/], ['HANDOFF.md', /배포된 버전\*{0,2} \| \*{0,2}v([\d.]+)/], ['TODO.md', /배포된 버전\*{0,2} \| \*{0,2}v([\d.]+)/], ['README.md', null]]) {
     const t = fs.readFileSync(path.join(ROOT, f), 'utf8'); const v = verRe && t.match(verRe); if (verRe && !v) err(`${f}: 「지금 버전」 줄을 못 찾았어요 — 이 검사가 읽는 모양(${verRe})`); else if (v && v[1] !== ver) err(`${f}: 문서의 버전 v${v[1]} ≠ APP_VERSION ${ver} (배포할 때 CLAUDE.md · HANDOFF.md 0절 · TODO.md 를 같이 고쳐요)`);
     const n = t.match(/(\d+)개 · 레슨 (\d+)/); if (!n) err(`${f}: 「N개 · 레슨 M」 줄을 못 찾았어요`); else if (+n[1] !== nC || +n[2] !== nL) err(`${f}: 문서의 「${n[1]}개 · 레슨 ${n[2]}」 ≠ 실제 코스 ${nC}개 · 레슨 ${nL} (core/config.js 의 COURSES)`); } }
+// v2.48.0: 교과서 사이 링크(href="../<코스>/…")가 있는 코스 폴더를 가리키는지 — 수학 교과서를 지울 때 다른 교과서 23곳에 수학 링크가 있었어요(LESSON.md U15).
+//   코스를 지우거나 폴더 이름을 바꾸면 여기서 잡혀요
+{ const have = new Set(courses()); for (const id of courses()) for (const f of ['content.js', 'book.js']) { const fp = path.join(ROOT, 'courses', id, f); if (!fs.existsSync(fp)) continue;
+    for (const m of fs.readFileSync(fp, 'utf8').matchAll(/href=\\?["']\.\.\/([a-z0-9-]+)\//g)) if (!have.has(m[1])) err(`${id}/${f}: 없는 코스로 가는 링크 ../${m[1]}/ — courses/${m[1]} 폴더가 없어요(지운 코스를 가리키는 링크는 빼요)`); } }
 console.log(`APP_VERSION ${ver} · 총 레슨 ${totals.lessons} · 문제 ${totals.problems}`);
 warns.forEach(w => console.log('  ⚠ ' + w));
 if (errors.length) { console.error(`✗ 에러 ${errors.length}개`); errors.forEach(e => console.error('  ' + e)); process.exit(1); }

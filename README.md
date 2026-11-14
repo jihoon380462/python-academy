@@ -8,7 +8,7 @@
 
 ## 코스
 
-교과서 21개 · 레슨 540 (`core/config.js` 의 `COURSES`). 모두 📖 교과서예요. 순서는 허브 묶음 순서예요.
+교과서 20개 · 레슨 495 (`core/config.js` 의 `COURSES`). 모두 📖 교과서예요. 순서는 허브 묶음 순서예요.
 
 허브 맨 위 「🎓 필수교양」 에는 영어 단어장(`/vocab/`)이 있어요. 교과서가 아니라 Anki 방식 단어장이에요(설계 [`specs/vocab.md`](specs/vocab.md)).
 
@@ -24,7 +24,6 @@
 | 🌐 웹과 서비스 | 웹 | `/courses/web/` | 34 (HTML · CSS · JS) | VS Code + Live Server + 브라우저 |
 | 〃 | HTTP·API·SDK | `/courses/api/` | 21 (HTTP → requests → FastAPI → SDK) | VS Code + 파이썬 requests + curl + 브라우저 F12 |
 | 〃 | 데이터베이스(SQL) | `/courses/sql/` | 17 | DB Browser for SQLite |
-| 📊 데이터와 AI | 수학 공간 | `/courses/math/` | 45 (그림 만지기) | 브라우저 그림 + VS Code + 파이썬 |
 | 〃 | 데이터 분석 | `/courses/data/` | 18 | VS Code + 파이썬 + pandas · matplotlib |
 | 〃 | AI·머신러닝 기초 | `/courses/ml/` | 16 | VS Code + 파이썬 + numpy · scikit-learn |
 | 〃 | LLM 기초 | `/courses/llm/` | 20 | VS Code + 파이썬 + numpy |
@@ -74,7 +73,7 @@
 - 저장 `storage.js` · `sync.js`
 - 설정값 `config.js` (`APP_VERSION` · `COURSES`)
 - 알고리즘 그림 `visualize.js` + `runners/python.js`
-- 수학 그림 `figure.js` + `ui-views-math.js`
+- 교과서 그림 `figure.js` + `ui-views-math.js`(운영체제 교과서가 써요 — 수학 교과서는 v2.48.0 에 지웠어요)
 
 맨 위의 문서
 
