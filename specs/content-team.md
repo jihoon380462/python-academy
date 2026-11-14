@@ -8,7 +8,7 @@
 |---|---|
 | 상태 | **지금은 쓰지 않아요** — 기록용 |
 | 까닭 | v2.19.0(TODO D12 · N13)에 옛 문제집 화면(문제 풀기 · 채점 · 가짜 셸 · 브라우저 SQL · 웹 편집기)을 사이트에서 빼서 [`archive/classic/`](../archive/classic/README.md) 에 보관했어요 |
-| 지금 사이트 | 21개 코스 전부 교과서. 연습은 내 PC 의 도구(VS Code · Git Bash · DB Browser)로 해요 |
+| 지금 사이트 | 모든 코스가 교과서(코스 수 · 목록은 [`README.md`](../README.md)). 연습은 내 PC 의 도구(VS Code · Git Bash · DB Browser)로 해요 |
 | 지금 따를 규칙 | [`CLAUDE.md`](../CLAUDE.md) → [`HANDOFF.md`](../HANDOFF.md) · [`specs/site-intent.md`](site-intent.md) · [`LESSON.md`](../LESSON.md) |
 
 이 문서에 나오는 파일이 지금 있는 곳 (11/8 확인)

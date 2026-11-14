@@ -24,7 +24,7 @@
 | 🌐 웹과 서비스 | 웹 | `/courses/web/` | 34 (HTML · CSS · JS) | VS Code + Live Server + 브라우저 |
 | 〃 | HTTP·API·SDK | `/courses/api/` | 21 (HTTP → requests → FastAPI → SDK) | VS Code + 파이썬 requests + curl + 브라우저 F12 |
 | 〃 | 데이터베이스(SQL) | `/courses/sql/` | 17 | DB Browser for SQLite |
-| 〃 | 데이터 분석 | `/courses/data/` | 18 | VS Code + 파이썬 + pandas · matplotlib |
+| 📊 데이터와 AI | 데이터 분석 | `/courses/data/` | 18 | VS Code + 파이썬 + pandas · matplotlib |
 | 〃 | AI·머신러닝 기초 | `/courses/ml/` | 16 | VS Code + 파이썬 + numpy · scikit-learn |
 | 〃 | LLM 기초 | `/courses/llm/` | 20 | VS Code + 파이썬 + numpy |
 | ⚙️ 컴퓨터 깊이 | CS | `/courses/cs/` | 23 | VS Code + 파이썬 |

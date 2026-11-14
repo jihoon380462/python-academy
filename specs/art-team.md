@@ -1,5 +1,14 @@
 # 아트 검수·요청팀 지시서 (Opus) — 파이썬 아카데미
 
+## 지금 상태 (11/15 확인)
+
+- ⚠ **낡은 문서예요.** 팀 채팅을 나눠 일하던 때(11/2 ~ 11/6)의 지시서이고 지금은 쓰지 않아요([`workflow.md`](workflow.md) 「지금 상태」).
+- 이 문서가 다루는 그림(코스 · 보스 · 뱃지 · 챕터 장식)은 옛 문제집 화면의 것이에요. 그 화면과 그림은 v2.19.0 에 [`archive/classic/`](../archive/classic/README.md) 로 옮겼고, 요청서 `docs/IMAGES.md` 도 `archive/classic/docs-IMAGES.md` 로 옮겼어요.
+- 「버전은 Fable」 같은 권한 구분은 옛 규칙이에요. 지금 규칙은 [`CLAUDE.md`](../CLAUDE.md) → [`HANDOFF.md`](../HANDOFF.md) 예요.
+- 남은 일은 하나예요: 8차 아트(선 아이콘) 납품 뒤 검수 — 보류([`TODO.md`](../TODO.md) 1-5).
+
+아래는 그때 글 그대로예요.
+
 읽는 순서: HANDOFF.md → specs/workflow.md(1·7·8절) → docs/IMAGES.md → 이 파일.  그림 파일 자체는 ChatGPT(생성기)가 만든다. 이 팀은 **요청서를 쓰고, 납품을 검수하고, 통과한 것만 PR로 올린다.**
 
 ## 1. 역할 두 가지

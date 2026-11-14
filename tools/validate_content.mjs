@@ -85,7 +85,48 @@ for (const f of walk(ROOT)) { const s = fs.readFileSync(f, 'utf8'); if (/<head>/
 { const cx = { window: {} }; vm.createContext(cx); vm.runInContext(cfg.replace(/^(const|let) /gm, 'var '), cx); const ready = (cx.CONFIG.COURSES || []).filter(x => x.ready && x.book) /* v2.46.0: 교과서만 — 영어 단어장(deck)은 레슨 수가 없어 세지 않아요 */; const nC = ready.length, nL = ready.reduce((n, x) => n + x.lessons, 0);
   for (const [f, verRe] of [['CLAUDE.md', /지금 v([\d.]+)/], ['HANDOFF.md', /배포된 버전\*{0,2} \| \*{0,2}v([\d.]+)/], ['TODO.md', /배포된 버전\*{0,2} \| \*{0,2}v([\d.]+)/], ['README.md', null]]) {
     const t = fs.readFileSync(path.join(ROOT, f), 'utf8'); const v = verRe && t.match(verRe); if (verRe && !v) err(`${f}: 「지금 버전」 줄을 못 찾았어요 — 이 검사가 읽는 모양(${verRe})`); else if (v && v[1] !== ver) err(`${f}: 문서의 버전 v${v[1]} ≠ APP_VERSION ${ver} (배포할 때 CLAUDE.md · HANDOFF.md 0절 · TODO.md 를 같이 고쳐요)`);
-    const n = t.match(/(\d+)개 · 레슨 (\d+)/); if (!n) err(`${f}: 「N개 · 레슨 M」 줄을 못 찾았어요`); else if (+n[1] !== nC || +n[2] !== nL) err(`${f}: 문서의 「${n[1]}개 · 레슨 ${n[2]}」 ≠ 실제 코스 ${nC}개 · 레슨 ${nL} (core/config.js 의 COURSES)`); } }
+    // 11/15: 첫 곳만 보던 것을 문서의 모든 곳으로 — HANDOFF.md 는 0절 상태판만 맞고 1절 「코스 현황」 은 수학을 지운 뒤에도 「21개 · 레슨 540」 이었어요(LESSON.md R15)
+    const ns = [...t.matchAll(/(\d+)개 · 레슨 (\d+)/g)]; if (!ns.length) err(`${f}: 「N개 · 레슨 M」 줄을 못 찾았어요`);
+    for (const n of ns) if (+n[1] !== nC || +n[2] !== nL) err(`${f}:${t.slice(0, n.index).split('\n').length}: 문서의 「${n[1]}개 · 레슨 ${n[2]}」 ≠ 실제 코스 ${nC}개 · 레슨 ${nL} (core/config.js 의 COURSES) — 옛 수를 적어야 하면 「21 → 20개」 처럼 다른 모양으로 써요`); }
+  // 11/15: 코스를 되풀이해 적은 표도 데이터와 대조해요 — 수학을 지울 때(v2.48.0) README 코스 표에서 수학 줄과 함께 묶음 이름이 지워져,
+  //   데이터 분석 · 머신러닝 · LLM 이 「웹과 서비스」 아래로 읽혔어요(LESSON.md R15). 표 모양이 바뀌어 줄을 못 찾아도 실패해요(조용히 넘기지 않기 — R6)
+  const cats = cx.CONFIG.CATEGORIES || [], catOf = (id) => cats.find(c => (c.courses || []).includes(id)), rd = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
+  { // README.md 코스 표: | 묶음(〃 = 윗줄과 같음) | 코스 | `/courses/<id>/` | 레슨 수 … |
+    const rows = new Map(); let cur = '';
+    for (const line of rd('README.md').split('\n')) { const m = line.match(/^\| ([^|]+) \| [^|]+ \| `\/courses\/([a-z0-9-]+)\/` \| (\d+)/); if (!m) continue;
+      if (m[1].trim() !== '〃') cur = m[1].trim(); if (rows.has(m[2])) err('README.md: 코스 표에 ' + m[2] + ' 줄이 두 번 있어요'); rows.set(m[2], { cat: cur, n: +m[3] }); }
+    if (!rows.size) err('README.md: 코스 표(| 묶음 | 코스 | `/courses/<id>/` | 레슨 |)를 못 찾았어요');
+    else { for (const x of ready) { const r = rows.get(x.id), c = catOf(x.id); if (!r) { err(`README.md: 코스 표에 ${x.id}(${x.name}) 줄이 없어요`); continue; }
+        if (r.n !== x.lessons) err(`README.md: 코스 표의 ${x.id} 레슨 ${r.n} ≠ 실제 ${x.lessons}`);
+        if (c && !r.cat.includes(c.name)) err(`README.md: 코스 표의 ${x.id} 줄이 「${r.cat}」 묶음 아래에 있어요 — 실제 묶음은 「${c.name}」(묶음의 첫 줄에는 〃 대신 묶음 이름을 적어요)`); }
+      for (const id of rows.keys()) if (!ready.some(x => x.id === id)) err(`README.md: 코스 표에 지금 없는 교과서가 있어요: ${id}`); } }
+  { // HANDOFF.md 1절 「코스 현황」 표: | 순서 | 묶음 | 코스 레슨 수 · 코스 레슨 수 … | — 괄호 안 글은 빼고, 항목마다 맨 끝 숫자를 레슨 수로 읽어요
+    const rows = rd('HANDOFF.md').split('\n').filter(l => /^\| \d+ \| /.test(l)).map(l => l.split('|').map(s => s.trim()));
+    for (const c of cats) { const want = (c.courses || []).map(id => ready.find(x => x.id === id)).filter(Boolean).map(x => x.lessons); if (!want.length) continue; // 교과서가 없는 묶음(필수교양 = 단어장)은 레슨 수가 없어요
+      const row = rows.find(r => (r[2] || '').includes(c.name)); if (!row) { err(`HANDOFF.md: 1절 「코스 현황」 표에 「${c.name}」 묶음 줄이 없어요`); continue; }
+      const got = (row[3] || '').replace(/\([^)]*\)/g, '').split(' · ').map(s => +((s.trim().match(/(\d+)$/) || [])[1]));
+      if (got.join(',') !== want.join(',')) err(`HANDOFF.md: 1절 「코스 현황」 표의 「${c.name}」 레슨 수 [${got.join(' · ')}] ≠ 실제 [${want.join(' · ')}] (core/config.js 의 CATEGORIES 순서대로)`); } }
+  { // specs/site-intent.md 2절 코스 표: | 코스 | `courses/<id>/`(여럿이면 `courses/a · b/`) | 레슨 수(같은 순서) | … 와 그 위의 「N개 코스 모두」
+    const t = rd('specs/site-intent.md'), seen = new Map();
+    for (const line of t.split('\n')) { const m = line.match(/^\| [^|]+ \| `courses\/([^`]+)\/` \| ([^|]+) \|/); if (!m) continue; const nums = m[2].split(' · ').map(s => parseInt(s, 10));
+      m[1].split(' · ').forEach((id, i) => { id = id.trim(); if (seen.has(id)) err('specs/site-intent.md: 2절 코스 표에 두 번 나온 코스: ' + id); seen.set(id, nums[i]); }); }
+    if (!seen.size) err('specs/site-intent.md: 2절 코스 표(| 코스 | `courses/<id>/` | 레슨 |)를 못 찾았어요');
+    else { for (const x of ready) { if (!seen.has(x.id)) err(`specs/site-intent.md: 2절 코스 표에 없는 코스: ${x.id}(${x.name})`); else if (seen.get(x.id) !== x.lessons) err(`specs/site-intent.md: 2절 코스 표의 ${x.id} 레슨 ${seen.get(x.id)} ≠ 실제 ${x.lessons}`); }
+      for (const id of seen.keys()) if (!ready.some(x => x.id === id)) err(`specs/site-intent.md: 2절 코스 표에 지금 없는 교과서가 있어요: ${id}`); }
+    const m = t.match(/(\d+)개 코스 모두/); if (!m) err('specs/site-intent.md: 2절의 「N개 코스 모두」 줄을 못 찾았어요'); else if (+m[1] !== nC) err(`specs/site-intent.md: 「${m[1]}개 코스 모두」 ≠ 실제 교과서 ${nC}개`); } }
+// 11/15: 제목 바로 아래에 윗줄 없이 들여쓴 목록 줄 — 목록의 윗줄만 지우고 딸린 줄을 남긴 흔적이에요.
+//   수학을 지울 때 HANDOFF.md 6절의 「수학: …」 줄만 지워 그 아래 세 줄이 남았어요(LESSON.md R15). 기록용 폴더(archive · qa-reports)는 보지 않아요
+{ const walkMd = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.name.startsWith('.') || ['node_modules', 'archive', 'qa-reports'].includes(e.name) ? [] : e.isDirectory() ? walkMd(path.join(d, e.name)) : e.name.endsWith('.md') ? [path.join(d, e.name)] : []);
+  for (const f of walkMd(ROOT)) { const L = fs.readFileSync(f, 'utf8').split('\n'); let fence = false;
+    L.forEach((line, i) => { if (/^\s*```/.test(line)) { fence = !fence; return; } if (fence || !/^\s{2,}[-*] /.test(line)) return;
+      let j = i - 1; while (j >= 0 && !L[j].trim()) j--;
+      if (j < 0 || /^#{1,6} /.test(L[j])) err(`${path.relative(ROOT, f)}:${i + 1}: 제목 바로 아래에 들여쓴 목록 줄이 있어요(윗줄 없이 딸린 줄만 남음) — 윗줄을 지웠으면 딸린 줄도 지우거나, 들여쓰기를 없애요`); }); } }
+// 11/15: specs/README.md(지시서 목록)가 specs/ 의 모든 .md 를 적고 있는지, 적힌 파일이 있는지 —
+//   목록이 문서 여덟만 적은 채 「시행 중 · 구현 전 · 덱 채우기 전」 으로 낡아 있었어요(LESSON.md R15). 지시서를 더하거나 지우면 목록도 같이 고쳐요
+{ const dir = path.join(ROOT, 'specs'), t = fs.readFileSync(path.join(dir, 'README.md'), 'utf8');
+  const all = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? all(path.join(d, e.name)) : e.name.endsWith('.md') ? [path.relative(dir, path.join(d, e.name)).split(path.sep).join('/')] : []);
+  for (const rel of all(dir)) if (rel !== 'README.md' && !t.includes('`' + rel + '`')) err('specs/README.md: 목록에 없는 문서: `' + rel + '` — 지시서를 더하면 목록에도 한 줄 적어요');
+  for (const m of t.matchAll(/^\| `([^`]+\.md)` \|/gm)) if (!fs.existsSync(path.join(dir, m[1]))) err('specs/README.md: 목록에 적힌 `' + m[1] + '` 파일이 없어요 — 지운 지시서는 목록에서도 빼요'); }
 // v2.48.0: 교과서 사이 링크(href="../<코스>/…")가 있는 코스 폴더를 가리키는지 — 수학 교과서를 지울 때 다른 교과서 23곳에 수학 링크가 있었어요(LESSON.md U15).
 //   코스를 지우거나 폴더 이름을 바꾸면 여기서 잡혀요
 { const have = new Set(courses()); for (const id of courses()) for (const f of ['content.js', 'book.js']) { const fp = path.join(ROOT, 'courses', id, f); if (!fs.existsSync(fp)) continue;
