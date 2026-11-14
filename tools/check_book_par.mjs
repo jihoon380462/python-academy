@@ -7,7 +7,9 @@
 import fs from 'fs'; import os from 'os'; import path from 'path'; import { spawn } from 'child_process';
 const R = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const N = Math.max(1, +process.argv[2] || os.cpus().length);
-const HEAVY = ['data', 'ml', 'python', 'llm', 'debug', 'cs', 'algo', 'oop', 'ai', 'os', 'asm', 'api', 'vim']; // CI 기록(v2.37.0)에서 오래 걸린 순
+// CI 기록에서 오래 걸린 순(11/15 PR #196 실행, 초): data 97.5 · ml 88.9 · python 58.4 · llm 47.3 · vim 33.5 · files 26.9 · auto 22.4 · debug 19.8 · asm 12.1 ·
+//   api 11.9 · cs 11.1 · os 8.7 · algo 7.9 · ai 4.8 · terminal-git 3.7 · oop 3.6 · github 3.3 · sql 3.1 · linux 1.2 · web 0.2. 예전 목록(v2.37.0)은 vim · files · auto 가 뒤에 있어 끝에 셋이 남아 기다렸어요.
+const HEAVY = ['data', 'ml', 'python', 'llm', 'vim', 'files', 'auto', 'debug', 'asm', 'api', 'cs', 'os', 'algo', 'ai', 'terminal-git', 'oop', 'github', 'sql', 'linux', 'web'];
 const all = fs.readdirSync(R + '/courses').filter(d => fs.existsSync(`${R}/courses/${d}/book.js`));
 const queue = [...HEAVY.filter(c => all.includes(c)), ...all.filter(c => !HEAVY.includes(c))];
 let fails = 0; let running = 0; const t0 = Date.now();
